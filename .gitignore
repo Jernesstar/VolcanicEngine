@@ -1,0 +1,13 @@
+# VS and VS Code configuration
+.vscode/
+.vs/
+**.sln
+**.vcxproj*
+
+# Exes and intermediates
+/bin/
+/obj/
+
+# GNU Makefiles
+Makefile
+**.make

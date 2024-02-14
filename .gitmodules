@@ -1,0 +1,9 @@
+[submodule "Saddle/vendor/glfw"]
+	path = Saddle/vendor/glfw
+	url = https://github.com/glfw/glfw.git
+[submodule "Saddle/vendor/glm"]
+	path = Saddle/vendor/glm
+	url = https://github.com/g-truc/glm.git
+[submodule "Saddle/vendor/imgui"]
+	path = Saddle/vendor/imgui
+	url = https://github.com/ocornut/imgui.git
