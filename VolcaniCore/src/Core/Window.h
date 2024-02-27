@@ -5,13 +5,15 @@
 
 #include "Defines.h"
 
-namespace Volcanic {
+namespace VolcaniCore {
 
 class Window {
 public:
     Window();
+    Window(uint32_t width, uint32_t height);
 
 private:
+    uint32_t m_Width, m_Height;
     GLFWwindow* m_Window;
 };
 

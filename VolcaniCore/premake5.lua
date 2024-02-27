@@ -1,4 +1,4 @@
-project "Volcanic"
+project "VolcaniCore"
     kind "StaticLib"
     language "C++"
     cppdialect "C++20"
