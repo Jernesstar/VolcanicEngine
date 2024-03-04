@@ -9,7 +9,7 @@ namespace VolcaniCore {
 
 class Window {
 public:
-    Window();
+    Window() = default;
     Window(uint32_t width, uint32_t height);
 
 private:

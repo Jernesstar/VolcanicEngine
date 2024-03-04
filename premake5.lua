@@ -8,7 +8,7 @@ Includes = {}
 Includes["glm"] = "%{VendorPaths.glm}"
 Includes["glfw"] = "%{VendorPaths.glfw}/include"
 
-workspace "Volcanic"
+workspace "VolcaniCore"
     architecture "x64"
 
     configurations
@@ -19,5 +19,6 @@ workspace "Volcanic"
     }
 
 include "VolcaniCore/config/glfw"
+-- include "VolcaniCore/config/imgui"
 include "VolcaniCore"
 include "Sandbox"
