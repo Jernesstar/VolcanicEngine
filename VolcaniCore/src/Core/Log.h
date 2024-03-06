@@ -6,33 +6,33 @@
 namespace VolcaniCore {
 class Log { 
 public:
-    template<typename... Args>
-    static void Info(const std::string& format_string, Args&&... args)
-    {
-        printf("[Info]: ");
-        printf(format_string.c_str(), std::forward<Args>(args)...);
-        printf("\n");
-    }
+	template<typename... Args>
+	static void Info(const std::string& format_string, Args&&... args)
+	{
+		printf("[Info]: ");
+		printf(format_string.c_str(), std::forward<Args>(args)...);
+		printf("\n");
+	}
 
-    template<typename... Args>
-    static void Warning(const std::string& format_string, Args&&... args)
-    {
-        printf("[Warning]: ");
-        printf(format_string.c_str(), std::forward<Args>(args)...);
-        printf("\n");
-    }
+	template<typename... Args>
+	static void Warning(const std::string& format_string, Args&&... args)
+	{
+		printf("[Warning]: ");
+		printf(format_string.c_str(), std::forward<Args>(args)...);
+		printf("\n");
+	}
 
-    template<typename... Args>
-    static void Error(const std::string& format_string, Args&&... args)
-    {
-        printf("[Error]: ");
-        printf(format_string.c_str(), std::forward<Args>(args)...);
-        printf("\n");
-    }
+	template<typename... Args>
+	static void Error(const std::string& format_string, Args&&... args)
+	{
+		printf("[Error]: ");
+		printf(format_string.c_str(), std::forward<Args>(args)...);
+		printf("\n");
+	}
 
 private:
-    Log() = delete;
-    ~Log() = delete; 
+	Log() = delete;
+	~Log() = delete; 
 };
 
 }

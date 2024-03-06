@@ -5,8 +5,7 @@ project "glfw"
     targetdir ("%{wks.location}/bin")
     objdir ("%{wks.location}/obj")
 
-    files
-    {
+    files {
         "%{VendorPaths.glfw}/src/context.c",
         "%{VendorPaths.glfw}/src/init.c",
         "%{VendorPaths.glfw}/src/input.c",
@@ -22,16 +21,13 @@ project "glfw"
         "%{VendorPaths.glfw}/src/osmesa_context.c"
     }
 
-    includedirs
-    {
+    includedirs {
         "%{VendorPaths.glfw}/src"
     }
 
     filter "system:windows"
         systemversion "latest"
-
-        files
-        {
+        files {
             "%{VendorPaths.glfw}/src/win32_init.c",
             "%{VendorPaths.glfw}/src/win32_module.c",
             "%{VendorPaths.glfw}/src/win32_joystick.c",
@@ -42,15 +38,12 @@ project "glfw"
             "%{VendorPaths.glfw}/src/wgl_context.c"
         }
 
-        defines 
-        { 
-            "_GLFW_WIN32",
-            "_CRT_SECURE_NO_WARNINGS"
+        defines {
+            "_GLFW_WIN32"
         }
-    
+
     filter "system:linux"
-        files
-        {
+        files {
             "%{VendorPaths.glfw}/src/x11_init.c",
             "%{VendorPaths.glfw}/src/x11_monitor.c",
             "%{VendorPaths.glfw}/src/x11_window.c",
@@ -60,10 +53,9 @@ project "glfw"
             "%{VendorPaths.glfw}/src/posix_thread.c",
             "%{VendorPaths.glfw}/src/posix_poll.c",
             "%{VendorPaths.glfw}/src/linux_joystick.c",
-            "%{VendorPaths.glfw}/src/glx_context.c",
+            "%{VendorPaths.glfw}/src/glx_context.c"
         }
 
-        defines
-        {
+        defines {
             "_GLFW_X11"
         }

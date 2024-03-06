@@ -6,22 +6,19 @@ project "Sandbox"
     targetdir ("%{wks.location}/bin")
     objdir ("%{wks.location}/obj")
 
-    files
-    {
+    files {
         "src/**.h",
         "src/**.cpp",
     }
 
-    includedirs
-    {
+    includedirs {
         "%{wks.location}/VolcaniCore/src",
 
         "%{Includes.glfw}",
         "%{Includes.glm}",
     }
 
-    links
-    {
+    links {
         "VolcaniCore",
         "glfw",
     }
@@ -29,14 +26,12 @@ project "Sandbox"
     filter "system:windows"
         systemversion "latest"
 
-        links
-        {
+        links {
             "gdi32"
         }
 
     filter "system:linux"
-        links
-        {
+        links {
             "pthread",
             "dl"
         }

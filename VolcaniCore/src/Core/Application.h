@@ -6,10 +6,12 @@ namespace VolcaniCore {
 
 class Application {
 public:
-    Application();
+	Application();
+
+	static void Init();
 
 private:
-    Window m_Window;
+	Window m_Window;
 };
 
 

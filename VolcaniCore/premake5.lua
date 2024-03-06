@@ -6,20 +6,17 @@ project "VolcaniCore"
     targetdir ("%{wks.location}/bin")
     objdir ("%{wks.location}/obj")
 
-    files
-    {
+    files {
         "src/**.h",
         "src/**.cpp",
     }
 
-    includedirs
-    {
+    includedirs {
         "src",
 
         "%{Includes.glfw}",
+        "%{Includes.glad}",
         "%{Includes.glm}",
-        "%{Includes.imgui}",
-        "%{Includes.imgui}/imgui",
     }
 
     filter "system:windows"

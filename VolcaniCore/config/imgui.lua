@@ -6,8 +6,7 @@ project "imgui"
     targetdir ("%{wks.location}/bin")
     objdir ("%{wks.location}/obj")
 
-    files
-    {
+    files {
         "%{VendorPaths.imgui}/*.h",
         "%{VendorPaths.imgui}/*.cpp",
 
@@ -15,8 +14,7 @@ project "imgui"
         "%{VendorPaths.imgui}/backends/imgui_impl_opengl3.cpp",
     }
 
-    includedirs
-    {
+    includedirs {
         "%{Includes.imgui}",
         "%{Includes.imgui}/imgui",
         "%{Includes.glfw}"
