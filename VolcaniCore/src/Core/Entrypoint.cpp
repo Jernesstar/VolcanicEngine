@@ -4,6 +4,10 @@ using namespace VolcaniCore;
 
 int main(int argc, char** argv)
 {
-	Application* app = new Application();
+	Application::Init();
 
+	Application* app = new Application();
+	app->Run();
+
+	Applciation::Close();
 }

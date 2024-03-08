@@ -12,6 +12,8 @@ public:
 
 private:
 	Window m_Window;
+
+	Renderer m_Renderer;
 };
 
 

@@ -2,17 +2,21 @@
 
 namespace VolcaniCore {
 
-enum class RenderAPI { OpenGL, Vulkan, bgfx };
+class APIRenderer {
+protected:
+    APIRenderer():
+    ~APIRenderer();
+};
 
 class Renderer {
 public:
-	virtual void Init() = 0;
-	virtual void Close() = 0;
-	virtual void Render() = 0;
+	void Init();
+	void Close();
+	void Render();
 
 protected:
-	Renderer();
-	~Renderer();
+	Renderer() = delete;
+	~Renderer() = delete;
 };
 
 }
