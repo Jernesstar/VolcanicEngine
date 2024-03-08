@@ -23,8 +23,14 @@ public:
 	bool IsOpen() const { return !glfwWindowShouldClose(m_Window); }
 
 private:
+	GLFWwindow* GetNativeWindow() const { return m_Window; }
+
 	uint32_t m_Width, m_Height;
 	GLFWwindow* m_Window;
+
+	friend class WindowManager;
+	friend class EventSystem;
+	friend class Input;
 };
 
 }

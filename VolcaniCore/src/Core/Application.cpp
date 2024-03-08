@@ -26,4 +26,9 @@ void Application::Init() {
 	Renderer::Init();
 }
 
+void Application::Close() {
+	glfwTerminate();
+	exit(0);
+}
+
 }

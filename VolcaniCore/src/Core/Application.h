@@ -10,7 +10,7 @@ public:
 
 	static void Init();
 	static void Run() { while(true) { } };
-	static void Close() { };
+	static void Close();
 
 private:
 	WindowManager m_WindowManager;
