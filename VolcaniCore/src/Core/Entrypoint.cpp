@@ -9,5 +9,5 @@ int main(int argc, char** argv)
 	Application* app = new Application();
 	app->Run();
 
-	Applciation::Close();
+	Application::Close();
 }

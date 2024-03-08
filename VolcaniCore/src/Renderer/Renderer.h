@@ -4,15 +4,15 @@ namespace VolcaniCore {
 
 class APIRenderer {
 protected:
-    APIRenderer():
-    ~APIRenderer();
+	APIRenderer();
+	~APIRenderer();
 };
 
 class Renderer {
 public:
-	void Init();
-	void Close();
-	void Render();
+	static void Init() { };
+	static void Close();
+	static void Render();
 
 protected:
 	Renderer() = delete;

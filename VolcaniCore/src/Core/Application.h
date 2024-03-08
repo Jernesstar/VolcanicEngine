@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Window.h"
+#include "WindowManager.h"
 
 namespace VolcaniCore {
 
@@ -9,11 +9,11 @@ public:
 	Application();
 
 	static void Init();
+	static void Run() { while(true) { } };
+	static void Close() { };
 
 private:
-	Window m_Window;
-
-	Renderer m_Renderer;
+	WindowManager m_WindowManager;
 };
 
 

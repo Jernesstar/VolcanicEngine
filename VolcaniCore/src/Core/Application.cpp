@@ -6,11 +6,12 @@
 #include "GLFW/glfw3.h"
 
 #include "Assert.h"
+#include "Renderer/Renderer.h"
 
 namespace VolcaniCore {
 
 Application::Application() {
-	
+	m_WindowManager.CreateWindow(800, 600);
 }
 
 void Application::Init() {
