@@ -3,10 +3,9 @@
 #include <glad/glad.h>
 
 #include "Core/Application.h"
+#include "Core/InputHandler.h"
 #include "Core/Assert.h"
-#include "Core/Input.h"
 #include "Core/Log.h"
-
 
 #define GET_CALLBACKS(TEvent) \
 template<> \
@@ -19,6 +18,7 @@ namespace VolcaniCore {
 
 void EventSystem::Init(Ref<Window> window)
 {
+    m_LastRegisteredWindow = window;
     auto w = window->GetNativeWindow();
     VOLCANICORE_ASSERT(window);
 
@@ -161,17 +161,23 @@ void EventSystem::MouseScrolledCallback(GLFWwindow* window, double x_scroll, dou
 
 void EventSystem::MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 {
-    // if(action == GLFW_PRESS)
-    // {
-    //     MouseButtonPressedEvent event((MouseCode)button, Input::GetMouseX(), Input::GetMouseY());
-    //     Dispatch(event);
-    // }
+    if(action == GLFW_PRESS)
+    {
+        MouseButtonPressedEvent event(
+            (MouseCode)button, m_LastRegisteredWindow->GetInput()->GetMouseX(),
+            m_LastRegisteredWindow->GetInput()->GetMouseY()
+        );
+        Dispatch(event);
+    }
 
-    // if(action == GLFW_RELEASE)
-    // {
-    //     MouseButtonReleasedEvent event((MouseCode)button, Input::GetMouseX(), Input::GetMouseY());
-    //     Dispatch(event);
-    // }
+    if(action == GLFW_RELEASE)
+    {
+        MouseButtonReleasedEvent event(
+            (MouseCode)button, m_LastRegisteredWindow->GetInput()->GetMouseX(),
+            m_LastRegisteredWindow->GetInput()->GetMouseY()
+        );
+        Dispatch(event);
+    }
 }
 
 void EventSystem::WindowResizedCallback(GLFWwindow* window, int width, int height)

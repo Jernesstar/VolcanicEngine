@@ -5,9 +5,10 @@
 
 namespace VolcaniCore {
 
-Ref<Window> WindowManager::CreateWindow(uint32_t width, uint32_t height) {
+uint32_t WindowManager::CreateWindow(uint32_t width, uint32_t height) {
 	auto window = CreateRef<Window>(width, height);
 	m_Windows.push_back(window);
+	index++;
 
 	EventSystem::Init(window);
 
@@ -17,7 +18,11 @@ Ref<Window> WindowManager::CreateWindow(uint32_t width, uint32_t height) {
 		Application::Close();
 	});
 
-	return window;
+	return index;
+}
+
+Ref<Window> WindowManager::GetWindow(uint32_t index) {
+	return m_Windows[index];
 }
 
 }
