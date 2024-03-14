@@ -1,7 +1,7 @@
 #include "WindowManager.h"
 
-#include "Application.h"
-#include "EventSystem.h"
+#include "Core/Application.h"
+#include "Events/EventSystem.h"
 
 namespace VolcaniCore {
 

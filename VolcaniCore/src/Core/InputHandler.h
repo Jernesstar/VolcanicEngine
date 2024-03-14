@@ -5,14 +5,14 @@
 #include "Codes.h"
 #include "Defines.h"
 
-class Window;
-
 namespace VolcaniCore {
+
+class Window;
 
 class InputHandler {
 public:
-	InputHandler(Window* window);
-	~InputHandler();
+	InputHandler(Window* window) : m_Window(window) { };
+	~InputHandler() = default;
 
 	bool KeyPressed(Key key);
 	bool KeysPressed(Key key1, Key key2);

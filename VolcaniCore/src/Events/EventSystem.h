@@ -67,7 +67,7 @@ private:
     inline static Callbacks<ApplicationUpdatedEvent>  ApplicationUpdatedEventCallbacks;
 
 private:
-    static Ref<Window> m_LastRegisteredWindow;
+    inline static Ref<Window> m_LastRegisteredWindow;
 
     template<typename TEvent>
     static void Dispatch(TEvent& event)
