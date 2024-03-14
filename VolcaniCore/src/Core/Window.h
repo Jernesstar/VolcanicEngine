@@ -5,8 +5,6 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
-#include "InputHandler.h"
-
 namespace VolcaniCore {
 
 class Window {
@@ -24,19 +22,14 @@ public:
 
 	bool IsOpen() const { return !glfwWindowShouldClose(m_NativeWindow); }
 
-	InputHandler* GetInput() { return m_InputHandler; }
-
 private:
 	GLFWwindow* GetNativeWindow() const { return m_NativeWindow; }
 
 	uint32_t m_Width, m_Height;
 	GLFWwindow* m_NativeWindow;
 
-	InputHandler* m_InputHandler;
-
-	friend class WindowManager;
 	friend class EventSystem;
-	friend class InputHandler;
+	friend class Input;
 };
 
 }

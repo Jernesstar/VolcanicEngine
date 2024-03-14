@@ -24,7 +24,7 @@ using Callbacks = std::unordered_map<VolcaniCore::UUID, EventCallback<TEvent>>;
 
 class EventSystem {
 public:
-    static void Init(Ref<Window> window);
+    static void Init();
     static void PollEvents() { glfwPollEvents(); }
 
     template<typename TEvent>
@@ -67,8 +67,6 @@ private:
     inline static Callbacks<ApplicationUpdatedEvent>  ApplicationUpdatedEventCallbacks;
 
 private:
-    inline static Ref<Window> m_LastRegisteredWindow;
-
     template<typename TEvent>
     static void Dispatch(TEvent& event)
     {
