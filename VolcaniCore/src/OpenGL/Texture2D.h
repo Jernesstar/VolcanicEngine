@@ -4,9 +4,11 @@
 
 #include <glm/vec2.hpp>
 
+#include "Renderer/Texture.h"
+
 namespace VolcaniCore {
 
-class Texture2D {
+class Texture2D : public Texture {
 public:
     const uint32_t InternalFormat, DataFormat;
 

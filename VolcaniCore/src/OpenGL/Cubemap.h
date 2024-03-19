@@ -3,7 +3,7 @@
 #include <string>
 #include <cstdint>
 
-#include "VertexArray.h"
+#include "Renderer/Cubemap.h"
 
 namespace VolcaniCore {
 
