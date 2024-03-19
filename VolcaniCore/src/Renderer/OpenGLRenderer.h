@@ -15,8 +15,14 @@ namespace Saddle {
 
 class Renderer {
 public:
-	static void Init();
-	static void Clear(const glm::vec4& color = { 0.0f, 0.0f, 0.0f, 0.0f });
+	void Init() = 0;
+	void ClearScreen() = 0;
+
+	void RenderMesh(Ref<Mesh> mesh) = 0;
+	void RenderCubemap(Ref<Cubemap> cubemap) = 0;
+	void RenderQuad(Ref<Quad> quad, Transform t) = 0;
+	void RenderText(Ref<Text> text, Transform t) = 0;
+	void RenderTexture(Ref<Texture> texture, Transform t) = 0;
 
 private:
 	Renderer() = delete;
