@@ -8,3 +8,6 @@
 	path = VolcaniCore/vendor/glad
 	url = https://github.com/Dav1dde/glad.git
 	branch = c
+[submodule "VolcaniCore/vendor/stb_image"]
+	path = VolcaniCore/vendor/stb_image
+	url = https://github.com/Jernesstar/stb_image
