@@ -1,6 +1,8 @@
 #pragma once
 
-#include "WindowManager.h"
+#include "Defines.h"
+#include "Window.h"
+#include "Time.h"
 
 namespace VolcaniCore {
 
@@ -9,11 +11,21 @@ public:
 	Application();
 
 	static void Init();
-	static void Run() { while(true) { } };
+	static void Run();
 	static void Close();
 
+	Ref<Window> GetWindow() { return m_Window; }
+
 private:
-	WindowManager m_WindowManager;
+	Ref<Window> m_Window;
+	inline static Application* s_Instance;
+    inline static TimePoint s_LastFrame{ Time::GetTime() };
+    inline static TimeStep s_TimeStep;
+
+	static Application* Get() { return s_Instance; }
+
+	friend class EventSystem;
+	friend class Input;
 };
 
 

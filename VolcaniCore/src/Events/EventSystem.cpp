@@ -3,8 +3,8 @@
 #include <glad/glad.h>
 
 #include "Core/Application.h"
-#include "Core/InputHandler.h"
 #include "Core/Assert.h"
+#include "Core/Input.h"
 #include "Core/Log.h"
 
 #define GET_CALLBACKS(TEvent) \
@@ -16,21 +16,21 @@ Callbacks<TEvent>& EventSystem::GetCallbacks<TEvent>() \
 
 namespace VolcaniCore {
 
-void EventSystem::Init(Ref<Window> window)
+void EventSystem::Init()
 {
-    m_LastRegisteredWindow = window;
-    auto w = window->GetNativeWindow();
+    GLFWwindow* window = Application::Get()->GetWindow()->GetNativeWindow();
+
     VOLCANICORE_ASSERT(window);
 
     glfwSetErrorCallback(ErrorCallback);
-    glfwSetKeyCallback(w, KeyCallback);
-    glfwSetCharCallback(w, KeyCharCallback);
-    glfwSetCursorPosCallback(w, MouseMovedCallback);
-    glfwSetScrollCallback(w, MouseScrolledCallback);
-    glfwSetMouseButtonCallback(w, MouseButtonCallback);
-    glfwSetWindowPosCallback(w, WindowMovedCallback);
-    glfwSetWindowSizeCallback(w, WindowResizedCallback);
-    glfwSetWindowCloseCallback(w, WindowClosedCallback);
+    glfwSetKeyCallback(window, KeyCallback);
+    glfwSetCharCallback(window, KeyCharCallback);
+    glfwSetCursorPosCallback(window, MouseMovedCallback);
+    glfwSetScrollCallback(window, MouseScrolledCallback);
+    glfwSetMouseButtonCallback(window, MouseButtonCallback);
+    glfwSetWindowPosCallback(window, WindowMovedCallback);
+    glfwSetWindowSizeCallback(window, WindowResizedCallback);
+    glfwSetWindowCloseCallback(window, WindowClosedCallback);
 }
 
 GET_CALLBACKS(KeyPressedEvent);
@@ -163,19 +163,13 @@ void EventSystem::MouseButtonCallback(GLFWwindow* window, int button, int action
 {
     if(action == GLFW_PRESS)
     {
-        MouseButtonPressedEvent event(
-            (MouseCode)button, m_LastRegisteredWindow->GetInput()->GetMouseX(),
-            m_LastRegisteredWindow->GetInput()->GetMouseY()
-        );
+        MouseButtonPressedEvent event((MouseCode)button, Input::GetMouseX(), Input::GetMouseY());
         Dispatch(event);
     }
 
     if(action == GLFW_RELEASE)
     {
-        MouseButtonReleasedEvent event(
-            (MouseCode)button, m_LastRegisteredWindow->GetInput()->GetMouseX(),
-            m_LastRegisteredWindow->GetInput()->GetMouseY()
-        );
+        MouseButtonReleasedEvent event((MouseCode)button, Input::GetMouseX(), Input::GetMouseY());
         Dispatch(event);
     }
 }

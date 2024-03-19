@@ -6,12 +6,15 @@
 #include "GLFW/glfw3.h"
 
 #include "Assert.h"
+#include "Time.h"
 #include "Renderer/Renderer.h"
+#include "Events/Events.h"
 
 namespace VolcaniCore {
 
 Application::Application() {
-	m_WindowManager.CreateWindow(800, 600);
+	m_Window = CreateRef<Window>(800, 600);
+	s_Instance = this;
 }
 
 void Application::Init() {
@@ -24,6 +27,22 @@ void Application::Init() {
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
 	Renderer::Init();
+}
+
+void Application::Run() {
+	while(s_Instance->m_Window->IsOpen())
+    {
+        TimePoint time = Time::GetTime();
+        TimeStep ts = time - s_LastFrame;
+        s_LastFrame = time;
+        s_TimeStep = ts;
+
+        ApplicationUpdatedEvent event(ts);
+        EventSystem::Dispatch(event);
+        EventSystem::PollEvents();
+
+        s_Instance->m_Window->Update();
+    }
 }
 
 void Application::Close() {
