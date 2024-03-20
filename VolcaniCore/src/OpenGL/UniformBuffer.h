@@ -4,7 +4,7 @@
 
 #include "BufferLayout.h"
 
-namespace VolcaniCore {
+namespace VolcaniCore::OpenGL {
 
 class UniformBuffer {
 public:

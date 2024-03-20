@@ -7,7 +7,7 @@
 
 #include "Core/Log.h"
 
-namespace VolcaniCore {
+namespace VolcaniCore::OpenGL {
 
 VertexArray::VertexArray()
 {

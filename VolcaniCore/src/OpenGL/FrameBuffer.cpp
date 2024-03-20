@@ -1,9 +1,10 @@
 #include "FrameBuffer.h"
 
+#include "Core/Assert.h"
+
 #include <glad/glad.h>
 
-namespace VolcaniCore
-{
+namespace VolcaniCore::OpenGL {
 
 FrameBuffer::FrameBuffer(const AttachmentSpecification& specs)
 {

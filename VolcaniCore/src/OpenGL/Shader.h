@@ -13,7 +13,7 @@
 
 #include "Texture2D.h"
 
-namespace VolcaniCore {
+namespace VolcaniCore::OpenGL {
 
 enum class ShaderType { Vertex, Geometry, Fragment, Compute, Unknown };
 

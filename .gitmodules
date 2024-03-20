@@ -11,3 +11,12 @@
 [submodule "VolcaniCore/vendor/stb_image"]
 	path = VolcaniCore/vendor/stb_image
 	url = https://github.com/Jernesstar/stb_image
+[submodule "VolcaniCore/vendor/freetype"]
+	path = VolcaniCore/vendor/freetype
+	url = https://github.com/freetype/freetype.git
+[submodule "VolcaniCore/vendor/assimp"]
+	path = VolcaniCore/vendor/assimp
+	url = https://github.com/assimp/assimp.git
+[submodule "VolcaniCore/vendor/imgui"]
+	path = VolcaniCore/vendor/imgui
+	url = https://github.com/ocornut/imgui.git

@@ -7,7 +7,7 @@
 #include "Core/Assert.h"
 #include "Core/Utils.h"
 
-namespace VolcaniCore {
+namespace VolcaniCore::OpenGL {
 
 Shader::ShaderFile FindShaderFile(const std::string& path);
 uint32_t CreateProgram(const std::vector<Shader::ShaderFile>& shader_files);

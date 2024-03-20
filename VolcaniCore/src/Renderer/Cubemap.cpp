@@ -11,7 +11,7 @@ Ref<Cubemap> Cubemap::Create(const std::string& cubemap_folder) {
 
 	switch(api) {
 		case RenderAPI::OpenGL:
-			return CreateRef<VolcaniCore::OpenGL::Cubemap>(cubemap_folder);
+			return CreateRef<OpenGL::Cubemap>(cubemap_folder);
 			break;
 	}
 }

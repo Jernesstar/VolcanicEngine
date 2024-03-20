@@ -7,10 +7,10 @@
 #include "Core/Assert.h"
 #include "Core/Utils.h"
 
-namespace VolcaniCore {
+namespace VolcaniCore::OpenGL {
 
 Texture2D::Texture2D(uint32_t width, uint32_t height)
-    : InternalFormat(GL_RGBA8), DataFormat(GL_RGBA), m_Slot(-1), m_Width(width), m_Height(height)
+    : VolcaniCore::Texture(width, height), InternalFormat(GL_RGBA8), DataFormat(GL_RGBA), m_Slot(-1)
 {
     glCreateTextures(GL_TEXTURE_2D, 1, &m_TextureID);
     glTextureStorage2D(m_TextureID, 1, InternalFormat, m_Width, m_Height);
@@ -23,7 +23,7 @@ Texture2D::Texture2D(uint32_t width, uint32_t height)
 }
 
 Texture2D::Texture2D(const std::string& path)
-    : m_Path(path), InternalFormat(GL_RGBA8), DataFormat(GL_RGBA), m_Slot(-1)
+    : VolcaniCore::Texture(path), InternalFormat(GL_RGBA8), DataFormat(GL_RGBA), m_Slot(-1)
 {
     unsigned char* pixel_data = Utils::ReadImage(path.c_str(), m_Width, m_Height, 4, true);
     

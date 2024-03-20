@@ -1,15 +1,20 @@
 #pragma once
 
 #include "Renderer/APIRenderer.h"
+#include "Renderer/Mesh.h"
 
-namespace VolcaniCore {
+#include "VertexArray.h"
+#include "VertexBuffer.h"
 
-class OpenGLRenderer : public APIRenderer {
+namespace VolcaniCore::OpenGL {
+
+class Renderer : public VolcaniCore::APIRenderer {
 public:
-	OpenGLRenderer();
-	~OpenGLRenderer();
+	Renderer();
+	~Renderer();
 
 	void Init();
+	void Close();
 	void ClearScreen();
 
 	void RenderMesh(Ref<Mesh> mesh);
@@ -17,6 +22,10 @@ public:
 	void RenderQuad(Ref<Quad> quad, Transform t);
 	void RenderText(Ref<Text> text, Transform t);
 	void RenderTexture(Ref<Texture> texture, Transform t);
+
+private:
+    VertexBuffer* s_CubemapBuffer;
+    VertexArray* s_CubemapArray;
 };
 
 }

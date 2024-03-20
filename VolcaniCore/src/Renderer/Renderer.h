@@ -14,6 +14,7 @@ public:
 	static void Close();
 
 	static RenderAPI GetRenderAPI() { return m_API; }
+	static Ref<APIRenderer> GetRenderer() { return m_BackendRenderer; }
 
 private:
 	static RenderAPI m_API;

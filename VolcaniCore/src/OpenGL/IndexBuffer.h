@@ -1,6 +1,6 @@
 #pragma once
 
-namespace VolcaniCore {
+namespace VolcaniCore::OpenGL {
 
 class IndexBuffer {
 public:

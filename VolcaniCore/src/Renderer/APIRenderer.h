@@ -14,6 +14,7 @@ namespace VolcaniCore {
 class APIRenderer {
 public:
 	virtual void Init() = 0;
+	virtual void Close() = 0;
 	virtual void ClearScreen() = 0;
 
 	virtual void RenderMesh(Ref<Mesh> mesh) = 0;

@@ -6,7 +6,7 @@
 #include "IndexBuffer.h"
 #include "BufferLayout.h"
 
-namespace VolcaniCore {
+namespace VolcaniCore::OpenGL {
 
 class VertexArray {
 public:

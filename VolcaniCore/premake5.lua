@@ -17,6 +17,7 @@ project "VolcaniCore"
         "%{Includes.glfw}",
         "%{Includes.glad}",
         "%{Includes.glm}",
+        "%{Includes.stb_image}",
     }
 
     filter "system:windows"

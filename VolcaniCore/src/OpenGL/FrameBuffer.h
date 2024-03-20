@@ -2,7 +2,7 @@
 
 #include "Core/Application.h"
 
-namespace VolcaniCore {
+namespace VolcaniCore::OpenGL {
 
 class AttachmentSpecification;
 

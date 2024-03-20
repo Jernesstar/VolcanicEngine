@@ -6,9 +6,9 @@
 
 #include "Renderer/Texture.h"
 
-namespace VolcaniCore {
+namespace VolcaniCore::OpenGL {
 
-class Texture2D : public Texture {
+class Texture2D : public VolcaniCore::Texture {
 public:
     const uint32_t InternalFormat, DataFormat;
 
