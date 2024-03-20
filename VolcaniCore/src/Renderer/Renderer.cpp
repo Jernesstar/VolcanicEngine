@@ -4,7 +4,7 @@
 
 namespace VolcaniCore {
 
-Renderer::Init(RenderAPI api) {
+void Renderer::Init(RenderAPI api) {
 	if(api == RenderAPI::OpenGL)
 		m_BackendRenderer = CreateRef<OpenGLRenderer>();
 

@@ -14,6 +14,8 @@ public:
 	static void Run();
 	static void Close();
 
+	static Application* Get() { return s_Instance; }
+
 	Ref<Window> GetWindow() { return m_Window; }
 
 private:
@@ -21,11 +23,6 @@ private:
 	inline static Application* s_Instance;
     inline static TimePoint s_LastFrame{ Time::GetTime() };
     inline static TimeStep s_TimeStep;
-
-	static Application* Get() { return s_Instance; }
-
-	friend class EventSystem;
-	friend class Input;
 };
 
 

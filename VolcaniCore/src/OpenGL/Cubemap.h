@@ -1,13 +1,10 @@
 #pragma once
 
-#include <string>
-#include <cstdint>
-
 #include "Renderer/Cubemap.h"
 
-namespace VolcaniCore {
+namespace VolcaniCore::OpenGL {
 
-class Cubemap {
+class Cubemap : public VolcaniCore::Cubemap {
 public:
     Cubemap(const std::string& cubemap_folder);
     Cubemap(const std::vector<std::string>& faces);

@@ -13,8 +13,11 @@ public:
 	static void Init(RenderAPI api);
 	static void Close();
 
+	static RenderAPI GetRenderAPI() { return m_API; }
+
 private:
-	Ref<APIRenderer> m_BackendRenderer;
+	static RenderAPI m_API;
+	static Ref<APIRenderer> m_BackendRenderer;
 
 	Renderer() = delete;
 	~Renderer() = delete;

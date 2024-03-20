@@ -9,10 +9,10 @@
 
 namespace VolcaniCore {
 
-class TransformComponent {
+class Transform {
 public:
-    TransformComponent() = default;
-    TransformComponent(const glm::vec3& translation, const glm::vec3& rotation, const glm::vec3& scale)
+    Transform() = default;
+    Transform(const glm::vec3& translation, const glm::vec3& rotation, const glm::vec3& scale)
         : Translation(translation), Rotation(rotation), Scale(scale) { }
 
     glm::mat4 GetTransform()

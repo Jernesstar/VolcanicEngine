@@ -7,7 +7,7 @@ public:
 	Mesh(const std::string& path);
 	~Mesh();
 
-	virtual void LoadMesh(const std::string& path);0p
+	virtual void LoadMesh(const std::string& path);
 
 	const std::string& GetPath() const { return m_Path; }
 

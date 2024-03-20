@@ -1,18 +1,15 @@
-#pragma once
-
-#include "Application.h"
-
-#include "OpenGL/Cubemap.h"
+#include "Renderer/Cubemap.h"
+#include "Renderer/Renderer.h"
 
 namespace VolcaniCore {
 
-Ref<Cubmap> Cubemap::Create(const std::string& cubemap_folder) {
-	RenderAPI api = Application::Get()->GetRenderAPI();
+Ref<Cubemap> Cubemap::Create(const std::string& cubemap_folder) {
+	RenderAPI api = Renderer::GetRenderAPI();
 
 	switch(api) {
 		case RenderAPI::OpenGL:
-			return CreateRef<
-
+			return CreateRef<VolcaniCore::OpenGL::Cubemap>(cubemap_folder);
+			break;
 	}
 }
 

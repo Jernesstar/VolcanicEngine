@@ -1,4 +1,5 @@
 {
     "editor.detectIndentation": false,
-    "editor.insertSpaces": false
+	"editor.insertSpaces": false,
+	"cmake.sourceDirectory": "/workspaces/VolcanicEngine/VolcaniCore/vendor/glm/test/gtc"
 }

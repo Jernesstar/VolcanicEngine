@@ -1,6 +1,10 @@
 #pragma once
 
+#define GLM_ENABLE_EXPERIMENTAL
+
 #include <memory>
+#include <vector>
+#include <string>
 
 namespace VolcaniCore {
 
