@@ -1,5 +1,8 @@
-#include "Renderer/Cubemap.h"
-#include "Renderer/Renderer.h"
+#include "Cubemap.h"
+
+#include "Renderer.h"
+
+#include "OpenGL/Cubemap.h"
 
 namespace VolcaniCore {
 
@@ -14,7 +17,6 @@ Ref<Cubemap> Cubemap::Create(const std::string& cubemap_folder) {
 }
 
 Ref<Cubemap> Cubemap::Create(const std::vector<std::string>& faces) {
-
 
 }
 
