@@ -35,7 +35,7 @@ class Font {
 //         const Font::Character GetCharacter() const { return m_Character; }
 //         const glm::vec2 GetVertices(uint32_t i) const
 //         {
-//             SADDLE_CORE_ASSERT(i <= 4);
+//             VOLCANICORE_ASSERT(i <= 4);
 //             return m_Vertices[i];
 //         }
 
@@ -53,7 +53,7 @@ class Font {
 //     Font(const std::string& font_path, uint32_t width, uint32_t height);
 //     ~Font();
 
-//     static void Init() { SADDLE_CORE_ASSERT(!FT_Init_FreeType(&s_FT), "Could not initialize FreeType Library"); }
+//     static void Init() { VOLCANICORE_ASSERT(!FT_Init_FreeType(&s_FT), "Could not initialize FreeType Library"); }
 //     static void Close() { FT_Done_FreeType(s_FT); }
 
 //     void SetWidth(uint32_t width) { FT_Set_Pixel_Sizes(m_Face, width, 0); UpdateCharacters(); }
@@ -64,7 +64,7 @@ class Font {
 
 //     const CharacterQuad* GetQuad(char character) const
 //     {
-//         SADDLE_CORE_ASSERT_ARGS(m_Quads.find(character) != m_Quads.end(), "%s is not a valid character!", character);
+//         VOLCANICORE_ASSERT_ARGS(m_Quads.find(character) != m_Quads.end(), "%s is not a valid character!", character);
 //         return m_Quads.at(character);
 //     };
 

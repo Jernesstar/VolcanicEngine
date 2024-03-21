@@ -37,6 +37,6 @@ private:
 
 }
 
-#define VOLCANICORE_LOG_INFO(message, ...) Log::Info(message, ## __VA_ARGS__)
-#define VOLCANICORE_LOG_WARNING(message, ...) Log::Warning(message, ## __VA_ARGS__)
-#define VOLCANICORE_LOG_ERROR(message, ...) Log::Error(message, ## __VA_ARGS__)
+#define VOLCANICORE_LOG_INFO(message, ...) VolcaniCore::Log::Info(message, ## __VA_ARGS__)
+#define VOLCANICORE_LOG_WARNING(message, ...) VolcaniCore::Log::Warning(message, ## __VA_ARGS__)
+#define VOLCANICORE_LOG_ERROR(message, ...) VolcaniCore::Log::Error(message, ## __VA_ARGS__)

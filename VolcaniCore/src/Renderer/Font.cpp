@@ -2,7 +2,7 @@
 
 // #include <stb_image/stb_image.h>
 
-// namespace Saddle {
+// namespace VolcaniCore {
 
 // Font::Font(const std::string& font_path, uint32_t width, uint32_t height)
 //     : FontPath(font_path)
