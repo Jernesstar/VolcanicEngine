@@ -44,6 +44,9 @@ public:
 	Ref<ShaderProgram> Create(const std::vector<std::string>& paths);
 	Ref<ShaderProgram> Create(const std::initializer_list<Shader>& files);
 	Ref<ShaderProgram> Create(const std::string& folder_path, const std::string& name);
+
+	template<typename Derived>
+	Derived* As() const { return (Derived*)(this); }
 };
 
 }

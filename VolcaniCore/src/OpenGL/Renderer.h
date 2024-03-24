@@ -4,14 +4,13 @@
 #include "Renderer/Mesh.h"
 
 #include "VertexArray.h"
-#include "VertexBuffer.h"
 
 namespace VolcaniCore::OpenGL {
 
 class Renderer : public VolcaniCore::APIRenderer {
 public:
 	Renderer();
-	~Renderer();
+	~Renderer() = default;
 
 	void Init();
 	void Close();
@@ -24,8 +23,7 @@ public:
 	void RenderTexture(Ref<Texture> texture, Transform t);
 
 private:
-    VertexBuffer* s_CubemapBuffer;
-    VertexArray* s_CubemapArray;
+    Ptr<VertexArray> s_CubemapArray;
 };
 
 }
