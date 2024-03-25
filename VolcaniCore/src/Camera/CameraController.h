@@ -2,10 +2,11 @@
 
 #include <memory>
 
-#include "Saddle/Renderer/Camera.h" 
-#include "Saddle/Events/Events.h"
-#include "Saddle/Core/Time.h"
-#include "Saddle/Core/Codes.h"
+#include "Camera.h"
+
+#include "Events/Events.h"
+#include "Core/Time.h"
+#include "Core/Codes.h"
 
 namespace VolcaniCore {
 

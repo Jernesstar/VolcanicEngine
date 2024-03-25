@@ -15,13 +15,15 @@ public:
 
 	void Init();
 	void Close();
-	void ClearScreen();
+	void Clear();
 
 	void RenderMesh(Ref<Mesh> mesh);
 	void RenderCubemap(Ref<Cubemap> cubemap);
 	void RenderQuad(Ref<Quad> quad, Transform t);
 	void RenderText(Ref<Text> text, Transform t);
 	void RenderTexture(Ref<Texture> texture, Transform t);
+
+	void DrawIndexed(Ref<VertexArray> vertex_array, uint32_t indices = 0);
 
 private:
     VertexBuffer* s_CubemapBuffer;

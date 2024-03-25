@@ -18,6 +18,7 @@ project "VolcaniCore"
         "%{Includes.glad}",
         "%{Includes.glm}",
         "%{Includes.stb_image}",
+        "%{Includes.imgui}",
     }
 
     filter "system:windows"

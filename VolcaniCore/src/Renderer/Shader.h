@@ -11,7 +11,7 @@
 #include <glm/mat3x3.hpp>
 #include <glm/mat4x4.hpp>
 
-#include "Texture2D.h"
+#include "Texture.h"
 
 namespace VolcaniCore {
 

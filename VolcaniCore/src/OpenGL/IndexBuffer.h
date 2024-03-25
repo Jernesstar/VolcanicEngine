@@ -1,5 +1,7 @@
 #pragma once
 
+#include <glad/glad.h>
+
 namespace VolcaniCore::OpenGL {
 
 class IndexBuffer {

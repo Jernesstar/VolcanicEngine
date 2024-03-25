@@ -15,12 +15,17 @@ project "Sandbox"
         "%{wks.location}/VolcaniCore/src",
 
         "%{Includes.glfw}",
+        "%{Includes.glad}",
         "%{Includes.glm}",
+        "%{Includes.imgui}",
     }
 
     links {
         "VolcaniCore",
         "glfw",
+        "glad",
+        "imgui",
+        "stb_image",
     }
 
     filter "system:windows"

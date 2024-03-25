@@ -5,7 +5,11 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include <OpenGL/Shader.h>
+#include <OpenGL/IndexBuffer.h>
+#include <OpenGL/VertexBuffer.h>
+#include <OpenGL/VertexArray.h>
 #include <OpenGL/UniformBuffer.h>
+#include <OpenGL/Renderer.h>
 
 #include <Core/Application.h>
 #include <Renderer/Renderer.h>
@@ -149,39 +153,39 @@ private:
         glm::rotate(glm::translate(glm::mat4(1.0f), { -1.3f,  1.0f, -1.5f }), glm::radians(20.0f * 9.0f), { 1.0f, 0.3f, 0.5f }),
     };
 
-    BufferLayout l1 =
+    OpenGL::BufferLayout l1 =
     {
-        { "a_Position", BufferDataType::Vec3 },
+        { "a_Position", OpenGL::BufferDataType::Vec3 },
     };
 
-    BufferLayout l2 =
+    OpenGL::BufferLayout l2 =
     {
-        { "a_Position", BufferDataType::Vec3 },
-        { "a_Normal",   BufferDataType::Vec3 },
-        { "a_TextureCoordinate",   BufferDataType::Vec2 },
+        { "a_Position", OpenGL::BufferDataType::Vec3 },
+        { "a_Normal",   OpenGL::BufferDataType::Vec3 },
+        { "a_TextureCoordinate", OpenGL::BufferDataType::Vec2 },
     };
 
-    IndexBuffer* index_buffer = new IndexBuffer(indices);
+    OpenGL::IndexBuffer* index_buffer = new OpenGL::IndexBuffer(indices);
 
-    VertexBuffer* light_buffer = new VertexBuffer(vertices, l1);
-    VertexArray* light_array = new VertexArray(light_buffer, index_buffer);
+    OpenGL::VertexBuffer* light_buffer = new OpenGL::VertexBuffer(vertices, l1);
+    Ref<OpenGL::VertexArray> light_array = CreateRef<OpenGL::VertexArray>(light_buffer, index_buffer);
 
-    VertexBuffer* cube_buffer = new VertexBuffer(cube_vertices, l2);
-    VertexArray* cube_array = new VertexArray(cube_buffer, nullptr);
+    OpenGL::VertexBuffer* cube_buffer = new OpenGL::VertexBuffer(cube_vertices, l2);
+    OpenGL::VertexArray* cube_array = new OpenGL::VertexArray(cube_buffer, nullptr);
 
-    Shader light_shader
+    OpenGL::Shader light_shader
     {
-        { "Sandbox/assets/shaders/Light.glsl.vert", ShaderType::Vertex },
-        { "Sandbox/assets/shaders/Light.glsl.frag", ShaderType::Fragment }
+        { "Sandbox/assets/shaders/Light.glsl.vert", OpenGL::ShaderType::Vertex },
+        { "Sandbox/assets/shaders/Light.glsl.frag", OpenGL::ShaderType::Fragment }
     };
-    Shader cube_shader
+    OpenGL::Shader cube_shader
     {
-        { "Sandbox/assets/shaders/Lighting.glsl.vert", ShaderType::Vertex },
-        { "Sandbox/assets/shaders/Lighting.glsl.frag", ShaderType::Fragment }
+        { "Sandbox/assets/shaders/Lighting.glsl.vert", OpenGL::ShaderType::Vertex },
+        { "Sandbox/assets/shaders/Lighting.glsl.frag", OpenGL::ShaderType::Fragment }
     };
 
-    Texture2D wood{ "Sandbox/assets/images/wood.png" };
-    Texture2D wood_specular{ "Sandbox/assets/images/wood_specular.png" };
+    OpenGL::Texture2D wood{ "Sandbox/assets/images/wood.png" };
+    OpenGL::Texture2D wood_specular{ "Sandbox/assets/images/wood_specular.png" };
 
     StereographicCamera camera{ 75.0f, 0.01f, 100.0f, 1600, 900 };
     CameraController controller{ camera };
@@ -189,7 +193,7 @@ private:
     PointLight pointlights[4];
     SpotLight spotlight;
 
-    UniformBuffer* spot_light;
+    OpenGL::UniformBuffer* spot_light;
 };
 
 LightingDemo::LightingDemo()
@@ -264,22 +268,22 @@ LightingDemo::LightingDemo()
         spotlight.CutoffAngle = glm::radians(12.5f);
         spotlight.OuterCutoffAngle = glm::radians(15.0f);
 
-        spot_light = new UniformBuffer(0, sizeof(SpotLight));
+        spot_light = new OpenGL::UniformBuffer(0, sizeof(SpotLight));
     }
 }
 
 void LightingDemo::OnUpdate(TimeStep ts)
 {
-    ImGui::Begin("Spotlight");
-    {
-        ImGui::SliderFloat("Light.CutoffAngle", &spotlight.CutoffAngle, 0.0f, 3.14159265358979323846264338327950288419716939937510f);
-        ImGui::SliderFloat("Light.OuterCutoffAngle", &spotlight.OuterCutoffAngle, 0.0f, 3.14159265358979323846264338327950288419716939937510f);
-    }
-    ImGui::End();
+    // ImGui::Begin("Spotlight");
+    // {
+    //     ImGui::SliderFloat("Light.CutoffAngle", &spotlight.CutoffAngle, 0.0f, 3.14159265358979323846264338327950288419716939937510f);
+    //     ImGui::SliderFloat("Light.OuterCutoffAngle", &spotlight.OuterCutoffAngle, 0.0f, 3.14159265358979323846264338327950288419716939937510f);
+    // }
+    // ImGui::End();
 
     controller.OnUpdate(ts);
 
-    Renderer::Clear({ 0.0f, 0.0f, 0.0f, 0.0f });
+    Renderer::Clear();
     light_shader.Bind();
     {
         light_shader.SetMat4("u_ViewProj", camera.GetViewProjection());
@@ -287,7 +291,7 @@ void LightingDemo::OnUpdate(TimeStep ts)
         for(uint32_t i = 0; i < 4; i++)
         {
             light_shader.SetVec3("u_Position", pointlights[i].Position);
-            Renderer::DrawIndexed(light_array);
+            Renderer::GetRenderer()->As<OpenGL::Renderer>()->DrawIndexed(light_array);
         }
     }
 
