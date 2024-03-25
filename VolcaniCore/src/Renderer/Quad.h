@@ -1,14 +1,19 @@
 #pragma once
 
-#include <glm/vec3.hpp>
+#include "Core/Defines.h"
+
+#include "Texture.h"
 
 namespace VolcaniCore {
 
 class Quad {
 public:
-	Quad(glm::vec3 color);
+	Quad(Ref<Texture> texture);
 
-	static Ref<Quad> Create(glm::vec3 color);
+	static Ref<Quad> Create(Ref<Texture> texture);
+
+	template<typename Derived>
+	Derived* As() const { return (Derived*)(this); }
 };
 
 }

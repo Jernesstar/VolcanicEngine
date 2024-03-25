@@ -14,6 +14,9 @@ public:
 
 	static Ref<Texture> Create(const std::string& path);
 
+	template<typename Derived>
+	Derived* As() const { return (Derived*)(this); }
+
 protected:
 	uint32_t m_Width, m_Height;
 };
