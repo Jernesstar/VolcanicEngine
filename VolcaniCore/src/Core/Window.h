@@ -15,10 +15,10 @@ public:
 
 	void Update() { glfwSwapBuffers(m_NativeWindow); }
 
-	void SetWindowIcon(const std::string& path);
-	void SetTitle(const std::string& title);
-	void SetVSync(bool vsync);
-	void SetFramebufferSize(uint32_t width, uint32_t height);
+	// void SetWindowIcon(const std::string& path);
+	// void SetTitle(const std::string& title);
+	// void SetVSync(bool vsync);
+	// void SetFramebufferSize(uint32_t width, uint32_t height);
 
 	bool IsOpen() const { return !glfwWindowShouldClose(m_NativeWindow); }
 

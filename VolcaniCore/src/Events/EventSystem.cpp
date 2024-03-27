@@ -18,7 +18,7 @@ namespace VolcaniCore {
 
 void EventSystem::Init()
 {
-    GLFWwindow* window = Application::Get()->GetWindow()->GetNativeWindow();
+    GLFWwindow* window = Application::GetWindow()->GetNativeWindow();
 
     VOLCANICORE_ASSERT(window);
 

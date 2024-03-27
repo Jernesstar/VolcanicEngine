@@ -12,40 +12,40 @@
 
 namespace VolcaniCore {
 
-Application::Application() {
-	m_Window = CreateRef<Window>(800, 600);
+Application::Application()
+	: m_Window(CreateRef<Window>(800, 600))
+{
+	VOLCANICORE_ASSERT(gladLoadGL(), "Glad could not load OpenGL");
+
 	s_Instance = this;
+
+	EventSystem::Init();
+	Renderer::Init(RenderAPI::OpenGL);
 }
 
 void Application::Init() {
-	VOLCANICORE_ASSERT(glfwInit());
-
-	glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-
-	// Renderer::Init();
+	VOLCANICORE_ASSERT(glfwInit(), "Failed to initialize GLFW");
 }
 
 void Application::Run() {
 	while(s_Instance->m_Window->IsOpen())
-    {
-        TimePoint time = Time::GetTime();
-        TimeStep ts = time - s_LastFrame;
-        s_LastFrame = time;
-        s_TimeStep = ts;
+	{
+		TimePoint time = Time::GetTime();
+		TimeStep ts = time - s_LastFrame;
+		s_LastFrame = time;
+		s_TimeStep = ts;
 
-        ApplicationUpdatedEvent event(ts);
-        EventSystem::Dispatch(event);
-        EventSystem::PollEvents();
-
-        s_Instance->m_Window->Update();
-    }
+		ApplicationUpdatedEvent event(ts);
+		EventSystem::Dispatch(event);
+		EventSystem::PollEvents();
+		
+		s_Instance->OnUpdate(ts);
+		s_Instance->m_Window->Update();
+	}	
 }
 
 void Application::Close() {
+	delete s_Instance;
 	glfwTerminate();
 	exit(0);
 }

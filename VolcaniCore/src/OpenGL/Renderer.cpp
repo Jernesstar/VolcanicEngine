@@ -56,14 +56,17 @@ Renderer::Renderer() {
 }
 
 void Renderer::Init() {
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_DEPTH_TEST); // Depth testing
+    glEnable(GL_MULTISAMPLE); // Smooth edges
+    glEnable(GL_FRAMEBUFFER_SRGB); // Gamma correction
+    glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS); // ???
 
-	glEnable(GL_CULL_FACE);
-	glFrontFace(GL_CCW);
-	glCullFace(GL_BACK);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+    glFrontFace(GL_CCW);
+    glCullFace(GL_BACK);
 }
 
 void Renderer::Close() {

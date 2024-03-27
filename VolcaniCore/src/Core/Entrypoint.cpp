@@ -9,7 +9,7 @@ int main(int argc, char** argv)
 	Application::Init();
 
 	Application* app = CreateApplication(argv[0]);
-	app->Run();
+	Application::Run();
 
 	Application::Close();
 }

@@ -4,26 +4,33 @@
 #include "Window.h"
 #include "Time.h"
 
+int main(int argc, char** argv);
+
 namespace VolcaniCore {
 
 class Application {
 public:
 	Application();
 
-	static void Init();
-	static void Run();
 	static void Close();
+	static Ref<Window> GetWindow() { return s_Instance->m_Window; }
 
-	static Application* Get() { return s_Instance; }
+protected:
+	virtual ~Application() = default;
 
-	Ref<Window> GetWindow() { return m_Window; }
+	virtual void OnUpdate(TimeStep ts) = 0;
+	Ref<Window> m_Window;
 
 private:
-	Ref<Window> m_Window;
-	inline static Application* s_Instance;
-    inline static TimePoint s_LastFrame{ Time::GetTime() };
-    inline static TimeStep s_TimeStep;
-};
+	static void Init();
+	static void Run();
 
+	inline static Application* s_Instance;
+	inline static TimePoint s_LastFrame{ Time::GetTime() };
+	inline static TimeStep s_TimeStep;
+
+	friend int ::main(int argc, char** argv);
+	friend class Window;
+};
 
 }

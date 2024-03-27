@@ -12,7 +12,7 @@ bool Input::KeyPressed(Key key)
     if(key == Key::Shift) return KeyPressed(Key::LeftShift) || KeyPressed(Key::RightShift);
     if(key == Key::Alt) return KeyPressed(Key::LeftAlt) || KeyPressed(Key::RightAlt);
 
-    auto window = Application::Get()->GetWindow()->GetNativeWindow();
+    auto window = Application::GetWindow()->GetNativeWindow();
     auto state = glfwGetKey(window, (int)key);
 
     return state == GLFW_PRESS;
@@ -20,13 +20,13 @@ bool Input::KeyPressed(Key key)
 
 void Input::SetCursorMode(CursorMode mode)
 {
-    GLFWwindow* window = Application::Get()->GetWindow()->GetNativeWindow();
+    GLFWwindow* window = Application::GetWindow()->GetNativeWindow();
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL + (int)mode);
 }
 
 bool Input::MouseButtonPressed(Mouse mouse_button)
 {
-    auto window = Application::Get()->GetWindow()->GetNativeWindow();
+    auto window = Application::GetWindow()->GetNativeWindow();
     auto state = glfwGetMouseButton(window, (int)(mouse_button));
 
     return state == GLFW_PRESS;
@@ -34,7 +34,7 @@ bool Input::MouseButtonPressed(Mouse mouse_button)
 
 glm::vec2 Input::GetMousePosition()
 {
-    auto window = Application::Get()->GetWindow()->GetNativeWindow();
+    auto window = Application::GetWindow()->GetNativeWindow();
     double x, y;
     glfwGetCursorPos(window, &x, &y);
 

@@ -17,7 +17,7 @@ void CameraController::OnUpdate(TimeStep ts)
     glm::vec2 delta = (mouse_pos - m_LastMousePosition) * 0.001f;
     m_LastMousePosition = mouse_pos;
 
-    if(Input::MouseButtonPressed(Mouse::LeftButton) /*&& !Application::Get()->GetWindow()->IsImGuiFocused()*/)
+    if(Input::MouseButtonPressed(Mouse::LeftButton) /*&& !Application::GetWindow()->IsImGuiFocused()*/)
         Input::SetCursorMode(CursorMode::Locked);
     else
     {
