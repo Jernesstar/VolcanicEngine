@@ -176,16 +176,14 @@ private:
 	OpenGL::VertexBuffer* cube_buffer = new OpenGL::VertexBuffer(cube_vertices, l2);
 	OpenGL::VertexArray* cube_array = new OpenGL::VertexArray(cube_buffer, nullptr);
 
-	OpenGL::Shader light_shader
-	{
+	Ref<ShaderPipeline> light_shader = ShaderPipeline::Create({
 		{ "Sandbox/assets/shaders/Light.glsl.vert", OpenGL::ShaderType::Vertex },
 		{ "Sandbox/assets/shaders/Light.glsl.frag", OpenGL::ShaderType::Fragment }
-	};
-	OpenGL::Shader cube_shader
-	{
+	});
+	Ref<ShaderPipeline> cube_shader = ShaderPipeline::Create({
 		{ "Sandbox/assets/shaders/Lighting.glsl.vert", OpenGL::ShaderType::Vertex },
 		{ "Sandbox/assets/shaders/Lighting.glsl.frag", OpenGL::ShaderType::Fragment }
-	};
+	});
 
 	OpenGL::Texture2D wood{ "Sandbox/assets/images/wood.png" };
 	OpenGL::Texture2D wood_specular{ "Sandbox/assets/images/wood_specular.png" };

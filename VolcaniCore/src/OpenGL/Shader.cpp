@@ -9,31 +9,11 @@
 
 namespace VolcaniCore::OpenGL {
 
-Shader::ShaderFile FindShaderFile(const std::string& path);
 uint32_t CreateProgram(const std::vector<Shader::ShaderFile>& shader_files);
 
-Shader::Shader(const std::vector<std::string>& paths)
+Shader::Shader(const std::vector<Shader>& shaders)
 {
-	std::vector<ShaderFile> files;
-	files.reserve(paths.size());
-
-	for(const auto& path : paths)
-	{
-		ShaderFile file = FindShaderFile(path);
-		files.push_back(file);
-	}
-
-	m_ProgramID = CreateProgram(files);
-}
-
-Shader::Shader(const std::initializer_list<ShaderFile>& files)
-{
-	m_ProgramID = CreateProgram(files);
-}
-
-Shader::Shader(const std::string& folder_path, const std::string& name)
-{
-	// TODO: Find all the different kinds shaders in the folder that have the same name
+	m_ProgramID = CreateProgram(shaders);
 }
 
 Shader::~Shader() { glDeleteProgram(m_ProgramID); }
@@ -106,24 +86,6 @@ uint32_t GetShaderType(ShaderType type)
 	}
 
 	return 0;
-}
-
-bool StringContains(const std::string& str, const std::string& sub_str) { return str.find(sub_str) != std::string::npos; }
-
-Shader::ShaderFile FindShaderFile(const std::string& path)
-{
-	std::size_t dot = path.find_first_of('.');
-	if(dot == std::string::npos)
-		VOLCANICORE_ASSERT_ARGS(false, "%s is an incorrectly formatted file name. Accepted formats: example.glsl.vert, example.vert.glsl, example.vert", path.c_str());
-
-	std::string sub_str = path.substr(dot);
-	if(StringContains(sub_str, "vert") || StringContains(sub_str, "vs")) return Shader::ShaderFile{ path, ShaderType::Vertex };
-	if(StringContains(sub_str, "geom") || StringContains(sub_str, "gs")) return Shader::ShaderFile{ path, ShaderType::Geometry };
-	if(StringContains(sub_str, "frag") || StringContains(sub_str, "fs")) return Shader::ShaderFile{ path, ShaderType::Fragment };
-	if(StringContains(sub_str, "comp") || StringContains(sub_str, "compute")) return Shader::ShaderFile{ path, ShaderType::Compute };
-
-	VOLCANICORE_ASSERT_ARGS(false, "File %s is of unknown shader type", path.c_str());
-	return Shader::ShaderFile{ "", ShaderType::Unknown };
 }
 
 uint32_t CreateShader(const Shader::ShaderFile& file)

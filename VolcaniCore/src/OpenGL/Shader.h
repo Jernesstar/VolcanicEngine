@@ -15,19 +15,8 @@
 
 namespace VolcaniCore::OpenGL {
 
-enum class ShaderType { Vertex, Geometry, Fragment, Compute, Unknown };
-
-class Shader {
+class ShaderProgram : VolcaniCore::ShaderPipeline {
 public:
-	struct ShaderFile {
-		const std::string Path;
-		const ShaderType Type;
-	};
-
-public:
-	Shader(const std::vector<std::string>& paths);
-	Shader(const std::initializer_list<ShaderFile>& files);
-	Shader(const std::string& folder_path, const std::string& name);
 	~Shader();
 
 	void Bind() const;
@@ -46,6 +35,8 @@ public:
 	void SetMat4(const std::string& name, const glm::mat4& mat);
 
 private:
+	ShaderProgram(const std::vector<Shader> shaders);
+
 	uint32_t m_ProgramID;
 };
 

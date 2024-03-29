@@ -22,11 +22,10 @@ struct Shader {
 	const ShaderType Type;
 };
 
-class ShaderProgram {
+class ShaderPipeline {
 public:
-	virtual void LoadShaders(const std::vector<std::string>& paths) = 0;
-	virtual void LoadShaders(const std::initializer_list<Shader>& files) = 0;
-	virtual void LoadShaders(const std::string& folder_path, const std::string& name) = 0;
+	ShaderPipeline(const std::initializer_list<Shader>& files) = default;
+	virtual ~ShaderPipeline() = default;
 
 	virtual void SetInt(const std::string& name, int _int) = 0;
 	virtual void SetFloat(const std::string& name, float _float) = 0;
@@ -41,12 +40,19 @@ public:
 	virtual void SetMat3(const std::string& name, const glm::mat3& mat) = 0;
 	virtual void SetMat4(const std::string& name, const glm::mat4& mat) = 0;
 
-	Ref<ShaderProgram> Create(const std::vector<std::string>& paths);
-	Ref<ShaderProgram> Create(const std::initializer_list<Shader>& files);
-	Ref<ShaderProgram> Create(const std::string& folder_path, const std::string& name);
+	Ref<ShaderPipeline> Create(const std::initializer_list<Shader>& files);
+	Ref<ShaderPipeline> Create(const std::vector<std::string>& paths);
+	Ref<ShaderPipeline> Create(const std::string& folder_path, const std::string& name);
 
 	template<typename Derived>
 	Derived* As() const { return (Derived*)(this); }
+
+protected:
+	std::vector<Shader> Shaders;
+
+private:
+	std::vector<Shader> GetShaders(const std::vector<std::string>& paths);
+	std::vector<Shader> GetShaders(const std::string& cubemap_folder, const std::string& name);
 };
 
 }
