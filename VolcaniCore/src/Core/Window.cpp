@@ -23,8 +23,8 @@ Window::Window(uint32_t width, uint32_t height)
 
 Window::~Window()
 {
-    if(m_NativeWindow) glfwDestroyWindow(m_NativeWindow);
-    m_NativeWindow = nullptr;
+	if(m_NativeWindow) glfwDestroyWindow(m_NativeWindow);
+	m_NativeWindow = nullptr;
 }
 
 }

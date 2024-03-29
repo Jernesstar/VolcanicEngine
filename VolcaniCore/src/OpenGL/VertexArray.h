@@ -10,27 +10,27 @@ namespace VolcaniCore::OpenGL {
 
 class VertexArray {
 public:
-    VertexArray();
-    VertexArray(VertexBuffer* vertex_buffer, IndexBuffer* index_buffer = nullptr);
-    VertexArray(std::initializer_list<VertexBuffer*> vertex_buffers, IndexBuffer* index_buffer = nullptr);
-    ~VertexArray();
+	VertexArray();
+	VertexArray(VertexBuffer* vertex_buffer, IndexBuffer* index_buffer = nullptr);
+	VertexArray(std::initializer_list<VertexBuffer*> vertex_buffers, IndexBuffer* index_buffer = nullptr);
+	~VertexArray();
 
-    void Bind() const;
-    void Unbind() const;
+	void Bind() const;
+	void Unbind() const;
 
-    void AddVertexBuffer(VertexBuffer* vertex_buffer);
-    void SetIndexBuffer(IndexBuffer* index_buffer);
+	void AddVertexBuffer(VertexBuffer* vertex_buffer);
+	void SetIndexBuffer(IndexBuffer* index_buffer);
 
-    std::vector<VertexBuffer*> GetVertexBuffer() const { return m_VertexBuffers; }
-    IndexBuffer* GetIndexBuffer() const { return m_IndexBuffer; }
-    bool HasIndexBuffer() const { return m_IndexBuffer != nullptr; }
+	std::vector<VertexBuffer*> GetVertexBuffer() const { return m_VertexBuffers; }
+	IndexBuffer* GetIndexBuffer() const { return m_IndexBuffer; }
+	bool HasIndexBuffer() const { return m_IndexBuffer != nullptr; }
 
 private:
-    uint32_t m_VertexArrayID;
-    uint32_t m_BufferIndex = 0;
+	uint32_t m_VertexArrayID;
+	uint32_t m_BufferIndex = 0;
 
-    std::vector<VertexBuffer*> m_VertexBuffers;
-    IndexBuffer* m_IndexBuffer;
+	std::vector<VertexBuffer*> m_VertexBuffers;
+	IndexBuffer* m_IndexBuffer;
 };
 
 }

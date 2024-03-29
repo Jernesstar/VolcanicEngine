@@ -12,7 +12,7 @@ public:
 	inline static Ref<Cubemap> Create(const std::string& cubemap_folder);
 	inline static Ref<Cubemap> Create(const std::vector<std::string>& faces);
 
-    template<typename Derived>
+	template<typename Derived>
 	Derived* As() const { return ((Derived*)(this)); }
 };
 

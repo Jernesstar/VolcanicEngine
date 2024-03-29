@@ -57,16 +57,16 @@ Renderer::Renderer() {
 
 void Renderer::Init() {
 	glEnable(GL_DEPTH_TEST); // Depth testing
-    glEnable(GL_MULTISAMPLE); // Smooth edges
-    glEnable(GL_FRAMEBUFFER_SRGB); // Gamma correction
-    glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS); // ???
+	glEnable(GL_MULTISAMPLE); // Smooth edges
+	glEnable(GL_FRAMEBUFFER_SRGB); // Gamma correction
+	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS); // ???
 
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    glEnable(GL_CULL_FACE);
-    glFrontFace(GL_CCW);
-    glCullFace(GL_BACK);
+	glEnable(GL_CULL_FACE);
+	glFrontFace(GL_CCW);
+	glCullFace(GL_BACK);
 }
 
 void Renderer::Close() {
@@ -104,9 +104,9 @@ void Renderer::RenderTexture(Ref<Texture> texture, Transform t) {
 
 void Renderer::DrawIndexed(Ref<VertexArray> vertex_array, uint32_t indices)
 {
-    vertex_array->Bind();
-    glDrawElements(GL_TRIANGLES, indices != 0 ? indices : vertex_array->GetIndexBuffer()->Count,
-        GL_UNSIGNED_INT, nullptr);
+	vertex_array->Bind();
+	glDrawElements(GL_TRIANGLES, indices != 0 ? indices : vertex_array->GetIndexBuffer()->Count,
+		GL_UNSIGNED_INT, nullptr);
 }
 
 }

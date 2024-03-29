@@ -7,13 +7,13 @@ namespace VolcaniCore {
 
 struct ApplicationEvent : public Event {
 protected:
-    ApplicationEvent(EventType type) : Event(EventCategory::Application, type) { }
+	ApplicationEvent(EventType type) : Event(EventCategory::Application, type) { }
 };
 
 struct ApplicationUpdatedEvent : public ApplicationEvent {
-    TimeStep DeltaTime;
+	TimeStep DeltaTime;
 
-    ApplicationUpdatedEvent(TimeStep ts) : ApplicationEvent(EventType::ApplicationUpdated), DeltaTime(ts) { }
+	ApplicationUpdatedEvent(TimeStep ts) : ApplicationEvent(EventType::ApplicationUpdated), DeltaTime(ts) { }
 };
 
 }

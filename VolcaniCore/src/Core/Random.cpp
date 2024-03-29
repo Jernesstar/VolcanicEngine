@@ -8,13 +8,13 @@ static std::uniform_int_distribution<uint32_t> s_Dist{ };
 
 uint32_t Random::RandInt()
 {
-    return s_Dist(s_RNG);
+	return s_Dist(s_RNG);
 }
 
 uint32_t Random::RandInt(uint32_t low, uint32_t high)
 {
-    std::uniform_int_distribution<uint32_t> dist{ low, high };
-    return dist(s_RNG);
+	std::uniform_int_distribution<uint32_t> dist{ low, high };
+	return dist(s_RNG);
 }
 
 }

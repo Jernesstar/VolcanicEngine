@@ -25,7 +25,7 @@ public:
 	void DrawIndexed(Ref<VertexArray> vertex_array, uint32_t indices = 0);
 
 private:
-    Ptr<VertexArray> s_CubemapArray;
+	Ptr<VertexArray> s_CubemapArray;
 };
 
 }

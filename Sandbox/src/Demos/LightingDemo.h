@@ -31,6 +31,7 @@ private:
 	struct Vertex1 {
 		glm::vec3 Position;
 	};
+
 	struct Vertex2 {
 		glm::vec3 Position;
 		glm::vec3 Normal;
@@ -200,123 +201,123 @@ private:
 
 LightingDemo::LightingDemo()
 {
-    glDisable(GL_CULL_FACE);
+	glDisable(GL_CULL_FACE);
 
-    EventSystem::RegisterEventListener<KeyPressedEvent>(
-    [](const KeyPressedEvent& event)
-    {
-        if(event.Key == Key::Escape)
-            Application::Close();
-    });
-    EventSystem::RegisterEventListener<WindowResizedEvent>(
-    [this](const WindowResizedEvent& event)
-    {
-        this->camera.Resize(event.Width, event.Height);
-    });
+	EventSystem::RegisterEventListener<KeyPressedEvent>(
+	[](const KeyPressedEvent& event)
+	{
+		if(event.Key == Key::Escape)
+			Application::Close();
+	});
+	EventSystem::RegisterEventListener<WindowResizedEvent>(
+	[this](const WindowResizedEvent& event)
+	{
+		this->camera.Resize(event.Width, event.Height);
+	});
 
-    light_shader.Bind();
-    {
-        light_shader.SetVec3("u_LightColor", { 1.0f, 1.0f, 1.0f });
-    }
+	light_shader.Bind();
+	{
+		light_shader.SetVec3("u_LightColor", { 1.0f, 1.0f, 1.0f });
+	}
 
-    cube_shader.Bind();
-    {
-        camera.SetPosition({ 0.0f, 0.0f, 4.0f });
-        controller.RotationSpeed = 1.0f;
+	cube_shader.Bind();
+	{
+		camera.SetPosition({ 0.0f, 0.0f, 4.0f });
+		controller.RotationSpeed = 1.0f;
 
-        glm::vec3 positions[4] =
-        {
-            { 1.0f, -3.5f, -3.5f  },
-            { 1.0f,  5.0f,  2.5f  },
-            { 1.0f,  1.5f, -10.0f },
-            { 1.0f,  0.5f, -3.0f  },
-        };
+		glm::vec3 positions[4] =
+		{
+			{ 1.0f, -3.5f, -3.5f  },
+			{ 1.0f,  5.0f,  2.5f  },
+			{ 1.0f,  1.5f, -10.0f },
+			{ 1.0f,  0.5f, -3.0f  },
+		};
 
-        cube_shader.SetMat4("u_Model", glm::mat4{ 1.0f });
+		cube_shader.SetMat4("u_Model", glm::mat4{ 1.0f });
 
-        wood.Bind(0);
-        wood_specular.Bind(1);
+		wood.Bind(0);
+		wood_specular.Bind(1);
 
-        cube_shader.SetTexture("u_Material.Diffuse", &wood);
-        cube_shader.SetTexture("u_Material.Specular", &wood_specular);
-        cube_shader.SetFloat("u_Material.Shininess", 32.0f);
+		cube_shader.SetTexture("u_Material.Diffuse", &wood);
+		cube_shader.SetTexture("u_Material.Specular", &wood_specular);
+		cube_shader.SetFloat("u_Material.Shininess", 32.0f);
 
-        for(uint32_t i = 0; i < 4; i++)
-        {
-            pointlights[i].Position = positions[i];
-            pointlights[i].Ambient  = { 0.2f, 0.2f, 0.2f };
-            pointlights[i].Diffuse  = { 0.5f, 0.5f, 0.5f };
-            pointlights[i].Specular = { 1.0f, 1.0f, 1.0f };
-            pointlights[i].Constant  = 0.3f;
-            pointlights[i].Linear    = 0.0f;
-            pointlights[i].Quadratic = 0.032f;
-        }
+		for(uint32_t i = 0; i < 4; i++)
+		{
+			pointlights[i].Position = positions[i];
+			pointlights[i].Ambient  = { 0.2f, 0.2f, 0.2f };
+			pointlights[i].Diffuse  = { 0.5f, 0.5f, 0.5f };
+			pointlights[i].Specular = { 1.0f, 1.0f, 1.0f };
+			pointlights[i].Constant  = 0.3f;
+			pointlights[i].Linear    = 0.0f;
+			pointlights[i].Quadratic = 0.032f;
+		}
 
-        for(uint32_t i = 0; i < 4; i++)
-        {
-            std::string name = "u_PointLights[" + std::to_string(i) + "]";
-            cube_shader.SetVec3(name + ".Ambient",  pointlights[i].Ambient);
-            cube_shader.SetVec3(name + ".Diffuse",  pointlights[i].Diffuse);
-            cube_shader.SetVec3(name + ".Specular", pointlights[i].Specular);
+		for(uint32_t i = 0; i < 4; i++)
+		{
+			std::string name = "u_PointLights[" + std::to_string(i) + "]";
+			cube_shader.SetVec3(name + ".Ambient",  pointlights[i].Ambient);
+			cube_shader.SetVec3(name + ".Diffuse",  pointlights[i].Diffuse);
+			cube_shader.SetVec3(name + ".Specular", pointlights[i].Specular);
 
-            cube_shader.SetFloat(name + ".Constant",  pointlights[i].Constant);
-            cube_shader.SetFloat(name + ".Linear",    pointlights[i].Linear);
-            cube_shader.SetFloat(name + ".Quadratic", pointlights[i].Quadratic);
-        }
+			cube_shader.SetFloat(name + ".Constant",  pointlights[i].Constant);
+			cube_shader.SetFloat(name + ".Linear",    pointlights[i].Linear);
+			cube_shader.SetFloat(name + ".Quadratic", pointlights[i].Quadratic);
+		}
 
-        spotlight.Position  = { 0.0f, 0.0f, 0.0f, 0.0f };
-        spotlight.Direction = { 0.0f, 0.0f, 0.0f, 0.0f };
+		spotlight.Position  = { 0.0f, 0.0f, 0.0f, 0.0f };
+		spotlight.Direction = { 0.0f, 0.0f, 0.0f, 0.0f };
 
-        spotlight.CutoffAngle = glm::radians(12.5f);
-        spotlight.OuterCutoffAngle = glm::radians(15.0f);
+		spotlight.CutoffAngle = glm::radians(12.5f);
+		spotlight.OuterCutoffAngle = glm::radians(15.0f);
 
-        spot_light = new OpenGL::UniformBuffer(0, sizeof(SpotLight));
-    }
+		spot_light = new OpenGL::UniformBuffer(0, sizeof(SpotLight));
+	}
 }
 
 void LightingDemo::OnUpdate(TimeStep ts)
 {
-    // ImGui::Begin("Spotlight");
-    // {
-    //     ImGui::SliderFloat("Light.CutoffAngle", &spotlight.CutoffAngle, 0.0f, 3.14159265358979323846264338327950288419716939937510f);
-    //     ImGui::SliderFloat("Light.OuterCutoffAngle", &spotlight.OuterCutoffAngle, 0.0f, 3.14159265358979323846264338327950288419716939937510f);
-    // }
-    // ImGui::End();
+	// ImGui::Begin("Spotlight");
+	// {
+	//     ImGui::SliderFloat("Light.CutoffAngle", &spotlight.CutoffAngle, 0.0f, 3.14159265358979323846264338327950288419716939937510f);
+	//     ImGui::SliderFloat("Light.OuterCutoffAngle", &spotlight.OuterCutoffAngle, 0.0f, 3.14159265358979323846264338327950288419716939937510f);
+	// }
+	// ImGui::End();
 
-    controller.OnUpdate(ts);
+	controller.OnUpdate(ts);
 
-    Renderer::Clear();
-    light_shader.Bind();
-    {
-        light_shader.SetMat4("u_ViewProj", camera.GetViewProjection());
+	Renderer::Clear();
+	light_shader.Bind();
+	{
+		light_shader.SetMat4("u_ViewProj", camera.GetViewProjection());
 
-        for(uint32_t i = 0; i < 4; i++)
-        {
-            light_shader.SetVec3("u_Position", pointlights[i].Position);
-            Renderer::GetRenderer()->As<OpenGL::Renderer>()->DrawIndexed(light_array);
-        }
-    }
+		for(uint32_t i = 0; i < 4; i++)
+		{
+			light_shader.SetVec3("u_Position", pointlights[i].Position);
+			Renderer::GetRenderer()->As<OpenGL::Renderer>()->DrawIndexed(light_array);
+		}
+	}
 
-    cube_shader.Bind();
-    {
-        cube_shader.SetVec3("u_CameraPosition", camera.GetPosition());
-        cube_shader.SetMat4("u_ViewProj", camera.GetViewProjection());
+	cube_shader.Bind();
+	{
+		cube_shader.SetVec3("u_CameraPosition", camera.GetPosition());
+		cube_shader.SetMat4("u_ViewProj", camera.GetViewProjection());
 
-        spotlight.Position = glm::vec4(camera.GetPosition(), 0.0f);
-        spotlight.Direction = glm::vec4(camera.GetDirection(), 0.0f);
-        spot_light->SetData(&spotlight);
+		spotlight.Position = glm::vec4(camera.GetPosition(), 0.0f);
+		spotlight.Direction = glm::vec4(camera.GetDirection(), 0.0f);
+		spot_light->SetData(&spotlight);
 
-        for(uint32_t i = 0; i < 4; i++)
-        {
-            std::string name = "u_PointLights[" + std::to_string(i) + "]";
-            cube_shader.SetVec3(name + ".Position",  pointlights[i].Position);
-        }
+		for(uint32_t i = 0; i < 4; i++)
+		{
+			std::string name = "u_PointLights[" + std::to_string(i) + "]";
+			cube_shader.SetVec3(name + ".Position",  pointlights[i].Position);
+		}
 
-        cube_array->Bind();
-        for(uint32_t i = 0; i < 10; i++)
-        {
-            cube_shader.SetMat4("u_Model", cube_positions[i]);
-            glDrawArrays(GL_TRIANGLES, 0, 36);
-        }
-    }
+		cube_array->Bind();
+		for(uint32_t i = 0; i < 10; i++)
+		{
+			cube_shader.SetMat4("u_Model", cube_positions[i]);
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+		}
+	}
 }
