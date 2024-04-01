@@ -1,8 +1,18 @@
 #include "Shader.h"
 
+#include "OpenGL/Shader.h"
+
+#include "Core/Assert.h"
+
+#include "Renderer.h"
+
 namespace VolcaniCore {
 
-Ref<ShaderProgram> Create(const std::vector<Shader>& shaders) {
+std::vector<Shader> GetShaders(const std::vector<std::string>& paths);
+std::vector<Shader> GetShaders(const std::string& cubemap_folder, const std::string& name);
+Shader FindShader(const std::string& path);
+
+Ref<ShaderPipeline> ShaderPipeline::Create(const std::vector<Shader>& shaders) {
 	RenderAPI api = Renderer::GetRenderAPI();
 
 	switch(api) {
@@ -12,15 +22,31 @@ Ref<ShaderProgram> Create(const std::vector<Shader>& shaders) {
 	}
 }
 
-Ref<ShaderProgram> Create(const std::vector<std::string>& paths) {
-	return Create(GetShaders(paths));
+Ref<ShaderPipeline> ShaderPipeline::Create(const std::vector<std::string>& paths) {
+	RenderAPI api = Renderer::GetRenderAPI();
+
+	auto shaders = GetShaders(paths);
+
+	switch(api) {
+		case RenderAPI::OpenGL:
+			return CreateRef<OpenGL::ShaderProgram>(shaders);
+			break;
+	}
 }
 
-Ref<ShaderProgram> Create(const std::string& folder_path, const std::string& name) {
-	return Create(GetShaders(folder_path, name));
+Ref<ShaderPipeline> ShaderPipeline::Create(const std::string& folder_path, const std::string& name) {
+	RenderAPI api = Renderer::GetRenderAPI();
+
+	auto shaders = GetShaders(folder_path, name);
+
+	switch(api) {
+		case RenderAPI::OpenGL:
+			return CreateRef<OpenGL::ShaderProgram>(shaders);
+			break;
+	}
 }
 
-std::vector<Shader> ShaderPipeline::GetShaders(const std::vector<std::string>& paths) {
+std::vector<Shader> GetShaders(const std::vector<std::string>& paths) {
 	std::vector<Shader> shaders;
 	shaders.reserve(paths.size());
 
@@ -33,7 +59,7 @@ std::vector<Shader> ShaderPipeline::GetShaders(const std::vector<std::string>& p
 	return shaders;
 }
 
-std::vector<Shader> ShaderPipeline::GetShaders(const std::string& cubemap_folder, const std::string& name) {
+std::vector<Shader> GetShaders(const std::string& cubemap_folder, const std::string& name) {
 
 }
 

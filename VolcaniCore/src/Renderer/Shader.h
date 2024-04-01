@@ -24,7 +24,6 @@ struct Shader {
 
 class ShaderPipeline {
 public:
-	ShaderPipeline(const std::initializer_list<Shader>& files) = default;
 	virtual ~ShaderPipeline() = default;
 
 	virtual void SetInt(const std::string& name, int _int) = 0;
@@ -40,19 +39,12 @@ public:
 	virtual void SetMat3(const std::string& name, const glm::mat3& mat) = 0;
 	virtual void SetMat4(const std::string& name, const glm::mat4& mat) = 0;
 
-	Ref<ShaderPipeline> Create(const std::initializer_list<Shader>& files);
-	Ref<ShaderPipeline> Create(const std::vector<std::string>& paths);
-	Ref<ShaderPipeline> Create(const std::string& folder_path, const std::string& name);
+	static Ref<ShaderPipeline> Create(const std::vector<Shader>& shaders);
+	static Ref<ShaderPipeline> Create(const std::vector<std::string>& paths);
+	static Ref<ShaderPipeline> Create(const std::string& folder_path, const std::string& name);
 
 	template<typename Derived>
 	Derived* As() const { return (Derived*)(this); }
-
-protected:
-	std::vector<Shader> Shaders;
-
-private:
-	std::vector<Shader> GetShaders(const std::vector<std::string>& paths);
-	std::vector<Shader> GetShaders(const std::string& cubemap_folder, const std::string& name);
 };
 
 }

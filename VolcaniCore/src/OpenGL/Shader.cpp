@@ -7,69 +7,71 @@
 #include "Core/Assert.h"
 #include "Core/Utils.h"
 
+#include "Texture2D.h"
+
 namespace VolcaniCore::OpenGL {
 
-uint32_t CreateProgram(const std::vector<Shader::ShaderFile>& shader_files);
+uint32_t CreateProgram(const std::vector<Shader>& shader_files);
 
-Shader::Shader(const std::vector<Shader>& shaders)
+ShaderProgram::ShaderProgram(const std::vector<Shader>& shaders)
 {
 	m_ProgramID = CreateProgram(shaders);
 }
 
-Shader::~Shader() { glDeleteProgram(m_ProgramID); }
+ShaderProgram::~ShaderProgram() { glDeleteProgram(m_ProgramID); }
 
-void Shader::Bind() const { glUseProgram(m_ProgramID); }
-void Shader::Unbind() const { glUseProgram(0); }
+void ShaderProgram::Bind() const { glUseProgram(m_ProgramID); }
+void ShaderProgram::Unbind() const { glUseProgram(0); }
 
-void Shader::SetInt(const std::string& name, int _int)
+void ShaderProgram::SetInt(const std::string& name, int _int)
 {
 	GLint location = glGetUniformLocation(m_ProgramID, name.c_str());
 	glUniform1i(location, _int);
 }
 
-void Shader::SetFloat(const std::string& name, float _float)
+void ShaderProgram::SetFloat(const std::string& name, float _float)
 {
 	GLint location = glGetUniformLocation(m_ProgramID, name.c_str());
 	glUniform1f(location, _float);
 }
 
-void Shader::SetTexture(const std::string& name, Texture2D* texture)
+void ShaderProgram::SetTexture(const std::string& name, Ref<Texture> texture, uint32_t slot)
 {
-	VOLCANICORE_ASSERT(texture->GetSlot() >= 0);
-	SetInt(name, texture->GetSlot());
+	VOLCANICORE_ASSERT(slot >= 0);
+	SetInt(name, slot);
 }
 
-void Shader::SetVec2(const std::string& name, const glm::vec2& vec)
+void ShaderProgram::SetVec2(const std::string& name, const glm::vec2& vec)
 {
 	GLint location = glGetUniformLocation(m_ProgramID, name.c_str());
 	glUniform2f(location, vec.x, vec.y);
 }
 
-void Shader::SetVec3(const std::string& name, const glm::vec3& vec)
+void ShaderProgram::SetVec3(const std::string& name, const glm::vec3& vec)
 {
 	GLint location = glGetUniformLocation(m_ProgramID, name.c_str());
 	glUniform3f(location, vec.x, vec.y, vec.z);
 }
 
-void Shader::SetVec4(const std::string& name, const glm::vec4& vec)
+void ShaderProgram::SetVec4(const std::string& name, const glm::vec4& vec)
 {
 	GLint location = glGetUniformLocation(m_ProgramID, name.c_str());
 	glUniform4f(location, vec.r, vec.g, vec.b, vec.a);
 }
 
-void Shader::SetMat2(const std::string& name, const glm::mat2& matrix)
+void ShaderProgram::SetMat2(const std::string& name, const glm::mat2& matrix)
 {
 	GLint location = glGetUniformLocation(m_ProgramID, name.c_str());
 	glUniformMatrix2fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
 }
 
-void Shader::SetMat3(const std::string& name, const glm::mat3& matrix)
+void ShaderProgram::SetMat3(const std::string& name, const glm::mat3& matrix)
 {
 	GLint location = glGetUniformLocation(m_ProgramID, name.c_str());
 	glUniformMatrix3fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
 }
 
-void Shader::SetMat4(const std::string& name, const glm::mat4& matrix)
+void ShaderProgram::SetMat4(const std::string& name, const glm::mat4& matrix)
 {
 	GLint location = glGetUniformLocation(m_ProgramID, name.c_str());
 	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
@@ -88,12 +90,12 @@ uint32_t GetShaderType(ShaderType type)
 	return 0;
 }
 
-uint32_t CreateShader(const Shader::ShaderFile& file)
+uint32_t CreateShader(Shader shader)
 {
-	uint32_t type = GetShaderType(file.Type);
+	uint32_t type = GetShaderType(shader.Type);
 	uint32_t shader_id = glCreateShader(type);
 
-	std::string source = Utils::ReadFile(file.Path);
+	std::string source = Utils::ReadFile(shader.Path);
 	const char* address = source.c_str();
 	glShaderSource(shader_id, 1, &address, nullptr);
 	glCompileShader(shader_id);
@@ -108,18 +110,18 @@ uint32_t CreateShader(const Shader::ShaderFile& file)
 		char* message = (char*)alloca(length * sizeof(char));
 		glGetShaderInfoLog(shader_id, length, &length, message);
 
-		VOLCANICORE_ASSERT_ARGS(false, "A compile error was detected for shader file at %s:\n%s", file.Path.c_str(), message);
+		VOLCANICORE_ASSERT_ARGS(false, "A compile error was detected for shader file at %s:\n%s", shader.Path.c_str(), message);
 	}
 
 	return shader_id;
 }
 
-uint32_t CreateProgram(const std::vector<Shader::ShaderFile>& shader_files)
+uint32_t CreateProgram(const std::vector<Shader>& shaders)
 {
 	uint32_t program_id = glCreateProgram();
-	std::vector<uint32_t> shader_ids(shader_files.size());
+	std::vector<uint32_t> shader_ids(shaders.size());
 
-	for(const auto& shader : shader_files)
+	for(const auto& shader : shaders)
 	{
 		uint32_t shader_id = CreateShader(shader);
 		glAttachShader(program_id, shader_id);

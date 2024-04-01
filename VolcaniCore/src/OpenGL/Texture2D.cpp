@@ -10,7 +10,7 @@
 namespace VolcaniCore::OpenGL {
 
 Texture2D::Texture2D(uint32_t width, uint32_t height)
-	: VolcaniCore::Texture(width, height), InternalFormat(GL_RGBA8), DataFormat(GL_RGBA), m_Slot(-1)
+	: VolcaniCore::Texture(width, height), InternalFormat(GL_RGBA8), DataFormat(GL_RGBA)
 {
 	glCreateTextures(GL_TEXTURE_2D, 1, &m_TextureID);
 	glTextureStorage2D(m_TextureID, 1, InternalFormat, m_Width, m_Height);
@@ -23,7 +23,7 @@ Texture2D::Texture2D(uint32_t width, uint32_t height)
 }
 
 Texture2D::Texture2D(const std::string& path)
-	: VolcaniCore::Texture(path), InternalFormat(GL_RGBA8), DataFormat(GL_RGBA), m_Slot(-1)
+	: VolcaniCore::Texture(path), InternalFormat(GL_RGBA8), DataFormat(GL_RGBA)
 {
 	unsigned char* pixel_data = Utils::ReadImage(path.c_str(), m_Width, m_Height, 4, true);
 	
@@ -45,7 +45,6 @@ Texture2D::~Texture2D() { glDeleteTextures(1, &m_TextureID); }
 void Texture2D::Bind(uint32_t slot)
 {
 	VOLCANICORE_ASSERT(slot >= 0);
-	m_Slot = slot;
 	glBindTextureUnit(slot, m_TextureID);
 }
 
