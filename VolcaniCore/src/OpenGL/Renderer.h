@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Renderer/APIRenderer.h"
-#include "Renderer/Mesh.h"
+#include "Renderer/Model.h"
 
 #include "VertexArray.h"
 
@@ -16,7 +16,7 @@ public:
 	void Close();
 	void Clear();
 
-	void RenderMesh(Ref<VolcaniCore::Mesh> mesh);
+	void RenderModel(Ref<VolcaniCore::Model> model);
 	void RenderCubemap(Ref<VolcaniCore::Cubemap> cubemap);
 	void RenderQuad(Ref<VolcaniCore::Quad> quad, Transform t);
 	void RenderText(Ref<VolcaniCore::Text> text, Transform t);

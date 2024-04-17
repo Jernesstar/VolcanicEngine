@@ -29,7 +29,9 @@ public:
 	virtual void SetInt(const std::string& name, int _int) = 0;
 	virtual void SetFloat(const std::string& name, float _float) = 0;
 	virtual void SetTexture(const std::string& name, Ref<Texture> texture, uint32_t slot) = 0;
-	// virtual void SetUniformBuffer(const std::string& name, Ref<UniformBuffer> buffer) = 0
+
+	// template<typename T>
+	// virtual void SetUniformBuffer(const std::string& name, Ref<UniformBuffer<T>> buffer) = 0;
 
 	virtual void SetVec2(const std::string& name, const glm::vec2& vec) = 0;
 	virtual void SetVec3(const std::string& name, const glm::vec3& vec) = 0;

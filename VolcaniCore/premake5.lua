@@ -14,11 +14,22 @@ project "VolcaniCore"
     includedirs {
         "src",
 
+        "%{Includes.bgfx}",
         "%{Includes.glfw}",
         "%{Includes.glad}",
         "%{Includes.glm}",
-        "%{Includes.stb_image}",
         "%{Includes.imgui}",
+        "%{Includes.assimp}",
+        "%{Includes.stb_image}",
+    }
+
+    links {
+        "bgfx",
+        "glfw",
+        "glad",
+        "imgui",
+        "assimp",
+        "stb_image",
     }
 
     filter "system:windows"

@@ -20,3 +20,12 @@
 [submodule "VolcaniCore/vendor/imgui"]
 	path = VolcaniCore/vendor/imgui
 	url = https://github.com/ocornut/imgui.git
+[submodule "VolcaniCore/vendor/bgfx"]
+	path = VolcaniCore/vendor/bgfx
+	url = https://github.com/bkaradzic/bgfx.git
+[submodule "VolcaniCore/vendor/bimg"]
+	path = VolcaniCore/vendor/bimg
+	url = https://github.com/bkaradzic/bimg.git
+[submodule "VolcaniCore/vendor/bx"]
+	path = VolcaniCore/vendor/bx
+	url = https://github.com/bkaradzic/bx.git

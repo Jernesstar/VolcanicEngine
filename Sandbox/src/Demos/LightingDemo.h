@@ -176,7 +176,7 @@ private:
 	Ref<OpenGL::VertexArray> light_array = CreateRef<OpenGL::VertexArray>(light_buffer, index_buffer);
 
 	OpenGL::VertexBuffer* cube_buffer = new OpenGL::VertexBuffer(cube_vertices, l2);
-	OpenGL::VertexArray* cube_array = new OpenGL::VertexArray(cube_buffer, nullptr);
+	Ref<OpenGL::VertexArray> cube_array = CreateRef<OpenGL::VertexArray>(cube_buffer, nullptr);
 
 	Ref<ShaderPipeline> light_shader = ShaderPipeline::Create({
 		{ "Sandbox/assets/shaders/Light.glsl.vert", ShaderType::Vertex },

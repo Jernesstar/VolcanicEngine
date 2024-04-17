@@ -15,7 +15,7 @@ public:
 
 	static void Clear() { m_BackendRenderer->Clear(); }
 
-	static void RenderMesh(Ref<Mesh> mesh) { m_BackendRenderer->RenderMesh(mesh); }
+	static void RenderModel(Ref<Model> model) { m_BackendRenderer->RenderModel(model); }
 	static void RenderCubemap(Ref<Cubemap> cubemap) { m_BackendRenderer->RenderCubemap(cubemap); }
 	static void RenderQuad(Ref<Quad> quad, Transform t) { m_BackendRenderer->RenderQuad(quad, t); }
 	static void RenderText(Ref<Text> text, Transform t) { m_BackendRenderer->RenderText(text, t); }

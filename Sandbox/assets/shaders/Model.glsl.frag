@@ -6,9 +6,12 @@ layout(location = 2) in vec3 v_Normal;
 
 layout(binding = 0) uniform sampler2D u_Diffuse;
 layout(binding = 1) uniform sampler2D u_Specular;
+layout(binding = 1) uniform sampler2D u_Roughness;
 uniform vec3 u_CameraPosition;
 uniform vec3 u_LightPosition;
 uniform vec3 u_LightColor;
+
+out vec4 FragColor;
 
 void main()
 {
@@ -17,6 +20,7 @@ void main()
 
     vec3 diffuse_color = texture(u_Diffuse, v_TextureCoordinate).xyz;
     vec3 specular_color = texture(u_Specular, v_TextureCoordinate).xyz;
+    vec3 roughness = texture(u_Roughness, v_TextureCoordinate).xyz;
 
     // vec3 ambient = u_LightColor * ambient_color;
 
@@ -33,5 +37,5 @@ void main()
     vec3 specular = u_LightColor * (spec * specular_color);
 
     vec3 result = diffuse + specular;
-    gl_FragColor = vec4(result, 1.0);
+    FragColor = vec4(result, 1.0);
 }

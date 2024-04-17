@@ -14,17 +14,22 @@ project "Sandbox"
     includedirs {
         "%{wks.location}/VolcaniCore/src",
 
+        "%{Includes.bgfx}",
         "%{Includes.glfw}",
         "%{Includes.glad}",
         "%{Includes.glm}",
         "%{Includes.imgui}",
+        "%{Includes.assimp}",
+        "%{Includes.stb_image}",
     }
 
     links {
         "VolcaniCore",
+        "bgfx",
         "glfw",
         "glad",
         "imgui",
+        "assimp",
         "stb_image",
     }
 

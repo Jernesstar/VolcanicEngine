@@ -3,6 +3,8 @@
 #include "Cubemap.h"
 #include "VertexBuffer.h"
 
+#include "OpenGL/Texture2D.h"
+
 namespace VolcaniCore::OpenGL {
 
 Renderer::Renderer() {
@@ -78,8 +80,18 @@ void Renderer::Clear() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void Renderer::RenderMesh(Ref<Mesh> mesh) {
+void Renderer::RenderModel(Ref<Model> model) {
+	model->Bind();
 
+	for(uint32_t i = 0; i < model->GetMeshCount(); i++)
+	{
+		auto& mesh = model->GetMesh(i);
+		auto material_index = mesh.MaterialIndex;
+		model->GetMaterial(material_index).Bind();
+
+		glDrawElementsBaseVertex(GL_TRIANGLES, mesh.IndexCount, GL_UNSIGNED_INT,
+			(void*)(sizeof(uint32_t) * mesh.BaseIndex), mesh.BaseVertex);
+	}
 }
 
 void Renderer::RenderCubemap(Ref<VolcaniCore::Cubemap> cubemap) {
