@@ -1,9 +1,61 @@
-VendorPath = "%{wks.location}/VolcaniCore/vendor"
+workspace "VolcanicEngine"
+    location ("build")
+    architecture "x64"
+    configurations { "Debug", "Release" }
+
+    if os.is64bit() and not os.istarget("windows") then
+        platforms "x86_64"
+    else
+        platforms { "x86", "x86_64" }
+    end
+
+    filter "configurations:Debug*"
+        defines {
+            "_DEBUG",
+            "BX_CONFIG_DEBUG=1"
+        }
+        optimize "Debug"
+        symbols "On"
+
+    filter "configurations:Release"
+        defines {
+            "NDEBUG",
+            "BX_CONFIG_DEBUG=0"
+        }
+        optimize "Full"
+
+    filter "platforms:x86"
+        architecture "x86"
+    filter "platforms:x86_64"
+        architecture "x86_64"
+
+    filter "system:macosx"
+        xcodebuildsettings {
+            ["MACOSX_DEPLOYMENT_TARGET"] = "10.9",
+            ["ALWAYS_SEARCH_USER_PATHS"] = "YES", -- This is the minimum version of macos we'll be able to run on
+        }
+
+    filter "action:vs*"
+        startproject "Sandbox"
+
+
+include "VolcaniCore/scripts/bgfx"
+include "VolcaniCore/scripts/glfw"
+include "VolcaniCore/scripts/glad"
+include "VolcaniCore/scripts/imgui"
+include "VolcaniCore/scripts/assimp"
+include "VolcaniCore/scripts/freetype"
+include "VolcaniCore/scripts/stb_image"
+include "VolcaniCore"
+include "Sandbox"
+
+RootPath = _MAIN_SCRIPT_DIR;
+VendorPath = "%{RootPath}/VolcaniCore/vendor"
 
 VendorPaths = {}
-VendorPaths["bx"] = "%{VendorPath}/bx"
 VendorPaths["bgfx"] = "%{VendorPath}/bgfx"
 VendorPaths["bimg"] = "%{VendorPath}/bimg"
+VendorPaths["bx"] = "%{VendorPath}/bx"
 VendorPaths["glm"] = "%{VendorPath}/glm"
 VendorPaths["glad"] = "%{VendorPath}/glad"
 VendorPaths["glfw"] = "%{VendorPath}/glfw"
@@ -13,9 +65,9 @@ VendorPaths["freetype"] = "%{VendorPath}/freetype"
 VendorPaths["stb_image"] = "%{VendorPath}/stb_image"
 
 Includes = {}
+Includes["bgfx"] = "%{VendorPaths.bgfx}/include"
+Includes["bimg"] = "%{VendorPaths.bimg}/include"
 Includes["bx"] = "%{VendorPaths.bx}/include"
-Includes["bgfx"] = "%{VendorPaths.bgfx}"
-Includes["bimg"] = "%{VendorPaths.bimg}"
 Includes["glm"] = "%{VendorPaths.glm}"
 Includes["glad"] = "%{VendorPaths.glad}/include"
 Includes["glfw"] = "%{VendorPaths.glfw}/include"
@@ -23,24 +75,3 @@ Includes["imgui"] = "%{VendorPath}"
 Includes["assimp"] = "%{VendorPaths.assimp}/include"
 Includes["freetype"] = "%{VendorPaths.freetype}/include"
 Includes["stb_image"] = "%{VendorPaths.stb_image}/include"
-
-workspace "VolcaniCore"
-    architecture "x64"
-
-    configurations {
-        "Debug",
-        "Release",
-        "Dist"
-    }
-
--- include "VolcaniCore/vendor/bx/scripts/bx"
-include "VolcaniCore/vendor/bgfx/scripts/bgfx"
--- include "VolcaniCore/vendor/bimg/scripts/"
-include "VolcaniCore/buildconfig/glad"
-include "VolcaniCore/buildconfig/glfw"
-include "VolcaniCore/buildconfig/imgui"
-include "VolcaniCore/buildconfig/assimp"
-include "VolcaniCore/buildconfig/freetype"
-include "VolcaniCore/buildconfig/stb_image"
-include "VolcaniCore"
-include "Sandbox"

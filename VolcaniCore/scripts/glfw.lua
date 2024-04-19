@@ -2,8 +2,8 @@ project "glfw"
     kind "StaticLib"
     language "C"
 
-    targetdir ("%{wks.location}/bin")
-    objdir ("%{wks.location}/obj")
+    objdir ("%{RootPath}/build/obj")
+    targetdir ("%{RootPath}/build/libs")
 
     files {
         "%{VendorPaths.glfw}/src/context.c",

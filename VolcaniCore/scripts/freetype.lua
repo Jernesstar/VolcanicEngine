@@ -2,11 +2,10 @@ project "freetype"
     kind "StaticLib"
     language "C"
 
-    targetdir ("%{wks.location}/bin")
-    objdir ("%{wks.location}/obj")
+    objdir ("%{RootPath}/build/obj")
+    targetdir ("%{RootPath}/build/libs")
 
-    files
-    {
+    files {
         "%{VendorPaths.freetype}/src/base/ftinit.c",
         "%{VendorPaths.freetype}/src/base/ftbase.c",
         "%{VendorPaths.freetype}/src/base/ftbbox.c",
@@ -28,12 +27,10 @@ project "freetype"
         "%{VendorPaths.freetype}/src/svg/svg.c"
     }
 
-    includedirs
-    {
+    includedirs {
         "%{Includes.freetype}"
     }
 
-    buildoptions 
-    {
+    buildoptions  {
         "-DFT2_BUILD_LIBRARY",
     }

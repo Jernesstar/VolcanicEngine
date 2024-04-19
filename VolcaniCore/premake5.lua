@@ -1,10 +1,10 @@
 project "VolcaniCore"
     kind "StaticLib"
     language "C++"
-    cppdialect "C++20"
+    cppdialect "C++latest"
 
-    targetdir ("%{wks.location}/bin")
-    objdir ("%{wks.location}/obj")
+    objdir ("%{RootPath}/build/obj")
+    targetdir ("%{RootPath}/build/libs")
 
     files {
         "src/**.h",
@@ -21,15 +21,6 @@ project "VolcaniCore"
         "%{Includes.imgui}",
         "%{Includes.assimp}",
         "%{Includes.stb_image}",
-    }
-
-    links {
-        "bgfx",
-        "glfw",
-        "glad",
-        "imgui",
-        "assimp",
-        "stb_image",
     }
 
     filter "system:windows"

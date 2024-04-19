@@ -3,8 +3,8 @@ project "imgui"
     language "C++"
     cppdialect "C++20"
 
-    targetdir ("%{wks.location}/bin")
-    objdir ("%{wks.location}/obj")
+    objdir ("%{RootPath}/build/obj")
+    targetdir ("%{RootPath}/build/libs")
 
     files {
         "%{VendorPaths.imgui}/*.h",

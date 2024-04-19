@@ -1,13 +1,12 @@
 project "assimp"
     kind "StaticLib"
     language "C++"
-    cppdialect "C++20"
+    cppdialect "C++latest"
 
-    targetdir ("%{wks.location}/bin")
-    objdir ("%{wks.location}/obj")
+    objdir ("%{RootPath}/build/obj")
+    targetdir ("%{RootPath}/build/libs")
 
-    files
-    {
+    files {
         -- "%{VendorPaths.assimp}/code/CApi/*.cpp",
         "%{VendorPaths.assimp}/code/Common/*.cpp",
         "%{VendorPaths.assimp}/code/Geometry/*.cpp",
@@ -29,10 +28,9 @@ project "assimp"
         "%{VendorPaths.assimp}/contrib/zip/**.c",
     }
 
-    removefiles
-    {
-        "%{VendorPaths.assimp}/code/**Export*.cpp",
-        "%{VendorPaths.assimp}/code/Common/*Exporter*.cpp",
+    removefiles {
+        "%{VendorPaths.assimp}/code/**/*Export*.cpp",
+        "%{VendorPaths.assimp}/code/Common/**/*Exporter*.cpp",
         "%{VendorPaths.assimp}/code/Common/Exporter.cpp",
         "%{VendorPaths.assimp}/code/AssetLib/Obj/ObjExporter.cpp",
         "%{VendorPaths.assimp}/code/AssetLib/STL/STLExporter.cpp",
@@ -41,8 +39,7 @@ project "assimp"
         "%{VendorPaths.assimp}/code/AssetLib/FBX/FBXExportProperty.cpp",
     }
 
-    includedirs
-    {
+    includedirs {
         "%{Includes.assimp}",
         "%{VendorPaths.assimp}",
         "%{VendorPaths.assimp}/code",
@@ -56,20 +53,17 @@ project "assimp"
         "%{VendorPaths.assimp}/contrib/openddlparser/include",
     }
 
-    buildoptions
-    {
+    buildoptions {
         "-W",
         "-long-long",
         "-O3",
     }
 
-    links
-    {
+    links {
         "zlib",
     }
 
-    defines
-    {
+    defines {
         "ASSIMP_NO_EXPORT",
         "ASSIMP_BUILD_RELEASE",
         "WIN32_LEAN_AND_MEAN",

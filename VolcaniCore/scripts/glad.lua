@@ -2,8 +2,8 @@ project "glad"
     kind "StaticLib"
     language "C"
 
-    targetdir ("%{wks.location}/bin")
-    objdir ("%{wks.location}/obj")
+    objdir ("%{RootPath}/build/obj")
+    targetdir ("%{RootPath}/build/libs")
 
     files {
         "%{VendorPaths.glad}/include/*.h",
