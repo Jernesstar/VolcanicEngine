@@ -41,7 +41,7 @@ project "bgfx"
     filter { "system:windows", "action:gmake2" }
         includedirs { path.join("%{VendorPaths.bx}", "include/compat/mingw") }
     filter { "system:linux", "action:gmake2" }
-        defines { "BX_PLATFORMLINUX" }
+        defines { "BX_PLATFORM_LINUX" }
         includedirs { path.join("%{VendorPaths.bx}", "include/compat/linux") }
     filter { "system:macosx" }
         includedirs { path.join("%{VendorPaths.bx}", "include/compat/osx") }
