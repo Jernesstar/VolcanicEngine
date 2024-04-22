@@ -28,8 +28,9 @@ private:
 	uint32_t m_Width, m_Height;
 	GLFWwindow* m_NativeWindow;
 
-	friend class EventSystem;
 	friend class Input;
+	friend class EventSystem;
+	friend class Application;
 };
 
 }

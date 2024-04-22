@@ -1,4 +1,8 @@
 {
 	"editor.detectIndentation": false,
 	"editor.insertSpaces": false,
+	"files.associations": {
+		"*.html": "html",
+		"x11_platform.h": "c"
+	},
 }

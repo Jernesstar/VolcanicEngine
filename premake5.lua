@@ -35,6 +35,12 @@ workspace "VolcanicEngine"
             ["ALWAYS_SEARCH_USER_PATHS"] = "YES", -- This is the minimum version of macos we'll be able to run on
         }
 
+    filter "system:linux"
+        defines "VOLCANICENGINE_LINUX"
+
+    filter "system:windows"
+        defines "VOLCANICENGINE_WINDOWS"
+
     filter "action:vs*"
         startproject "Sandbox"
 
