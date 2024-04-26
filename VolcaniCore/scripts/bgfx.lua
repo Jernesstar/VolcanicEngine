@@ -63,15 +63,14 @@ project "bimg"
         path.join("%{VendorPaths.bimg}", "src/image.cpp"),
         path.join("%{VendorPaths.bimg}", "src/image_gnf.cpp"),
         path.join("%{VendorPaths.bimg}", "src/*.h"),
-        path.join("%{VendorPaths.bimg}", "3rdparty/astc-codec/src/decoder/*.cc")
+        path.join("%{VendorPaths.bimg}", "3rdparty/astc-encoder/source/*.cpp"),
     }
 
     includedirs {
         path.join("%{VendorPaths.bx}", "include"),
         path.join("%{VendorPaths.bimg}", "include"),
-        path.join("%{VendorPaths.bimg}", "3rdparty/astc-codec"),
-        path.join("%{VendorPaths.bimg}", "3rdparty/astc-codec/include/"),
-        path.join("%{VendorPaths.bimg}", "3rdparty/astc-encoder/include/")
+        path.join("%{VendorPaths.bimg}", "3rdparty/astc-encoder"),
+        path.join("%{VendorPaths.bimg}", "3rdparty/astc-encoder/include/"),
     }
 
     filter "action:vs*"

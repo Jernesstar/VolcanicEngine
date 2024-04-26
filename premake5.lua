@@ -9,6 +9,12 @@ workspace "VolcanicEngine"
         platforms { "x86", "x86_64" }
     end
 
+    filter "system:linux"
+        defines "VOLCANICENGINE_LINUX"
+
+    filter "system:windows"
+        defines "VOLCANICENGINE_WINDOWS"
+
     filter "configurations:Debug*"
         defines {
             "_DEBUG",
@@ -34,13 +40,6 @@ workspace "VolcanicEngine"
             ["MACOSX_DEPLOYMENT_TARGET"] = "10.9",
             ["ALWAYS_SEARCH_USER_PATHS"] = "YES", -- This is the minimum version of macos we'll be able to run on
         }
-
-    filter "system:linux"
-        defines "VOLCANICENGINE_LINUX"
-
-    filter "system:windows"
-        defines "VOLCANICENGINE_WINDOWS"
-
     filter "action:vs*"
         startproject "Sandbox"
 

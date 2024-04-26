@@ -1,4 +1,5 @@
 #include "Application.h"
+#include "Events/Events.h"
 
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
@@ -17,7 +18,6 @@
 #include "Assert.h"
 #include "Time.h"
 #include "Renderer/Renderer.h"
-#include "Events/Events.h"
 
 namespace VolcaniCore {
 
@@ -27,17 +27,17 @@ Application::Application()
 	bgfx::PlatformData pd;
 #if defined(VOLCANICENGINE_LINUX)
 	pd.nwh = (void*)glfwGetX11Window(m_Window->GetNativeWindow());
+	pd.ndt = glfwGetX11Display();
 #elif defined(VOLCANICENGINE_WINDOWS)
 	pd.nwh = (void*)glfwGetWin32Window(m_Window->GetNativeWindow());
 #endif // VOLCANICENGINE_LINUX
 
-	bgfx::setPlatformData(pd);
-
 	bgfx::Init bgfxInit;
 	bgfxInit.type = bgfx::RendererType::Count; // Automatically choose a renderer.
-	bgfxInit.resolution.width = m_Window->m_Width;
-	bgfxInit.resolution.height = m_Window->m_Height;
+	bgfxInit.resolution.width = (uint16_t)m_Window->m_Width;
+	bgfxInit.resolution.height = (uint16_t)m_Window->m_Height;
 	bgfxInit.resolution.reset = BGFX_RESET_VSYNC;
+	bgfxInit.platformData = pd;
 	bgfx::init(bgfxInit);
 
 	s_Instance = this;
@@ -47,7 +47,6 @@ Application::Application()
 
 void Application::Init() {
 	VOLCANICORE_ASSERT(glfwInit(), "Failed to initialize GLFW");
-	VOLCANICORE_ASSERT(bgfx::init(), "Failed to initialize GLFW");
 }
 
 void Application::Run() {

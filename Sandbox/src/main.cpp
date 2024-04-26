@@ -7,7 +7,7 @@
 
 using namespace VolcaniCore;
 
-Application* CreateApplication(const std::string& project)
+Application* CreateApplication()
 {
-	return new ModelDemo();
+	return new LightingDemo();
 }

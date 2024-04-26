@@ -23,7 +23,6 @@
 
 using namespace VolcaniCore;
 
-class LightingDemo : public Application {
 public:
 	LightingDemo();
 

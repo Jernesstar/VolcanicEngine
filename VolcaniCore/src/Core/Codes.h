@@ -1,5 +1,4 @@
 #pragma once
-
 namespace VolcaniCore {
 
 using KeyCode = unsigned short; // uint16_t
@@ -147,7 +146,7 @@ enum Key : KeyCode {
 	Alt   = LeftAlt + RightAlt,
 };
 
-using MouseCode = unsigned char; // uint8_t
+using MouseCode = uint8_t; // uint8_t
 
 enum Mouse : MouseCode {
 	// From glfw3.h starting line 571
