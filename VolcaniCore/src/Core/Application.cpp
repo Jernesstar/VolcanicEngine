@@ -4,53 +4,25 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
-#if defined(VOLCANICENGINE_LINUX)
-	#define GLFW_EXPOSE_NATIVE_X11
-#elif defined(VOLCANICENGINE_WINDOWS)
-	#define GLFW_EXPOSE_NATIVE_WIN32
-#endif // VOLCANICENGINE_LINUX
-
-#include <GLFW/glfw3native.h>
-
-#include <bgfx/bgfx.h>
-#include <bgfx/platform.h>
-
 #include "Assert.h"
 #include "Time.h"
 #include "Renderer/Renderer.h"
 
 namespace VolcaniCore {
 
-Application::Application()
-	: m_Window(CreateRef<Window>(800, 600))
-{
-	bgfx::PlatformData pd;
-#if defined(VOLCANICENGINE_LINUX)
-	pd.nwh = (void*)glfwGetX11Window(m_Window->GetNativeWindow());
-	pd.ndt = glfwGetX11Display();
-#elif defined(VOLCANICENGINE_WINDOWS)
-	pd.nwh = (void*)glfwGetWin32Window(m_Window->GetNativeWindow());
-#endif // VOLCANICENGINE_LINUX
-
-	bgfx::Init bgfxInit;
-	bgfxInit.type = bgfx::RendererType::Count; // Automatically choose a renderer.
-	bgfxInit.resolution.width = (uint16_t)m_Window->m_Width;
-	bgfxInit.resolution.height = (uint16_t)m_Window->m_Height;
-	bgfxInit.resolution.reset = BGFX_RESET_VSYNC;
-	bgfxInit.platformData = pd;
-	bgfx::init(bgfxInit);
-
+Application::Application() {
 	s_Instance = this;
 	EventSystem::Init();
-	Renderer::Init(RenderAPI::OpenGL);
+	Renderer::Init();
 }
 
 void Application::Init() {
+	s_Window = CreateRef<Window>(800, 600);
 	VOLCANICORE_ASSERT(glfwInit(), "Failed to initialize GLFW");
 }
 
 void Application::Run() {
-	while(s_Instance->m_Window->IsOpen())
+	while(s_Window->IsOpen())
 	{
 		TimePoint time = Time::GetTime();
 		TimeStep ts = time - s_LastFrame;
@@ -62,7 +34,7 @@ void Application::Run() {
 		EventSystem::PollEvents();
 		
 		s_Instance->OnUpdate(ts);
-		s_Instance->m_Window->Update();
+		s_Window->Update();
 	}	
 }
 

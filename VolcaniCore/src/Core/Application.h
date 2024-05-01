@@ -11,21 +11,24 @@ namespace VolcaniCore {
 class Application {
 public:
 	Application();
-
-	static void Close();
-	static Ref<Window> GetWindow() { return s_Instance->m_Window; }
-
-protected:
 	virtual ~Application() = default;
 
+	static void Close();
+
+	static Ref<Window> GetWindow() { return s_Window; }
+	static Ref<APIRenderer> GetBackendRenderer() { return s_BackendRenderer; }
+
+protected:
 	virtual void OnUpdate(TimeStep ts) = 0;
-	Ref<Window> m_Window;
 
 private:
 	static void Init();
 	static void Run();
 
 	inline static Application* s_Instance;
+	inline static Ref<Window> s_Window;
+	inline static Ref<APIRenderer> s_BackendRenderer;
+
 	inline static TimePoint s_LastFrame{ Time::GetTime() };
 	inline static TimeStep s_TimeStep;
 

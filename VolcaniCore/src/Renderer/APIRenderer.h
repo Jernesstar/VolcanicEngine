@@ -11,7 +11,12 @@
 
 namespace VolcaniCore {
 
+enum class RenderAPI { OpenGL, Vulkan, DirectX, bgfx };
+
 class APIRenderer {
+public:
+	inline static RenderAPI m_API;
+
 public:
 	virtual void Init() = 0;
 	virtual void Close() = 0;

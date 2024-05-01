@@ -9,10 +9,13 @@ project "VolcaniCore"
     files {
         "src/**.h",
         "src/**.cpp",
+        "impl/**.h",
+        "impl/**.cpp",
     }
 
     includedirs {
         "src",
+        "impl",
 
         "%{Includes.bgfx}",
         "%{Includes.glfw}",
