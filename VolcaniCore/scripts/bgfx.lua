@@ -36,17 +36,16 @@ project "bgfx"
     filter "system:macosx"
         files { path.join("%{VendorPaths.bgfx}", "src/*.mm") }
 
-    filter "action:vs*"
-        includedirs { path.join("%{VendorPaths.bx}", "include/compat/msvc") }
     filter { "system:windows", "action:gmake2" }
         includedirs { path.join("%{VendorPaths.bx}", "include/compat/mingw") }
     filter { "system:linux", "action:gmake2" }
-        defines { "BX_PLATFORM_LINUX" }
+        -- defines { "BX_PLATFORM_LINUX" }
         includedirs { path.join("%{VendorPaths.bx}", "include/compat/linux") }
     filter { "system:macosx" }
         includedirs { path.join("%{VendorPaths.bx}", "include/compat/osx") }
         buildoptions { "-x objective-c++" }
-
+    filter "action:vs*"
+        includedirs { path.join("%{VendorPaths.bx}", "include/compat/msvc") }
 
 project "bimg"
     kind "StaticLib"

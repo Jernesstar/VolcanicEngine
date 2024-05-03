@@ -15,10 +15,11 @@ enum class RenderAPI { OpenGL, Vulkan, DirectX, bgfx };
 
 class RendererAPI {
 public:
-	// const RenderAPI API;
+	const RenderAPI API;
 
 public:
-	// RendererAPI(RenderAPI api);
+	RendererAPI(RenderAPI api) : API(api) { };
+	virtual ~RendererAPI() = default;
 
 	virtual void Init() = 0;
 	virtual void Close() = 0;
