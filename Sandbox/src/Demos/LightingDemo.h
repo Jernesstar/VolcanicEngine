@@ -23,6 +23,7 @@
 
 using namespace VolcaniCore;
 
+class LightingDemo : public Application {
 public:
 	LightingDemo();
 
@@ -293,7 +294,7 @@ void LightingDemo::OnUpdate(TimeStep ts)
 		for(uint32_t i = 0; i < 4; i++)
 		{
 			light_shader->SetVec3("u_Position", pointlights[i].Position);
-			Renderer::GetRenderer()->As<OpenGL::Renderer>()->DrawIndexed(light_array);
+			Application::GetRenderer()->As<OpenGL::Renderer>()->DrawIndexed(light_array);
 		}
 	}
 

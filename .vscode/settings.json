@@ -6,4 +6,5 @@
 		"x11_platform.h": "c",
 		"*.in": "cpp"
 	},
+	"cmake.sourceDirectory": "/workspaces/VolcanicEngine/VolcaniCore/vendor/assimp/contrib/pugixml",
 }

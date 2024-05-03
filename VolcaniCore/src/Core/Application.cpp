@@ -12,13 +12,18 @@ namespace VolcaniCore {
 
 Application::Application() {
 	s_Instance = this;
-	EventSystem::Init();
+
+	s_BackendRenderer = RendererAPI::CreateRenderer(RenderAPI::OpenGL);
+	s_BackendRenderer->Init();
+
 	Renderer::Init();
 }
 
 void Application::Init() {
-	s_Window = CreateRef<Window>(800, 600);
 	VOLCANICORE_ASSERT(glfwInit(), "Failed to initialize GLFW");
+	s_Window = CreateRef<Window>(800, 600);
+
+	EventSystem::Init();
 }
 
 void Application::Run() {

@@ -13,11 +13,13 @@ namespace VolcaniCore {
 
 enum class RenderAPI { OpenGL, Vulkan, DirectX, bgfx };
 
-class APIRenderer {
+class RendererAPI {
 public:
-	inline static RenderAPI m_API;
+	// const RenderAPI API;
 
 public:
+	// RendererAPI(RenderAPI api);
+
 	virtual void Init() = 0;
 	virtual void Close() = 0;
 
@@ -28,6 +30,8 @@ public:
 	virtual void RenderQuad(Ref<Quad> quad, Transform t) = 0;
 	virtual void RenderText(Ref<Text> text, Transform t) = 0;
 	virtual void RenderTexture(Ref<Texture> texture, Transform t) = 0;
+
+	static Ref<RendererAPI> CreateRenderer(RenderAPI api);
 
 	template<typename Derived>
 	Derived* As() const { return (Derived*)(this); }

@@ -1,13 +1,13 @@
 #pragma once
 
-#include "Renderer/APIRenderer.h"
+#include "Renderer/RendererAPI.h"
 #include "Renderer/Model.h"
 
 #include "VertexArray.h"
 
 namespace VolcaniCore::OpenGL {
 
-class Renderer : public VolcaniCore::APIRenderer {
+class Renderer : public VolcaniCore::RendererAPI {
 public:
 	Renderer();
 	~Renderer() = default;

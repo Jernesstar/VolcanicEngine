@@ -4,6 +4,8 @@
 #include "Window.h"
 #include "Time.h"
 
+#include "Renderer/RendererAPI.h"
+
 int main(int argc, char** argv);
 
 namespace VolcaniCore {
@@ -16,7 +18,7 @@ public:
 	static void Close();
 
 	static Ref<Window> GetWindow() { return s_Window; }
-	static Ref<APIRenderer> GetBackendRenderer() { return s_BackendRenderer; }
+	static Ref<RendererAPI> GetRenderer() { return s_BackendRenderer; }
 
 protected:
 	virtual void OnUpdate(TimeStep ts) = 0;
@@ -27,7 +29,7 @@ private:
 
 	inline static Application* s_Instance;
 	inline static Ref<Window> s_Window;
-	inline static Ref<APIRenderer> s_BackendRenderer;
+	inline static Ref<RendererAPI> s_BackendRenderer;
 
 	inline static TimePoint s_LastFrame{ Time::GetTime() };
 	inline static TimeStep s_TimeStep;
