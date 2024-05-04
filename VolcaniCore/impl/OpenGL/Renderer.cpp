@@ -7,7 +7,8 @@
 
 namespace VolcaniCore::OpenGL {
 
-Renderer::Renderer() {
+Renderer::Renderer()
+: RendererAPI::RendererAPI(RenderAPI::OpenGL) {
 	float vertices[] =
 	{
 		-1.0f,  1.0f, -1.0f,

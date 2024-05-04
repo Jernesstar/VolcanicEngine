@@ -15,6 +15,7 @@ project "Sandbox"
 
     includedirs {
         "%{RootPath}/VolcaniCore/src",
+        "%{RootPath}/VolcaniCore/impl",
 
         "%{Includes.bgfx}",
         "%{Includes.bimg}",
@@ -24,6 +25,7 @@ project "Sandbox"
         "%{Includes.glm}",
         "%{Includes.imgui}",
         "%{Includes.assimp}",
+        "%{Includes.freetype}",
         "%{Includes.stb_image}",
     }
 
@@ -36,6 +38,7 @@ project "Sandbox"
         "glad",
         "imgui",
         "assimp",
+        "freetype",
         "stb_image",
     }
 

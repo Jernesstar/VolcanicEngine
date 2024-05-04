@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Core/Application.h"
 #include "Core/Defines.h"
 
 #include "RendererAPI.h"
@@ -15,14 +16,11 @@ public:
 
 	static void Clear() { Application::GetRenderer()->Clear(); }
 
-	// static void RenderModel(Ref<Model> model) { m_BackendRenderer->RenderModel(model); }
-	// static void RenderCubemap(Ref<Cubemap> cubemap) { m_BackendRenderer->RenderCubemap(cubemap); }
-	// static void RenderQuad(Ref<Quad> quad, Transform t) { m_BackendRenderer->RenderQuad(quad, t); }
-	// static void RenderText(Ref<Text> text, Transform t) { m_BackendRenderer->RenderText(text, t); }
-	// static void RenderTexture(Ref<Texture> texture, Transform t) { m_BackendRenderer->RenderTexture(texture, t); }
-
-	// static RenderAPI GetRenderAPI() { return m_API; }
-	// static Ref<RendererAPI> GetRenderer() { return m_BackendRenderer; }
+	static void RenderModel(Ref<Model> model) { Application::GetRenderer()->RenderModel(model); }
+	static void RenderCubemap(Ref<Cubemap> cubemap) { Application::GetRenderer()->RenderCubemap(cubemap); }
+	static void RenderQuad(Ref<Quad> quad, Transform t) { Application::GetRenderer()->RenderQuad(quad, t); }
+	static void RenderText(Ref<Text> text, Transform t) { Application::GetRenderer()->RenderText(text, t); }
+	static void RenderTexture(Ref<Texture> texture, Transform t) { Application::GetRenderer()->RenderTexture(texture, t); }
 
 	Renderer() = delete;
 	~Renderer() = delete;

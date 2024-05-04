@@ -44,7 +44,7 @@ workspace "VolcanicEngine"
         startproject "Sandbox"
 
 
--- include "VolcaniCore/scripts/bgfx"
+include "VolcaniCore/scripts/bgfx"
 include "VolcaniCore/scripts/glfw"
 include "VolcaniCore/scripts/glad"
 include "VolcaniCore/scripts/imgui"

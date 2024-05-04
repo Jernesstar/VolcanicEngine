@@ -19,6 +19,7 @@ public:
 
 	static Ref<Window> GetWindow() { return s_Window; }
 	static Ref<RendererAPI> GetRenderer() { return s_BackendRenderer; }
+	static RenderAPI GetRenderAPI() { return s_BackendRenderer->API; }
 
 protected:
 	virtual void OnUpdate(TimeStep ts) = 0;

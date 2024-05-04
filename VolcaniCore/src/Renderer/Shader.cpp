@@ -13,7 +13,7 @@ std::vector<Shader> GetShaders(const std::string& cubemap_folder, const std::str
 Shader FindShader(const std::string& path);
 
 Ref<ShaderPipeline> ShaderPipeline::Create(const std::vector<Shader>& shaders) {
-	RenderAPI api = Renderer::GetRenderAPI();
+	RenderAPI api = Application::GetRenderAPI();
 
 	switch(api) {
 		case RenderAPI::OpenGL:
@@ -23,7 +23,7 @@ Ref<ShaderPipeline> ShaderPipeline::Create(const std::vector<Shader>& shaders) {
 }
 
 Ref<ShaderPipeline> ShaderPipeline::Create(const std::vector<std::string>& paths) {
-	RenderAPI api = Renderer::GetRenderAPI();
+	RenderAPI api = Application::GetRenderAPI();
 
 	auto shaders = GetShaders(paths);
 
@@ -35,7 +35,7 @@ Ref<ShaderPipeline> ShaderPipeline::Create(const std::vector<std::string>& paths
 }
 
 Ref<ShaderPipeline> ShaderPipeline::Create(const std::string& folder_path, const std::string& name) {
-	RenderAPI api = Renderer::GetRenderAPI();
+	RenderAPI api = Application::GetRenderAPI();
 
 	auto shaders = GetShaders(folder_path, name);
 

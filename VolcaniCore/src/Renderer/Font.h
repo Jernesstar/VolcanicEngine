@@ -2,12 +2,12 @@
 
 #include <unordered_map>
 
-// #include <ft2build.h>
-// #include <freetype/freetype.h>
+#include <ft2build.h>
+#include <freetype/freetype.h>
 
 #include <glm/vec3.hpp>
 
-#include "Core/Application.h"
+// #include "Core/Application.h"
 
 namespace VolcaniCore {
 
