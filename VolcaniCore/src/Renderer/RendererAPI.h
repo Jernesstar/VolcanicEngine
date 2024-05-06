@@ -18,7 +18,7 @@ public:
 	const RenderAPI API;
 
 public:
-	RendererAPI(RenderAPI api) : API(api) { };
+	RendererAPI(RenderAPI api) : API(api) { }
 	virtual ~RendererAPI() = default;
 
 	virtual void Init() = 0;

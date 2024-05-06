@@ -1,14 +1,20 @@
 #include "Renderer.h"
 
-#include "Cubemap.h"
-#include "VertexBuffer.h"
+#include <glad/glad.h>
 
 #include "OpenGL/Texture2D.h"
+
+#include "Core/Assert.h"
+
+#include "Cubemap.h"
+#include "VertexBuffer.h"
 
 namespace VolcaniCore::OpenGL {
 
 Renderer::Renderer()
 : RendererAPI::RendererAPI(RenderAPI::OpenGL) {
+	VOLCANICORE_ASSERT(gladLoadGL(), "Glad could not load OpenGL");
+
 	float vertices[] =
 	{
 		-1.0f,  1.0f, -1.0f,
@@ -54,15 +60,15 @@ Renderer::Renderer()
 		 1.0f, -1.0f,  1.0f
 	};
 
-	VertexBuffer* buffer = new VertexBuffer(vertices, BufferLayout{ { "Position", BufferDataType::Vec3 } });
-	s_CubemapArray = CreatePtr<VertexArray>(buffer);
+	// VertexBuffer* buffer = new VertexBuffer(vertices, BufferLayout{ { "Position", BufferDataType::Vec3 } });
+	// s_CubemapArray = CreatePtr<VertexArray>(buffer);
 }
 
 void Renderer::Init() {
-	glEnable(GL_DEPTH_TEST); // Depth testing
-	glEnable(GL_MULTISAMPLE); // Smooth edges
-	glEnable(GL_FRAMEBUFFER_SRGB); // Gamma correction
-	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS); // ???
+	glEnable(GL_DEPTH_TEST);				// Depth testing
+	glEnable(GL_MULTISAMPLE);				// Smooth edges
+	glEnable(GL_FRAMEBUFFER_SRGB);			// Gamma correction
+	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);	// ???
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -84,8 +90,7 @@ void Renderer::Clear() {
 void Renderer::RenderModel(Ref<Model> model) {
 	model->Bind();
 
-	for(uint32_t i = 0; i < model->GetMeshCount(); i++)
-	{
+	for(uint32_t i = 0; i < model->GetMeshCount(); i++) {
 		auto& mesh = model->GetMesh(i);
 		auto material_index = mesh.MaterialIndex;
 		model->GetMaterial(material_index).Bind();

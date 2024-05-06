@@ -4,7 +4,7 @@
 
 #include "Demos/ModelDemo.h"
 #include "Demos/LightingDemo.h"
-// #include "Demos/bgfx.h"
+#include "Demos/bgfx.h"
 
 using namespace VolcaniCore;
 
