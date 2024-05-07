@@ -18,19 +18,18 @@ namespace VolcaniCore {
 
 void EventSystem::Init()
 {
+	GLFWwindow* window = Application::GetWindow()->GetNativeWindow();
+
 	glfwSetErrorCallback(ErrorCallback);
 
-	// GLFWwindow* window = Application::GetWindow()->GetNativeWindow();
-	// VOLCANICORE_ASSERT(window);
-
-	// glfwSetKeyCallback(window, KeyCallback);
-	// glfwSetCharCallback(window, KeyCharCallback);
-	// glfwSetCursorPosCallback(window, MouseMovedCallback);
-	// glfwSetScrollCallback(window, MouseScrolledCallback);
-	// glfwSetMouseButtonCallback(window, MouseButtonCallback);
-	// glfwSetWindowPosCallback(window, WindowMovedCallback);
-	// glfwSetWindowSizeCallback(window, WindowResizedCallback);
-	// glfwSetWindowCloseCallback(window, WindowClosedCallback);
+	glfwSetKeyCallback(window, KeyCallback);
+	glfwSetCharCallback(window, KeyCharCallback);
+	glfwSetCursorPosCallback(window, MouseMovedCallback);
+	glfwSetScrollCallback(window, MouseScrolledCallback);
+	glfwSetMouseButtonCallback(window, MouseButtonCallback);
+	glfwSetWindowPosCallback(window, WindowMovedCallback);
+	glfwSetWindowSizeCallback(window, WindowResizedCallback);
+	glfwSetWindowCloseCallback(window, WindowClosedCallback);
 }
 
 GET_CALLBACKS(KeyPressedEvent);

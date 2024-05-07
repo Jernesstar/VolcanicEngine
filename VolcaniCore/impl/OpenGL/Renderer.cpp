@@ -2,17 +2,17 @@
 
 #include <glad/glad.h>
 
-#include "OpenGL/Texture2D.h"
-
 #include "Core/Assert.h"
 
 #include "Cubemap.h"
+#include "Texture2D.h"
 #include "VertexBuffer.h"
 
 namespace VolcaniCore::OpenGL {
 
 Renderer::Renderer()
-: RendererAPI::RendererAPI(RenderAPI::OpenGL) {
+	: RendererAPI::RendererAPI(RenderAPI::OpenGL)
+{
 	VOLCANICORE_ASSERT(gladLoadGL(), "Glad could not load OpenGL");
 
 	float vertices[] =

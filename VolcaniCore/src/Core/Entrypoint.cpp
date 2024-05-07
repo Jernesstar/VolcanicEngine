@@ -6,9 +6,7 @@ extern Application* CreateApplication();
 
 int main(int argc, char** argv) {
 	Application::Init();
-
-	Application* app = CreateApplication();	
-
-	// Application::Run();
+	Application* app = CreateApplication();
+	Application::Run();
 	Application::Close();
 }
