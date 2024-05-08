@@ -25,6 +25,9 @@ public:
 	bool IsOpen() const { return !glfwWindowShouldClose(m_NativeWindow); }
 
 private:
+	void InitImGui();
+	void CloseImGui();
+
 	GLFWwindow* GetNativeWindow() const { return m_NativeWindow; }
 
 	uint32_t m_Width, m_Height;

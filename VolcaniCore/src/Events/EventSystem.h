@@ -79,7 +79,6 @@ private:
 	template<typename TEvent>
 	static Callbacks<TEvent>& GetCallbacks();
 
-	static void ErrorCallback(int error, const char* description);
 	static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 	static void KeyCharCallback(GLFWwindow* window, uint32_t codepoint);
 	static void MouseMovedCallback(GLFWwindow* window, double x, double y);

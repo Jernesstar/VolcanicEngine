@@ -15,7 +15,7 @@ project "imgui"
     }
 
     includedirs {
+        "%{Includes.glfw}",
         "%{Includes.imgui}",
         "%{Includes.imgui}/imgui",
-        "%{Includes.glfw}"
     }

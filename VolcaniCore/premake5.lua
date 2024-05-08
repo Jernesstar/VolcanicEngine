@@ -22,6 +22,7 @@ project "VolcaniCore"
         "%{Includes.glad}",
         "%{Includes.glm}",
         "%{Includes.imgui}",
+        "%{Includes.imgui}/imgui",
         "%{Includes.freetype}",
         "%{Includes.assimp}",
         "%{Includes.stb_image}",

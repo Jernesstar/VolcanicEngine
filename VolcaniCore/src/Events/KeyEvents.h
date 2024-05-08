@@ -31,11 +31,7 @@ struct KeyCharEvent : public KeyEvent {
 	KeyCharEvent(KeyCode key, const char& _char)
 		: KeyEvent(EventType::KeyCharEvent, key), Char(_char) { };
 
-	std::string ToString() const
-	{
-		std::string str;
-		return str = Char;
-	}
+	std::string ToString() const { return std::string{Char}; }
 };
 
 }

@@ -20,8 +20,6 @@ void EventSystem::Init()
 {
 	GLFWwindow* window = Application::GetWindow()->GetNativeWindow();
 
-	glfwSetErrorCallback(ErrorCallback);
-
 	glfwSetKeyCallback(window, KeyCallback);
 	glfwSetCharCallback(window, KeyCharCallback);
 	glfwSetCursorPosCallback(window, MouseMovedCallback);
@@ -112,11 +110,6 @@ void EventSystem::RegisterEventListener<Event>(const EventCallback<Event>& event
 	RegisterEventListener<KeyEvent>((EventCallback<KeyEvent>)event_callback);
 	RegisterEventListener<MouseEvent>((EventCallback<MouseEvent>)event_callback);
 	RegisterEventListener<WindowEvent>((EventCallback<WindowEvent>)event_callback);
-}
-
-void EventSystem::ErrorCallback(int error, const char* description)
-{
-	VOLCANICORE_ASSERT(false, description);
 }
 
 void EventSystem::KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)

@@ -9,5 +9,5 @@
 using namespace VolcaniCore;
 
 Application* CreateApplication() {
-	return new EmptyDemo();
+	return new LightingDemo();
 }
