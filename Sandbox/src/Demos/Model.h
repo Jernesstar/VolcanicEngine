@@ -111,7 +111,7 @@ ModelDemo::ModelDemo()
 	light_shader->SetVec3("u_LightColor", light_color);
 	light_shader->SetMat4("u_Model", light_model);
 
-	//m_Model = CreateRef<Model>("Sandbox/assets/models/rpg");
+	m_Model = CreateRef<Model>("Sandbox/assets/models/rpg");
 }
 
 void ModelDemo::OnUpdate(TimeStep ts)
@@ -127,5 +127,5 @@ void ModelDemo::OnUpdate(TimeStep ts)
 	model_shader->As<OpenGL::ShaderProgram>()->Bind();
 	model_shader->SetMat4("u_ViewProj", m_Camera.GetViewProjection());
 	model_shader->SetVec3("u_CameraPosition", m_Camera.GetPosition());
-	//Renderer::RenderModel(m_Model);
+	Renderer::RenderModel(m_Model);
 }
