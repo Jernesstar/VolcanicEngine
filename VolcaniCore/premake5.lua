@@ -7,15 +7,15 @@ project "VolcaniCore"
     targetdir ("%{RootPath}/build/libs")
 
     files {
-        "src/**.h",
-        "src/**.cpp",
-        "impl/**.h",
-        "impl/**.cpp",
+        "src/VolcaniCore/**.h",
+        "src/VolcaniCore/**.cpp",
+        "src/impl/**.h",
+        "src/impl/**.cpp",
     }
 
     includedirs {
-        "src",
-        "impl",
+        "src/VolcaniCore",
+        "src/impl",
 
         "%{Includes.bgfx}",
         "%{Includes.glfw}",
