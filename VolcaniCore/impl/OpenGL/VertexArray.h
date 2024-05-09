@@ -4,7 +4,7 @@
 
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
-#include "BufferLayout.h"
+#include "Renderer/BufferLayout.h"
 
 namespace VolcaniCore::OpenGL {
 

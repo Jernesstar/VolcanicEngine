@@ -3,10 +3,10 @@
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 
-#include "OpenGL/BufferLayout.h"
-
 #include "Core/Log.h"
 #include "Core/Assert.h"
+
+#include "BufferLayout.h"
 
 using namespace VolcaniCore::OpenGL;
 
@@ -15,16 +15,14 @@ namespace VolcaniCore {
 Model::Model(const std::string& path)
 	: m_Path(path)
 {
-	if(path == "" || path.find_first_not_of(" ") == std::string::npos)
-		return;
+	VOLCANICORE_ASSERT(path == "" || path.find_first_not_of(" ") == std::string::npos)
 
 	LoadMesh(path);
 }
 
 Model::~Model() { Clear(); }
 
-void Model::Clear()
-{
+void Model::Clear() {
 	m_Meshes.clear();
 	m_Materials.clear();
 
@@ -40,8 +38,7 @@ void Model::Clear()
 	m_VertexArray.reset();
 }
 
-void Model::LoadMesh(const std::string& path)
-{
+void Model::LoadMesh(const std::string& path) {
 	Clear();
 
 	Assimp::Importer imp;
@@ -101,12 +98,10 @@ void Model::LoadMesh(const std::string& path)
 	delete scene;
 }
 
-void Model::LoadSubMesh(const aiMesh* mesh)
-{
+void Model::LoadSubMesh(const aiMesh* mesh) {
 	const aiVector3D Zero3D(0.0f, 0.0f, 0.0f);
 
-	for(uint32_t i = 0; i < mesh->mNumVertices; i++)
-	{
+	for(uint32_t i = 0; i < mesh->mNumVertices; i++) {
 		const aiVector3D& position = mesh->mVertices[i];
 		const aiVector3D& normal = mesh->mNormals[i];
 		const aiVector3D& texture_coord = mesh->HasTextureCoords(0) ? mesh->mTextureCoords[0][i] : Zero3D;
@@ -116,8 +111,7 @@ void Model::LoadSubMesh(const aiMesh* mesh)
 		m_TextureCoords.push_back(glm::vec2(texture_coord.x, texture_coord.y));
 	}
 
-	for(uint32_t i = 0; i < mesh->mNumFaces; i++)
-	{
+	for(uint32_t i = 0; i < mesh->mNumFaces; i++) {
 		const aiFace& face = mesh->mFaces[i];
 		m_Indices.push_back(face.mIndices[0]);
 		m_Indices.push_back(face.mIndices[1]);
@@ -125,8 +119,7 @@ void Model::LoadSubMesh(const aiMesh* mesh)
 	}
 }
 
-void Model::LoadMaterial(const aiMaterial* material, const std::string& path, uint32_t index)
-{
+void Model::LoadMaterial(const aiMaterial* material, const std::string& path, uint32_t index) {
 	std::size_t slash_index = path.find("textures");
 	std::string dir;
 
@@ -142,8 +135,7 @@ void Model::LoadMaterial(const aiMaterial* material, const std::string& path, ui
 	m_Materials[index].Roughness = LoadTexture(material, dir, aiTextureType_DIFFUSE_ROUGHNESS);
 }
 
-Ref<Texture> Model::LoadTexture(const aiMaterial* material, const std::string& dir, aiTextureType type)
-{
+Ref<Texture> Model::LoadTexture(const aiMaterial* material, const std::string& dir, aiTextureType type) {
 	if(material->GetTextureCount(type) == 0)
 		return nullptr;
 
@@ -156,7 +148,7 @@ Ref<Texture> Model::LoadTexture(const aiMaterial* material, const std::string& d
 		p = p.substr(2, p.size() - 2);
 
 	std::string full_path = dir + "/" + p;
-	return CreateRef<Texture>(full_path);
+	return Texture::Create(full_path);
 }
 
 }

@@ -157,16 +157,16 @@ private:
 		glm::rotate(glm::translate(glm::mat4(1.0f), { -1.3f,  1.0f, -1.5f }), glm::radians(20.0f * 9.0f), { 1.0f, 0.3f, 0.5f }),
 	};
 
-	OpenGL::BufferLayout l1 =
+	BufferLayout l1 =
 	{
-		{ "a_Position", OpenGL::BufferDataType::Vec3 },
+		{ "a_Position", BufferDataType::Vec3 },
 	};
 
-	OpenGL::BufferLayout l2 =
+	BufferLayout l2 =
 	{
-		{ "a_Position", OpenGL::BufferDataType::Vec3 },
-		{ "a_Normal",   OpenGL::BufferDataType::Vec3 },
-		{ "a_TextureCoordinate", OpenGL::BufferDataType::Vec2 },
+		{ "a_Position", BufferDataType::Vec3 },
+		{ "a_Normal",   BufferDataType::Vec3 },
+		{ "a_TextureCoordinate", BufferDataType::Vec2 },
 	};
 
 	OpenGL::IndexBuffer* index_buffer = new OpenGL::IndexBuffer(indices);

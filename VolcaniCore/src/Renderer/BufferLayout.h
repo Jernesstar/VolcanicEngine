@@ -3,14 +3,12 @@
 #include <vector>
 #include <string>
 
-namespace VolcaniCore::OpenGL {
+namespace VolcaniCore {
 
 enum class BufferDataType { Float, Int, Vec2, Vec3, Vec4, Mat2, Mat3, Mat4 };
 
-static uint32_t BufferElementSize(BufferDataType type)
-{
-	switch(type)
-	{
+static uint32_t BufferElementSize(BufferDataType type) {
+	switch(type) {
 		case BufferDataType::Float: return 4;
 		case BufferDataType::Int:   return 4;
 		case BufferDataType::Vec2:  return 4 * 2;
@@ -23,10 +21,8 @@ static uint32_t BufferElementSize(BufferDataType type)
 	return 0;
 }
 
-static uint32_t BufferElementCount(BufferDataType type)
-{
-	switch(type)
-	{
+static uint32_t BufferElementCount(BufferDataType type) {
+	switch(type) {
 		case BufferDataType::Float: return 1;
 		case BufferDataType::Int:   return 1;
 		case BufferDataType::Vec2:  return 2;
@@ -65,8 +61,7 @@ public:
 	std::vector<BufferElement>::const_iterator end() const { return Elements.end(); }
 
 private:
-	uint32_t CalculateStride(const std::initializer_list<BufferElement>& elements)
-	{
+	uint32_t CalculateStride(const std::initializer_list<BufferElement>& elements) {
 		int stride = 0;
 		for(auto& element : elements)
 			stride += element.Size;

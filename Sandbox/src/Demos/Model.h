@@ -59,8 +59,8 @@ private:
 		2, 6, 7,
 	};
 
-	OpenGL::BufferLayout l1 = {
-		{ "a_Position", OpenGL::BufferDataType::Vec3, true },
+	BufferLayout l1 = {
+		{ "a_Position", BufferDataType::Vec3, true },
 	};
 
 	OpenGL::IndexBuffer* index_buffer = new OpenGL::IndexBuffer(indices);

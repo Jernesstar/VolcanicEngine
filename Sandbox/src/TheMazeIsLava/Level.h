@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <vector>
 
-struct Coordinate { uint32_t x, y; }
+struct Coordinate { uint32_t x, y; };
 
 class Level {
 public:
