@@ -13,9 +13,9 @@ using namespace VolcaniCore::OpenGL;
 namespace VolcaniCore {
 
 Model::Model(const std::string& path)
-	: m_Path(path)
+	: Path(path)
 {
-	VOLCANICORE_ASSERT(path == "" || path.find_first_not_of(" ") == std::string::npos)
+	VOLCANICORE_ASSERT(path != "");
 
 	LoadMesh(path);
 }
@@ -39,14 +39,11 @@ void Model::Clear() {
 }
 
 void Model::LoadMesh(const std::string& path) {
-	Clear();
-
 	Assimp::Importer imp;
 	uint32_t load_flags = aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices;
 	const aiScene* scene = imp.ReadFile(path.c_str(), load_flags);
 
-	if(!scene)
-		VOLCANICORE_ASSERT_ARGS(false, "Error importing from %s: %s", path.c_str(), imp.GetErrorString());
+	VOLCANICORE_ASSERT_ARGS(scene, "Error importing model(s) from %s: %s", path.c_str(), imp.GetErrorString());
 
 	m_Path = path;
 	m_Meshes.resize(scene->mNumMeshes);
@@ -55,8 +52,7 @@ void Model::LoadMesh(const std::string& path) {
 	uint32_t vertex_count = 0;
 	uint32_t index_count = 0;
 
-	for(uint32_t i = 0; i < m_Meshes.size(); i++)
-	{
+	for(uint32_t i = 0; i < m_Meshes.size(); i++) {
 		aiMesh* in_mesh = scene->mMeshes[i];
 		Mesh& out_mesh = m_Meshes[i];
 		out_mesh.MaterialIndex = in_mesh->mMaterialIndex;
@@ -99,12 +95,10 @@ void Model::LoadMesh(const std::string& path) {
 }
 
 void Model::LoadSubMesh(const aiMesh* mesh) {
-	const aiVector3D Zero3D(0.0f, 0.0f, 0.0f);
-
 	for(uint32_t i = 0; i < mesh->mNumVertices; i++) {
 		const aiVector3D& position = mesh->mVertices[i];
 		const aiVector3D& normal = mesh->mNormals[i];
-		const aiVector3D& texture_coord = mesh->HasTextureCoords(0) ? mesh->mTextureCoords[0][i] : Zero3D;
+		const aiVector3D& texture_coord = mesh->HasTextureCoords(0) ? mesh->mTextureCoords[0][i] : aiVector3D(0.0f, 0.0f, 0.0f);
 
 		m_Positions.push_back(glm::vec3(position.x, position.y, position.z));
 		m_Normals.push_back(glm::vec3(normal.x, normal.y, normal.z));
@@ -142,10 +136,6 @@ Ref<Texture> Model::LoadTexture(const aiMaterial* material, const std::string& d
 	aiString path;
 	if(material->GetTexture(type, 0, &path) == AI_FAILURE)
 		return nullptr;
-
-	std::string p(path.data);
-	if(p.substr(0, 2) == "./")
-		p = p.substr(2, p.size() - 2);
 
 	std::string full_path = dir + "/" + p;
 	return Texture::Create(full_path);

@@ -36,8 +36,10 @@ public:
 		}
 	};
 
+	const std::string Path;
+
 public:
-	Model(const std::string& path);
+	Model(const std::string& folder_path);
 	~Model();
 
 	void Bind() const { m_VertexArray->Bind(); }
@@ -54,7 +56,6 @@ private:
 		Normal
 	};
 
-	std::string m_Path;
 	std::vector<Mesh> m_Meshes;
 	std::vector<Material> m_Materials;
 
