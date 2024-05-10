@@ -12,11 +12,11 @@ public:
 	const uint32_t Size;
 
 public:
-	UniformBuffer(uint32_t binding, std::size_t size, const void* data = nullptr, bool dynamic = true)
+	UniformBuffer(uint32_t binding, std::size_t size, const void* data = nullptr)
 		: Binding(binding), Size(size)
 	{
 		glCreateBuffers(1, &m_BufferID);
-		glNamedBufferData(m_BufferID, size, data, dynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+		glNamedBufferData(m_BufferID, size, data, GL_DYNAMIC_DRAW);
 		glBindBufferBase(GL_UNIFORM_BUFFER, binding, m_BufferID);
 	}
 

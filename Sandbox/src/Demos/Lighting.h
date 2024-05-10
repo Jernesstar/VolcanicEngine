@@ -56,14 +56,6 @@ private:
 		float Quadratic;
 	};
 
-	struct SpotLight {
-		glm::vec4 Position;
-		glm::vec4 Direction;
-
-		float CutoffAngle;
-		float OuterCutoffAngle;
-	};
-
 	Vertex1 vertices[8] =
 	{
 		{ { -0.5f,  0.5f,  0.5 } }, // 0 Front Top Left
@@ -186,16 +178,13 @@ private:
 		{ "Sandbox/assets/shaders/Lighting.glsl.frag", ShaderType::Fragment }
 	});
 
-	OpenGL::Texture2D wood{ "Sandbox/assets/images/wood.png" };
-	OpenGL::Texture2D wood_specular{ "Sandbox/assets/images/wood_specular.png" };
+	Ref<Texture> wood = Texture::Create("Sandbox/assets/images/wood.png");
+	Ref<Texture> wood_specular = Texture::Create("Sandbox/assets/images/wood_specular.png");
 
 	StereographicCamera camera{ 75.0f, 0.01f, 100.0f, 1600, 900 };
 	CameraController controller{ camera };
 
 	PointLight pointlights[4];
-	SpotLight spotlight;
-
-	OpenGL::UniformBuffer* spot_light;
 };
 
 LightingDemo::LightingDemo()
@@ -212,7 +201,7 @@ LightingDemo::LightingDemo()
 
 	light_shader->As<OpenGL::ShaderProgram>()->Bind();
 	{
-		light_shader->SetVec3("u_LightColor", { 1.0f, 1.0f, 1.0f });
+		light_shader->SetVec3("u_LightColor", { 1.0f, 0.0f, 1.0f });
 	}
 
 	cube_shader->As<OpenGL::ShaderProgram>()->Bind();
@@ -230,11 +219,8 @@ LightingDemo::LightingDemo()
 
 		cube_shader->SetMat4("u_Model", glm::mat4{ 1.0f });
 
-		wood.Bind(0);
-		wood_specular.Bind(1);
-
-		// cube_shader->SetTexture("u_Material.Diffuse", &wood);
-		// cube_shader->SetTexture("u_Material.Specular", &wood_specular);
+		cube_shader->SetTexture("u_Material.Diffuse", wood, 0);
+		cube_shader->SetTexture("u_Material.Specular", wood_specular, 1);
 		cube_shader->SetFloat("u_Material.Shininess", 32.0f);
 
 		for(uint32_t i = 0; i < 4; i++) {
@@ -257,28 +243,13 @@ LightingDemo::LightingDemo()
 			cube_shader->SetFloat(name + ".Linear",    pointlights[i].Linear);
 			cube_shader->SetFloat(name + ".Quadratic", pointlights[i].Quadratic);
 		}
-
-		spotlight.Position  = { 0.0f, 0.0f, 0.0f, 0.0f };
-		spotlight.Direction = { 0.0f, 0.0f, 0.0f, 0.0f };
-
-		spotlight.CutoffAngle = glm::radians(12.5f);
-		spotlight.OuterCutoffAngle = glm::radians(15.0f);
-
-		spot_light = new OpenGL::UniformBuffer(0, sizeof(SpotLight));
 	}
 }
 
 void LightingDemo::OnUpdate(TimeStep ts) {
-	ImGui::Begin("Spotlight");
-	{
-		ImGui::SliderFloat("Light.CutoffAngle", &spotlight.CutoffAngle, 0.0f, 3.14159265358979323846264338327950288419716939937510f);
-		ImGui::SliderFloat("Light.OuterCutoffAngle", &spotlight.OuterCutoffAngle, 0.0f, 3.14159265358979323846264338327950288419716939937510f);
-	}
-	ImGui::End();
-
+	Renderer::Clear();
 	controller.OnUpdate(ts);
 
-	Renderer::Clear();
 	light_shader->As<OpenGL::ShaderProgram>()->Bind();
 	{
 		light_shader->SetMat4("u_ViewProj", camera.GetViewProjection());
@@ -293,10 +264,6 @@ void LightingDemo::OnUpdate(TimeStep ts) {
 	{
 		cube_shader->SetVec3("u_CameraPosition", camera.GetPosition());
 		cube_shader->SetMat4("u_ViewProj", camera.GetViewProjection());
-
-		spotlight.Position = glm::vec4(camera.GetPosition(), 0.0f);
-		spotlight.Direction = glm::vec4(camera.GetDirection(), 0.0f);
-		spot_light->SetData(&spotlight);
 
 		for(uint32_t i = 0; i < 4; i++) {
 			std::string name = "u_PointLights[" + std::to_string(i) + "]";

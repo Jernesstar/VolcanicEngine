@@ -29,7 +29,7 @@ public:
 	uint32_t GetWidth() const { return m_Width; }
 	uint32_t GetHeight() const { return m_Height; }
 
-	bool operator ==(const Texture2D& other) const { return m_TextureID == other.m_TextureID; }
+	bool operator ==(const Texture2D& other) const { return this->m_TextureID == other.m_TextureID; }
 
 private:
 	uint32_t m_TextureID;

@@ -45,7 +45,6 @@ public:
 	void Bind() const { m_VertexArray->Bind(); }
 
 	uint32_t GetMeshCount() 		const { return m_Meshes.size(); }
-	const std::string& GetPath()	const { return m_Path; }
 	const Mesh& GetMesh(uint32_t i) const { return m_Meshes[i]; }
 	const Material& GetMaterial(uint32_t index) const { return m_Materials[index]; }
 

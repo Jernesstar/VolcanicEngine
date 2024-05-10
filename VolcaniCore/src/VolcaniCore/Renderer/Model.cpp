@@ -45,7 +45,6 @@ void Model::LoadMesh(const std::string& path) {
 
 	VOLCANICORE_ASSERT_ARGS(scene, "Error importing model(s) from %s: %s", path.c_str(), imp.GetErrorString());
 
-	m_Path = path;
 	m_Meshes.resize(scene->mNumMeshes);
 	m_Materials.resize(scene->mNumMaterials);
 
@@ -136,6 +135,7 @@ Ref<Texture> Model::LoadTexture(const aiMaterial* material, const std::string& d
 	aiString path;
 	if(material->GetTexture(type, 0, &path) == AI_FAILURE)
 		return nullptr;
+    std::string p(path.data);
 
 	std::string full_path = dir + "/" + p;
 	return Texture::Create(full_path);

@@ -14,8 +14,8 @@ project "Sandbox"
     }
 
     includedirs {
-        "%{RootPath}/VolcaniCore/src",
-        "%{RootPath}/VolcaniCore/impl",
+        "%{RootPath}/VolcaniCore/src/VolcaniCore",
+        "%{RootPath}/VolcaniCore/src/impl",
 
         "%{Includes.bgfx}",
         "%{Includes.bimg}",
@@ -32,8 +32,8 @@ project "Sandbox"
     links {
         "VolcaniCore",
         -- "bgfx",
-        "bimg",
-        "bx",
+        -- "bimg",
+        -- "bx",
         "glfw",
         "glad",
         "imgui",

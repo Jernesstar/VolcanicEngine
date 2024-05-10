@@ -10,7 +10,7 @@ project "VolcaniCore"
         "src/VolcaniCore/**.h",
         "src/VolcaniCore/**.cpp",
         "src/impl/**.h",
-        "src/impl/**.cpp",
+        "src/impl/**.cpp"
     }
 
     includedirs {
@@ -25,7 +25,7 @@ project "VolcaniCore"
         "%{Includes.imgui}/imgui",
         "%{Includes.freetype}",
         "%{Includes.assimp}",
-        "%{Includes.stb_image}",
+        "%{Includes.stb_image}"
     }
 
     filter "system:windows"

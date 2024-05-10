@@ -48,7 +48,7 @@ void Texture2D::Bind(uint32_t slot)
 	glBindTextureUnit(slot, m_TextureID);
 }
 
-void Texture2D::SetData(const std::string& path)
+void Texture2D::SetData(const std::string& path) // TODO: Keep this ?
 {
 	m_Path = path;
 	unsigned char* pixel_data = Utils::ReadImage(path.c_str(), m_Width, m_Height, 4, true);
