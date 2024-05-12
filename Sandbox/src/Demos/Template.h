@@ -6,15 +6,17 @@
 
 using namespace VolcaniCore;
 
-class EmptyDemo : public Application {
+class TemplateDemo : public Application {
 public:
-	EmptyDemo();
+	TemplateDemo();
 
 	void OnUpdate(TimeStep ts);
+
+private:
+	
 };
 
-EmptyDemo::EmptyDemo()
-{
+TemplateDemo::TemplateDemo() {
 	EventSystem::RegisterEventListener<KeyPressedEvent>(
 	[](const KeyPressedEvent& event) {
 		if(event.Key == Key::Escape)
@@ -29,6 +31,6 @@ EmptyDemo::EmptyDemo()
 	VOLCANICORE_LOG_INFO("Test");
 }
 
-void EmptyDemo::OnUpdate(TimeStep ts) {
+void TemplateDemo::OnUpdate(TimeStep ts) {
 
 }

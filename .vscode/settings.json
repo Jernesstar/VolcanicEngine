@@ -75,7 +75,8 @@
 		"streambuf": "cpp",
 		"thread": "cpp",
 		"typeinfo": "cpp",
-		"variant": "cpp"
+		"variant": "cpp",
+		"*.hpp11": "cpp"
 	},
 	"cmake.sourceDirectory": "/workspaces/VolcanicEngine/VolcaniCore/vendor/assimp/contrib/pugixml",
 }

@@ -8,10 +8,9 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
-#include "Assert.h"
-#include "Time.h"
 #include "Events/Events.h"
 #include "Renderer/Renderer.h"
+#include "Assert.h"
 
 namespace VolcaniCore {
 

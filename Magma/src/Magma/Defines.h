@@ -8,7 +8,7 @@
 
 #define GLM_ENABLE_EXPERIMENTAL
 
-namespace VolcaniCore {
+namespace Magma {
 
 template<typename T>
 using Ptr = std::unique_ptr<T>;

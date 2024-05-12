@@ -39,7 +39,7 @@ void ShaderProgram::SetTexture(const std::string& name, Ref<Texture> texture, ui
 {
 	VOLCANICORE_ASSERT(slot >= 0);
 
-	texture->As<OpenGL::Texture2D>()->Bind();
+	texture->As<OpenGL::Texture2D>()->Bind(slot);
 	SetInt(name, slot);
 }
 

@@ -3,8 +3,8 @@ project "assimp"
     language "C++"
     cppdialect "C++latest"
 
-    objdir ("%{RootPath}/build/obj")
-    targetdir ("%{RootPath}/build/libs")
+    objdir ("%{RootPath}/build/VolcaniCore/obj")
+    targetdir ("%{RootPath}/build/VolcaniCore/libs")
 
     files {
         -- "%{VendorPaths.assimp}/code/CApi/*.cpp",

@@ -9,7 +9,7 @@
 namespace VolcaniCore {
 
 std::vector<Shader> GetShaders(const std::vector<std::string>& paths);
-std::vector<Shader> GetShaders(const std::string& cubemap_folder, const std::string& name);
+std::vector<Shader> GetShaders(const std::string& shader_folder, const std::string& name);
 Shader FindShader(const std::string& path);
 
 Ref<ShaderPipeline> ShaderPipeline::Create(const std::vector<Shader>& shaders) {
@@ -59,7 +59,7 @@ std::vector<Shader> GetShaders(const std::vector<std::string>& paths) {
 	return shaders;
 }
 
-std::vector<Shader> GetShaders(const std::string& cubemap_folder, const std::string& name) {
+std::vector<Shader> GetShaders(const std::string& shader_folder, const std::string& name) {
 
 }
 

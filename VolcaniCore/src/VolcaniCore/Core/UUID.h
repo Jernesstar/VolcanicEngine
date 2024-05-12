@@ -21,8 +21,7 @@ namespace std {
 
 template<>
 struct hash<VolcaniCore::UUID> {
-	std::size_t operator()(const VolcaniCore::UUID& uuid) const
-	{
+	std::size_t operator()(const VolcaniCore::UUID& uuid) const {
 		return (uint64_t)uuid;
 	}
 };

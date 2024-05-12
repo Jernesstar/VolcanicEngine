@@ -6,8 +6,8 @@ project "bgfx"
     rtti "Off"
     defines "__STDC_FORMAT_MACROS"
 
-    objdir ("%{RootPath}/build/obj")
-    targetdir ("%{RootPath}/build/libs")
+    objdir ("%{RootPath}/build/VolcaniCore/obj")
+    targetdir ("%{RootPath}/build/VolcaniCore/lib")
 
     files {
         path.join("%{VendorPaths.bgfx}", "include/bgfx/**.h"),
@@ -39,7 +39,6 @@ project "bgfx"
     filter { "system:windows", "action:gmake2" }
         includedirs { path.join("%{VendorPaths.bx}", "include/compat/mingw") }
     filter { "system:linux", "action:gmake2" }
-        -- defines { "BX_PLATFORM_LINUX" }
         includedirs { path.join("%{VendorPaths.bx}", "include/compat/linux") }
     filter { "system:macosx" }
         includedirs { path.join("%{VendorPaths.bx}", "include/compat/osx") }

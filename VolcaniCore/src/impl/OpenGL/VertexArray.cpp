@@ -71,7 +71,7 @@ void VertexArray::AddVertexBuffer(VertexBuffer* vertex_buffer)
 			{
 				glEnableVertexAttribArray(m_BufferIndex);
 				glVertexAttribPointer(
-					m_BufferIndex, element.ComponentCount, GL_FLOAT, element.Normalized ? GL_FALSE : GL_TRUE, stride, (void*)offset
+					m_BufferIndex, element.Count, GL_FLOAT, element.Normalized ? GL_FALSE : GL_TRUE, stride, (void*)offset
 				);
 
 				m_BufferIndex++;
@@ -81,7 +81,7 @@ void VertexArray::AddVertexBuffer(VertexBuffer* vertex_buffer)
 			case BufferDataType::Int:
 			{
 				glEnableVertexAttribArray(m_BufferIndex);
-				glVertexAttribIPointer(m_BufferIndex, element.ComponentCount, GL_INT, stride, (void*)offset);
+				glVertexAttribIPointer(m_BufferIndex, element.Count, GL_INT, stride, (void*)offset);
 
 				m_BufferIndex++;
 				break;
@@ -91,12 +91,12 @@ void VertexArray::AddVertexBuffer(VertexBuffer* vertex_buffer)
 			case BufferDataType::Mat3:
 			case BufferDataType::Mat4:
 			{
-				for(uint32_t i = 0; i < element.ComponentCount; i++)
+				for(uint32_t i = 0; i < element.Count; i++)
 				{
 					glEnableVertexAttribArray(m_BufferIndex);
 					glVertexAttribPointer(
-						m_BufferIndex, element.ComponentCount, GL_FLOAT, element.Normalized ? GL_FALSE : GL_TRUE, stride,
-						(void*)(offset + (sizeof(float) * element.ComponentCount * i))
+						m_BufferIndex, element.Count, GL_FLOAT, element.Normalized ? GL_FALSE : GL_TRUE, stride,
+						(void*)(offset + (sizeof(float) * element.Count * i))
 					);
 
 					glVertexAttribDivisor(m_BufferIndex, 1);

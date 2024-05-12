@@ -51,23 +51,30 @@ include "VolcaniCore/scripts/imgui"
 include "VolcaniCore/scripts/assimp"
 include "VolcaniCore/scripts/freetype"
 include "VolcaniCore/scripts/stb_image"
+
+include "Magma/scripts/yaml-cpp"
+
 include "VolcaniCore"
+include "Magma"
 include "Sandbox"
 
 RootPath = _MAIN_SCRIPT_DIR;
-VendorPath = "%{RootPath}/VolcaniCore/vendor"
+VolcaniCoreVendorDir = "%{RootPath}/VolcaniCore/vendor"
+MagmaVendorDir = "%{RootPath}/Magma/vendor"
 
 VendorPaths = {}
-VendorPaths["bgfx"] = "%{VendorPath}/bgfx"
-VendorPaths["bimg"] = "%{VendorPath}/bimg"
-VendorPaths["bx"] = "%{VendorPath}/bx"
-VendorPaths["glm"] = "%{VendorPath}/glm"
-VendorPaths["glad"] = "%{VendorPath}/glad"
-VendorPaths["glfw"] = "%{VendorPath}/glfw"
-VendorPaths["imgui"] = "%{VendorPath}/imgui"
-VendorPaths["assimp"] = "%{VendorPath}/assimp"
-VendorPaths["freetype"] = "%{VendorPath}/freetype"
-VendorPaths["stb_image"] = "%{VendorPath}/stb_image"
+VendorPaths["bgfx"] = "%{VolcaniCoreVendorDir}/bgfx"
+VendorPaths["bimg"] = "%{VolcaniCoreVendorDir}/bimg"
+VendorPaths["bx"] = "%{VolcaniCoreVendorDir}/bx"
+VendorPaths["glm"] = "%{VolcaniCoreVendorDir}/glm"
+VendorPaths["glad"] = "%{VolcaniCoreVendorDir}/glad"
+VendorPaths["glfw"] = "%{VolcaniCoreVendorDir}/glfw"
+VendorPaths["imgui"] = "%{VolcaniCoreVendorDir}/imgui"
+VendorPaths["assimp"] = "%{VolcaniCoreVendorDir}/assimp"
+VendorPaths["freetype"] = "%{VolcaniCoreVendorDir}/freetype"
+VendorPaths["stb_image"] = "%{VolcaniCoreVendorDir}/stb_image"
+
+VendorPaths["yaml-cpp"] = "%{MagmaVendorDir}/yaml-cpp"
 
 Includes = {}
 Includes["bgfx"] = "%{VendorPaths.bgfx}/include"
@@ -76,7 +83,9 @@ Includes["bx"] = "%{VendorPaths.bx}/include"
 Includes["glm"] = "%{VendorPaths.glm}"
 Includes["glad"] = "%{VendorPaths.glad}/include"
 Includes["glfw"] = "%{VendorPaths.glfw}/include"
-Includes["imgui"] = "%{VendorPath}"
+Includes["imgui"] = "%{VolcaniCoreVendorDir}"
 Includes["assimp"] = "%{VendorPaths.assimp}/include"
 Includes["freetype"] = "%{VendorPaths.freetype}/include"
 Includes["stb_image"] = "%{VendorPaths.stb_image}/include"
+
+Includes["yaml-cpp"] = "%{VendorPaths.yaml-cpp}/include"

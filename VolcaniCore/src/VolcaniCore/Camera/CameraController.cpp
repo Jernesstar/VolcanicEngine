@@ -25,27 +25,20 @@ void CameraController::OnUpdate(TimeStep ts)
 		return;
 	}
 
+	glm::vec3 up_direction(0.0f, 1.0f, 0.0f);
 	glm::vec3 forward_direction = m_Camera->GetDirection();
-
-	const glm::vec3 up_direction(0.0f, 1.0f, 0.0f);
 	glm::vec3 right_direction = glm::cross(forward_direction, up_direction);
 
 	bool moved = false;
-	if(int8_t x = Input::KeyPressed(Controls[Control::Right]) - Input::KeyPressed(Controls[Control::Left]))
-	{
-		m_Camera->Position += (float)x * right_direction * TranslationSpeed * (float)ts;
+	glm::vec3 xyz;
+	if(xyz.x = Input::KeyPressed(Controls[Control::Right]) - Input::KeyPressed(Controls[Control::Left]))
+		m_Camera->Position += (float)xyz.x * right_direction * TranslationSpeed * (float)ts;
+	if(xyz.y = Input::KeyPressed(Controls[Control::Up]) - Input::KeyPressed(Controls[Control::Down]))
+		m_Camera->Position += (float)xyz.y * up_direction * TranslationSpeed * (float)ts;
+	if(xyz.z = Input::KeyPressed(Controls[Control::Forward]) - Input::KeyPressed(Controls[Control::Backward]))
+		m_Camera->Position += (float)xyz.z * forward_direction * TranslationSpeed * (float)ts;
+	if(xyz.x || xyz.y || xyz.z)
 		moved = true;
-	}
-	if(int8_t y = Input::KeyPressed(Controls[Control::Up]) - Input::KeyPressed(Controls[Control::Down]))
-	{
-		m_Camera->Position += (float)y * up_direction * TranslationSpeed * (float)ts;
-		moved = true;
-	}
-	if(int8_t z = Input::KeyPressed(Controls[Control::Forward]) - Input::KeyPressed(Controls[Control::Backward]))
-	{
-		m_Camera->Position += (float)z * forward_direction * TranslationSpeed * (float)ts;
-		moved = true;
-	}
 
 	if(delta.x != 0.0f || delta.y != 0.0f)
 	{

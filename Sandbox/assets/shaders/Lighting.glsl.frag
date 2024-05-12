@@ -25,8 +25,8 @@ struct PointLight {
     float Quadratic;
 };
 
-uniform vec3 u_CameraPosition;
 uniform Material u_Material;
+uniform vec3 u_CameraPosition;
 uniform PointLight u_PointLights[POINT_LIGHTS];
 
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 view_dir);
@@ -37,7 +37,7 @@ void main()
     vec3 view_dir = normalize(u_CameraPosition - v_FragPosition);
 
     vec3 result = vec3(0.0, 0.0, 0.0);
-    for(int i = 0; i < 4; i++)
+    for(int i = 0; i < POINT_LIGHTS; i++)
         result += CalcPointLight(u_PointLights[i], normal, view_dir);
     FragColor = vec4(result, 1.0);
 }

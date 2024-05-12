@@ -5,8 +5,8 @@ project "Sandbox"
     exceptionhandling "Off"
     rtti "Off"
 
-    objdir ("%{RootPath}/build/obj")
-    targetdir ("%{RootPath}/build/bin")
+    objdir ("%{RootPath}/build/Sanbox/obj")
+    targetdir ("%{RootPath}/build/Sanbox/bin")
 
     files {
         "src/**.h",
@@ -14,23 +14,25 @@ project "Sandbox"
     }
 
     includedirs {
+        "%{RootPath}/VolcaniCore/src",
         "%{RootPath}/VolcaniCore/src/VolcaniCore",
         "%{RootPath}/VolcaniCore/src/impl",
+        "%{RootPath}/Magma/src",
 
         "%{Includes.bgfx}",
-        "%{Includes.bimg}",
-        "%{Includes.bx}",
         "%{Includes.glfw}",
         "%{Includes.glad}",
         "%{Includes.glm}",
         "%{Includes.imgui}",
-        "%{Includes.assimp}",
+        "%{Includes.imgui}/imgui",
         "%{Includes.freetype}",
-        "%{Includes.stb_image}",
+        "%{Includes.assimp}",
+        "%{Includes.stb_image}"
     }
 
     links {
         "VolcaniCore",
+        "Magma",
         -- "bgfx",
         -- "bimg",
         -- "bx",
@@ -64,13 +66,3 @@ project "Sandbox"
             "IOKit.framework",
             "CoreVideo.framework"
         }
-
-    filter "action:vs*"
-        includedirs { path.join("%{VendorPaths.bx}", "include/compat/msvc") }
-    filter { "system:windows", "action:gmake2" }
-        includedirs { path.join("%{VendorPaths.bx}", "include/compat/mingw") }
-    filter { "system:linux", "action:gmake2" }
-        includedirs { path.join("%{VendorPaths.bx}", "include/compat/linux") }
-    filter "system:macosx"
-        includedirs { path.join("%{VendorPaths.bx}", "include/compat/osx") }
-        buildoptions { "-x objective-c++" }

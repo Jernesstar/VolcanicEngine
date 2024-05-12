@@ -2,8 +2,8 @@ project "freetype"
     kind "StaticLib"
     language "C"
 
-    objdir ("%{RootPath}/build/obj")
-    targetdir ("%{RootPath}/build/libs")
+    objdir ("%{RootPath}/build/VolcaniCore/obj")
+    targetdir ("%{RootPath}/build/VolcaniCore/lib")
 
     files {
         "%{VendorPaths.freetype}/src/base/ftinit.c",

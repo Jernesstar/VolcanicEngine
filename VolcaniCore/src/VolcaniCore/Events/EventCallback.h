@@ -21,7 +21,7 @@ public:
 	void operator ()(TEvent& event) const { this->m_Callback(event); }
 
 	const UUID& GetID() const { return m_ID; }
-	const std::function<void(TEvent&)>& GetCallback() const { return m_Callback; } 
+	const std::function<void(TEvent&)>& GetCallback() const { return m_Callback; }
 
 private:
 	UUID m_ID;

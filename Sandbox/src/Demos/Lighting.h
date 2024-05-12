@@ -29,25 +29,11 @@ public:
 	void OnUpdate(TimeStep ts);
 
 private:
-	struct Vertex1 {
-		glm::vec3 Position;
-	};
-
-	struct Vertex2 {
-		glm::vec3 Position;
-		glm::vec3 Normal;
-		glm::vec2 TextureCoordinates;
-	};
-
 	struct Light {
 		glm::vec3 Position;
 		glm::vec3 Ambient;
 		glm::vec3 Diffuse;
 		glm::vec3 Specular;
-	};
-
-	struct DirectionalLight : public Light {
-		glm::vec3 Direction;
 	};
 
 	struct PointLight : public Light {
@@ -56,7 +42,8 @@ private:
 		float Quadratic;
 	};
 
-	Vertex1 vertices[8] =
+	struct { glm::vec3 Position; }
+	vertices[8] =
 	{
 		{ { -0.5f,  0.5f,  0.5 } }, // 0 Front Top Left
 		{ {  0.5f,  0.5f,  0.5 } }, // 1 Front Top Right
@@ -69,7 +56,12 @@ private:
 		{ {  0.5f, -0.5f, -0.5 } }, // 7 Back Bottom Right
 	};
 
-	Vertex2 cube_vertices[6 * 6] =
+	struct {
+		glm::vec3 Position;
+		glm::vec3 Normal;
+		glm::vec2 TextureCoordinates;
+	}
+	cube_vertices[6 * 6] =
 	{
 		{ { -0.5f, -0.5f, -0.5f }, { 0.0f, 0.0f, -1.0f }, { 0.0f, 0.0f } },
 		{ {  0.5f, -0.5f, -0.5f }, { 0.0f, 0.0f, -1.0f }, { 1.0f, 0.0f } },
@@ -152,22 +144,21 @@ private:
 	BufferLayout l1 =
 	{
 		{ "a_Position", BufferDataType::Vec3 },
-	};
-
-	BufferLayout l2 =
-	{
-		{ "a_Position", BufferDataType::Vec3 },
 		{ "a_Normal",   BufferDataType::Vec3 },
 		{ "a_TextureCoordinate", BufferDataType::Vec2 },
 	};
+	
+	BufferLayout l2 =
+	{
+		{ "a_Position", BufferDataType::Vec3 },
+	};
 
+	OpenGL::VertexBuffer* cube_buffer = new OpenGL::VertexBuffer(cube_vertices, l1);
+	OpenGL::VertexBuffer* light_buffer = new OpenGL::VertexBuffer(vertices, l2);
 	OpenGL::IndexBuffer* index_buffer = new OpenGL::IndexBuffer(indices);
 
-	OpenGL::VertexBuffer* light_buffer = new OpenGL::VertexBuffer(vertices, l1);
-	Ref<OpenGL::VertexArray> light_array = CreateRef<OpenGL::VertexArray>(light_buffer, index_buffer);
-
-	OpenGL::VertexBuffer* cube_buffer = new OpenGL::VertexBuffer(cube_vertices, l2);
 	Ref<OpenGL::VertexArray> cube_array = CreateRef<OpenGL::VertexArray>(cube_buffer, nullptr);
+	Ref<OpenGL::VertexArray> light_array = CreateRef<OpenGL::VertexArray>(light_buffer, index_buffer);
 
 	Ref<ShaderPipeline> light_shader = ShaderPipeline::Create({
 		{ "Sandbox/assets/shaders/Light.glsl.vert", ShaderType::Vertex },
@@ -189,6 +180,7 @@ private:
 
 LightingDemo::LightingDemo()
 {
+	glDisable(GL_CULL_FACE);
 	EventSystem::RegisterEventListener<KeyPressedEvent>(
 	[](const KeyPressedEvent& event) {
 		if(event.Key == Key::Escape)
@@ -201,7 +193,7 @@ LightingDemo::LightingDemo()
 
 	light_shader->As<OpenGL::ShaderProgram>()->Bind();
 	{
-		light_shader->SetVec3("u_LightColor", { 1.0f, 0.0f, 1.0f });
+		light_shader->SetVec3("u_LightColor", { 1.0f, 1.0f, 1.0f });
 	}
 
 	cube_shader->As<OpenGL::ShaderProgram>()->Bind();
