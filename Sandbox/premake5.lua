@@ -40,6 +40,7 @@ project "Sandbox"
         "glad",
         "imgui",
         "assimp",
+        "yaml-cpp",
         "freetype",
         "stb_image",
     }

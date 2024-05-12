@@ -13,8 +13,7 @@ StereographicCamera::StereographicCamera(float vertical_fov, float near_clip, fl
 	SetProjection(vertical_fov, near_clip, far_clip);
 }
 
-void StereographicCamera::SetProjection(float vertical_fov, float near_clip, float far_clip)
-{
+void StereographicCamera::SetProjection(float vertical_fov, float near_clip, float far_clip) {
 	VOLCANICORE_ASSERT(near_clip != 0, "Near clip must not be 0");
 
 	m_VerticalFOV = vertical_fov;
