@@ -74,7 +74,7 @@ VendorPaths["assimp"] = "%{VolcaniCoreVendorDir}/assimp"
 VendorPaths["freetype"] = "%{VolcaniCoreVendorDir}/freetype"
 VendorPaths["stb_image"] = "%{VolcaniCoreVendorDir}/stb_image"
 
-VendorPaths["yaml-cpp"] = "%{MagmaVendorDir}/yaml-cpp"
+VendorPaths["yaml_cpp"] = "%{MagmaVendorDir}/yaml-cpp"
 
 Includes = {}
 Includes["bgfx"] = "%{VendorPaths.bgfx}/include"
@@ -88,4 +88,4 @@ Includes["assimp"] = "%{VendorPaths.assimp}/include"
 Includes["freetype"] = "%{VendorPaths.freetype}/include"
 Includes["stb_image"] = "%{VendorPaths.stb_image}/include"
 
-Includes["yaml-cpp"] = "%{VendorPaths.yaml-cpp}/include"
+Includes["yaml_cpp"] = "%{VendorPaths.yaml_cpp}/include"

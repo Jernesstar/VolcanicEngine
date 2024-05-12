@@ -9,7 +9,7 @@ namespace VolcaniCore {
 
 class OrthographicCamera : public Camera {
 public:
-	OrthographicCamera() = default;
+	OrthographicCamera() : Camera(CameraType::Ortho) { }
 	OrthographicCamera(float left, float right, float bottom, float top);
 	~OrthographicCamera() = default;
 

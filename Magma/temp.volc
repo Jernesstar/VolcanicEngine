@@ -1,0 +1,26 @@
+Name: Untitled
+Entities:
+  - Entity:
+      ID: 3880348600
+      TagComponent:
+        Tag: Entity1
+      TextureComponent:
+        Texture: Sandbox/assets/images/apple.png
+      TrasformComponent:
+        Translation: [0, 0, 0]
+        Rotation: [0, 0, 0]
+        Scale: [1, 1, 1]
+  - Entity:
+      ID: 2287135973
+      EventListenerComponent:
+        {}
+      TagComponent:
+        Tag: Entity2
+      TextureComponent:
+        Texture: Sandbox/assets/images/start_bg.png
+      TrasformComponent:
+        Translation: [0, 0, 0]
+        Rotation: [0, 0, 0]
+        Scale: [1, 1, 1]
+  - Entity:
+      ID: 3819645637

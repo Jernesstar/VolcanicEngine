@@ -26,6 +26,7 @@ project "Sandbox"
         "%{Includes.imgui}",
         "%{Includes.imgui}/imgui",
         "%{Includes.freetype}",
+        "%{Includes.yaml_cpp}",
         "%{Includes.assimp}",
         "%{Includes.stb_image}"
     }

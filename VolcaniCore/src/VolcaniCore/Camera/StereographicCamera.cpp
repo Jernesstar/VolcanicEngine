@@ -7,7 +7,7 @@
 namespace VolcaniCore {
 
 StereographicCamera::StereographicCamera(float vertical_fov, float near_clip, float far_clip, uint32_t width, uint32_t height)
-	: m_ViewportWidth(width), m_ViewportHeight(height)
+	: Camera(CameraType::Stereo), m_ViewportWidth(width), m_ViewportHeight(height)
 {
 	VOLCANICORE_ASSERT(m_ViewportWidth != 0 && m_ViewportHeight != 0, "Viewport width and height must not be 0");
 	SetProjection(vertical_fov, near_clip, far_clip);

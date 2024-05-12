@@ -13,6 +13,7 @@ public:
 
 	Entity& AddEntity() { return m_Entities.emplace_back(); }
 	Entity& AddEntity(const Entity& entity) { return m_Entities.emplace_back(entity); }
+
 	void RemoveEntity(Entity& entity) {
 		m_Entities.erase(std::remove(m_Entities.begin(), m_Entities.end(), entity), m_Entities.end());
 	}

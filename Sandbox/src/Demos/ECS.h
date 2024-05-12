@@ -15,10 +15,6 @@ public:
 	ECSDemo();
 
 	void OnUpdate(TimeStep ts);
-
-private:
-	Entity entity;
-	Ref<Scene> scene;
 };
 
 ECSDemo::ECSDemo() {
@@ -28,15 +24,31 @@ ECSDemo::ECSDemo() {
 			Application::Close();
 	});
 
-	scene = CreateRef<Scene>();
+	Ref<Scene> scene = CreateRef<Scene>();
 	scene->Camera = CreateRef<StereographicCamera>();
 
-	entity.Add<TransformComponent>();
-	entity.Add<TextureComponent>("Sandbox/assets/images/apple.png");
-	TagComponent& tag = entity.Add<TagComponent>("Test Entity");
+	Entity entity1, entity2, entity3;
 
-	scene->AddEntity(entity);
+	entity1.Add<TransformComponent>();
+	entity1.Add<TextureComponent>("Sandbox/assets/images/apple.png");
+	entity1.Add<TagComponent>("Entity1");
+
+	entity2.Add<TransformComponent>();
+	entity2.Add<TagComponent>("Entity2");
+	entity2.Add<TextureComponent>("Sandbox/assets/images/start_bg.png");
+	entity2.Add<EventListenerComponent>();
+
+	scene->GetEntitySystem().AddEntity(entity1);
+	scene->GetEntitySystem().AddEntity(entity2);
+	scene->GetEntitySystem().AddEntity(entity3);
 	SceneSerializer::Serialize(scene, "Magma/temp.volc");
+
+	Ref<Scene> scene2 = SceneSerializer::Deserialize("Magma/temp.volc");
+
+	scene2->GetEntitySystem().ForEachEntity(
+	[](Entity& entity) {
+		VOLCANICORE_LOG_INFO("%s", entity.Get<TagComponent>().Tag.c_str());
+	});
 }
 
 void ECSDemo::OnUpdate(TimeStep ts) {

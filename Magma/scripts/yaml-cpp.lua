@@ -7,10 +7,10 @@ project "yaml-cpp"
     targetdir ("%{RootPath}/build/Magma/lib")
 
     files {
-        "%{VendorPaths.yaml-cpp}/*.h",
-        "%{VendorPaths.yaml-cpp}/*.cpp",
+        "%{VendorPaths.yaml_cpp}/src/**.h",
+        "%{VendorPaths.yaml_cpp}/src/**.cpp",
     }
 
     includedirs {
-        "%{Includes.yaml-cpp}",
+        "%{Includes.yaml_cpp}",
     }

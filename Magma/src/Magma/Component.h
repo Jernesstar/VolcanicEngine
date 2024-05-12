@@ -1,12 +1,15 @@
 #pragma once
 
+#include <VolcaniCore/Core/Defines.h>
+
 #include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/quaternion.hpp>
 
-#include <Core/Defines.h>
-#include <Renderer/Texture.h>
+#include <VolcaniCore/Events/EventCallback.h>
+#include <VolcaniCore/Events/EventSystem.h>
+#include <VolcaniCore/Renderer/Texture.h>
 
 using namespace VolcaniCore;
 
@@ -17,6 +20,8 @@ enum class ComponentType { EventListener, Tag, Texture, Transform, Unknown };
 struct Component {
 	const ComponentType Type;
 	Component(ComponentType type) : Type(type) { }
+	Component(const Component& other) = default;
+	virtual ~Component() = default;
 };
 
 struct EventListenerComponent : public Component {
@@ -60,15 +65,16 @@ struct TagComponent : public Component {
 
 	TagComponent() : Component(ComponentType::Tag), Tag("Null Tag") { }
 	TagComponent(const std::string_view& tag) : Component(ComponentType::Tag), Tag(tag) { }
+	TagComponent(const TagComponent& other) = default;
 };
 
 struct TextureComponent : public Component {
 	Ptr<VolcaniCore::Texture> Texture;
 
 	TextureComponent() : Component(ComponentType::Texture) { }
-	TextureComponent(const std::string& path) : Component(ComponentType::Texture) {
-		Texture = CreatePtr<VolcaniCore::Texture>(path);
-	}
+	TextureComponent(const std::string& path)
+		: Component(ComponentType::Texture) { Texture = CreatePtr<VolcaniCore::Texture>(path); }
+	TextureComponent(const TextureComponent& other) = default;
 };
 
 struct TransformComponent : public Component {
@@ -79,6 +85,7 @@ struct TransformComponent : public Component {
 	TransformComponent() : Component(ComponentType::Transform) { }
 	TransformComponent(glm::vec3 t, glm::vec3 r, glm::vec3 s)
 		: Component(ComponentType::Transform), Translation(t), Rotation(r), Scale(s) { }
+	TransformComponent(const TransformComponent& other) = default;
 
 	glm::mat4 GetTransform() {
 		return glm::translate(glm::mat4(1.0f), Translation)

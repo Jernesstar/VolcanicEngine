@@ -8,35 +8,41 @@ namespace Magma {
 
 class Entity {
 public:
-	Entity() = default;
+	Entity() : m_ID() { }
 	~Entity() = default;
 	
+	UUID GetID() { return m_ID; }
+
 	template<typename TComponent>
 	bool Has() { return m_Components.count(TypeOf<TComponent>::Get()) == 1; }
 
 	template<typename TComponent, typename... Args>
 	TComponent& Add(Args&& ...args) {
 		if(Has<TComponent>()) return Get<TComponent>();
-		m_Components[TypeOf<TComponent>::Get()] = CreatePtr<TComponent>(std::forward<Args>(args)...);
-		return *((TComponent*)m_Components[TypeOf<TComponent>::Get()].get());
+		m_Components[TypeOf<TComponent>::Get()] = new TComponent(std::forward<Args>(args)...);
+		return *((TComponent*)m_Components[TypeOf<TComponent>::Get()]);
 	}
 
 	template<typename TComponent>
 	TComponent& Get() {
 		if(!Has<TComponent>()) return Add<TComponent>();
-		return *((TComponent*)m_Components[TypeOf<TComponent>::Get()].get());
+		return *((TComponent*)m_Components[TypeOf<TComponent>::Get()]);
 	}
 
 	template<typename TComponent>
 	void Remove() {
+		if(!Has<TComponent>()) return;
 		m_Components.erase(TypeOf<TComponent>::Get());
 	}
 
+	bool operator ==(const Entity& other) const { return this->m_ID == other.m_ID; }
+
 private:
+	UUID m_ID;
+	std::unordered_map<ComponentType, Component*> m_Components;
+
 	template<typename TComponent>
 	struct TypeOf { static ComponentType Get() { return ComponentType::Unknown; } };
-
-	std::unordered_map<ComponentType, Ptr<Component>> m_Components;
 };
 
 template<>

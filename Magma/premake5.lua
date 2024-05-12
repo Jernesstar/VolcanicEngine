@@ -14,11 +14,14 @@ project "Magma"
     includedirs {
         "src",
         "%{RootPath}/VolcaniCore/src",
+        "%{RootPath}/VolcaniCore/src/VolcaniCore",
 
         "%{Includes.glm}",
+        "%{Includes.glfw}",
+        "%{Includes.yaml_cpp}",
+        "%{Includes.freetype}",
         "%{Includes.imgui}",
         "%{Includes.imgui}/imgui",
-        "%{Includes.freetype}",
     }
 
     filter "system:windows"

@@ -5,10 +5,14 @@
 
 namespace VolcaniCore {
 
+enum class CameraType { Ortho, Stereo };
+
 class Camera {
 public:
-	Camera() = default;
+	Camera(CameraType type) : Type(type) { }
 	~Camera() = default;
+
+	CameraType GetType() const { return Type; }
 
 	const glm::vec3& GetPosition()       const { return Position; }
 	const glm::vec3& GetDirection()      const { return ForwardDirection; }
@@ -21,6 +25,8 @@ public:
 	void SetDirection(const glm::vec3& direction) { ForwardDirection = direction; CalculateView(); }
 
 protected:
+	CameraType Type;
+
 	glm::mat4 Projection{ 1.0f };
 	glm::mat4 InverseProjection{ 1.0f };
 	glm::mat4 View{ 1.0f };
@@ -34,6 +40,7 @@ protected:
 	virtual void CalculateProjection() = 0;
 
 	friend class CameraController;
+	// friend class ::Magma::SceneSerializer;
 };
 
 }

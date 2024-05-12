@@ -5,6 +5,7 @@
 namespace VolcaniCore {
 
 OrthographicCamera::OrthographicCamera(float left, float right, float bottom, float top)
+	: Camera(CameraType::Ortho)
 {
 	SetProjection(left, right, bottom, top);
 }

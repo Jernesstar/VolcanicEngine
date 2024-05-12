@@ -10,7 +10,7 @@ namespace VolcaniCore {
 
 class StereographicCamera : public Camera {
 public:
-	StereographicCamera() = default;
+	StereographicCamera() : Camera(CameraType::Stereo) { }
 	StereographicCamera(float verticalFOV, float nearClip, float farClip, uint32_t width, uint32_t height);
 	~StereographicCamera() = default;
 
