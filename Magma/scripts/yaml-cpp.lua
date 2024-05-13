@@ -14,3 +14,16 @@ project "yaml-cpp"
     includedirs {
         "%{Includes.yaml_cpp}",
     }
+
+    defines {
+        "YAML_CPP_STATIC_DEFINE",
+    }
+
+    buildoptions {
+        "-w",
+        "-Wall",
+        "-Wextra",
+        "-Wshadow",
+        "-Weffc++",
+        "-Wno-long-long"
+    }

@@ -211,29 +211,29 @@ struct convert<glm::vec4> {
 	}
 };
 
-// template<>
-// struct convert<glm::mat4> {
-// 	static Node encode(const glm::mat4& v) {
-// 		Node node;
-// 		node.push_back(v[0]);
-// 		node.push_back(v[1]);
-// 		node.push_back(v[2]);
-// 		node.push_back(v[3]);
-// 		node.SetStyle(EmitterStyle::Flow);
-// 		return node;
-// 	}
+template<>
+struct convert<glm::mat4> {
+	static Node encode(const glm::mat4& v) {
+		Node node;
+		node.push_back(v[0]);
+		node.push_back(v[1]);
+		node.push_back(v[2]);
+		node.push_back(v[3]);
+		node.SetStyle(EmitterStyle::Flow);
+		return node;
+	}
 
-// 	static bool decode(const Node& node, glm::mat4& v) {
-// 		if (!node.IsSequence() || node.size() != 4)
-// 			return false;
+	static bool decode(const Node& node, glm::mat4& v) {
+		if (!node.IsSequence() || node.size() != 4)
+			return false;
 
-// 		v[0] = node[0].as<glm::vec4>();
-// 		v[1] = node[1].as<glm::vec4>();
-// 		v[2] = node[2].as<glm::vec4>();
-// 		v[3] = node[3].as<glm::vec4>();
-// 		return true;
-// 	}
-// };
+		v[0] = node[0].as<glm::vec4>();
+		v[1] = node[1].as<glm::vec4>();
+		v[2] = node[2].as<glm::vec4>();
+		v[3] = node[3].as<glm::vec4>();
+		return true;
+	}
+};
 
 template<>
 struct convert<VolcaniCore::UUID> {

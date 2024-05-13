@@ -54,6 +54,7 @@ project "assimp"
     }
 
     buildoptions {
+        "-w",
         "-W",
         "-long-long",
         "-O3",

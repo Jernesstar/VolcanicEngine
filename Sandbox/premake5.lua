@@ -50,8 +50,8 @@ project "Sandbox"
         systemversion "latest"
         links {
             "gdi32",
-            -- "kernel32",
-            -- "psapi"
+            "kernel32",
+            "psapi"
         }
     filter "system:linux"
         links {

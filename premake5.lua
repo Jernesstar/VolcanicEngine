@@ -3,11 +3,16 @@ workspace "VolcanicEngine"
     architecture "x64"
     configurations { "Debug", "Release" }
 
-    if os.is64bit() and not os.istarget("windows") then
-        platforms "x86_64"
-    else
-        platforms { "x86", "x86_64" }
-    end
+    -- if os.is64bit() and not os.istarget("windows") then
+    --     platforms "x86_64"
+    -- else
+    --     platforms { "x86", "x86_64" }
+    -- end
+
+    -- filter "platforms:x86"
+    --     architecture "x86"
+    -- filter "platforms:x86_64"
+    --     architecture "x86_64"
 
     filter "system:linux"
         defines "VOLCANICENGINE_LINUX"
@@ -29,11 +34,6 @@ workspace "VolcanicEngine"
             "BX_CONFIG_DEBUG=0"
         }
         optimize "Full"
-
-    filter "platforms:x86"
-        architecture "x86"
-    filter "platforms:x86_64"
-        architecture "x86_64"
 
     filter "system:macosx"
         xcodebuildsettings {
