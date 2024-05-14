@@ -6,6 +6,8 @@
 
 #include <VolcaniCore/Core/Assert.h>
 #include <VolcaniCore/Core/UUID.h>
+#include <VolcaniCore/Camera/StereographicCamera.h>
+#include <VolcaniCore/Camera/OrthographicCamera.h>
 
 namespace Magma {
 
@@ -44,21 +46,21 @@ void SceneSerializer::Serialize(Ref<Scene> scene, const std::string& filepath) {
 	out << YAML::Key << "Camera" << YAML::Value << YAML::BeginMap; // Camera
 	out << YAML::Key << "Position" << YAML::Value << c->GetPosition();
 	out << YAML::Key << "Direction" << YAML::Value << c->GetDirection();
-	out << YAML::Key << "Type" << YAML::Value << c->GetType() == CameraType::Stereo ? "Stereo" : "Ortho";
-	if(c.Type == CameraType::Stereo) {
-		out << YAML::Key << "VerticalFOV" << YAML::Value << c->GetVerticalFOV();
-		out << YAML::Key << "NearClip" << YAML::Value << c->GetNearClip();
-		out << YAML::Key << "FarClip" << YAML::Value << c->GetFarClip();
-		out << YAML::Key << "RotationSpeed" << YAML::Value << c->GetRotationSpeed();
-		out << YAML::Key << "ViewportWidth" << YAML::Value << c->GetViewportWidth();
-		out << YAML::Key << "ViewportHeight" << YAML::Value << c->GetViewportHeight();
+	out << YAML::Key << "Type" << YAML::Value << (c->GetType() == CameraType::Stereo ? "Stereo" : "Ortho");
+	if(c->GetType() == CameraType::Stereo) {
+		out << YAML::Key << "VerticalFOV" << YAML::Value << c->As<StereographicCamera>()->GetVerticalFOV();
+		out << YAML::Key << "NearClip" << YAML::Value << c->As<StereographicCamera>()->GetNearClip();
+		out << YAML::Key << "FarClip" << YAML::Value << c->As<StereographicCamera>()->GetFarClip();
+		out << YAML::Key << "RotationSpeed" << YAML::Value << c->As<StereographicCamera>()->GetRotationSpeed();
+		out << YAML::Key << "ViewportWidth" << YAML::Value << c->As<StereographicCamera>()->GetViewportWidth();
+		out << YAML::Key << "ViewportHeight" << YAML::Value << c->As<StereographicCamera>()->GetViewportHeight();
 	}
-	else if(c.Type == CameraType::Ortho) {
-		out << YAML::Key << "GetRotation" << YAML::Value << c->GetRotation();
-		out << YAML::Key << "GetLeft" << YAML::Value << c->GetLeft();
-		out << YAML::Key << "GetRight" << YAML::Value << c->GetRight();
-		out << YAML::Key << "GetBottom" << YAML::Value << c->GetBottom();
-		out << YAML::Key << "GetTop" << YAML::Value << c->GetTop();
+	else if(c->GetType() == CameraType::Ortho) {
+		out << YAML::Key << "Left" << YAML::Value << c->As<OrthographicCamera>()->GetLeft();
+		out << YAML::Key << "Right" << YAML::Value << c->As<OrthographicCamera>()->GetRight();
+		out << YAML::Key << "Bottom" << YAML::Value << c->As<OrthographicCamera>()->GetBottom();
+		out << YAML::Key << "Top" << YAML::Value << c->As<OrthographicCamera>()->GetTop();
+		out << YAML::Key << "Rotation" << YAML::Value << c->As<OrthographicCamera>()->GetRotation();
 	}
 	out << YAML::EndMap; // Camera
 
@@ -92,43 +94,39 @@ Ref<Scene> SceneSerializer::Deserialize(const std::string& filepath) {
 	VOLCANICORE_ASSERT(scene);
 	VOLCANICORE_ASSERT(camera);
 
-	Ref<Scene> newScene = CreateRef<Scene>(file["Scene"].as<std::string>());
+	Ref<Scene> newScene = CreateRef<Scene>(scene["Name"].as<std::string>());
 
-	auto camera = file["Camera"];
 	if(camera["Type"].as<std::string>() == "Stereo") {
 		auto verticalFOV = camera["VerticalFOV"].as<float>();
 		auto nearClip = camera["NearClip"].as<float>();
 		auto farClip = camera["FarClip"].as<float>();
 		auto rotationSpeed = camera["RotationSpeed"].as<float>();
-		auto viewportWidth = camera["ViewportWidth"].as<float>();
-		auto viewportHeight = camera["ViewportHeight"].as<float>();
+		auto viewportWidth = camera["ViewportWidth"].as<uint32_t>();
+		auto viewportHeight = camera["ViewportHeight"].as<uint32_t>();
 
-		newScene->Camera = CreateRef<StereographicCamera>(verticalFOV, nearClip, farClip, rotationSpeed, viewportWidth, viewportHeight);
+		newScene->Camera = CreateRef<StereographicCamera>(verticalFOV, nearClip, farClip, viewportWidth, viewportHeight, rotationSpeed);
 	}
 	if(camera["Type"].as<std::string>() == "Ortho") {
-		auto rotation = camera["Rotation"].as<float>();
 		auto left = camera["Left"].as<float>();
 		auto right = camera["Right"].as<float>();
 		auto bottom = camera["Bottom"].as<float>();
 		auto top = camera["Top"].as<float>();
+		auto rotation = camera["Rotation"].as<float>();
 
-		newScene->Camera = CreateRef<OrthographicCameraCamera>(left, right, bottom, top, rotation);
+		newScene->Camera = CreateRef<OrthographicCamera>(left, right, bottom, top, rotation);
 	}
 
-	newScene->Camera->SetPosition(camera["Position"].as<glm::vec3>());
-	newScene->Camera->SetDirection(camera["Direction"].as<glm::vec3>());
+	newScene->Camera->SetPositionDirection(camera["Position"].as<glm::vec3>(), camera["Direction"].as<glm::vec3>());
 
-	if(!scene["Entities"]) return scene;
-
+	if(!scene["Entities"]) return newScene;
 	for(auto entity : scene["Entities"])
-		DeserializeEntity(entity["Entity"], scene);
+		DeserializeEntity(entity["Entity"], newScene);
 
 	return newScene;
 }
 
 void SerializeEntity(YAML::Emitter& out, Entity& entity) {
-	out << YAML::Key << "Entity";
-	out << YAML::BeginMap;
+	out << YAML::Key << "Entity" << YAML::Value << YAML::BeginMap;
 
 	out << YAML::Key << "ID" << YAML::Value << entity.GetID();
 

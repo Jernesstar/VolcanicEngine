@@ -15,7 +15,6 @@ void OrthographicCamera::SetProjection(float left, float right, float bottom, fl
 	m_Right = right;
 	m_Bottom = bottom;
 	m_Top = top;
-	m_Rotation = rotation;
 	CalculateProjection();
 }
 

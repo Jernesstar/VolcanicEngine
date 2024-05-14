@@ -24,7 +24,7 @@ ECSDemo::ECSDemo() {
 			Application::Close();
 	});
 
-	Ref<Scene> scene = CreateRef<Scene>();
+	Ref<Scene> scene = CreateRef<Scene>("Test Scene");
 	scene->Camera = CreateRef<StereographicCamera>();
 
 	Entity entity1, entity2, entity3;
@@ -43,12 +43,12 @@ ECSDemo::ECSDemo() {
 	scene->GetEntitySystem().AddEntity(entity3);
 	SceneSerializer::Serialize(scene, "Magma/temp.volc");
 
-	Ref<Scene> scene2 = SceneSerializer::Deserialize("Magma/temp.volc");
+	// Ref<Scene> scene2 = SceneSerializer::Deserialize("Magma/temp.volc");
 
-	scene2->GetEntitySystem().ForEachEntity(
-	[](Entity& entity) {
-		VOLCANICORE_LOG_INFO("%s", entity.Get<TagComponent>().Tag.c_str());
-	});
+	// scene2->GetEntitySystem().ForEachEntity(
+	// [](Entity& entity) {
+	// 	VOLCANICORE_LOG_INFO("%s", entity.Get<TagComponent>().Tag.c_str());
+	// });
 }
 
 void ECSDemo::OnUpdate(TimeStep ts) {

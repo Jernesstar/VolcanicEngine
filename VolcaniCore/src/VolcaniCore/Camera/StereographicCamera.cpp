@@ -6,19 +6,19 @@
 
 namespace VolcaniCore {
 
-StereographicCamera::StereographicCamera(float vertical_fov, float near_clip, float far_clip, uint32_t width, uint32_t height)
-	: Camera(CameraType::Stereo), m_ViewportWidth(width), m_ViewportHeight(height)
+StereographicCamera::StereographicCamera(float verticalFov, float nearClip, float farClip, uint32_t width, uint32_t height, float rotationSpeed)
+	: Camera(CameraType::Stereo), m_ViewportWidth(width), m_ViewportHeight(height), m_RotationSpeed(rotationSpeed)
 {
 	VOLCANICORE_ASSERT(m_ViewportWidth != 0 && m_ViewportHeight != 0, "Viewport width and height must not be 0");
-	SetProjection(vertical_fov, near_clip, far_clip);
+	SetProjection(verticalFov, nearClip, farClip);
 }
 
-void StereographicCamera::SetProjection(float vertical_fov, float near_clip, float far_clip) {
-	VOLCANICORE_ASSERT(near_clip != 0, "Near clip must not be 0");
+void StereographicCamera::SetProjection(float verticalFov, float nearClip, float farClip) {
+	VOLCANICORE_ASSERT(nearClip != 0, "Near clip must not be 0");
 
-	m_VerticalFOV = vertical_fov;
-	m_NearClip = near_clip;
-	m_FarClip = far_clip;
+	m_VerticalFOV = verticalFov;
+	m_NearClip = nearClip;
+	m_FarClip = farClip;
 
 	CalculateProjection();
 }

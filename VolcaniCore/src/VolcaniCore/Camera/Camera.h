@@ -23,6 +23,14 @@ public:
 
 	void SetPosition(const glm::vec3& position) { Position = position; CalculateView(); }
 	void SetDirection(const glm::vec3& direction) { ForwardDirection = direction; CalculateView(); }
+	void SetPositionDirection(const glm::vec3& position, const glm::vec3& direction) {
+		Position = position;
+		ForwardDirection = direction;
+		CalculateView();
+	}
+
+	template<typename Derived>
+	Derived* As() const { return (Derived*)(this); }
 
 protected:
 	CameraType Type;

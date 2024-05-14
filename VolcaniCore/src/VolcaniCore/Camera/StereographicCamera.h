@@ -11,7 +11,7 @@ namespace VolcaniCore {
 class StereographicCamera : public Camera {
 public:
 	StereographicCamera() : Camera(CameraType::Stereo) { }
-	StereographicCamera(float verticalFOV, float nearClip, float farClip, uint32_t width, uint32_t height);
+	StereographicCamera(float verticalFOV, float nearClip, float farClip, uint32_t width, uint32_t height, float rotationSpeed = 0.3f);
 	~StereographicCamera() = default;
 
 	void SetProjection(float verticalFOV, float nearClip, float farClip);
@@ -21,8 +21,8 @@ public:
 	float GetNearClip() const { return m_NearClip; }
 	float GetFarClip() const { return m_FarClip; }
 	float GetRotationSpeed() const { return m_RotationSpeed; }
-	float GetViewportWidth() const { return m_ViewportWidth; }
-	float GetViewportHeight() const { return m_ViewportHeight; }
+	uint32_t GetViewportWidth() const { return m_ViewportWidth; }
+	uint32_t GetViewportHeight() const { return m_ViewportHeight; }
 
 private:
 	float m_VerticalFOV = 45.0f;
