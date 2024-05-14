@@ -10,7 +10,7 @@ enum class CameraType { Ortho, Stereo };
 class Camera {
 public:
 	Camera(CameraType type) : Type(type) { }
-	~Camera() = default;
+	virtual ~Camera() = default;
 
 	CameraType GetType() const { return Type; }
 

@@ -46,20 +46,21 @@ void SceneSerializer::Serialize(Ref<Scene> scene, const std::string& filepath) {
 	out << YAML::Key << "Camera" << YAML::Value << YAML::BeginMap; // Camera
 	out << YAML::Key << "Position" << YAML::Value << c->GetPosition();
 	out << YAML::Key << "Direction" << YAML::Value << c->GetDirection();
-	out << YAML::Key << "Type" << YAML::Value << (c->GetType() == CameraType::Stereo ? "Stereo" : "Ortho");
 	if(c->GetType() == CameraType::Stereo) {
-		out << YAML::Key << "VerticalFOV" << YAML::Value << c->As<StereographicCamera>()->GetVerticalFOV();
-		out << YAML::Key << "NearClip" << YAML::Value << c->As<StereographicCamera>()->GetNearClip();
-		out << YAML::Key << "FarClip" << YAML::Value << c->As<StereographicCamera>()->GetFarClip();
+		out << YAML::Key << "Type" << YAML::Value << "Stereo";
+		out << YAML::Key << "VerticalFOV" 	<< YAML::Value << c->As<StereographicCamera>()->GetVerticalFOV();
+		out << YAML::Key << "NearClip" 		<< YAML::Value << c->As<StereographicCamera>()->GetNearClip();
+		out << YAML::Key << "FarClip" 		<< YAML::Value << c->As<StereographicCamera>()->GetFarClip();
 		out << YAML::Key << "RotationSpeed" << YAML::Value << c->As<StereographicCamera>()->GetRotationSpeed();
 		out << YAML::Key << "ViewportWidth" << YAML::Value << c->As<StereographicCamera>()->GetViewportWidth();
 		out << YAML::Key << "ViewportHeight" << YAML::Value << c->As<StereographicCamera>()->GetViewportHeight();
 	}
 	else if(c->GetType() == CameraType::Ortho) {
-		out << YAML::Key << "Left" << YAML::Value << c->As<OrthographicCamera>()->GetLeft();
-		out << YAML::Key << "Right" << YAML::Value << c->As<OrthographicCamera>()->GetRight();
+		out << YAML::Key << "Type" << YAML::Value << "Ortho";
+		out << YAML::Key << "Left"	 << YAML::Value << c->As<OrthographicCamera>()->GetLeft();
+		out << YAML::Key << "Right"	 << YAML::Value << c->As<OrthographicCamera>()->GetRight();
 		out << YAML::Key << "Bottom" << YAML::Value << c->As<OrthographicCamera>()->GetBottom();
-		out << YAML::Key << "Top" << YAML::Value << c->As<OrthographicCamera>()->GetTop();
+		out << YAML::Key << "Top"	 << YAML::Value << c->As<OrthographicCamera>()->GetTop();
 		out << YAML::Key << "Rotation" << YAML::Value << c->As<OrthographicCamera>()->GetRotation();
 	}
 	out << YAML::EndMap; // Camera
@@ -97,23 +98,23 @@ Ref<Scene> SceneSerializer::Deserialize(const std::string& filepath) {
 	Ref<Scene> newScene = CreateRef<Scene>(scene["Name"].as<std::string>());
 
 	if(camera["Type"].as<std::string>() == "Stereo") {
-		auto verticalFOV = camera["VerticalFOV"].as<float>();
-		auto nearClip = camera["NearClip"].as<float>();
-		auto farClip = camera["FarClip"].as<float>();
-		auto rotationSpeed = camera["RotationSpeed"].as<float>();
-		auto viewportWidth = camera["ViewportWidth"].as<uint32_t>();
-		auto viewportHeight = camera["ViewportHeight"].as<uint32_t>();
+		auto fov 	= camera["VerticalFOV"].as<float>();
+		auto near 	= camera["NearClip"].as<float>();
+		auto far 	= camera["FarClip"].as<float>();
+		auto speed 	= camera["RotationSpeed"].as<float>();
+		auto width 	= camera["ViewportWidth"].as<uint32_t>();
+		auto heigth = camera["ViewportHeight"].as<uint32_t>();
 
-		newScene->Camera = CreateRef<StereographicCamera>(verticalFOV, nearClip, farClip, viewportWidth, viewportHeight, rotationSpeed);
+		newScene->Camera = CreateRef<StereographicCamera>(fov, near, far, width, height, speed);
 	}
-	if(camera["Type"].as<std::string>() == "Ortho") {
-		auto left = camera["Left"].as<float>();
-		auto right = camera["Right"].as<float>();
+	else if(camera["Type"].as<std::string>() == "Ortho") {
+		auto left 	= camera["Left"].as<float>();
+		auto right 	= camera["Right"].as<float>();
 		auto bottom = camera["Bottom"].as<float>();
-		auto top = camera["Top"].as<float>();
-		auto rotation = camera["Rotation"].as<float>();
+		auto top 	= camera["Top"].as<float>();
+		auto ro		= camera["Rotation"].as<float>();
 
-		newScene->Camera = CreateRef<OrthographicCamera>(left, right, bottom, top, rotation);
+		newScene->Camera = CreateRef<OrthographicCamera>(left, right, bottom, top, ro);
 	}
 
 	newScene->Camera->SetPositionDirection(camera["Position"].as<glm::vec3>(), camera["Direction"].as<glm::vec3>());
@@ -127,7 +128,6 @@ Ref<Scene> SceneSerializer::Deserialize(const std::string& filepath) {
 
 void SerializeEntity(YAML::Emitter& out, Entity& entity) {
 	out << YAML::Key << "Entity" << YAML::Value << YAML::BeginMap;
-
 	out << YAML::Key << "ID" << YAML::Value << entity.GetID();
 
 	if(entity.Has<EventListenerComponent>()) {
