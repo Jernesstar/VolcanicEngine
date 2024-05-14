@@ -17,6 +17,13 @@ public:
 	void SetProjection(float verticalFOV, float nearClip, float farClip);
 	void Resize(uint32_t width, uint32_t height);
 
+	float GetVerticalFOV() const { return m_VerticalFOV; }
+	float GetNearClip() const { return m_NearClip; }
+	float GetFarClip() const { return m_FarClip; }
+	float GetRotationSpeed() const { return m_RotationSpeed; }
+	float GetViewportWidth() const { return m_ViewportWidth; }
+	float GetViewportHeight() const { return m_ViewportHeight; }
+
 private:
 	float m_VerticalFOV = 45.0f;
 	float m_NearClip = 0.1f;

@@ -36,25 +36,43 @@ static void DeserializeEntity(YAML::Node node, Ref<Scene> scene);
 void SceneSerializer::Serialize(Ref<Scene> scene, const std::string& filepath) {
 	YAML::Emitter out;
 
-	out << YAML::BeginMap;
-	out << YAML::Key << "Name" << YAML::Value << scene->Name;
+	out << YAML::BeginMap; // Scene
+	out << YAML::Key << "Scene" << YAML::Value << YAML::BeginMap;
+	out << YAML::Key << "Name" << YAML::Value <<  scene->Name;
 
-	// auto c = scene->Camera;
-	// out << YAML::Key << "Camera" << YAML::Value << YAML::BeginMap;
-	// out << YAML::Key << "Position" << YAML::Value << c->GetPosition();
-	// out << YAML::Key << "Direction" << YAML::Value << c->GetDirection();
-	// out << YAML::EndMap;
+	auto c = scene->Camera;
+	out << YAML::Key << "Camera" << YAML::Value << YAML::BeginMap; // Camera
+	out << YAML::Key << "Position" << YAML::Value << c->GetPosition();
+	out << YAML::Key << "Direction" << YAML::Value << c->GetDirection();
+	out << YAML::Key << "Type" << YAML::Value << c->GetType() == CameraType::Stereo ? "Stereo" : "Ortho";
+	if(c.Type == CameraType::Stereo) {
+		out << YAML::Key << "VerticalFOV" << YAML::Value << c->GetVerticalFOV();
+		out << YAML::Key << "NearClip" << YAML::Value << c->GetNearClip();
+		out << YAML::Key << "FarClip" << YAML::Value << c->GetFarClip();
+		out << YAML::Key << "RotationSpeed" << YAML::Value << c->GetRotationSpeed();
+		out << YAML::Key << "ViewportWidth" << YAML::Value << c->GetViewportWidth();
+		out << YAML::Key << "ViewportHeight" << YAML::Value << c->GetViewportHeight();
+	}
+	else if(c.Type == CameraType::Ortho) {
+		out << YAML::Key << "GetRotation" << YAML::Value << c->GetRotation();
+		out << YAML::Key << "GetLeft" << YAML::Value << c->GetLeft();
+		out << YAML::Key << "GetRight" << YAML::Value << c->GetRight();
+		out << YAML::Key << "GetBottom" << YAML::Value << c->GetBottom();
+		out << YAML::Key << "GetTop" << YAML::Value << c->GetTop();
+	}
+	out << YAML::EndMap; // Camera
 
-	out << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;
+	out << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq; // Entities
 	scene->GetEntitySystem().ForEachEntity(
 	[&](Entity& entity) {
-		out << YAML::BeginMap;
+		out << YAML::BeginMap; // Entity
 		SerializeEntity(out, entity);
-		out << YAML::EndMap;
+		out << YAML::EndMap; // Entity
 	});
-	out << YAML::EndSeq;
+	out << YAML::EndSeq; // Entities
 
 	out << YAML::EndMap;
+	out << YAML::EndMap; // Scene
 
 	std::ofstream fout(filepath);
 	fout << out.c_str();
@@ -68,22 +86,44 @@ Ref<Scene> SceneSerializer::Deserialize(const std::string& filepath) {
 	catch (YAML::ParserException e) {
 		VOLCANICORE_ASSERT_ARGS(false, "Could not load file {0}: {1}", filepath, e.what());
 	}
+	auto scene = file["Scene"];
+	auto camera = scene["Camera"];
 
-	VOLCANICORE_ASSERT(file["Name"]);
-	// VOLCANICORE_ASSERT(file["Camera"]);
+	VOLCANICORE_ASSERT(scene);
+	VOLCANICORE_ASSERT(camera);
 
-	Ref<Scene> scene = CreateRef<Scene>(file["Name"].as<std::string>());
+	Ref<Scene> newScene = CreateRef<Scene>(file["Scene"].as<std::string>());
 
-	// auto scene_camera = file["Camera"];
-	// scene->Camera->Position = scene_camera["Position"].as<glm::vec3>();
-	// scene->Camera->ForwardDirection = scene_camera["Direction"].as<glm::vec3>();
+	auto camera = file["Camera"];
+	if(camera["Type"].as<std::string>() == "Stereo") {
+		auto verticalFOV = camera["VerticalFOV"].as<float>();
+		auto nearClip = camera["NearClip"].as<float>();
+		auto farClip = camera["FarClip"].as<float>();
+		auto rotationSpeed = camera["RotationSpeed"].as<float>();
+		auto viewportWidth = camera["ViewportWidth"].as<float>();
+		auto viewportHeight = camera["ViewportHeight"].as<float>();
 
-	if(!file["Entities"]) return scene;
+		newScene->Camera = CreateRef<StereographicCamera>(verticalFOV, nearClip, farClip, rotationSpeed, viewportWidth, viewportHeight);
+	}
+	if(camera["Type"].as<std::string>() == "Ortho") {
+		auto rotation = camera["Rotation"].as<float>();
+		auto left = camera["Left"].as<float>();
+		auto right = camera["Right"].as<float>();
+		auto bottom = camera["Bottom"].as<float>();
+		auto top = camera["Top"].as<float>();
 
-	for(auto entity : file["Entities"])
+		newScene->Camera = CreateRef<OrthographicCameraCamera>(left, right, bottom, top, rotation);
+	}
+
+	newScene->Camera->SetPosition(camera["Position"].as<glm::vec3>());
+	newScene->Camera->SetDirection(camera["Direction"].as<glm::vec3>());
+
+	if(!scene["Entities"]) return scene;
+
+	for(auto entity : scene["Entities"])
 		DeserializeEntity(entity["Entity"], scene);
 
-	return scene;
+	return newScene;
 }
 
 void SerializeEntity(YAML::Emitter& out, Entity& entity) {
@@ -207,30 +247,6 @@ struct convert<glm::vec4> {
 		v.y = node[1].as<float>();
 		v.z = node[2].as<float>();
 		v.w = node[3].as<float>();
-		return true;
-	}
-};
-
-template<>
-struct convert<glm::mat4> {
-	static Node encode(const glm::mat4& v) {
-		Node node;
-		node.push_back(v[0]);
-		node.push_back(v[1]);
-		node.push_back(v[2]);
-		node.push_back(v[3]);
-		node.SetStyle(EmitterStyle::Flow);
-		return node;
-	}
-
-	static bool decode(const Node& node, glm::mat4& v) {
-		if (!node.IsSequence() || node.size() != 4)
-			return false;
-
-		v[0] = node[0].as<glm::vec4>();
-		v[1] = node[1].as<glm::vec4>();
-		v[2] = node[2].as<glm::vec4>();
-		v[3] = node[3].as<glm::vec4>();
 		return true;
 	}
 };

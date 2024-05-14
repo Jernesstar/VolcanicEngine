@@ -40,7 +40,6 @@ protected:
 	virtual void CalculateProjection() = 0;
 
 	friend class CameraController;
-	// friend class ::Magma::SceneSerializer;
 };
 
 }
