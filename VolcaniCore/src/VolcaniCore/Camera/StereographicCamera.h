@@ -27,7 +27,7 @@ private:
 	float m_NearClip = 0.1f;
 	float m_FarClip = 100.0f;
 	float m_RotationSpeed = 0.3f;
-	uint32_t m_ViewportWidth = 0, m_ViewportHeight = 0;
+	uint32_t m_ViewportWidth = 1, m_ViewportHeight = 1;
 
 private:
 	void CalculateView() override;

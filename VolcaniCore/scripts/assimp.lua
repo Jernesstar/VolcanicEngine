@@ -4,7 +4,7 @@ project "assimp"
     cppdialect "C++latest"
 
     objdir ("%{RootPath}/build/VolcaniCore/obj")
-    targetdir ("%{RootPath}/build/VolcaniCore/libs")
+    targetdir ("%{RootPath}/build/VolcaniCore/lib")
 
     files {
         -- "%{VendorPaths.assimp}/code/CApi/*.cpp",

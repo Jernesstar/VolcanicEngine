@@ -1,26 +1,37 @@
-Name: Test Scene
-Entities:
-  - Entity:
-      ID: 272234017
-      TagComponent:
-        Tag: Entity1
-      TextureComponent:
-        Texture: Sandbox/assets/images/apple.png
-      TrasformComponent:
-        Translation: [0, 0, 0]
-        Rotation: [0, 0, 0]
-        Scale: [1, 1, 1]
-  - Entity:
-      ID: 4221637617
-      EventListenerComponent:
-        {}
-      TagComponent:
-        Tag: Entity2
-      TextureComponent:
-        Texture: Sandbox/assets/images/start_bg.png
-      TrasformComponent:
-        Translation: [0, 0, 0]
-        Rotation: [0, 0, 0]
-        Scale: [1, 1, 1]
-  - Entity:
-      ID: 1222007500
+Scene:
+  Name: Test Scene
+  Camera:
+    Position: [0, 0, 0]
+    Direction: [0, 0, -1]
+    Type: Stereo
+    VerticalFOV: 45
+    NearClip: 0.100000001
+    FarClip: 100
+    RotationSpeed: 0.300000012
+    ViewportWidth: 1
+    ViewportHeight: 1
+  Entities:
+    - Entity:
+        ID: 2337353802
+        TagComponent:
+          Tag: Entity1
+        TextureComponent:
+          Texture: Sandbox/assets/images/apple.png
+        TrasformComponent:
+          Translation: [0, 0, 0]
+          Rotation: [0, 0, 0]
+          Scale: [1, 1, 1]
+    - Entity:
+        ID: 3261558416
+        EventListenerComponent:
+          {}
+        TagComponent:
+          Tag: Entity2
+        TextureComponent:
+          Texture: Sandbox/assets/images/start_bg.png
+        TrasformComponent:
+          Translation: [0, 0, 0]
+          Rotation: [0, 0, 0]
+          Scale: [1, 1, 1]
+    - Entity:
+        ID: 4067653841

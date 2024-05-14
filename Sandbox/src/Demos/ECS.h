@@ -43,12 +43,12 @@ ECSDemo::ECSDemo() {
 	scene->GetEntitySystem().AddEntity(entity3);
 	SceneSerializer::Serialize(scene, "Magma/temp.volc");
 
-	// Ref<Scene> scene2 = SceneSerializer::Deserialize("Magma/temp.volc");
+	Ref<Scene> scene2 = SceneSerializer::Deserialize("Magma/temp.volc");
 
-	// scene2->GetEntitySystem().ForEachEntity(
-	// [](Entity& entity) {
-	// 	VOLCANICORE_LOG_INFO("%s", entity.Get<TagComponent>().Tag.c_str());
-	// });
+	scene2->GetEntitySystem().ForEachEntity(
+	[](Entity& entity) {
+		VOLCANICORE_LOG_INFO("%s", entity.Get<TagComponent>().Tag.c_str());
+	});
 }
 
 void ECSDemo::OnUpdate(TimeStep ts) {

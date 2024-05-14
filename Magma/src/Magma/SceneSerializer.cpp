@@ -103,7 +103,7 @@ Ref<Scene> SceneSerializer::Deserialize(const std::string& filepath) {
 		auto far 	= camera["FarClip"].as<float>();
 		auto speed 	= camera["RotationSpeed"].as<float>();
 		auto width 	= camera["ViewportWidth"].as<uint32_t>();
-		auto heigth = camera["ViewportHeight"].as<uint32_t>();
+		auto height = camera["ViewportHeight"].as<uint32_t>();
 
 		newScene->Camera = CreateRef<StereographicCamera>(fov, near, far, width, height, speed);
 	}
