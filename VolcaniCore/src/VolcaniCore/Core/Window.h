@@ -18,13 +18,14 @@ public:
 	// void SetWindowIcon(const std::string& path);
 	// void SetTitle(const std::string& title);
 	// void SetVSync(bool vsync);
-	// void SetFramebufferSize(uint32_t width, uint32_t height);
 
 	uint32_t GetWidth() const { return m_Width; }
 	uint32_t GetHeight() const { return m_Height; }
 	bool IsOpen() const { return !glfwWindowShouldClose(m_NativeWindow); }
 
 private:
+	void SetFramebufferSize(uint32_t width, uint32_t height);
+
 	void InitImGui();
 	void CloseImGui();
 

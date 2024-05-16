@@ -25,6 +25,7 @@ public:
 	virtual void Close() = 0;
 
 	virtual void Clear() = 0;
+	virtual void Resize(uint32_t width, uint32_t height) = 0;
 
 	virtual void RenderModel(Ref<Model> model) = 0;
 	virtual void RenderCubemap(Ref<Cubemap> cubemap) = 0;

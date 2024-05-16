@@ -1,0 +1,9 @@
+checkoutLocation: src/github.com/Jernesstar/VolcanicEngine
+workspaceLocation: /workspace/VolcanicEngine
+image:
+  file: Dockerfile
+ports:
+  - port: 6080
+    protocol: "http"
+tasks:
+  - command: "scripts/premake.sh && scripts/build.sh"

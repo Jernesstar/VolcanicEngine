@@ -23,6 +23,10 @@ Window::Window(uint32_t width, uint32_t height)
 	[](const WindowClosedEvent& event) {
 		Application::Close();
 	});
+	EventSystem::RegisterEventListener<WindowResizedEvent>(
+	[&](const WindowResizedEvent& event) {
+		SetFramebufferSize(event.Width, event.Height);
+	});
 
 	InitImGui();
 }
@@ -33,6 +37,11 @@ Window::~Window()
 
 	if(m_NativeWindow) glfwDestroyWindow(m_NativeWindow);
 	m_NativeWindow = nullptr;
+}
+
+void Window::SetFramebufferSize(uint32_t width, uint32_t height) {
+    m_Width = width;
+    m_Height = height;
 }
 
 void Window::InitImGui()

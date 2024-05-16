@@ -4,6 +4,7 @@
 #include <imgui/imgui.h>
 
 #include "Core/Assert.h"
+#include "Events/EventSystem.h"
 
 #include "Cubemap.h"
 #include "Texture2D.h"
@@ -61,8 +62,8 @@ Renderer::Renderer()
 		 1.0f, -1.0f,  1.0f
 	};
 
-	// VertexBuffer* buffer = new VertexBuffer(vertices, BufferLayout{ { "Position", BufferDataType::Vec3 } });
-	// s_CubemapArray = CreatePtr<VertexArray>(buffer);
+	VertexBuffer* buffer = new VertexBuffer(vertices, BufferLayout{ { "Position", BufferDataType::Vec3 } });
+	s_CubemapArray = CreatePtr<VertexArray>(buffer);
 }
 
 void Renderer::Init() {
@@ -77,6 +78,11 @@ void Renderer::Init() {
 	glEnable(GL_CULL_FACE);
 	glFrontFace(GL_CCW);
 	glCullFace(GL_BACK);
+
+	EventSystem::RegisterEventListener<WindowResizedEvent>(
+	[&](const WindowResizedEvent& event) {
+		Renderer::Resize(event.Width, event.Height);
+	});
 }
 
 void Renderer::Close() {
@@ -86,6 +92,10 @@ void Renderer::Close() {
 void Renderer::Clear() {
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
+void Renderer::Resize(uint32_t width, uint32_t height) {
+	glViewport(0, 0, width, height);
 }
 
 void Renderer::RenderModel(Ref<Model> model) {
