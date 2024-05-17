@@ -1,30 +1,16 @@
 #pragma once
 
-#include <Core/Application.h>
-#include <Core/Log.h>
-#include <Events/EventSystem.h>
+#include <VolcanicCore/Core/Time.h>
 
-using namespace VolcaniCore;
+namespace Magma {
 
-class Editor : public Application {
+class EditorLayer {
 public:
-	Editor();
+	EditorLayer();
+	~EditorLayer();
 
-	void OnUpdate(TimeStep ts);
-
-private:
-	Ref<EditorLayer> m_EditorLayer;
+	void Update(TimeStep ts);
+	void Render();
 };
 
-Editor::Editor() {
-	EventSystem::RegisterEventListener<KeyPressedEvent>(
-	[](const KeyPressedEvent& event) {
-		if(event.Key == Key::Escape)
-			Application::Close();
-	});
-}
-
-void Editor::OnUpdate(TimeStep ts) {
-	m_EditorLayer->OnUpdate(ts);
-	m_EditorLayer->Render();
 }
