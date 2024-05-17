@@ -33,35 +33,36 @@ YAML::Emitter& operator<<(YAML::Emitter& out, const glm::mat4& v)
 }
 
 static void SerializeEntity(YAML::Emitter& out, Entity& entity);
-static void DeserializeEntity(YAML::Node node, Ref<Scene> scene);
+static void DeserializeEntity(YAML::Node entityNode, Ref<Scene> scene);
 
 void SceneSerializer::Serialize(Ref<Scene> scene, const std::string& filepath) {
 	YAML::Emitter out;
+	out << YAML::BeginMap; // File
 
-	out << YAML::BeginMap; // Scene
-	out << YAML::Key << "Scene" << YAML::Value << YAML::BeginMap;
+	out << YAML::Key << "Scene" << YAML::Value << YAML::BeginMap; // Scene
 	out << YAML::Key << "Name" << YAML::Value <<  scene->Name;
 
-	auto c = scene->Camera;
 	out << YAML::Key << "Camera" << YAML::Value << YAML::BeginMap; // Camera
-	out << YAML::Key << "Position" << YAML::Value << c->GetPosition();
-	out << YAML::Key << "Direction" << YAML::Value << c->GetDirection();
-	if(c->GetType() == CameraType::Stereo) {
-		out << YAML::Key << "Type" << YAML::Value << "Stereo";
-		out << YAML::Key << "VerticalFOV" 	<< YAML::Value << c->As<StereographicCamera>()->GetVerticalFOV();
-		out << YAML::Key << "NearClip" 		<< YAML::Value << c->As<StereographicCamera>()->GetNearClip();
-		out << YAML::Key << "FarClip" 		<< YAML::Value << c->As<StereographicCamera>()->GetFarClip();
-		out << YAML::Key << "RotationSpeed" << YAML::Value << c->As<StereographicCamera>()->GetRotationSpeed();
-		out << YAML::Key << "ViewportWidth" << YAML::Value << c->As<StereographicCamera>()->GetViewportWidth();
-		out << YAML::Key << "ViewportHeight" << YAML::Value << c->As<StereographicCamera>()->GetViewportHeight();
+	out << YAML::Key << "Type" << YAML::Value << (scene->Camera->GetType() == CameraType::Stereo ? "Stereographic" : "Orthographic");
+	out << YAML::Key << "Position" << YAML::Value << scene->Camera->GetPosition();
+	out << YAML::Key << "Direction" << YAML::Value << scene->Camera->GetDirection();
+
+	if(scene->Camera->GetType() == CameraType::Stereo) {
+		auto c = scene->Camera->As<StereographicCamera>();
+		out << YAML::Key << "VerticalFOV" 	<< YAML::Value << c->GetVerticalFOV();
+		out << YAML::Key << "NearClip" 		<< YAML::Value << c->GetNearClip();
+		out << YAML::Key << "FarClip" 		<< YAML::Value << c->GetFarClip();
+		out << YAML::Key << "RotationSpeed" << YAML::Value << c->GetRotationSpeed();
+		out << YAML::Key << "ViewportWidth" << YAML::Value << c->GetViewportWidth();
+		out << YAML::Key << "ViewportHeight" << YAML::Value << c->GetViewportHeight();
 	}
-	else if(c->GetType() == CameraType::Ortho) {
-		out << YAML::Key << "Type" << YAML::Value << "Ortho";
-		out << YAML::Key << "Left"	 << YAML::Value << c->As<OrthographicCamera>()->GetLeft();
-		out << YAML::Key << "Right"	 << YAML::Value << c->As<OrthographicCamera>()->GetRight();
-		out << YAML::Key << "Bottom" << YAML::Value << c->As<OrthographicCamera>()->GetBottom();
-		out << YAML::Key << "Top"	 << YAML::Value << c->As<OrthographicCamera>()->GetTop();
-		out << YAML::Key << "Rotation" << YAML::Value << c->As<OrthographicCamera>()->GetRotation();
+	else if(scene->Camera->GetType() == CameraType::Ortho) {
+		auto c = scene->Camera->As<OrthographicCamera>();
+		out << YAML::Key << "Left"	 << YAML::Value << c->GetLeft();
+		out << YAML::Key << "Right"	 << YAML::Value << c->GetRight();
+		out << YAML::Key << "Bottom" << YAML::Value << c->GetBottom();
+		out << YAML::Key << "Top"	 << YAML::Value << c->GetTop();
+		out << YAML::Key << "Rotation" << YAML::Value << c->GetRotation();
 	}
 	out << YAML::EndMap; // Camera
 
@@ -74,8 +75,9 @@ void SceneSerializer::Serialize(Ref<Scene> scene, const std::string& filepath) {
 	});
 	out << YAML::EndSeq; // Entities
 
-	out << YAML::EndMap;
 	out << YAML::EndMap; // Scene
+
+	out << YAML::EndMap; // File
 
 	std::ofstream fout(filepath);
 	fout << out.c_str();
@@ -97,7 +99,7 @@ Ref<Scene> SceneSerializer::Deserialize(const std::string& filepath) {
 
 	Ref<Scene> newScene = CreateRef<Scene>(scene["Name"].as<std::string>());
 
-	if(camera["Type"].as<std::string>() == "Stereo") {
+	if(camera["Type"].as<std::string>() == "Stereographic") {
 		auto fov 	= camera["VerticalFOV"].as<float>();
 		auto near 	= camera["NearClip"].as<float>();
 		auto far 	= camera["FarClip"].as<float>();
@@ -107,7 +109,7 @@ Ref<Scene> SceneSerializer::Deserialize(const std::string& filepath) {
 
 		newScene->Camera = CreateRef<StereographicCamera>(fov, near, far, width, height, speed);
 	}
-	else if(camera["Type"].as<std::string>() == "Ortho") {
+	else if(camera["Type"].as<std::string>() == "Orthographic") {
 		auto left 	= camera["Left"].as<float>();
 		auto right 	= camera["Right"].as<float>();
 		auto bottom = camera["Bottom"].as<float>();
@@ -127,9 +129,10 @@ Ref<Scene> SceneSerializer::Deserialize(const std::string& filepath) {
 }
 
 void SerializeEntity(YAML::Emitter& out, Entity& entity) {
-	out << YAML::Key << "Entity" << YAML::Value << YAML::BeginMap;
+	out << YAML::Key << "Entity" << YAML::Value << YAML::BeginMap; // Entity
 	out << YAML::Key << "ID" << YAML::Value << entity.GetID();
 
+	out << YAML::Key << "Components" << YAML::Key << YAML::BeginMap; // Components
 	if(entity.Has<EventListenerComponent>()) {
 		auto& eventlistener = entity.Get<EventListenerComponent>();
 
@@ -169,27 +172,31 @@ void SerializeEntity(YAML::Emitter& out, Entity& entity) {
 		out << YAML::Key << "Scale" << YAML::Value << sc;
 		out << YAML::EndMap;
 	}
-
-	out << YAML::EndMap;
+	out << YAML::EndMap; // Components
+ 
+	out << YAML::EndMap; // Entity
 }
 
-void DeserializeEntity(YAML::Node node, Ref<Scene> scene) {
+void DeserializeEntity(YAML::Node entityNode, Ref<Scene> scene) {
 	Entity& entity = scene->GetEntitySystem().AddEntity();
 
-	auto eventlistener = node["EventListenerComponent"];
+	auto components = entityNode["Components"];
+	if(!components) return;
+
+	auto eventlistener = components["EventListenerComponent"];
 	if(eventlistener) {
 		entity.Add<EventListenerComponent>();
 	}
 
-	auto tag = node["TagComponent"];
+	auto tag = components["TagComponent"];
 	if(tag)
 		entity.Add<TagComponent>(tag["Tag"].as<std::string>());
 
-	auto texture = node["TextureComponent"];
+	auto texture = components["TextureComponent"];
 	if(texture)
 		entity.Add<TextureComponent>(texture["Texture"].as<std::string>());
 
-	auto transform = node["TransformComponent"];
+	auto transform = components["TransformComponent"];
 	if(transform) {
 		auto& tc = entity.Add<TransformComponent>();
 		tc.Translation = transform["Translation"].as<glm::vec3>();

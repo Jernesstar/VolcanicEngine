@@ -36,5 +36,4 @@ void OrthographicCamera::CalculateProjection() {
 	ViewProjection = Projection * View;
 }
 
-
 }

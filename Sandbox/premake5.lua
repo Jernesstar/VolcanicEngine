@@ -32,8 +32,8 @@ project "Sandbox"
     }
 
     links {
-        "VolcaniCore",
         "Magma",
+        "VolcaniCore",
         -- "bgfx",
         -- "bimg",
         -- "bx",
