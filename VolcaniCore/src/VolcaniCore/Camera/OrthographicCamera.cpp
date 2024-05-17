@@ -1,4 +1,3 @@
-
 #include "OrthographicCamera.h"
 
 #include <glm/gtc/matrix_transform.hpp>
@@ -7,7 +6,7 @@
 
 namespace VolcaniCore {
 
-OrthographicCamera::OrthographicCamera(float& left, float& right, float& bottom, float& top, float rotation)
+OrthographicCamera::OrthographicCamera(float left, float right, float bottom, float top, float rotation)
 	: Camera(CameraType::Ortho), m_Rotation(rotation)
 {
 	SetProjection(left, right, bottom, top);

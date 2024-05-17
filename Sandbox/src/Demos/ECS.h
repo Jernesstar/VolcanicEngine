@@ -3,6 +3,8 @@
 #include <VolcaniCore/Core/Application.h>
 #include <VolcaniCore/Core/Log.h>
 #include <VolcaniCore/Events/EventSystem.h>
+#include <VolcaniCore/Camera/OrthographicCamera.h>
+#include <VolcaniCore/Camera/StereographicCamera.h>
 
 #include <Magma/Entity.h>
 #include <Magma/SceneSerializer.h>
