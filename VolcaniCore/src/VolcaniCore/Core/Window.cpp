@@ -25,7 +25,7 @@ Window::Window(uint32_t width, uint32_t height)
 	});
 	EventSystem::RegisterEventListener<WindowResizedEvent>(
 	[&](const WindowResizedEvent& event) {
-		SetFramebufferSize(event.Width, event.Height);
+		Resize(event.Width, event.Height);
 	});
 
 	InitImGui();
@@ -39,7 +39,7 @@ Window::~Window()
 	m_NativeWindow = nullptr;
 }
 
-void Window::SetFramebufferSize(uint32_t width, uint32_t height) {
+void Window::Resize(uint32_t width, uint32_t height) {
     m_Width = width;
     m_Height = height;
 }

@@ -24,7 +24,7 @@ public:
 	bool IsOpen() const { return !glfwWindowShouldClose(m_NativeWindow); }
 
 private:
-	void SetFramebufferSize(uint32_t width, uint32_t height);
+	void Resize(uint32_t width, uint32_t height);
 
 	void InitImGui();
 	void CloseImGui();
