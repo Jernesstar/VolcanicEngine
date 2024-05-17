@@ -1,6 +1,6 @@
 workspace "VolcanicEngine"
     location ("build")
-    architecture "x64"
+    architecture "x86_64"
     configurations { "Debug", "Release" }
 
     if os.is64bit() and not os.istarget("windows") then
@@ -18,8 +18,11 @@ workspace "VolcanicEngine"
         defines "VOLCANICENGINE_LINUX"
 
     filter "system:windows"
-        defines "VOLCANICENGINE_WINDOWS"
-
+        defines {
+            "VOLCANICENGINE_WINDOWS",
+            "YAML_CPP_STATIC_DEFINE",
+            "YAML_CPP_NO_CONTRIB"
+        }
     filter "configurations:Debug*"
         defines {
             "_DEBUG",

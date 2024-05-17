@@ -3,10 +3,10 @@
 #include <VolcaniCore/Core/Application.h>
 #include <VolcaniCore/Core/CommandLineArgs.h>
 
+#include "Demos/Template.h"
 #include "Demos/Model.h"
 #include "Demos/Lighting.h"
 #include "Demos/ECS.h"
-#include "Demos/Template.h"
 
 #include "TheMazeIsLava/Game.h"
 

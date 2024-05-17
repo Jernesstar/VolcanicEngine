@@ -8,19 +8,14 @@ project "assimp"
 
     files {
         -- "%{VendorPaths.assimp}/code/CApi/*.cpp",
+        -- "%{VendorPaths.assimp}/code/Pbrt/*.cpp",
         "%{VendorPaths.assimp}/code/Common/*.cpp",
         "%{VendorPaths.assimp}/code/Geometry/*.cpp",
         "%{VendorPaths.assimp}/code/Material/*.cpp",
-        "%{VendorPaths.assimp}/code/Pbrt/*.cpp",
         "%{VendorPaths.assimp}/code/PostProcessing/*.cpp",
         "%{VendorPaths.assimp}/code/AssetLib/Obj/*.cpp",
-        -- "%{VendorPaths.assimp}/code/AssetLib/STL/*.cpp",
-        -- "%{VendorPaths.assimp}/code/AssetLib/FBX/*.cpp",
-        -- "%{VendorPaths.assimp}/code/AssetLib/Blender/*.cpp",
-        -- "%{VendorPaths.assimp}/code/AssetLib/Unreal/*.cpp",
         "%{VendorPaths.assimp}/contrib/clipper/**.cpp",
         "%{VendorPaths.assimp}/contrib/gtest/**.cpp",
-        "%{VendorPaths.assimp}/contrib/Open3DGC/**.cpp",
         "%{VendorPaths.assimp}/contrib/openddlparser/**.cpp",
         "%{VendorPaths.assimp}/contrib/poly2tri/**.cpp",
         "%{VendorPaths.assimp}/contrib/pugixml/**.cpp",
@@ -29,14 +24,19 @@ project "assimp"
     }
 
     removefiles {
-        "%{VendorPaths.assimp}/code/**/*Export*.cpp",
+        "%{VendorPaths.assimp}/code/**/*Exporter.cpp",
         "%{VendorPaths.assimp}/code/Common/**/*Exporter*.cpp",
         "%{VendorPaths.assimp}/code/Common/Exporter.cpp",
+        "%{VendorPaths.assimp}/code/AssetLib/STL/*.cpp",
+        "%{VendorPaths.assimp}/code/AssetLib/FBX/*.cpp",
+        "%{VendorPaths.assimp}/code/AssetLib/Blender/*.cpp",
+        "%{VendorPaths.assimp}/code/AssetLib/Unreal/*.cpp",
         "%{VendorPaths.assimp}/code/AssetLib/Obj/ObjExporter.cpp",
         "%{VendorPaths.assimp}/code/AssetLib/STL/STLExporter.cpp",
         "%{VendorPaths.assimp}/code/AssetLib/FBX/FBXExporter.cpp",
         "%{VendorPaths.assimp}/code/AssetLib/FBX/FBXExportNode.cpp",
         "%{VendorPaths.assimp}/code/AssetLib/FBX/FBXExportProperty.cpp",
+        "%{VendorPaths.assimp}/contrib/Open3DGC/**.cpp",
     }
 
     includedirs {
