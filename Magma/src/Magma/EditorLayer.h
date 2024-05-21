@@ -1,6 +1,6 @@
 #pragma once
 
-#include <VolcanicCore/Core/Time.h>
+#include <VolcaniCore/Core/Time.h>
 
 namespace Magma {
 
@@ -9,7 +9,7 @@ public:
 	EditorLayer();
 	~EditorLayer();
 
-	void Update(TimeStep ts);
+	void Update(VolcaniCore::TimeStep ts);
 	void Render();
 };
 

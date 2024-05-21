@@ -18,6 +18,7 @@ project "Sandbox"
         "%{RootPath}/VolcaniCore/src/VolcaniCore",
         "%{RootPath}/VolcaniCore/src/impl",
         "%{RootPath}/Magma/src",
+        "%{RootPath}/Magma/src/Magma",
 
         "%{Includes.bgfx}",
         "%{Includes.glfw}",

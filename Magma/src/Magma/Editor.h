@@ -1,10 +1,16 @@
 #pragma once
 
-#include <Core/Application.h>
-#include <Core/Log.h>
-#include <Events/EventSystem.h>
+#include <VolcaniCore/Core/Application.h>
+#include <VolcaniCore/Core/Log.h>
+#include <VolcaniCore/Camera/Camera.h>
+#include <VolcaniCore/Renderer/Renderer.h>
+#include <VolcaniCore/Events/EventSystem.h>
+
+#include <EditorLayer.h>
 
 using namespace VolcaniCore;
+
+namespace Magma {
 
 class Editor : public Application {
 public:
@@ -14,6 +20,8 @@ public:
 
 private:
 	Ref<EditorLayer> m_EditorLayer;
+	Ref<Camera> m_Camera;
+
 };
 
 Editor::Editor() {
@@ -25,6 +33,9 @@ Editor::Editor() {
 }
 
 void Editor::OnUpdate(TimeStep ts) {
+	Renderer::Clear();
 	m_EditorLayer->Update(ts);
 	m_EditorLayer->Render();
+}
+
 }

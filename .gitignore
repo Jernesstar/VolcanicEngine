@@ -6,3 +6,8 @@
 
 # Exes, intermediates, and GNU Makefiles
 build/
+
+# Files created by the program's execution
+*.volc
+*.ini
+Magma/temp.volc

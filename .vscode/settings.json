@@ -78,5 +78,4 @@
 		"variant": "cpp",
 		"*.hpp11": "cpp"
 	},
-	"cmake.sourceDirectory": "/workspaces/VolcanicEngine/VolcaniCore/vendor/assimp/contrib/pugixml",
 }

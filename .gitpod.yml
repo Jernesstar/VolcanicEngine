@@ -6,4 +6,5 @@ ports:
   - port: 6080
     protocol: "http"
 tasks:
-  - command: "scripts/premake.sh && scripts/build.sh"
+  - command: "git pull && git submodule update --init \
+          &&  scripts/premake.sh && scripts/build.sh"
