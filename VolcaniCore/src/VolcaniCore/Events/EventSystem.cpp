@@ -44,71 +44,57 @@ GET_CALLBACKS(ApplicationUpdatedEvent);
 
 void EventSystem::KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-	if(action == GLFW_PRESS)
-	{
+	if(action == GLFW_PRESS) {
 		KeyPressedEvent event((KeyCode)key);
 		Dispatch(event);
 	}
-
-	if(action == GLFW_RELEASE)
-	{
+	if(action == GLFW_RELEASE) {
 		KeyReleasedEvent event((KeyCode)key);
 		Dispatch(event);
 	}
-
-	if(action == GLFW_REPEAT)
-	{
+	if(action == GLFW_REPEAT) {
 		KeyPressedEvent event((KeyCode)key, true);
 		Dispatch(event);
 	}
 }
 
-void EventSystem::KeyCharCallback(GLFWwindow* window, unsigned int codepoint)
-{
+void EventSystem::KeyCharCallback(GLFWwindow* window, unsigned int codepoint) {
 	KeyCharEvent event((KeyCode)codepoint, (char)codepoint);
 	Dispatch(event);
 }
 
-void EventSystem::MouseMovedCallback(GLFWwindow* window, double x, double y)
-{
+void EventSystem::MouseMovedCallback(GLFWwindow* window, double x, double y) {
 	MouseMovedEvent event((float)x, (float)y);
 	Dispatch(event);
 }
 
-void EventSystem::MouseScrolledCallback(GLFWwindow* window, double x_scroll, double y_scroll)
-{
+void EventSystem::MouseScrolledCallback(GLFWwindow* window, double x_scroll, double y_scroll) {
 	MouseScrolledEvent event((float)x_scroll, (float)y_scroll);
 	Dispatch(event);
 }
 
-void EventSystem::MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
-{
-	if(action == GLFW_PRESS)
-	{
+void EventSystem::MouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
+	if(action == GLFW_PRESS) {
 		MouseButtonPressedEvent event((MouseCode)button, Input::GetMouseX(), Input::GetMouseY());
 		Dispatch(event);
 	}
-
-	if(action == GLFW_RELEASE)
-	{
+	if(action == GLFW_RELEASE) {
 		MouseButtonReleasedEvent event((MouseCode)button, Input::GetMouseX(), Input::GetMouseY());
 		Dispatch(event);
 	}
 }
 
-void EventSystem::WindowResizedCallback(GLFWwindow* window, int width, int height)
-{
+void EventSystem::WindowResizedCallback(GLFWwindow* window, int width, int height) {
 	WindowResizedEvent event(width, height);
 	Dispatch(event);
 }
 
-void EventSystem::WindowMovedCallback(GLFWwindow* window, int x, int y)
-{
+void EventSystem::WindowMovedCallback(GLFWwindow* window, int x, int y) {
 	WindowMovedEvent event(x, y);
 	Dispatch(event);
 }
-void EventSystem::WindowClosedCallback(GLFWwindow* window)
-{
+
+void EventSystem::WindowClosedCallback(GLFWwindow* window) {
 	WindowClosedEvent event;
 	Dispatch(event);
 }

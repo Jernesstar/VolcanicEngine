@@ -18,10 +18,10 @@ project "Magma"
 
         "%{Includes.glm}",
         "%{Includes.glfw}",
-        "%{Includes.yaml_cpp}",
-        "%{Includes.freetype}",
         "%{Includes.imgui}",
         "%{Includes.imgui}/imgui",
+        "%{Includes.yaml_cpp}",
+        "%{Includes.ImGuiFileDialog}",
     }
 
     filter "system:windows"

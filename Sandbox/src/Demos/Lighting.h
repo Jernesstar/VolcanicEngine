@@ -181,12 +181,12 @@ private:
 LightingDemo::LightingDemo()
 {
 	glDisable(GL_CULL_FACE);
-	EventSystem::RegisterEventListener<KeyPressedEvent>(
+	EventSystem::RegisterListener<KeyPressedEvent>(
 	[](const KeyPressedEvent& event) {
 		if(event.Key == Key::Escape)
 			Application::Close();
 	});
-	EventSystem::RegisterEventListener<WindowResizedEvent>(
+	EventSystem::RegisterListener<WindowResizedEvent>(
 	[this](const WindowResizedEvent& event) {
 		this->camera.Resize(event.Width, event.Height);
 	});

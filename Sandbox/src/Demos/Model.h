@@ -87,12 +87,12 @@ private:
 
 ModelDemo::ModelDemo()
 {
-	EventSystem::RegisterEventListener<KeyPressedEvent>(
+	EventSystem::RegisterListener<KeyPressedEvent>(
 	[](const KeyPressedEvent& event) {
 		if(event.Key == Key::Escape)
 			Application::Close();
 	});
-	EventSystem::RegisterEventListener<WindowResizedEvent>(
+	EventSystem::RegisterListener<WindowResizedEvent>(
 	[this](const WindowResizedEvent& event) {
 		this->m_Camera.Resize(event.Width, event.Height);
 	});

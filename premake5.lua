@@ -56,6 +56,7 @@ include "VolcaniCore/scripts/freetype"
 include "VolcaniCore/scripts/stb_image"
 
 include "Magma/scripts/yaml-cpp"
+include "Magma/scripts/ImGuiFileDialog"
 
 include "VolcaniCore"
 include "Magma"
@@ -78,6 +79,7 @@ VendorPaths["freetype"] = "%{VolcaniCoreVendorDir}/freetype"
 VendorPaths["stb_image"] = "%{VolcaniCoreVendorDir}/stb_image"
 
 VendorPaths["yaml_cpp"] = "%{MagmaVendorDir}/yaml-cpp"
+VendorPaths["ImGuiFileDialog"] = "%{MagmaVendorDir}/ImGuiFileDialog"
 
 Includes = {}
 Includes["bgfx"] = "%{VendorPaths.bgfx}/include"
@@ -92,3 +94,4 @@ Includes["freetype"] = "%{VendorPaths.freetype}/include"
 Includes["stb_image"] = "%{VendorPaths.stb_image}/include"
 
 Includes["yaml_cpp"] = "%{VendorPaths.yaml_cpp}/include"
+Includes["ImGuiFileDialog"] = "%{MagmaVendorDir}"

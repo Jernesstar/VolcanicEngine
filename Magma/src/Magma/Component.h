@@ -38,25 +38,25 @@ struct EventListenerComponent : public Component {
 	EventListenerComponent(const EventListenerComponent& other) = default;
 
 	void RegisterCallbacks() {
-		if(OnKeyPressed)          EventSystem::RegisterEventListener(OnKeyPressed);
-		if(OnKeyReleased)         EventSystem::RegisterEventListener(OnKeyReleased);
-		if(OnMouseMoved)          EventSystem::RegisterEventListener(OnMouseMoved);
-		if(OnMouseScrolled)       EventSystem::RegisterEventListener(OnMouseScrolled);
-		if(OnMouseButtonPressed)  EventSystem::RegisterEventListener(OnMouseButtonPressed);
-		if(OnMouseButtonReleased) EventSystem::RegisterEventListener(OnMouseButtonReleased);
-		if(OnWindowResized)       EventSystem::RegisterEventListener(OnWindowResized);
-		if(OnWindowClosed)        EventSystem::RegisterEventListener(OnWindowClosed);
+		if(OnKeyPressed)          EventSystem::RegisterListener(OnKeyPressed);
+		if(OnKeyReleased)         EventSystem::RegisterListener(OnKeyReleased);
+		if(OnMouseMoved)          EventSystem::RegisterListener(OnMouseMoved);
+		if(OnMouseScrolled)       EventSystem::RegisterListener(OnMouseScrolled);
+		if(OnMouseButtonPressed)  EventSystem::RegisterListener(OnMouseButtonPressed);
+		if(OnMouseButtonReleased) EventSystem::RegisterListener(OnMouseButtonReleased);
+		if(OnWindowResized)       EventSystem::RegisterListener(OnWindowResized);
+		if(OnWindowClosed)        EventSystem::RegisterListener(OnWindowClosed);
 	}
 
 	void UnregisterCallbacks() {
-		if(OnKeyPressed)          EventSystem::UnregisterEventListener(OnKeyPressed);
-		if(OnKeyReleased)         EventSystem::UnregisterEventListener(OnKeyReleased);
-		if(OnMouseMoved)          EventSystem::UnregisterEventListener(OnMouseMoved);
-		if(OnMouseScrolled)       EventSystem::UnregisterEventListener(OnMouseScrolled);
-		if(OnMouseButtonPressed)  EventSystem::UnregisterEventListener(OnMouseButtonPressed);
-		if(OnMouseButtonReleased) EventSystem::UnregisterEventListener(OnMouseButtonReleased);
-		if(OnWindowResized)       EventSystem::UnregisterEventListener(OnWindowResized);
-		if(OnWindowClosed)        EventSystem::UnregisterEventListener(OnWindowClosed);
+		if(OnKeyPressed)          EventSystem::UnregisterListener(OnKeyPressed);
+		if(OnKeyReleased)         EventSystem::UnregisterListener(OnKeyReleased);
+		if(OnMouseMoved)          EventSystem::UnregisterListener(OnMouseMoved);
+		if(OnMouseScrolled)       EventSystem::UnregisterListener(OnMouseScrolled);
+		if(OnMouseButtonPressed)  EventSystem::UnregisterListener(OnMouseButtonPressed);
+		if(OnMouseButtonReleased) EventSystem::UnregisterListener(OnMouseButtonReleased);
+		if(OnWindowResized)       EventSystem::UnregisterListener(OnWindowResized);
+		if(OnWindowClosed)        EventSystem::UnregisterListener(OnWindowClosed);
 	}
 };
 

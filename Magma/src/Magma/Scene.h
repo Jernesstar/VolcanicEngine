@@ -1,10 +1,16 @@
 #pragma once
 
+// #include <vector>
+
 #include <VolcaniCore/Camera/Camera.h>
+// #include "VolcaniCore/Renderer/Mesh.h>
+
 
 #include "EntitySystem.h"
 
 namespace Magma {
+
+// class Light;
 
 class Scene {
 public:
@@ -20,6 +26,9 @@ public:
 
 private:
 	EntitySystem m_EntitySystem;
+
+	// std::vector<Light> m_Lights;
+	// std::vector<Mesh> m_Meshes;
 };
 
 }

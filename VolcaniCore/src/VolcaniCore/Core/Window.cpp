@@ -19,11 +19,11 @@ Window::Window(uint32_t width, uint32_t height)
 
 	glfwMakeContextCurrent(m_NativeWindow);
 
-	EventSystem::RegisterEventListener<WindowClosedEvent>(
+	EventSystem::RegisterListener<WindowClosedEvent>(
 	[](const WindowClosedEvent& event) {
 		Application::Close();
 	});
-	EventSystem::RegisterEventListener<WindowResizedEvent>(
+	EventSystem::RegisterListener<WindowResizedEvent>(
 	[&](const WindowResizedEvent& event) {
 		Resize(event.Width, event.Height);
 	});
@@ -57,33 +57,47 @@ void Window::InitImGui()
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableSetMousePos;
 	io.DisplaySize = ImVec2{ (float)m_Width, (float)m_Height };
+	io.KeyMap[ImGuiKey_Space] = Key::Space;
 
-	EventSystem::RegisterEventListener<MouseButtonPressedEvent>(
+	EventSystem::RegisterListener<KeyPressedEvent>(
+	[&io](KeyPressedEvent& event) {
+		io.KeysDown[event.Key] = true;
+		event.Handled = true;
+	});
+	EventSystem::RegisterListener<KeyReleasedEvent>(
+	[&io](KeyReleasedEvent& event) {
+		io.KeysDown[event.Key] = false;
+		event.Handled = true;
+	});
+	EventSystem::RegisterListener<KeyCharEvent>(
+	[&io](KeyCharEvent& event) {
+		io.AddInputCharacter(event.Key);
+		event.Handled = true;
+	});
+	EventSystem::RegisterListener<MouseButtonPressedEvent>(
 	[&io](MouseButtonPressedEvent& event) {
 		io.MouseDown[event.MouseButton] = true;
 		event.Handled = true;
 	});
-	EventSystem::RegisterEventListener<MouseButtonReleasedEvent>(
+	EventSystem::RegisterListener<MouseButtonReleasedEvent>(
 	[&io](MouseButtonReleasedEvent& event) {
 		io.MouseDown[event.MouseButton] = false;
 		event.Handled = true;
 	});
-	EventSystem::RegisterEventListener<MouseScrolledEvent>(
+	EventSystem::RegisterListener<MouseScrolledEvent>(
 	[&io](MouseScrolledEvent& event) {
 		io.MouseWheelH += event.ScrollX;
 		io.MouseWheel += event.ScrollY;
 		event.Handled = true;
 	});
-	EventSystem::RegisterEventListener<MouseMovedEvent>(
+	EventSystem::RegisterListener<MouseMovedEvent>(
 	[&io](const MouseMovedEvent& event) {
 		io.MousePos = ImVec2{ event.x, event.y };
 	});
-	EventSystem::RegisterEventListener<WindowResizedEvent>(
+	EventSystem::RegisterListener<WindowResizedEvent>(
 	[&io](const WindowResizedEvent& event) {
 		io.DisplaySize = ImVec2{ (float)event.Width, (float)event.Height };
 	});
-
-	// Todo: Add more event handlers
 }
 
 void Window::CloseImGui()

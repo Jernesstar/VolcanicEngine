@@ -17,7 +17,7 @@ public:
 };
 
 bgfxDemo::bgfxDemo() {
-	EventSystem::RegisterEventListener<KeyPressedEvent>(
+	EventSystem::RegisterListener<KeyPressedEvent>(
 	[](const KeyPressedEvent& event)
 	{
 		if(event.Key == Key::Escape)

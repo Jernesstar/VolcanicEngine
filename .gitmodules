@@ -32,6 +32,6 @@
 [submodule "Magma/vendor/yaml-cpp"]
 	path = Magma/vendor/yaml-cpp
 	url = https://github.com/jbeder/yaml-cpp.git
-[submodule "Magma/vendor/portable-file-dialogs"]
-	path = Magma/vendor/portable-file-dialogs
-	url = https://github.com/samhocevar/portable-file-dialogs.git
+[submodule "Magma/vendor/ImGuiFileDialog"]
+	path = Magma/vendor/ImGuiFileDialog
+	url = https://github.com/aiekick/ImGuiFileDialog.git

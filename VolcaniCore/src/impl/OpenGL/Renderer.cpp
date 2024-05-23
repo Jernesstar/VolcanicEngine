@@ -79,7 +79,7 @@ void Renderer::Init() {
 	glFrontFace(GL_CCW);
 	glCullFace(GL_BACK);
 
-	EventSystem::RegisterEventListener<WindowResizedEvent>(
+	EventSystem::RegisterListener<WindowResizedEvent>(
 	[&](const WindowResizedEvent& event) {
 		Renderer::Resize(event.Width, event.Height);
 	});

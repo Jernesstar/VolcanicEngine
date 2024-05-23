@@ -2,6 +2,8 @@
 
 #include <VolcaniCore/Core/Time.h>
 
+#include "Scene.h"
+
 namespace Magma {
 
 class EditorLayer {
@@ -11,6 +13,13 @@ public:
 
 	void Update(VolcaniCore::TimeStep ts);
 	void Render();
+
+private:
+	Ref<Scene> m_CurrentScene;
+
+	void NewScene();
+	void OpenScene();
+	void SaveScene();
 };
 
 }

@@ -20,7 +20,7 @@ public:
 };
 
 ECSDemo::ECSDemo() {
-	EventSystem::RegisterEventListener<KeyPressedEvent>(
+	EventSystem::RegisterListener<KeyPressedEvent>(
 	[](const KeyPressedEvent& event) {
 		if(event.Key == Key::Escape)
 			Application::Close();
@@ -43,9 +43,9 @@ ECSDemo::ECSDemo() {
 	scene->GetEntitySystem().AddEntity(entity1);
 	scene->GetEntitySystem().AddEntity(entity2);
 	scene->GetEntitySystem().AddEntity(entity3);
-	SceneSerializer::Serialize(scene, "Magma/temp.volc");
+	SceneSerializer::Serialize(scene, "Sandbox/scenes/test_scene.volc");
 
-	Ref<Scene> scene2 = SceneSerializer::Deserialize("Magma/temp.volc");
+	Ref<Scene> scene2 = SceneSerializer::Deserialize("Sandbox/scenes/test_scene.volc");
 
 	scene2->GetEntitySystem().ForEachEntity(
 	[](Entity& entity) {

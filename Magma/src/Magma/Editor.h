@@ -25,11 +25,13 @@ private:
 };
 
 Editor::Editor() {
-	EventSystem::RegisterEventListener<KeyPressedEvent>(
+	EventSystem::RegisterListener<KeyPressedEvent>(
 	[](const KeyPressedEvent& event) {
 		if(event.Key == Key::Escape)
 			Application::Close();
 	});
+
+	m_EditorLayer = CreateRef<EditorLayer>();
 }
 
 void Editor::OnUpdate(TimeStep ts) {

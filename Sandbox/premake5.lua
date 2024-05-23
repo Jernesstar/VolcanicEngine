@@ -27,24 +27,29 @@ project "Sandbox"
         "%{Includes.imgui}",
         "%{Includes.imgui}/imgui",
         "%{Includes.freetype}",
-        "%{Includes.yaml_cpp}",
         "%{Includes.assimp}",
-        "%{Includes.stb_image}"
+        "%{Includes.stb_image}",
+
+        "%{Includes.yaml_cpp}",
+        "%{Includes.ImGuiFileDialog}"
     }
 
     links {
         "Magma",
         "VolcaniCore",
-        -- "bgfx",
+
+        "yaml-cpp",
+		"ImGuiFileDialog",
+
+		-- "bgfx",
         -- "bimg",
         -- "bx",
         "glfw",
         "glad",
         "imgui",
         "assimp",
-        "yaml-cpp",
         "freetype",
-        "stb_image",
+        "stb_image"
     }
 
     filter "system:windows"
