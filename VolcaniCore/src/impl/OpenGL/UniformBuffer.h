@@ -2,7 +2,7 @@
 
 #include <glad/glad.h>
 
-#include "Renderer/BufferLayout.h"
+#include "BufferLayout.h"
 
 namespace VolcaniCore::OpenGL {
 

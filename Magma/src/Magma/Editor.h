@@ -21,7 +21,6 @@ public:
 private:
 	Ref<EditorLayer> m_EditorLayer;
 	Ref<Camera> m_Camera;
-
 };
 
 Editor::Editor() {

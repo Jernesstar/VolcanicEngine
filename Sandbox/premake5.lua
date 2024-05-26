@@ -39,9 +39,9 @@ project "Sandbox"
         "VolcaniCore",
 
         "yaml-cpp",
-		"ImGuiFileDialog",
+        "ImGuiFileDialog",
 
-		-- "bgfx",
+        -- "bgfx",
         -- "bimg",
         -- "bx",
         "glfw",

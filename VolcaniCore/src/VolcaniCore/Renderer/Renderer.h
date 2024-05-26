@@ -7,7 +7,6 @@
 
 namespace VolcaniCore {
 
-
 class Renderer {
 public:
 	static void Init() { m_Renderer = Application::GetRenderer(); }

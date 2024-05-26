@@ -9,6 +9,7 @@
 
 namespace VolcaniCore {
 
+// NOTE: Is this really needed ?
 class Transform {
 public:
 	Transform() = default;

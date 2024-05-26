@@ -1,6 +1,6 @@
 #include "BufferLayout.h"
 
-namespace VolcaniCore {
+namespace VolcaniCore::OpenGL {
 
 uint32_t BufferElement::CalcSize(BufferDataType type) {
 	switch(type) {

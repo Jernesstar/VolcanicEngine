@@ -14,6 +14,7 @@
 [submodule "VolcaniCore/vendor/imgui"]
 	path = VolcaniCore/vendor/imgui
 	url = https://github.com/ocornut/imgui.git
+	branch = docking
 [submodule "VolcaniCore/vendor/bgfx"]
 	path = VolcaniCore/vendor/bgfx
 	url = https://github.com/bkaradzic/bgfx.git

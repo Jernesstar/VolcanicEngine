@@ -6,9 +6,12 @@
 #include "Core/Assert.h"
 #include "Events/EventSystem.h"
 
+#include "Model.h"
 #include "Cubemap.h"
 #include "Texture2D.h"
 #include "VertexBuffer.h"
+
+using namespace VolcaniCore;
 
 namespace VolcaniCore::OpenGL {
 
@@ -98,13 +101,14 @@ void Renderer::Resize(uint32_t width, uint32_t height) {
 	glViewport(0, 0, width, height);
 }
 
-void Renderer::RenderModel(Ref<Model> model) {
-	model->Bind();
+void Renderer::RenderModel(Ref<VolcaniCore::Model> model) {
+	auto m = model->As<OpenGL::Model>();
+	m->Bind();
 
-	for(uint32_t i = 0; i < model->GetMeshCount(); i++) {
-		auto& mesh = model->GetMesh(i);
+	for(uint32_t i = 0; i < m->GetMeshCount(); i++) {
+		auto& mesh = m->GetMesh(i);
 		auto material_index = mesh.MaterialIndex;
-		model->GetMaterial(material_index).Bind();
+		m->GetMaterial(material_index).Bind();
 
 		glDrawElementsBaseVertex(GL_TRIANGLES, mesh.IndexCount, GL_UNSIGNED_INT,
 			(void*)(sizeof(uint32_t) * mesh.BaseIndex), mesh.BaseVertex);

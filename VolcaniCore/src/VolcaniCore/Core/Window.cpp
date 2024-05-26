@@ -57,7 +57,9 @@ void Window::InitImGui()
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableSetMousePos;
 	io.DisplaySize = ImVec2{ (float)m_Width, (float)m_Height };
-	io.KeyMap[ImGuiKey_Space] = Key::Space;
+
+	io.KeyMap[ImGuiKey_Space] 	  = Key::Space;
+	io.KeyMap[ImGuiKey_Backspace] = Key::Backspace;
 
 	EventSystem::RegisterListener<KeyPressedEvent>(
 	[&io](KeyPressedEvent& event) {

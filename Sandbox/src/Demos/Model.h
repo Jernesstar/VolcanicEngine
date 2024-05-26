@@ -2,6 +2,7 @@
 
 #include <OpenGL/Renderer.h>
 #include <OpenGL/Shader.h>
+#include <OpenGL/Model.h>
 
 #include <Core/Application.h>
 
@@ -59,8 +60,8 @@ private:
 		2, 6, 7,
 	};
 
-	BufferLayout l1 = {
-		{ "a_Position", BufferDataType::Vec3, true },
+	OpenGL::BufferLayout l1 = {
+		{ "a_Position", OpenGL::BufferDataType::Vec3, true },
 	};
 
 	OpenGL::IndexBuffer* index_buffer = new OpenGL::IndexBuffer(indices);
@@ -82,7 +83,7 @@ private:
 	StereographicCamera m_Camera{ 90.0f, 0.1f, 100.0f, 1600, 900 };
 	CameraController m_Controller{ m_Camera };
 
-	Ref<Model> m_Model;
+	Ref<VolcaniCore::Model> m_Model;
 };
 
 ModelDemo::ModelDemo()
@@ -111,7 +112,7 @@ ModelDemo::ModelDemo()
 	light_shader->SetVec3("u_LightColor", light_color);
 	light_shader->SetMat4("u_Model", light_model);
 
-	m_Model = CreateRef<Model>("Sandbox/assets/models/rpg");
+	m_Model = VolcaniCore::Model::Create("Sandbox/assets/models/rpg");
 }
 
 void ModelDemo::OnUpdate(TimeStep ts)
