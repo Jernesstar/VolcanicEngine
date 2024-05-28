@@ -68,8 +68,8 @@ void EventSystem::MouseMovedCallback(GLFWwindow* window, double x, double y) {
 	Dispatch(event);
 }
 
-void EventSystem::MouseScrolledCallback(GLFWwindow* window, double x_scroll, double y_scroll) {
-	MouseScrolledEvent event((float)x_scroll, (float)y_scroll);
+void EventSystem::MouseScrolledCallback(GLFWwindow* window, double scrollX, double scrollY) {
+	MouseScrolledEvent event((float)scrollX, (float)scrollY);
 	Dispatch(event);
 }
 

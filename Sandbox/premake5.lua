@@ -24,12 +24,12 @@ project "Sandbox"
         "%{Includes.glfw}",
         "%{Includes.glad}",
         "%{Includes.glm}",
-        "%{Includes.imgui}",
-        "%{Includes.imgui}/imgui",
         "%{Includes.freetype}",
         "%{Includes.assimp}",
         "%{Includes.stb_image}",
 
+        "%{Includes.imgui}",
+        "%{Includes.imgui}/imgui",
         "%{Includes.yaml_cpp}",
         "%{Includes.ImGuiFileDialog}"
     }
@@ -38,6 +38,7 @@ project "Sandbox"
         "Magma",
         "VolcaniCore",
 
+        "imgui",
         "yaml-cpp",
         "ImGuiFileDialog",
 
@@ -46,7 +47,6 @@ project "Sandbox"
         -- "bx",
         "glfw",
         "glad",
-        "imgui",
         "assimp",
         "freetype",
         "stb_image"

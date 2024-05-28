@@ -20,6 +20,7 @@ public:
 private:
 	Ref<Scene> m_CurrentScene;
 	Ref<Texture> m_IconPlay, m_IconPause, m_IconStop;
+	
 
 	enum class SceneState { Edit, Play };
 	SceneState m_SceneState = SceneState::Edit;
@@ -29,17 +30,17 @@ private:
 	glm::vec2 m_ViewportSize = { 0.0f, 0.0f };
 	glm::vec2 m_ViewportBounds[2];
 
-	// void UI_Toolbar();
-
 	void NewScene();
 	void OpenScene();
 	void OpenScene(const std::filesystem::path& path);
 	void SaveScene();
-	void SaveSceneAs() { }
+
+	void UI_Toolbar();
 	void OpenProject() { }
-
+	void SaveSceneAs() { }
+	void OnScenePlay() { }
+	void OnSceneStop() { }
 	void OnSceneSimulate() { }
-
 };
 
 }

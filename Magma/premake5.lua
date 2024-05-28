@@ -12,9 +12,10 @@ project "Magma"
     }
 
     includedirs {
-        "src",
+        "src/Magma",
         "%{RootPath}/VolcaniCore/src",
         "%{RootPath}/VolcaniCore/src/VolcaniCore",
+        "%{RootPath}/VolcaniCore/src/impl/",
 
         "%{Includes.glm}",
         "%{Includes.glfw}",
@@ -26,3 +27,8 @@ project "Magma"
 
     filter "system:windows"
         systemversion "latest"
+
+
+include "Magma/scripts/imgui"
+include "Magma/scripts/yaml-cpp"
+include "Magma/scripts/ImGuiFileDialog"

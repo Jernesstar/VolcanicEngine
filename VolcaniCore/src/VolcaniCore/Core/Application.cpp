@@ -1,9 +1,6 @@
 #include "Application.h"
 
 #include <glad/glad.h>
-#include <imgui/imgui.h>
-#include <imgui/backends/imgui_impl_glfw.h>
-#include <imgui/backends/imgui_impl_opengl3.h>
 
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
@@ -49,18 +46,11 @@ void Application::Run() {
 		s_TimeStep = ts;
 
 		ApplicationUpdatedEvent event(ts);
-		EventSystem::PollEvents();
 		EventSystem::Dispatch(event);
 
-		ImGui_ImplOpenGL3_NewFrame();
-		ImGui_ImplGlfw_NewFrame();
-		ImGui::NewFrame();
+		EventSystem::PollEvents();
 
 		s_Instance->OnUpdate(ts);
-
-		ImGui::Render();
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
 		s_Window->Update();
 	}
 }

@@ -21,18 +21,18 @@ struct MouseScrolledEvent : public MouseEvent {
 	const float ScrollX;
 	const float ScrollY;
 
-	MouseScrolledEvent(float scroll_x, float scroll_y)
+	MouseScrolledEvent(float scrollX, float scrollY)
 		: MouseEvent(EventType::MouseScrolled), 
-			ScrollX(scroll_x), ScrollY(scroll_y) { }
+			ScrollX(scrollX), ScrollY(scrollY) { }
 };
 
 struct MouseButtonEvent : public MouseEvent {
-	const MouseCode MouseButton;
+	const MouseCode Button;
 	const float x, y;
 
 protected:
 	MouseButtonEvent(EventType type, MouseCode button, float x, float y) 
-		: MouseEvent(type), MouseButton(button), x(x), y(y) { }
+		: MouseEvent(type), Button(button), x(x), y(y) { }
 };
 
 struct MouseButtonPressedEvent : public MouseButtonEvent {

@@ -3,8 +3,8 @@ project "imgui"
     language "C++"
     cppdialect "C++20"
 
-    objdir ("%{RootPath}/build/VolcaniCore/obj")
-    targetdir ("%{RootPath}/build/VolcaniCore/lib")
+    objdir ("%{RootPath}/build/Magma/obj")
+    targetdir ("%{RootPath}/build/Magma/lib")
 
     files {
         "%{VendorPaths.imgui}/*.h",

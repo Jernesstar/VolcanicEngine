@@ -21,8 +21,6 @@ project "VolcaniCore"
         "%{Includes.glfw}",
         "%{Includes.glad}",
         "%{Includes.glm}",
-        "%{Includes.imgui}",
-        "%{Includes.imgui}/imgui",
         "%{Includes.freetype}",
         "%{Includes.assimp}",
         "%{Includes.stb_image}"
@@ -30,3 +28,11 @@ project "VolcaniCore"
 
     filter "system:windows"
         systemversion "latest"
+
+
+-- include "VolcaniCore/scripts/bgfx"
+include "VolcaniCore/scripts/glfw"
+include "VolcaniCore/scripts/glad"
+include "VolcaniCore/scripts/assimp"
+include "VolcaniCore/scripts/freetype"
+include "VolcaniCore/scripts/stb_image"

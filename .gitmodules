@@ -11,10 +11,6 @@
 [submodule "VolcaniCore/vendor/stb_image"]
 	path = VolcaniCore/vendor/stb_image
 	url = https://github.com/Jernesstar/stb_image
-[submodule "VolcaniCore/vendor/imgui"]
-	path = VolcaniCore/vendor/imgui
-	url = https://github.com/ocornut/imgui.git
-	branch = docking
 [submodule "VolcaniCore/vendor/bgfx"]
 	path = VolcaniCore/vendor/bgfx
 	url = https://github.com/bkaradzic/bgfx.git
@@ -36,3 +32,7 @@
 [submodule "Magma/vendor/ImGuiFileDialog"]
 	path = Magma/vendor/ImGuiFileDialog
 	url = https://github.com/aiekick/ImGuiFileDialog.git
+[submodule "Magma/vendor/imgui"]
+	path = Magma/vendor/imgui
+	url = https://github.com/ocornut/imgui.git
+	branch = docking

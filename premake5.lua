@@ -41,22 +41,11 @@ workspace "VolcanicEngine"
     filter "system:macosx"
         xcodebuildsettings {
             ["MACOSX_DEPLOYMENT_TARGET"] = "10.9",
-            ["ALWAYS_SEARCH_USER_PATHS"] = "YES", -- This is the minimum version of macos we'll be able to run on
+            ["ALWAYS_SEARCH_USER_PATHS"] = "YES",
         }
     filter "action:vs*"
         startproject "Sandbox"
 
-
--- include "VolcaniCore/scripts/bgfx"
-include "VolcaniCore/scripts/glfw"
-include "VolcaniCore/scripts/glad"
-include "VolcaniCore/scripts/imgui"
-include "VolcaniCore/scripts/assimp"
-include "VolcaniCore/scripts/freetype"
-include "VolcaniCore/scripts/stb_image"
-
-include "Magma/scripts/yaml-cpp"
-include "Magma/scripts/ImGuiFileDialog"
 
 include "VolcaniCore"
 include "Magma"
@@ -67,31 +56,32 @@ VolcaniCoreVendorDir = "%{RootPath}/VolcaniCore/vendor"
 MagmaVendorDir = "%{RootPath}/Magma/vendor"
 
 VendorPaths = {}
+Includes = {}
+
 VendorPaths["bgfx"] = "%{VolcaniCoreVendorDir}/bgfx"
 VendorPaths["bimg"] = "%{VolcaniCoreVendorDir}/bimg"
 VendorPaths["bx"] = "%{VolcaniCoreVendorDir}/bx"
 VendorPaths["glm"] = "%{VolcaniCoreVendorDir}/glm"
 VendorPaths["glad"] = "%{VolcaniCoreVendorDir}/glad"
 VendorPaths["glfw"] = "%{VolcaniCoreVendorDir}/glfw"
-VendorPaths["imgui"] = "%{VolcaniCoreVendorDir}/imgui"
 VendorPaths["assimp"] = "%{VolcaniCoreVendorDir}/assimp"
 VendorPaths["freetype"] = "%{VolcaniCoreVendorDir}/freetype"
 VendorPaths["stb_image"] = "%{VolcaniCoreVendorDir}/stb_image"
 
+VendorPaths["imgui"] = "%{MagmaVendorDir}/imgui"
 VendorPaths["yaml_cpp"] = "%{MagmaVendorDir}/yaml-cpp"
 VendorPaths["ImGuiFileDialog"] = "%{MagmaVendorDir}/ImGuiFileDialog"
 
-Includes = {}
 Includes["bgfx"] = "%{VendorPaths.bgfx}/include"
 Includes["bimg"] = "%{VendorPaths.bimg}/include"
 Includes["bx"] = "%{VendorPaths.bx}/include"
 Includes["glm"] = "%{VendorPaths.glm}"
 Includes["glad"] = "%{VendorPaths.glad}/include"
 Includes["glfw"] = "%{VendorPaths.glfw}/include"
-Includes["imgui"] = "%{VolcaniCoreVendorDir}"
 Includes["assimp"] = "%{VendorPaths.assimp}/include"
 Includes["freetype"] = "%{VendorPaths.freetype}/include"
 Includes["stb_image"] = "%{VendorPaths.stb_image}/include"
 
+Includes["imgui"] = "%{MagmaVendorDir}"
 Includes["yaml_cpp"] = "%{VendorPaths.yaml_cpp}/include"
 Includes["ImGuiFileDialog"] = "%{MagmaVendorDir}"
