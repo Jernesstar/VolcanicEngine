@@ -5,10 +5,11 @@
 
 #include <Magma/Editor.h>
 
-#include "Demos/Template.h"
-#include "Demos/Model.h"
-#include "Demos/Lighting.h"
 #include "Demos/ECS.h"
+#include "Demos/Lighting.h"
+#include "Demos/FrameBuffer.h"
+#include "Demos/Model.h"
+#include "Demos/Template.h"
 
 #include "TheMazeIsLava/Game.h"
 
@@ -19,6 +20,8 @@ VolcaniCore::Application* CreateApplication(const VolcaniCore::CommandLineArgs& 
 		return new TemplateDemo();
 	if(project == "Lighting")
 		return new LightingDemo();
+	if(project == "FrameBuffer")
+		return new FrameBuferDemo();
 	if(project == "Model")
 		return new ModelDemo();
 	if(project == "ECS")

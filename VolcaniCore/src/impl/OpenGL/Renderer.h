@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Renderer/RendererAPI.h"
+#include "Renderer/Shader.h"
 #include "Renderer/Model.h"
 
 #include "VertexArray.h"
@@ -15,7 +16,7 @@ public:
 	void Init() override;
 	void Close() override;
 
-	void Clear() override;
+	void Clear(const glm::vec3& colors) override;
 	void Resize(uint32_t width, uint32_t height) override;
 
 	void RenderModel(Ref<VolcaniCore::Model> model) override;
@@ -28,6 +29,7 @@ public:
 
 private:
 	Ptr<VertexArray> s_CubemapArray;
+	Ref<ShaderPipeline> m_QuadShader;
 };
 
 }

@@ -67,7 +67,7 @@ void SceneSerializer::Serialize(Ref<Scene> scene, const std::string& filepath) {
 	out << YAML::EndMap; // Camera
 
 	out << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq; // Entities
-	scene->GetEntitySystem().ForEachEntity(
+	scene->GetEntitySystem().ForEach(
 	[&](Entity& entity) {
 		out << YAML::BeginMap; // Entity
 		SerializeEntity(out, entity);

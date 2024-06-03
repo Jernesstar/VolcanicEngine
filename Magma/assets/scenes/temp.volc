@@ -11,4 +11,10 @@ Scene:
     ViewportWidth: 1
     ViewportHeight: 1
   Entities:
-    []
+    - Entity:
+        ID: 3224195941
+        Components:
+          TagComponent:
+            Tag: Empty Entity
+          TextureComponent:
+            Texture: Sandbox/assets/images/apple.png

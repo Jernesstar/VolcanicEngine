@@ -47,7 +47,7 @@ ECSDemo::ECSDemo() {
 
 	Ref<Scene> scene2 = SceneSerializer::Deserialize("Sandbox/scenes/test_scene.volc");
 
-	scene2->GetEntitySystem().ForEachEntity(
+	scene2->GetEntitySystem().ForEach(
 	[](Entity& entity) {
 		VOLCANICORE_LOG_INFO("%s", entity.Get<TagComponent>().Tag.c_str());
 	});

@@ -7,9 +7,37 @@
 
 namespace VolcaniCore {
 
-std::vector<Shader> GetShaders(const std::vector<std::string>& paths);
-std::vector<Shader> GetShaders(const std::string& shader_folder, const std::string& name);
-Shader FindShader(const std::string& path);
+static std::vector<Shader> GetShaders(const std::vector<std::string>& paths);
+static std::vector<Shader> GetShaders(const std::string& shader_folder, const std::string& name);
+static Shader FindShader(const std::string& path);
+
+void ShaderPipeline::Init() {
+	s_SimpleShader = ShaderPipeline::Create({
+		{ "VolcaniCore/assets/shaders/Simple.glsl.vert", ShaderType::Vertex },
+		{ "VolcaniCore/assets/shaders/Simple.glsl.frag", ShaderType::Fragment }
+	});
+
+	s_CubemapShader = Create({
+		{ "VolcaniCore/assets/shaders/Cubemap.glsl.vert", ShaderType::Vertex },
+		{ "VolcaniCore/assets/shaders/Cubemap.glsl.frag", ShaderType::Fragment }
+	});
+
+	s_ModelShader = Create({
+		{ "VolcaniCore/assets/shaders/Model.glsl.vert", ShaderType::Vertex },
+		{ "VolcaniCore/assets/shaders/Model.glsl.frag", ShaderType::Fragment }
+	});
+}
+
+void ShaderPipeline::BindShader(ShaderKind kind) {
+	switch(kind) {
+		case ShaderKind::Simple:
+			s_SimpleShader->Bind();
+		case ShaderKind::Cubemap:
+			s_CubemapShader->Bind();
+		case ShaderKind::Model:
+			s_ModelShader->Bind();
+	}
+}
 
 Ref<ShaderPipeline> ShaderPipeline::Create(const std::vector<Shader>& shaders) {
 	RenderAPI api = Application::GetRenderAPI();
@@ -49,8 +77,7 @@ std::vector<Shader> GetShaders(const std::vector<std::string>& paths) {
 	std::vector<Shader> shaders;
 	shaders.reserve(paths.size());
 
-	for(const auto& path : paths)
-	{
+	for(const auto& path : paths) {
 		Shader shader = FindShader(path);
 		shaders.push_back(shader);
 	}
@@ -59,6 +86,7 @@ std::vector<Shader> GetShaders(const std::vector<std::string>& paths) {
 }
 
 std::vector<Shader> GetShaders(const std::string& shader_folder, const std::string& name) {
+	std::vector<std::string> paths;
 
 }
 

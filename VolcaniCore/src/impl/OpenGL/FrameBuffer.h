@@ -1,26 +1,10 @@
 #pragma once
 
-#include "Core/Application.h"
+#include <cstdint>
+
+#include "Renderer/FrameBuffer.h"
 
 namespace VolcaniCore::OpenGL {
-
-class AttachmentSpecification;
-
-class FrameBuffer {
-public:
-	FrameBuffer(const AttachmentSpecification& specs);
-	~FrameBuffer();
-
-	void Bind();
-	void Unbind();
-	void BindTexture();
-	void BindRenderbuffer();
-
-private:
-	uint32_t m_BufferID;
-	uint32_t m_TextureID;
-	uint32_t m_RenderbufferID;
-};
 
 enum class AttachmentType { Texture, RenderBuffer, None };
 
@@ -33,6 +17,25 @@ struct AttachmentSpecification {
 		AttachmentType depth = AttachmentType::RenderBuffer,
 		AttachmentType stencil = AttachmentType::RenderBuffer
 	) : Width(width), Height(height), Color(color), Depth(depth), Stencil(stencil) { }
+};
+
+class FrameBuffer : public VolcaniCore::FrameBuffer {
+public:
+	FrameBuffer(const AttachmentSpecification& specs);
+	~FrameBuffer();
+
+	void Bind() const override;
+	void Unbind() const override;
+
+	void BindTexture() const;
+	void BindRenderbuffer() const;
+
+	uint32_t GetColorAttachmentID() { return m_TextureID; }
+
+private:
+	uint32_t m_BufferID;
+	uint32_t m_TextureID;
+	uint32_t m_RenderbufferID;
 };
 
 }

@@ -114,10 +114,7 @@ void VertexArray::AddVertexBuffer(VertexBuffer* vertex_buffer)
 void VertexArray::SetIndexBuffer(IndexBuffer* index_buffer)
 {
 	if(!index_buffer)
-	{
-		VOLCANICORE_LOG_WARNING("Index buffer is nullptr");
 		return;
-	}
 
 	glBindVertexArray(m_VertexArrayID);
 	index_buffer->Bind();

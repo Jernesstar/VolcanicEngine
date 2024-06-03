@@ -13,8 +13,7 @@ namespace VolcaniCore::OpenGL {
 
 uint32_t CreateProgram(const std::vector<Shader>& shader_files);
 
-ShaderProgram::ShaderProgram(const std::vector<Shader>& shaders)
-{
+ShaderProgram::ShaderProgram(const std::vector<Shader>& shaders) {
 	m_ProgramID = CreateProgram(shaders);
 }
 

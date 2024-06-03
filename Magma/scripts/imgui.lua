@@ -10,6 +10,7 @@ project "imgui"
         "%{VendorPaths.imgui}/*.h",
         "%{VendorPaths.imgui}/*.cpp",
 
+        "%{VendorPaths.imgui}/misc/cpp/imgui_stdlib.cpp",
         "%{VendorPaths.imgui}/backends/imgui_impl_glfw.cpp",
         "%{VendorPaths.imgui}/backends/imgui_impl_opengl3.cpp",
     }

@@ -21,8 +21,8 @@ public:
 	ShaderProgram(const std::vector<Shader>& shaders);
 	~ShaderProgram();
 
-	void Bind() const;
-	void Unbind() const;
+	void Bind() const override;
+	void Unbind() const override;
 
 	void SetInt(const std::string& name, int _int) override;
 	void SetFloat(const std::string& name, float _float) override;
@@ -37,7 +37,6 @@ public:
 	void SetMat4(const std::string& name, const glm::mat4& mat) override;
 
 private:
-
 	uint32_t m_ProgramID;
 };
 

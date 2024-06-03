@@ -7,13 +7,13 @@
 namespace VolcaniCore::OpenGL {
 
 FrameBuffer::FrameBuffer(const AttachmentSpecification& specs)
+	: VolcaniCore::FrameBuffer(specs.Width, specs.Height)
 {
 	glGenFramebuffers(1, &m_BufferID);
 	glGenTextures(1, &m_TextureID);
 	glGenRenderbuffers(1, &m_RenderbufferID);
 
-	switch(specs.Color)
-	{
+	switch(specs.Color) {
 		case AttachmentType::Texture:
 			glBindTexture(GL_TEXTURE_2D, m_TextureID);
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, specs.Width, specs.Height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
@@ -26,15 +26,13 @@ FrameBuffer::FrameBuffer(const AttachmentSpecification& specs)
 			break;
 	}
 
-	if(specs.Depth == AttachmentType::RenderBuffer && specs.Stencil == AttachmentType::RenderBuffer)
-	{
+	if(specs.Depth == AttachmentType::RenderBuffer && specs.Stencil == AttachmentType::RenderBuffer) {
 		glBindRenderbuffer(GL_RENDERBUFFER, m_RenderbufferID);
 		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, specs.Width, specs.Height);
 		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_RenderbufferID);
 	}
 
-	switch(specs.Depth)
-	{
+	switch(specs.Depth) {
 		case AttachmentType::Texture:
 			glBindTexture(GL_TEXTURE_2D, m_TextureID);
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, specs.Width, specs.Height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
@@ -48,13 +46,11 @@ FrameBuffer::FrameBuffer(const AttachmentSpecification& specs)
 			break;
 	}
 
-	switch(specs.Stencil)
-	{
+	switch(specs.Stencil) {
 
 	}
 
-	if(specs.Color == AttachmentType::None)
-	{
+	if(specs.Color == AttachmentType::None) {
 		glDrawBuffer(GL_NONE);
 		glReadBuffer(GL_NONE);
 	}
@@ -63,16 +59,15 @@ FrameBuffer::FrameBuffer(const AttachmentSpecification& specs)
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-FrameBuffer::~FrameBuffer()
-{
+FrameBuffer::~FrameBuffer() {
 	glDeleteTextures(1, &m_TextureID);
 	glDeleteRenderbuffers(1, &m_RenderbufferID);
 	glDeleteBuffers(1, &m_BufferID);
 }
 
-void FrameBuffer::Bind() { glBindFramebuffer(GL_FRAMEBUFFER, m_BufferID); }
-void FrameBuffer::Unbind() { glBindFramebuffer(GL_FRAMEBUFFER, 0); }
-void FrameBuffer::BindTexture() { glBindTexture(GL_TEXTURE_2D, m_TextureID); }
-void FrameBuffer::BindRenderbuffer() { glBindRenderbuffer(GL_RENDERBUFFER, m_RenderbufferID); }
+void FrameBuffer::Bind() const { glBindFramebuffer(GL_FRAMEBUFFER, m_BufferID); }
+void FrameBuffer::Unbind() const { glBindFramebuffer(GL_FRAMEBUFFER, 0); }
+void FrameBuffer::BindTexture() const { glBindTexture(GL_TEXTURE_2D, m_TextureID); }
+void FrameBuffer::BindRenderbuffer() const { glBindRenderbuffer(GL_RENDERBUFFER, m_RenderbufferID); }
 
 }

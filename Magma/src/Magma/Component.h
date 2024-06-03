@@ -61,7 +61,7 @@ struct EventListenerComponent : public Component {
 };
 
 struct TagComponent : public Component {
-	const std::string Tag;
+	std::string Tag;
 
 	TagComponent() : Component(ComponentType::Tag), Tag("Null Tag") { }
 	TagComponent(const std::string_view& tag) : Component(ComponentType::Tag), Tag(tag) { }
@@ -69,11 +69,11 @@ struct TagComponent : public Component {
 };
 
 struct TextureComponent : public Component {
-	Ptr<VolcaniCore::Texture> Texture;
+	Ref<VolcaniCore::Texture> Texture;
 
 	TextureComponent() : Component(ComponentType::Texture) { }
 	TextureComponent(const std::string& path)
-		: Component(ComponentType::Texture) { Texture = CreatePtr<VolcaniCore::Texture>(path); }
+		: Component(ComponentType::Texture) { Texture = CreateRef<VolcaniCore::Texture>(path); }
 	TextureComponent(const TextureComponent& other) = default;
 };
 

@@ -66,6 +66,34 @@ Renderer::Renderer()
 
 	VertexBuffer* buffer = new VertexBuffer(vertices, BufferLayout{ { "Position", BufferDataType::Vec3 } });
 	s_CubemapArray = CreatePtr<VertexArray>(buffer);
+
+	// indices[0] = 0;
+	// indices[1] = 1;
+	// indices[2] = 2;
+
+	// indices[3] = 2;
+	// indices[4] = 3;
+	// indices[5] = 0;
+
+	// BufferLayout layout =
+	// {
+	// 	{ "Position",          BufferDataType::Vec3 },
+	// 	{ "Color",             BufferDataType::Vec4 },
+	// 	{ "TextureCoordinate", BufferDataType::Vec2 },
+	// 	{ "TextureIndex",      BufferDataType::Int },
+	// };
+
+	// s_Data.QuadIndexBuffer = new IndexBuffer(indices, Renderer2DData::MaxIndices);
+	// delete[] indices;
+
+	// s_Data.QuadVertexBuffer = new VertexBuffer(Renderer2DData::MaxVertices, layout);
+	// s_Data.QuadVertexArray = new VertexArray(s_Data.QuadVertexBuffer, s_Data.QuadIndexBuffer);
+
+	// s_Data.QuadShader = new Shader(
+	// { 
+	// 	{ "Saddle/assets/shaders/Quad.glsl.vert", ShaderType::Vertex },
+	// 	{ "Saddle/assets/shaders/Quad.glsl.frag", ShaderType::Fragment }
+	// });
 }
 
 void Renderer::Init() {
@@ -131,7 +159,14 @@ void Renderer::RenderText(Ref<Text> text, Transform t) {
 }
 
 void Renderer::RenderTexture(Ref<Texture> texture, Transform t) {
+	// auto tex = texture->As<OpenGL::Texture2D>();
 
+	// m_QuadShader->Bind();
+	// m_QuadShader->SetMat4("u_ViewProjMatrix", s_ViewProjMatrix);
+
+	// Renderer::DrawIndexed(m_QuadVertexArray, m_QuadIndexCount);
+	Renderer::Clear();
+	ShaderPipeline::BindShader(ShaderKind::Simple);
 }
 
 void Renderer::DrawIndexed(Ref<VertexArray> vertex_array, uint32_t indices)

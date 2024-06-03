@@ -16,6 +16,7 @@
 namespace VolcaniCore {
 
 enum class ShaderType { Vertex, Geometry, Fragment, Compute, Unknown };
+enum class ShaderKind { Simple, Cubemap, Model };
 
 struct Shader {
 	const std::string Path;
@@ -24,7 +25,17 @@ struct Shader {
 
 class ShaderPipeline {
 public:
+	static void Init();
+	static void BindShader(ShaderKind kind);
+
+	static Ref<ShaderPipeline> Create(const std::vector<Shader>& shaders);
+	static Ref<ShaderPipeline> Create(const std::vector<std::string>& paths);
+	static Ref<ShaderPipeline> Create(const std::string& folder_path, const std::string& name);
+
 	virtual ~ShaderPipeline() = default;
+
+	virtual void Bind() const = 0;
+	virtual void Unbind() const = 0;
 
 	virtual void SetInt(const std::string& name, int _int) = 0;
 	virtual void SetFloat(const std::string& name, float _float) = 0;
@@ -41,12 +52,13 @@ public:
 	virtual void SetMat3(const std::string& name, const glm::mat3& mat) = 0;
 	virtual void SetMat4(const std::string& name, const glm::mat4& mat) = 0;
 
-	static Ref<ShaderPipeline> Create(const std::vector<Shader>& shaders);
-	static Ref<ShaderPipeline> Create(const std::vector<std::string>& paths);
-	static Ref<ShaderPipeline> Create(const std::string& folder_path, const std::string& name);
-
 	template<typename Derived>
 	Derived* As() const { return (Derived*)(this); }
+
+private:
+	inline static Ref<ShaderPipeline> s_SimpleShader;
+	inline static Ref<ShaderPipeline> s_CubemapShader;
+	inline static Ref<ShaderPipeline> s_ModelShader;
 };
 
 }

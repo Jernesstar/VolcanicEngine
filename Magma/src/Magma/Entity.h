@@ -12,6 +12,7 @@ public:
 	~Entity() = default;
 	
 	UUID GetID() { return m_ID; }
+	operator uint32_t() const { return m_ID; }
 
 	template<typename TComponent>
 	bool Has() { return m_Components.count(TypeOf<TComponent>::Get()) == 1; }

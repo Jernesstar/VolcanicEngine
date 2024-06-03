@@ -1,5 +1,7 @@
 #pragma once
 
+#include <glm/vec3.hpp>
+
 #include "Core/Application.h"
 #include "Core/Defines.h"
 
@@ -10,9 +12,9 @@ namespace VolcaniCore {
 class Renderer {
 public:
 	static void Init() { m_Renderer = Application::GetRenderer(); }
-	static void Close() { };
+	static void Close() { }
 
-	static void Clear() { Application::GetRenderer()->Clear(); }
+	static void Clear(const glm::vec3& color = { 0.0f, 0.0f, 0.0f, 0.0f }) { Application::GetRenderer()->Clear(color); }
 
 	static void RenderModel(Ref<Model> model) { m_Renderer->RenderModel(model); }
 	static void RenderCubemap(Ref<Cubemap> cubemap) { m_Renderer->RenderCubemap(cubemap); }
