@@ -1,5 +1,7 @@
 #include "Shader.h"
 
+#include <filesystem>
+
 #include "OpenGL/Shader.h"
 
 #include "Core/Application.h"
@@ -7,39 +9,43 @@
 
 namespace VolcaniCore {
 
-static std::vector<Shader> GetShaders(const std::vector<std::string>& paths);
-static std::vector<Shader> GetShaders(const std::string& shader_folder, const std::string& name);
-static Shader FindShader(const std::string& path);
+static std::vector<ShaderFile> GetShaders(const std::vector<std::string>& paths);
+static std::vector<ShaderFile> GetShaders(const std::string& shader_folder, const std::string& name);
+static ShaderFile TryGetShader(const std::string& path);
 
 void ShaderPipeline::Init() {
 	s_SimpleShader = ShaderPipeline::Create({
 		{ "VolcaniCore/assets/shaders/Simple.glsl.vert", ShaderType::Vertex },
 		{ "VolcaniCore/assets/shaders/Simple.glsl.frag", ShaderType::Fragment }
 	});
-
 	s_CubemapShader = Create({
 		{ "VolcaniCore/assets/shaders/Cubemap.glsl.vert", ShaderType::Vertex },
 		{ "VolcaniCore/assets/shaders/Cubemap.glsl.frag", ShaderType::Fragment }
 	});
-
 	s_ModelShader = Create({
 		{ "VolcaniCore/assets/shaders/Model.glsl.vert", ShaderType::Vertex },
 		{ "VolcaniCore/assets/shaders/Model.glsl.frag", ShaderType::Fragment }
 	});
+	s_FrameBufferShader = Create({
+		{ "Sandbox/assets/shaders/FrameBuffer.glsl.vert", ShaderType::Vertex },
+		{ "Sandbox/assets/shaders/FrameBuffer.glsl.frag", ShaderType::Fragment }
+	});
 }
 
-void ShaderPipeline::BindShader(ShaderKind kind) {
+Ref<ShaderPipeline> ShaderPipeline::Get(ShaderKind kind) {
 	switch(kind) {
 		case ShaderKind::Simple:
-			s_SimpleShader->Bind();
+			return s_SimpleShader;
 		case ShaderKind::Cubemap:
-			s_CubemapShader->Bind();
+			return s_CubemapShader;
 		case ShaderKind::Model:
-			s_ModelShader->Bind();
+			return s_ModelShader;
+		case ShaderKind::FrameBuffer:
+			return s_FrameBufferShader;
 	}
 }
 
-Ref<ShaderPipeline> ShaderPipeline::Create(const std::vector<Shader>& shaders) {
+Ref<ShaderPipeline> ShaderPipeline::Create(const std::vector<ShaderFile>& shaders) {
 	RenderAPI api = Application::GetRenderAPI();
 
 	switch(api) {
@@ -61,6 +67,7 @@ Ref<ShaderPipeline> ShaderPipeline::Create(const std::vector<std::string>& paths
 	}
 }
 
+// Find all the shader files in the folder with a file name in the format: name.glsl.vert, name.comp.glsl
 Ref<ShaderPipeline> ShaderPipeline::Create(const std::string& folder_path, const std::string& name) {
 	RenderAPI api = Application::GetRenderAPI();
 
@@ -73,39 +80,44 @@ Ref<ShaderPipeline> ShaderPipeline::Create(const std::string& folder_path, const
 	}
 }
 
-std::vector<Shader> GetShaders(const std::vector<std::string>& paths) {
+std::vector<ShaderFile> GetShaders(const std::vector<std::string>& paths) {
 	std::vector<Shader> shaders;
 	shaders.reserve(paths.size());
 
-	for(const auto& path : paths) {
-		Shader shader = FindShader(path);
-		shaders.push_back(shader);
-	}
+	for(const auto& path : paths)
+		shaders.push_back(TryGetShader(path));
 
 	return shaders;
 }
 
-std::vector<Shader> GetShaders(const std::string& shader_folder, const std::string& name) {
-	std::vector<std::string> paths;
+std::vector<ShaderFile> GetShaders(const std::string& shader_folder, const std::string& name) {
+	std::vector<ShaderFile> shaders;
 
+	for(const auto & filepath : fs::directory_iterator(path)) {
+		std::string path = filepath.path();
+		if(path.substr(0, path.find_first_of('.')) != name)
+			continue;
+
+		shaders.push_back(TryGetShader(path));
+	}
 }
 
 bool StringContains(const std::string& str, const std::string& sub_str) { return str.find(sub_str) != std::string::npos; }
 
-Shader FindShader(const std::string& path)
+ShaderFile TryGetShader(const std::string& path)
 {
 	std::size_t dot = path.find_first_of('.');
 	if(dot == std::string::npos)
 		VOLCANICORE_ASSERT_ARGS(false, "%s is an incorrectly formatted file name. Accepted formats: example.glsl.vert, example.vert.glsl, example.vert", path.c_str());
 
 	std::string sub_str = path.substr(dot);
-	if(StringContains(sub_str, "vert") || StringContains(sub_str, "vs")) return Shader{ path, ShaderType::Vertex };
-	if(StringContains(sub_str, "geom") || StringContains(sub_str, "gs")) return Shader{ path, ShaderType::Geometry };
-	if(StringContains(sub_str, "frag") || StringContains(sub_str, "fs")) return Shader{ path, ShaderType::Fragment };
-	if(StringContains(sub_str, "comp") || StringContains(sub_str, "compute")) return Shader{ path, ShaderType::Compute };
+	if(StringContains(sub_str, "vert") || StringContains(sub_str, "vs")) return ShaderFile{ path, ShaderType::Vertex };
+	if(StringContains(sub_str, "geom") || StringContains(sub_str, "gs")) return ShaderFile{ path, ShaderType::Geometry };
+	if(StringContains(sub_str, "frag") || StringContains(sub_str, "fs")) return ShaderFile{ path, ShaderType::Fragment };
+	if(StringContains(sub_str, "comp") || StringContains(sub_str, "compute")) return ShaderFile{ path, ShaderType::Compute };
 
 	VOLCANICORE_ASSERT_ARGS(false, "File %s is of unknown shader type", path.c_str());
-	return Shader{ "", ShaderType::Unknown };
+	return ShaderFile{ "", ShaderType::Unknown };
 }
 
 }

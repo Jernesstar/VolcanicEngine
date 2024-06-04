@@ -33,6 +33,8 @@ public:
 	virtual void RenderText(Ref<Text> text, Transform t) = 0;
 	virtual void RenderTexture(Ref<Texture> texture, Transform t) = 0;
 
+	virtual void RenderToFrameBuffer(FrameBuffer buffer, const std::function<void(void)>& renderFunction) = 0;
+
 	static Ref<RendererAPI> CreateRenderer(RenderAPI api);
 
 	template<typename Derived>

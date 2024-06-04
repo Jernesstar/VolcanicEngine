@@ -16,9 +16,9 @@
 namespace VolcaniCore {
 
 enum class ShaderType { Vertex, Geometry, Fragment, Compute, Unknown };
-enum class ShaderKind { Simple, Cubemap, Model };
+enum class Shader { Simple, Cubemap, Model, FrameBuffer };
 
-struct Shader {
+struct ShaderFile {
 	const std::string Path;
 	const ShaderType Type;
 };
@@ -26,9 +26,11 @@ struct Shader {
 class ShaderPipeline {
 public:
 	static void Init();
-	static void BindShader(ShaderKind kind);
 
-	static Ref<ShaderPipeline> Create(const std::vector<Shader>& shaders);
+	static Ref<ShaderPipeline> Get(ShadeShaderrKind kind);
+	static void Bind(Shader kind) { GetShader(kind)->Bind() }
+
+	static Ref<ShaderPipeline> Create(const std::vector<ShaderFile>& shaders);
 	static Ref<ShaderPipeline> Create(const std::vector<std::string>& paths);
 	static Ref<ShaderPipeline> Create(const std::string& folder_path, const std::string& name);
 
@@ -59,6 +61,8 @@ private:
 	inline static Ref<ShaderPipeline> s_SimpleShader;
 	inline static Ref<ShaderPipeline> s_CubemapShader;
 	inline static Ref<ShaderPipeline> s_ModelShader;
+	inline static Ref<ShaderPipeline> s_FrameBufferShader;
+	// inline static Ref<ShaderPipeline> s_QuadShader;
 };
 
 }

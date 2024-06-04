@@ -18,7 +18,7 @@ namespace VolcaniCore::OpenGL {
 
 class ShaderProgram : public VolcaniCore::ShaderPipeline {
 public:
-	ShaderProgram(const std::vector<Shader>& shaders);
+	ShaderProgram(const std::vector<ShaderFile>& shaders);
 	~ShaderProgram();
 
 	void Bind() const override;

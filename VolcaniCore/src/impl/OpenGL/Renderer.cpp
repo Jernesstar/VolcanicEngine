@@ -64,8 +64,34 @@ Renderer::Renderer()
 		 1.0f, -1.0f,  1.0f
 	};
 
-	VertexBuffer* buffer = new VertexBuffer(vertices, BufferLayout{ { "Position", BufferDataType::Vec3 } });
+	VertexBuffer* buffer;
+	Ref<VertexArray> array;
+
+	buffer = new VertexBuffer(vertices, BufferLayout{ { "Position", BufferDataType::Vec3 } });
 	s_CubemapArray = CreatePtr<VertexArray>(buffer);
+
+	float rectangleVertices[24] =
+	{
+		// Coords    // TexCoords
+		 1.0f, -1.0f,  1.0f, 0.0f,
+		-1.0f, -1.0f,  0.0f, 0.0f,
+		-1.0f,  1.0f,  0.0f, 1.0f,
+
+		 1.0f,  1.0f,  1.0f, 1.0f,
+		 1.0f, -1.0f,  1.0f, 0.0f,
+		-1.0f,  1.0f,  0.0f, 1.0f
+	};
+
+	BufferLayout layout = {
+		{ "Coordinate", OpenGL::BufferDataType::Vec2 },
+		{ "TextureCoordinate", OpenGL::BufferDataType::Vec2 },
+	};
+
+	buffer = new OpenGL::VertexBuffer(rectangleVertices, layout);
+	s_FrameBufferArray = CreateRef<VertexArray>(buffer);
+
+	ShaderPipeline::Bind(Shader::FrameBuffer);
+	frameBufferShader->SetInt("u_ScreenTexture", 0);
 
 	// indices[0] = 0;
 	// indices[1] = 1;
@@ -88,12 +114,6 @@ Renderer::Renderer()
 
 	// s_Data.QuadVertexBuffer = new VertexBuffer(Renderer2DData::MaxVertices, layout);
 	// s_Data.QuadVertexArray = new VertexArray(s_Data.QuadVertexBuffer, s_Data.QuadIndexBuffer);
-
-	// s_Data.QuadShader = new Shader(
-	// { 
-	// 	{ "Saddle/assets/shaders/Quad.glsl.vert", ShaderType::Vertex },
-	// 	{ "Saddle/assets/shaders/Quad.glsl.frag", ShaderType::Fragment }
-	// });
 }
 
 void Renderer::Init() {
@@ -107,7 +127,7 @@ void Renderer::Init() {
 
 	glEnable(GL_CULL_FACE);
 	glFrontFace(GL_CCW);
-	glCullFace(GL_BACK);
+	glCullFace(GL_FRONT);
 
 	EventSystem::RegisterListener<WindowResizedEvent>(
 	[&](const WindowResizedEvent& event) {
@@ -167,6 +187,21 @@ void Renderer::RenderTexture(Ref<Texture> texture, Transform t) {
 	// Renderer::DrawIndexed(m_QuadVertexArray, m_QuadIndexCount);
 	Renderer::Clear();
 	ShaderPipeline::BindShader(ShaderKind::Simple);
+}
+
+void RenderToFrameBuffer(FrameBuffer buffer, const std::function<void(void)>& renderFunction) {
+	buffer->Bind();
+	glEnable(GL_DEPTH_TEST);
+
+	renderFunction();
+
+	buffer->Unbind();
+	glDisable(GL_DEPTH_TEST);
+
+	ShaderPipeline::Bind(Shader::FrameBuffer);
+	buffer->As<OpenGL::FrameBuffer>()->BindTexture();
+	array->Bind();
+	glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
 void Renderer::DrawIndexed(Ref<VertexArray> vertex_array, uint32_t indices)

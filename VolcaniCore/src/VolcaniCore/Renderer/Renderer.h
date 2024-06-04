@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+
 #include <glm/vec3.hpp>
 
 #include "Core/Application.h"
@@ -21,6 +23,10 @@ public:
 	static void RenderQuad(Ref<Quad> quad, Transform t) { m_Renderer->RenderQuad(quad, t); }
 	static void RenderText(Ref<Text> text, Transform t) { m_Renderer->RenderText(text, t); }
 	static void RenderTexture(Ref<Texture> texture, Transform t) { m_Renderer->RenderTexture(texture, t); }
+
+	static void RenderToFrameBuffer(FrameBuffer buffer, const std::function<void(void)>& renderFunction) {
+		m_Renderer->RenderToFrameBuffer(buffer, renderFunction);
+	}
 
 	Renderer() = delete;
 	~Renderer() = delete;
