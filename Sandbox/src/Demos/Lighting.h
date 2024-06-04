@@ -190,12 +190,12 @@ LightingDemo::LightingDemo()
 		this->camera.Resize(event.Width, event.Height);
 	});
 
-	light_shader->As<OpenGL::ShaderProgram>()->Bind();
+	light_shader->Bind();
 	{
 		light_shader->SetVec3("u_LightColor", { 1.0f, 1.0f, 1.0f });
 	}
 
-	cube_shader->As<OpenGL::ShaderProgram>()->Bind();
+	cube_shader->Bind();
 	{
 		camera.SetPosition({ 0.0f, 0.0f, 4.0f });
 		controller.RotationSpeed = 1.0f;
@@ -241,7 +241,7 @@ void LightingDemo::OnUpdate(TimeStep ts) {
 	Renderer::Clear();
 	controller.OnUpdate(ts);
 
-	light_shader->As<OpenGL::ShaderProgram>()->Bind();
+	light_shader->Bind();
 	{
 		light_shader->SetMat4("u_ViewProj", camera.GetViewProjection());
 
@@ -251,7 +251,7 @@ void LightingDemo::OnUpdate(TimeStep ts) {
 		}
 	}
 
-	cube_shader->As<OpenGL::ShaderProgram>()->Bind();
+	cube_shader->Bind();
 	{
 		cube_shader->SetVec3("u_CameraPosition", camera.GetPosition());
 		cube_shader->SetMat4("u_ViewProj", camera.GetViewProjection());

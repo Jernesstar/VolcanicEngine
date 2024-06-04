@@ -16,7 +16,7 @@ public:
 	void Init() override;
 	void Close() override;
 
-	void Clear(const glm::vec3& colors) override;
+	void Clear(const glm::vec4& color = { 0.0f, 0.0f, 0.0f, 0.0f }) override;
 	void Resize(uint32_t width, uint32_t height) override;
 
 	void RenderModel(Ref<VolcaniCore::Model> model) override;

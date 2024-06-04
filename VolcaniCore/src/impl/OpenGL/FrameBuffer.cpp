@@ -9,16 +9,20 @@ namespace VolcaniCore::OpenGL {
 FrameBuffer::FrameBuffer(const AttachmentSpecification& specs)
 	: VolcaniCore::FrameBuffer(specs.Width, specs.Height)
 {
-	glGenFramebuffers(1, &m_BufferID);
+	glGenFramebuffers(1, &m_BufferID); // TODO: Separate textures for color and depth attachment
 	glGenTextures(1, &m_TextureID);
 	glGenRenderbuffers(1, &m_RenderbufferID);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, m_BufferID);
 
 	switch(specs.Color) {
 		case AttachmentType::Texture:
 			glBindTexture(GL_TEXTURE_2D, m_TextureID);
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, specs.Width, specs.Height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_TextureID, 0);
 			break;
 

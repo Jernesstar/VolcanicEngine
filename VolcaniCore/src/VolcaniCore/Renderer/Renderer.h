@@ -14,7 +14,7 @@ public:
 	static void Init() { m_Renderer = Application::GetRenderer(); }
 	static void Close() { }
 
-	static void Clear(const glm::vec3& color = { 0.0f, 0.0f, 0.0f, 0.0f }) { Application::GetRenderer()->Clear(color); }
+	static void Clear(const glm::vec4& color = { 0.0f, 0.0f, 0.0f, 0.0f }) { Application::GetRenderer()->Clear(color); }
 
 	static void RenderModel(Ref<Model> model) { m_Renderer->RenderModel(model); }
 	static void RenderCubemap(Ref<Cubemap> cubemap) { m_Renderer->RenderCubemap(cubemap); }

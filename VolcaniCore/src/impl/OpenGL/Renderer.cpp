@@ -119,8 +119,8 @@ void Renderer::Close() {
 
 }
 
-void Renderer::Clear() {
-	glClearColor(0.0, 0.0, 0.0, 0.0);
+void Renderer::Clear(const glm::vec4& color) {
+	glClearColor(color.x, color.y, color.z, color.w);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
