@@ -3,14 +3,20 @@
 #include <cstdint>
 #include <vector>
 
-struct Coordinate { uint32_t x, y; };
+#include <glm/vec2.hpp>
+
+namespace TheMazeIsLava {
+
+using Coordinate = glm::vec2;
 
 class Level {
 public:
-	static void LoadLevel(std::vector<std::vector<uint32_t>> map);
+	Level(std::vector<std::vector<uint32_t>> map);
+	void Render();
 
 private:
-	static Coordinate m_Goal;
-	static std::vector<Coordinate> m_LavaPoints;
+	Coordinate m_Goal;
+	std::vector<Coordinate> m_LavaPoints;
 };
 
+}
