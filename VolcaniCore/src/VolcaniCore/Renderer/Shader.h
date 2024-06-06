@@ -27,8 +27,7 @@ class ShaderPipeline {
 public:
 	static void Init();
 
-	static Ref<ShaderPipeline> Get(ShadeShaderrKind kind);
-	static void Bind(Shader kind) { GetShader(kind)->Bind() }
+	static Ref<ShaderPipeline> Get(Shader shader);
 
 	static Ref<ShaderPipeline> Create(const std::vector<ShaderFile>& shaders);
 	static Ref<ShaderPipeline> Create(const std::vector<std::string>& paths);

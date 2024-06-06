@@ -10,11 +10,11 @@
 namespace VolcaniCore {
 
 static std::vector<ShaderFile> GetShaders(const std::vector<std::string>& paths);
-static std::vector<ShaderFile> GetShaders(const std::string& shader_folder, const std::string& name);
+static std::vector<ShaderFile> GetShaders(const std::string& shaderFolder, const std::string& name);
 static ShaderFile TryGetShader(const std::string& path);
 
 void ShaderPipeline::Init() {
-	s_SimpleShader = ShaderPipeline::Create({
+	s_SimpleShader = Create({
 		{ "VolcaniCore/assets/shaders/Simple.glsl.vert", ShaderType::Vertex },
 		{ "VolcaniCore/assets/shaders/Simple.glsl.frag", ShaderType::Fragment }
 	});
@@ -27,20 +27,20 @@ void ShaderPipeline::Init() {
 		{ "VolcaniCore/assets/shaders/Model.glsl.frag", ShaderType::Fragment }
 	});
 	s_FrameBufferShader = Create({
-		{ "Sandbox/assets/shaders/FrameBuffer.glsl.vert", ShaderType::Vertex },
-		{ "Sandbox/assets/shaders/FrameBuffer.glsl.frag", ShaderType::Fragment }
+		{ "VolcaniCore/assets/shaders/FrameBuffer.glsl.vert", ShaderType::Vertex },
+		{ "VolcaniCore/assets/shaders/FrameBuffer.glsl.frag", ShaderType::Fragment }
 	});
 }
 
-Ref<ShaderPipeline> ShaderPipeline::Get(ShaderKind kind) {
-	switch(kind) {
-		case ShaderKind::Simple:
+Ref<ShaderPipeline> ShaderPipeline::Get(Shader shader) {
+	switch(shader) {
+		case Shader::Simple:
 			return s_SimpleShader;
-		case ShaderKind::Cubemap:
+		case Shader::Cubemap:
 			return s_CubemapShader;
-		case ShaderKind::Model:
+		case Shader::Model:
 			return s_ModelShader;
-		case ShaderKind::FrameBuffer:
+		case Shader::FrameBuffer:
 			return s_FrameBufferShader;
 	}
 }
@@ -81,7 +81,7 @@ Ref<ShaderPipeline> ShaderPipeline::Create(const std::string& folder_path, const
 }
 
 std::vector<ShaderFile> GetShaders(const std::vector<std::string>& paths) {
-	std::vector<Shader> shaders;
+	std::vector<ShaderFile> shaders;
 	shaders.reserve(paths.size());
 
 	for(const auto& path : paths)
@@ -90,10 +90,10 @@ std::vector<ShaderFile> GetShaders(const std::vector<std::string>& paths) {
 	return shaders;
 }
 
-std::vector<ShaderFile> GetShaders(const std::string& shader_folder, const std::string& name) {
+std::vector<ShaderFile> GetShaders(const std::string& shaderFolder, const std::string& name) {
 	std::vector<ShaderFile> shaders;
 
-	for(const auto & filepath : fs::directory_iterator(path)) {
+	for(const auto & filepath : std::filesystem::directory_iterator(shaderFolder)) {
 		std::string path = filepath.path();
 		if(path.substr(0, path.find_first_of('.')) != name)
 			continue;
@@ -104,8 +104,7 @@ std::vector<ShaderFile> GetShaders(const std::string& shader_folder, const std::
 
 bool StringContains(const std::string& str, const std::string& sub_str) { return str.find(sub_str) != std::string::npos; }
 
-ShaderFile TryGetShader(const std::string& path)
-{
+ShaderFile TryGetShader(const std::string& path) {
 	std::size_t dot = path.find_first_of('.');
 	if(dot == std::string::npos)
 		VOLCANICORE_ASSERT_ARGS(false, "%s is an incorrectly formatted file name. Accepted formats: example.glsl.vert, example.vert.glsl, example.vert", path.c_str());

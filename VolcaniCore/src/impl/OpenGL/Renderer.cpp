@@ -9,6 +9,7 @@
 #include "Cubemap.h"
 #include "Texture2D.h"
 #include "VertexBuffer.h"
+#include "FrameBuffer.h"
 
 using namespace VolcaniCore;
 
@@ -64,13 +65,7 @@ Renderer::Renderer()
 		 1.0f, -1.0f,  1.0f
 	};
 
-	VertexBuffer* buffer;
-	Ref<VertexArray> array;
-
-	buffer = new VertexBuffer(vertices, BufferLayout{ { "Position", BufferDataType::Vec3 } });
-	s_CubemapArray = CreatePtr<VertexArray>(buffer);
-
-	float rectangleVertices[24] =
+	float rectangleVertices[] =
 	{
 		// Coords    // TexCoords
 		 1.0f, -1.0f,  1.0f, 0.0f,
@@ -87,11 +82,12 @@ Renderer::Renderer()
 		{ "TextureCoordinate", OpenGL::BufferDataType::Vec2 },
 	};
 
-	buffer = new OpenGL::VertexBuffer(rectangleVertices, layout);
-	s_FrameBufferArray = CreateRef<VertexArray>(buffer);
+	VertexBuffer* buffer;
 
-	ShaderPipeline::Bind(Shader::FrameBuffer);
-	frameBufferShader->SetInt("u_ScreenTexture", 0);
+	buffer = new VertexBuffer(vertices, BufferLayout{ { "Position", BufferDataType::Vec3 } });
+	s_CubemapArray = CreatePtr<VertexArray>(buffer);
+	buffer = new VertexBuffer(rectangleVertices, layout);
+	s_FrameBufferArray = CreatePtr<VertexArray>(buffer);
 
 	// indices[0] = 0;
 	// indices[1] = 1;
@@ -128,6 +124,9 @@ void Renderer::Init() {
 	glEnable(GL_CULL_FACE);
 	glFrontFace(GL_CCW);
 	glCullFace(GL_FRONT);
+
+	ShaderPipeline::Get(Shader::FrameBuffer)->Bind();
+	ShaderPipeline::Get(Shader::FrameBuffer)->SetInt("u_ScreenTexture", 0);
 
 	EventSystem::RegisterListener<WindowResizedEvent>(
 	[&](const WindowResizedEvent& event) {
@@ -185,23 +184,23 @@ void Renderer::RenderTexture(Ref<Texture> texture, Transform t) {
 	// m_QuadShader->SetMat4("u_ViewProjMatrix", s_ViewProjMatrix);
 
 	// Renderer::DrawIndexed(m_QuadVertexArray, m_QuadIndexCount);
-	Renderer::Clear();
-	ShaderPipeline::BindShader(ShaderKind::Simple);
+	// Renderer::Clear();
+	// ShaderPipeline::BindShader(ShaderKind::Simple);
 }
 
-void RenderToFrameBuffer(FrameBuffer buffer, const std::function<void(void)>& renderFunction) {
+void Renderer::RenderToFrameBuffer(Ref<VolcaniCore::FrameBuffer> buffer, const std::function<void(void)>& func) {
 	buffer->Bind();
 	glEnable(GL_DEPTH_TEST);
 
-	renderFunction();
+	func();
 
 	buffer->Unbind();
 	glDisable(GL_DEPTH_TEST);
 
-	ShaderPipeline::Bind(Shader::FrameBuffer);
-	buffer->As<OpenGL::FrameBuffer>()->BindTexture();
-	array->Bind();
-	glDrawArrays(GL_TRIANGLES, 0, 6);
+	// ShaderPipeline::Get(Shader::FrameBuffer)->Bind();
+	// buffer->As<OpenGL::FrameBuffer>()->BindTexture();
+	// s_FrameBufferArray->Bind();
+	// glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
 void Renderer::DrawIndexed(Ref<VertexArray> vertex_array, uint32_t indices)

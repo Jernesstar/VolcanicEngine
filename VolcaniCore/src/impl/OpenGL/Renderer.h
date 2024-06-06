@@ -25,7 +25,7 @@ public:
 	void RenderText(Ref<VolcaniCore::Text> text, Transform t) override;
 	void RenderTexture(Ref<VolcaniCore::Texture> texture, Transform t) override;
 
-	void RenderToFrameBuffer(FrameBuffer buffer, const std::function<void(void)>& renderFunction) override;
+	void RenderToFrameBuffer(Ref<VolcaniCore::FrameBuffer> buffer, const std::function<void(void)>& func) override;
 
 	void DrawIndexed(Ref<VertexArray> vertex_array, uint32_t indices = 0);
 

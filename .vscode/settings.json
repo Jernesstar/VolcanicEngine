@@ -76,6 +76,7 @@
 		"thread": "cpp",
 		"typeinfo": "cpp",
 		"variant": "cpp",
-		"*.hpp11": "cpp"
+		"*.hpp11": "cpp",
+		"valarray": "cpp"
 	},
 }

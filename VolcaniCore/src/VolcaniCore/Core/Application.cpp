@@ -7,6 +7,7 @@
 
 #include "Assert.h"
 #include "Events/Events.h"
+#include "Renderer/Shader.h"
 #include "Renderer/Renderer.h"
 
 namespace VolcaniCore {
@@ -26,6 +27,7 @@ void Application::Init() {
 	s_Window = CreateRef<Window>(800, 600);
 
 	s_BackendRenderer = RendererAPI::CreateRenderer(RenderAPI::OpenGL);
+	ShaderPipeline::Init();
 	s_BackendRenderer->Init();
 
 	Renderer::Init();

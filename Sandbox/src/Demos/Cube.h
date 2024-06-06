@@ -20,11 +20,7 @@ public:
 	void OnUpdate(TimeStep ts);
 
 private:
-	Ref<ShaderPipeline> cubeShader = ShaderPipeline::Create({
-		{ "Sandbox/assets/shaders/Cube.glsl.vert", ShaderType::Vertex },
-		{ "Sandbox/assets/shaders/Cube.glsl.frag", ShaderType::Fragment }
-	});
-
+	Ref<ShaderPipeline> cubeShader;
 	Ref<FrameBuffer> frameBuffer;
 };
 
@@ -35,13 +31,13 @@ CubeDemo::CubeDemo() {
 			Application::Close();
 	});
 
+	cubeShader = ShaderPipeline::Create({
+		{ "Sandbox/assets/shaders/Cube.glsl.vert", ShaderType::Vertex },
+		{ "Sandbox/assets/shaders/Cube.glsl.frag", ShaderType::Fragment }
+	});
+
 	frameBuffer = CreateRef<OpenGL::FrameBuffer>(
-	OpenGL::AttachmentSpecification(
-		800, 600,
-		OpenGL::AttachmentType::Texture,
-		OpenGL::AttachmentType::RenderBuffer,
-		OpenGL::AttachmentType::RenderBuffer
-	));
+	OpenGL::AttachmentSpecification(800, 600, OpenGL::AttachmentType::Texture));
 }
 
 void CubeDemo::OnUpdate(TimeStep ts) {

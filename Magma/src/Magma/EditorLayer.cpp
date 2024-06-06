@@ -40,21 +40,10 @@ EditorLayer::~EditorLayer() {
 }
 
 void EditorLayer::Update(TimeStep ts) {
-	m_FrameBuffer->Bind();
-
-	m_CurrentScene->GetEntitySystem().ForEach(
-	[](Entity& e) {
-		if(e.Has<TextureComponent>() && e.Has<TransformComponent>()) {
-			auto c = e.Get<TransformComponent>();
-			auto t = c.Translation;
-			auto r = c.Rotation;
-			auto s = c.Scale;
-
-			Renderer::RenderTexture(e.Get<TextureComponent>().Texture, Transform(t, r, s));
-		}
+	Renderer::RenderToFrameBuffer(m_FrameBuffer,
+	[&]() {
+		Renderer::Clear({ 0.34, 0.2, 0.87, 1.0 });
 	});
-
-	m_FrameBuffer->Unbind();
 }
 
 void EditorLayer::Render() {
@@ -150,6 +139,7 @@ void EditorLayer::Render() {
 		m_ViewportFocused = ImGui::IsWindowFocused();
 		m_ViewportHovered = ImGui::IsWindowHovered();
 
+		m_FrameBuffer->As<OpenGL::FrameBuffer>()->BindTexture();
 		uint64_t textureID = m_FrameBuffer->As<OpenGL::FrameBuffer>()->GetColorAttachmentID();
 		ImGui::Image(reinterpret_cast<void*>(textureID), ImVec2{ m_ViewportSize.x, m_ViewportSize.y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
 
@@ -247,7 +237,7 @@ void EditorLayer::UI_Toolbar()
 	ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
 
 	ImVec4 tintColor = ImVec4(1, 1, 1, 1);
-	ImVec4 v  = ImVec4(0.0f, 0.0f, 0.0f, 0.0f);
+	ImVec4 v0  = ImVec4(0.0f, 0.0f, 0.0f, 0.0f);
 	ImVec2 v1 = ImVec2(size, size);
 	ImVec2 v2 = ImVec2(0, 0);
 	ImVec2 v3 = ImVec2(1, 1);
@@ -257,7 +247,7 @@ void EditorLayer::UI_Toolbar()
 
 	if(hasPlayButton) {
 		auto icon = m_IconPlay->As<OpenGL::Texture2D>();
-		if (ImGui::ImageButton((ImTextureID)(uint64_t)icon->GetID(), v1, v2, v3, 0, v, tintColor)) {
+		if (ImGui::ImageButton((ImTextureID)(uint64_t)icon->GetID(), v1, v2, v3, 0, v0, tintColor)) {
 			m_SceneState = SceneState::Play;
 			// OnScenePlay();
 		}
@@ -265,7 +255,7 @@ void EditorLayer::UI_Toolbar()
 
 	if(!hasPlayButton) {
 		auto icon = m_IconPause->As<OpenGL::Texture2D>();
-		if(ImGui::ImageButton((ImTextureID)(uint64_t)icon->GetID(), v1, v2, v3, 0, v, tintColor)) {
+		if(ImGui::ImageButton((ImTextureID)(uint64_t)icon->GetID(), v1, v2, v3, 0, v0, tintColor)) {
 			m_SceneState = SceneState::Pause;
 			// OnScenePause();
 		}
@@ -275,7 +265,7 @@ void EditorLayer::UI_Toolbar()
 		ImGui::SameLine();
 
 		auto icon = m_IconStop->As<OpenGL::Texture2D>();
-		if(ImGui::ImageButton((ImTextureID)(uint64_t)icon->GetID(), v1, v2, v3, 0, v, tintColor)) {
+		if(ImGui::ImageButton((ImTextureID)(uint64_t)icon->GetID(), v1, v2, v3, 0, v0, tintColor)) {
 			m_SceneState = SceneState::Edit;
 			// OnSceneStop();
 		}

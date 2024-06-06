@@ -133,11 +133,8 @@ void SceneHierarchyPanel::DrawEntityNode(Entity& entity) {
 		ImGui::EndPopup();
 	}
 
-	if(opened) {
-		
-
+	if(opened)
 		ImGui::TreePop();
-	}
 
 	if(entityDeleted) {
 		m_Context->GetEntitySystem().RemoveEntity(entity);

@@ -24,8 +24,8 @@ public:
 	static void RenderText(Ref<Text> text, Transform t) { m_Renderer->RenderText(text, t); }
 	static void RenderTexture(Ref<Texture> texture, Transform t) { m_Renderer->RenderTexture(texture, t); }
 
-	static void RenderToFrameBuffer(FrameBuffer buffer, const std::function<void(void)>& renderFunction) {
-		m_Renderer->RenderToFrameBuffer(buffer, renderFunction);
+	static void RenderToFrameBuffer(Ref<FrameBuffer> buffer, const std::function<void(void)>& func) {
+		m_Renderer->RenderToFrameBuffer(buffer, func);
 	}
 
 	Renderer() = delete;
