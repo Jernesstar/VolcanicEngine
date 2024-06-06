@@ -19,6 +19,7 @@ public:
 	void Pause();
 
 private:
+	uint32_t m_CurrentLevel = 0;
 	std::vector<Level> m_Levels;
 };
 

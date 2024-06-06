@@ -160,8 +160,8 @@ private:
 	Ref<OpenGL::VertexArray> light_array = CreateRef<OpenGL::VertexArray>(light_buffer, index_buffer);
 
 	Ref<ShaderPipeline> light_shader = ShaderPipeline::Create({
-		{ "Sandbox/assets/shaders/Light.glsl.vert", ShaderType::Vertex },
-		{ "Sandbox/assets/shaders/Light.glsl.frag", ShaderType::Fragment }
+		{ "VolcaniCore/assets/shaders/Simple.glsl.vert", ShaderType::Vertex },
+		{ "VolcaniCore/assets/shaders/Simple.glsl.frag", ShaderType::Fragment }
 	});
 	Ref<ShaderPipeline> cube_shader = ShaderPipeline::Create({
 		{ "Sandbox/assets/shaders/Lighting.glsl.vert", ShaderType::Vertex },
