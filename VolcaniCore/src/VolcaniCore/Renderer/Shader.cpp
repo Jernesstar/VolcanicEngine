@@ -67,7 +67,6 @@ Ref<ShaderPipeline> ShaderPipeline::Create(const std::vector<std::string>& paths
 	}
 }
 
-// Find all the shader files in the folder with a file name in the format: name.glsl.vert, name.comp.glsl
 Ref<ShaderPipeline> ShaderPipeline::Create(const std::string& folder_path, const std::string& name) {
 	RenderAPI api = Application::GetRenderAPI();
 
@@ -90,11 +89,12 @@ std::vector<ShaderFile> GetShaders(const std::vector<std::string>& paths) {
 	return shaders;
 }
 
+// Find all the shader files in the folder with a file name in the format: name.glsl.vert, name.comp.glsl
 std::vector<ShaderFile> GetShaders(const std::string& shaderFolder, const std::string& name) {
 	std::vector<ShaderFile> shaders;
 
-	for(const auto & filepath : std::filesystem::directory_iterator(shaderFolder)) {
-		std::string path = filepath.path();
+	for(const auto& filepath : std::filesystem::directory_iterator(shaderFolder)) {
+		std::string path = filepath.path().string();
 		if(path.substr(0, path.find_first_of('.')) != name)
 			continue;
 
