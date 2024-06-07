@@ -1,6 +1,7 @@
 #include "Level.h"
 
-#include <VolcaniCore/Core/Transform.h>
+#include <Renderer/Renderer.h>
+#include <Renderer/Transform.h>
 
 namespace TheMazeIsLava {
 
@@ -9,6 +10,10 @@ void Level::Init() {
 	s_Lava  = Texture::Create("Sandbox/assets/images/lava.png");
 	s_Stone = Texture::Create("Sandbox/assets/images/stone.png");
 	s_Door  = Texture::Create("Sandbox/assets/images/door.png");
+}
+
+Level Level::Create(const std::string& levelPath) {
+
 }
 
 Level::Level(std::vector<std::vector<uint32_t>> map,
@@ -30,13 +35,13 @@ void Level::Render(TimeStep ts) {
 
 	for(uint32_t y = 0; y < m_Height; y++) {
 		for(uint32_t x = 0; x < m_Width; x++) {
-			if(map[y][x] == 0)
-				Renderer::RenderTexture(m_Stone, Transform({ x, y, 0.0f }));
+			if(m_TileMap[y][x] == 0)
+				Renderer::RenderTexture(s_Stone, Transform{ .Translation = { x, y, 0.0f } });
 		}
 	}
 }
 
-void Level::PropagateLave() {
+void Level::PropagateLava() {
 	uint32_t lavaSpeed = LavaSpeed(m_TimeStep);
 }
 

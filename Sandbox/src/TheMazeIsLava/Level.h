@@ -21,9 +21,11 @@ public:
 	const std::function<float(float timeSinceLevelStart)> LavaSpeed;
 
 public:
-	static Init();
+	static void Init();
+	static Level Create(const std::string& levelPath);
 
-	Level(std::vector<std::vector<uint32_t>> map);
+	Level(std::vector<std::vector<uint32_t>> map,
+		const std::function<float(float timeSinceLevelStart)>& lavaSpeed);
 	void Render(TimeStep ts);
 
 private:
@@ -33,13 +35,13 @@ private:
 	float m_TimeSinceLevelStart;
 	const uint32_t m_Width, m_Height;
 
-	const Coordinate m_Goal;
+	Coordinate m_Goal;
 	std::vector<Coordinate> m_LavaPoints;
 	std::vector<std::vector<uint32_t>> m_TileMap;
 
-	static Ref<Texture> s_Lava;
-	static Ref<Texture> s_Stone;
-	static Ref<Texture> s_Door;
+	inline static Ref<Texture> s_Lava;
+	inline static Ref<Texture> s_Stone;
+	inline static Ref<Texture> s_Door;
 };
 
 }

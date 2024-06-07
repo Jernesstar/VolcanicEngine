@@ -15,9 +15,11 @@
 
 using namespace VolcaniCore;
 
-class ModelDemo : public Application {
+namespace Demo {
+
+class Model : public Application {
 public:
-	ModelDemo();
+	Model();
 
 	void OnUpdate(TimeStep ts) override;
 
@@ -86,7 +88,7 @@ private:
 	Ref<VolcaniCore::Model> m_Model;
 };
 
-ModelDemo::ModelDemo()
+Model::Model()
 {
 	EventSystem::RegisterListener<KeyPressedEvent>(
 	[](const KeyPressedEvent& event) {
@@ -115,7 +117,7 @@ ModelDemo::ModelDemo()
 	m_Model = VolcaniCore::Model::Create("Sandbox/assets/models/rpg");
 }
 
-void ModelDemo::OnUpdate(TimeStep ts)
+void Model::OnUpdate(TimeStep ts)
 {
 	Renderer::Clear();
 
@@ -129,4 +131,6 @@ void ModelDemo::OnUpdate(TimeStep ts)
 	model_shader->SetMat4("u_ViewProj", m_Camera.GetViewProjection());
 	model_shader->SetVec3("u_CameraPosition", m_Camera.GetPosition());
 	Renderer::RenderModel(m_Model);
+}
+
 }

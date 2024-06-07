@@ -20,7 +20,7 @@ Renderer::Renderer()
 {
 	VOLCANICORE_ASSERT(gladLoadGL(), "Glad could not load OpenGL");
 
-	float vertices[] =
+	float cubemapVertices[] =
 	{
 		-1.0f,  1.0f, -1.0f,
 		-1.0f, -1.0f, -1.0f,
@@ -65,7 +65,7 @@ Renderer::Renderer()
 		 1.0f, -1.0f,  1.0f
 	};
 
-	float rectangleVertices[] =
+	float framebufferVertices[] =
 	{
 		// Coords    // TexCoords
 		 1.0f, -1.0f,  1.0f, 0.0f,
@@ -77,16 +77,71 @@ Renderer::Renderer()
 		-1.0f,  1.0f,  0.0f, 1.0f
 	};
 
-	BufferLayout layout = {
-		{ "Coordinate", OpenGL::BufferDataType::Vec2 },
-		{ "TextureCoordinate", OpenGL::BufferDataType::Vec2 },
+	struct {
+		glm::vec3 Position;
+		glm::vec3 Normal;
+		glm::vec2 TextureCoordinates;
+	} cubeVertices[6*6] =
+	{
+		{ { -0.5f, -0.5f,  0.5f }, { 0.0f, 0.0f,  1.0f }, { 0.0f, 0.0f } },
+		{ {  0.5f, -0.5f,  0.5f }, { 0.0f, 0.0f,  1.0f }, { 1.0f, 0.0f } },
+		{ {  0.5f,  0.5f,  0.5f }, { 0.0f, 0.0f,  1.0f }, { 1.0f, 1.0f } },
+		{ {  0.5f,  0.5f,  0.5f }, { 0.0f, 0.0f,  1.0f }, { 1.0f, 1.0f } },
+		{ { -0.5f,  0.5f,  0.5f }, { 0.0f, 0.0f,  1.0f }, { 0.0f, 1.0f } },
+		{ { -0.5f, -0.5f,  0.5f }, { 0.0f, 0.0f,  1.0f }, { 0.0f, 0.0f } },
+
+		{ { -0.5f,  0.5f, -0.5f }, { 0.0f, 0.0f, -1.0f }, { 0.0f, 0.0f } },
+		{ {  0.5f,  0.5f, -0.5f }, { 0.0f, 0.0f, -1.0f }, { 1.0f, 0.0f } },
+		{ {  0.5f, -0.5f, -0.5f }, { 0.0f, 0.0f, -1.0f }, { 1.0f, 1.0f } },
+		{ {  0.5f, -0.5f, -0.5f }, { 0.0f, 0.0f, -1.0f }, { 1.0f, 1.0f } },
+		{ { -0.5f, -0.5f, -0.5f }, { 0.0f, 0.0f, -1.0f }, { 0.0f, 1.0f } },
+		{ { -0.5f,  0.5f, -0.5f }, { 0.0f, 0.0f, -1.0f }, { 0.0f, 0.0f } },
+
+		{ { -0.5f,  0.5f,  0.5f }, { -1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } },
+		{ { -0.5f,  0.5f, -0.5f }, { -1.0f, 0.0f, 0.0f }, { 1.0f, 0.0f } },
+		{ { -0.5f, -0.5f, -0.5f }, { -1.0f, 0.0f, 0.0f }, { 1.0f, 1.0f } },
+		{ { -0.5f, -0.5f, -0.5f }, { -1.0f, 0.0f, 0.0f }, { 1.0f, 1.0f } },
+		{ { -0.5f, -0.5f,  0.5f }, { -1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f } },
+		{ { -0.5f,  0.5f,  0.5f }, { -1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } },
+
+		{ {  0.5f,  0.5f, -0.5f }, {  1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } },
+		{ {  0.5f,  0.5f,  0.5f }, {  1.0f, 0.0f, 0.0f }, { 1.0f, 0.0f } },
+		{ {  0.5f, -0.5f,  0.5f }, {  1.0f, 0.0f, 0.0f }, { 1.0f, 1.0f } },
+		{ {  0.5f, -0.5f,  0.5f }, {  1.0f, 0.0f, 0.0f }, { 1.0f, 1.0f } },
+		{ {  0.5f, -0.5f, -0.5f }, {  1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f } },
+		{ {  0.5f,  0.5f, -0.5f }, {  1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } },
+
+		{ { -0.5f, -0.5f, -0.5f }, { 0.0f, -1.0f, 0.0f }, { 0.0f, 0.0f } },
+		{ {  0.5f, -0.5f, -0.5f }, { 0.0f, -1.0f, 0.0f }, { 1.0f, 0.0f } },
+		{ {  0.5f, -0.5f,  0.5f }, { 0.0f, -1.0f, 0.0f }, { 1.0f, 1.0f } },
+		{ {  0.5f, -0.5f,  0.5f }, { 0.0f, -1.0f, 0.0f }, { 1.0f, 1.0f } },
+		{ { -0.5f, -0.5f,  0.5f }, { 0.0f, -1.0f, 0.0f }, { 0.0f, 1.0f } },
+		{ { -0.5f, -0.5f, -0.5f }, { 0.0f, -1.0f, 0.0f }, { 0.0f, 0.0f } },
+
+		{ {  0.5f,  0.5f, -0.5f }, { 0.0f,  1.0f, 0.0f }, { 0.0f, 0.0f } },
+		{ { -0.5f,  0.5f, -0.5f }, { 0.0f,  1.0f, 0.0f }, { 1.0f, 0.0f } },
+		{ { -0.5f,  0.5f,  0.5f }, { 0.0f,  1.0f, 0.0f }, { 1.0f, 1.0f } },
+		{ { -0.5f,  0.5f,  0.5f }, { 0.0f,  1.0f, 0.0f }, { 1.0f, 1.0f } },
+		{ {  0.5f,  0.5f,  0.5f }, { 0.0f,  1.0f, 0.0f }, { 0.0f, 1.0f } },
+		{ {  0.5f,  0.5f, -0.5f }, { 0.0f,  1.0f, 0.0f }, { 0.0f, 0.0f } },
 	};
 
 	VertexBuffer* buffer;
 
-	buffer = new VertexBuffer(vertices, BufferLayout{ { "Position", BufferDataType::Vec3 } });
+	buffer = new VertexBuffer(cubemapVertices, {
+		{ "Position", BufferDataType::Vec3 }
+	});
 	s_CubemapArray = CreatePtr<VertexArray>(buffer);
-	buffer = new VertexBuffer(rectangleVertices, layout);
+	buffer = new VertexBuffer(cubeVertices, {
+		{ "a_Position",			 OpenGL::BufferDataType::Vec3 },
+		{ "a_Normal",			 OpenGL::BufferDataType::Vec3 },
+		{ "a_TextureCoordinate", OpenGL::BufferDataType::Vec2 },
+	});
+	s_CubeArray = CreatePtr<VertexArray>(buffer);
+	buffer = new VertexBuffer(framebufferVertices, {
+		{ "Coordinate", OpenGL::BufferDataType::Vec2 },
+		{ "TextureCoordinate", OpenGL::BufferDataType::Vec2 },
+	});
 	s_FrameBufferArray = CreatePtr<VertexArray>(buffer);
 
 	// indices[0] = 0;
@@ -123,7 +178,7 @@ void Renderer::Init() {
 
 	glEnable(GL_CULL_FACE);
 	glFrontFace(GL_CCW);
-	glCullFace(GL_FRONT);
+	glCullFace(GL_BACK);
 
 	ShaderPipeline::Get(Shader::FrameBuffer)->Bind();
 	ShaderPipeline::Get(Shader::FrameBuffer)->SetInt("u_ScreenTexture", 0);
@@ -195,7 +250,11 @@ void Renderer::RenderToFrameBuffer(Ref<VolcaniCore::FrameBuffer> buffer, const s
 	func();
 
 	buffer->Unbind();
-	glDisable(GL_DEPTH_TEST);
+
+	// glDisable(GL_DEPTH_TEST);
+	// glEnable(GL_CULL_FACE);
+	// glFrontFace(GL_CCW);
+	// glCullFace(GL_FRONT);
 
 	// ShaderPipeline::Get(Shader::FrameBuffer)->Bind();
 	// buffer->As<OpenGL::FrameBuffer>()->BindTexture();

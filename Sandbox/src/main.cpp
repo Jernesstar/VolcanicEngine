@@ -17,17 +17,20 @@ VolcaniCore::Application* CreateApplication(const VolcaniCore::CommandLineArgs& 
 	std::string project = args[1];
 
 	if(project == "Template")
-		return new TemplateDemo();
+		return new Demo::Template();
 	if(project == "Cube")
-		return new CubeDemo();
+		return new Demo::Cube();
 	if(project == "ECS")
-		return new ECSDemo();
-	if(project == "Lighting")
-		return new LightingDemo();
+		return new Demo::ECS();
 	if(project == "Model")
-		return new ModelDemo();
+		return new Demo::Model();
+	if(project == "Lighting")
+		return new Demo::Lighting();
+
+	if(project == "Game")
+		return new TheMazeIsLava::Game();
 	if(project == "Editor")
 		return new Magma::Editor();
 
-	return new TemplateDemo();
+	return new Demo::Template();
 }

@@ -12,14 +12,16 @@
 using namespace VolcaniCore;
 using namespace Magma;
 
-class ECSDemo : public Application {
+namespace Demo {
+
+class ECS : public Application {
 public:
-	ECSDemo();
+	ECS();
 
 	void OnUpdate(TimeStep ts);
 };
 
-ECSDemo::ECSDemo() {
+ECS::ECS() {
 	EventSystem::RegisterListener<KeyPressedEvent>(
 	[](const KeyPressedEvent& event) {
 		if(event.Key == Key::Escape)
@@ -53,6 +55,8 @@ ECSDemo::ECSDemo() {
 	});
 }
 
-void ECSDemo::OnUpdate(TimeStep ts) {
+void ECS::OnUpdate(TimeStep ts) {
 	
+}
+
 }

@@ -31,6 +31,7 @@ public:
 
 private:
 	Ptr<VertexArray> s_CubemapArray;
+	Ptr<VertexArray> s_CubeArray;
 	Ptr<VertexArray> s_FrameBufferArray;
 };
 
