@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Renderer/RendererAPI.h"
+#include "Renderer/Camera.h"
 #include "Renderer/Shader.h"
 #include "Renderer/Model.h"
 

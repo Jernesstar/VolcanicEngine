@@ -24,8 +24,8 @@ public:
 	void OnUpdate(TimeStep ts);
 
 private:
-	StereographicCamera camera{ 75.0f, 0.01f, 100.0f, 1600, 900 };
-	CameraController controller{ camera };
+	Ref<StereographicCamera> camera = CreateRef<StereographicCamera>(75.0f, 0.01f, 100.0f, 800, 600);
+	CameraController controller{ *camera.get() };
 
 	Ref<Texture> stone = Texture::Create("Sandbox/assets/images/stone.png");
 };
@@ -37,19 +37,20 @@ Cube::Cube() {
 			Application::Close();
 	});
 	EventSystem::RegisterListener<WindowResizedEvent>(
-	[this](const WindowResizedEvent& event) {
-		this->camera.Resize(event.Width, event.Height);
+	[&](const WindowResizedEvent& event) {
+		camera->Resize(event.Width, event.Height);
 	});
 
-	camera.SetPosition({ 0.0f, 0.0f, 3.0f });
+	camera->SetPosition({ 0.0f, 0.0f, 3.0f });
 }
 
 void Cube::OnUpdate(TimeStep ts) {
 	controller.OnUpdate(ts);
 
 	Renderer::Clear();
+	Application::GetRenderer()->As<OpenGL::Renderer>()->Begin(camera);
 
-	Application::GetRenderer()->As<OpenGL::Renderer>()->DrawCube(stone);
+	Application::GetRenderer()->As<OpenGL::Renderer>()->DrawCube(stone, Transform{ });
 }
 
 }

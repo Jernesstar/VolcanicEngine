@@ -53,8 +53,9 @@ void CameraController::OnUpdate(TimeStep ts)
 		m_Camera->CalculateView();
 }
 
-void CameraController::OnMouseEvent(const MouseEvent& event)
-{
+// TODO: Implement
+void CameraController::OnResize(uint32_t width, uint32_t height) {
+
 }
 
 }

@@ -2,16 +2,4 @@
 
 namespace TheMazeIsLava {
 
-UIElement::UIElement() {
-
-}
-
-UIElement::~UIElement() {
-
-}
-
-UI::DrawText(const std::string& text) {
-
-}
-
 }

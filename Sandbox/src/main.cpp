@@ -27,10 +27,12 @@ VolcaniCore::Application* CreateApplication(const VolcaniCore::CommandLineArgs& 
 	if(project == "Lighting")
 		return new Demo::Lighting();
 
-	if(project == "Game")
-		return new TheMazeIsLava::Game();
 	if(project == "Editor")
 		return new Magma::Editor();
+	if(project == "Game") {
+		TheMazeIsLava::Game::Init();
+		return new TheMazeIsLava::Game();
+	}
 
 	return new Demo::Template();
 }

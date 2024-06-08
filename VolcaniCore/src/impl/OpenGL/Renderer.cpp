@@ -16,7 +16,7 @@ using namespace VolcaniCore;
 namespace VolcaniCore::OpenGL {
 
 struct RendererData {
-	// Cubes
+	// float cubes[64];
 
 	Ref<ShaderPipeline> CubeShader;
 
@@ -159,12 +159,11 @@ Renderer::Renderer()
 	s_Data.FrameBufferArray = CreatePtr<VertexArray>(buffer);
 
 	s_Data.CubeShader = ShaderPipeline::Create({
-		{ "Sandbox/assets/shaders/Cube.glsl.vert", ShaderType::Vertex },
-		{ "Sandbox/assets/shaders/Cube.glsl.frag", ShaderType::Fragment }
+		{ "VolcaniCore/assets/shaders/Cube.glsl.vert", ShaderType::Vertex },
+		{ "VolcaniCore/assets/shaders/Cube.glsl.frag", ShaderType::Fragment }
 	});
 	s_Data.CubeShader->Bind();
 	s_Data.CubeShader->SetMat4("u_Model", glm::mat4{ 1.0f });
-	s_Data.CubeShader->SetTexture("u_Texture", block, 0); // TODO: Default argument slot 0
 }
 
 void Renderer::Init() {
@@ -194,7 +193,7 @@ void Renderer::Init() {
 }
 
 void Renderer::Close() {
-	delete s_Data;
+	// delete s_Data;
 }
 
 void Renderer::Clear(const glm::vec4& color) {
@@ -258,17 +257,18 @@ void Renderer::DrawIndexed(Ref<VertexArray> vertex_array, uint32_t indices)
 
 void Renderer::Begin(Ref<Camera> camera) {
 	s_Data.CubeShader->Bind();
-	s_Data.CubeShader->SetVec3("u_CameraPosition", camera.GetPosition());
-	s_Data.CubeShader->SetMat4("u_ViewProj", camera.GetViewProjection());
-	s_Data.ViewProjection = camera.GetViewProjection();
+	s_Data.CubeShader->SetVec3("u_CameraPosition", camera->GetPosition());
+	s_Data.CubeShader->SetMat4("u_ViewProj", camera->GetViewProjection());
+	s_Data.ViewProjection = camera->GetViewProjection();
 }
 
 void Renderer::End() {
 	Flush();
 }
 
-void Renderer::DrawCube(Ref<Camera> camera, Ref<VolcaniCore::Texture> texture, Transform t) {
+void Renderer::DrawCube(Ref<VolcaniCore::Texture> texture, Transform t) {
 	s_Data.CubeShader->Bind();
+	s_Data.CubeShader->SetTexture("u_Texture", texture, 0); 
 	s_Data.CubeShader->SetMat4("u_Model", t.GetTransform());
 
 	s_Data.CubeArray->Bind();

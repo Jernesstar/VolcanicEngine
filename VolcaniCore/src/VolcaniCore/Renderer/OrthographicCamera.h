@@ -10,6 +10,12 @@ public:
 	OrthographicCamera(float left, float right, float bottom, float top, float rotation = 0.0f);
 	~OrthographicCamera() = default;
 
+	void Resize(uint32_t width, uint32_t height) override {
+		m_Right = width;
+		m_Top = height;
+		CalculateView();
+	}
+
 	void SetProjection(float left, float right, float bottom, float top);
 	void SetRotation(float rotation) { m_Rotation = rotation; CalculateView(); }
 

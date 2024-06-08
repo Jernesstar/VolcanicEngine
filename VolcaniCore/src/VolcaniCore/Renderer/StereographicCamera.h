@@ -12,8 +12,8 @@ public:
 	StereographicCamera(float verticalFOV, float nearClip, float farClip, uint32_t width, uint32_t height, float rotationSpeed = 0.3f);
 	~StereographicCamera() = default;
 
+	void Resize(uint32_t width, uint32_t height) override;
 	void SetProjection(float verticalFOV, float nearClip, float farClip);
-	void Resize(uint32_t width, uint32_t height);
 
 	float GetVerticalFOV() const { return m_VerticalFOV; }
 	float GetNearClip() const { return m_NearClip; }

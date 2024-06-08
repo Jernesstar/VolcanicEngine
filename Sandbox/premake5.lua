@@ -66,6 +66,10 @@ project "Sandbox"
             "GL",
             "X11"
         }
+
+        buildoptions {
+            "-fexceptions"
+        }
     filter "system:macosx"
         links {
             "QuartzCore.framework",
