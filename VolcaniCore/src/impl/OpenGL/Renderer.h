@@ -26,13 +26,15 @@ public:
 	void RenderTexture(Ref<VolcaniCore::Texture> texture, Transform t) override;
 
 	void RenderToFrameBuffer(Ref<VolcaniCore::FrameBuffer> buffer, const std::function<void(void)>& func) override;
-
+	// TODO: Get rid of this
 	void DrawIndexed(Ref<VertexArray> vertex_array, uint32_t indices = 0);
 
+	void Begin(Ref<Camera> camera);
+	void DrawCube(Ref<VolcaniCore::Texture> texture, Transform t);
+	void End();
+
 private:
-	Ptr<VertexArray> s_CubemapArray;
-	Ptr<VertexArray> s_CubeArray;
-	Ptr<VertexArray> s_FrameBufferArray;
+	void Flush();
 };
 
 }

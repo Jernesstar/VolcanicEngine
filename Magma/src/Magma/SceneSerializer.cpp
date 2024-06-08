@@ -6,8 +6,8 @@
 
 #include <VolcaniCore/Core/Assert.h>
 #include <VolcaniCore/Core/UUID.h>
-#include <VolcaniCore/Camera/StereographicCamera.h>
-#include <VolcaniCore/Camera/OrthographicCamera.h>
+#include <VolcaniCore/Renderer/StereographicCamera.h>
+#include <VolcaniCore/Renderer/OrthographicCamera.h>
 
 namespace Magma {
 

@@ -1,10 +1,10 @@
 #pragma once
 
-#include <VolcaniCore/Core/Application.h>
-#include <VolcaniCore/Core/Log.h>
-#include <VolcaniCore/Events/EventSystem.h>
-#include <VolcaniCore/Camera/OrthographicCamera.h>
-#include <VolcaniCore/Camera/StereographicCamera.h>
+#include <Core/Application.h>
+#include <Core/Log.h>
+#include <Events/EventSystem.h>
+#include <Renderer/OrthographicCamera.h>
+#include <Renderer/StereographicCamera.h>
 
 #include <Magma/Entity.h>
 #include <Magma/SceneSerializer.h>

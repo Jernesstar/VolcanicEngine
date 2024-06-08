@@ -10,8 +10,8 @@
 
 #include <Renderer/Renderer.h>
 #include <Renderer/Model.h>
-#include <Camera/StereographicCamera.h>
-#include <Camera/CameraController.h>
+#include <Renderer/StereographicCamera.h>
+#include <Renderer/CameraController.h>
 
 using namespace VolcaniCore;
 

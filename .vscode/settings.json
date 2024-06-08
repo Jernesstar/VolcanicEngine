@@ -1,5 +1,5 @@
 {
-	"editor.detectIndentation": false,
+	"editor.detectIndentation": true,
 	"editor.insertSpaces": false,
 	"files.associations": {
 		"*.html": "html",

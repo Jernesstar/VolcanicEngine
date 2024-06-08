@@ -18,18 +18,19 @@ using Coordinate = glm::vec2;
 class Level {
 public:
 	// Return the speed of the lava as a function of the time elapsed since the level started
-	const std::function<float(float timeSinceLevelStart)> LavaSpeed;
+	const std::function<float(float t)> LavaSpeed;
 
 public:
 	static void Init();
 	static Level Create(const std::string& levelPath);
 
 	Level(std::vector<std::vector<uint32_t>> map,
-		const std::function<float(float timeSinceLevelStart)>& lavaSpeed);
+		const std::function<float(float t)>& lavaSpeed);
 	void Render(TimeStep ts);
 
 private:
 	void PropagateLava();
+	void DrawStoneBlock();
 
 	TimeStep m_TimeStep;
 	float m_TimeSinceLevelStart;

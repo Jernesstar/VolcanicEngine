@@ -17,7 +17,7 @@ Level Level::Create(const std::string& levelPath) {
 }
 
 Level::Level(std::vector<std::vector<uint32_t>> map,
-	const std::function<float(float timeSinceLevelStart)>& lavaSpeed)
+	const std::function<float(float t)>& lavaSpeed)
 	: m_TileMap(map), LavaSpeed(lavaSpeed), m_Width(map[0].size()), m_Height(map.size())
 {
 	for(uint32_t y = 0; y < m_Height; y++) {
@@ -33,16 +33,15 @@ void Level::Render(TimeStep ts) {
 	m_TimeSinceLevelStart += (float)ts;
 	PropagateLava();
 
-	for(uint32_t y = 0; y < m_Height; y++) {
-		for(uint32_t x = 0; x < m_Width; x++) {
-			if(m_TileMap[y][x] == 0)
-				Renderer::RenderTexture(s_Stone, Transform{ .Translation = { x, y, 0.0f } });
-		}
-	}
+	DrawStoneBlock();
 }
 
 void Level::PropagateLava() {
 	uint32_t lavaSpeed = LavaSpeed(m_TimeStep);
+}
+
+void Level::DrawStoneBlock() {
+	Application::GetRenderer()->As<OpenGL::Renderer>()->DrawCube(stone, transform);
 }
 
 }

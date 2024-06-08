@@ -15,9 +15,8 @@
 #include <Core/Log.h>
 
 #include <Renderer/Renderer.h>
-#include <Camera/OrthographicCamera.h>
-#include <Camera/StereographicCamera.h>
-#include <Camera/CameraController.h>
+#include <Renderer/StereographicCamera.h>
+#include <Renderer/CameraController.h>
 
 using namespace VolcaniCore;
 

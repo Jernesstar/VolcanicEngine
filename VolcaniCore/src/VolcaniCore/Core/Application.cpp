@@ -47,12 +47,12 @@ void Application::Run() {
 		s_LastFrame = time;
 		s_TimeStep = ts;
 
+		s_Instance->OnUpdate(ts);
+
 		ApplicationUpdatedEvent event(ts);
 		EventSystem::Dispatch(event);
-
 		EventSystem::PollEvents();
 
-		s_Instance->OnUpdate(ts);
 		s_Window->Update();
 	}
 }

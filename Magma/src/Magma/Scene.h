@@ -2,7 +2,7 @@
 
 // #include <vector>
 
-#include <VolcaniCore/Camera/Camera.h>
+#include <VolcaniCore/Renderer/Camera.h>
 // #include "VolcaniCore/Renderer/Mesh.h>
 
 
