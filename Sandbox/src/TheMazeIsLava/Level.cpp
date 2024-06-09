@@ -8,14 +8,9 @@
 namespace TheMazeIsLava {
 
 void Level::Init() {
-	// TODO: Procedurally create lava and have it spread naturally; 3D Stone blocks
 	s_Lava  = Texture::Create("Sandbox/assets/images/lava.png");
 	s_Stone = Texture::Create("Sandbox/assets/images/stone.png");
-	// s_Door  = Texture::Create("Sandbox/assets/images/door.png");
-}
-
-Level Level::Create(const std::string& levelPath) {
-
+	// s_Staircase  = Texture::Create("Sandbox/assets/images/staircase.png");
 }
 
 Level::Level(std::vector<std::vector<uint32_t>> map, const std::function<float(float t)>& lavaSpeed)
@@ -39,6 +34,8 @@ void Level::Render(TimeStep ts) {
 
 void Level::PropagateLava() {
 	uint32_t lavaSpeed = LavaSpeed(m_TimeSinceLevelStart);
+
+	// Propagate the lava in tile space, flow animation interpolates smoothly
 }
 
 void Level::DrawStoneBlock() {

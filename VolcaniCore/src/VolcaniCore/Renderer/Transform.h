@@ -9,7 +9,6 @@
 
 namespace VolcaniCore {
 
-// NOTE: Is this really needed ?
 struct Transform {
 	glm::vec3 Translation = { 0, 0, 0 };
 	glm::vec3 Rotation = { 0, 0, 0 };

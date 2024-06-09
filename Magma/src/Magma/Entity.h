@@ -17,8 +17,8 @@ public:
 	template<typename TComponent>
 	bool Has() { return m_Components.count(TypeOf<TComponent>::Get()) == 1; }
 
-	template<typename TComponent, typename... Args>
-	TComponent& Add(Args&& ...args) {
+	template<typename TComponent, typename ...Args>
+	TComponent& Add(Args&&... args) {
 		if(Has<TComponent>()) return Get<TComponent>();
 		m_Components[TypeOf<TComponent>::Get()] = new TComponent(std::forward<Args>(args)...);
 		return *((TComponent*)m_Components[TypeOf<TComponent>::Get()]);

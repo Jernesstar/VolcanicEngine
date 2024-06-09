@@ -150,18 +150,18 @@ private:
 		{ "a_Position", OpenGL::BufferDataType::Vec3 },
 	};
 
-	OpenGL::VertexBuffer* cube_buffer = new OpenGL::VertexBuffer(cubeVertices, l1);
-	OpenGL::VertexBuffer* light_buffer = new OpenGL::VertexBuffer(vertices, l2);
-	OpenGL::IndexBuffer* index_buffer = new OpenGL::IndexBuffer(indices);
+	OpenGL::VertexBuffer* cubeBuffer = new OpenGL::VertexBuffer(cubeVertices, l1);
+	OpenGL::VertexBuffer* lightBuffer = new OpenGL::VertexBuffer(vertices, l2);
+	OpenGL::IndexBuffer* indexBuffer = new OpenGL::IndexBuffer(indices);
 
-	Ref<OpenGL::VertexArray> cube_array = CreateRef<OpenGL::VertexArray>(cube_buffer, nullptr);
-	Ref<OpenGL::VertexArray> light_array = CreateRef<OpenGL::VertexArray>(light_buffer, index_buffer);
+	Ref<OpenGL::VertexArray> cubeArray = CreateRef<OpenGL::VertexArray>(cubeBuffer, nullptr);
+	Ref<OpenGL::VertexArray> lightArray = CreateRef<OpenGL::VertexArray>(lightBuffer, indexBuffer);
 
-	Ref<ShaderPipeline> light_shader = ShaderPipeline::Create({
+	Ref<ShaderPipeline> lightShader = ShaderPipeline::Create({
 		{ "VolcaniCore/assets/shaders/Simple.glsl.vert", ShaderType::Vertex },
 		{ "VolcaniCore/assets/shaders/Simple.glsl.frag", ShaderType::Fragment }
 	});
-	Ref<ShaderPipeline> cube_shader = ShaderPipeline::Create({
+	Ref<ShaderPipeline> lightingShader = ShaderPipeline::Create({
 		{ "Sandbox/assets/shaders/Lighting.glsl.vert", ShaderType::Vertex },
 		{ "Sandbox/assets/shaders/Lighting.glsl.frag", ShaderType::Fragment }
 	});
@@ -187,12 +187,12 @@ Lighting::Lighting()
 		this->camera.Resize(event.Width, event.Height);
 	});
 
-	light_shader->Bind();
+	lightShader->Bind();
 	{
-		light_shader->SetVec3("u_LightColor", { 1.0f, 1.0f, 1.0f });
+		lightShader->SetVec3("u_LightColor", { 1.0f, 1.0f, 1.0f });
 	}
 
-	cube_shader->Bind();
+	lightingShader->Bind();
 	{
 		camera.SetPosition({ 0.0f, 0.0f, 4.0f });
 		controller.RotationSpeed = 1.0f;
@@ -205,11 +205,11 @@ Lighting::Lighting()
 			{ 1.0f,  0.5f, -3.0f  },
 		};
 
-		cube_shader->SetMat4("u_Model", glm::mat4{ 1.0f });
+		lightingShader->SetMat4("u_Model", glm::mat4{ 1.0f });
 
-		cube_shader->SetTexture("u_Material.Diffuse", wood, 0);
-		cube_shader->SetTexture("u_Material.Specular", wood_specular, 1);
-		cube_shader->SetFloat("u_Material.Shininess", 32.0f);
+		lightingShader->SetTexture("u_Material.Diffuse", wood, 0);
+		lightingShader->SetTexture("u_Material.Specular", wood_specular, 1);
+		lightingShader->SetFloat("u_Material.Shininess", 32.0f);
 
 		for(uint32_t i = 0; i < 4; i++) {
 			pointlights[i].Position = positions[i];
@@ -223,13 +223,13 @@ Lighting::Lighting()
 
 		for(uint32_t i = 0; i < 4; i++) {
 			std::string name = "u_PointLights[" + std::to_string(i) + "]";
-			cube_shader->SetVec3(name + ".Ambient",  pointlights[i].Ambient);
-			cube_shader->SetVec3(name + ".Diffuse",  pointlights[i].Diffuse);
-			cube_shader->SetVec3(name + ".Specular", pointlights[i].Specular);
+			lightingShader->SetVec3(name + ".Ambient",  pointlights[i].Ambient);
+			lightingShader->SetVec3(name + ".Diffuse",  pointlights[i].Diffuse);
+			lightingShader->SetVec3(name + ".Specular", pointlights[i].Specular);
 
-			cube_shader->SetFloat(name + ".Constant",  pointlights[i].Constant);
-			cube_shader->SetFloat(name + ".Linear",    pointlights[i].Linear);
-			cube_shader->SetFloat(name + ".Quadratic", pointlights[i].Quadratic);
+			lightingShader->SetFloat(name + ".Constant",  pointlights[i].Constant);
+			lightingShader->SetFloat(name + ".Linear",    pointlights[i].Linear);
+			lightingShader->SetFloat(name + ".Quadratic", pointlights[i].Quadratic);
 		}
 	}
 }
@@ -238,29 +238,29 @@ void Lighting::OnUpdate(TimeStep ts) {
 	Renderer::Clear();
 	controller.OnUpdate(ts);
 
-	light_shader->Bind();
+	lightShader->Bind();
 	{
-		light_shader->SetMat4("u_ViewProj", camera.GetViewProjection());
+		lightShader->SetMat4("u_ViewProj", camera.GetViewProjection());
 
 		for(uint32_t i = 0; i < 4; i++) {
-			light_shader->SetVec3("u_Position", pointlights[i].Position);
-			Application::GetRenderer()->As<OpenGL::Renderer>()->DrawIndexed(light_array);
+			lightShader->SetVec3("u_Position", pointlights[i].Position);
+			Application::GetRenderer()->As<OpenGL::Renderer>()->DrawIndexed(lightArray);
 		}
 	}
 
-	cube_shader->Bind();
+	lightingShader->Bind();
 	{
-		cube_shader->SetVec3("u_CameraPosition", camera.GetPosition());
-		cube_shader->SetMat4("u_ViewProj", camera.GetViewProjection());
+		lightingShader->SetVec3("u_CameraPosition", camera.GetPosition());
+		lightingShader->SetMat4("u_ViewProj", camera.GetViewProjection());
 
 		for(uint32_t i = 0; i < 4; i++) {
 			std::string name = "u_PointLights[" + std::to_string(i) + "]";
-			cube_shader->SetVec3(name + ".Position",  pointlights[i].Position);
+			lightingShader->SetVec3(name + ".Position",  pointlights[i].Position);
 		}
 
-		cube_array->Bind();
+		cubeArray->Bind();
 		for(uint32_t i = 0; i < 10; i++) {
-			cube_shader->SetMat4("u_Model", cube_positions[i]);
+			lightingShader->SetMat4("u_Model", cube_positions[i]);
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
 	}

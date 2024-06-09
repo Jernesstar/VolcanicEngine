@@ -19,6 +19,7 @@
 
 namespace VolcaniCore {
 
+// TODO: Change this to some ordered structure so that event.Handled works properly
 template<typename TEvent>
 using Callbacks = std::unordered_map<VolcaniCore::UUID, EventCallback<TEvent>>;
 
@@ -70,12 +71,12 @@ private:
 	// }
 
 	template<typename TEvent>
-	static void Dispatch(TEvent& event)
-	{
+	static void Dispatch(TEvent& event) {
 		Callbacks<TEvent>& callback_list = GetCallbacks<TEvent>();
 	
-		for(auto& [_, func] : callback_list) 
-			func(event); 
+		for(auto& [_, func] : callback_list)
+			if(event.Handled = false)
+				func(event);
 	}
 
 	template<typename TEvent>

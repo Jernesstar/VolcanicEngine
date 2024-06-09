@@ -47,7 +47,6 @@ void EditorLayer::Update(TimeStep ts) {
 }
 
 void EditorLayer::Render() {
-	// Note: Switch this to true to enable dockspace
 	static bool dockspaceOpen = true;
 	static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
 

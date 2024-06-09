@@ -6,7 +6,7 @@ enum class EventCategory {
 	Key,
 	Mouse,
 	Window,
-	Application, // TODO: What does this even do ?
+	Application,
 };
 
 enum class EventType {
@@ -20,7 +20,7 @@ enum class EventType {
 	WindowResized,
 	WindowMoved,
 	WindowClosed,
-	ApplicationUpdated // ???
+	ApplicationUpdated
 };
 
 struct Event {

@@ -21,11 +21,12 @@ public:
 	const std::function<float(float t)> LavaSpeed;
 
 public:
-	static void Init();
-	static Level Create(const std::string& levelPath);
-
 	Level(std::vector<std::vector<uint32_t>> map, const std::function<float(float t)>& lavaSpeed);
+	~Level();
+
 	void Render(TimeStep ts);
+
+	static void Init();
 
 private:
 	void PropagateLava();
