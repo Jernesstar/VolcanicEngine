@@ -31,7 +31,7 @@ public:
 	void RenderTexture(Ref<VolcaniCore::Texture> texture, Transform t) override;
 
 	void RenderToFrameBuffer(Ref<VolcaniCore::FrameBuffer> buffer, const std::function<void(void)>& func) override;
-	void RenderFrameBuffer(Ref<FrameBuffer> buffer, Ref<ShaderPipeline> frameBufferShader);
+	void RenderFrameBuffer(Ref<VolcaniCore::FrameBuffer> buffer, Ref<ShaderPipeline> frameBufferShader);
 
 	// TODO: Make this private
 	void DrawIndexed(Ref<VertexArray> vertex_array, uint32_t indices = 0);

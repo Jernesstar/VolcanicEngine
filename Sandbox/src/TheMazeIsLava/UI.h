@@ -3,6 +3,8 @@
 #include <string>
 #include <vector>
 
+#include <glm/vec4.hpp>
+
 #include <Core/Defines.h>
 
 using namespace VolcaniCore;
@@ -11,7 +13,7 @@ namespace TheMazeIsLava {
 
 class UIElement {
 public:
-	UIElement(Ref<UIElement> parent = nullptr) : m_Parent(parent) { }
+	UIElement(Ref<UIElement> parent = nullptr) : m_Parent(parent.get()) { }
 	virtual ~UIElement() = default;
 
 	void Render() {
@@ -19,24 +21,21 @@ public:
 		for(auto& node : m_Children) node->Render();
 	}
 
-	Ref<UIElement> Add(Ref<UIElement> element) {
-		if(!OnAddElement(element)) // Try to add the element
-			return std::move(this); // Could not add element
+	template<typename TElement, typename ...Args>
+	Ref<TElement> Add(Args&&... args) {
+		Ref<UIElement> element = CreateRef<TElement>(std::forward(args)...);
+		if(!OnAddElement(element))
+			return element;
 
 		auto oldParent = element->m_Parent;
 		element->m_Parent = this;
-		if(!element->OnAttach()) { // Try attach element
+		if(!element->OnAttach()) {
 			element->m_Parent = oldParent; 
-			return std::move(this);
+			return element;
 		}
 
 		m_Children.push_back(element);
 		return element; // To enable chaining
-	};
-
-	template<typename TElement, typename ...Args>
-	Ref<TElement> Add(Args&&... args) {
-		return Add(CreateRef<TElement>(std::forward(args)...));
 	};
 
 protected:
@@ -45,7 +44,7 @@ protected:
 	virtual bool OnAddElement(Ref<UIElement> element) = 0; // If added the element successfully
 
 private:
-	Ref<UIElement> m_Parent;
+	UIElement* m_Parent;
 	std::vector<Ref<UIElement>> m_Children;
 };
 
@@ -80,7 +79,7 @@ private:
 
 class UIButton : public UIElement {
 public:
-	UIButton(const std::string& text = "", const glm::vec4& color, const glm::vec4& textColor);
+	UIButton(const glm::vec4& color, const std::string& text = "", const glm::vec4& textColor = { 1.0f, 1.0f, 1.0f, 1.0f });
 
 	void SetText(const std::string& text) { m_Text = text; }
 
@@ -90,14 +89,14 @@ public:
 private:
 	void Draw() override;
 	bool OnAttach() override;
-	bool OnAddElement(Ref<UIElement> element) override { return false; };
+	bool OnAddElement(Ref<UIElement> element) override { return false; }
 
 private:
 	std::string m_Text;
 	glm::vec4 m_Color, m_TextColor;
 	float x, y;
 	uint32_t m_Width, m_Height;
-	bool m_Pressed, m_Released;
+	bool m_Pressed = false, m_Released = false;
 };
 
 class UIDropDown : public UIElement {

@@ -75,7 +75,7 @@ private:
 		Callbacks<TEvent>& callback_list = GetCallbacks<TEvent>();
 	
 		for(auto& [_, func] : callback_list)
-			if(event.Handled = false)
+			if(event.Handled == false)
 				func(event);
 	}
 

@@ -191,12 +191,7 @@ void Renderer::Init() {
 	s_Data.CubeShader->SetMat4("u_Model", glm::mat4{ 1.0f });
 }
 
-void Renderer::Close() {
-	delete s_Data.CubeShader;
-	delete s_Data.CubemapArray;
-	delete s_Data.CubeArray;
-	delete s_Data.FrameBufferArray;
-}
+void Renderer::Close() { }
 
 void Renderer::Resize(uint32_t width, uint32_t height) {
 	glViewport(0, 0, width, height);
@@ -249,24 +244,25 @@ void Renderer::RenderTexture(Ref<Texture> texture, Transform t) {
 }
 
 void Renderer::RenderToFrameBuffer(Ref<VolcaniCore::FrameBuffer> buffer, const std::function<void(void)>& func) {
-	buffer->Bind();
 	glEnable(GL_DEPTH_TEST);
 
+	buffer->Bind();
 	func();
-
 	buffer->Unbind();
 }
 
 void Renderer::RenderFrameBuffer(Ref<VolcaniCore::FrameBuffer> buffer, Ref<ShaderPipeline> frameBufferShader) {
 	glDisable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
 	glFrontFace(GL_CCW);
 	glCullFace(GL_FRONT);
 
 	frameBufferShader->Bind();
 	buffer->As<OpenGL::FrameBuffer>()->BindTexture();
-	s_FrameBufferArray->Bind();
+	s_Data.FrameBufferArray->Bind();
 	glDrawArrays(GL_TRIANGLES, 0, 6);
+
+	glFrontFace(GL_CCW);
+	glCullFace(GL_BACK);
 }
 
 void Renderer::DrawIndexed(Ref<VertexArray> vertex_array, uint32_t indices)

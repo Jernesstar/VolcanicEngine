@@ -24,6 +24,10 @@ Level::Level(std::vector<std::vector<uint32_t>> map, const std::function<float(f
 	}
 }
 
+Level::~Level() {
+
+}
+
 void Level::Render(TimeStep ts) {
 	m_TimeStep = ts;
 	m_TimeSinceLevelStart += (float)ts;
