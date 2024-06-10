@@ -26,10 +26,6 @@ void ShaderPipeline::Init() {
 		{ "VolcaniCore/assets/shaders/Model.glsl.vert", ShaderType::Vertex },
 		{ "VolcaniCore/assets/shaders/Model.glsl.frag", ShaderType::Fragment }
 	});
-	s_FrameBufferShader = Create({
-		{ "VolcaniCore/assets/shaders/FrameBuffer.glsl.vert", ShaderType::Vertex },
-		{ "VolcaniCore/assets/shaders/FrameBuffer.glsl.frag", ShaderType::Fragment }
-	});
 }
 
 Ref<ShaderPipeline> ShaderPipeline::Get(Shader shader) {

@@ -21,22 +21,25 @@ public:
 	void Resize(uint32_t width, uint32_t height) override;
 
 	void Begin(Ref<Camera> camera);
-	void DrawCube(Ref<VolcaniCore::Texture> texture, Transform t);
-	void End();
+	void DrawCubemap(Ref<VolcaniCore::Cubemap> cubemap);
+	void Draw3DCube(Ref<VolcaniCore::Texture> texture,	Transform t = { });
+	void Draw3DModel(Ref<VolcaniCore::Model> model,		Transform t = { });
 
-	void RenderModel(Ref<VolcaniCore::Model> model) override;
-	void RenderCubemap(Ref<VolcaniCore::Cubemap> cubemap) override;
-	void RenderQuad(Ref<VolcaniCore::Quad> quad, Transform t) override;
-	void RenderText(Ref<VolcaniCore::Text> text, Transform t) override;
-	void RenderTexture(Ref<VolcaniCore::Texture> texture, Transform t) override;
+	// void Draw2DModel(Ref<Model> model,		Transform t = { });
+	void Draw2DQuad(const glm::vec4& color, Transform t = { });
+	void Draw2DQuad(Ref<Texture> texture,	Transform t = { });
+	void Draw2DText(Ref<Text> text,			Transform t = { });
 
-	void RenderToFrameBuffer(Ref<VolcaniCore::FrameBuffer> buffer, const std::function<void(void)>& func) override;
 	void RenderFrameBuffer(Ref<VolcaniCore::FrameBuffer> buffer, Ref<ShaderPipeline> frameBufferShader);
 
-	// TODO: Make this private
-	void DrawIndexed(Ref<VertexArray> vertex_array, uint32_t indices = 0);
+	void RenderCubemap(Ref<VolcaniCore::Cubemap> cubemap) override { }
+	void RenderModel(Ref<VolcaniCore::Model> model) override { }
+	void RenderQuad(Ref<VolcaniCore::Quad> quad, Transform t) override { }
+	void RenderText(Ref<VolcaniCore::Text> text, Transform t) override { }
+	void RenderTexture(Ref<VolcaniCore::Texture> texture, Transform t) override { }
 
 private:
+	void DrawIndexed(Ref<VertexArray> vertex_array, uint32_t indices = 0);
 	void Flush();
 };
 

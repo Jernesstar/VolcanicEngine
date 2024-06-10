@@ -15,24 +15,11 @@ using namespace VolcaniCore;
 
 namespace VolcaniCore::OpenGL {
 
-struct RendererData {
-	// float cubes[64];
-
-	Ref<ShaderPipeline> CubeShader;
-
-	Ptr<VertexArray> CubemapArray;
-	Ptr<VertexArray> CubeArray;
-	Ptr<VertexArray> FrameBufferArray;
-
-	glm::mat4 ViewProjection;
-};
-
-static RendererData s_Data;
-
 Renderer::Renderer()
 	: RendererAPI::RendererAPI(RenderAPI::OpenGL)
 {
 	VOLCANICORE_ASSERT(gladLoadGL(), "Glad could not load OpenGL");
+
 	EventSystem::RegisterListener<WindowResizedEvent>(
 	[&](const WindowResizedEvent& event) {
 		Resize(event.Width, event.Height);
@@ -42,6 +29,23 @@ Renderer::Renderer()
 		Flush();
 	});
 }
+
+struct RendererData {
+	// float cubes[64];
+
+	Ref<ShaderPipeline> CubeShader;
+	Ref<ShaderPipeline> FrameBufferShader;
+
+	Ptr<VertexArray> CubemapArray;
+	Ptr<VertexArray> CubeArray;
+	Ptr<VertexArray> FrameBufferArray;
+
+	Ref<FrameBuffer> FrameBuffer2D;
+
+	glm::mat4 ViewProjection;
+};
+
+static RendererData s_Data;
 
 void Renderer::Init() {
 	glEnable(GL_DEPTH_TEST);				// Depth testing
@@ -55,9 +59,6 @@ void Renderer::Init() {
 	glEnable(GL_CULL_FACE);
 	glFrontFace(GL_CCW);
 	glCullFace(GL_BACK);
-
-	ShaderPipeline::Get(Shader::FrameBuffer)->Bind();
-	ShaderPipeline::Get(Shader::FrameBuffer)->SetInt("u_ScreenTexture", 0);
 
 	float cubemapVertices[] =
 	{
@@ -189,6 +190,15 @@ void Renderer::Init() {
 	});
 	s_Data.CubeShader->Bind();
 	s_Data.CubeShader->SetMat4("u_Model", glm::mat4{ 1.0f });
+
+	s_Data.FrameBufferShader = ShaderPipeline::Create({
+		{ "VolcaniCore/assets/shaders/FrameBuffer.glsl.vert", ShaderType::Vertex },
+		{ "VolcaniCore/assets/shaders/FrameBuffer.glsl.frag", ShaderType::Fragment }
+	});
+	FrameBufferShader->Bind();
+	FrameBufferShader->SetInt("u_ScreenTexture", 0);
+
+	s_Data.FrameBuffer2D = FrameBuffer::Create(800, 600);
 }
 
 void Renderer::Close() { }
@@ -219,11 +229,16 @@ void Renderer::Flush() {
 
 }
 
-void Renderer::RenderModel(Ref<VolcaniCore::Model> model) {
+void Renderer::DrawCube(Ref<VolcaniCore::Texture> texture, Transform t) {
+	s_Data.CubeShader->Bind();
+	s_Data.CubeShader->SetTexture("u_Texture", texture, 0);
+	s_Data.CubeShader->SetMat4("u_Model", t.GetTransform());
 
+	s_Data.CubeArray->Bind();
+	glDrawArrays(GL_TRIANGLES, 0, 36);
 }
 
-void Renderer::RenderCubemap(Ref<VolcaniCore::Cubemap> cubemap) {
+void Renderer::DrawCubemap(Ref<VolcaniCore::Cubemap> cubemap) {
 	glDepthMask(GL_FALSE);
 	s_Data.CubemapArray->Bind();
 	cubemap->As<OpenGL::Cubemap>()->Bind();
@@ -231,24 +246,32 @@ void Renderer::RenderCubemap(Ref<VolcaniCore::Cubemap> cubemap) {
 	glDepthMask(GL_TRUE);
 }
 
-void Renderer::RenderQuad(Ref<Quad> quad, Transform t) {
-
+void Renderer::Draw3DModel(Ref<VolcaniCore::Model> model, Transform t) {
+	ShaderPipeline::Get(Shader::Model)->Bind();
 }
 
-void Renderer::RenderText(Ref<Text> text, Transform t) {
+void Renderer::Draw2DQuad(const glm::vec4& color, Transform t) {
+	s_Data.FrameBuffer2D->Bind();
 
+
+
+	s_Data.FrameBuffer2D->Unbind();
 }
 
-void Renderer::RenderTexture(Ref<Texture> texture, Transform t) {
+void Renderer::Draw2DQuad(Ref<Texture> texture, Transform t) {
+	s_Data.FrameBuffer2D->Bind();
 
+
+
+	s_Data.FrameBuffer2D->Unbind();
 }
 
-void Renderer::RenderToFrameBuffer(Ref<VolcaniCore::FrameBuffer> buffer, const std::function<void(void)>& func) {
-	glEnable(GL_DEPTH_TEST);
+void Renderer::Draw2DText(Ref<Text> text, Transform t) {
+	s_Data.FrameBuffer2D->Bind();
 
-	buffer->Bind();
-	func();
-	buffer->Unbind();
+
+
+	s_Data.FrameBuffer2D->Unbind();
 }
 
 void Renderer::RenderFrameBuffer(Ref<VolcaniCore::FrameBuffer> buffer, Ref<ShaderPipeline> frameBufferShader) {
@@ -263,6 +286,7 @@ void Renderer::RenderFrameBuffer(Ref<VolcaniCore::FrameBuffer> buffer, Ref<Shade
 
 	glFrontFace(GL_CCW);
 	glCullFace(GL_BACK);
+	glEnable(GL_DEPTH_TEST);
 }
 
 void Renderer::DrawIndexed(Ref<VertexArray> vertex_array, uint32_t indices)
@@ -270,15 +294,6 @@ void Renderer::DrawIndexed(Ref<VertexArray> vertex_array, uint32_t indices)
 	vertex_array->Bind();
 	glDrawElements(GL_TRIANGLES, indices != 0 ? indices : vertex_array->GetIndexBuffer()->Count,
 		GL_UNSIGNED_INT, nullptr);
-}
-
-void Renderer::DrawCube(Ref<VolcaniCore::Texture> texture, Transform t) {
-	s_Data.CubeShader->Bind();
-	s_Data.CubeShader->SetTexture("u_Texture", texture, 0);
-	s_Data.CubeShader->SetMat4("u_Model", t.GetTransform());
-
-	s_Data.CubeArray->Bind();
-	glDrawArrays(GL_TRIANGLES, 0, 36);
 }
 
 }

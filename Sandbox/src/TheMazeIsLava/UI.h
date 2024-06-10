@@ -55,7 +55,7 @@ public:
 private:
 	void Draw() override { }
 	bool OnAttach() override { return true; } // Can be added to any element
-	bool OnAddElement(Ref<UIElement> element) override { return true; } // Can add any element
+	bool OnAddElement(Ref<UIElement> element) override { return true; } // C4an add any element
 };
 
 class UIWindow : public UIElement {

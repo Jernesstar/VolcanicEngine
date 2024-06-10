@@ -34,9 +34,6 @@ public:
 	virtual void RenderText(Ref<Text> text, Transform t) = 0;
 	virtual void RenderTexture(Ref<Texture> texture, Transform t) = 0;
 
-	// virtual void RenderFrameBuffer(Ref<FrameBuffer> buffer) = 0;
-	virtual void RenderToFrameBuffer(Ref<FrameBuffer> buffer, const std::function<void(void)>& func) = 0;
-
 	static Ref<RendererAPI> CreateRenderer(RenderAPI api);
 
 	template<typename Derived>
