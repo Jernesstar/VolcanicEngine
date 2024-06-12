@@ -52,7 +52,7 @@ public:
 
 private:
 	glm::vec2 m_LastMousePosition = { 0.0f, 0.0f };
-	Camera* m_Camera;
+	Camera* m_Camera; // TODO: Change to Ref
 };
 
 }

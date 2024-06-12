@@ -20,13 +20,16 @@ void Game::Init() {
 	s_NoUI			= CreateRef<UIEmpty>();
 	s_LevelSelectUI = CreateRef<UIWindow>(600, 400,
 		glm::vec4{ 0.859375f, 0.76171875f, 0.5859375f, 1.0f },
-		glm::vec4{ 0.3125f, 0.234375f, 0.078125f, 1.0f }, 10, 20);
+		glm::vec4{ 0.3125f, 0.234375f, 0.078125f, 1.0f }, 10, 20
+	);
 	s_PauseUI = CreateRef<UIWindow>(600, 400,
 		glm::vec4{ 0.859375f, 0.76171875f, 0.5859375f, 1.0f },
-		glm::vec4{ 0.3125f, 0.234375f, 0.078125f, 1.0f }, 10, 20);
+		glm::vec4{ 0.3125f, 0.234375f, 0.078125f, 1.0f }, 10, 20
+	);
 	s_OverUI = CreateRef<UIWindow>(600, 400,
 		glm::vec4{ 0.859375f, 0.76171875f, 0.5859375f, 1.0f },
-		glm::vec4{ 0.3125f, 0.234375f, 0.078125f, 1.0f }, 10, 20);
+		glm::vec4{ 0.3125f, 0.234375f, 0.078125f, 1.0f }, 10, 20
+	);
 
 	Level::Init();
 }

@@ -3,6 +3,7 @@
 #include <iostream>
 #include <functional>
 #include <unordered_map>
+#include <map>
 
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
@@ -19,9 +20,8 @@
 
 namespace VolcaniCore {
 
-// TODO: Change this to some ordered structure so that event.Handled works properly
 template<typename TEvent>
-using Callbacks = std::unordered_map<VolcaniCore::UUID, EventCallback<TEvent>>;
+using Callbacks = std::map<VolcaniCore::UUID, EventCallback<TEvent>>;
 
 class EventSystem {
 public:

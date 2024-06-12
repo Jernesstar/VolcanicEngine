@@ -48,14 +48,7 @@ void Texture2D::Bind(uint32_t slot)
 	glBindTextureUnit(slot, m_TextureID);
 }
 
-void Texture2D::SetData(const std::string& path) // TODO: Keep this ?
-{
-	m_Path = path;
-	unsigned char* pixel_data = Utils::ReadImage(path.c_str(), m_Width, m_Height, 4, true);
-	glTextureSubImage2D(m_TextureID, 0, 0, 0, m_Width, m_Height, DataFormat, GL_UNSIGNED_BYTE, pixel_data);
-	stbi_image_free(pixel_data);
-}
-
+// TODO: Consider removing these as they are likely to cause errors
 void Texture2D::SetData(const void* data, uint32_t size)
 {
 	VOLCANICORE_ASSERT(size == m_Width * m_Height * 4, "Data must be the whole size of the texture.");
