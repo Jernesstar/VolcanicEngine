@@ -40,10 +40,7 @@ EditorLayer::~EditorLayer() {
 }
 
 void EditorLayer::Update(TimeStep ts) {
-	Renderer::RenderToFrameBuffer(m_FrameBuffer,
-	[&]() {
-		Renderer::Clear({ 0.34, 0.2, 0.87, 1.0 });
-	});
+	Renderer::Clear({ 0.34, 0.2, 0.87, 1.0 });
 }
 
 void EditorLayer::Render() {

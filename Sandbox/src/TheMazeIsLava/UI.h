@@ -19,14 +19,14 @@ public:
 	const UIType Type;
 
 public:
-	UIElement(UIType type, Ref<UIElement> parent = nullptr)
-		: Type(type), m_Parent(parent.get()) { }
+	UIElement(UIType type, Ref<UIElement> parent = nullptr, uint32_t width = 0, uint32_t height = 0, float x = 0, float y = 0)
+		: Type(type), m_Parent(parent.get()), m_Width(width), m_Height(height), x(x), y(y) { }
 	virtual ~UIElement() = default;
 
 	void Render() {
 		Draw();
-		for(auto& node : m_Children)
-			node->Render();
+		for(auto& child : m_Children)
+			child->Render();
 	}
 
 	Ref<UIElement> Add(Ref<UIElement> element) {
@@ -44,10 +44,15 @@ public:
 		return element; // To enable chaining
 	};
 
-	template<typename TElement, typename ...Args>
-	Ref<TElement> Add(Args&&... args) {
-		return Add(CreateRef<TElement>(std::forward(args)...));
-	}
+	// template<typename TElement, typename ...Args>
+	// requires std::derived_from<TElement, UIElement>
+	// Ref<TElement> Add(Args&&... args) {
+	// 	Ref<TElement> element{ new TElement(std::forward<Args>(args)...) };
+	// 	return Add(element);
+	// }
+
+	uint32_t GetWidth() const { return m_Width; }
+	uint32_t GetHeight() const { return m_Height; }
 
 protected:
 	virtual void Draw() = 0; // Render itself
@@ -79,7 +84,7 @@ class UIWindow : public UIElement {
 public:
 	UIWindow(uint32_t width, uint32_t height, const glm::vec4& bgColor,
 		const glm::vec4 borderColor, const uint32_t borderWidth, const uint32_t borderHeight)
-		: UIElement(UIType::Window), m_Width(width), m_Height(height), m_BackgroundColor(bgColor),
+		: UIElement(UIType::Window, nullptr, width, height), m_BackgroundColor(bgColor),
 		m_BorderColor(borderColor), m_BorderWidth(borderWidth), m_BorderHeight(borderHeight) { }
 
 private:
@@ -101,8 +106,8 @@ public:
 
 private:
 	void Draw() override;
-	bool OnAttach() override;
-	bool OnAddElement(Ref<UIElement> element) override;
+	bool OnAttach() override { return true; }
+	bool OnAddElement(Ref<UIElement> element) override { return true; }
 
 private:
 	std::string m_Text;
@@ -112,26 +117,22 @@ private:
 
 class UIButton : public UIElement {
 public:
-	std::function<void(void)> OnPressed;
-	std::function<void(void)> OnReleased;
+	std::function<void(void)> OnPressed = [](){};
+	std::function<void(void)> OnReleased = [](){};
 
 public:
-	UIButton(Ref<UIText> uiText = nullptr) {
-		if(uiText != nullptr)
-			m_Text = Add(uiText);
-	}
-	UIButton(const glm::vec4& color, const std::string& text = "",
-			const glm::vec4& textColor = glm::vec4(1.0f))
+	UIButton(uint32_t width, uint32_t height, const glm::vec4& color, Ref<UIText> uiText = nullptr);
+	UIButton(uint32_t width, uint32_t height, glm::vec4& color, const std::string& text = "",
+		const glm::vec4& textColor = glm::vec4(1.0f))
+		: UIElement(UIType::Button, nullptr, width, height)
 	{
-		if(text != "") SetText(text);
+		UIButton(width, height, color, CreateRef<UIText>(text, textColor));
 	}
-
-	void SetText(const std::string& text) { m_Text = Add<UIText>(text, textColor); }
 
 private:
 	void Draw() override;
 	bool OnAttach() override { return true; }
-	bool OnAddElement(Ref<UIElement> element) override { return false; }
+	bool OnAddElement(Ref<UIElement> element) override;
 
 private:
 	bool m_Pressed = false, m_Released = false;

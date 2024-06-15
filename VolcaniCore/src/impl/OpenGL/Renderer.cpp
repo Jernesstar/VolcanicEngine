@@ -4,6 +4,7 @@
 
 #include "Core/Assert.h"
 #include "Events/EventSystem.h"
+#include "Renderer/OrthographicCamera.h"
 
 #include "Model.h"
 #include "Cubemap.h"
@@ -32,7 +33,7 @@ Renderer::Renderer()
 }
 
 struct QuadVertex {
-	glm::vec3 Position;
+	glm::vec4 Position;
 	glm::vec4 Color;
 	glm::vec2 TextureCoordinate;
 	int32_t TextureIndex;
@@ -48,12 +49,24 @@ struct RendererData {
 
 	QuadVertex* QuadVertexBufferBase;
 	QuadVertex* QuadVertexBufferPtr;
+	IndexBuffer* QuadIndexBuffer;
 	VertexBuffer* QuadVertexBuffer;
-	Ptr<VertexArray> QuadVertexArray;
+	Ref<VertexArray> QuadVertexArray;
+	uint32_t QuadIndexCount = 0;
 
 	void* TextureSlots[MaxTextureSlots];
 	uint32_t TextureSlotIndex = 0;
 	uint32_t TextSlotIndex = 0;
+
+	Ref<OrthographicCamera> Camera2D;
+
+	glm::vec4 VertexPositions[4] =
+	{
+		{ -0.5f, -0.5f, 0.0f, 1.0f }, // Bottom left,  0
+		{  0.5f, -0.5f, 0.0f, 1.0f }, // Bottom right, 1
+		{  0.5f,  0.5f, 0.0f, 1.0f }, // Top right,    2
+		{ -0.5f,  0.5f, 0.0f, 1.0f }, // Top left,     3
+	};
 
 	glm::vec2 TextureCoordinates[4] =
 	{
@@ -70,7 +83,11 @@ struct RendererData {
 		{ 1.0f, 0.0f }, // Top right,    2
 		{ 0.0f, 0.0f }, // Top left,     3
 	};
-	Ref<FrameBuffer> FrameBuffer2D;
+
+	Ref<VolcaniCore::FrameBuffer> FrameBuffer2D;
+	Ref<ShaderPipeline> CubeShader;
+	Ref<ShaderPipeline> FrameBufferShader;
+	Ref<ShaderPipeline> QuadShader;
 	
 	Ptr<VertexArray> CubemapArray;
 	Ptr<VertexArray> CubeArray;
@@ -94,10 +111,10 @@ void Renderer::Init() {
 	glFrontFace(GL_CCW);
 	glCullFace(GL_BACK);
 
-	s_Data.QuadVertexBufferBase = new QuadVertex[Renderer2DData::MaxVertices];
-	uint32_t* indices = new uint32_t[Renderer2DData::MaxIndices];
+	s_Data.QuadVertexBufferBase = new QuadVertex[RendererData::MaxVertices];
+	uint32_t* indices = new uint32_t[RendererData::MaxIndices];
 
-	for(uint32_t i = 0; i < Renderer2DData::MaxQuads; i++)
+	for(uint32_t i = 0; i < RendererData::MaxQuads; i++)
 	{
 		indices[6*i + 0] = 4*i + 0;
 		indices[6*i + 1] = 4*i + 1;
@@ -110,17 +127,17 @@ void Renderer::Init() {
 
 	BufferLayout layout =
 	{
-		{ "Position",          BufferDataType::Vec3 },
-		{ "Color",             BufferDataType::Vec4 },
-		{ "TextureCoordinate", BufferDataType::Vec2 },
-		{ "TextureIndex",      BufferDataType::Int },
+		{ "Position",			BufferDataType::Vec4 },
+		{ "Color",				BufferDataType::Vec4 },
+		{ "TextureCoordinate",	BufferDataType::Vec2 },
+		{ "TextureIndex",		BufferDataType::Int },
 	};
 
-	s_Data.QuadIndexBuffer = new IndexBuffer(indices, Renderer2DData::MaxIndices);
+	s_Data.QuadIndexBuffer = new IndexBuffer(indices, RendererData::MaxIndices);
 	delete[] indices;
 
-	s_Data.QuadVertexBuffer = new VertexBuffer(Renderer2DData::MaxVertices, layout);
-	s_Data.QuadVertexArray = CreatePtr<VertexArray>(s_Data.QuadVertexBuffer, s_Data.QuadIndexBuffer);
+	s_Data.QuadVertexBuffer = new VertexBuffer(RendererData::MaxVertices, layout);
+	s_Data.QuadVertexArray = CreateRef<VertexArray>(s_Data.QuadVertexBuffer, s_Data.QuadIndexBuffer);
 
 	float cubemapVertices[] =
 	{
@@ -254,12 +271,18 @@ void Renderer::Init() {
 		{ "VolcaniCore/assets/shaders/FrameBuffer.glsl.vert", ShaderType::Vertex },
 		{ "VolcaniCore/assets/shaders/FrameBuffer.glsl.frag", ShaderType::Fragment }
 	});
+	s_Data.QuadShader = ShaderPipeline::Create({
+		{ "VolcaniCore/assets/shaders/Quad.glsl.vert", ShaderType::Vertex },
+		{ "VolcaniCore/assets/shaders/Quad.glsl.frag", ShaderType::Fragment }
+	});
 	s_Data.CubeShader->Bind();
 	s_Data.CubeShader->SetMat4("u_Model", glm::mat4{ 1.0f });
 	s_Data.FrameBufferShader->Bind();
 	s_Data.FrameBufferShader->SetInt("u_ScreenTexture", 0);
 
 	s_Data.FrameBuffer2D = FrameBuffer::Create(800, 600);
+	s_Data.Camera2D = CreateRef<OrthographicCamera>(800.0f, 600.0f, 0.1f, 100.0f);
+	s_Data.Camera2D->SetPosition({ 0.0f, 0.0f, 10.0f });
 }
 
 void Renderer::Close() { }
@@ -281,28 +304,29 @@ void Renderer::Begin(Ref<Camera> camera) {
 	s_Data.CubeShader->SetVec3("u_CameraPosition", camera->GetPosition());
 	s_Data.CubeShader->SetMat4("u_ViewProj", camera->GetViewProjection());
 	s_Data.ViewProjection = camera->GetViewProjection();
+
+	s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
+	s_Data.QuadIndexCount = 0;
+	s_Data.TextureSlotIndex = 0;
+	s_Data.TextSlotIndex = s_Data.MaxTextureSlots - 1;
 }
 
 void Renderer::Flush() {
-	s_Data.FrameBuffer2D->Bind();
+	if(std::size_t dataCount = s_Data.QuadVertexBufferPtr - s_Data.QuadVertexBufferBase)
 	{
-		std::size_t data_count = s_Data.QuadVertexBufferPtr - s_Data.QuadVertexBufferBase;
-		s_Data.QuadVertexBuffer->SetData(s_Data.QuadVertexBufferBase, data_count);
+		s_Data.QuadVertexBuffer->SetData(s_Data.QuadVertexBufferBase, dataCount);
 
 		for(uint32_t i = 0; i < s_Data.TextureSlotIndex; i++)
 			((Texture2D*)s_Data.TextureSlots[i])->Bind(i);
 
 		s_Data.QuadShader->Bind();
-		s_Data.QuadShader->SetMat4("u_ViewProjMatrix", s_Data.ViewProjection);
+		s_Data.QuadShader->SetMat4("u_ViewProjMatrix", s_Data.Camera2D->GetViewProjection());
 
 		Renderer::DrawIndexed(s_Data.QuadVertexArray, s_Data.QuadIndexCount);
 	}
-	s_Data.FrameBuffer2D->Unbind();
-
-	RenderFrameBuffer(s_Data.FrameBuffer2D, s_Data.FrameBufferShader);
 }
 
-void Renderer::DrawCube(Ref<VolcaniCore::Texture> texture, Transform t) {
+void Renderer::Draw3DCube(Ref<VolcaniCore::Texture> texture, Transform t) {
 	s_Data.CubeShader->Bind();
 	s_Data.CubeShader->SetTexture("u_Texture", texture, 0);
 	s_Data.CubeShader->SetMat4("u_Model", t.GetTransform());
@@ -324,20 +348,22 @@ void Renderer::Draw3DModel(Ref<VolcaniCore::Model> model, Transform t) {
 }
 
 void Renderer::Draw2DQuad(const glm::vec4& color, Transform t) {
-	s_Data.QuadVertexBufferPtr->Position			= transform.GetTransform() * s_Data.VertexPositions[i];
-	s_Data.QuadVertexBufferPtr->Color				= color;
-	s_Data.QuadVertexBufferPtr->TextureCoordinate	= s_Data.TextureCoordinates[i];
-	s_Data.QuadVertexBufferPtr->TextureIndex		= -1;
-
-	s_Data.QuadVertexBufferPtr++;
+	for(uint32_t i = 0; i < 4; i++)
+	{
+		s_Data.QuadVertexBufferPtr->Position		  = t.GetTransform() * s_Data.VertexPositions[i];
+		s_Data.QuadVertexBufferPtr->Color			  = color;
+		s_Data.QuadVertexBufferPtr->TextureCoordinate = s_Data.TextureCoordinates[i];
+		s_Data.QuadVertexBufferPtr->TextureIndex	  = -1;
+		s_Data.QuadVertexBufferPtr++;
+	}
 	s_Data.QuadIndexCount += 6;
 }
 
 void Renderer::Draw2DQuad(Ref<Texture> texture, Transform t) {
 	uint32_t textureIndex = 0;
 	for(uint32_t i = 0; i < s_Data.TextureSlotIndex; i++) {
-		if(*(Texture2D*)s_Data.TextureSlots[i] == *texture) {
-			texture_index = i;
+		if(*(Texture2D*)s_Data.TextureSlots[i] == *texture->As<Texture2D>()) {
+			textureIndex = i;
 			break;
 		}
 	}
@@ -347,12 +373,15 @@ void Renderer::Draw2DQuad(Ref<Texture> texture, Transform t) {
 		s_Data.TextureSlots[s_Data.TextureSlotIndex++] = (void*)texture.get();
 	}
 
-	s_Data.QuadVertexBufferPtr->Position = transform * s_Data.VertexPositions[i];
-	s_Data.QuadVertexBufferPtr->Color = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
-	s_Data.QuadVertexBufferPtr->TextureCoordinate = s_Data.TextureCoordinates[i];
-	s_Data.QuadVertexBufferPtr->TextureIndex = (int32_t)textureIndex;
+	for(uint32_t i = 0; i < 4; i++)
+	{
+		s_Data.QuadVertexBufferPtr->Position		  = t.GetTransform() * s_Data.VertexPositions[i];
+		s_Data.QuadVertexBufferPtr->Color			  = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
+		s_Data.QuadVertexBufferPtr->TextureCoordinate = s_Data.TextureCoordinates[i];
+		s_Data.QuadVertexBufferPtr->TextureIndex 	  = (int32_t)textureIndex;
+		s_Data.QuadVertexBufferPtr++;
+	}
 
-	s_Data.QuadVertexBufferPtr++;
 	s_Data.QuadIndexCount += 6;
 }
 

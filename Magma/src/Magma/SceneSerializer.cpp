@@ -58,11 +58,11 @@ void SceneSerializer::Serialize(Ref<Scene> scene, const std::string& filepath) {
 	}
 	else if(scene->Camera->GetType() == CameraType::Ortho) {
 		auto c = scene->Camera->As<OrthographicCamera>();
-		out << YAML::Key << "Left"	 << YAML::Value << c->GetLeft();
-		out << YAML::Key << "Right"	 << YAML::Value << c->GetRight();
-		out << YAML::Key << "Bottom" << YAML::Value << c->GetBottom();
-		out << YAML::Key << "Top"	 << YAML::Value << c->GetTop();
-		out << YAML::Key << "Rotation" << YAML::Value << c->GetRotation();
+		out << YAML::Key << "Width"		<< YAML::Value << c->GetWidth();
+		out << YAML::Key << "Height"	<< YAML::Value << c->GetHeight();
+		out << YAML::Key << "Near"		<< YAML::Value << c->GetNear();
+		out << YAML::Key << "Far"		<< YAML::Value << c->GetFar();
+		out << YAML::Key << "Rotation"	<< YAML::Value << c->GetRotation();
 	}
 	out << YAML::EndMap; // Camera
 
@@ -110,13 +110,13 @@ Ref<Scene> SceneSerializer::Deserialize(const std::string& filepath) {
 		newScene->Camera = CreateRef<StereographicCamera>(fov, near, far, width, height, speed);
 	}
 	else if(camera["Type"].as<std::string>() == "Orthographic") {
-		auto left 	= camera["Left"].as<float>();
-		auto right 	= camera["Right"].as<float>();
-		auto bottom = camera["Bottom"].as<float>();
-		auto top 	= camera["Top"].as<float>();
+		auto width	= camera["Width"].as<float>();
+		auto height	= camera["Height"].as<float>();
+		auto near	= camera["Near"].as<float>();
+		auto far	= camera["Far"].as<float>();
 		auto ro		= camera["Rotation"].as<float>();
 
-		newScene->Camera = CreateRef<OrthographicCamera>(left, right, bottom, top, ro);
+		newScene->Camera = CreateRef<OrthographicCamera>(width, height, near, far, ro);
 	}
 
 	newScene->Camera->SetPositionDirection(camera["Position"].as<glm::vec3>(), camera["Direction"].as<glm::vec3>());

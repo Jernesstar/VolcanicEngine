@@ -43,7 +43,7 @@ void Level::PropagateLava() {
 }
 
 void Level::DrawStoneBlock() {
-	Application::GetRenderer()->As<OpenGL::Renderer>()->DrawCube(s_Stone, Transform{ });
+	Application::GetRenderer()->As<OpenGL::Renderer>()->Draw3DCube(s_Stone, Transform{ });
 }
 
 }

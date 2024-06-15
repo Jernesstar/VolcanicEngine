@@ -30,8 +30,7 @@ public:
 	void BindTexture() const;
 	void BindRenderbuffer() const;
 
-	// TODO: Implement
-	void Resize(uint32_t width, uint32_t height) { }
+	void Resize(uint32_t width, uint32_t height) override { }
 
 	uint32_t GetColorAttachmentID() { return m_TextureID; }
 

@@ -244,7 +244,7 @@ void Lighting::OnUpdate(TimeStep ts) {
 
 		for(uint32_t i = 0; i < 4; i++) {
 			lightShader->SetVec3("u_Position", pointlights[i].Position);
-			Application::GetRenderer()->As<OpenGL::Renderer>()->DrawIndexed(lightArray);
+			// Application::GetRenderer()->As<OpenGL::Renderer>()->DrawIndexed(lightArray);
 		}
 	}
 

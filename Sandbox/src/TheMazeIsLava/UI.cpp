@@ -1,6 +1,6 @@
 #include "UI.h"
 
-
+#include <Core/Log.h>
 #include <Renderer/Renderer.h>
 #include <Events/EventSystem.h>
 
@@ -29,35 +29,35 @@ namespace TheMazeIsLava {
 
 
 void UIWindow::Draw() {
-	Renderer::Render2DQuad(m_BackgroundColor, Transform{ .Scale = { m_Width, m_Height, 1.0f } });
-	Renderer::Render2DQuad(m_BorderColor, Transform{
-		.Translation = {  m_Height, 0.0f, 0.0f }, .Scale = { m_BorderWidth, m_BorderHeight, 1.0f }
+	Application::GetRenderer()->As<OpenGL::Renderer>()->Draw2DQuad(m_BackgroundColor, Transform{ .Scale = { m_Width, m_Height, 1.0f } });
+	Application::GetRenderer()->As<OpenGL::Renderer>()->Draw2DQuad(m_BorderColor, Transform{
+		.Translation = { (m_Width + m_BorderWidth)/2.0f, 0.0f, 0.0f }, .Scale = { m_BorderWidth, m_Height, 1.0f }
 	});
-	Renderer::Render2DQuad(m_BorderColor, Transform{
-		.Translation = { -m_Height, 0.0f, 0.0f }, .Scale = { m_BorderWidth, m_BorderHeight, 1.0f }
+	Application::GetRenderer()->As<OpenGL::Renderer>()->Draw2DQuad(m_BorderColor, Transform{
+		.Translation = { -float(m_Width + m_BorderWidth)/2.0f, 0.0f, 0.0f }, .Scale = { m_BorderWidth, m_Height, 1.0f }
 	});
-	Renderer::Render2DQuad(m_BorderColor, Transform{
-		.Translation = {  m_Width, 0.0f, 0.0f }, .Scale = { m_BorderWidth, m_BorderHeight, 1.0f }
+	Application::GetRenderer()->As<OpenGL::Renderer>()->Draw2DQuad(m_BorderColor, Transform{
+		.Translation = { 0.0f, (m_Height + m_BorderHeight)/2.0f, 0.0f }, .Scale = { m_Width, m_BorderHeight, 1.0f }
 	});
-	Renderer::Render2DQuad(m_BorderColor, Transform{
-		.Translation = { -m_Width, 0.0f, 0.0f }, .Scale = { m_BorderWidth, m_BorderHeight, 1.0f }
+	Application::GetRenderer()->As<OpenGL::Renderer>()->Draw2DQuad(m_BorderColor, Transform{
+		.Translation = { 0.0f, -float(m_Height + m_BorderHeight)/2.0f, 0.0f }, .Scale = { m_Width, m_BorderHeight, 1.0f }
 	});
 }
 
 
-UIText::UIText()
+UIText::UIText(const std::string& text, const glm::vec4& textColor)
 	: UIElement(UIType::Text)
 {
 
 }
 
 void UIText::Draw() {
-	Renderer::Draw2DText(m_Text);
+	// Application::GetRenderer()->As<OpenGL::Renderer>()->Draw2DText(m_Text);
 }
 
 
-UIButton::UIButton(const glm::vec4& color, const std::string& text, const glm::vec4& textColor)
-	: UIElement(UIType::Button), m_Color(color), m_Text(text), m_TextColor(textColor)
+UIButton::UIButton(uint32_t width, uint32_t height, const glm::vec4& color, Ref<UIText> uiText)
+	: UIElement(UIType::Button, nullptr, width, height), m_Color(color)
 {
 	EventSystem::RegisterListener<MouseButtonPressedEvent>(
 	[&](MouseButtonPressedEvent& event) {
@@ -83,20 +83,19 @@ UIButton::UIButton(const glm::vec4& color, const std::string& text, const glm::v
 	[&](const ApplicationUpdatedEvent& event) {
 		m_Released = false;
 	});
+
+	if(uiText != nullptr)
+		Add(m_Text = uiText);
 }
 
 void UIButton::Draw() {
-	Renderer::Render2DQuad(m_BorderColor, Transform{ 
-		.Translation = {  x, 0.0f, 0.0f }, .Scale = { m_BorderWidth, m_BorderHeight, 1.0f }
+	Application::GetRenderer()->As<OpenGL::Renderer>()->Draw2DQuad(m_Color, Transform{ 
+		.Translation = {  x, 0.0f, 0.0f }, .Scale = { m_Width, m_Height, 1.0f }
 	});
 }
 
-bool UIButton::OnAttach() {
-	return true;
-}
-
 bool UIButton::OnAddElement(Ref<UIElement> element) {
-	if(element.Type == UIType::Text)
+	if(element->Type == UIType::Text)
 		return true;
 	return false;
 }
@@ -124,11 +123,13 @@ void UIDropDown::Draw() {
 }
 
 bool UIDropDown::OnAttach() {
-
+	return true;
 }
 
 bool UIDropDown::OnAddElement(Ref<UIElement> element) {
-	m_Height += element->m_Height;
+	m_Height += element->GetHeight();
+
+	return true;
 }
 
 

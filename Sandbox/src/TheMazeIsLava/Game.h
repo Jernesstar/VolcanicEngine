@@ -42,9 +42,10 @@ private:
 	bool m_ReturnPressed = false;
 	bool m_GameOver = false;
 	uint32_t m_CurrentLevel = 0;
-	Screen m_CurrentScreen;
+	std::function<void(void)> m_CurrentScreen;
 
 	inline static Ref<UIElement> s_NoUI;
+	inline static Ref<UIElement> s_HomeScreenUI;
 	inline static Ref<UIElement> s_LevelSelectUI;
 	inline static Ref<UIElement> s_PauseUI;
 	inline static Ref<UIElement> s_OverUI;

@@ -25,8 +25,7 @@ public:
 	void OnUpdate(TimeStep ts);
 
 private:
-	// Ref<StereographicCamera> camera = CreateRef<StereographicCamera>(75.0f, 0.01f, 100.0f, 800, 600);
-	Ref<OrthographicCamera> camera = CreateRef<OrthographicCamera>(0, 800, 0, 600);
+	Ref<StereographicCamera> camera = CreateRef<StereographicCamera>(75.0f, 0.01f, 100.0f, 800, 600);
 	CameraController controller{ *camera.get() };
 
 	Ref<FrameBuffer> frameBuffer = FrameBuffer::Create(800, 600);
@@ -48,19 +47,23 @@ Cube::Cube() {
 		camera->Resize(event.Width, event.Height);
 	});
 
-	camera->SetPosition({ 0.0f, 0.0f, 3.0f });
+	camera->SetPosition({ 0.0f, 0.0f, 4.0f });
 }
 
 void Cube::OnUpdate(TimeStep ts) {
 	controller.OnUpdate(ts);
+	Renderer::Clear({ 1.0f, 1.0f, 1.0f, 1.0f });
 
-	Renderer::RenderToFrameBuffer(frameBuffer, [&]() {
+	frameBuffer->Bind();
+	{
 		Renderer::Clear();
 		Application::GetRenderer()->As<OpenGL::Renderer>()->Begin(camera);
-		Application::GetRenderer()->As<OpenGL::Renderer>()->DrawCube(stone, Transform{ });
-	});
-
+		Application::GetRenderer()->As<OpenGL::Renderer>()->Draw3DCube(stone);
+	}
+	frameBuffer->Unbind();
 	Application::GetRenderer()->As<OpenGL::Renderer>()->RenderFrameBuffer(frameBuffer, pixelate);
+
+	Application::GetRenderer()->As<OpenGL::Renderer>()->Draw2DQuad({ 0.3125f, 0.234375f, 0.078125f, 1.0f });
 }
 
 }

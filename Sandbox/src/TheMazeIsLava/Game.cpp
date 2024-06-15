@@ -17,7 +17,11 @@ using namespace VolcaniCore;
 namespace TheMazeIsLava {
 
 void Game::Init() {
-	s_NoUI			= CreateRef<UIEmpty>();
+	s_NoUI = CreateRef<UIEmpty>();
+	s_HomeScreenUI = CreateRef<UIWindow>(600, 400,
+		glm::vec4{ 0.859375f, 0.76171875f, 0.5859375f, 1.0f },
+		glm::vec4{ 0.3125f, 0.234375f, 0.078125f, 1.0f }, 10, 20
+	);
 	s_LevelSelectUI = CreateRef<UIWindow>(600, 400,
 		glm::vec4{ 0.859375f, 0.76171875f, 0.5859375f, 1.0f },
 		glm::vec4{ 0.3125f, 0.234375f, 0.078125f, 1.0f }, 10, 20
@@ -30,6 +34,8 @@ void Game::Init() {
 		glm::vec4{ 0.859375f, 0.76171875f, 0.5859375f, 1.0f },
 		glm::vec4{ 0.3125f, 0.234375f, 0.078125f, 1.0f }, 10, 20
 	);
+
+	s_HomeScreenUI->Add(CreateRef<UIButton>(700, 50, glm::vec4{ 0.3125f, 0.234375f, 0.078125f, 1.0f }));
 
 	Level::Init();
 }
@@ -46,11 +52,8 @@ Game::Game() {
 	Reset();
 	Load();
 
-	m_Camera = CreateRef<StereographicCamera>(75.0f, 0.01f, 100.0f, 800, 600);
-	m_Camera->SetPosition({ 0.0f, 0.0f, 3.0f });
-
 	VOLCANICORE_LOG_INFO("Going to Start Screen");
-	m_CurrentUI = s_NoUI;
+	m_CurrentUI = s_HomeScreenUI;
 	m_CurrentScreen = std::bind(&Game::StartScreen, this);
 }
 
@@ -66,8 +69,6 @@ void Game::OnUpdate(TimeStep ts) {
 
 	m_CurrentScreen();
 	m_CurrentUI->Render();
-
-	Application::GetRenderer()->As<OpenGL::Renderer>()->End();
 }
 
 void Game::StartScreen() {
@@ -159,6 +160,9 @@ void Game::Load() {
 }
 
 void Game::Reset() {
+	m_Camera = CreateRef<StereographicCamera>(75.0f, 0.01f, 100.0f, 800, 600);
+	m_Camera->SetPosition({ 0.0f, 0.0f, 3.0f });
+
 	m_Levels.push_back(Level{
 	{
 		{ 0, 0, 0, 0, 0, 0, 0, 0, 3, 0 },

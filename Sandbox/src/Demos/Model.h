@@ -125,7 +125,7 @@ void Model::OnUpdate(TimeStep ts)
 
 	light_shader->As<OpenGL::ShaderProgram>()->Bind();
 	light_shader->SetMat4("u_ViewProj", m_Camera.GetViewProjection());
-	Application::GetRenderer()->As<OpenGL::Renderer>()->DrawIndexed(light_array);
+	// Application::GetRenderer()->As<OpenGL::Renderer>()->DrawIndexed(light_array);
 
 	model_shader->As<OpenGL::ShaderProgram>()->Bind();
 	model_shader->SetMat4("u_ViewProj", m_Camera.GetViewProjection());
