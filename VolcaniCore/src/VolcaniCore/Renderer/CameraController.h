@@ -44,15 +44,15 @@ public:
 	const MovementControls Controls;
 
 public:
-	CameraController(Camera& camera, MovementControls controls = { })
-		: m_Camera(&camera), Controls(controls) { }
+	CameraController(Ref<Camera> camera, const MovementControls& controls = { })
+		: m_Camera(camera), Controls(controls) { }
 
 	void OnUpdate(TimeStep ts);
 	void OnResize(uint32_t width, uint32_t height);
 
 private:
 	glm::vec2 m_LastMousePosition = { 0.0f, 0.0f };
-	Camera* m_Camera; // TODO: Change to Ref
+	Ref<Camera> m_Camera;
 };
 
 }

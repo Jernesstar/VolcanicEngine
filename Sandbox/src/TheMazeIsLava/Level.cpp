@@ -19,7 +19,9 @@ Level::Level(std::vector<std::vector<uint32_t>> map, const std::function<float(f
 	for(uint32_t y = 0; y < m_Height; y++) {
 		for(uint32_t x = 0; x < m_Width; x++) {
 			if(map[y][x] == 3)
-				m_Goal = { x, y };
+				m_Goal = { x, m_Height - y };
+			if(map[y][x] == 2)
+				
 		}
 	}
 }
@@ -36,6 +38,12 @@ void Level::Render(TimeStep ts) {
 	DrawStoneBlock();
 }
 
+static void TraverseTilemap(const std::function<void((uint32_t x, uint32_t y))>& func) {
+	for(uint32_t i = 0; i < m_Height; i++)
+		for(uint32_t j = 0; j < m_Width; j++)
+			func(j, i);
+}
+
 void Level::PropagateLava() {
 	uint32_t lavaSpeed = LavaSpeed(m_TimeSinceLevelStart);
 
@@ -43,7 +51,10 @@ void Level::PropagateLava() {
 }
 
 void Level::DrawStoneBlock() {
-	Application::GetRenderer()->As<OpenGL::Renderer>()->Draw3DCube(s_Stone, Transform{ });
+	TraverseTilemap(
+	[](uint32_t x, uint32_t y){
+		Application::GetRenderer()->As<OpenGL::Renderer>()->Draw3DCube(s_Stone, Transform{ .Translation = glm::vec3{ x, 0.0f, y } });
+	});
 }
 
 }

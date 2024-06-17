@@ -18,8 +18,6 @@ public:
 
 	void OnUpdate(TimeStep ts) override;
 
-	static void Init();
-
 private:
 	void Reset();
 
@@ -31,6 +29,9 @@ private:
 
 	void Save();
 	void Load();
+
+	void LoadUI();
+	void LoadLevels();
 
 private:
 	Ref<UIElement> m_CurrentUI;
@@ -44,11 +45,11 @@ private:
 	uint32_t m_CurrentLevel = 0;
 	std::function<void(void)> m_CurrentScreen;
 
-	inline static Ref<UIElement> s_NoUI;
-	inline static Ref<UIElement> s_HomeScreenUI;
-	inline static Ref<UIElement> s_LevelSelectUI;
-	inline static Ref<UIElement> s_PauseUI;
-	inline static Ref<UIElement> s_OverUI;
+	inline static Ref<UIElement> m_NoUI;
+	inline static Ref<UIElement> m_HomeScreenUI;
+	inline static Ref<UIElement> m_LevelSelectUI;
+	inline static Ref<UIElement> m_PauseUI;
+	inline static Ref<UIElement> m_OverUI;
 };
 
 

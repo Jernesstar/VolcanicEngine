@@ -16,29 +16,6 @@ using namespace VolcaniCore;
 
 namespace TheMazeIsLava {
 
-void Game::Init() {
-	s_NoUI = CreateRef<UIEmpty>();
-	s_HomeScreenUI = CreateRef<UIWindow>(600, 400,
-		glm::vec4{ 0.859375f, 0.76171875f, 0.5859375f, 1.0f },
-		glm::vec4{ 0.3125f, 0.234375f, 0.078125f, 1.0f }, 10, 20
-	);
-	s_LevelSelectUI = CreateRef<UIWindow>(600, 400,
-		glm::vec4{ 0.859375f, 0.76171875f, 0.5859375f, 1.0f },
-		glm::vec4{ 0.3125f, 0.234375f, 0.078125f, 1.0f }, 10, 20
-	);
-	s_PauseUI = CreateRef<UIWindow>(600, 400,
-		glm::vec4{ 0.859375f, 0.76171875f, 0.5859375f, 1.0f },
-		glm::vec4{ 0.3125f, 0.234375f, 0.078125f, 1.0f }, 10, 20
-	);
-	s_OverUI = CreateRef<UIWindow>(600, 400,
-		glm::vec4{ 0.859375f, 0.76171875f, 0.5859375f, 1.0f },
-		glm::vec4{ 0.3125f, 0.234375f, 0.078125f, 1.0f }, 10, 20
-	);
-
-	s_HomeScreenUI->Add(CreateRef<UIButton>(700, 50, glm::vec4{ 0.3125f, 0.234375f, 0.078125f, 1.0f }));
-
-	Level::Init();
-}
 
 Game::Game() {
 	EventSystem::RegisterListener<KeyPressedEvent>(
@@ -49,12 +26,18 @@ Game::Game() {
 			m_ReturnPressed = true;
 	});
 
-	Reset();
+	m_Camera = CreateRef<StereographicCamera>(75.0f, 0.01f, 100.0f, 800, 600);
+	m_Camera->SetPositionDirection({ 0.0f, 0.0f, 3.0f }, { -1.0f, 0.0f, -1.0f });
+
+	Level::Init();
+
+	LoadLevels();
+	LoadUI();
 	Load();
 
-	VOLCANICORE_LOG_INFO("Going to Start Screen");
-	m_CurrentUI = s_HomeScreenUI;
+	m_CurrentUI = m_HomeScreenUI;
 	m_CurrentScreen = std::bind(&Game::StartScreen, this);
+	VOLCANICORE_LOG_INFO("Going to Start Screen");
 }
 
 Game::~Game() {
@@ -76,9 +59,9 @@ void Game::StartScreen() {
 
 	if(m_ReturnPressed) {
 		m_ReturnPressed = false;
-		VOLCANICORE_LOG_INFO("Going to Level Screen");
-		m_CurrentUI = s_LevelSelectUI;
+		m_CurrentUI = m_LevelSelectUI;
 		m_CurrentScreen = std::bind(&Game::LevelScreen, this);
+		VOLCANICORE_LOG_INFO("Going to Level Screen");
 		return;
 	}
 }
@@ -87,11 +70,11 @@ void Game::LevelScreen() {
 	// Staircase like level selection
 
 	if(m_ReturnPressed) {
-		VOLCANICORE_LOG_INFO("Going to Play Screen");
 		m_ReturnPressed = false;
 		m_CurrentLevel = 1;
-		m_CurrentUI = s_NoUI;
+		m_CurrentUI = m_NoUI;
 		m_CurrentScreen = std::bind(&Game::PlayScreen, this);
+		VOLCANICORE_LOG_INFO("Going to Play Screen");
 		return;
 	}
 }
@@ -102,36 +85,36 @@ void Game::PlayScreen() {
 	m_Levels[m_CurrentLevel - 1].Render(m_TimeStep);
 
 	if(m_GameOver) {
-		VOLCANICORE_LOG_INFO("Going to Over Screen");
-		m_CurrentUI = s_OverUI;
+		m_CurrentUI = m_OverUI;
 		m_CurrentScreen = std::bind(&Game::OverScreen, this);
+		VOLCANICORE_LOG_INFO("Going to Over Screen");
 		return;
 	}
 	if(m_ReturnPressed) {
-		VOLCANICORE_LOG_INFO("Going to Pause Screen");
 		m_ReturnPressed = false;
-		m_CurrentUI = s_PauseUI;
+		m_CurrentUI = m_PauseUI;
 		m_CurrentScreen = std::bind(&Game::PauseScreen, this);
+		VOLCANICORE_LOG_INFO("Going to Pause Screen");
 		return;
 	}
 }
 
 void Game::PauseScreen() {
 	if(m_ReturnPressed) {
-		VOLCANICORE_LOG_INFO("Exiting Pause Screen; Going to Play Screen");
 		m_ReturnPressed = false;
-		m_CurrentUI = s_NoUI;
+		m_CurrentUI = m_NoUI;
 		m_CurrentScreen = std::bind(&Game::PlayScreen, this);
+		VOLCANICORE_LOG_INFO("Exiting Pause Screen; Going to Play Screen");
 		return;
 	}
 }
 
 void Game::OverScreen() {
 	if(m_ReturnPressed) {
-		VOLCANICORE_LOG_INFO("Exiting Over Screen; Going to Play Screen");
 		m_ReturnPressed = false;
-		m_CurrentUI = s_NoUI;
+		m_CurrentUI = m_NoUI;
 		m_CurrentScreen = std::bind(&Game::PlayScreen, this);
+		VOLCANICORE_LOG_INFO("Exiting Over Screen; Going to Play Screen");
 		return;
 	}
 }
@@ -159,10 +142,29 @@ void Game::Load() {
 	m_CurrentLevel = file["Current Level"].as<uint32_t>();
 }
 
-void Game::Reset() {
-	m_Camera = CreateRef<StereographicCamera>(75.0f, 0.01f, 100.0f, 800, 600);
-	m_Camera->SetPosition({ 0.0f, 0.0f, 3.0f });
+void Game::LoadUI() {
+	m_NoUI = CreateRef<UIEmpty>();
+	m_HomeScreenUI = CreateRef<UIWindow>(600, 400,
+		glm::vec4{ 0.859375f, 0.76171875f, 0.5859375f, 1.0f },
+		glm::vec4{ 0.3125f, 0.234375f, 0.078125f, 1.0f }, 10, 20
+	);
+	m_LevelSelectUI = CreateRef<UIWindow>(600, 400,
+		glm::vec4{ 0.859375f, 0.76171875f, 0.5859375f, 1.0f },
+		glm::vec4{ 0.3125f, 0.234375f, 0.078125f, 1.0f }, 10, 20
+	);
+	m_PauseUI = CreateRef<UIWindow>(600, 400,
+		glm::vec4{ 0.859375f, 0.76171875f, 0.5859375f, 1.0f },
+		glm::vec4{ 0.3125f, 0.234375f, 0.078125f, 1.0f }, 10, 20
+	);
+	m_OverUI = CreateRef<UIWindow>(600, 400,
+		glm::vec4{ 0.859375f, 0.76171875f, 0.5859375f, 1.0f },
+		glm::vec4{ 0.3125f, 0.234375f, 0.078125f, 1.0f }, 10, 20
+	);
 
+	m_HomeScreenUI->Add(CreateRef<UIButton>(700, 50, glm::vec4{ 0.3125f, 0.234375f, 0.078125f, 1.0f }));
+}
+
+void Game::LoadLevels() {
 	m_Levels.push_back(Level{
 	{
 		{ 0, 0, 0, 0, 0, 0, 0, 0, 3, 0 },
@@ -203,5 +205,6 @@ void Game::Reset() {
 		{ 0, 0, 0, 0, 0, 2, 0, 0, 0, 0 },
 	}, [](float t) { return 5.85f; } });
 }
+
 
 }
