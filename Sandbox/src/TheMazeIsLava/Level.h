@@ -31,6 +31,7 @@ public:
 private:
 	void PropagateLava();
 	void DrawStoneBlock();
+	void TraverseTilemap(const std::function<void((uint32_t x, uint32_t y))>& func);
 
 	TimeStep m_TimeStep;
 	float m_TimeSinceLevelStart;

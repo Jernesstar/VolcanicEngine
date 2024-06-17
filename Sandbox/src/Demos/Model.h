@@ -82,8 +82,8 @@ private:
 	glm::vec3 light_pos = { 1.2f, 1.0f, 2.0f }, light_color = { 1.0f, 1.0f, 1.0f };
 	glm::mat4 light_model{ 1.0f };
 
-	StereographicCamera m_Camera{ 90.0f, 0.1f, 100.0f, 1600, 900 };
-	CameraController m_Controller{ m_Camera };
+	// StereographicCamera m_Camera{ 90.0f, 0.1f, 100.0f, 1600, 900 };
+	// CameraController m_Controller{ m_Camera };
 
 	Ref<VolcaniCore::Model> m_Model;
 };
@@ -95,15 +95,15 @@ Model::Model()
 		if(event.Key == Key::Escape)
 			Application::Close();
 	});
-	EventSystem::RegisterListener<WindowResizedEvent>(
-	[this](const WindowResizedEvent& event) {
-		this->m_Camera.Resize(event.Width, event.Height);
-	});
+	// EventSystem::RegisterListener<WindowResizedEvent>(
+	// [this](const WindowResizedEvent& event) {
+	// 	this->m_Camera.Resize(event.Width, event.Height);
+	// });
+
+	// m_Camera.SetPosition({ 0.0f, 0.0f, 5.0f });
 
 	light_model = glm::translate(light_model, light_pos);
 	light_model = glm::scale(light_model, glm::vec3(0.2f));
-
-	m_Camera.SetPosition({ 0.0f, 0.0f, 5.0f });
 
 	model_shader->As<OpenGL::ShaderProgram>()->Bind();
 	model_shader->SetMat4("u_Model", glm::mat4(1.0f));
@@ -119,18 +119,18 @@ Model::Model()
 
 void Model::OnUpdate(TimeStep ts)
 {
-	Renderer::Clear();
+	// Renderer::Clear();
 
-	m_Controller.OnUpdate(ts);
+	// m_Controller.OnUpdate(ts);
 
-	light_shader->As<OpenGL::ShaderProgram>()->Bind();
-	light_shader->SetMat4("u_ViewProj", m_Camera.GetViewProjection());
+	// light_shader->As<OpenGL::ShaderProgram>()->Bind();
+	// light_shader->SetMat4("u_ViewProj", m_Camera.GetViewProjection());
 	// Application::GetRenderer()->As<OpenGL::Renderer>()->DrawIndexed(light_array);
 
-	model_shader->As<OpenGL::ShaderProgram>()->Bind();
-	model_shader->SetMat4("u_ViewProj", m_Camera.GetViewProjection());
-	model_shader->SetVec3("u_CameraPosition", m_Camera.GetPosition());
-	Renderer::RenderModel(m_Model);
+	// model_shader->As<OpenGL::ShaderProgram>()->Bind();
+	// model_shader->SetMat4("u_ViewProj", m_Camera.GetViewProjection());
+	// model_shader->SetVec3("u_CameraPosition", m_Camera.GetPosition());
+	// Renderer::RenderModel(m_Model);
 }
 
 }

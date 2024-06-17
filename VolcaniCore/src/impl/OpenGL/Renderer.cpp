@@ -94,6 +94,7 @@ struct RendererData {
 	Ptr<VertexArray> FrameBufferArray;
 
 	glm::mat4 ViewProjection;
+	uint32_t Depth;
 };
 
 static RendererData s_Data;
@@ -282,7 +283,7 @@ void Renderer::Init() {
 
 	s_Data.FrameBuffer2D = FrameBuffer::Create(800, 600);
 	s_Data.Camera2D = CreateRef<OrthographicCamera>(800.0f, 600.0f, 0.1f, 100.0f);
-	s_Data.Camera2D->SetPosition({ 0.0f, 0.0f, 10.0f });
+	s_Data.Camera2D->SetPosition({ 0.0f, 0.0f, 1.0f });
 }
 
 void Renderer::Close() { }
@@ -337,9 +338,11 @@ void Renderer::Draw3DCube(Ref<VolcaniCore::Texture> texture, Transform t) {
 
 void Renderer::DrawCubemap(Ref<VolcaniCore::Cubemap> cubemap) {
 	glDepthMask(GL_FALSE);
+
 	s_Data.CubemapArray->Bind();
 	cubemap->As<OpenGL::Cubemap>()->Bind();
 	glDrawArrays(GL_TRIANGLES, 0, 36);
+
 	glDepthMask(GL_TRUE);
 }
 
@@ -355,6 +358,7 @@ void Renderer::Draw2DQuad(const glm::vec4& color, Transform t) {
 		s_Data.QuadVertexBufferPtr->TextureCoordinate = s_Data.TextureCoordinates[i];
 		s_Data.QuadVertexBufferPtr->TextureIndex	  = -1;
 		s_Data.QuadVertexBufferPtr++;
+		s_Data.QuadVertexBufferPtr->Position.z += 1.0f;
 	}
 	s_Data.QuadIndexCount += 6;
 }

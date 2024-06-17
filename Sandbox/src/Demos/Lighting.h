@@ -169,7 +169,7 @@ private:
 	Ref<Texture> wood = Texture::Create("Sandbox/assets/images/wood.png");
 	Ref<Texture> wood_specular = Texture::Create("Sandbox/assets/images/wood_specular.png");
 
-	StereographicCamera camera{ 75.0f, 0.01f, 100.0f, 1600, 900 };
+	Ref<StereographicCamera> camera = CreateRef<StereographicCamera>(75.0f, 0.01f, 100.0f, 1600, 900);
 	CameraController controller{ camera };
 
 	PointLight pointlights[4];
@@ -184,8 +184,10 @@ Lighting::Lighting()
 	});
 	EventSystem::RegisterListener<WindowResizedEvent>(
 	[this](const WindowResizedEvent& event) {
-		this->camera.Resize(event.Width, event.Height);
+		this->camera->Resize(event.Width, event.Height);
 	});
+	camera->SetPosition({ 0.0f, 0.0f, 4.0f });
+	controller.RotationSpeed = 1.0f;
 
 	lightShader->Bind();
 	{
@@ -194,8 +196,6 @@ Lighting::Lighting()
 
 	lightingShader->Bind();
 	{
-		camera.SetPosition({ 0.0f, 0.0f, 4.0f });
-		controller.RotationSpeed = 1.0f;
 
 		glm::vec3 positions[4] =
 		{
@@ -238,20 +238,20 @@ void Lighting::OnUpdate(TimeStep ts) {
 	Renderer::Clear();
 	controller.OnUpdate(ts);
 
-	lightShader->Bind();
-	{
-		lightShader->SetMat4("u_ViewProj", camera.GetViewProjection());
+	// lightShader->Bind();
+	// {
+	// 	lightShader->SetMat4("u_ViewProj", camera->GetViewProjection());
 
-		for(uint32_t i = 0; i < 4; i++) {
-			lightShader->SetVec3("u_Position", pointlights[i].Position);
-			// Application::GetRenderer()->As<OpenGL::Renderer>()->DrawIndexed(lightArray);
-		}
-	}
+	// 	for(uint32_t i = 0; i < 4; i++) {
+	// 		lightShader->SetVec3("u_Position", pointlights[i].Position);
+	// 		Application::GetRenderer()->As<OpenGL::Renderer>()->DrawIndexed(lightArray);
+	// 	}
+	// }
 
 	lightingShader->Bind();
 	{
-		lightingShader->SetVec3("u_CameraPosition", camera.GetPosition());
-		lightingShader->SetMat4("u_ViewProj", camera.GetViewProjection());
+		lightingShader->SetVec3("u_CameraPosition", camera->GetPosition());
+		lightingShader->SetMat4("u_ViewProj", camera->GetViewProjection());
 
 		for(uint32_t i = 0; i < 4; i++) {
 			std::string name = "u_PointLights[" + std::to_string(i) + "]";

@@ -23,10 +23,10 @@ public:
 		: Type(type), m_Parent(parent.get()), m_Width(width), m_Height(height), x(x), y(y) { }
 	virtual ~UIElement() = default;
 
-	void Render() {
-		Draw();
+	void Render() { // TODO: Fix rendering order
 		for(auto& child : m_Children)
 			child->Render();
+		Draw();
 	}
 
 	Ref<UIElement> Add(Ref<UIElement> element) {

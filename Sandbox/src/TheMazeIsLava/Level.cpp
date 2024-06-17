@@ -21,7 +21,7 @@ Level::Level(std::vector<std::vector<uint32_t>> map, const std::function<float(f
 			if(map[y][x] == 3)
 				m_Goal = { x, m_Height - y };
 			if(map[y][x] == 2)
-				
+				m_LavaPoints.push_back({ x, y });
 		}
 	}
 }
@@ -38,7 +38,7 @@ void Level::Render(TimeStep ts) {
 	DrawStoneBlock();
 }
 
-static void TraverseTilemap(const std::function<void((uint32_t x, uint32_t y))>& func) {
+void Level::TraverseTilemap(const std::function<void((uint32_t x, uint32_t y))>& func) {
 	for(uint32_t i = 0; i < m_Height; i++)
 		for(uint32_t j = 0; j < m_Width; j++)
 			func(j, i);

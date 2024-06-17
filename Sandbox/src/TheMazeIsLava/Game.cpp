@@ -17,7 +17,8 @@ using namespace VolcaniCore;
 namespace TheMazeIsLava {
 
 
-Game::Game() {
+Game::Game()
+{
 	EventSystem::RegisterListener<KeyPressedEvent>(
 	[&](const KeyPressedEvent& event) {
 		if(event.Key == Key::Escape)
@@ -26,8 +27,7 @@ Game::Game() {
 			m_ReturnPressed = true;
 	});
 
-	m_Camera = CreateRef<StereographicCamera>(75.0f, 0.01f, 100.0f, 800, 600);
-	m_Camera->SetPositionDirection({ 0.0f, 0.0f, 3.0f }, { -1.0f, 0.0f, -1.0f });
+	m_Camera->SetPositionDirection({ 5.0f, 2.0f, 5.0f }, { -0.5f, -0.5f, -0.5f });
 
 	Level::Init();
 
@@ -46,6 +46,7 @@ Game::~Game() {
 
 void Game::OnUpdate(TimeStep ts) {
 	m_TimeStep = ts;
+	m_CameraController.OnUpdate(ts);
 
 	Renderer::Clear();
 	Application::GetRenderer()->As<OpenGL::Renderer>()->Begin(m_Camera);
@@ -148,7 +149,7 @@ void Game::LoadUI() {
 		glm::vec4{ 0.859375f, 0.76171875f, 0.5859375f, 1.0f },
 		glm::vec4{ 0.3125f, 0.234375f, 0.078125f, 1.0f }, 10, 20
 	);
-	m_LevelSelectUI = CreateRef<UIWindow>(600, 400,
+	m_LevelSelectUI = CreateRef<UIWindow>(600, 200,
 		glm::vec4{ 0.859375f, 0.76171875f, 0.5859375f, 1.0f },
 		glm::vec4{ 0.3125f, 0.234375f, 0.078125f, 1.0f }, 10, 20
 	);
@@ -161,7 +162,7 @@ void Game::LoadUI() {
 		glm::vec4{ 0.3125f, 0.234375f, 0.078125f, 1.0f }, 10, 20
 	);
 
-	m_HomeScreenUI->Add(CreateRef<UIButton>(700, 50, glm::vec4{ 0.3125f, 0.234375f, 0.078125f, 1.0f }));
+	m_HomeScreenUI->Add(CreateRef<UIButton>(70, 50, glm::vec4{ 0.3125f, 0.234375f, 0.078125f, 0.01f }));
 }
 
 void Game::LoadLevels() {

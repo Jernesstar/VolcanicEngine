@@ -2,6 +2,8 @@
 
 #include <Core/Application.h>
 #include <Renderer/Camera.h>
+#include <Renderer/StereographicCamera.h>
+#include <Renderer/CameraController.h>
 
 #include "Level.h"
 #include "UI.h"
@@ -35,11 +37,12 @@ private:
 
 private:
 	Ref<UIElement> m_CurrentUI;
-	Ref<Camera> m_Camera;
-	TimeStep m_TimeStep;
+	Ref<Camera> m_Camera = CreateRef<StereographicCamera>(75.0f, 0.01f, 100.0f, 800, 600);
+	CameraController m_CameraController{ m_Camera };
 
 	std::vector<Level> m_Levels;
 
+	TimeStep m_TimeStep;
 	bool m_ReturnPressed = false;
 	bool m_GameOver = false;
 	uint32_t m_CurrentLevel = 0;

@@ -26,7 +26,8 @@ public:
 
 private:
 	Ref<StereographicCamera> camera = CreateRef<StereographicCamera>(75.0f, 0.01f, 100.0f, 800, 600);
-	CameraController controller{ *camera.get() };
+	// Ref<OrthographicCamera> camera = CreateRef<OrthographicCamera>(800, 600, 0.01f, 100.0f);
+	CameraController controller{ camera };
 
 	Ref<FrameBuffer> frameBuffer = FrameBuffer::Create(800, 600);
 	Ref<Texture> stone = Texture::Create("Sandbox/assets/images/stone.png");
@@ -47,7 +48,8 @@ Cube::Cube() {
 		camera->Resize(event.Width, event.Height);
 	});
 
-	camera->SetPosition({ 0.0f, 0.0f, 4.0f });
+	camera->SetPosition({ 2.5f, 2.5f, 2.5f });
+	camera->SetDirection({ -0.5f, -0.5f, -0.5f });
 }
 
 void Cube::OnUpdate(TimeStep ts) {
