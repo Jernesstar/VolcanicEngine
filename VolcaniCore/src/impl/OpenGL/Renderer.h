@@ -33,7 +33,7 @@ public:
 	void RenderFrameBuffer(Ref<VolcaniCore::FrameBuffer> buffer, Ref<ShaderPipeline> frameBufferShader);
 
 	void RenderCubemap(Ref<VolcaniCore::Cubemap> cubemap) override { }
-	void RenderModel(Ref<VolcaniCore::Model> model) override { }
+	void RenderModel(Ref<VolcaniCore::Model> model) override;
 	void RenderQuad(Ref<VolcaniCore::Quad> quad, Transform t) override { }
 	void RenderText(Ref<VolcaniCore::Text> text, Transform t) override { }
 	void RenderTexture(Ref<VolcaniCore::Texture> texture, Transform t) override { }

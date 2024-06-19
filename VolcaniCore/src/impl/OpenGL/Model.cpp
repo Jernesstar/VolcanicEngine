@@ -78,9 +78,9 @@ void Model::LoadMesh(const std::string& path) {
 	OpenGL::BufferLayout l2({ { "TextureCoordinate", BufferDataType::Vec2, false } }, false);
 	OpenGL::BufferLayout l3({ { "Normal",            BufferDataType::Vec3, false } }, false);
 
-	m_Buffers[BufferIndex::Position]          = CreatePtr<VertexBuffer>(m_Positions.size(), l1, &m_Positions[0]);
+	m_Buffers[BufferIndex::Position]		  = CreatePtr<VertexBuffer>(m_Positions.size(),     l1, &m_Positions[0]);
 	m_Buffers[BufferIndex::TextureCoordinate] = CreatePtr<VertexBuffer>(m_TextureCoords.size(), l2, &m_TextureCoords[0]);
-	m_Buffers[BufferIndex::Normal]            = CreatePtr<VertexBuffer>(m_Normals.size(), l3, &m_Normals[0]);
+	m_Buffers[BufferIndex::Normal]			  = CreatePtr<VertexBuffer>(m_Normals.size(),       l3, &m_Normals[0]);
 
 	m_IndexBuffer = CreatePtr<IndexBuffer>(&m_Indices[0], m_Indices.size());
 
@@ -135,7 +135,7 @@ Ref<Texture> Model::LoadTexture(const aiMaterial* material, const std::string& d
 	aiString path;
 	if(material->GetTexture(type, 0, &path) == AI_FAILURE)
 		return nullptr;
-    std::string p(path.data);
+	std::string p(path.data);
 
 	std::string full_path = dir + "/" + p;
 	return Texture::Create(full_path);

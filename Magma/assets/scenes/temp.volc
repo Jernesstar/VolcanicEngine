@@ -12,7 +12,7 @@ Scene:
     ViewportHeight: 1
   Entities:
     - Entity:
-        ID: 1048892810
+        ID: 4234233682
         Components:
           TagComponent:
             Tag: Empty Entity

@@ -5,8 +5,7 @@
 namespace VolcaniCore {
 
 bool Input::KeyPressed(Key key)
-{   
-	// TODO: Get the special cases to work
+{
 	if(key == Key::Ctrl) return KeyPressed(Key::LeftCtrl) || KeyPressed(Key::RightCtrl);
 	if(key == Key::Shift) return KeyPressed(Key::LeftShift) || KeyPressed(Key::RightShift);
 	if(key == Key::Alt) return KeyPressed(Key::LeftAlt) || KeyPressed(Key::RightAlt);

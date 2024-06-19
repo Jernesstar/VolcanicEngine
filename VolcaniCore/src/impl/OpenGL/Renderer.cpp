@@ -327,6 +327,22 @@ void Renderer::Flush() {
 	}
 }
 
+void Renderer::RenderModel(Ref<VolcaniCore::Model> model) {
+	auto mesh = model->As<OpenGL::Model>();
+	mesh->m_VertexArray->Bind();
+
+	for(uint32_t i = 0; i < mesh->GetMeshCount(); i++)
+	{
+		const Model::Mesh& sub_mesh = mesh->m_Meshes[i];
+		uint32_t material_index = sub_mesh.MaterialIndex;
+
+		mesh->m_Materials[material_index].Bind();
+
+		glDrawElementsBaseVertex(GL_TRIANGLES, sub_mesh.IndexCount, GL_UNSIGNED_INT,
+			(void*)(sizeof(uint32_t) * sub_mesh.BaseIndex), sub_mesh.BaseVertex);
+	}
+}
+
 void Renderer::Draw3DCube(Ref<VolcaniCore::Texture> texture, Transform t) {
 	s_Data.CubeShader->Bind();
 	s_Data.CubeShader->SetTexture("u_Texture", texture, 0);

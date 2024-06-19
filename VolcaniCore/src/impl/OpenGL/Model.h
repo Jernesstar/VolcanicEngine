@@ -74,6 +74,8 @@ private:
 	void LoadSubMesh(const aiMesh* mesh);
 	void LoadMaterial(const aiMaterial* material, const std::string& path, uint32_t index);
 	Ref<Texture> LoadTexture(const aiMaterial* material, const std::string& dir, aiTextureType type);
+
+	friend class Renderer;
 };
 
 }

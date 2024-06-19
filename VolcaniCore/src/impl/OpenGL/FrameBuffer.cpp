@@ -9,7 +9,7 @@ namespace VolcaniCore::OpenGL {
 FrameBuffer::FrameBuffer(const AttachmentSpecification& specs)
 	: VolcaniCore::FrameBuffer(specs.Width, specs.Height)
 {
-	glGenFramebuffers(1, &m_BufferID); // TODO: Separate textures for color and depth attachment
+	glGenFramebuffers(1, &m_BufferID);
 	glGenTextures(1, &m_TextureID);
 	glGenRenderbuffers(1, &m_RenderbufferID);
 

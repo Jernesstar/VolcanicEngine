@@ -48,7 +48,6 @@ void Texture2D::Bind(uint32_t slot)
 	glBindTextureUnit(slot, m_TextureID);
 }
 
-// TODO: Consider removing these as they are likely to cause errors
 void Texture2D::SetData(const void* data, uint32_t size)
 {
 	VOLCANICORE_ASSERT(size == m_Width * m_Height * 4, "Data must be the whole size of the texture.");

@@ -14,6 +14,7 @@ project "assimp"
         "%{VendorPaths.assimp}/code/Material/*.cpp",
         "%{VendorPaths.assimp}/code/PostProcessing/*.cpp",
         "%{VendorPaths.assimp}/code/AssetLib/Obj/*.cpp",
+        "%{VendorPaths.assimp}/code/AssetLib/FBX/*.cpp",
         "%{VendorPaths.assimp}/contrib/clipper/**.cpp",
         "%{VendorPaths.assimp}/contrib/gtest/**.cpp",
         "%{VendorPaths.assimp}/contrib/openddlparser/**.cpp",
@@ -31,11 +32,6 @@ project "assimp"
         "%{VendorPaths.assimp}/code/AssetLib/FBX/*.cpp",
         "%{VendorPaths.assimp}/code/AssetLib/Blender/*.cpp",
         "%{VendorPaths.assimp}/code/AssetLib/Unreal/*.cpp",
-        "%{VendorPaths.assimp}/code/AssetLib/Obj/ObjExporter.cpp",
-        "%{VendorPaths.assimp}/code/AssetLib/STL/STLExporter.cpp",
-        "%{VendorPaths.assimp}/code/AssetLib/FBX/FBXExporter.cpp",
-        "%{VendorPaths.assimp}/code/AssetLib/FBX/FBXExportNode.cpp",
-        "%{VendorPaths.assimp}/code/AssetLib/FBX/FBXExportProperty.cpp",
         "%{VendorPaths.assimp}/contrib/Open3DGC/**.cpp",
     }
 
@@ -90,7 +86,7 @@ project "assimp"
         "ASSIMP_BUILD_NO_COLLADA_IMPORTER",
         "ASSIMP_BUILD_NO_DXF_IMPORTER",
         "ASSIMP_BUILD_NO_ENFF_IMPORTER",
-        "ASSIMP_BUILD_NO_FBX_IMPORTER",
+        -- "ASSIMP_BUILD_NO_FBX_IMPORTER",
         "ASSIMP_BUILD_NO_GLTF_IMPORTER",
         "ASSIMP_BUILD_NO_HMP_IMPORTER",
         "ASSIMP_BUILD_NO_IFC_IMPORTER",
