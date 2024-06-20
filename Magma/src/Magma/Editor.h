@@ -8,7 +8,6 @@ using namespace VolcaniCore;
 
 namespace Magma {
 
-// TODO: Fix
 class Editor : public Application {
 public:
 	Editor();

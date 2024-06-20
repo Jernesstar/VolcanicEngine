@@ -9,6 +9,7 @@
 #include "UI.h"
 
 using namespace VolcaniCore;
+using namespace Magma;
 
 namespace TheMazeIsLava {
 
@@ -36,8 +37,8 @@ private:
 	void LoadLevels();
 
 private:
-	Ref<UIElement> m_CurrentUI;
-	Ref<Camera> m_Camera = CreateRef<StereographicCamera>(75.0f, 0.01f, 100.0f, 800, 600);
+	Ref<UI::UIElement> m_CurrentUI;
+	Ref<Camera> m_Camera = CreateRef<StereographicCamera>();
 	CameraController m_CameraController{ m_Camera };
 
 	std::vector<Level> m_Levels;
@@ -48,11 +49,11 @@ private:
 	uint32_t m_CurrentLevel = 0;
 	std::function<void(void)> m_CurrentScreen;
 
-	inline static Ref<UIElement> m_NoUI;
-	inline static Ref<UIElement> m_HomeScreenUI;
-	inline static Ref<UIElement> m_LevelSelectUI;
-	inline static Ref<UIElement> m_PauseUI;
-	inline static Ref<UIElement> m_OverUI;
+	inline static Ref<UI::UIElement> m_NoUI;
+	inline static Ref<UI::UIElement> m_HomeScreenUI;
+	inline static Ref<UI::UIElement> m_LevelSelectUI;
+	inline static Ref<UI::UIElement> m_PauseUI;
+	inline static Ref<UI::UIElement> m_OverUI;
 };
 
 

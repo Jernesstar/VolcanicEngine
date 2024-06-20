@@ -21,7 +21,8 @@ public:
 	const std::function<float(float t)> LavaSpeed;
 
 public:
-	Level(std::vector<std::vector<uint32_t>> map, const std::function<float(float t)>& lavaSpeed);
+	Level(std::vector<std::vector<uint32_t>> map,
+		const std::function<float(float t)>& lavaSpeed);
 	~Level();
 
 	void Render(TimeStep ts);
@@ -30,8 +31,14 @@ public:
 
 private:
 	void PropagateLava();
-	void DrawStoneBlock();
-	void TraverseTilemap(const std::function<void((uint32_t x, uint32_t y))>& func);
+	void DrawStoneBlocks();
+	void TraverseTilemap(
+			const std::function<void((uint32_t x, uint32_t y))>& func);
+
+	bool IsPath(uint32_t col, uint32_t row);
+	bool IsLava(uint32_t col, uint32_t row);
+	bool IsGoal(uint32_t col, uint32_t row);
+	bool IsWall(uint32_t col, uint32_t row);
 
 	TimeStep m_TimeStep;
 	float m_TimeSinceLevelStart;

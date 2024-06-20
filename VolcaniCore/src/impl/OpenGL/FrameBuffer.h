@@ -16,7 +16,8 @@ struct AttachmentSpecification {
 		AttachmentType color = AttachmentType::Texture,
 		AttachmentType depth = AttachmentType::RenderBuffer,
 		AttachmentType stencil = AttachmentType::RenderBuffer
-	) : Width(width), Height(height), Color(color), Depth(depth), Stencil(stencil) { }
+	) : Width(width), Height(height), Color(color), Depth(depth),
+		Stencil(stencil) { }
 };
 
 class FrameBuffer : public VolcaniCore::FrameBuffer {
@@ -24,13 +25,12 @@ public:
 	FrameBuffer(const AttachmentSpecification& specs);
 	~FrameBuffer();
 
+	void Resize(uint32_t width, uint32_t height) override { }
 	void Bind() const override;
 	void Unbind() const override;
 
 	void BindTexture() const;
 	void BindRenderbuffer() const;
-
-	void Resize(uint32_t width, uint32_t height) override { }
 
 	uint32_t GetColorAttachmentID() { return m_TextureID; }
 

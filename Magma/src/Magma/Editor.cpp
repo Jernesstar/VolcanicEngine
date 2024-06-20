@@ -16,21 +16,27 @@ Editor::Editor() {
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 
+	Ref<Window> window = Application::GetWindow();
 	ImGuiIO& io = ImGui::GetIO();
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableSetMousePos;
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
-	io.DisplaySize = ImVec2{ (float)Application::GetWindow()->GetWidth(), (float)Application::GetWindow()->GetHeight() };
+	io.DisplaySize = ImVec2{
+		(float)window->GetWidth(),
+		(float)window->GetHeight()
+	};
 
-	ImGui_ImplGlfw_InitForOpenGL(Application::GetWindow()->GetNativeWindow(), false);
+	ImGui_ImplGlfw_InitForOpenGL(window->GetNativeWindow(), false);
 	ImGui_ImplOpenGL3_Init("#version 450");
 
 	ImGui::StyleColorsDark();
 
 	float fontSize = 18.0f * 2.0f;
-	io.Fonts->AddFontFromFileTTF("VolcaniCore/assets/fonts/JetBrainsMono-Bold.ttf", fontSize);
-	io.FontDefault = io.Fonts->AddFontFromFileTTF("VolcaniCore/assets/fonts/JetBrainsMono-Regular.ttf", fontSize);
+	io.Fonts->AddFontFromFileTTF(
+			"VolcaniCore/assets/fonts/JetBrainsMono-Bold.ttf", fontSize);
+	io.FontDefault = io.Fonts->AddFontFromFileTTF(
+			"VolcaniCore/assets/fonts/JetBrainsMono-Regular.ttf", fontSize);
 
 	EventSystem::RegisterListener<KeyPressedEvent>(
 	[&io](KeyPressedEvent& event) {

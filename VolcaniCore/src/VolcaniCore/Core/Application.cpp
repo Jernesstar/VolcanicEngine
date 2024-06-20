@@ -12,26 +12,26 @@
 
 namespace VolcaniCore {
 
-void ErrorCallback(int error, const char* description) {
-	VOLCANICORE_ASSERT(false, description);
-}
-
-Application::Application() {
+Application::Application(uint32_t width, uint32_t height,
+	const std::string_view& title, const std::string_view& iconPath)
+{
+	s_Window->SetIcon(iconPath);
+	s_Window->SetTitle(title);
+	s_Window->Resize(width, height);
 	s_Instance = this;
 }
 
 void Application::Init() {
-	glfwSetErrorCallback(ErrorCallback);
 	VOLCANICORE_ASSERT(glfwInit(), "Failed to initialize GLFW");
 
 	s_Window = CreateRef<Window>(800, 600);
+	EventSystem::Init();
 
 	s_BackendRenderer = RendererAPI::CreateRenderer(RenderAPI::OpenGL);
 	ShaderPipeline::Init();
 	s_BackendRenderer->Init();
 
 	Renderer::Init();
-	EventSystem::Init();
 }
 
 void Application::Close() {

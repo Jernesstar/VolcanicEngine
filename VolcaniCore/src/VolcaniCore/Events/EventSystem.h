@@ -29,23 +29,25 @@ public:
 	static void PollEvents() { glfwPollEvents(); }
 
 	template<typename TEvent>
-	static void RegisterListener(const EventCallback<TEvent>& event_callback) {
-		if(!event_callback)
+	static void RegisterListener(const EventCallback<TEvent>& eventCallback) {
+		if(!eventCallback)
 			return;
 
 		Callbacks<TEvent>& callbacks = GetCallbacks<TEvent>();
-		callbacks[event_callback.GetID()] = event_callback;
+		callbacks[eventCallback.GetID()] = eventCallback;
 	}
 
 	template<typename TEvent>
-	static EventCallback<TEvent> RegisterListener(const std::function<void(TEvent&)>& callback) {
+	static EventCallback<TEvent> RegisterListener(
+		const std::function<void(TEvent&)>& callback)
+	{
 		EventCallback<TEvent> _event_callback(callback);
 		RegisterListener<TEvent>((EventCallback<TEvent>&)_event_callback);
 		return _event_callback;
 	}
 
 	template<typename TEvent>
-	static void UnregisterListener(const EventCallback<TEvent>& event_callback) {
+	static void UnregisterListener(const EventCallback<TEvent>& eventCallback) {
 		Callbacks<TEvent>& callbacks = GetCallbacks<TEvent>();
 		if(callbacks.count(event_callback.GetID()))
 			callbacks.erase(event_callback.GetID());
@@ -65,11 +67,6 @@ private:
 	inline static Callbacks<ApplicationUpdatedEvent>  ApplicationUpdatedEventCallbacks;
 
 private:
-	// template<typename TEvent>
-	// static EventCallback<TEvent> RegisterListener(const std::function<void(const TEvent&)>& callback) {
-	// 	return RegisterListener(callback);
-	// }
-
 	template<typename TEvent>
 	static void Dispatch(TEvent& event) {
 		Callbacks<TEvent>& callback_list = GetCallbacks<TEvent>();
@@ -81,6 +78,8 @@ private:
 
 	template<typename TEvent>
 	static Callbacks<TEvent>& GetCallbacks();
+
+	static void ErrorCallback(int error, const char* description);
 
 	static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 	static void KeyCharCallback(GLFWwindow* window, uint32_t codepoint);

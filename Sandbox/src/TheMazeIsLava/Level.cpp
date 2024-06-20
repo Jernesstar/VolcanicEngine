@@ -35,10 +35,12 @@ void Level::Render(TimeStep ts) {
 	m_TimeSinceLevelStart += (float)ts;
 	PropagateLava();
 
-	DrawStoneBlock();
+	DrawStoneBlocks();
 }
 
-void Level::TraverseTilemap(const std::function<void((uint32_t x, uint32_t y))>& func) {
+void Level::TraverseTilemap(
+	const std::function<void((uint32_t x, uint32_t y))>& func)
+{
 	for(uint32_t i = 0; i < m_Height; i++)
 		for(uint32_t j = 0; j < m_Width; j++)
 			func(j, i);
@@ -50,11 +52,51 @@ void Level::PropagateLava() {
 	// Propagate the lava in tile space, flow animation interpolates smoothly
 }
 
-void Level::DrawStoneBlock() {
+void Level::DrawStoneBlocks() {
 	TraverseTilemap(
 	[](uint32_t x, uint32_t y){
-		Application::GetRenderer()->As<OpenGL::Renderer>()->Draw3DCube(s_Stone, Transform{ .Translation = glm::vec3{ x, 0.0f, y } });
+		Application::GetRenderer()->As<OpenGL::Renderer>()->Draw3DCube(s_Stone,
+		Transform{
+			.Translation = glm::vec3{ x, 0.0f, y }
+		});
+
+		if(!IsWall(x, y))
+			return;
+		Application::GetRenderer()->As<OpenGL::Renderer>()->Draw3DCube(s_Stone,
+		Transform{
+			.Translation = glm::vec3{ x, 1.0f, y }
+		});
 	});
+}
+
+bool Level::IsPath(uint32_t col, uint32_t row) {
+	return m_TileMap[row][col] == 1;
+}
+
+bool Level::IsLava(uint32_t col, uint32_t row) {
+	return m_TileMap[row][col] == 2;
+}
+
+bool Level::IsGoal(uint32_t col, uint32_t row) {
+	return m_TileMap[row][col] == 3;
+}
+
+bool Level::IsWall(uint32_t col, uint32_t row) {
+	if(IsPath(col, row) || IsLava(col, row) || IsEnd(col, row)) {
+		return false;
+	}
+
+	var result = false;
+	if(col - 1 >= 0)                              // Left
+		result |= (m_TimeMap[row][col - 1] == 1);
+	if(col + 1 < m_TimeMap.size())                // Right
+		result |= (m_TimeMap[row][col + 1] == 1);
+	if(row - 1 >= 0)                              // Up
+		result |= (m_TimeMap[row - 1][col] == 1);
+	if(row + 1 < m_TimeMap.size())                // Down
+		result |= (m_TimeMap[row + 1][col] == 1);
+
+	return result;
 }
 
 }
