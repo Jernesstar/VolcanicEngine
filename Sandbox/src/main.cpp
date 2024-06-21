@@ -11,7 +11,7 @@
 #include "Demos/Model.h"
 #include "Demos/Template.h"
 
-#include "TheMazeIsLava/Game.h"
+#include "TheMazeIsLava/src/Game.h"
 
 VolcaniCore::Application* CreateApplication(const VolcaniCore::CommandLineArgs& args) {
 	std::string project = args[1];

@@ -21,12 +21,17 @@ using namespace VolcaniCore;
 namespace Magma {
 
 struct {
-	struct { bool newScene = false, openScene = false, saveScene = false; } file;
+	struct {
+		bool newScene = false;
+		bool openScene = false;
+		bool saveScene = false;
+	} file;
 	struct { bool addEntity = false; } edit;
 } menu;
 
 EditorLayer::EditorLayer() {
-	m_CurrentScene = SceneSerializer::Deserialize("Magma/assets/scenes/temp.volc");
+	m_CurrentScene = SceneSerializer::Deserialize(
+											"Magma/assets/scenes/temp.volc");
 	m_SceneHierarchyPanel = CreateRef<SceneHierarchyPanel>(m_CurrentScene);
 	m_FrameBuffer = FrameBuffer::Create(800, 600);
 
@@ -76,7 +81,7 @@ void EditorLayer::Render() {
 	// all active windows docked into it will lose their parent and become undocked.
 	// We cannot preserve the docking relationship between an active window and an inactive docking, otherwise 
 	// any change of dockspace/settings would lead to windows being stuck in limbo and never being visible.
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+
 	ImGui::Begin("DockSpace Demo", &dockspaceOpen, windowFlags);
 	ImGui::PopStyleVar();
 	ImGui::PopStyleVar(2);
@@ -142,7 +147,7 @@ void EditorLayer::Render() {
 		m_ViewportFocused = ImGui::IsWindowFocused();
 		m_ViewportHovered = ImGui::IsWindowHovered();
 
-		m_FrameBuffer->As<OpenGL::FrameBuffer>()->Bind();
+		m_FrameBuffer->Bind();
 		m_FrameBuffer->As<OpenGL::FrameBuffer>()->BindTexture();
 
 		uint64_t textureID = m_FrameBuffer->As<OpenGL::FrameBuffer>()->GetColorAttachmentID();

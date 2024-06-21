@@ -1,8 +1,5 @@
 #include "UI.h"
 
-#include <imgui/imgui.h>
-
-#include <Core/Log.h>
 #include <Renderer/Renderer.h>
 #include <Events/EventSystem.h>
 
@@ -39,8 +36,10 @@ bool DropDown::OnAttach() {
 }
 
 bool DropDown::OnAddElement(Ref<UIElement> element) {
-	m_Height += element->GetHeight();
+	if(element->Type != UIType::Text)
+		return;
 
+	m_Height += element->GetHeight();
 	return true;
 }
 

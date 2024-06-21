@@ -1,6 +1,5 @@
 #include "UI.h"
 
-#include <Core/Log.h>
 #include <Renderer/Renderer.h>
 #include <Events/EventSystem.h>
 
@@ -8,9 +7,11 @@
 
 using namespace VolcaniCore;
 
-namespace Magma {
+namespace Magma::UI {
 
-// UIElement::UIElement() {
+// UIElement::UIElement()
+// 	: UIElement(UIType::Type)
+// {
 
 // }
 

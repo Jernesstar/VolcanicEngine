@@ -11,6 +11,7 @@ project "Sandbox"
     files {
         "src/**.h",
         "src/**.cpp",
+        "TheMazeIsLava/src/**.cpp"
     }
 
     includedirs {
