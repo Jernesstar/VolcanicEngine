@@ -45,11 +45,11 @@ void EditorLayer::Update(TimeStep ts) {
 
 void EditorLayer::Render() {
 	static bool dockspaceOpen = true;
-	static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
+	static ImGuiDockNodeFlags dockspaceFlags = ImGuiDockNodeFlags_None;
 
 	// We are using the ImGuiWindowFlags_NoDocking flag to make the parent window not dockable into,
 	// because it would be confusing to have two docking targets within each others.
-	ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar
+	ImGuiWindowFlags windowFlags = ImGuiWindowFlags_MenuBar
 									| ImGuiWindowFlags_NoDocking;
 
 	ImGuiViewport* viewport = ImGui::GetMainViewport();
@@ -58,18 +58,18 @@ void EditorLayer::Render() {
 	ImGui::SetNextWindowViewport(viewport->ID);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-	window_flags |=
+	windowFlags |=
 		ImGuiWindowFlags_NoTitleBar
 		| ImGuiWindowFlags_NoCollapse
 		| ImGuiWindowFlags_NoResize
 		| ImGuiWindowFlags_NoMove;
-	window_flags |=
+	windowFlags |=
 		ImGuiWindowFlags_NoBringToFrontOnFocus
 		| ImGuiWindowFlags_NoNavFocus;
 
 	// When using ImGuiDockNodeFlags_PassthruCentralNode, DockSpace() will render our background and handle the pass-thru hole, so we ask Begin() to not render a background.
-	if (dockspace_flags & ImGuiDockNodeFlags_PassthruCentralNode)
-		window_flags |= ImGuiWindowFlags_NoBackground;
+	if (dockspaceFlags & ImGuiDockNodeFlags_PassthruCentralNode)
+		windowFlags |= ImGuiWindowFlags_NoBackground;
 
 	// Important: note that we proceed even if Begin() returns false (aka window is collapsed).
 	// This is because we want to keep our DockSpace() active. If a DockSpace() is inactive,
@@ -77,7 +77,7 @@ void EditorLayer::Render() {
 	// We cannot preserve the docking relationship between an active window and an inactive docking, otherwise 
 	// any change of dockspace/settings would lead to windows being stuck in limbo and never being visible.
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-	ImGui::Begin("DockSpace Demo", &dockspaceOpen, window_flags);
+	ImGui::Begin("DockSpace Demo", &dockspaceOpen, windowFlags);
 	ImGui::PopStyleVar();
 	ImGui::PopStyleVar(2);
 
@@ -89,7 +89,7 @@ void EditorLayer::Render() {
 	if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
 	{
 		ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
-		ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
+		ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspaceFlags);
 	}
 
 	style.WindowMinSize.x = minWinSizeX;
@@ -174,7 +174,8 @@ void EditorLayer::NewScene() {
 void EditorLayer::OpenScene() {
 	IGFD::FileDialogConfig config;
 	config.path = ".";
-	ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose File", ".volc", config);
+	ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose File",
+											".volc", config);
 
 	if(ImGuiFileDialog::Instance()->Display("ChooseFileDlgKey")) {
 		if (ImGuiFileDialog::Instance()->IsOk()) {
@@ -194,7 +195,8 @@ void EditorLayer::OpenScene(const std::filesystem::path& path) {
 void EditorLayer::SaveScene() {
 	IGFD::FileDialogConfig config;
 	config.path = ".";
-	ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose File", ".volc", config);
+	ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose File",
+											".volc", config);
 
 	if(ImGuiFileDialog::Instance()->Display("ChooseFileDlgKey")) {
 		if (ImGuiFileDialog::Instance()->IsOk()) {
@@ -233,13 +235,19 @@ void EditorLayer::UI_Toolbar()
 	const auto& buttonHovered = colors[ImGuiCol_ButtonHovered];
 	const auto& buttonActive = colors[ImGuiCol_ButtonActive];
 
-	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(buttonHovered.x, buttonHovered.y, buttonHovered.z, 0.5f));
-	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(buttonActive.x, buttonActive.y, buttonActive.z, 0.5f));
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered,
+		ImVec4(buttonHovered.x, buttonHovered.y, buttonHovered.z, 0.5f));
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive,
+		ImVec4(buttonActive.x, buttonActive.y, buttonActive.z, 0.5f));
 
-	ImGui::Begin("##toolbar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+	ImGui::Begin("##toolbar", nullptr,
+		ImGuiWindowFlags_NoDecoration
+		| ImGuiWindowFlags_NoScrollbar
+		| ImGuiWindowFlags_NoScrollWithMouse);
 	
 	float size = ImGui::GetWindowHeight() - 4.0f;
-	ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
+	ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) 
+							- (size * 0.5f));
 
 	ImVec4 tintColor = ImVec4(1, 1, 1, 1);
 	ImVec4 v0  = ImVec4(0.0f, 0.0f, 0.0f, 0.0f);
@@ -247,12 +255,15 @@ void EditorLayer::UI_Toolbar()
 	ImVec2 v2 = ImVec2(0, 0);
 	ImVec2 v3 = ImVec2(1, 1);
 
-	bool hasPlayButton = m_SceneState == SceneState::Pause || m_SceneState == SceneState::Edit;
+	bool hasPlayButton = m_SceneState == SceneState::Pause 
+						|| m_SceneState == SceneState::Edit;
 	bool hasStopButton = true;
 
 	if(hasPlayButton) {
 		auto icon = m_IconPlay->As<OpenGL::Texture2D>();
-		if (ImGui::ImageButton((ImTextureID)(uint64_t)icon->GetID(), v1, v2, v3, 0, v0, tintColor)) {
+		if (ImGui::ImageButton((ImTextureID)(uint64_t)icon->GetID(),
+								v1, v2, v3, 0, v0, tintColor))
+		{
 			m_SceneState = SceneState::Play;
 			// OnScenePlay();
 		}
@@ -260,7 +271,9 @@ void EditorLayer::UI_Toolbar()
 
 	if(!hasPlayButton) {
 		auto icon = m_IconPause->As<OpenGL::Texture2D>();
-		if(ImGui::ImageButton((ImTextureID)(uint64_t)icon->GetID(), v1, v2, v3, 0, v0, tintColor)) {
+		if(ImGui::ImageButton((ImTextureID)(uint64_t)icon->GetID(),
+								v1, v2, v3, 0, v0, tintColor))
+		{
 			m_SceneState = SceneState::Pause;
 			// OnScenePause();
 		}
@@ -270,7 +283,9 @@ void EditorLayer::UI_Toolbar()
 		ImGui::SameLine();
 
 		auto icon = m_IconStop->As<OpenGL::Texture2D>();
-		if(ImGui::ImageButton((ImTextureID)(uint64_t)icon->GetID(), v1, v2, v3, 0, v0, tintColor)) {
+		if(ImGui::ImageButton((ImTextureID)(uint64_t)icon->GetID(),
+								v1, v2, v3, 0, v0, tintColor))
+		{
 			m_SceneState = SceneState::Edit;
 			// OnSceneStop();
 		}

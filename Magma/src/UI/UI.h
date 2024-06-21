@@ -54,6 +54,7 @@ public:
 
 	uint32_t GetWidth() const { return m_Width; }
 	uint32_t GetHeight() const { return m_Height; }
+	UIElement* const GetParent() { return m_Parent; }
 
 protected:
 	virtual void Draw() = 0;
@@ -74,9 +75,9 @@ public:
 		: UIElement(UIType::Empty) { }
 
 private:
-	void Draw() override;
-	bool OnAttach() override;
-	bool OnAddElement(Ref<UIElement> element) override;
+	void Draw() override { }
+	bool OnAttach() override { return true; }
+	bool OnAddElement(Ref<UIElement> element) override { return true; }
 };
 
 class Window : public UIElement {
@@ -91,6 +92,7 @@ private:
 	bool OnAddElement(Ref<UIElement> element) override;
 
 private:
+	bool m_Open;
 	uint32_t m_BorderWidth, m_BorderHeight;
 	glm::vec4 m_BackgroundColor;
 	glm::vec4 m_BorderColor;

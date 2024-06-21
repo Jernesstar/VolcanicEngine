@@ -41,16 +41,16 @@ public:
 	static EventCallback<TEvent> RegisterListener(
 		const std::function<void(TEvent&)>& callback)
 	{
-		EventCallback<TEvent> _event_callback(callback);
-		RegisterListener<TEvent>((EventCallback<TEvent>&)_event_callback);
-		return _event_callback;
+		EventCallback<TEvent> eventCallback(callback);
+		RegisterListener<TEvent>((EventCallback<TEvent>&)eventCallback);
+		return eventCallback;
 	}
 
 	template<typename TEvent>
 	static void UnregisterListener(const EventCallback<TEvent>& eventCallback) {
 		Callbacks<TEvent>& callbacks = GetCallbacks<TEvent>();
-		if(callbacks.count(event_callback.GetID()))
-			callbacks.erase(event_callback.GetID());
+		if(callbacks.count(eventCallback.GetID()))
+			callbacks.erase(eventCallback.GetID());
 	}
 
 private:

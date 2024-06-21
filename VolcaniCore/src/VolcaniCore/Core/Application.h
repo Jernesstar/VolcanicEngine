@@ -13,8 +13,8 @@ namespace VolcaniCore {
 class Application {
 public:
 	Application(uint32_t width = 800, uint32_t height = 600,
-		const std::string_view& title = "",
-		const std::string_view& iconPath = "");
+		const std::string& title = "",
+		const std::string& iconPath = "");
 	virtual ~Application() = default;
 
 	static void Close();

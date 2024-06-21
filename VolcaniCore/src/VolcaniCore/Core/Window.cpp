@@ -32,6 +32,7 @@ Window::~Window() {
 void Window::Resize(uint32_t width, uint32_t height) {
 	m_Width = width;
 	m_Height = height;
+	glfwSetWindowSize(m_NativeWindow, width, height);
 }
 
 void Window::SetIcon(const std::string& path) {
@@ -42,8 +43,8 @@ void Window::SetIcon(const std::string& path) {
 
 	GLFWimage icon;
 	icon.pixels = Utils::ReadImage(path, icon.width, icon.height);
-	glfwSetWindowIcon(m_Window, 1, &icon);
-	stbi_image_free(icon.pixels);
+	glfwSetWindowIcon(m_NativeWindow, 1, &icon);
+	free(icon.pixels);
 }
 
 void Window::SetTitle(const std::string& title) {
