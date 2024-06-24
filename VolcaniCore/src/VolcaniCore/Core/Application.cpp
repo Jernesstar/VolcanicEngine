@@ -51,6 +51,7 @@ void Application::Run() {
 		EventSystem::PollEvents();
 
 		s_Instance->OnUpdate(ts);
+
 		ApplicationUpdatedEvent event(ts);
 		EventSystem::Dispatch(event);
 

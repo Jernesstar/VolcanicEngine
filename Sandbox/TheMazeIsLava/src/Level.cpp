@@ -7,14 +7,10 @@
 
 namespace TheMazeIsLava {
 
-void Level::Init() {
-	s_Lava  = Texture::Create("Sandbox/assets/images/lava.png");
-	s_Stone = Texture::Create("Sandbox/assets/images/stone.png");
-	// s_Staircase  = Texture::Create("Sandbox/assets/images/staircase.png");
-}
-
-Level::Level(std::vector<std::vector<uint32_t>> map, const std::function<float(float t)>& lavaSpeed)
-	: m_TileMap(map), LavaSpeed(lavaSpeed), m_Width(map[0].size()), m_Height(map.size())
+Level::Level(std::vector<std::vector<uint32_t>> map,
+			const std::function<float(float t)>& lavaSpeedFunction)
+	: m_TileMap(map), LavaSpeed(lavaSpeedFunction),
+		m_Width(map[0].size()), m_Height(map.size())
 {
 	for(uint32_t y = 0; y < m_Height; y++) {
 		for(uint32_t x = 0; x < m_Width; x++) {
@@ -33,17 +29,9 @@ Level::~Level() {
 void Level::Render(TimeStep ts) {
 	m_TimeStep = ts;
 	m_TimeSinceLevelStart += (float)ts;
-	PropagateLava();
 
 	DrawStoneBlocks();
-}
-
-void Level::TraverseTilemap(
-	const std::function<void((uint32_t x, uint32_t y))>& func)
-{
-	for(uint32_t i = 0; i < m_Height; i++)
-		for(uint32_t j = 0; j < m_Width; j++)
-			func(j, i);
+	PropagateLava();
 }
 
 void Level::PropagateLava() {
@@ -67,6 +55,18 @@ void Level::DrawStoneBlocks() {
 			.Translation = glm::vec3{ x, 1.0f, y }
 		});
 	});
+}
+
+void Level::TraverseTilemap(
+	const std::function<void(uint32_t x, uint32_t y)>& func)
+{
+	for(uint32_t i = 0; i < m_Height; i++)
+		for(uint32_t j = 0; j < m_Width; j++)
+			func(j, i);
+}
+
+bool Level::IsCheckpoint(uint32_t col, uint32_t row) {
+	return m_TileMap[row][col] == 1; // TODO: New numbering system
 }
 
 bool Level::IsPath(uint32_t col, uint32_t row) {

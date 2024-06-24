@@ -1,16 +1,14 @@
 #pragma once
 
-// #include <vector>
+#include <vector>
 
-#include <VolcaniCore/Renderer/Camera.h>
-// #include "VolcaniCore/Renderer/Mesh.h>
-
+#include <Core/Time.h>
+#include <Renderer/Camera.h>
+#include "Renderer/Mesh.h>
 
 #include "EntitySystem.h"
 
 namespace Magma {
-
-// class Light;
 
 class Scene {
 public:
@@ -19,16 +17,23 @@ public:
 
 public:
 	Scene() : Name("Untitled") { }
-	Scene(const std::string_view name) : Name(name) { }
+	Scene(const std::string& name) : Name(name) { }
 	~Scene() = default;
 
 	EntitySystem& GetEntitySystem() { return m_EntitySystem; }
 
+	void OnUpdate(TimeStep ts);
+	void OnRender();
+
+	void AddLight(const Light& light) {
+		m_Lights.push_back(light);
+	}
+
 private:
 	EntitySystem m_EntitySystem;
 
-	// std::vector<Light> m_Lights;
-	// std::vector<Mesh> m_Meshes;
+	std::vector<Light> m_Lights;
+	std::vector<Mesh> m_Meshes;
 };
 
 }

@@ -1,6 +1,7 @@
 #include "Window.h"
 
 #include "Application.h"
+#include "Utils.h"
 #include "Assert.h"
 #include "Events/EventSystem.h"
 

@@ -1,20 +1,31 @@
-#pragma once
+#include "Player.h"
 
-#include <Renderer/Model.h>
+#include <Core/Input.h>
+
+using namespace VolcaniCore;
 
 namespace TheMazeIsLava {
 
-class Player {
-public:
-	Player();
-	~Player();
 
-	void Move();
-	void Render();
+Player::Player() {
 
-private:
-	float x, y;
-	// Ref<Model> m_Model;
-};
+}
+
+Player::~Player() {
+	
+}
+
+void Player::Move() {
+	x += 5 * ((Input::KeyPressed(Key::Right) || Input::KeyPressed(Key::A))
+			- (Input::KeyPressed(Key::Left) || Input::KeyPressed(Key::D)));
+	y += 5 * ((Input::KeyPressed(Key::Up) || Input::KeyPressed(Key::W))
+			- (Input::KeyPressed(Key::Down) || Input::KeyPressed(Key::S)));
+}
+
+void Player::Render() {
+	Renderer::RenderModel(GameState::PlayerModel1,
+						Transform{ .Translation = { x, 0.0f, y } });
+}
+
 
 }

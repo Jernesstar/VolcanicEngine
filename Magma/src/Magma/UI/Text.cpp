@@ -1,4 +1,4 @@
-#include "UI.h"
+#include "Text.h"
 
 #include <Renderer/Renderer.h>
 #include <Events/EventSystem.h>
@@ -22,11 +22,10 @@ void Text::Draw() {
 		ImVec4(m_Color.r, m_Color.g, m_Color.b, m_Color.a));
 
 	ImVec2 pos;
-	ImVec2 size = ImGui::CalcTextSize(m_Text.c_str());
 	pos.x = x;
 	pos.y = y;
-	// pos.x = x + ((boundry.x / 2) - ((size.x + charSize.x) / 2));
-	// pos.y = y + ((idx * size.y) + ypadding);
+	// pos.x = x + ((boundry.x / 2) - ((m_Width + charSize.x) / 2));
+	// pos.y = y + ((idx * m_Height) + ypadding);
 	ImGui::RenderText(pos, m_Text.c_str(), 0, false);
 
 	ImGui::PopStyleColor();

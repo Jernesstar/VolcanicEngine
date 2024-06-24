@@ -16,9 +16,10 @@ public:
 	const uint32_t Size;
 	const uint32_t Count;
 
-	BufferElement(const std::string& name, BufferDataType type, bool normalized = true)
-		: Name(name), Type(type), Normalized(normalized),
-			Size(CalcSize(type)), Count(CalcCount(type)) { }
+	BufferElement(const std::string& name, BufferDataType type,
+					bool normalized = true)
+		: Name(name), Type(type), Normalized(normalized), Size(CalcSize(type)),
+			Count(CalcCount(type)) { }
 
 private:
 	static uint32_t CalcSize(BufferDataType type);
@@ -32,15 +33,20 @@ public:
 	const bool Dynamic;
 
 public:
-	BufferLayout(const std::initializer_list<BufferElement>& elements, bool dynamic = true)
-		: Elements(elements), Stride(CalculateStride(elements)), Dynamic(dynamic) { }
+	BufferLayout(const std::initializer_list<BufferElement>& elements,
+					bool dynamic = true)
+		: Elements(elements), Stride(CalcStride(elements)), Dynamic(dynamic) { }
 
-	std::vector<BufferElement>::const_iterator begin() const { return Elements.begin(); }
-	std::vector<BufferElement>::const_iterator end() const { return Elements.end(); }
+	std::vector<BufferElement>::const_iterator begin() const {
+		return Elements.begin();
+	}
+	std::vector<BufferElement>::const_iterator end() const {
+		return Elements.end();
+	}
 
 private:
-	uint32_t CalculateStride(const std::initializer_list<BufferElement>& elements) {
-		int stride = 0;
+	uint32_t CalcStride(const std::initializer_list<BufferElement>& elements) {
+		uint32_t stride = 0;
 		for(auto& element : elements)
 			stride += element.Size;
 		return stride;
