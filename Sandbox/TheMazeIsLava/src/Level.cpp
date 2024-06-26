@@ -7,19 +7,16 @@
 
 namespace TheMazeIsLava {
 
-Level::Level(std::vector<std::vector<uint32_t>> map,
-			const std::function<float(float t)>& lavaSpeedFunction)
-	: m_TileMap(map), LavaSpeed(lavaSpeedFunction),
-		m_Width(map[0].size()), m_Height(map.size())
+Level::Level(const std::string& name, std::vector<std::vector<uint32_t>> map)
+	: Name(name), m_Tilemap(map), m_Width(map[0].size()), m_Height(map.size())
 {
-	for(uint32_t y = 0; y < m_Height; y++) {
-		for(uint32_t x = 0; x < m_Width; x++) {
-			if(map[y][x] == 3)
-				m_Goal = { x, m_Height - y };
-			if(map[y][x] == 2)
-				m_LavaPoints.push_back({ x, y });
-		}
-	}
+	TraverseTilemap(
+	[](uint32_t x, uint32_t y) {
+		if(IsGoal(x, y))
+			m_Goal = { x, m_Height - y };
+		if(IsLave(x, y))
+			m_LavaPoints.push_back({ x, y });
+	});
 }
 
 Level::~Level() {
@@ -35,7 +32,7 @@ void Level::Render(TimeStep ts) {
 }
 
 void Level::PropagateLava() {
-	uint32_t lavaSpeed = LavaSpeed(m_TimeSinceLevelStart);
+	// uint32_t lavaSpeed = LavaSpeed(m_TimeSinceLevelStart);
 
 	// Propagate the lava in tile space, flow animation interpolates smoothly
 }
@@ -66,19 +63,19 @@ void Level::TraverseTilemap(
 }
 
 bool Level::IsCheckpoint(uint32_t col, uint32_t row) {
-	return m_TileMap[row][col] == 1; // TODO: New numbering system
+	return m_Tilemap[row][col] == 1; // TODO: New numbering system
 }
 
 bool Level::IsPath(uint32_t col, uint32_t row) {
-	return m_TileMap[row][col] == 1;
+	return m_Tilemap[row][col] == 1;
 }
 
 bool Level::IsLava(uint32_t col, uint32_t row) {
-	return m_TileMap[row][col] == 2;
+	return m_Tilemap[row][col] == 2;
 }
 
 bool Level::IsGoal(uint32_t col, uint32_t row) {
-	return m_TileMap[row][col] == 3;
+	return m_Tilemap[row][col] == 3;
 }
 
 bool Level::IsWall(uint32_t col, uint32_t row) {
@@ -88,13 +85,13 @@ bool Level::IsWall(uint32_t col, uint32_t row) {
 
 	var result = false;
 	if(col - 1 >= 0)                              // Left
-		result |= (m_TimeMap[row][col - 1] == 1);
-	if(col + 1 < m_TimeMap.size())                // Right
-		result |= (m_TimeMap[row][col + 1] == 1);
+		result |= (m_Tilemap[row][col - 1] == 1);
+	if(col + 1 < m_Tilemap.size())                // Right
+		result |= (m_Tilemap[row][col + 1] == 1);
 	if(row - 1 >= 0)                              // Up
-		result |= (m_TimeMap[row - 1][col] == 1);
-	if(row + 1 < m_TimeMap.size())                // Down
-		result |= (m_TimeMap[row + 1][col] == 1);
+		result |= (m_Tilemap[row - 1][col] == 1);
+	if(row + 1 < m_Tilemap.size())                // Down
+		result |= (m_Tilemap[row + 1][col] == 1);
 
 	return result;
 }

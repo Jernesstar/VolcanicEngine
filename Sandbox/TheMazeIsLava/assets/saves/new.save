@@ -4,8 +4,8 @@ Save:
 
   Levels:
     - Level:
-        Name: The Beginning of it All
-        TileMap:
+        Name: Fiery Beginnings
+        Tilemap:
         - [0, 0, 0, 0, 0, 0, 0, 0, 3, 0]
         - [0, 0, 2, 0, 1, 1, 1, 0, 1, 0]
         - [0, 1, 1, 0, 1, 0, 1, 1, 1, 0]
@@ -18,7 +18,7 @@ Save:
         - [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     - Level:
         Name: Round and Around We Go
-        TileMap:
+        Tilemap:
         - [0, 0, 0, 0, 0, 0, 0, 0, 3, 0]
         - [0, 0, 1, 1, 1, 1, 1, 0, 1, 0]
         - [0, 0, 1, 0, 0, 0, 1, 0, 1, 0]
@@ -30,8 +30,8 @@ Save:
         - [0, 0, 1, 1, 1, 1, 1, 1, 1, 0]
         - [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     - Level:
-        Name: A Case Against Rectilinear Motion
-        TileMap:
+        Name: It's in the Zig and the Zag
+        Tilemap:
         - [0, 0, 0, 0, 0, 0, 0, 0, 0, 3]
         - [0, 1, 1, 1, 1, 1, 1, 1, 1, 1]
         - [0, 1, 0, 0, 0, 0, 0, 0, 0, 0]

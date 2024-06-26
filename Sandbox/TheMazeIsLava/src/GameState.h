@@ -38,7 +38,7 @@ public:
 
 private:
 	static void InitUI();
-	static void LoadState(bool newState);
+	static void LoadState(bool newState = false);
 	static void SaveState();
 
 	uint32_t m_CurrentLevel;

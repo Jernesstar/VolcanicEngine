@@ -85,7 +85,7 @@ Ref<Scene> SceneSerializer::Deserialize(const std::string& filepath) {
 	try {
 		file = YAML::LoadFile(filepath);
 	}
-	catch (YAML::ParserException e) {
+	catch(YAML::ParserException e) {
 		VOLCANICORE_ASSERT_ARGS(false, "Could not load file {0}: {1}",
 										filepath, e.what());
 	}
@@ -121,9 +121,8 @@ Ref<Scene> SceneSerializer::Deserialize(const std::string& filepath) {
 	newScene->Camera->SetPositionDirection(camera["Position"].as<glm::vec3>(),
 										   camera["Direction"].as<glm::vec3>());
 
-	if(!scene["Entities"]) return newScene;
-	for(auto entity : scene["Entities"])
-		DeserializeEntity(entity["Entity"], newScene);
+	for(auto node : scene["Entities"])
+		DeserializeEntity(node["Entity"], newScene);
 
 	return newScene;
 }
@@ -183,10 +182,11 @@ void DeserializeEntity(YAML::Node entityNode, Ref<Scene> scene) {
 	auto components = entityNode["Components"];
 	if(!components) return;
 
-	auto eventlistener = components["EventListenerComponent"];
-	if(eventlistener) {
-		entity.Add<EventListenerComponent>();
-	}
+	// TODO: Scripting ?
+	// auto eventlistener = components["EventListenerComponent"];
+	// if(eventlistener) {
+	// 	entity.Add<EventListenerComponent>();
+	// }
 
 	auto tag = components["TagComponent"];
 	if(tag)

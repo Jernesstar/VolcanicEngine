@@ -17,6 +17,11 @@ void GameState::Save() {
 	SaveState();
 }
 
+void GameState::Reset() {
+	LoadState(true);
+	InitUI();
+}
+
 void GameState::InitUI() {
 	EmptyUI = CreateRef<UI::Empty>();
 	HomeUI = CreateRef<UI::Window>(600, 400,
@@ -47,7 +52,11 @@ void GameState::InitUI() {
 			color.a = 0.2f; // Buttons for locked levels are darker
 		LevelSelectUI
 		->Add<UI::Button>(color, std::to_string(i), glm::vec4(1.0f))
-		->SetPosition(i, 0.0f);
+		->SetPosition(i, 0.0f)
+		->SetOnPressed(
+		[&i]() {
+			VOLCANICORE_LOG_INFO("Yet another button pressed");
+		});
 	}
 }
 
@@ -56,25 +65,26 @@ YAML::Emitter& operator <<(YAML::Emitter& out, std::vector<uint32_t>& row) {
 	out << YAML::BeginSeq;
 	for(auto tile : row)
 		out << tile;
+	out << YAML::EndSeq;
 	return out;
 }
 
-void LoadLevel(YAML::Node level);
-void SaveLevel(YAML::Emitter& out, Ref<Level> level);
+Level LoadLevel(YAML::Node levelNode) {
+	std::vector<std::vector<uint32_t>> tilemap;
+	for(auto rowNode : levelNode["Tilemap"])
+		tilemap.push_back(rowNode.as<std::vector<uint32_t>>());
 
-void GameState::Reset() {
-	LoadState(true);
+	return Level{ levelNode["Name"].as<std::string>(), tilemap };
 }
 
-// TODO: Serialize the UI info
 void GameState::LoadState(bool newState) {
-	std::filesystem::path path = newState ? "Sandbox/assets/saves/new.save"
-										  : "Sandbox/assets/saves/game.save";
+	std::string path = newState ? "Sandbox/assets/saves/new.save"
+								: "Sandbox/assets/saves/game.save";
 	YAML::Node file;
 	try {
 		file = YAML::LoadFile(path);
 	}
-	catch (YAML::ParserException e) {
+	catch(YAML::ParserException e) {
 		return;
 	}
 	auto save = file["Save"];
@@ -82,11 +92,23 @@ void GameState::LoadState(bool newState) {
 	m_CurrentLevel = save["Current Level"].as<uint32_t>();
 	m_Coins = save["Coins"].as<uint32_t>();
 
-	for(auto level : save["Levels"])
-		LoadLevel(level);
+	for(auto node : save["Levels"]) {
+		m_Levels.push_back(LoadLevel(node["Level"]));
+	}
 }
 
-// TODO: Deserialize the UI info
+void SaveLevel(YAML::Emitter& out, Level& level) {
+	out << YAML::Key << "Level" << YAML::Value << YAML::BeginMap; // Level
+	out << YAML::Key << "Name" << YAML::Value << level.Name;
+
+	out << YAML::Key << "Tilemap" << YAML::Value << YAML::BeginSeq; // Tilemap
+	for(auto row : m_Levels)
+		out << row;
+	out << YAML::EndSeq; // Tilemap
+
+	out << YAML::EndMap; // Level
+}
+
 void GameState::SaveState() {
 	YAML::Emitter out;
 	out << YAML::BeginMap; // File
@@ -106,44 +128,9 @@ void GameState::SaveState() {
 	out << YAML::EndMap; // Save
 	out << YAML::EndMap; // File
 
-	std::ofstream fout("Sandbox/assets/saves/progress.save");
+	std::ofstream fout("Sandbox/assets/saves/game.save");
 	fout << out.c_str();
 }
-
-void LoadLevel(YAML::Node level) {
-	
-}
-
-void SaveLevel(YAML::Emitter& out, Ref<Level> level) {
-	out << YAML::Key << "Name" << YAML::Value << scene->Name;
-
-}
-
-}
-
-namespace YAML {
-
-
-template<>
-struct convert<std::vector<uint32_>> {
-	static Node encode(const std::vector<uint32_t>& row) {
-		Node node;
-		for(auto tile : row)
-			node.push_back(tile);
-		node.SetStyle(EmitterStyle::Flow);
-		return node;
-	}
-
-	static bool decode(const Node& node, std::vector<uint32_t>& row) {
-		if (!node.IsSequence())
-			return false;
-
-		row.reserve(node.size());
-		for(uint32_t i = 0; i < node.size(); i++)
-			row[i] = node[i].as<uint32_t>();
-		return true;
-	}
-};
 
 
 }

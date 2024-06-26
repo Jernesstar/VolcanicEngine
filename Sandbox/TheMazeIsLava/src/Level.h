@@ -17,13 +17,14 @@ using Coordinate = glm::vec2;
 
 class Level {
 public:
+	const std::string Name;
 	// Return the speed of the lava as a function
 	// of the time elapsed since the level started
-	const std::function<float(float t)> LavaSpeed;
+	// const std::function<float(float t)> LavaSpeed;
 
+	// TODO: Checkpoints
 public:
-	Level(std::vector<std::vector<uint32_t>> map,
-		const std::function<float(float t)>& lavaSpeed);
+	Level(const std::string& name, std::vector<std::vector<uint32_t>> map);
 	~Level();
 
 	void Render(TimeStep ts);
@@ -31,7 +32,8 @@ public:
 private:
 	void PropagateLava();
 	void DrawStoneBlocks();
-	void TraverseTilemap(const std::function<void(uint32_t x, uint32_t y)>& func);
+	void TraverseTilemap(
+			const std::function<void(uint32_t x, uint32_t y)>& func);
 
 	bool IsCheckpoint(uint32_t col, uint32_t row);
 	bool IsPath(uint32_t col, uint32_t row);
@@ -45,7 +47,7 @@ private:
 
 	Coordinate m_Goal;
 	std::vector<Coordinate> m_LavaPoints;
-	std::vector<std::vector<uint32_t>> m_TileMap;
+	std::vector<std::vector<uint32_t>> m_Tilemap;
 };
 
 }

@@ -40,6 +40,11 @@ public:
 		Add(CreateRef<Image>(imagePath));
 	}
 
+	UIElement* SetOnPressed(const std::function<void(void)>& callback) {
+		OnPressed = callback;
+		return this;
+	}
+
 private:
 	void Draw() override;
 	bool OnAttach() override;
