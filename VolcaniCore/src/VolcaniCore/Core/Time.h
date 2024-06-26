@@ -14,8 +14,7 @@ public:
 	TimePoint(const Time_Point& time_point) : m_TimePoint(time_point) { }
 	~TimePoint() = default;
 
-	float operator -(const TimePoint& other)
-	{
+	float operator -(const TimePoint& other) {
 		Duration duration = this->m_TimePoint - other.m_TimePoint;
 		return (float)duration.count();
 	}

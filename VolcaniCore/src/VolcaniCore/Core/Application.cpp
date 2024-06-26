@@ -13,7 +13,7 @@
 namespace VolcaniCore {
 
 Application::Application(uint32_t width, uint32_t height,
-	const std::string& title, const std::string& iconPath)
+						 const std::string& title, const std::string& iconPath)
 {
 	s_Window->SetIcon(iconPath);
 	s_Window->SetTitle(title);

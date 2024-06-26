@@ -9,8 +9,10 @@ public:
 	const std::string Path;
 
 public:
-	Texture(uint32_t width, uint32_t height) { m_Width = width; m_Height = height; }
-	Texture(const std::string& path) : Path(path) { }
+	Texture(uint32_t width, uint32_t height) {
+		m_Width = width;
+		m_Height = height;
+	}
 
 	uint32_t GetWidth() const { return m_Width; }
 	uint32_t GetHeight() const { return m_Height; }

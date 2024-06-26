@@ -13,15 +13,15 @@ namespace VolcaniCore {
 class Application {
 public:
 	Application(uint32_t width = 800, uint32_t height = 600,
-		const std::string& title = "",
-		const std::string& iconPath = "");
+				const std::string& title = "Application",
+				const std::string& iconPath = "");
 	virtual ~Application() = default;
 
 	static void Close();
 
-	static Ref<Window> GetWindow() { return s_Window; }
-	static Ref<RendererAPI> GetRenderer() { return s_BackendRenderer; }
-	static RenderAPI GetRenderAPI() { return s_BackendRenderer->API; }
+	static Ref<Window>		GetWindow() const { return s_Window; }
+	static Ref<RendererAPI> GetRenderer() const { return s_BackendRenderer; }
+	static RenderAPI GetRenderAPI() const { return s_BackendRenderer->API; }
 
 protected:
 	virtual void OnUpdate(TimeStep ts) = 0;
@@ -38,7 +38,6 @@ private:
 	inline static TimeStep s_TimeStep;
 
 	friend int ::main(int argc, char** argv);
-	friend class Window;
 };
 
 }

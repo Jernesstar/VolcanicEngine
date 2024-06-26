@@ -11,7 +11,8 @@ public:
 	CommandLineArgs(int argc, char** argv)
 		: Count(argc - 1), m_Args(argc - 1)
 	{
-		for(int i = 1; i < argc; i++) // Avoid the first commandline argument, which is the executable itself
+		// Skip the first commandline argument, which is the executable itself
+		for(int i = 1; i < argc; i++)
 			m_Args[i - 1] = std::string(argv[i]);
 	}
 

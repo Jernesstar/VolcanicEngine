@@ -7,7 +7,8 @@ namespace VolcaniCore {
 
 struct MouseEvent : public Event {
 protected:
-	MouseEvent(EventType type) : Event(EventCategory::Mouse, type) { }
+	MouseEvent(EventType type)
+		: Event(EventCategory::Mouse, type) { }
 };
 
 struct MouseMovedEvent : public MouseEvent {
@@ -22,7 +23,7 @@ struct MouseScrolledEvent : public MouseEvent {
 	const float ScrollY;
 
 	MouseScrolledEvent(float scrollX, float scrollY)
-		: MouseEvent(EventType::MouseScrolled), 
+		: MouseEvent(EventType::MouseScrolled),
 			ScrollX(scrollX), ScrollY(scrollY) { }
 };
 
@@ -31,7 +32,7 @@ struct MouseButtonEvent : public MouseEvent {
 	const float x, y;
 
 protected:
-	MouseButtonEvent(EventType type, MouseCode button, float x, float y) 
+	MouseButtonEvent(EventType type, MouseCode button, float x, float y)
 		: MouseEvent(type), Button(button), x(x), y(y) { }
 };
 

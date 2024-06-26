@@ -21,7 +21,9 @@ struct MovementControls {
 	Key operator [](const Control& control) const { return Map.at(control); }
 
 private:
-	std::unordered_map<Control, Key> GetControls(std::unordered_map<Control, Key> map) {
+	std::unordered_map<Control, Key> GetControls(
+										std::unordered_map<Control, Key> map)
+	{
 		std::unordered_map<Control, Key> controls;
 		controls[Control::Up]       = Get(map, Control::Up,       Key::Q);
 		controls[Control::Down]     = Get(map, Control::Down,     Key::E);
@@ -32,7 +34,10 @@ private:
 		return controls;
 	}
 
-	Key Get(std::unordered_map<Control, Key> map, Control control, Key default_val) {
+	Key Get(std::unordered_map<Control, Key> map,
+			Control control,
+			Key default_val)
+	{
 		return map.find(control) != map.end() ? map[control] : default_val;
 	}
 };

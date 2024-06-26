@@ -86,7 +86,8 @@ Ref<Scene> SceneSerializer::Deserialize(const std::string& filepath) {
 		file = YAML::LoadFile(filepath);
 	}
 	catch (YAML::ParserException e) {
-		VOLCANICORE_ASSERT_ARGS(false, "Could not load file {0}: {1}", filepath, e.what());
+		VOLCANICORE_ASSERT_ARGS(false, "Could not load file {0}: {1}",
+										filepath, e.what());
 	}
 	auto scene = file["Scene"];
 	auto camera = scene["Camera"];
@@ -104,7 +105,8 @@ Ref<Scene> SceneSerializer::Deserialize(const std::string& filepath) {
 		auto width 	= camera["ViewportWidth"].as<uint32_t>();
 		auto height = camera["ViewportHeight"].as<uint32_t>();
 
-		newScene->Camera = CreateRef<StereographicCamera>(fov, near, far, width, height, speed);
+		newScene->Camera = CreateRef<StereographicCamera>(fov, near, far,
+														  width, height, speed);
 	}
 	else if(camera["Type"].as<std::string>() == "Orthographic") {
 		auto width	= camera["Width"].as<float>();
@@ -116,7 +118,8 @@ Ref<Scene> SceneSerializer::Deserialize(const std::string& filepath) {
 		newScene->Camera = CreateRef<OrthographicCamera>(width, height, near, far, ro);
 	}
 
-	newScene->Camera->SetPositionDirection(camera["Position"].as<glm::vec3>(), camera["Direction"].as<glm::vec3>());
+	newScene->Camera->SetPositionDirection(camera["Position"].as<glm::vec3>(),
+										   camera["Direction"].as<glm::vec3>());
 
 	if(!scene["Entities"]) return newScene;
 	for(auto entity : scene["Entities"])

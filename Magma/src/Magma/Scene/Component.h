@@ -63,17 +63,23 @@ struct EventListenerComponent : public Component {
 struct TagComponent : public Component {
 	std::string Tag;
 
-	TagComponent() : Component(ComponentType::Tag), Tag("Null Tag") { }
-	TagComponent(const std::string_view& tag) : Component(ComponentType::Tag), Tag(tag) { }
+	TagComponent()
+		: Component(ComponentType::Tag), Tag("Null Tag") { }
+	TagComponent(const std::string_view& tag)
+		: Component(ComponentType::Tag), Tag(tag) { }
 	TagComponent(const TagComponent& other) = default;
 };
 
 struct TextureComponent : public Component {
-	Ref<VolcaniCore::Texture> Texture;
+	Ref<Texture> Texture;
 
-	TextureComponent() : Component(ComponentType::Texture) { }
+	TextureComponent()
+		: Component(ComponentType::Texture) { }
 	TextureComponent(const std::string& path)
-		: Component(ComponentType::Texture) { Texture = CreateRef<VolcaniCore::Texture>(path); }
+		: Component(ComponentType::Texture)
+	{
+		Texture = CreateRef<Texture>(path);
+	}
 	TextureComponent(const TextureComponent& other) = default;
 };
 
@@ -82,10 +88,12 @@ struct TransformComponent : public Component {
 	glm::vec3 Rotation = { 0.0f, 0.0f, 0.0f };
 	glm::vec3 Scale = { 1.0f, 1.0f, 1.0f };
 
-	TransformComponent() : Component(ComponentType::Transform) { }
-	TransformComponent(glm::vec3 t, glm::vec3 r, glm::vec3 s)
-		: Component(ComponentType::Transform), Translation(t), Rotation(r), Scale(s) { }
 	TransformComponent(const TransformComponent& other) = default;
+	TransformComponent()
+		: Component(ComponentType::Transform) { }
+	TransformComponent(glm::vec3 t, glm::vec3 r, glm::vec3 s)
+		: Component(ComponentType::Transform),
+			Translation(t), Rotation(r), Scale(s) { }
 
 	glm::mat4 GetTransform() {
 		return glm::translate(glm::mat4(1.0f), Translation)

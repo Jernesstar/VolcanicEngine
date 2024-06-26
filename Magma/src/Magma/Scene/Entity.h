@@ -22,7 +22,8 @@ public:
 	requires std::derived_from<TComponent, Component>
 	TComponent& Add(Args&&... args) {
 		if(Has<TComponent>()) return Get<TComponent>();
-		m_Components[TypeOf<TComponent>::Get()] = new TComponent(std::forward<Args>(args)...);
+		m_Components[TypeOf<TComponent>::Get()]
+			= new TComponent(std::forward<Args>(args)...);
 		return *((TComponent*)m_Components[TypeOf<TComponent>::Get()]);
 	}
 
@@ -51,12 +52,18 @@ private:
 };
 
 template<>
-struct Entity::TypeOf<TagComponent> { static ComponentType Get() { return ComponentType::Tag; } };
+struct Entity::TypeOf<TagComponent> { 
+	static ComponentType Get() { return ComponentType::Tag; }
+};
 
 template<>
-struct Entity::TypeOf<TextureComponent> { static ComponentType Get() { return ComponentType::Texture; } };
+struct Entity::TypeOf<TextureComponent> {
+	static ComponentType Get() { return ComponentType::Texture; }
+};
 
 template<>
-struct Entity::TypeOf<TransformComponent> { static ComponentType Get() { return ComponentType::Transform; } };
+struct Entity::TypeOf<TransformComponent> {
+	static ComponentType Get() { return ComponentType::Transform; }
+};
 
 }

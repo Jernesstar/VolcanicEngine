@@ -13,7 +13,9 @@
 
 #include "TheMazeIsLava/src/Game.h"
 
-VolcaniCore::Application* CreateApplication(const VolcaniCore::CommandLineArgs& args) {
+VolcaniCore::Application* CreateApplication(
+									const VolcaniCore::CommandLineArgs& args)
+{
 	std::string project = args[1];
 
 	if(project == "Template")

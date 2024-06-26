@@ -7,7 +7,8 @@ namespace VolcaniCore {
 class OrthographicCamera : public Camera {
 public:
 	OrthographicCamera() : Camera(CameraType::Ortho) { }
-	OrthographicCamera(float width, float height, float near, float far, float rotation = 0.0f);
+	OrthographicCamera(float width, float height,
+					   float near, float far, float rotation = 0.0f);
 	~OrthographicCamera() = default;
 
 	void Resize(uint32_t width, uint32_t height) override {

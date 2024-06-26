@@ -9,7 +9,8 @@ enum class CameraType { Ortho, Stereo };
 
 class Camera {
 public:
-	Camera(CameraType type) : Type(type) { }
+	Camera(CameraType type)
+		: Type(type) { }
 	virtual ~Camera() = default;
 
 	CameraType GetType() const { return Type; }
@@ -21,9 +22,15 @@ public:
 	const glm::mat4& GetView()           const { return View; }
 	const glm::mat4& GetViewProjection() const { return ViewProjection; }
 
-	void SetPosition(const glm::vec3& position) { Position = position; CalculateView(); }
-	void SetDirection(const glm::vec3& direction) { ForwardDirection = direction; CalculateView(); }
-	void SetPositionDirection(const glm::vec3& position, const glm::vec3& direction) {
+	void SetPosition(const glm::vec3& position) {
+		Position = position; CalculateView();
+	}
+	void SetDirection(const glm::vec3& direction) {
+		ForwardDirection = direction; CalculateView();
+	}
+	void SetPositionDirection(const glm::vec3& position,
+							  const glm::vec3& direction)
+	{
 		Position = position;
 		ForwardDirection = direction;
 		CalculateView();

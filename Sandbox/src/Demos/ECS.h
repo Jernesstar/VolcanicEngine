@@ -45,9 +45,10 @@ ECS::ECS() {
 	scene->GetEntitySystem().AddEntity(entity1);
 	scene->GetEntitySystem().AddEntity(entity2);
 	scene->GetEntitySystem().AddEntity(entity3);
-	SceneSerializer::Serialize(scene, "Sandbox/scenes/test_scene.volc");
+	SceneSerializer::Serialize(scene, "Sandbox/scenes/test.volc");
 
-	Ref<Scene> scene2 = SceneSerializer::Deserialize("Sandbox/scenes/test_scene.volc");
+	scene.reset()
+	scene = SceneSerializer::Deserialize("Sandbox/scenes/test.volc");
 
 	scene2->GetEntitySystem().ForEach(
 	[](Entity& entity) {

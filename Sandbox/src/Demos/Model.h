@@ -68,7 +68,8 @@ private:
 
 	OpenGL::IndexBuffer* index_buffer = new OpenGL::IndexBuffer(indices);
 	OpenGL::VertexBuffer* light_buffer = new OpenGL::VertexBuffer(vertices, l1);
-	Ref<OpenGL::VertexArray> light_array = CreateRef<OpenGL::VertexArray>(light_buffer, index_buffer);
+	Ref<OpenGL::VertexArray> light_array = CreateRef<OpenGL::VertexArray>(
+													light_buffer, index_buffer);
 
 	Ref<ShaderPipeline> model_shader = ShaderPipeline::Create({
 		{ "VolcaniCore/assets/shaders/Model.glsl.vert", ShaderType::Vertex },

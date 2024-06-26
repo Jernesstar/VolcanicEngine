@@ -52,8 +52,10 @@ void EditorLayer::Render() {
 	static bool dockspaceOpen = true;
 	static ImGuiDockNodeFlags dockspaceFlags = ImGuiDockNodeFlags_None;
 
-	// We are using the ImGuiWindowFlags_NoDocking flag to make the parent window not dockable into,
-	// because it would be confusing to have two docking targets within each others.
+	// We are using the ImGuiWindowFlags_NoDocking flag
+	// to make the parent window not dockable into,
+	// because it would be confusing to have
+	// two docking targets within each others.
 	ImGuiWindowFlags windowFlags = ImGuiWindowFlags_MenuBar
 									| ImGuiWindowFlags_NoDocking;
 
@@ -72,7 +74,9 @@ void EditorLayer::Render() {
 		ImGuiWindowFlags_NoBringToFrontOnFocus
 		| ImGuiWindowFlags_NoNavFocus;
 
-	// When using ImGuiDockNodeFlags_PassthruCentralNode, DockSpace() will render our background and handle the pass-thru hole, so we ask Begin() to not render a background.
+	// When using ImGuiDockNodeFlags_PassthruCentralNode,
+	// DockSpace() will render our background and handle the pass-thru hole,
+	// so we ask Begin() to not render a background.
 	if (dockspaceFlags & ImGuiDockNodeFlags_PassthruCentralNode)
 		windowFlags |= ImGuiWindowFlags_NoBackground;
 
@@ -141,8 +145,10 @@ void EditorLayer::Render() {
 		auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
 		auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
 		auto viewportOffset = ImGui::GetWindowPos();
-		m_ViewportBounds[0] = { viewportMinRegion.x + viewportOffset.x, viewportMinRegion.y + viewportOffset.y };
-		m_ViewportBounds[1] = { viewportMaxRegion.x + viewportOffset.x, viewportMaxRegion.y + viewportOffset.y };
+		m_ViewportBounds[0] = { viewportMinRegion.x + viewportOffset.x,
+								viewportMinRegion.y + viewportOffset.y };
+		m_ViewportBounds[1] = { viewportMaxRegion.x + viewportOffset.x,
+								viewportMaxRegion.y + viewportOffset.y };
 
 		m_ViewportFocused = ImGui::IsWindowFocused();
 		m_ViewportHovered = ImGui::IsWindowHovered();
@@ -150,12 +156,16 @@ void EditorLayer::Render() {
 		m_FrameBuffer->Bind();
 		m_FrameBuffer->As<OpenGL::FrameBuffer>()->BindTexture();
 
-		uint64_t textureID = m_FrameBuffer->As<OpenGL::FrameBuffer>()->GetColorAttachmentID();
-		ImGui::Image(reinterpret_cast<void*>(textureID), ImVec2{ m_ViewportSize.x, m_ViewportSize.y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+		uint64_t textureID = m_FrameBuffer
+							->As<OpenGL::FrameBuffer>()
+							->GetColorAttachmentID();
+		ImGui::Image(reinterpret_cast<void*>(textureID),
+					 ImVec2{ m_ViewportSize.x, m_ViewportSize.y },
+					 ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
 
-		if (ImGui::BeginDragDropTarget())
-		{
-			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+		if(ImGui::BeginDragDropTarget()) {
+			if(const ImGuiPayload* payload =
+						 ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
 			{
 				const wchar_t* path = (const wchar_t*)payload->Data;
 				OpenScene(path);

@@ -20,24 +20,25 @@ void FileUtils::CreateFile(const std::string& path) {
 std::string FileUtils::ReadFile(const std::string& file_path) {
 	std::ifstream in(file_path, std::ios::in | std::ios::binary);
 
-	VOLCANICORE_ASSERT_ARGS(in, "ReadFile: Could not open file: %s",
+	VOLCANICORE_ASSERT_ARGS(in, "Could not open file: %s",
 								file_path.c_str())
 
-	in.seekg(0, std::ios::end); // Sets the read position at the end of the file;
+	// Sets the read position at the end of the file;
+	in.seekg(0, std::ios::end);
 
 	// Gets current read position. Since read position is at the end of the file
 	// this operation returns the size of the file
 	size_t size = in.tellg();
 
-	VOLCANICORE_ASSERT_ARGS(size != -1, "ReadFile: Could not read from file: %s",
+	VOLCANICORE_ASSERT_ARGS(size != -1, "Could not read from file: %s",
 										file_path.c_str());
 
-	std::string result;
-	result.resize(size); // Resize the resulting string
-	in.seekg(0, std::ios::beg); // Set the read position to the beginning of the file
-	in.read(result.data(), size); // Read the entire file and output the contents to the string
+	std::string str;
+	str.resize(size); // Resize the resulting string
+	in.seekg(0, std::ios::beg); // Set read position at the start of the file
+	in.read(str.data(), size); // Read entire file, output contents to string
 
-	return result;
+	return str;
 }
 
 void FileUtils::WriteToFile(const std::string& path,

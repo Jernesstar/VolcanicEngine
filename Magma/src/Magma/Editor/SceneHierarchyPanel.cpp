@@ -19,7 +19,9 @@
 
 namespace Magma {
 
-static void DrawVec3Control(const std::string& label, glm::vec3& values, float resetValue = 0.0f, float columnWidth = 190.0f);
+static void DrawVec3Control(const std::string& label, glm::vec3& values,
+							float resetValue = 0.0f,
+							float columnWidth = 190.0f);
 
 SceneHierarchyPanel::SceneHierarchyPanel(const Ref<Scene>& context) {
 	SetContext(context);
@@ -47,7 +49,8 @@ void SceneHierarchyPanel::Render() {
 
 		if(ImGui::BeginPopupContextWindow(0, ImGuiPopupFlags_NoOpenOverItems)) {
 			if (ImGui::MenuItem("Create Empty Entity"))
-				m_SelectionContext = &m_Context->GetEntitySystem().AddEntity("Empty Entity");
+				m_SelectionContext = &m_Context->GetEntitySystem()
+												.AddEntity("Empty Entity");
 
 			ImGui::EndPopup();
 		}
@@ -101,7 +104,9 @@ void SceneHierarchyPanel::DrawComponents(Entity& entity)
 	[this](auto& component) {
 		ImGui::Button("Texture", ImVec2(120.0f, 0.0f));
 		if(ImGui::BeginDragDropTarget()) {
-			if(const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
+			if(const ImGuiPayload* payload =
+						ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+			{
 				const wchar_t* path = (const wchar_t*)payload->Data;
 				std::filesystem::path texturePath(path);
 				Ref<Texture> texture = Texture::Create(texturePath.string());
@@ -117,9 +122,11 @@ void SceneHierarchyPanel::DrawEntityNode(Entity& entity) {
 	auto& tag = entity.Get<TagComponent>().Tag;
 	
 	ImGuiTreeNodeFlags flags;
-	if(m_SelectionContext) flags = ((*m_SelectionContext == entity) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow;
+	if(m_SelectionContext)
+		flags = ((*m_SelectionContext == entity) ? ImGuiTreeNodeFlags_Selected : 0)
+												 | ImGuiTreeNodeFlags_OpenOnArrow;
 	flags |= ImGuiTreeNodeFlags_SpanAvailWidth;
-	bool opened = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, tag.c_str());
+	bool opened = ImGui::TreeNodeEx((void*)entity, flags, tag.c_str());
 
 	if(ImGui::IsItemClicked()) {
 		m_SelectionContext = &entity;
@@ -155,18 +162,25 @@ void SceneHierarchyPanel::DisplayAddComponentEntry(const std::string& entryName)
 }
 
 template<typename TComponent, typename UIFunction>
-void SceneHierarchyPanel::DrawComponent(const std::string& name, Entity& entity, UIFunction uiFunction)
+void SceneHierarchyPanel::DrawComponent(const std::string& name, Entity& entity,
+										UIFunction uiFunction)
 {
 	if (!entity.Has<TComponent>()) return;
 
-	const ImGuiTreeNodeFlags treeNodeFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_FramePadding;
+	const ImGuiTreeNodeFlags treeNodeFlags = ImGuiTreeNodeFlags_DefaultOpen
+											| ImGuiTreeNodeFlags_Framed
+											| ImGuiTreeNodeFlags_SpanAvailWidth
+											| ImGuiTreeNodeFlags_AllowItemOverlap
+											| ImGuiTreeNodeFlags_FramePadding;
 	auto& component = entity.Get<TComponent>();
 	ImVec2 contentRegionAvailable = ImGui::GetContentRegionAvail();
 
 	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{ 4, 4 });
-	float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+	float lineHeight = GImGui->Font->FontSize
+					 + GImGui->Style.FramePadding.y * 2.0f;
 	ImGui::Separator();
-	bool open = ImGui::TreeNodeEx((void*)typeid(T).hash_code(), treeNodeFlags, name.c_str());
+	bool open = ImGui::TreeNodeEx((void*)typeid(T).hash_code(),
+								  treeNodeFlags, name.c_str());
 	ImGui::PopStyleVar();
 	ImGui::SameLine(contentRegionAvailable.x - lineHeight * 0.5f);
 
@@ -191,7 +205,8 @@ void SceneHierarchyPanel::DrawComponent(const std::string& name, Entity& entity,
 		entity.Remove<TComponent>();
 }
 
-static void DrawVec3Control(const std::string& label, glm::vec3& values, float resetValue, float columnWidth)
+static void DrawVec3Control(const std::string& label, glm::vec3& values,
+							float resetValue, float columnWidth)
 {
 	ImGuiIO& io = ImGui::GetIO();
 	auto boldFont = io.Fonts->Fonts[0];

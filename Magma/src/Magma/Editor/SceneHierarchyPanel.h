@@ -25,8 +25,9 @@ private:
 	template<typename T>
 	void DisplayAddComponentEntry(const std::string& entryName);
 
-	template<typename TComponent, typename UIFunction>
-	void DrawComponent(const std::string& name, Entity& entity, UIFunction uiFunction);
+	template<typename TComponent, typename TUIFunction>
+	void DrawComponent(const std::string& name, Entity& entity,
+					   TUIFunction uiFunction);
 
 	void SetContext(const Ref<Scene>& scene);
 	void SetSelectedEntity(Entity& entity);
