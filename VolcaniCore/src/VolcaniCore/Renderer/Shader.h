@@ -36,6 +36,9 @@ public:
 
 	virtual ~ShaderPipeline() = default;
 
+	virtual void AddShader(const ShaderFile& shader) = 0;
+	virtual void Compile() = 0;
+
 	virtual void Bind() const = 0;
 	virtual void Unbind() const = 0;
 

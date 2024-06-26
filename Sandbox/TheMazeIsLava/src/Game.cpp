@@ -33,7 +33,7 @@ Game::Game()
 		{ -0.5f, -0.5f, -0.5f }
 	);
 
-	GameState::Init();
+	GameState::Load();
 
 	m_CurrentUI = GameState::HomeUI;
 	m_CurrentScreen = std::bind(&Game::StartScreen, this);
@@ -79,7 +79,7 @@ void Game::LevelScreen() {
 void Game::PlayScreen() {
 	// Gameplay
 
-	m_Levels[m_CurrentLevel - 1].Render(m_TimeStep);
+	// GameState::GetLevel().Render(m_TimeStep);
 
 	if(m_GameOver) {
 		m_CurrentUI = GameState::GameOverUI;

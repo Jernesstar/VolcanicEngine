@@ -11,13 +11,38 @@
 
 namespace VolcaniCore::OpenGL {
 
-uint32_t CreateProgram(const std::vector<ShaderFile>& shader_files);
+uint32_t CreateProgram(const std::vector<ShaderFile>& shaders);
 
 ShaderProgram::ShaderProgram(const std::vector<ShaderFile>& shaders) {
 	m_ProgramID = CreateProgram(shaders);
 }
 
 ShaderProgram::~ShaderProgram() { glDeleteProgram(m_ProgramID); }
+
+void ShaderProgram::AddShader(const ShaderFile& void) {
+	uint32_t shaderID = CreateShader(shader);
+	glAttachShader(programID, shaderID);
+}
+
+void ShaderProgram::Compile() {
+	glLinkProgram(programID);
+
+	int result;
+	glGetProgramiv(programID, GL_LINK_STATUS, &result);
+
+	if(result == GL_FALSE) {
+		GLint length;
+		glGetProgramiv(programID, GL_INFO_LOG_LENGTH, &length);
+
+		char* message = (char*)alloca(length * sizeof(char));
+		glGetProgramInfoLog(programID, length, &length, message);
+
+		VOLCANICORE_ASSERT_ARGS(false, "An linking error has occured: \n%s", message);
+
+		glDeleteProgram(programID);
+		return 0;
+	}
+}
 
 void ShaderProgram::Bind() const { glUseProgram(m_ProgramID); }
 void ShaderProgram::Unbind() const { glUseProgram(0); }
@@ -95,8 +120,7 @@ uint32_t CreateShader(const ShaderFile& shader)
 	int result;
 	glGetShaderiv(shaderID, GL_COMPILE_STATUS, &result);
 
-	if(result == GL_FALSE)
-	{
+	if(result == GL_FALSE) {
 		int length;
 		glGetShaderiv(shaderID, GL_INFO_LOG_LENGTH, &length);
 		char* message = (char*)alloca(length * sizeof(char));
@@ -115,28 +139,11 @@ uint32_t CreateProgram(const std::vector<ShaderFile>& shaders)
 	std::vector<uint32_t> shaderIDs(shaders.size());
 
 	for(const auto& shader : shaders) {
-		uint32_t shaderID = CreateShader(shader);
-		glAttachShader(programID, shaderID);
+		AddShader(shader);
 		shaderIDs.push_back(shaderID);
 	}
 
-	glLinkProgram(programID);
-
-	int result;
-	glGetProgramiv(programID, GL_LINK_STATUS, &result);
-
-	if(result == GL_FALSE) {
-		GLint length;
-		glGetProgramiv(programID, GL_INFO_LOG_LENGTH, &length);
-
-		char* message = (char*)alloca(length * sizeof(char));
-		glGetProgramInfoLog(programID, length, &length, message);
-
-		VOLCANICORE_ASSERT_ARGS(false, "An linking error has occured: \n%s", message);
-
-		glDeleteProgram(programID);
-		return 0;
-	}
+	Compile();
 
 	for(auto& shaderID : shaderIDs) {
 		glDetachShader(programID, shaderID);

@@ -10,7 +10,7 @@ namespace TheMazeIsLava {
 // Global state
 class GameState {
 public:
-	void Init();
+	void Load();
 	void Save();
 	void Reset();
 
@@ -18,7 +18,7 @@ public:
 	void Update(TimeStep ts);
 
 	uint32_t GetCurrentLevel();
-	Ref<Scene> LoadLevel(uint32_t level);
+	Ref<Scene> LoadLevel(Level level);
 
 public:
 	inline static const uint32_t LevelCount = 3;
@@ -38,10 +38,11 @@ public:
 
 private:
 	static void InitUI();
-	static void LoadState();
+	static void LoadState(bool newState);
 	static void SaveState();
 
 	uint32_t m_CurrentLevel;
+	std::vector<Level> m_Levels;
 };
 
 }

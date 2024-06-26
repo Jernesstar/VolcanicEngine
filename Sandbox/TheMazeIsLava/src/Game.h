@@ -32,19 +32,11 @@ private:
 	void PauseScreen();
 	void OverScreen();
 
-	void Save();
-	void Load();
-
-	void LoadUI();
-	void LoadLevels();
-
 private:
 	Ref<UI::UIElement> m_CurrentUI;
 	Ref<Camera> m_Camera = CreateRef<StereographicCamera>();
 	Ref<Scene> m_Scene;
 	CameraController m_CameraController{ m_Camera };
-
-	std::vector<Level> m_Levels;
 
 	bool m_ReturnPressed = false;
 	bool m_GameOver = false;

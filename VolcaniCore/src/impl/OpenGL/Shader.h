@@ -21,6 +21,9 @@ public:
 	ShaderProgram(const std::vector<ShaderFile>& shaders);
 	~ShaderProgram();
 
+	void AddShader(const ShaderFile& shader) override;
+	void Compile() override;
+
 	void Bind() const override;
 	void Unbind() const override;
 
