@@ -25,13 +25,14 @@ struct ShaderFile {
 
 class ShaderPipeline {
 public:
+	// NOTE: For later use in the future
 	static void Init();
-
-	static Ref<ShaderPipeline> Get(Shader shader);
+	static Ref<Shader> Get(ShaderType shader);
 
 	static Ref<ShaderPipeline> Create(const std::vector<ShaderFile>& shaders);
 	static Ref<ShaderPipeline> Create(const std::vector<std::string>& paths);
-	static Ref<ShaderPipeline> Create(const std::string& folder_path, const std::string& name);
+	static Ref<ShaderPipeline> Create(const std::string& folderPath,
+									  const std::string& name);
 
 	virtual ~ShaderPipeline() = default;
 
@@ -40,10 +41,13 @@ public:
 
 	virtual void SetInt(const std::string& name, int _int) = 0;
 	virtual void SetFloat(const std::string& name, float _float) = 0;
-	virtual void SetTexture(const std::string& name, Ref<Texture> texture, uint32_t slot) = 0;
+	virtual void SetTexture(const std::string& name, Ref<Texture> texture,
+							uint32_t slot) = 0;
 
+	// TODO: Implement
 	// template<typename T>
-	// virtual void SetUniformBuffer(const std::string& name, Ref<UniformBuffer<T>> buffer) = 0;
+	// virtual void SetUniformBuffer(const std::string& name,
+									//  Ref<UniformBuffer<T>> buffer) = 0;
 
 	virtual void SetVec2(const std::string& name, const glm::vec2& vec) = 0;
 	virtual void SetVec3(const std::string& name, const glm::vec3& vec) = 0;
@@ -52,16 +56,6 @@ public:
 	virtual void SetMat2(const std::string& name, const glm::mat2& mat) = 0;
 	virtual void SetMat3(const std::string& name, const glm::mat3& mat) = 0;
 	virtual void SetMat4(const std::string& name, const glm::mat4& mat) = 0;
-
-	template<typename Derived>
-	Derived* As() const { return (Derived*)(this); }
-
-private:
-	inline static Ref<ShaderPipeline> s_SimpleShader;
-	inline static Ref<ShaderPipeline> s_CubemapShader;
-	inline static Ref<ShaderPipeline> s_ModelShader;
-	inline static Ref<ShaderPipeline> s_FrameBufferShader;
-	// inline static Ref<ShaderPipeline> s_QuadShader;
 };
 
 }

@@ -7,7 +7,7 @@
 #include <glad/glad.h>
 #include <stb_image/stb_image.h>
 
-#include "Core/Utils.h"
+#include "Core/FileUtils.h"
 #include "Core/Log.h"
 
 namespace VolcaniCore::OpenGL {
@@ -44,7 +44,7 @@ Cubemap::Cubemap(const std::string& cubemap_folder)
 	for(auto& face : faces)
 	{
 		int width, height, bpp;
-		unsigned char* data = Utils::ReadImage(face.string(), width, height, bpp, 0, false);
+		unsigned char* data = FileUtils::ReadImage(face.string(), width, height, bpp, 0, false);
 		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + map[face.stem().string()], 0, GL_RGB, width,
 			height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
 		stbi_image_free(data);
@@ -66,7 +66,7 @@ Cubemap::Cubemap(const std::vector<std::string>& faces)
 	for(int i = 0; i < 6; i++)
 	{
 		int width, height, bpp;
-		unsigned char* data = Utils::ReadImage(faces[i], width, height, bpp, 0, false);
+		unsigned char* data = FileUtils::ReadImage(faces[i], width, height, bpp, 0, false);
 		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 		stbi_image_free(data);
 	}

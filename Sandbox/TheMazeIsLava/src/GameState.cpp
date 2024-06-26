@@ -51,6 +51,14 @@ void GameState::InitUI() {
 	}
 }
 
+YAML::Emitter& operator <<(YAML::Emitter& out, std::vector<uint32_t>& row) {
+	out << YAML::Flow;
+	out << YAML::BeginSeq;
+	for(auto tile : row)
+		out << tile;
+	return out;
+}
+
 void LoadLevel(YAML::Node level) {
 
 }
@@ -83,5 +91,33 @@ void GameState::SaveState() {
 	std::ofstream fout("Sandbox/assets/saves/progress.save");
 	fout << out.c_str();
 }
+
+
+}
+
+namespace YAML {
+
+
+template<>
+struct convert<std::vector<uint32_>> {
+	static Node encode(const std::vector<uint32_t>& row) {
+		Node node;
+		for(auto tile : row)
+			node.push_back(tile);
+		node.SetStyle(EmitterStyle::Flow);
+		return node;
+	}
+
+	static bool decode(const Node& node, std::vector<uint32_t>& row) {
+		if (!node.IsSequence())
+			return false;
+
+		row.reserve(node.size());
+		for(uint32_t i = 0; i < node.size(); i++)
+			row[i] = node[i].as<uint32_t>();
+		return true;
+	}
+};
+
 
 }

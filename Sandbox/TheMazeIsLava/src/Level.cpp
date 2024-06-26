@@ -31,7 +31,7 @@ void Level::Render(TimeStep ts) {
 	m_TimeSinceLevelStart += (float)ts;
 
 	DrawStoneBlocks();
-	PropagateLava();
+	PropagateLava(); // Fluid simulation
 }
 
 void Level::PropagateLava() {

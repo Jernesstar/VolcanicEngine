@@ -12,6 +12,7 @@ class GameState {
 public:
 	void Init();
 	void Save();
+	void Reset();
 
 	void SetUI();
 	void Update(TimeStep ts);

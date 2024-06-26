@@ -1,7 +1,7 @@
 #include "Window.h"
 
 #include "Application.h"
-#include "Utils.h"
+#include "FileUtils.h"
 #include "Assert.h"
 #include "Events/EventSystem.h"
 
@@ -43,7 +43,7 @@ void Window::SetIcon(const std::string& path) {
 	}
 
 	GLFWimage icon;
-	icon.pixels = Utils::ReadImage(path, icon.width, icon.height);
+	icon.pixels = FileUtils::ReadImage(path, icon.width, icon.height);
 	glfwSetWindowIcon(m_NativeWindow, 1, &icon);
 	free(icon.pixels);
 }
