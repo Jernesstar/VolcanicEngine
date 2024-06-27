@@ -1,26 +1,21 @@
 #include "Window.h"
 
-#include <Renderer/Renderer.h>
-#include <Events/EventSystem.h>
-
-#include <OpenGL/Renderer.h>
-
 using namespace VolcaniCore;
 
 namespace Magma::UI {
 
-Window(uint32_t width, uint32_t height, const glm::vec4& bgColor,
-		const uint32_t borderWidth, const uint32_t borderHeight,
-		const glm::vec4 borderColor)
+
+Window::Window(uint32_t width, uint32_t height, const glm::vec4& bgColor,
+			   uint32_t borderWidth, uint32_t borderHeight,
+			   const glm::vec4& borderColor)
 	: UIElement(UIType::Window, width, height),
-		m_BackgroundColor(bgColor),
+		m_BackgroundColor(bgColor), m_BorderColor(borderColor),
 		m_BorderWidth(borderWidth), m_BorderHeight(borderHeight)
-		m_BorderColor(borderColor)
 {
 	EventSystem::RegisterListener<ApplicationUpdatedEvent>(
 	[](ApplicationUpdatedEvent&) {
 		// After the app has finished rendering, we can draw the UI
-		ImGUI::End();
+		ImGui::End();
 	});
 }
 
@@ -53,7 +48,7 @@ void Window::Draw() {
 				| ImGuiWindowFlags_NoBringToFrontOnFocus
 				| ImGuiWindowFlags_NoNavFocus;
 
-	ImGUI::Begin("##Window", &m_Open, windowFlags);
+	ImGui::Begin("##Window", &m_Open, windowFlags);
 
 	ImGui::PopStyleColor();
 	ImGui::PopStyleVar();

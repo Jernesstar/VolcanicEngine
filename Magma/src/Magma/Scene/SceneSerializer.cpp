@@ -151,7 +151,7 @@ void SerializeEntity(YAML::Emitter& out, Entity& entity) {
 	}
 
 	if(entity.Has<TextureComponent>()) {
-		auto& texture = entity.Get<TextureComponent>().Texture->Path;
+		auto texture = entity.Get<TextureComponent>().Texture->GetPath();
 
 		out << YAML::Key << "TextureComponent";
 		out << YAML::BeginMap;

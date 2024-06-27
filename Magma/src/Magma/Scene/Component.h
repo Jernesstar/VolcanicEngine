@@ -71,14 +71,14 @@ struct TagComponent : public Component {
 };
 
 struct TextureComponent : public Component {
-	Ref<Texture> Texture;
+	Ref<VolcaniCore::Texture> Texture;
 
 	TextureComponent()
 		: Component(ComponentType::Texture) { }
 	TextureComponent(const std::string& path)
 		: Component(ComponentType::Texture)
 	{
-		Texture = CreateRef<Texture>(path);
+		Texture = Texture::Create(path);
 	}
 	TextureComponent(const TextureComponent& other) = default;
 };

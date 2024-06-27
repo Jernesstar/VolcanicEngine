@@ -1,9 +1,17 @@
 #pragma once
 
-#include <imgui/imgui.h>
 #include <glm/vec4.hpp>
 
+#include <imgui/imgui.h>
+#include <imgui/backends/imgui_impl_glfw.h>
+#include <imgui/backends/imgui_impl_opengl3.h>
+
 #include <Core/Defines.h>
+#include <Events/EventSystem.h>
+#include <Renderer/Renderer.h>
+#include <Renderer/Texture.h>
+
+#include <OpenGL/Renderer.h>
 
 using namespace VolcaniCore;
 
@@ -36,12 +44,9 @@ public:
 		}
 
 		if(m_Border)
-		Renderer::Draw2DQuad(m_Border,
-							Transform{
-								.Translation = {
-									ImGUI::GetCursor().x, ImGUI::GetCursor().y
-								}
-							});
+		Application::GetRenderer()->As<OpenGL::Renderer>()->Draw2DQuad(m_Border,
+			Transform{ .Translation = { ImGui::GetCursorPos().x, ImGui::GetCursorPos().y, 0.0f }
+		});
 
 		Draw();
 		for(auto& child : m_Children)
@@ -66,8 +71,20 @@ public:
 	template<typename TElement, typename ...Args>
 	requires std::derived_from<TElement, UIElement>
 	Ref<TElement> Add(Args&&... args) {
-		Ref<TElement> element{ new TElement(std::forward<Args>(args)...) };
-		return Add(element);
+		Ref<UIElement> element{ new TElement(std::forward<Args>(args)...) };
+		if(!OnAddElement(element))
+			return std::static_pointer_cast<TElement>(element);
+
+		auto oldParent = element->m_Parent;
+		element->m_Parent = this;
+
+		if(!element->OnAttach()) {
+			element->m_Parent = oldParent;
+			return std::static_pointer_cast<TElement>(element);
+		}
+
+		m_Children.push_back(element);
+		return std::static_pointer_cast<TElement>(element);
 	}
 
 	uint32_t GetWidth() const { return m_Width; }
@@ -86,10 +103,10 @@ public:
 		this->y = y;
 		return this;
 	}
-	// UIElement* SetBorder(Ref<Texture> border) {
-	// 	m_Border = border;
-	// 	return this;
-	// }
+	UIElement* SetBorder(Ref<Texture> border) {
+		m_Border = border;
+		return this;
+	}
 
 	template<typename TDerived>
 	TDerived* As() const { return (TDerived*)(this); }
@@ -102,11 +119,10 @@ protected:
 	// glm::vec4 m_Color;
 	uint32_t m_Width = 0, m_Height = 0;
 	float x = 0, y = 0;
+	Ref<Texture> m_Border = nullptr;
 
-private:
-	UIElement* m_Parent;
 	std::vector<Ref<UIElement>> m_Children;
-	// Ref<Texture> m_Border = nullptr;
+	UIElement* m_Parent;
 };
 
 class Empty : public UIElement {
@@ -121,7 +137,7 @@ private:
 };
 
 void Init() {
-	EventListener::RegisterListener<ApplicationUpdatedEvent>(
+	EventSystem::RegisterListener<ApplicationUpdatedEvent>(
 	[](const ApplicationUpdatedEvent& event) {
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

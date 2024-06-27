@@ -26,7 +26,7 @@ void Text::Draw() {
 	pos.y = y;
 	// pos.x = x + ((boundry.x / 2) - ((m_Width + charSize.x) / 2));
 	// pos.y = y + ((idx * m_Height) + ypadding);
-	ImGui::RenderText(pos, m_Text.c_str(), 0, false);
+	// ImGui::RenderText(pos, m_Text.c_str(), 0, false);
 
 	ImGui::PopStyleColor();
 }

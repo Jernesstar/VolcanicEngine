@@ -27,13 +27,13 @@ Game::Game()
 			m_ReturnPressed = true;
 	});
 	
-	m_Camera->SetProjection(75.0f, 0.01f, 100.0f, 800, 600);
+	m_Camera = CreateRef<StereographicCamera>(75.0f, 0.01f, 100.0f, 800, 600);
 	m_Camera->SetPositionDirection(
 		{  5.0f,  2.0f,  5.0f },
 		{ -0.5f, -0.5f, -0.5f }
 	);
 
-	GameState::Load();
+	GameState::Reset();
 
 	m_CurrentUI = GameState::HomeUI;
 	m_CurrentScreen = std::bind(&Game::StartScreen, this);

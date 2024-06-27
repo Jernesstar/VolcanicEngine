@@ -3,7 +3,7 @@
 #include <VolcaniCore/Core/Application.h>
 #include <VolcaniCore/Core/CommandLineArgs.h>
 
-#include <Magma/Editor.h>
+#include <Magma/Editor/Editor.h>
 
 #include "Demos/Cube.h"
 #include "Demos/ECS.h"
@@ -11,7 +11,7 @@
 #include "Demos/Model.h"
 #include "Demos/Template.h"
 
-#include "TheMazeIsLava/src/Game.h"
+#include "Sandbox/TheMazeIsLava/src/Game.h"
 
 VolcaniCore::Application* CreateApplication(
 									const VolcaniCore::CommandLineArgs& args)

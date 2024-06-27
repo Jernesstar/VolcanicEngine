@@ -9,14 +9,14 @@ using namespace VolcaniCore;
 
 namespace Magma::UI {
 
-TextInput::TextInput()
-	: UIElement(UIType::TextInput), m_Text("")
+TextInput::TextInput(uint32_t maxChars)
+	: UIElement(UIType::TextInput), MaxCharCount(maxChars), m_Text("")
 {
 
 }
 
 void TextInput::Draw() {
-	static char input[64]{ '' };
+	static char input[64]{""};
 
 	ImGui::InputText("##TextInput", input, sizeof(input));
 	m_Text = std::string(input);

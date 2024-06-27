@@ -18,6 +18,7 @@ project "Magma"
         "%{RootPath}/VolcaniCore/src/impl/",
 
         "%{Includes.glm}",
+        "%{Includes.glad}",
         "%{Includes.glfw}",
         "%{Includes.imgui}",
         "%{Includes.imgui}/imgui",

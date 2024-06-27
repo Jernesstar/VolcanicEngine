@@ -9,8 +9,8 @@ public:
 	glm::vec4 Color;
 
 public:
-	Light(const glm::vec4& color) : m_Color(color) { }
-	~Light();
+	Light(const glm::vec4& color) : Color(color) { }
+	~Light() = default;
  };
 
 }

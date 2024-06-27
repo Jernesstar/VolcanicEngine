@@ -363,7 +363,7 @@ void Renderer::DrawCubemap(Ref<VolcaniCore::Cubemap> cubemap) {
 }
 
 void Renderer::Draw3DModel(Ref<VolcaniCore::Model> model, Transform t) {
-	ShaderPipeline::Get(Shader::Model)->Bind();
+	// ShaderPipeline::Get("Model")->Bind();
 }
 
 void Renderer::Draw2DQuad(const glm::vec4& color, Transform t) {

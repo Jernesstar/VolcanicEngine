@@ -28,7 +28,7 @@ void Application::Init() {
 	EventSystem::Init();
 
 	s_BackendRenderer = RendererAPI::CreateRenderer(RenderAPI::OpenGL);
-	ShaderPipeline::Init();
+	// ShaderPipeline::Init();
 	s_BackendRenderer->Init();
 
 	Renderer::Init();

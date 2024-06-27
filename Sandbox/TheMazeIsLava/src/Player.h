@@ -15,7 +15,7 @@ public:
 
 private:
 	float x, y;
-	Ref<Model> m_Model;
+	// Ref<Model> m_Model;
 };
 
 }

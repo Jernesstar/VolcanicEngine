@@ -26,8 +26,8 @@ struct ShaderFile {
 class ShaderPipeline {
 public:
 	// NOTE: For later use in the future
-	static void Init();
-	static Ref<Shader> Get(ShaderType shader);
+	// static void Init();
+	// static Ref<Shader> Get(ShaderType shader);
 
 	static Ref<ShaderPipeline> Create(const std::vector<ShaderFile>& shaders);
 	static Ref<ShaderPipeline> Create(const std::vector<std::string>& paths);

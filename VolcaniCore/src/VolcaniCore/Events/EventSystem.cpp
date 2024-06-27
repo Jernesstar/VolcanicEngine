@@ -44,7 +44,7 @@ GET_CALLBACKS(WindowMovedEvent);
 GET_CALLBACKS(WindowClosedEvent);
 GET_CALLBACKS(ApplicationUpdatedEvent);
 
-void ErrorCallback(int error, const char* description) {
+void EventSystem::ErrorCallback(int error, const char* description) {
 	VOLCANICORE_ASSERT(false, description);
 }
 

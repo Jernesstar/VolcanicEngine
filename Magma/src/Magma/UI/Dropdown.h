@@ -20,7 +20,7 @@ public:
 	DropDown();
 
 	void AddOption(const std::string& text);
-	std::string GetSelection() const { return std::string(m_CurrentItem) };
+	std::string GetSelection() const { return std::string(m_CurrentItem); }
 
 private:
 	void Draw() override;

@@ -5,10 +5,10 @@
 #include <Renderer/StereographicCamera.h>
 #include <Renderer/CameraController.h>
 
-#include <Magma/Scene.h>
+#include <Magma/Scene/Scene.h>
+#include <Magma/UI/UI.h>
 
 #include "Level.h"
-#include "UI.h"
 
 using namespace VolcaniCore;
 using namespace Magma;
@@ -34,14 +34,15 @@ private:
 
 private:
 	Ref<UI::UIElement> m_CurrentUI;
-	Ref<Camera> m_Camera = CreateRef<StereographicCamera>();
+	Ref<StereographicCamera> m_Camera;
 	Ref<Scene> m_Scene;
 	CameraController m_CameraController{ m_Camera };
 
+	TimeStep m_TimeStep;
+	std::function<void(void)> m_CurrentScreen;
+	uint32_t m_CurrentLevel = 0;
 	bool m_ReturnPressed = false;
 	bool m_GameOver = false;
-	uint32_t m_CurrentLevel = 0;
-	std::function<void(void)> m_CurrentScreen;
 };
 
 

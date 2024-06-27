@@ -20,6 +20,7 @@ project "Sandbox"
         "%{RootPath}/VolcaniCore/src/impl",
         "%{RootPath}/Magma/src",
         "%{RootPath}/Magma/src/Magma",
+        "%{RootPath}",
 
         "%{Includes.bgfx}",
         "%{Includes.glfw}",
@@ -48,7 +49,7 @@ project "Sandbox"
         -- "bx",
         "glfw",
         "glad",
-        "assimp",
+        -- "assimp",
         "freetype",
         "stb_image"
     }

@@ -11,36 +11,45 @@
 
 namespace VolcaniCore::OpenGL {
 
-uint32_t CreateProgram(const std::vector<ShaderFile>& shaders);
+uint32_t CreateShader(const ShaderFile& shader);
 
 ShaderProgram::ShaderProgram(const std::vector<ShaderFile>& shaders) {
-	m_ProgramID = CreateProgram(shaders);
+	m_ProgramID = glCreateProgram();
+
+	for(auto shader : shaders)
+		AddShader(shader);
+	Compile();
 }
 
 ShaderProgram::~ShaderProgram() { glDeleteProgram(m_ProgramID); }
 
-void ShaderProgram::AddShader(const ShaderFile& void) {
+void ShaderProgram::AddShader(const ShaderFile& shader) {
 	uint32_t shaderID = CreateShader(shader);
-	glAttachShader(programID, shaderID);
+	glAttachShader(m_ProgramID, shaderID);
+	m_ShaderIDs.push_back(shaderID);
 }
 
 void ShaderProgram::Compile() {
-	glLinkProgram(programID);
+	glLinkProgram(m_ProgramID);
 
 	int result;
-	glGetProgramiv(programID, GL_LINK_STATUS, &result);
+	glGetProgramiv(m_ProgramID, GL_LINK_STATUS, &result);
 
 	if(result == GL_FALSE) {
 		GLint length;
-		glGetProgramiv(programID, GL_INFO_LOG_LENGTH, &length);
+		glGetProgramiv(m_ProgramID, GL_INFO_LOG_LENGTH, &length);
 
 		char* message = (char*)alloca(length * sizeof(char));
-		glGetProgramInfoLog(programID, length, &length, message);
+		glGetProgramInfoLog(m_ProgramID, length, &length, message);
+
+		glDeleteProgram(m_ProgramID);
 
 		VOLCANICORE_ASSERT_ARGS(false, "An linking error has occured: \n%s", message);
+	}
 
-		glDeleteProgram(programID);
-		return 0;
+	for(auto& shaderID : m_ShaderIDs) {
+		glDetachShader(m_ProgramID, shaderID);
+		glDeleteShader(shaderID);
 	}
 }
 
@@ -131,26 +140,6 @@ uint32_t CreateShader(const ShaderFile& shader)
 	}
 
 	return shaderID;
-}
-
-uint32_t CreateProgram(const std::vector<ShaderFile>& shaders)
-{
-	uint32_t programID = glCreateProgram();
-	std::vector<uint32_t> shaderIDs(shaders.size());
-
-	for(const auto& shader : shaders) {
-		AddShader(shader);
-		shaderIDs.push_back(shaderID);
-	}
-
-	Compile();
-
-	for(auto& shaderID : shaderIDs) {
-		glDetachShader(programID, shaderID);
-		glDeleteShader(shaderID);
-	}
-
-	return programID;
 }
 
 }

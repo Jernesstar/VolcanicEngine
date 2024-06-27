@@ -2,6 +2,8 @@
 
 #include <Core/Input.h>
 
+#include "GameState.h"
+
 using namespace VolcaniCore;
 
 namespace TheMazeIsLava {
@@ -23,8 +25,8 @@ void Player::Move() {
 }
 
 void Player::Render() {
-	Renderer::RenderModel(GameState::PlayerModel1,
-						Transform{ .Translation = { x, 0.0f, y } });
+	// Renderer::RenderModel(GameState::PlayerModel1,
+							// Transform{ .Translation = { x, 0.0f, y } });
 }
 
 

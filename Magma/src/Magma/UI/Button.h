@@ -2,13 +2,8 @@
 
 #include "UI.h"
 
-#include <string>
-#include <vector>
-
-#include <imgui/imgui.h>
-#include <glm/vec4.hpp>
-
-#include <Core/Defines.h>
+#include "Image.h"
+#include "Text.h"
 
 using namespace VolcaniCore;
 

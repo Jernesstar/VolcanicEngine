@@ -14,7 +14,7 @@
 #include <VolcaniCore/Core/Log.h>
 #include <VolcaniCore/Renderer/Renderer.h>
 
-#include "SceneSerializer.h"
+#include "Scene/SceneSerializer.h"
 
 using namespace VolcaniCore;
 

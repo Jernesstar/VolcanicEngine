@@ -41,6 +41,8 @@ public:
 
 private:
 	uint32_t m_ProgramID;
+
+	std::vector<uint32_t> m_ShaderIDs;
 };
 
 }

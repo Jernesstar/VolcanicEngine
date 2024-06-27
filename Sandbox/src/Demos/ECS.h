@@ -6,8 +6,8 @@
 #include <Renderer/OrthographicCamera.h>
 #include <Renderer/StereographicCamera.h>
 
-#include <Magma/Entity.h>
-#include <Magma/SceneSerializer.h>
+#include <Magma/Scene/Entity.h>
+#include <Magma/Scene/SceneSerializer.h>
 
 using namespace VolcaniCore;
 using namespace Magma;
@@ -47,10 +47,10 @@ ECS::ECS() {
 	scene->GetEntitySystem().AddEntity(entity3);
 	SceneSerializer::Serialize(scene, "Sandbox/scenes/test.volc");
 
-	scene.reset()
+	scene.reset();
 	scene = SceneSerializer::Deserialize("Sandbox/scenes/test.volc");
 
-	scene2->GetEntitySystem().ForEach(
+	scene->GetEntitySystem().ForEach(
 	[](Entity& entity) {
 		VOLCANICORE_LOG_INFO("%s", entity.Get<TagComponent>().Tag.c_str());
 	});

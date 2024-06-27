@@ -23,7 +23,7 @@ Texture2D::Texture2D(uint32_t width, uint32_t height)
 }
 
 Texture2D::Texture2D(const std::string& path)
-	: VolcaniCore::Texture(path), InternalFormat(GL_RGBA8), DataFormat(GL_RGBA)
+	: InternalFormat(GL_RGBA8), DataFormat(GL_RGBA)
 {
 	unsigned char* pixel_data = FileUtils::ReadImage(path.c_str(), m_Width, m_Height, 4, true);
 	

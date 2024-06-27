@@ -14,13 +14,13 @@ static std::vector<ShaderFile> GetShaders(const std::vector<std::string>& paths)
 static std::vector<ShaderFile> GetShaders(const std::string& shaderFolder,
 										  const std::string& name);
 
-void ShaderPipeline::Init() {
+// void ShaderPipeline::Init() {
 
-}
+// }
 
-Ref<ShaderPipeline> ShaderPipeline::Get(Shader shader) {
+// Ref<ShaderPipeline> ShaderPipeline::Get(Shader shader) {
 
-}
+// }
 
 Ref<ShaderPipeline> ShaderPipeline::Create(const std::vector<ShaderFile>& shaders) {
 	RenderAPI api = Application::GetRenderAPI();

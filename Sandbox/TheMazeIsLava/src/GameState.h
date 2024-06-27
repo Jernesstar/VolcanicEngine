@@ -1,6 +1,10 @@
 #pragma once
 
-#include "UI.h"
+#include <Renderer/Model.h>
+
+#include <Magma/UI/UI.h>
+
+#include "Level.h"
 
 using namespace VolcaniCore;
 using namespace Magma;
@@ -10,18 +14,19 @@ namespace TheMazeIsLava {
 // Global state
 class GameState {
 public:
-	void Load();
-	void Save();
-	void Reset();
+	static void Load();
+	static void Save();
+	static void Reset();
 
-	void SetUI();
-	void Update(TimeStep ts);
-
-	uint32_t GetCurrentLevel();
-	Ref<Scene> LoadLevel(Level level);
+	static void SetUI();
+	static void Update(TimeStep ts);
 
 public:
 	inline static const uint32_t LevelCount = 3;
+
+	inline static uint32_t Coins;
+	inline static uint32_t CurrentLevel;
+	inline static std::vector<Level> Levels;
 
 	inline static Ref<UI::UIElement> EmptyUI;
 	inline static Ref<UI::UIElement> HomeUI;
@@ -40,9 +45,6 @@ private:
 	static void InitUI();
 	static void LoadState(bool newState = false);
 	static void SaveState();
-
-	uint32_t m_CurrentLevel;
-	std::vector<Level> m_Levels;
 };
 
 }

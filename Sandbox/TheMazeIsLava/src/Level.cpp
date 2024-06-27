@@ -1,9 +1,8 @@
 #include "Level.h"
 
-#include <Renderer/Renderer.h>
-#include <Renderer/Transform.h>
+#include "GameState.h"
 
-#include <OpenGL/Renderer.h>
+using namespace VolcaniCore;
 
 namespace TheMazeIsLava {
 
@@ -11,10 +10,10 @@ Level::Level(const std::string& name, std::vector<std::vector<uint32_t>> map)
 	: Name(name), m_Tilemap(map), m_Width(map[0].size()), m_Height(map.size())
 {
 	TraverseTilemap(
-	[](uint32_t x, uint32_t y) {
+	[this](uint32_t x, uint32_t y) {
 		if(IsGoal(x, y))
 			m_Goal = { x, m_Height - y };
-		if(IsLave(x, y))
+		if(IsLava(x, y))
 			m_LavaPoints.push_back({ x, y });
 	});
 }
@@ -39,15 +38,17 @@ void Level::PropagateLava() {
 
 void Level::DrawStoneBlocks() {
 	TraverseTilemap(
-	[](uint32_t x, uint32_t y){
-		Application::GetRenderer()->As<OpenGL::Renderer>()->Draw3DCube(s_Stone,
+	[this](uint32_t x, uint32_t y){
+		Application::GetRenderer()->As<OpenGL::Renderer>()->Draw3DCube(
+		GameState::Stone,
 		Transform{
 			.Translation = glm::vec3{ x, 0.0f, y }
 		});
 
 		if(!IsWall(x, y))
 			return;
-		Application::GetRenderer()->As<OpenGL::Renderer>()->Draw3DCube(s_Stone,
+		Application::GetRenderer()->As<OpenGL::Renderer>()->Draw3DCube(
+		GameState::Stone,
 		Transform{
 			.Translation = glm::vec3{ x, 1.0f, y }
 		});
@@ -63,7 +64,7 @@ void Level::TraverseTilemap(
 }
 
 bool Level::IsCheckpoint(uint32_t col, uint32_t row) {
-	return m_Tilemap[row][col] == 1; // TODO: New numbering system
+	return m_Tilemap[row][col] == 4; // TODO: New numbering system
 }
 
 bool Level::IsPath(uint32_t col, uint32_t row) {
@@ -79,11 +80,11 @@ bool Level::IsGoal(uint32_t col, uint32_t row) {
 }
 
 bool Level::IsWall(uint32_t col, uint32_t row) {
-	if(IsPath(col, row) || IsLava(col, row) || IsEnd(col, row)) {
+	if(IsPath(col, row) || IsLava(col, row) || IsGoal(col, row)) {
 		return false;
 	}
 
-	var result = false;
+	bool result = false;
 	if(col - 1 >= 0)                              // Left
 		result |= (m_Tilemap[row][col - 1] == 1);
 	if(col + 1 < m_Tilemap.size())                // Right

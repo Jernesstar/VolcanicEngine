@@ -8,7 +8,7 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
-#include "Component.h"
+#include "Scene/Component.h"
 
 /* The Microsoft C++ compiler is non-compliant with the C++ standard and needs
 * the following definition to disable a security warning on std::strncpy().
@@ -126,7 +126,7 @@ void SceneHierarchyPanel::DrawEntityNode(Entity& entity) {
 		flags = ((*m_SelectionContext == entity) ? ImGuiTreeNodeFlags_Selected : 0)
 												 | ImGuiTreeNodeFlags_OpenOnArrow;
 	flags |= ImGuiTreeNodeFlags_SpanAvailWidth;
-	bool opened = ImGui::TreeNodeEx((void*)entity, flags, tag.c_str());
+	bool opened = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, tag.c_str());
 
 	if(ImGui::IsItemClicked()) {
 		m_SelectionContext = &entity;

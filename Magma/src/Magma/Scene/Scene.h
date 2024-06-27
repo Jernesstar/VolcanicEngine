@@ -4,9 +4,10 @@
 
 #include <Core/Time.h>
 #include <Renderer/Camera.h>
-#include "Renderer/Mesh.h>
+// #include <Renderer/Mesh.h>
 
 #include "EntitySystem.h"
+#include "Light.h"
 
 namespace Magma {
 
@@ -35,7 +36,7 @@ private:
 	EntitySystem m_EntitySystem;
 
 	std::vector<Light> m_Lights;
-	std::vector<Ref<Mesh>> m_Meshes;
+	// std::vector<Ref<Mesh>> m_Meshes;
 };
 
 }

@@ -103,7 +103,7 @@ Model::Model()
 
 	m_Camera->SetPosition({ 0.0f, 0.0f, 5.0f });
 
-	model_shader->As<OpenGL::ShaderProgram>()->Bind();
+	model_shader->Bind();
 	model_shader->SetMat4("u_Model", glm::mat4(1.0f));
 	model_shader->SetVec3("u_LightPosition", light_pos);
 	model_shader->SetVec3("u_LightColor", light_color);
@@ -125,7 +125,7 @@ void Model::OnUpdate(TimeStep ts)
 	// light_shader->SetMat4("u_ViewProj", m_Camera->GetViewProjection());
 	// Application::GetRenderer()->As<OpenGL::Renderer>()->Draw3DCube(nullptr);
 
-	model_shader->As<OpenGL::ShaderProgram>()->Bind();
+	model_shader->Bind();
 	model_shader->SetMat4("u_ViewProj", m_Camera->GetViewProjection());
 	model_shader->SetVec3("u_CameraPosition", m_Camera->GetPosition());
 	Renderer::RenderModel(m_Model);

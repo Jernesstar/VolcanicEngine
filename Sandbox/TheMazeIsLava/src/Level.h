@@ -29,6 +29,8 @@ public:
 
 	void Render(TimeStep ts);
 
+	std::vector<std::vector<uint32_t>> GetTilemap() const { return m_Tilemap; }
+
 private:
 	void PropagateLava();
 	void DrawStoneBlocks();

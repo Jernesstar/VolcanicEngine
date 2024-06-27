@@ -6,7 +6,7 @@
 #include <VolcaniCore/Renderer/Texture.h>
 #include <VolcaniCore/Renderer/FrameBuffer.h>
 
-#include "Scene.h"
+#include "Scene/Scene.h"
 #include "SceneHierarchyPanel.h"
 
 namespace Magma {

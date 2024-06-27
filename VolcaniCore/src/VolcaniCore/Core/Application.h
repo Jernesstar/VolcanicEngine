@@ -19,9 +19,9 @@ public:
 
 	static void Close();
 
-	static Ref<Window>		GetWindow() const { return s_Window; }
-	static Ref<RendererAPI> GetRenderer() const { return s_BackendRenderer; }
-	static RenderAPI GetRenderAPI() const { return s_BackendRenderer->API; }
+	static Ref<Window>		GetWindow() { return s_Window; }
+	static Ref<RendererAPI> GetRenderer() { return s_BackendRenderer; }
+	static RenderAPI 		GetRenderAPI() { return s_BackendRenderer->API; }
 
 protected:
 	virtual void OnUpdate(TimeStep ts) = 0;

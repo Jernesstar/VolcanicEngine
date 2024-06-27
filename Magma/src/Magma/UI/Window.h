@@ -10,8 +10,8 @@ namespace Magma::UI {
 class Window : public UIElement {
 public:
 	Window(uint32_t width, uint32_t height, const glm::vec4& bgColor,
-			const uint32_t borderWidth = 0, const uint32_t borderHeight = 0
-			const glm::vec4 borderColor = { 1.0f, 1.0f, 1.0f, 1.0f });
+			uint32_t borderWidth = 0, uint32_t borderHeight = 0,
+			const glm::vec4& borderColor = { 1.0f, 1.0f, 1.0f, 1.0f });
 
 private:
 	void Draw() override;
