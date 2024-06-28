@@ -19,8 +19,10 @@ Image::Image(const std::string& imagePath)
 }
 
 void Image::Draw() {
-	ImGui::Image((void*)m_Image->As<OpenGL::Texture2D>()->GetID(),
-					ImVec2{ m_Width, m_Width });
+	auto image = m_Image->As<OpenGL::Texture2D>();
+	image->Bind();
+	ImGui::Image((void*)(uint64_t)(uint32_t)image->GetID(),
+				 ImVec2(m_Width, m_Width));
 }
 
 bool Image::OnAttach() {

@@ -4,6 +4,8 @@
 
 #include <yaml-cpp/yaml.h>
 
+#include <Core/Log.h>
+
 #include <Magma/UI/UIElements.h>
 
 namespace TheMazeIsLava {
@@ -11,9 +13,8 @@ namespace TheMazeIsLava {
 
 void GameState::Load() {
 	LoadState();
+	InitAssets();
 	InitUI();
-
-	// PlayerModel1 = CreateRef<Model>("TheMazeIsLave/assets/models/player.fbx");
 }
 
 void GameState::Save() {
@@ -22,6 +23,7 @@ void GameState::Save() {
 
 void GameState::Reset() {
 	LoadState(true);
+	InitAssets();
 	InitUI();
 }
 
@@ -47,20 +49,30 @@ void GameState::InitUI() {
 	HomeUI
 	->Add<UI::Button>(glm::vec4{ 0.3125f, 0.234375f, 0.078125f, 1.0f })
 	->SetSize(70, 50)
-	->SetBorder(Texture::Create("Sandbox/TheMazeIsLava/assets/border.png"));
+	->SetBorder(
+			Texture::Create("Sandbox/TheMazeIsLava/assets/images/border.png"));
 
-	// for(uint32_t i = 0; i < LevelCount; i++) {
-	// 	glm::vec4 color = { 0.3125f, 0.234375f, 0.078125f, 1.0f };
-	// 	if(i > CurrentLevel)
-	// 		color.a = 0.2f; // Buttons for locked levels are darker
-	// 	LevelSelectUI
-	// 	->Add<UI::Button>(color, std::to_string(i), glm::vec4(1.0f))
-	// 	->SetPosition(i, 0.0f)
-	// 	->SetOnPressed(
-	// 	[&i]() {
-	// 		VOLCANICORE_LOG_INFO("Yet another button pressed");
-	// 	});
-	// }
+	for(uint32_t i = 0; i < LevelCount; i++) {
+		glm::vec4 color = { 0.3125f, 0.234375f, 0.078125f, 1.0f };
+		if(i > CurrentLevel)
+			color.a = 0.2f; // Buttons for locked levels are darker
+		LevelSelectUI
+		->Add<UI::Button>(color)
+		// ->SetText(std::to_string(i), glm::vec4(1.0f))
+		->SetOnPressed(
+		[&i]() {
+			// Prepare to play the next level
+		})
+		->SetPosition(i, 0.0f);
+	}
+}
+
+void GameState::InitAssets() {
+	Stone = Texture::Create("Sandbox/TheMazeIsLava/assets/images/stone.png");
+	// Lava  = Texture::Create("Sandbox/TheMazeIsLava/assets/images/lava.png");
+	// Door  = Texture::Create("Sandbox/TheMazeIsLava/assets/images/door.png");
+	// PlayerModel1 = Model::Create(
+	// 					"Sandbox/TheMazeIsLava/assets/models/player.fbx");
 }
 
 YAML::Emitter& operator <<(YAML::Emitter& out, std::vector<uint32_t>& row) {
@@ -82,7 +94,7 @@ Level LoadLevel(YAML::Node levelNode) {
 
 void GameState::LoadState(bool newState) {
 	std::string path = newState ? "Sandbox/TheMazeIsLava/assets/saves/new.save"
-								: "Sandbox/TheMazeIsLava/assets/saves/game.save";
+								: "Sandbox/TheMazeIsLava/assets/saves/curr.save";
 	YAML::Node file;
 	try {
 		file = YAML::LoadFile(path);
@@ -95,9 +107,8 @@ void GameState::LoadState(bool newState) {
 	CurrentLevel = save["Current Level"].as<uint32_t>();
 	Coins = save["Coins"].as<uint32_t>();
 
-	for(auto node : save["Levels"]) {
+	for(auto node : save["Levels"])
 		Levels.push_back(LoadLevel(node["Level"]));
-	}
 }
 
 void SaveLevel(YAML::Emitter& out, Level& level) {

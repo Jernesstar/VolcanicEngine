@@ -18,10 +18,10 @@ Editor::Editor() {
 
 	Ref<Window> window = Application::GetWindow();
 	ImGuiIO& io = ImGui::GetIO();
-	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-	io.ConfigFlags |= ImGuiConfigFlags_NavEnableSetMousePos;
-	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard
+				   | ImGuiConfigFlags_NavEnableSetMousePos
+				   | ImGuiConfigFlags_DockingEnable
+				   | ImGuiConfigFlags_ViewportsEnable;
 	io.DisplaySize = ImVec2{
 		(float)window->GetWidth(),
 		(float)window->GetHeight()

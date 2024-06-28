@@ -26,10 +26,10 @@ Renderer::Renderer()
 	[&](const WindowResizedEvent& event) {
 		Resize(event.Width, event.Height);
 	});
-	EventSystem::RegisterListener<ApplicationUpdatedEvent>(
-	[&](const ApplicationUpdatedEvent& event) {
-		Flush();
-	});
+	// EventSystem::RegisterListener<ApplicationUpdatedEvent>(
+	// [&](const ApplicationUpdatedEvent& event) {
+	// 	Flush();
+	// });
 }
 
 struct QuadVertex {

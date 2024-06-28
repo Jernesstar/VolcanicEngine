@@ -37,7 +37,7 @@ void Button::Draw() {
 
 
 	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 0, 0 });
-	bool pressed = ButtonFunction(m_Display, ImVec2{ m_Width, m_Height });
+	bool pressed = ButtonFunction(m_Display, ImVec2(m_Width, m_Height));
 	ImGui::PopStyleVar();
 
 	if(pressed) {
@@ -77,7 +77,8 @@ bool ButtonText(Ref<UIElement> element, ImVec2 dim) {
 bool ButtonImage(Ref<UIElement> element, ImVec2 dim) {
 	auto tex = element->As<Image>()->GetImage()->As<OpenGL::Texture2D>();
 	tex->Bind();
-	return ImGui::ImageButton("##Button", (void*)tex->GetID(), dim);
+	return ImGui::ImageButton("##Button",
+							  (void*)(uint64_t)(uint32_t)tex->GetID(), dim);
 }
 
 }

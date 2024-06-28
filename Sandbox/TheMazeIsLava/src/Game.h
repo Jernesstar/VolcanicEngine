@@ -34,9 +34,9 @@ private:
 
 private:
 	Ref<UI::UIElement> m_CurrentUI;
-	Ref<StereographicCamera> m_Camera;
 	Ref<Scene> m_Scene;
-	CameraController m_CameraController{ m_Camera };
+	Ref<StereographicCamera> m_Camera;
+	Ref<CameraController> m_CameraController;
 
 	TimeStep m_TimeStep;
 	std::function<void(void)> m_CurrentScreen;

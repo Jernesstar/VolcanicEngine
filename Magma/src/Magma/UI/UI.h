@@ -17,9 +17,11 @@ using namespace VolcaniCore;
 
 namespace Magma::UI {
 
-static void Init();
 
-static bool NewFrame = true;
+void Init();
+void Begin();
+void End();
+void Close();
 
 enum class UIType { Empty, Window, Button, Dropdown, TextInput, Text, Image };
 
@@ -29,44 +31,12 @@ public:
 
 public:
 	UIElement(UIType type, uint32_t width = 100, uint32_t height = 100,
-				float x = 0, float y = 0, Ref<UIElement> parent = nullptr)
-		: Type(type), m_Width(width), m_Height(height), x(x), y(y),
-			m_Parent(parent.get()) { }
-
+			  float x = 0, float y = 0, Ref<UIElement> parent = nullptr);
 	virtual ~UIElement() = default;
 
-	void Render() {
-		if(NewFrame) { // The first UIElement to be rendered starts the frame
-			ImGui_ImplGlfw_NewFrame();
-			ImGui_ImplOpenGL3_NewFrame();
-			ImGui::NewFrame();
-			NewFrame = false;
-		}
+	void Render();
 
-		if(m_Border)
-		Application::GetRenderer()->As<OpenGL::Renderer>()->Draw2DQuad(m_Border,
-			Transform{ .Translation = { ImGui::GetCursorPos().x, ImGui::GetCursorPos().y, 0.0f }
-		});
-
-		Draw();
-		for(auto& child : m_Children)
-			child->Render();
-	}
-
-	Ref<UIElement> Add(Ref<UIElement> element) {
-		if(!OnAddElement(element)) return element;
-
-		auto oldParent = element->m_Parent;
-		element->m_Parent = this;
-
-		if(!element->OnAttach()) {
-			element->m_Parent = oldParent;
-			return element;
-		}
-
-		m_Children.push_back(element);
-		return element;
-	};
+	Ref<UIElement> Add(Ref<UIElement> element);
 
 	template<typename TElement, typename ...Args>
 	requires std::derived_from<TElement, UIElement>
@@ -116,9 +86,9 @@ protected:
 	virtual bool OnAttach() = 0;
 	virtual bool OnAddElement(Ref<UIElement> element) = 0;
 
-	// glm::vec4 m_Color;
 	uint32_t m_Width = 0, m_Height = 0;
 	float x = 0, y = 0;
+	// glm::vec4 m_Color;
 	Ref<Texture> m_Border = nullptr;
 
 	std::vector<Ref<UIElement>> m_Children;
@@ -135,15 +105,5 @@ private:
 	bool OnAttach() override { return true; }
 	bool OnAddElement(Ref<UIElement> element) override { return true; }
 };
-
-void Init() {
-	EventSystem::RegisterListener<ApplicationUpdatedEvent>(
-	[](const ApplicationUpdatedEvent& event) {
-		ImGui::Render();
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-		NewFrame = true;
-	});
-}
-
 
 }

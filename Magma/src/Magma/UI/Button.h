@@ -20,19 +20,22 @@ public:
 	Button(Ref<Image> uiImage);
 
 	Button(const glm::vec4& color)
-		: UIElement(UIType::Button), m_Color(color) { }
+		: UIElement(UIType::Button), m_Color(color)
+	{
+		m_Display = CreateRef<Text>("");
+	}
 
 	Button(const glm::vec4& color, const std::string& text,
-			const glm::vec4& textColor)
+		   const glm::vec4& textColor)
 		: UIElement(UIType::Button)
 	{
-		Add(CreateRef<Text>(text, textColor));
+		Add(CreateRef<UI::Text>(text, textColor));
 	}
 
 	Button(const std::string& imagePath)
 		: UIElement(UIType::Button)
 	{
-		Add(CreateRef<Image>(imagePath));
+		Add(CreateRef<UI::Image>(imagePath));
 	}
 
 	UIElement* SetOnPressed(const std::function<void(void)>& callback) {

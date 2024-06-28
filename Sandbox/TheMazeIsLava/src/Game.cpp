@@ -32,7 +32,9 @@ Game::Game()
 		{  5.0f,  2.0f,  5.0f },
 		{ -0.5f, -0.5f, -0.5f }
 	);
+	m_CameraController = CreateRef<CameraController>(m_Camera);
 
+	UI::Init();
 	GameState::Reset();
 
 	m_CurrentUI = GameState::HomeUI;
@@ -41,21 +43,26 @@ Game::Game()
 
 Game::~Game() {
 	GameState::Save();
+	UI::Close();
 }
 
 void Game::OnUpdate(TimeStep ts) {
 	m_TimeStep = ts;
-	m_CameraController.OnUpdate(ts);
+	m_CameraController->OnUpdate(ts);
 
-	Renderer::Clear();
+	UI::Begin();
 	Application::GetRenderer()->As<OpenGL::Renderer>()->Begin(m_Camera);
 
 	m_CurrentScreen();
 	m_CurrentUI->Render();
+
+	UI::End();
 }
 
 void Game::StartScreen() {
 	// Front picture, level load, settings
+
+	Renderer::Clear(glm::vec4(1.0f));
 
 	if(m_ReturnPressed) {
 		m_ReturnPressed = false;
@@ -68,6 +75,8 @@ void Game::StartScreen() {
 void Game::LevelScreen() {
 	// Staircase like level selection
 
+	Renderer::Clear(glm::vec4(0.0f));
+
 	if(m_ReturnPressed) {
 		m_ReturnPressed = false;
 		m_CurrentUI = GameState::EmptyUI;
@@ -79,7 +88,9 @@ void Game::LevelScreen() {
 void Game::PlayScreen() {
 	// Gameplay
 
-	// GameState::GetLevel().Render(m_TimeStep);
+	Renderer::Clear(glm::vec4(0.0f));
+
+	GameState::GetCurrentLevel().Render(m_TimeStep);
 
 	if(m_GameOver) {
 		m_CurrentUI = GameState::GameOverUI;

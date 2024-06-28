@@ -65,14 +65,12 @@ void EditorLayer::Render() {
 	ImGui::SetNextWindowViewport(viewport->ID);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-	windowFlags |=
-		ImGuiWindowFlags_NoTitleBar
-		| ImGuiWindowFlags_NoCollapse
-		| ImGuiWindowFlags_NoResize
-		| ImGuiWindowFlags_NoMove;
-	windowFlags |=
-		ImGuiWindowFlags_NoBringToFrontOnFocus
-		| ImGuiWindowFlags_NoNavFocus;
+	windowFlags |= ImGuiWindowFlags_NoTitleBar
+				| ImGuiWindowFlags_NoCollapse
+				| ImGuiWindowFlags_NoResize
+				| ImGuiWindowFlags_NoMove
+				| ImGuiWindowFlags_NoBringToFrontOnFocus
+				| ImGuiWindowFlags_NoNavFocus;
 
 	// When using ImGuiDockNodeFlags_PassthruCentralNode,
 	// DockSpace() will render our background and handle the pass-thru hole,

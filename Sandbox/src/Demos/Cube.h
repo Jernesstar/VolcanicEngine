@@ -56,16 +56,16 @@ void Cube::OnUpdate(TimeStep ts) {
 	controller.OnUpdate(ts);
 	Renderer::Clear({ 1.0f, 1.0f, 1.0f, 1.0f });
 
-	frameBuffer->Bind();
-	{
+	// frameBuffer->Bind();
+	// {
 		Renderer::Clear();
 		Application::GetRenderer()->As<OpenGL::Renderer>()->Begin(camera);
 		Application::GetRenderer()->As<OpenGL::Renderer>()->Draw3DCube(stone);
-	}
-	frameBuffer->Unbind();
-	Application::GetRenderer()->As<OpenGL::Renderer>()->RenderFrameBuffer(frameBuffer, pixelate);
+	// }
+	// frameBuffer->Unbind();
+	// Application::GetRenderer()->As<OpenGL::Renderer>()->RenderFrameBuffer(frameBuffer, pixelate);
 
-	Application::GetRenderer()->As<OpenGL::Renderer>()->Draw2DQuad({ 0.3125f, 0.234375f, 0.078125f, 1.0f });
+	// Application::GetRenderer()->As<OpenGL::Renderer>()->Draw2DQuad({ 0.3125f, 0.234375f, 0.078125f, 1.0f });
 }
 
 }

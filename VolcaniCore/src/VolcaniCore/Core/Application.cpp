@@ -48,12 +48,11 @@ void Application::Run() {
 		TimeStep ts = time - s_LastFrame;
 		s_LastFrame = time;
 
-		EventSystem::PollEvents();
-
 		s_Instance->OnUpdate(ts);
 
 		ApplicationUpdatedEvent event(ts);
 		EventSystem::Dispatch(event);
+		EventSystem::PollEvents();
 
 		s_Window->Update();
 	}

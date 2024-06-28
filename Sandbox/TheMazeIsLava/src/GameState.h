@@ -18,8 +18,10 @@ public:
 	static void Save();
 	static void Reset();
 
-	static void SetUI();
-	static void Update(TimeStep ts);
+	// static void SetUI();
+	// static void Update(TimeStep ts);
+
+	static Level& GetCurrentLevel() { return Levels[CurrentLevel - 1]; }
 
 public:
 	inline static const uint32_t LevelCount = 3;
@@ -34,17 +36,18 @@ public:
 	inline static Ref<UI::UIElement> PauseUI;
 	inline static Ref<UI::UIElement> GameOverUI;
 
-	inline static Ref<Texture> Lava;
 	inline static Ref<Texture> Stone;
-	inline static Ref<Texture> Door;
+	inline static Ref<Texture> Lava;
+	// inline static Ref<Texture> Door;
 
 	// One can unlock different playable characters
 	inline static Ref<Model> PlayerModel1;
 
 private:
-	static void InitUI();
 	static void LoadState(bool newState = false);
 	static void SaveState();
+	static void InitUI();
+	static void InitAssets();
 };
 
 }
