@@ -27,6 +27,14 @@ void GameState::Reset() {
 	InitUI();
 }
 
+void GameState::InitAssets() {
+	Stone = Texture::Create("Sandbox/TheMazeIsLava/assets/images/stone.png");
+	// Lava  = Texture::Create("Sandbox/TheMazeIsLava/assets/images/lava.png");
+	// Door  = Texture::Create("Sandbox/TheMazeIsLava/assets/images/door.png");
+	// PlayerModel1 = Model::Create(
+	// 					"Sandbox/TheMazeIsLava/assets/models/player.fbx");
+}
+
 void GameState::InitUI() {
 	EmptyUI = CreateRef<UI::Empty>();
 	HomeUI = CreateRef<UI::Window>(
@@ -34,7 +42,7 @@ void GameState::InitUI() {
 		10, 20, glm::vec4{ 0.3125f, 0.234375f, 0.078125f, 1.0f }
 	);
 	LevelSelectUI = CreateRef<UI::Window>(
-		600, 200, glm::vec4{ 0.859375f, 0.76171875f, 0.5859375f, 1.0f },
+		600, 400, glm::vec4{ 0.859375f, 0.76171875f, 0.5859375f, 1.0f },
 		10, 20, glm::vec4{ 0.3125f, 0.234375f, 0.078125f, 1.0f }
 	);
 	PauseUI = CreateRef<UI::Window>(
@@ -46,33 +54,30 @@ void GameState::InitUI() {
 		10, 20, glm::vec4{ 0.3125f, 0.234375f, 0.078125f, 1.0f }
 	);
 
-	// HomeUI
-	// ->Add<UI::Button>(glm::vec4{ 0.3125f, 0.234375f, 0.078125f, 1.0f })
-	// ->SetSize(70, 50)
-	// ->SetBorder(
-	// 		Texture::Create("Sandbox/TheMazeIsLava/assets/images/border.png"));
+	HomeUI
+	->SetPosition(100, 100);
+	LevelSelectUI
+	->SetPosition(100, 100);
+	PauseUI
+	->SetPosition(100, 100);
+	GameOverUI
+	->SetPosition(100, 100);
 
-	// for(uint32_t i = 0; i < LevelCount; i++) {
-	// 	glm::vec4 color = { 0.3125f, 0.234375f, 0.078125f, 1.0f };
-	// 	if(i > CurrentLevel)
-	// 		color.a = 0.2f; // Buttons for locked levels are darker
-	// 	LevelSelectUI
-	// 	->Add<UI::Button>(color)
-	// 	// ->SetText(std::to_string(i), glm::vec4(1.0f))
-	// 	->SetOnPressed(
-	// 	[&i]() {
-	// 		// Prepare to play the next level
-	// 	})
-	// 	->SetPosition(i, 0.0f);
-	// }
-}
-
-void GameState::InitAssets() {
-	Stone = Texture::Create("Sandbox/TheMazeIsLava/assets/images/stone.png");
-	// Lava  = Texture::Create("Sandbox/TheMazeIsLava/assets/images/lava.png");
-	// Door  = Texture::Create("Sandbox/TheMazeIsLava/assets/images/door.png");
-	// PlayerModel1 = Model::Create(
-	// 					"Sandbox/TheMazeIsLava/assets/models/player.fbx");
+	float offset = 0.0f;
+	for(uint32_t i = 1; i <= LevelCount; i++) {
+		glm::vec4 color = { 0.3125f, 0.234375f, 0.078125f, 1.0f };
+		if(i > CurrentLevel)
+			color.a = 0.7f; // Buttons for locked levels are darker
+		LevelSelectUI
+		->Add<UI::Button>(color, std::to_string(i))
+		->SetOnPressed(
+		[&i]() {
+			VOLCANICORE_LOG_INFO("Here:");
+			CurrentLevel = 2;
+		})
+		->SetSize(70, 50)
+		->SetPosition(i * 70 + (offset += 40.0f), 100.0f);
+	}
 }
 
 YAML::Emitter& operator <<(YAML::Emitter& out, std::vector<uint32_t>& row) {
@@ -94,7 +99,7 @@ Level LoadLevel(YAML::Node levelNode) {
 
 void GameState::LoadState(bool newState) {
 	std::string path = newState ? "Sandbox/TheMazeIsLava/assets/saves/new.save"
-								: "Sandbox/TheMazeIsLava/assets/saves/curr.save";
+								: "Sandbox/TheMazeIsLava/assets/saves/game.save";
 	YAML::Node file;
 	try {
 		file = YAML::LoadFile(path);
@@ -142,7 +147,7 @@ void GameState::SaveState() {
 	out << YAML::EndMap; // Save
 	out << YAML::EndMap; // File
 
-	std::ofstream fout("Sandbox/assets/saves/game.save");
+	std::ofstream fout("Sandbox/TheMazeIsLava/assets/saves/game.save");
 	fout << out.c_str();
 }
 

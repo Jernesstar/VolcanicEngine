@@ -42,11 +42,8 @@ void Button::Draw() {
 
 	ImGui::SetCursorPos(ImVec2(x, y));
 
-	bool pressed = ButtonFunction(m_Display, ImVec2(m_Width, m_Height));
-
-	if(pressed) {
+	if(ButtonFunction(m_Display, ImVec2(m_Width, m_Height)))
 		OnPressed();
-	}
 	if(ImGui::IsItemDeactivated())
 		OnReleased();
 

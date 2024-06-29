@@ -74,7 +74,7 @@ GameUI::GameUI() {
 	->SetBorder(
 		Texture::Create("Sandbox/TheMazeIsLava/assets/images/border.png"));
 
-	uint32_t space = 0.0f;
+	uint32_t offset = 0.0f;
 	for(uint32_t i = 0; i < 4; i++) {
 		glm::vec4 color = { 0.3125f, 0.234375f, 0.078125f, 1.0f };
 		if(i > 1)
@@ -82,7 +82,7 @@ GameUI::GameUI() {
 		LevelSelectUI
 		->Add<UI::Button>(color, std::to_string(i))
 		->SetSize(70, 50)
-		->SetPosition(i * 70 + (space += 40.0f), 100.0f);
+		->SetPosition(i * 70 + (offset += 40.0f), 100.0f);
 	}
 }
 

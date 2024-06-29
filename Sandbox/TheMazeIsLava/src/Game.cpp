@@ -50,8 +50,10 @@ void Game::OnUpdate(TimeStep ts) {
 	m_TimeStep = ts;
 	m_CameraController->OnUpdate(ts);
 
-	UI::Begin();
+	Renderer::Clear();
 	Application::GetRenderer()->As<OpenGL::Renderer>()->Begin(m_Camera);
+
+	UI::Begin();
 
 	m_CurrentScreen();
 	m_CurrentUI->Render();
@@ -61,8 +63,6 @@ void Game::OnUpdate(TimeStep ts) {
 
 void Game::StartScreen() {
 	// Front picture, level load, settings
-
-	Renderer::Clear(glm::vec4(1.0f));
 
 	if(m_ReturnPressed) {
 		m_ReturnPressed = false;
@@ -74,8 +74,6 @@ void Game::StartScreen() {
 
 void Game::LevelScreen() {
 	// Staircase like level selection
-
-	Renderer::Clear(glm::vec4(0.0f));
 
 	if(m_ReturnPressed) {
 		m_ReturnPressed = false;

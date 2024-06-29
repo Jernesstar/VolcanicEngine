@@ -39,8 +39,8 @@ void Level::PropagateLava() {
 void Level::DrawStoneBlocks() {
 	TraverseTilemap(
 	[this](uint32_t x, uint32_t y) {
-		Application::GetRenderer()->As<OpenGL::Renderer>()
-		->Draw3DCube(GameState::Stone, Transform{ .Translation = glm::vec3{ x, 0.0f, y } });
+		// Application::GetRenderer()->As<OpenGL::Renderer>()
+		// ->Draw3DCube(GameState::Stone, Transform{ .Translation = glm::vec3{ x, 0.0f, y } });
 
 		if(!IsWall(x, y))
 			return;
@@ -74,7 +74,7 @@ bool Level::IsGoal(uint32_t col, uint32_t row) {
 }
 
 bool Level::IsWall(uint32_t col, uint32_t row) {
-	return !(IsPath(col, row) || IsLava(col, row) || IsGoal(col, row));
+	return m_Tilemap[row][col] == 0;
 }
 
 }
