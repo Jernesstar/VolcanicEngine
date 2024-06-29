@@ -68,11 +68,11 @@ GameUI::GameUI() {
 	GameOverUI
 	->SetPosition(100, 100);
 
-	// HomeUI
-	// ->Add<UI::Button>(glm::vec4{ 0.3125f, 0.234375f, 0.078125f, 1.0f })
-	// ->SetSize(70, 50)
-	// ->SetBorder(
-	// 	Texture::Create("Sandbox/TheMazeIsLava/assets/images/border.png"));
+	HomeUI
+	->Add<UI::Button>(glm::vec4{ 0.3125f, 0.234375f, 0.078125f, 1.0f }, "Home")
+	->SetSize(70, 50)
+	->SetBorder(
+		Texture::Create("Sandbox/TheMazeIsLava/assets/images/border.png"));
 
 	// for(uint32_t i = 0; i < 4; i++) {
 	// 	glm::vec4 color = { 0.3125f, 0.234375f, 0.078125f, 1.0f };
@@ -97,8 +97,8 @@ void GameUI::OnUpdate(TimeStep ts) {
 	Renderer::Clear();
 	UI::Begin();
 
-	// HomeUI->Render();
-	PauseUI->Render();
+	HomeUI->Render();
+	// PauseUI->Render();
 	
 	UI::End();
 }

@@ -37,6 +37,9 @@ void Button::Draw() {
 
 
 	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 0, 0 });
+
+	ImGui::SetCursorPos(ImVec2(x, y));
+
 	bool pressed = ButtonFunction(m_Display, ImVec2(m_Width, m_Height));
 	ImGui::PopStyleVar();
 

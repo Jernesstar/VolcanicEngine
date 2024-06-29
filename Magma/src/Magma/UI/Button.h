@@ -19,14 +19,8 @@ public:
 	Button(const glm::vec4& color, Ref<Text> uiText);
 	Button(Ref<Image> uiImage);
 
-	Button(const glm::vec4& color)
-		: UIElement(UIType::Button), m_Color(color)
-	{
-		m_Display = CreateRef<Text>("");
-	}
-
 	Button(const glm::vec4& color, const std::string& text,
-		   const glm::vec4& textColor)
+		   const glm::vec4& textColor = glm::vec4(1.0f))
 		: UIElement(UIType::Button)
 	{
 		Add(CreateRef<UI::Text>(text, textColor));

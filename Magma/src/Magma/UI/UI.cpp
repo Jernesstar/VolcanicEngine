@@ -50,7 +50,8 @@ Ref<UIElement> UIElement::Add(Ref<UIElement> element) {
 
 void UIElement::Render() {
 	if(m_Border)
-		Application::GetRenderer()->As<OpenGL::Renderer>()->Draw2DQuad(m_Border,
+		Application::GetRenderer()->As<OpenGL::Renderer>()
+		->Draw2DQuad(m_Border,
 		Transform{
 			.Translation = {
 				ImGui::GetCursorPos().x,
