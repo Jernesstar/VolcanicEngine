@@ -46,25 +46,25 @@ void GameState::InitUI() {
 		10, 20, glm::vec4{ 0.3125f, 0.234375f, 0.078125f, 1.0f }
 	);
 
-	HomeUI
-	->Add<UI::Button>(glm::vec4{ 0.3125f, 0.234375f, 0.078125f, 1.0f })
-	->SetSize(70, 50)
-	->SetBorder(
-			Texture::Create("Sandbox/TheMazeIsLava/assets/images/border.png"));
+	// HomeUI
+	// ->Add<UI::Button>(glm::vec4{ 0.3125f, 0.234375f, 0.078125f, 1.0f })
+	// ->SetSize(70, 50)
+	// ->SetBorder(
+	// 		Texture::Create("Sandbox/TheMazeIsLava/assets/images/border.png"));
 
-	for(uint32_t i = 0; i < LevelCount; i++) {
-		glm::vec4 color = { 0.3125f, 0.234375f, 0.078125f, 1.0f };
-		if(i > CurrentLevel)
-			color.a = 0.2f; // Buttons for locked levels are darker
-		LevelSelectUI
-		->Add<UI::Button>(color)
-		// ->SetText(std::to_string(i), glm::vec4(1.0f))
-		->SetOnPressed(
-		[&i]() {
-			// Prepare to play the next level
-		})
-		->SetPosition(i, 0.0f);
-	}
+	// for(uint32_t i = 0; i < LevelCount; i++) {
+	// 	glm::vec4 color = { 0.3125f, 0.234375f, 0.078125f, 1.0f };
+	// 	if(i > CurrentLevel)
+	// 		color.a = 0.2f; // Buttons for locked levels are darker
+	// 	LevelSelectUI
+	// 	->Add<UI::Button>(color)
+	// 	// ->SetText(std::to_string(i), glm::vec4(1.0f))
+	// 	->SetOnPressed(
+	// 	[&i]() {
+	// 		// Prepare to play the next level
+	// 	})
+	// 	->SetPosition(i, 0.0f);
+	// }
 }
 
 void GameState::InitAssets() {

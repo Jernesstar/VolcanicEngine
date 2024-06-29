@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Core/Log.h>
+
 #include "UI.h"
 
 #include "Image.h"
@@ -21,7 +23,7 @@ public:
 
 	Button(const glm::vec4& color, const std::string& text,
 		   const glm::vec4& textColor = glm::vec4(1.0f))
-		: UIElement(UIType::Button)
+		: UIElement(UIType::Button), m_Color(color)
 	{
 		Add(CreateRef<UI::Text>(text, textColor));
 	}

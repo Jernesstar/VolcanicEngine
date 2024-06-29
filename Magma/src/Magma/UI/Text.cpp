@@ -1,29 +1,26 @@
 #include "Text.h"
 
-#include <Renderer/Renderer.h>
-#include <Events/EventSystem.h>
-
-#include <OpenGL/Renderer.h>
+#include <Core/Log.h>
 
 using namespace VolcaniCore;
 
 namespace Magma::UI {
 
+
 Text::Text(const std::string& text, const glm::vec4& color)
-	: UIElement(UIType::Text), m_Text(text), m_Color(color)
-{
-	ImVec2 size = ImGui::CalcTextSize(m_Text.c_str());
-	m_Width = size.x;
-	m_Height = size.y;
-}
+	: UIElement(UIType::Text), m_Text(text), m_Color(color) { }
 
 void Text::Draw() {
 	ImGui::PushStyleColor(ImGuiCol_Text,
-		ImVec4(m_Color.r, m_Color.g, m_Color.b, m_Color.a));
+						  ImVec4(m_Color.r, m_Color.g, m_Color.b, m_Color.a));
 
 	ImVec2 pos;
 	pos.x = x;
 	pos.y = y;
+	ImVec2 size = ImGui::CalcTextSize(m_Text.c_str());
+	m_Width = size.x;
+	m_Height = size.y;
+
 	// pos.x = x + ((boundry.x / 2) - ((m_Width + charSize.x) / 2));
 	// pos.y = y + ((idx * m_Height) + ypadding);
 	// ImGui::RenderText(pos, m_Text.c_str(), 0, false);
@@ -41,5 +38,6 @@ bool Text::OnAttach() {
 bool Text::OnAddElement(Ref<UIElement> element) {
 	return false;
 }
+
 
 }

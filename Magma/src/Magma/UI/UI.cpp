@@ -49,15 +49,9 @@ Ref<UIElement> UIElement::Add(Ref<UIElement> element) {
 }
 
 void UIElement::Render() {
-	if(m_Border)
-		Application::GetRenderer()->As<OpenGL::Renderer>()
-		->Draw2DQuad(m_Border,
-		Transform{
-			.Translation = {
-				ImGui::GetCursorPos().x,
-				ImGui::GetCursorPos().y, 0.0f
-			}
-		});
+	// if(m_Border)
+	// 	Application::GetRenderer()->As<OpenGL::Renderer>()
+	// 	->Draw2DQuad(m_Border);
 
 	Draw();
 
@@ -106,11 +100,11 @@ void Init() {
 
 	ImGui::StyleColorsDark();
 
-	// float fontSize = 18.0f * 2.0f;
-	// io.Fonts->AddFontFromFileTTF(
-	// 		"VolcaniCore/assets/fonts/JetBrainsMono-Bold.ttf", fontSize);
-	// io.FontDefault = io.Fonts->AddFontFromFileTTF(
-	// 		"VolcaniCore/assets/fonts/JetBrainsMono-Regular.ttf", fontSize);
+	float fontSize = 18.0f * 2.0f;
+	io.Fonts->AddFontFromFileTTF(
+			"VolcaniCore/assets/fonts/JetBrainsMono-Bold.ttf", fontSize);
+	io.FontDefault = io.Fonts->AddFontFromFileTTF(
+			"VolcaniCore/assets/fonts/JetBrainsMono-Regular.ttf", fontSize);
 
 	EventSystem::RegisterListener<KeyPressedEvent>(
 	[&io](KeyPressedEvent& event) {

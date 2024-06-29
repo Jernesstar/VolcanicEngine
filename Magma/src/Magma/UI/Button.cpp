@@ -29,19 +29,20 @@ Button::Button(Ref<Image> uiImage)
 }
 
 void Button::Draw() {
-	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
-	ImGui::PushStyleColor(ImGuiCol_ButtonHovered,
-							ImVec4(0.24f, 0.24f, 0.24f, 0.0f));
-	ImGui::PushStyleColor(ImGuiCol_ButtonActive,
-							ImVec4(0.91f, 0.1f, 0.15f, 0.0f));
-
-
 	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 0, 0 });
+	ImGui::PushStyleColor(
+		ImGuiCol_Button,
+		ImVec4(m_Color.r, m_Color.g, m_Color.b, m_Color.a));
+	ImGui::PushStyleColor(
+		ImGuiCol_ButtonHovered,
+		ImVec4(m_Color.r, m_Color.g, m_Color.b, m_Color.a - 0.4f));
+	ImGui::PushStyleColor(
+		ImGuiCol_ButtonActive,
+		ImVec4(m_Color.r, m_Color.g, m_Color.b, m_Color.a - 0.8f));
 
 	ImGui::SetCursorPos(ImVec2(x, y));
 
 	bool pressed = ButtonFunction(m_Display, ImVec2(m_Width, m_Height));
-	ImGui::PopStyleVar();
 
 	if(pressed) {
 		OnPressed();
@@ -50,6 +51,9 @@ void Button::Draw() {
 		OnReleased();
 
 	ImGui::PopStyleColor();
+	ImGui::PopStyleColor();
+	ImGui::PopStyleColor();
+	ImGui::PopStyleVar();
 }
 
 bool Button::OnAttach() {
