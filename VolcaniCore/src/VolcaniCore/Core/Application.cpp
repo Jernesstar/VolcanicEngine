@@ -27,11 +27,8 @@ void Application::Init() {
 	s_Window = CreateRef<Window>(800, 600);
 	EventSystem::Init();
 
-	s_BackendRenderer = RendererAPI::CreateRenderer(RenderAPI::OpenGL);
-	// ShaderPipeline::Init();
-	s_BackendRenderer->Init();
-
-	Renderer::Init();
+	RendererAPI::Create(RenderAPI::OpenGL);
+	RendererAPI::Init();
 }
 
 void Application::Close() {

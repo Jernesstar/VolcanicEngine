@@ -23,9 +23,9 @@ static std::vector<ShaderFile> GetShaders(const std::string& shaderFolder,
 // }
 
 Ref<ShaderPipeline> ShaderPipeline::Create(const std::vector<ShaderFile>& shaders) {
-	RenderAPI api = Application::GetRenderAPI();
+	RendererBackend backend = RendererAPI::Get()->Backend;
 
-	switch(api) {
+	switch(backend) {
 		case RenderAPI::OpenGL:
 			return CreateRef<OpenGL::ShaderProgram>(shaders);
 			break;
@@ -33,11 +33,11 @@ Ref<ShaderPipeline> ShaderPipeline::Create(const std::vector<ShaderFile>& shader
 }
 
 Ref<ShaderPipeline> ShaderPipeline::Create(const std::vector<std::string>& paths) {
-	RenderAPI api = Application::GetRenderAPI();
+	RendererBackend backend = RendererAPI::Get()->Backend;
 
 	auto shaders = GetShaders(paths);
 
-	switch(api) {
+	switch(backend) {
 		case RenderAPI::OpenGL:
 			return CreateRef<OpenGL::ShaderProgram>(shaders);
 			break;
@@ -47,11 +47,11 @@ Ref<ShaderPipeline> ShaderPipeline::Create(const std::vector<std::string>& paths
 Ref<ShaderPipeline> ShaderPipeline::Create(const std::string& folderPath,
 										   const std::string& name)
 {
-	RenderAPI api = Application::GetRenderAPI();
+	RendererBackend backend = RendererAPI::Get()->Backend;
 
 	auto shaders = GetShaders(folderPath, name);
 
-	switch(api) {
+	switch(backend) {
 		case RenderAPI::OpenGL:
 			return CreateRef<OpenGL::ShaderProgram>(shaders);
 			break;

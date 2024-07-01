@@ -6,7 +6,7 @@
 
 namespace VolcaniCore::OpenGL {
 
-class UniformBuffer {
+class UniformBuffer : public VolcaniCore::UniformBuffer {
 public:
 	const uint32_t Binding;
 	const uint32_t Size;

@@ -97,7 +97,7 @@ void GameUI::OnUpdate(TimeStep ts) {
 	// HomeUI->Render();
 	LevelSelectUI->Render();
 	
-	UI::End();
+	UI::End();P
 }
 
 }

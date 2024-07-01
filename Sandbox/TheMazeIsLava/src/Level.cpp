@@ -39,12 +39,12 @@ void Level::PropagateLava() {
 void Level::DrawStoneBlocks() {
 	TraverseTilemap(
 	[this](uint32_t x, uint32_t y) {
-		// Application::GetRenderer()->As<OpenGL::Renderer>()
+		// RendererAPI::Get()
 		// ->Draw3DCube(GameState::Stone, Transform{ .Translation = glm::vec3{ x, 0.0f, y } });
 
 		if(!IsWall(x, y))
 			return;
-		Application::GetRenderer()->As<OpenGL::Renderer>()
+		RendererAPI::Get()
 		->Draw3DCube(GameState::Stone, Transform{ .Translation = glm::vec3{ x, 1.0f, y } });
 	});
 }

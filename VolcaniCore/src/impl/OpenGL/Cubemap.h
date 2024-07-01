@@ -1,8 +1,9 @@
 #pragma once
 
-#include "Renderer/Cubemap.h"
+#include "Object/Cubemap.h"
 
 namespace VolcaniCore::OpenGL {
+
 
 class Cubemap : public VolcaniCore::Cubemap {
 public:
@@ -14,5 +15,6 @@ public:
 private:
 	uint32_t m_TextureID;
 };
+
 
 }

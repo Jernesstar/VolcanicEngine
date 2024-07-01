@@ -17,6 +17,18 @@ void FileUtils::CreateFile(const std::string& path) {
 	std::ofstream { path.c_str() };
 }
 
+std::filesystem::directory_iterator GetFiles(const std::string& dir,
+											 const std::vector<std::string>
+											 						 extensions)
+{
+	std::vector<std::string> files;
+	for(auto p : std::filesystem::directory_iterator(dir.c_str())) {
+		for(auto ext : extensions)
+			if(p.path().extension() == ext)
+				files.push_back(p.path());
+	}
+}
+
 std::string FileUtils::ReadFile(const std::string& file_path) {
 	std::ifstream in(file_path, std::ios::in | std::ios::binary);
 

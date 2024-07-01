@@ -19,9 +19,7 @@ public:
 
 	static void Close();
 
-	static Ref<Window>		GetWindow() { return s_Window; }
-	static Ref<RendererAPI> GetRenderer() { return s_BackendRenderer; }
-	static RenderAPI 		GetRenderAPI() { return s_BackendRenderer->API; }
+	static Ref<Window> GetWindow() { return s_Window; }
 
 protected:
 	virtual void OnUpdate(TimeStep ts) = 0;
@@ -32,7 +30,6 @@ private:
 
 	inline static Application* s_Instance;
 	inline static Ref<Window> s_Window;
-	inline static Ref<RendererAPI> s_BackendRenderer;
 
 	inline static TimePoint s_LastFrame{ Time::GetTime() };
 	inline static TimeStep s_TimeStep;

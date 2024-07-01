@@ -50,7 +50,7 @@ Ref<UIElement> UIElement::Add(Ref<UIElement> element) {
 
 void UIElement::Render() {
 	// if(m_Border)
-	// 	Application::GetRenderer()->As<OpenGL::Renderer>()
+	// 	RendererAPI::Get()
 	// 	->Draw2DQuad(m_Border);
 
 	Draw();

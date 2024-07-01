@@ -7,9 +7,9 @@
 namespace VolcaniCore {
 
 Ref<FrameBuffer> FrameBuffer::Create(uint32_t width, uint32_t height) {
-	RenderAPI api = Application::GetRenderAPI();
+	RendererBackend backend = RendererAPI::Get()->Backend;
 
-	switch(api) {
+	switch(backend) {
 		case RenderAPI::OpenGL:
 			return CreateRef<OpenGL::FrameBuffer>(
 							OpenGL::AttachmentSpecification(width, height));

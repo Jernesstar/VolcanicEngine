@@ -59,13 +59,13 @@ void Cube::OnUpdate(TimeStep ts) {
 	// frameBuffer->Bind();
 	// {
 		Renderer::Clear();
-		Application::GetRenderer()->As<OpenGL::Renderer>()->Begin(camera);
-		Application::GetRenderer()->As<OpenGL::Renderer>()->Draw3DCube(stone);
+		RendererAPI::Get()->Begin(camera);
+		RendererAPI::Get()->Draw3DCube(stone);
 	// }
 	// frameBuffer->Unbind();
-	// Application::GetRenderer()->As<OpenGL::Renderer>()->RenderFrameBuffer(frameBuffer, pixelate);
+	// RendererAPI::Get()->RenderFrameBuffer(frameBuffer, pixelate);
 
-	// Application::GetRenderer()->As<OpenGL::Renderer>()->Draw2DQuad({ 0.3125f, 0.234375f, 0.078125f, 1.0f });
+	// RendererAPI::Get()->Draw2DQuad({ 0.3125f, 0.234375f, 0.078125f, 1.0f });
 }
 
 }

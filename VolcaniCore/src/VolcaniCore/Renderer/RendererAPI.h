@@ -12,16 +12,19 @@
 
 namespace VolcaniCore {
 
-enum class RenderAPI { OpenGL, Vulkan, DirectX, bgfx };
+enum class RendererBackend { OpenGL, Vulkan, DirectX, bgfx };
 
 class RendererAPI {
 public:
-	const RenderAPI API;
+	const RendererBackend Backend;
 
 public:
-	RendererAPI(RenderAPI api)
-		: API(api) { }
+	RendererAPI(RendererBackend backend)
+		: Backend(backend) { }
 	virtual ~RendererAPI() = default;
+
+	static void Create(RendererBackend backend);
+	static Ref<RendererAPI> Get() { return s_Instance; }
 
 	virtual void Init() = 0;
 	virtual void Close() = 0;
@@ -29,16 +32,23 @@ public:
 	virtual void Clear(const glm::vec4& color = { 0.0f, 0.0f, 0.0f, 0.0f }) = 0;
 	virtual void Resize(uint32_t width, uint32_t height) = 0;
 
-	virtual void RenderModel(Ref<Model> model) = 0;
-	virtual void RenderCubemap(Ref<Cubemap> cubemap) = 0;
-	virtual void RenderQuad(Ref<Quad> quad, Transform t) = 0;
-	virtual void RenderText(Ref<Text> text, Transform t) = 0;
-	virtual void RenderTexture(Ref<Texture> texture, Transform t) = 0;
+	virtual void Begin(Ref<Camera> camera) = 0;
+	virtual void End() = 0;
 
-	static Ref<RendererAPI> CreateRenderer(RenderAPI api);
+	virtual void Render(Ref<RenderPass> pass) = 0;
+	virtual void RenderFrameBuffer(Ref<FrameBuffer> buffer,
+								   Ref<ShaderPipeline> frameBufferShader) = 0;
 
-	template<typename Derived>
-	Derived* As() const { return (Derived*)(this); }
+	virtual void DrawCubemap(Ref<Cubemap> cubemap) = 0;
+	virtual void Draw3DCube(Ref<Texture> texture,	Transform t = { }) = 0;
+	virtual void Draw3DModel(Ref<Model> model,		Transform t = { }) = 0;
+
+	virtual void Draw2DQuad(const glm::vec4& color, Transform t = { }) = 0;
+	virtual void Draw2DQuad(Ref<Texture> texture,	Transform t = { }) = 0;
+	virtual void Draw2DText(Ref<Text> text,			Transform t = { }) = 0;
+
+private:
+	inline static Ref<RendererAPI> s_Instance;
 };
 
 }

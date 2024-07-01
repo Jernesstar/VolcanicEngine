@@ -4,7 +4,7 @@
 
 #include <glm/vec2.hpp>
 
-#include "Renderer/Texture.h"
+#include "Object/Texture.h"
 
 namespace VolcaniCore::OpenGL {
 
@@ -21,7 +21,8 @@ public:
 	void Bind(uint32_t slot = 0);
 	void SetData(const std::string& path);
 	void SetData(const void* data, uint32_t size);
-	void SetData(const void* data, const glm::ivec2& pos, const glm::ivec2& size);
+	void SetData(const void* data,
+				 const glm::ivec2& pos, const glm::ivec2& size);
 
 	const std::string& GetPath() { return m_Path; }
 
@@ -29,7 +30,9 @@ public:
 	uint32_t GetWidth() const { return m_Width; }
 	uint32_t GetHeight() const { return m_Height; }
 
-	bool operator ==(const Texture2D& other) const { return this->m_TextureID == other.m_TextureID; }
+	bool operator ==(const Texture2D& other) const {
+		return this->m_TextureID == other.m_TextureID;
+	}
 
 private:
 	uint32_t m_TextureID;

@@ -8,9 +8,9 @@
 namespace VolcaniCore {
 
 Ref<VolcaniCore::Model> Model::Create(const std::string& path) {
-	RenderAPI api = Application::GetRenderAPI();
+	RendererBackend backend = RendererAPI::Get()->Backend;
 
-	switch(api) {
+	switch(backend) {
 		case RenderAPI::OpenGL:
 			return CreateRef<VolcaniCore::OpenGL::Model>(path);
 			break;

@@ -51,7 +51,7 @@ void Game::OnUpdate(TimeStep ts) {
 	m_CameraController->OnUpdate(ts);
 
 	Renderer::Clear();
-	Application::GetRenderer()->As<OpenGL::Renderer>()->Begin(m_Camera);
+	RendererAPI::Get()->Begin(m_Camera);
 
 	UI::Begin();
 

@@ -18,7 +18,7 @@ namespace VolcaniCore::OpenGL {
 
 
 Renderer::Renderer()
-	: RendererAPI::RendererAPI(RenderAPI::OpenGL)
+	: ::RendererAPI(RendererBackend::OpenGL)
 {
 	VOLCANICORE_ASSERT(gladLoadGL(), "Glad could not load OpenGL");
 
@@ -125,20 +125,19 @@ void Renderer::Init() {
 		indices[6*i + 4] = 4*i + 3;
 		indices[6*i + 5] = 4*i + 0;
 	}
+	s_Data.QuadIndexBuffer = new IndexBuffer(indices, RendererData::MaxIndices);
+	delete[] indices;
 
-	BufferLayout layout =
+	BufferLayout l =
 	{
 		{ "Position",			BufferDataType::Vec4 },
 		{ "Color",				BufferDataType::Vec4 },
 		{ "TextureCoordinate",	BufferDataType::Vec2 },
 		{ "TextureIndex",		BufferDataType::Int },
 	};
-
-	s_Data.QuadIndexBuffer = new IndexBuffer(indices, RendererData::MaxIndices);
-	delete[] indices;
-
-	s_Data.QuadVertexBuffer = new VertexBuffer(RendererData::MaxVertices, layout);
-	s_Data.QuadVertexArray = CreateRef<VertexArray>(s_Data.QuadVertexBuffer, s_Data.QuadIndexBuffer);
+	s_Data.QuadVertexBuffer = new VertexBuffer(RendererData::MaxVertices, l);
+	s_Data.QuadVertexArray = CreateRef<VertexArray>(s_Data.QuadVertexBuffer,
+													s_Data.QuadIndexBuffer);
 
 	float cubemapVertices[] =
 	{
@@ -288,14 +287,14 @@ void Renderer::Init() {
 
 void Renderer::Close() { }
 
-void Renderer::Resize(uint32_t width, uint32_t height) {
-	glViewport(0, 0, width, height);
-	s_Data.FrameBuffer2D->Resize(width, height);
-}
-
 void Renderer::Clear(const glm::vec4& color) {
 	glClearColor(color.x, color.y, color.z, color.w);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
+void Renderer::Resize(uint32_t width, uint32_t height) {
+	glViewport(0, 0, width, height);
+	s_Data.FrameBuffer2D->Resize(width, height);
 }
 
 void Renderer::Begin(Ref<Camera> camera) {
@@ -312,45 +311,29 @@ void Renderer::Begin(Ref<Camera> camera) {
 	s_Data.TextSlotIndex = s_Data.MaxTextureSlots - 1;
 }
 
-void Renderer::Flush() {
-	if(std::size_t dataCount = s_Data.QuadVertexBufferPtr - s_Data.QuadVertexBufferBase)
-	{
-		s_Data.QuadVertexBuffer->SetData(s_Data.QuadVertexBufferBase, dataCount);
-
-		for(uint32_t i = 0; i < s_Data.TextureSlotIndex; i++)
-			((Texture2D*)s_Data.TextureSlots[i])->Bind(i);
-
-		s_Data.QuadShader->Bind();
-		s_Data.QuadShader->SetMat4("u_ViewProjMatrix", s_Data.Camera2D->GetViewProjection());
-
-		Renderer::DrawIndexed(s_Data.QuadVertexArray, s_Data.QuadIndexCount);
-	}
+void Renderer::End() {
+	Flush();
 }
 
-void Renderer::RenderModel(Ref<VolcaniCore::Model> model) {
-	auto mesh = model->As<OpenGL::Model>();
-	mesh->m_VertexArray->Bind();
+void Renderer::Render(Ref<RenderPass> pass) {
 
-	for(uint32_t i = 0; i < mesh->GetMeshCount(); i++)
-	{
-		const Model::Mesh& sub_mesh = mesh->m_Meshes[i];
-		uint32_t material_index = sub_mesh.MaterialIndex;
-
-		mesh->m_Materials[material_index].Bind();
-
-		glDrawElementsBaseVertex(GL_TRIANGLES, sub_mesh.IndexCount, GL_UNSIGNED_INT,
-			(void*)(sizeof(uint32_t) * sub_mesh.BaseIndex), sub_mesh.BaseVertex);
-	}
 }
 
-void Renderer::Draw3DCube(Ref<VolcaniCore::Texture> texture, Transform t) {
-	s_Data.CubeShader->Bind();
-	s_Data.CubeShader->SetTexture("u_Texture", texture, 0);
-	s_Data.CubeShader->SetMat4("u_Model", t.GetTransform());
+void Renderer::RenderFrameBuffer(Ref<VolcaniCore::FrameBuffer> buffer,
+								 Ref<ShaderPipeline> frameBufferShader)
+{
+	glDisable(GL_DEPTH_TEST);
+	glCullFace(GL_FRONT);
 
-	s_Data.CubeArray->Bind();
-	glDrawArrays(GL_TRIANGLES, 0, 36);
+	frameBufferShader->Bind();
+	buffer->As<OpenGL::FrameBuffer>()->BindTexture();
+	s_Data.FrameBufferArray->Bind();
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+
+	glCullFace(GL_BACK);
+	glEnable(GL_DEPTH_TEST);
 }
+
 
 void Renderer::DrawCubemap(Ref<VolcaniCore::Cubemap> cubemap) {
 	glDepthMask(GL_FALSE);
@@ -362,8 +345,34 @@ void Renderer::DrawCubemap(Ref<VolcaniCore::Cubemap> cubemap) {
 	glDepthMask(GL_TRUE);
 }
 
+void Renderer::Draw3DCube(Ref<VolcaniCore::Texture> texture, Transform t) {
+	s_Data.CubeShader->Bind();
+	s_Data.CubeShader->SetTexture("u_Texture", texture, 0);
+	s_Data.CubeShader->SetMat4("u_Model", t.GetTransform());
+
+	s_Data.CubeArray->Bind();
+
+	// TODO: Move to RenderCommand
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+}
+
 void Renderer::Draw3DModel(Ref<VolcaniCore::Model> model, Transform t) {
 	// ShaderPipeline::Get("Model")->Bind();
+
+	auto mesh = model->As<OpenGL::Model>();
+	mesh->m_VertexArray->Bind();
+
+	for(uint32_t i = 0; i < mesh->GetMeshCount(); i++) {
+		const Model::Mesh& subMesh = mesh->m_Meshes[i];
+
+		mesh->m_Materials[subMesh.MaterialIndex].Bind();
+
+		glDrawElementsBaseVertex(GL_TRIANGLES,
+								 subMesh.IndexCount,
+								 GL_UNSIGNED_INT,
+								 (void*)(sizeof(uint32_t) * subMesh.BaseIndex),
+								 subMesh.BaseVertex);
+	}
 }
 
 void Renderer::Draw2DQuad(const glm::vec4& color, Transform t) {
@@ -393,8 +402,7 @@ void Renderer::Draw2DQuad(Ref<Texture> texture, Transform t) {
 		s_Data.TextureSlots[s_Data.TextureSlotIndex++] = (void*)texture.get();
 	}
 
-	for(uint32_t i = 0; i < 4; i++)
-	{
+	for(uint32_t i = 0; i < 4; i++) {
 		s_Data.QuadVertexBufferPtr->Position		  = t.GetTransform() * s_Data.VertexPositions[i];
 		s_Data.QuadVertexBufferPtr->Color			  = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
 		s_Data.QuadVertexBufferPtr->TextureCoordinate = s_Data.TextureCoordinates[i];
@@ -411,24 +419,30 @@ void Renderer::Draw2DText(Ref<Text> text, Transform t) {
 	s_Data.QuadIndexCount += 6;
 }
 
-void Renderer::RenderFrameBuffer(Ref<VolcaniCore::FrameBuffer> buffer, Ref<ShaderPipeline> frameBufferShader) {
-	glDisable(GL_DEPTH_TEST);
-	glCullFace(GL_FRONT);
+void Renderer::Flush() {
+	if(std::size_t dataCount =
+		s_Data.QuadVertexBufferPtr - s_Data.QuadVertexBufferBase)
+	{
+		s_Data.QuadVertexBuffer->SetData(s_Data.QuadVertexBufferBase,
+										 dataCount);
 
-	frameBufferShader->Bind();
-	buffer->As<OpenGL::FrameBuffer>()->BindTexture();
-	s_Data.FrameBufferArray->Bind();
-	glDrawArrays(GL_TRIANGLES, 0, 6);
+		for(uint32_t i = 0; i < s_Data.TextureSlotIndex; i++)
+			((Texture2D*)s_Data.TextureSlots[i])->Bind(i);
 
-	glCullFace(GL_BACK);
-	glEnable(GL_DEPTH_TEST);
+		s_Data.QuadShader->Bind();
+		s_Data.QuadShader->SetMat4("u_ViewProjMatrix",
+								   s_Data.Camera2D->GetViewProjection());
+
+		Renderer::DrawIndexed(s_Data.QuadVertexArray, s_Data.QuadIndexCount);
+	}
 }
 
-void Renderer::DrawIndexed(Ref<VertexArray> vertex_array, uint32_t indices)
-{
+void Renderer::DrawIndexed(Ref<VertexArray> vertex_array, uint32_t indices) {
 	vertex_array->Bind();
-	glDrawElements(GL_TRIANGLES, indices != 0 ? indices : vertex_array->GetIndexBuffer()->Count,
-		GL_UNSIGNED_INT, nullptr);
+	glDrawElements(GL_TRIANGLES,
+				   indices != 0 ? indices
+				   				: vertex_array->GetIndexBuffer()->Count,
+				   GL_UNSIGNED_INT, nullptr);
 }
 
 

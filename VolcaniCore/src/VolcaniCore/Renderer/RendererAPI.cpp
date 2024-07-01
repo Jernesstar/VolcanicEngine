@@ -4,13 +4,16 @@
 
 namespace VolcaniCore {
 
-Ref<RendererAPI> RendererAPI::CreateRenderer(RenderAPI api) {
-	switch(api) {
-		case RenderAPI::OpenGL:
-			return CreateRef<OpenGL::Renderer>();
+
+void RendererAPI::CreateRenderer(RendererBackend backend) {
+	switch(backend) {
+		case RendererBackend::OpenGL:
+			s_Instance = CreateRef<OpenGL::Renderer>();
+		// case RenderAPI::Vulkan:
+		// 	s_Instance = CreateRef<Vulkan::Renderer>();
 	}
 
-	return CreateRef<OpenGL::Renderer>();
 }
+
 
 }

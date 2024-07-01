@@ -123,7 +123,7 @@ void Model::OnUpdate(TimeStep ts)
 
 	// light_shader->As<OpenGL::ShaderProgram>()->Bind();
 	// light_shader->SetMat4("u_ViewProj", m_Camera->GetViewProjection());
-	// Application::GetRenderer()->As<OpenGL::Renderer>()->Draw3DCube(nullptr);
+	// RendererAPI::Get()->Draw3DCube(nullptr);
 
 	model_shader->Bind();
 	model_shader->SetMat4("u_ViewProj", m_Camera->GetViewProjection());

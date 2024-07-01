@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-#include "Renderer/FrameBuffer.h"
+#include "Object/FrameBuffer.h"
 
 namespace VolcaniCore::OpenGL {
 
