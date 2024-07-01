@@ -5,7 +5,7 @@
 namespace VolcaniCore {
 
 
-void RendererAPI::CreateRenderer(RendererBackend backend) {
+void RendererAPI::Create(RendererBackend backend) {
 	switch(backend) {
 		case RendererBackend::OpenGL:
 			s_Instance = CreateRef<OpenGL::Renderer>();
@@ -13,6 +13,7 @@ void RendererAPI::CreateRenderer(RendererBackend backend) {
 		// 	s_Instance = CreateRef<Vulkan::Renderer>();
 	}
 
+	s_Instance->Init();
 }
 
 

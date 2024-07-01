@@ -5,7 +5,7 @@
 #include <imgui/backends/imgui_impl_opengl3.h>
 
 #include <VolcaniCore/Core/Log.h>
-#include <VolcaniCore/Renderer/Renderer.h>
+#include <VolcaniCore/Renderer/RendererAPI.h>
 #include <VolcaniCore/Events/EventSystem.h>
 
 namespace Magma {
@@ -97,7 +97,7 @@ void Editor::OnUpdate(TimeStep ts) {
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui::NewFrame();
 
-	Renderer::Clear();
+	RendererAPI::Get()->Clear();
 	m_EditorLayer->Update(ts);
 	m_EditorLayer->Render();
 

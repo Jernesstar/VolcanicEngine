@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Renderer/Model.h>
+#include <Object/Model.h>
 
 #include <Magma/UI/UI.h>
 

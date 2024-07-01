@@ -12,7 +12,7 @@
 
 #include <VolcaniCore/Core/Application.h>
 #include <VolcaniCore/Core/Log.h>
-#include <VolcaniCore/Renderer/Renderer.h>
+#include <VolcaniCore/Renderer/RendererAPI.h>
 
 #include "Scene/SceneSerializer.h"
 
@@ -45,7 +45,7 @@ EditorLayer::~EditorLayer() {
 }
 
 void EditorLayer::Update(TimeStep ts) {
-	Renderer::Clear({ 0.34, 0.2, 0.87, 1.0 });
+	RendererAPI::Get()->Clear({ 0.34, 0.2, 0.87, 1.0 });
 }
 
 void EditorLayer::Render() {

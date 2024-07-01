@@ -11,7 +11,7 @@ Ref<VolcaniCore::Model> Model::Create(const std::string& path) {
 	RendererBackend backend = RendererAPI::Get()->Backend;
 
 	switch(backend) {
-		case RenderAPI::OpenGL:
+		case RendererBackend::OpenGL:
 			return CreateRef<VolcaniCore::OpenGL::Model>(path);
 			break;
 	}

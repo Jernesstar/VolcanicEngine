@@ -2,7 +2,7 @@
 
 #include <filesystem>
 
-#include <VolcaniCore/Renderer/Texture.h>
+#include <VolcaniCore/Object/Texture.h>
 
 #include "Scene/Scene.h"
 

@@ -25,7 +25,7 @@ void Player::Move() {
 }
 
 void Player::Render() {
-	// Renderer::RenderModel(GameState::PlayerModel1,
+	// RendererAPI::Get()->RenderModel(GameState::PlayerModel1,
 							// Transform{ .Translation = { x, 0.0f, y } });
 }
 

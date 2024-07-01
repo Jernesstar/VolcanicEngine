@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Renderer/Model.h"
+#include "Object/Model.h"
 
 #include <vector>
 #include <memory>
@@ -13,7 +13,7 @@
 #include "OpenGL/Texture2D.h"
 #include "OpenGL/VertexArray.h"
 
-#include "Renderer/Texture.h"
+#include "Object/Texture.h"
 
 namespace VolcaniCore::OpenGL {
 

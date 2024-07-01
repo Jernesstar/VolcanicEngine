@@ -69,11 +69,10 @@ private:
 private:
 	template<typename TEvent>
 	static void Dispatch(TEvent& event) {
-		Callbacks<TEvent>& callback_list = GetCallbacks<TEvent>();
+		Callbacks<TEvent>& callbackList = GetCallbacks<TEvent>();
 	
-		for(auto& [_, func] : callback_list)
-			if(event.Handled == false)
-				func(event);
+		for(auto& [_, callback] : callbackList)
+			if(!event.Handled) callback(event);
 	}
 
 	template<typename TEvent>

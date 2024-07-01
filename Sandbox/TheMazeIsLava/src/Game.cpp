@@ -2,7 +2,7 @@
 
 #include <Core/Input.h>
 #include <Core/Assert.h>
-#include <Renderer/Renderer.h>
+#include <Renderer/RendererAPI.h>
 #include <Renderer/StereographicCamera.h>
 #include <Events/EventSystem.h>
 
@@ -50,7 +50,7 @@ void Game::OnUpdate(TimeStep ts) {
 	m_TimeStep = ts;
 	m_CameraController->OnUpdate(ts);
 
-	Renderer::Clear();
+	RendererAPI::Get()->Clear();
 	RendererAPI::Get()->Begin(m_Camera);
 
 	UI::Begin();
@@ -86,7 +86,7 @@ void Game::LevelScreen() {
 void Game::PlayScreen() {
 	// Gameplay
 
-	Renderer::Clear(glm::vec4(0.0f));
+	RendererAPI::Get()->Clear(glm::vec4(0.0f));
 
 	GameState::GetCurrentLevel().Render(m_TimeStep);
 

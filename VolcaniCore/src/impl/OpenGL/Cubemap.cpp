@@ -15,7 +15,8 @@ namespace VolcaniCore::OpenGL {
 std::vector<std::filesystem::path> GetImagePaths(const std::string& folder)
 {
 	std::vector<std::filesystem::path> paths;
-	for(const auto& path : FileUtils::GetFiles(""))
+	for(const auto& path :
+		FileUtils::GetFiles(folder, { "png", "jpg", "jpeg" }))
 	{
 		paths.push_back(path);
 

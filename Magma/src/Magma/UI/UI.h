@@ -8,10 +8,8 @@
 
 #include <Core/Defines.h>
 #include <Events/EventSystem.h>
-#include <Renderer/Renderer.h>
-#include <Renderer/Texture.h>
-
-#include <OpenGL/Renderer.h>
+#include <Renderer/RendererAPI.h>
+#include <Object/Texture.h>
 
 using namespace VolcaniCore;
 

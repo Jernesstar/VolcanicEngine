@@ -2,6 +2,8 @@
 
 #include <glad/glad.h>
 
+#include "Object/UniformBuffer.h"
+
 #include "BufferLayout.h"
 
 namespace VolcaniCore::OpenGL {
@@ -12,6 +14,7 @@ public:
 	const uint32_t Size;
 
 public:
+	UniformBuffer() : Size(0), Binding(0) { }
 	UniformBuffer(uint32_t binding, std::size_t size, const void* data = nullptr)
 		: Binding(binding), Size(size)
 	{

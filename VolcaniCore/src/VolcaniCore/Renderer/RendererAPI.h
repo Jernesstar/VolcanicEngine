@@ -2,13 +2,15 @@
 
 #include "Core/Defines.h"
 
-#include "Model.h"
-#include "Quad.h"
-#include "Text.h"
-#include "Texture.h"
-#include "Cubemap.h"
-#include "FrameBuffer.h"
-#include "Transform.h"
+#include "Object/Model.h"
+#include "Object/Quad.h"
+#include "Object/Text.h"
+#include "Object/Texture.h"
+#include "Object/Cubemap.h"
+#include "Object/FrameBuffer.h"
+
+#include "Renderer/RenderPass.h"
+#include "Renderer/Transform.h"
 
 namespace VolcaniCore {
 
@@ -36,8 +38,7 @@ public:
 	virtual void End() = 0;
 
 	virtual void Render(Ref<RenderPass> pass) = 0;
-	virtual void RenderFrameBuffer(Ref<FrameBuffer> buffer,
-								   Ref<ShaderPipeline> frameBufferShader) = 0;
+	virtual void RenderFrameBuffer(Ref<FrameBuffer> buffer) = 0;
 
 	virtual void DrawCubemap(Ref<Cubemap> cubemap) = 0;
 	virtual void Draw3DCube(Ref<Texture> texture,	Transform t = { }) = 0;

@@ -91,13 +91,13 @@ GameUI::~GameUI() {
 }
 
 void GameUI::OnUpdate(TimeStep ts) {
-	Renderer::Clear();
+	RendererAPI::Get()->Clear();
 	UI::Begin();
 
 	// HomeUI->Render();
 	LevelSelectUI->Render();
 	
-	UI::End();P
+	UI::End();
 }
 
 }

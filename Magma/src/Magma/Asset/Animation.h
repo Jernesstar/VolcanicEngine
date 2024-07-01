@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Renderer/Texture.h>
+#include <Object/Texture.h>
 
 namespace Magma {
 

@@ -2,15 +2,15 @@
 
 namespace VolcaniCore {
 
-template<typename T>
+// template<typename T>
 class UniformBuffer {
 public:
-	UniformBuffer();
-	~UniformBuffer();
+	UniformBuffer() = default;
+	virtual ~UniformBuffer() = default;
 
-	virtual void SetData(Ref<T> data) = 0;
+	// virtual void SetData(Ref<T> data) = 0;
 
-	static void Create();
+	static Ref<UniformBuffer> Create();
 };
 
 }

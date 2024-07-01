@@ -10,7 +10,7 @@ Ref<FrameBuffer> FrameBuffer::Create(uint32_t width, uint32_t height) {
 	RendererBackend backend = RendererAPI::Get()->Backend;
 
 	switch(backend) {
-		case RenderAPI::OpenGL:
+		case RendererBackend::OpenGL:
 			return CreateRef<OpenGL::FrameBuffer>(
 							OpenGL::AttachmentSpecification(width, height));
 			break;

@@ -8,8 +8,8 @@
 
 #include <Events/EventSystem.h>
 
-#include <Renderer/Renderer.h>
-#include <Renderer/Model.h>
+#include <Renderer/RendererAPI.h>
+#include <Object/Model.h>
 #include <Renderer/StereographicCamera.h>
 #include <Renderer/CameraController.h>
 
@@ -117,7 +117,7 @@ Model::Model()
 
 void Model::OnUpdate(TimeStep ts)
 {
-	Renderer::Clear();
+	RendererAPI::Get()->Clear();
 
 	m_Controller.OnUpdate(ts);
 
@@ -128,7 +128,7 @@ void Model::OnUpdate(TimeStep ts)
 	model_shader->Bind();
 	model_shader->SetMat4("u_ViewProj", m_Camera->GetViewProjection());
 	model_shader->SetVec3("u_CameraPosition", m_Camera->GetPosition());
-	Renderer::RenderModel(m_Model);
+	RendererAPI::Get()->Draw3DModel(m_Model);
 }
 
 }

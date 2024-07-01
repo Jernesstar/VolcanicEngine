@@ -1,6 +1,6 @@
 #include "TextInput.h"
 
-#include <Renderer/Renderer.h>
+#include <Renderer/RendererAPI.h>
 #include <Events/EventSystem.h>
 
 #include <OpenGL/Renderer.h>

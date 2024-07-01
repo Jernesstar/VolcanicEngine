@@ -7,8 +7,7 @@
 
 #include "Assert.h"
 #include "Events/Events.h"
-#include "Renderer/Shader.h"
-#include "Renderer/Renderer.h"
+#include "Renderer/RendererAPI.h"
 
 namespace VolcaniCore {
 
@@ -27,14 +26,13 @@ void Application::Init() {
 	s_Window = CreateRef<Window>(800, 600);
 	EventSystem::Init();
 
-	RendererAPI::Create(RenderAPI::OpenGL);
-	RendererAPI::Init();
+	RendererAPI::Create(RendererBackend::OpenGL);
 }
 
 void Application::Close() {
 	delete s_Instance;
 
-	Renderer::Close();
+	RendererAPI::Get()->Close();
 	// glfwTerminate();
 	exit(0);
 }
@@ -45,11 +43,11 @@ void Application::Run() {
 		TimeStep ts = time - s_LastFrame;
 		s_LastFrame = time;
 
+		EventSystem::PollEvents();
 		s_Instance->OnUpdate(ts);
 
 		ApplicationUpdatedEvent event(ts);
 		EventSystem::Dispatch(event);
-		EventSystem::PollEvents();
 
 		s_Window->Update();
 	}

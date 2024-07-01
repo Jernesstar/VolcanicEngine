@@ -3,8 +3,8 @@
 #include <filesystem>
 
 #include <VolcaniCore/Core/Time.h>
-#include <VolcaniCore/Renderer/Texture.h>
-#include <VolcaniCore/Renderer/FrameBuffer.h>
+#include <VolcaniCore/Object/Texture.h>
+#include <VolcaniCore/Object/FrameBuffer.h>
 
 #include "Scene/Scene.h"
 #include "SceneHierarchyPanel.h"

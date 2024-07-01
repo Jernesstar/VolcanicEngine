@@ -7,7 +7,7 @@
 #include <glm/vec2.hpp>
 
 #include <Core/Time.h>
-#include <Renderer/Texture.h>
+#include <Object/Texture.h>
 
 using namespace VolcaniCore;
 

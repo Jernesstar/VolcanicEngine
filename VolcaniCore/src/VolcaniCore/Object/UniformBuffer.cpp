@@ -1,17 +1,17 @@
 #include "Cubemap.h"
 
-#include "RendererAPI.h"
+#include "Renderer/RendererAPI.h"
 
 #include "OpenGL/UniformBuffer.h"
 
 namespace VolcaniCore {
 
 
-Ref<Cubemap> UniformBuffer::Create() {
-	RendererBackend api = RendererAPI::Get()->Backend;
+Ref<UniformBuffer> UniformBuffer::Create() {
+	RendererBackend backend = RendererAPI::Get()->Backend;
 
 	switch(backend) {
-		case RenderAPI::OpenGL:
+		case RendererBackend::OpenGL:
 			return CreateRef<OpenGL::UniformBuffer>();
 			break;
 	}

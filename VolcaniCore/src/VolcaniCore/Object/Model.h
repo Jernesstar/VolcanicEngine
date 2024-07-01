@@ -6,7 +6,7 @@
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 
-#include "Renderer/Texture.h"
+#include "Object/Texture.h"
 
 namespace VolcaniCore {
 

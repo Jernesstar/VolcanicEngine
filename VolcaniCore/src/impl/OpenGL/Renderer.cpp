@@ -319,13 +319,13 @@ void Renderer::Render(Ref<RenderPass> pass) {
 
 }
 
-void Renderer::RenderFrameBuffer(Ref<VolcaniCore::FrameBuffer> buffer,
-								 Ref<ShaderPipeline> frameBufferShader)
+void Renderer::RenderFrameBuffer(Ref<VolcaniCore::FrameBuffer> buffer)
 {
 	glDisable(GL_DEPTH_TEST);
 	glCullFace(GL_FRONT);
 
-	frameBufferShader->Bind();
+	// ShaderPipeline::Get("Model")->Bind();
+	// frameBufferShader->Bind();
 	buffer->As<OpenGL::FrameBuffer>()->BindTexture();
 	s_Data.FrameBufferArray->Bind();
 	glDrawArrays(GL_TRIANGLES, 0, 6);

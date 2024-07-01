@@ -5,9 +5,9 @@
 
 #include <Events/EventSystem.h>
 
-#include <Renderer/Renderer.h>
-#include <Renderer/Shader.h>
-#include <Renderer/Texture.h>
+#include <Renderer/RendererAPI.h>
+#include <Object/Shader.h>
+#include <Object/Texture.h>
 #include <Renderer/StereographicCamera.h>
 #include <Renderer/OrthographicCamera.h>
 #include <Renderer/CameraController.h>
@@ -54,11 +54,11 @@ Cube::Cube() {
 
 void Cube::OnUpdate(TimeStep ts) {
 	controller.OnUpdate(ts);
-	Renderer::Clear({ 1.0f, 1.0f, 1.0f, 1.0f });
+	RendererAPI::Get()->Clear({ 1.0f, 1.0f, 1.0f, 1.0f });
 
 	// frameBuffer->Bind();
 	// {
-		Renderer::Clear();
+		RendererAPI::Get()->Clear();
 		RendererAPI::Get()->Begin(camera);
 		RendererAPI::Get()->Draw3DCube(stone);
 	// }
