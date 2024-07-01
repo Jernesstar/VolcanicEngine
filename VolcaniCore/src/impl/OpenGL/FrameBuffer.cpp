@@ -7,71 +7,87 @@
 namespace VolcaniCore::OpenGL {
 
 
-FrameBuffer::FrameBuffer(const AttachmentSpecification& specs)
-	: VolcaniCore::FrameBuffer(specs.Width, specs.Height)
+FrameBuffer::FrameBuffer(uint32_t width, uint32_t height,
+						 const std::initializer_list<Attachment>& attachments)
+	: VolcaniCore::FrameBuffer(width, height)
 {
-	// TODO: Change this
 	glGenFramebuffers(1, &m_BufferID);
-	glGenTextures(1, &m_TextureID);
-	glGenRenderbuffers(1, &m_RenderbufferID);
-
 	glBindFramebuffer(GL_FRAMEBUFFER, m_BufferID);
 
-	switch(specs.Color) {
-		case AttachmentType::Texture:
-			glBindTexture(GL_TEXTURE_2D, m_TextureID);
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, specs.Width, specs.Height, 0,
-						 GL_RGB, GL_UNSIGNED_BYTE, NULL);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-								   GL_TEXTURE_2D, m_TextureID, 0);
-			break;
+	for(auto& attachment : attachments)
+		m_Attachments[attachment.Target] = attachment;
 
-		case AttachmentType::RenderBuffer:
-			break;
-	}
-
-	if(specs.Depth == AttachmentType::RenderBuffer
-		&& specs.Stencil == AttachmentType::RenderBuffer)
-	{
-		glBindRenderbuffer(GL_RENDERBUFFER, m_RenderbufferID);
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8,
-							  specs.Width, specs.Height);
-		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT,
-								  GL_RENDERBUFFER, m_RenderbufferID);
-	}
-
-	switch(specs.Depth) {
-		case AttachmentType::Texture:
-			glBindTexture(GL_TEXTURE_2D, m_TextureID);
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT,
-						 specs.Width, specs.Height, 0, GL_DEPTH_COMPONENT,
-						 GL_FLOAT, NULL);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-			break;
-		
-		case AttachmentType::RenderBuffer:
-			break;
-	}
-
-	switch(specs.Stencil) {
-
-	}
-
-	if(specs.Color == AttachmentType::None) {
-		glDrawBuffer(GL_NONE);
-		glReadBuffer(GL_NONE);
+	for(auto& attachment : attachment) {
+		if(attachment.Target == AttachmentTarget::Color)
+			CreateColorAttachment(attachment);
+		if(attachment.Target == AttachmentTarget::Depth)
+			CreateDepthAttachment(attachment);
+		if(attachment.Target == AttachmentTarget::Stencil)
+			CreateStencilAttachment(attachment);
 	}
 
 	VOLCANICORE_ASSERT(
 		glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void FrameBuffer::CreateColorAttachment(const Attachment& attachment) {
+	if(attachment.Type == AttachmentType::Texture) {
+		glGenTextures(1, &attachment.m_RendererID);
+
+		glBindTexture(GL_TEXTURE_2D, attachment.m_RendererID);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_Width, m_Height, 0, GL_RGB,
+					 GL_UNSIGNED_BYTE, NULL);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+								GL_TEXTURE_2D, attachment.m_RendererID, 0);
+	}
+	else if(attachment.Type == AttachmentType::RenderBuffer) {
+		// TODO: Implement
+	}
+	else if(attachment.Type == AttachmentType::None) {
+		glDrawBuffer(GL_NONE);
+		glReadBuffer(GL_NONE);
+	}
+}
+
+void FrameBuffer::CreateDepthAttachment(const Attachment& attachment) {
+	if(attachment.Target == AttachmentType::RenderBuffer)
+	{
+		if(this->Has(AttachmentTarget::Stencil))
+			auto& stencilAttachment = this->Get(AttachmentTarget::Stencil);
+
+		if(stencilAttachment.Type == AttachmentType::RenderBuffer) {
+			glGenRenderbuffers(1, &attachment.m_RendererID);
+			glBindRenderbuffer(GL_RENDERBUFFER, attachment.m_RendererID);
+
+			glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8,
+								  specs.Width, specs.Height);
+			glFramebufferRenderbuffer(GL_FRAMEBUFFER,
+									  GL_DEPTH_STENCIL_ATTACHMENT,
+									  GL_RENDERBUFFER, attachment.m_RendererID);
+		}
+		else {
+			// TODO: Implement
+		}
+	}
+	if(attachment.Type == AttachmentType::Texture) {
+		glBindTexture(GL_TEXTURE_2D, m_TextureID);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT,
+					 specs.Width, specs.Height, 0, GL_DEPTH_COMPONENT,
+					 GL_FLOAT, NULL);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	}
+}
+
+void FrameBuffer::CreateStencilAttachment(const Attachment& attachment) {
+	// TODO: Implement
 }
 
 FrameBuffer::~FrameBuffer() {
@@ -85,12 +101,6 @@ void FrameBuffer::Bind() const {
 }
 void FrameBuffer::Unbind() const {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
-void FrameBuffer::BindTexture() const {
-	glBindTexture(GL_TEXTURE_2D, m_TextureID);
-}
-void FrameBuffer::BindRenderbuffer() const {
-	glBindRenderbuffer(GL_RENDERBUFFER, m_RenderbufferID);
 }
 
 

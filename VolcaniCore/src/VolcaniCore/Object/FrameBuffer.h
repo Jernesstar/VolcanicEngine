@@ -20,7 +20,7 @@ public:
 	Derived* As() const { return (Derived*)(this); }
 
 public:
-	uint32_t m_Width, m_Height;
+uint32_t m_Width, m_Height;
 };
 
 }

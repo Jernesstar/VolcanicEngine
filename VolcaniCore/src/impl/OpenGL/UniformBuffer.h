@@ -35,3 +35,42 @@ private:
 };
 
 }
+
+// #pragma once
+
+// #include <glad/glad.h>
+
+// #include "Object/UniformBuffer.h"
+
+// #include "BufferLayout.h"
+
+// namespace VolcaniCore::OpenGL {
+
+// template<typename T>
+// class UniformBuffer : public VolcaniCore::UniformBuffer<T> {
+// public:
+// 	const uint32_t Binding;
+
+// public:
+// 	UniformBuffer() : Binding(0) { }
+// 	UniformBuffer(uint32_t binding, const void* data = nullptr)
+// 		: Binding(binding)
+// 	{
+// 		glCreateBuffers(1, &m_BufferID);
+// 		glNamedBufferData(m_BufferID, sizeof(T), data, GL_DYNAMIC_DRAW);
+// 		glBindBufferBase(GL_UNIFORM_BUFFER, binding, m_BufferID);
+// 	}
+
+// 	~UniformBuffer() { glDeleteBuffers(1, &m_BufferID); }
+
+// 	void SetData(Ref<T> data, uint32_t size = 0, uint32_t offset = 0)
+// 	{
+// 		glNamedBufferSubData(m_BufferID, offset, size == 0 ? sizeof(T)
+// 															: size, data.get());
+// 	}
+
+// private:
+// 	uint32_t m_BufferID;
+// };
+
+// }

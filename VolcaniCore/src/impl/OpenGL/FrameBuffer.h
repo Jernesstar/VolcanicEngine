@@ -1,43 +1,59 @@
 #pragma once
 
 #include <cstdint>
+#include <vector>
+#include <unordered_map>
 
 #include "Object/FrameBuffer.h"
 
 namespace VolcaniCore::OpenGL {
 
-enum class AttachmentType { Texture, RenderBuffer, None };
+enum class AttachmentTarget { Color, Depth, Stencil };
+enum class AttachmentType	{ Texture, RenderBuffer, None };
 
-struct AttachmentSpecification {
-	uint32_t Width, Height;
-	AttachmentType Color, Depth, Stencil;
+class Attachment {
+public:
+	const AttachmentTarget Target;
+	const AttachmentType Type;
 
-	AttachmentSpecification(uint32_t width, uint32_t height,
-		AttachmentType color = AttachmentType::Texture,
-		AttachmentType depth = AttachmentType::RenderBuffer,
-		AttachmentType stencil = AttachmentType::RenderBuffer
-	) : Width(width), Height(height), Color(color), Depth(depth),
-		Stencil(stencil) { }
+	void Bind() const {
+		if(Type == AttachmentType::Texture)
+			glBindTexture(GL_TEXTURE_2D, m_RendererID);
+		else if(Type == Attachment::RenderBuffer)
+			glBindRenderbuffer(GL_RENDERBUFFER, m_RendererID);
+	}
+
+private:
+	uint32_t m_RendererID;
+
+	friend class FrameBuffer;
 };
 
 class FrameBuffer : public VolcaniCore::FrameBuffer {
 public:
-	FrameBuffer(const AttachmentSpecification& specs);
+	FrameBuffer(uint32_t width, uint32_t height);
+	FrameBuffer(uint32_t witdth, uint32_t height,
+				const std::std::initializer_list<Attachment>& attachments);
 	~FrameBuffer();
 
-	void Resize(uint32_t width, uint32_t height) override { }
+	void Resize(uint32_t width, uint32_t height) override;
 	void Bind() const override;
 	void Unbind() const override;
 
-	void BindTexture() const;
-	void BindRenderbuffer() const;
+	bool Has(AttachmentTarget target) const {
+		return m_Components.count(target) == 1;
+	}
 
-	uint32_t GetColorAttachmentID() { return m_TextureID; }
+	const Attachment& Get(AttachmentTarget) const {
+		return m_Attachments[target];
+	}
 
 private:
-	uint32_t m_BufferID;
-	uint32_t m_TextureID;
-	uint32_t m_RenderbufferID;
+	void CreateColorAttachment(const Attachment& attachment);
+	void CreateDepthAttachment(const Attachment& attachment);
+	void CreateStencilAttachment(const Attachment& attachment);
+
+	std::unordered_map<AttachmentTarget, Attachment> m_Attachments;
 };
 
 }
