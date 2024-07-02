@@ -2,12 +2,12 @@
 
 namespace VolcaniCore {
 
-RenderPass::RenderPass() {
+// RenderPass::RenderPass() {
 	
-}
+// }
 
-RenderPass::~RenderPass() {
+// RenderPass::~RenderPass() {
 	
-}
+// }
 
 }

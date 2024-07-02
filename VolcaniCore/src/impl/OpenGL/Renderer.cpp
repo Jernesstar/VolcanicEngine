@@ -315,20 +315,16 @@ void Renderer::End() {
 	Flush();
 }
 
-void Renderer::Render(Ref<RenderPass> pass) {
-
-}
-
 void Renderer::RenderFrameBuffer(Ref<VolcaniCore::FrameBuffer> buffer)
 {
 	glDisable(GL_DEPTH_TEST);
 	glCullFace(GL_FRONT);
 
-	ShaderLibrary::Get("FrameBuffer")->Bind();
-	if(buffer->Has(AttachmentTarget::Color))
-		buffer->Get(AttachmentTarget::Color).Bind();
-	else if(buffer->Has(AttachmentTarget::Depth))
-		buffer->Get(AttachmentTarget::Depth).Bind();
+	// ShaderLibrary::Get("FrameBuffer")->Bind();
+	// if(buffer->Has(AttachmentTarget::Color))
+	// 	buffer->Get(AttachmentTarget::Color).Bind();
+	// else if(buffer->Has(AttachmentTarget::Depth))
+	// 	buffer->Get(AttachmentTarget::Depth).Bind();
 
 	s_Data.FrameBufferArray->Bind();
 	glDrawArrays(GL_TRIANGLES, 0, 6);

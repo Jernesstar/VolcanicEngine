@@ -7,9 +7,5 @@
 namespace VolcaniCore {
 
 
-Ref<UniformBuffer<THandle>> UniformBuffer::Create() {
-
-}
-
 
 }

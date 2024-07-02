@@ -11,8 +11,10 @@ namespace VolcaniCore::OpenGL {
 class VertexArray {
 public:
 	VertexArray();
-	VertexArray(VertexBuffer* vertex_buffer, IndexBuffer* index_buffer = nullptr);
-	VertexArray(std::initializer_list<VertexBuffer*> vertex_buffers, IndexBuffer* index_buffer = nullptr);
+	VertexArray(VertexBuffer* vertex_buffer,
+				IndexBuffer* index_buffer = nullptr);
+	VertexArray(std::initializer_list<VertexBuffer*> vertex_buffers,
+				IndexBuffer* index_buffer = nullptr);
 	~VertexArray();
 
 	void Bind() const;

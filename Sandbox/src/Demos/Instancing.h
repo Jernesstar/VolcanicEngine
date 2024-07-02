@@ -99,10 +99,10 @@ Instancing::Instancing() {
 	std::vector<glm::mat4> mats;
 	mats.reserve(InstanceCount);
 
-	for(uint32_t y = 0; x < InstanceCount / 50; i++) {
-		for(uint32_t x = 0; i < InstanceCount / 50; i++) {
+	for(uint32_t y = 0; y < InstanceCount / 50; y++) {
+		for(uint32_t x = 0; x < InstanceCount / 50; x++) {
 			Transform t{ .Translation = glm::vec3(x, 0.0f, y) };
-			mats[y*50 + x] = t.GetTransForm();
+			mats[y*50 + x] = t.GetTransform();
 		}
 	}
 
@@ -116,17 +116,20 @@ Instancing::Instancing() {
 	cubeBuffer = new VertexBuffer(vertices, cubeLayout);
 	indexBuffer = new IndexBuffer(indices);
 
-	array = CreateRef<VertexArray>({ cubeBuffer, matrixBuffer }, indexBuffer);
+	array = CreateRef<VertexArray>();
+	array->AddVertexBuffer(cubeBuffer);
+	array->AddVertexBuffer(matrixBuffer);
+	array->SetIndexBuffer(indexBuffer);
 	instancingShader->Bind();
 }
 
 void Instancing::OnUpdate(TimeStep ts) {
-	controller->Update(ts);
+	controller->OnUpdate(ts);
 	RendererAPI::Get()->Clear();
 
-	instancingShader->SetMat4("u_ViewProj", camera->GetViewProject());
+	instancingShader->SetMat4("u_ViewProj", camera->GetViewProjection());
 
-	glDrawElementsInstanced(GL_TRIANGLES, indexBuffer->GetCount(),
+	glDrawElementsInstanced(GL_TRIANGLES, indexBuffer->Count,
 							GL_UNSIGNED_INT, 0, InstanceCount);
 }
 

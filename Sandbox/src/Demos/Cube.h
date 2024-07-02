@@ -58,12 +58,12 @@ Cube::Cube() {
 	camera->SetPosition({ 2.5f, 2.5f, 2.5f });
 	camera->SetDirection({ -0.5f, -0.5f, -0.5f });
 
-	cullPass = CreateRef<RenderPass>("Cull Pass", cullShader);
-	drawPass = CreateRef<RenderPass>("Draw Pass", ShaderLibrary::Get("Cube"));
-	pixelatePass = CreateRef<RenderPass>("Pixelate Pass", pixelateShader);
+	// cullPass = CreateRef<RenderPass>("Cull Pass", cullShader);
+	// drawPass = CreateRef<RenderPass>("Draw Pass", ShaderLibrary::Get("Cube"));
+	// pixelatePass = CreateRef<RenderPass>("Pixelate Pass", pixelateShader);
 
-	drawPass->SetOutput(frameBuffer);
-	pixelatePass->SetInput(frameBuffer);
+	// drawPass->SetOutput(frameBuffer);
+	// pixelatePass->SetInput(frameBuffer);
 }
 
 void Cube::OnUpdate(TimeStep ts) {
@@ -71,17 +71,18 @@ void Cube::OnUpdate(TimeStep ts) {
 
 	RendererAPI::Get()->Clear();
 
-	RendererAPI::Get()->StartPass(drawPass);
-	{
+	// RendererAPI::Get()->StartPass(drawPass);
+	// {
 		RendererAPI::Get()->Begin(camera);
 		RendererAPI::Get()->Draw3DCube(stone);
-		// RendererAPI::Get()->Draw2DQuad({ 0.3125f, 0.234375f, 0.078125f, 1.0f });
+		RendererAPI::Get()->End();
+	// 	// RendererAPI::Get()->Draw2DQuad({ 0.3125f, 0.234375f, 0.078125f, 1.0f });
 
-	}
-	RendererAPI::Get()->EndPass();
+	// }
+	// RendererAPI::Get()->EndPass();
 
-	// RendererAPI::Get()->StartPass(cullPass);
-	RendererAPI::Get()->StartPass(pixelatePass);
+	// // RendererAPI::Get()->StartPass(cullPass);
+	// RendererAPI::Get()->StartPass(pixelatePass);
 }
 
 }

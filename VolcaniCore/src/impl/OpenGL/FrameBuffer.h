@@ -11,17 +11,19 @@ namespace VolcaniCore::OpenGL {
 enum class AttachmentTarget { Color, Depth, Stencil };
 enum class AttachmentType	{ Texture, RenderBuffer, None };
 
+// TODO: Have this become the base class
 class Attachment {
 public:
-	const AttachmentTarget Target;
-	const AttachmentType Type;
+	AttachmentTarget Target;
+	AttachmentType Type;
 
-	void Bind() const {
-		if(Type == AttachmentType::Texture)
-			glBindTexture(GL_TEXTURE_2D, m_RendererID);
-		else if(Type == Attachment::RenderBuffer)
-			glBindRenderbuffer(GL_RENDERBUFFER, m_RendererID);
-	}
+public:
+	Attachment() = default;
+	Attachment(AttachmentTarget target, AttachmentType type)
+		: Target(target), Type(type) { }
+	~Attachment();
+
+	void Bind() const;
 
 private:
 	uint32_t m_RendererID;
@@ -29,31 +31,34 @@ private:
 	friend class FrameBuffer;
 };
 
+// TODO: Rename to Framebuffer
 class FrameBuffer : public VolcaniCore::FrameBuffer {
 public:
 	FrameBuffer(uint32_t width, uint32_t height);
 	FrameBuffer(uint32_t witdth, uint32_t height,
-				const std::std::initializer_list<Attachment>& attachments);
+				const std::initializer_list<Attachment>& attachments);
 	~FrameBuffer();
 
-	void Resize(uint32_t width, uint32_t height) override;
+	// TODO: Possibly delete
+	void Resize(uint32_t width, uint32_t height) override { }
 	void Bind() const override;
 	void Unbind() const override;
 
 	bool Has(AttachmentTarget target) const {
-		return m_Components.count(target) == 1;
+		return m_Attachments.count(target) == 1;
 	}
 
-	const Attachment& Get(AttachmentTarget) const {
+	const Attachment& Get(AttachmentTarget target) {
 		return m_Attachments[target];
 	}
 
 private:
-	void CreateColorAttachment(const Attachment& attachment);
-	void CreateDepthAttachment(const Attachment& attachment);
-	void CreateStencilAttachment(const Attachment& attachment);
+	void CreateColorAttachment(Attachment& attachment);
+	void CreateDepthAttachment(Attachment& attachment);
+	void CreateStencilAttachment(Attachment& attachment);
 
 	std::unordered_map<AttachmentTarget, Attachment> m_Attachments;
+	uint32_t m_BufferID;
 };
 
 }

@@ -8,6 +8,7 @@
 #include "Demos/Template.h"
 #include "Demos/Cube.h"
 #include "Demos/ECS.h"
+#include "Demos/Instancing.h"
 #include "Demos/Model.h"
 #include "Demos/UI.h"
 
