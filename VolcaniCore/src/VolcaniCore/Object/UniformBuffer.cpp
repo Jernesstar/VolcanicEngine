@@ -7,14 +7,8 @@
 namespace VolcaniCore {
 
 
-Ref<UniformBuffer> UniformBuffer::Create() {
-	RendererBackend backend = RendererAPI::Get()->Backend;
+Ref<UniformBuffer<THandle>> UniformBuffer::Create() {
 
-	switch(backend) {
-		case RendererBackend::OpenGL:
-			return CreateRef<OpenGL::UniformBuffer>();
-			break;
-	}
 }
 
 

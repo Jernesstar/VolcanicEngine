@@ -103,7 +103,7 @@ void Renderer::Init() {
 	glEnable(GL_DEPTH_TEST);				// Depth testing
 	glEnable(GL_MULTISAMPLE);				// Smooth edges
 	glEnable(GL_FRAMEBUFFER_SRGB);			// Gamma correction
-	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);	// ???
+	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS); // ???
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -130,10 +130,10 @@ void Renderer::Init() {
 
 	BufferLayout l =
 	{
-		{ "Position",			BufferDataType::Vec4 },
-		{ "Color",				BufferDataType::Vec4 },
-		{ "TextureCoordinate",	BufferDataType::Vec2 },
-		{ "TextureIndex",		BufferDataType::Int },
+		{ "Position",		   BufferDataType::Vec4 },
+		{ "Color",			   BufferDataType::Vec4 },
+		{ "TextureCoordinate", BufferDataType::Vec2 },
+		{ "TextureIndex",	   BufferDataType::Int }
 	};
 	s_Data.QuadVertexBuffer = new VertexBuffer(RendererData::MaxVertices, l);
 	s_Data.QuadVertexArray = CreateRef<VertexArray>(s_Data.QuadVertexBuffer,
@@ -324,9 +324,12 @@ void Renderer::RenderFrameBuffer(Ref<VolcaniCore::FrameBuffer> buffer)
 	glDisable(GL_DEPTH_TEST);
 	glCullFace(GL_FRONT);
 
-	// ShaderPipeline::Get("Model")->Bind();
-	// frameBufferShader->Bind();
-	buffer->As<OpenGL::FrameBuffer>()->BindTexture();
+	ShaderLibrary::Get("FrameBuffer")->Bind();
+	if(buffer->Has(AttachmentTarget::Color))
+		buffer->Get(AttachmentTarget::Color).Bind();
+	else if(buffer->Has(AttachmentTarget::Depth))
+		buffer->Get(AttachmentTarget::Depth).Bind();
+
 	s_Data.FrameBufferArray->Bind();
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 
@@ -437,11 +440,11 @@ void Renderer::Flush() {
 	}
 }
 
-void Renderer::DrawIndexed(Ref<VertexArray> vertex_array, uint32_t indices) {
-	vertex_array->Bind();
+void Renderer::DrawIndexed(Ref<VertexArray> vertexArray, uint32_t indices) {
+	vertexArray->Bind();
 	glDrawElements(GL_TRIANGLES,
 				   indices != 0 ? indices
-				   				: vertex_array->GetIndexBuffer()->Count,
+				   				: vertexArray->GetIndexBuffer()->Count,
 				   GL_UNSIGNED_INT, nullptr);
 }
 

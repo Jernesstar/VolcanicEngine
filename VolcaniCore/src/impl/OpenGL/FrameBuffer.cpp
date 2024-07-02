@@ -6,6 +6,11 @@
 
 namespace VolcaniCore::OpenGL {
 
+FrameBuffer::FrameBuffer(uint32_t width, uint32_t height)
+	: VolcaniCore::FrameBuffer(width, height)
+{
+
+}
 
 FrameBuffer::FrameBuffer(uint32_t width, uint32_t height,
 						 const std::initializer_list<Attachment>& attachments)

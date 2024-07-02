@@ -31,10 +31,17 @@ private:
 
 	Ref<FrameBuffer> frameBuffer = FrameBuffer::Create(800, 600);
 	Ref<Texture> stone = Texture::Create("Sandbox/assets/images/stone.png");
-	Ref<ShaderPipeline> pixelate = ShaderPipeline::Create({
+	Ref<ShaderPipeline> pixelateShader = ShaderPipeline::Create({
 		{ "Sandbox/assets/shaders/Pixelate.glsl.vert", ShaderType::Vertex },
 		{ "Sandbox/assets/shaders/Pixelate.glsl.frag", ShaderType::Fragment }
 	});
+	Ref<ShaderPipeline> cullShader = ShaderPipeline::Create({
+		{ "Sandbox/assets/shaders/Cull.glsl.vert", ShaderType::Vertex },
+		{ "Sandbox/assets/shaders/Cull.glsl.geom", ShaderType::Geometry }
+	});
+
+	Ref<RenderPass> drawPass;
+	Ref<RenderPass> pixelatePass;
 };
 
 Cube::Cube() {
@@ -50,22 +57,31 @@ Cube::Cube() {
 
 	camera->SetPosition({ 2.5f, 2.5f, 2.5f });
 	camera->SetDirection({ -0.5f, -0.5f, -0.5f });
+
+	cullPass = CreateRef<RenderPass>("Cull Pass", cullShader);
+	drawPass = CreateRef<RenderPass>("Draw Pass", ShaderLibrary::Get("Cube"));
+	pixelatePass = CreateRef<RenderPass>("Pixelate Pass", pixelateShader);
+
+	drawPass->SetOutput(frameBuffer);
+	pixelatePass->SetInput(frameBuffer);
 }
 
 void Cube::OnUpdate(TimeStep ts) {
 	controller.OnUpdate(ts);
-	RendererAPI::Get()->Clear({ 1.0f, 1.0f, 1.0f, 1.0f });
 
-	// frameBuffer->Bind();
-	// {
-		RendererAPI::Get()->Clear();
+	RendererAPI::Get()->Clear();
+
+	RendererAPI::Get()->StartPass(drawPass);
+	{
 		RendererAPI::Get()->Begin(camera);
 		RendererAPI::Get()->Draw3DCube(stone);
-	// }
-	// frameBuffer->Unbind();
-	// RendererAPI::Get()->RenderFrameBuffer(frameBuffer, pixelate);
+		// RendererAPI::Get()->Draw2DQuad({ 0.3125f, 0.234375f, 0.078125f, 1.0f });
 
-	// RendererAPI::Get()->Draw2DQuad({ 0.3125f, 0.234375f, 0.078125f, 1.0f });
+	}
+	RendererAPI::Get()->EndPass();
+
+	// RendererAPI::Get()->StartPass(cullPass);
+	RendererAPI::Get()->StartPass(pixelatePass);
 }
 
 }

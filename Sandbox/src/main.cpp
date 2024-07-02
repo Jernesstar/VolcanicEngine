@@ -19,21 +19,15 @@ Application* CreateApplication(const CommandLineArgs& args)
 {
 	std::string project = args[1];
 
-	if(project == "Template")
-		return new Demo::Template();
-	if(project == "Cube")
-		return new Demo::Cube();
-	if(project == "ECS")
-		return new Demo::ECS();
-	if(project == "Model")
-		return new Demo::Model();
-	if(project == "UI")
-		return new Demo::GameUI();
+	if(project == "Template")	return new Demo::Template();
+	if(project == "Cube")		return new Demo::Cube();
+	if(project == "ECS")		return new Demo::ECS();
+	if(project == "Instancing") return new Demo::Instancing();
+	if(project == "Model")		return new Demo::Model();
+	if(project == "UI")			return new Demo::GameUI();
 
-	if(project == "Editor")
-		return new Magma::Editor();
-	if(project == "Game")
-		return new TheMazeIsLava::Game();
+	if(project == "Editor") return new Magma::Editor();
+	if(project == "Game")	return new TheMazeIsLava::Game();
 
 	return new Demo::Template();
 }

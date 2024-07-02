@@ -66,10 +66,10 @@ private:
 		{ "a_Position", OpenGL::BufferDataType::Vec3, true },
 	};
 
-	OpenGL::IndexBuffer* index_buffer = new OpenGL::IndexBuffer(indices);
-	OpenGL::VertexBuffer* light_buffer = new OpenGL::VertexBuffer(vertices, l1);
-	Ref<OpenGL::VertexArray> light_array = CreateRef<OpenGL::VertexArray>(
-													light_buffer, index_buffer);
+	OpenGL::IndexBuffer* indexBuffer = new OpenGL::IndexBuffer(indices);
+	OpenGL::VertexBuffer* lightBuffer = new OpenGL::VertexBuffer(vertices, l1);
+	Ref<OpenGL::VertexArray> lightArray = CreateRef<OpenGL::VertexArray>(
+													lightBuffer, indexBuffer);
 
 	Ref<ShaderPipeline> model_shader = ShaderPipeline::Create({
 		{ "VolcaniCore/assets/shaders/Model.glsl.vert", ShaderType::Vertex },

@@ -2,15 +2,29 @@
 
 namespace VolcaniCore {
 
-// template<typename T>
+
+template<typename THandle>
 class UniformBuffer {
 public:
-	UniformBuffer() = default;
+	UniformBuffer(Ref<THandle> handle)
+		: m_Handle(handle) { }
 	virtual ~UniformBuffer() = default;
 
-	// virtual void SetData(Ref<T> data) = 0;
+	virtual void Update(uint32_t size = 0, uint32_t offset = 0) = 0;
 
-	static Ref<UniformBuffer> Create();
+	static Ref<UniformBuffer<THandle>> Create(Ref<THandle> handle) {
+		RendererBackend backend = RendererAPI::Get()->Backend;
+
+		switch(backend) {
+			case RendererBackend::OpenGL:
+				return CreateRef<OpenGL::UniformBuffer<THandle>>();
+				break;
+		}
+	}
+
+protected:
+	Ref<THandle> m_Handle;
 };
+
 
 }

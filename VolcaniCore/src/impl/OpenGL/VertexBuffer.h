@@ -11,12 +11,14 @@ public:
 	const BufferLayout Layout;
 
 public:
-	VertexBuffer(uint32_t count, const BufferLayout& layout, const void* data = nullptr)
+	VertexBuffer(uint32_t count, const BufferLayout& layout,
+				 const void* data = nullptr)
 		: Layout(layout)
 	{
 		glCreateBuffers(1, &m_VertexBufferID);
 		glBindBuffer(GL_ARRAY_BUFFER, m_VertexBufferID);
-		glBufferData(GL_ARRAY_BUFFER, count * Layout.Stride, data, layout.Dynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, count * Layout.Stride,
+					 data, layout.Dynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
 	}
 
 	template<typename T, std::size_t TCount>
@@ -25,7 +27,8 @@ public:
 	{
 		glCreateBuffers(1, &m_VertexBufferID);
 		glBindBuffer(GL_ARRAY_BUFFER, m_VertexBufferID);
-		glBufferData(GL_ARRAY_BUFFER, TCount * Layout.Stride, vertices, layout.Dynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, TCount * Layout.Stride, vertices,
+					 layout.Dynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
 	}
 
 	~VertexBuffer() { glDeleteBuffers(1, &m_VertexBufferID); }

@@ -37,7 +37,8 @@ public:
 	virtual void Begin(Ref<Camera> camera) = 0;
 	virtual void End() = 0;
 
-	virtual void Render(Ref<RenderPass> pass) = 0;
+	// Move this to Renderer, along with DrawScene
+	virtual void StartPass(Ref<RenderPass> pass) = 0;
 	virtual void RenderFrameBuffer(Ref<FrameBuffer> buffer) = 0;
 
 	virtual void DrawCubemap(Ref<Cubemap> cubemap) = 0;

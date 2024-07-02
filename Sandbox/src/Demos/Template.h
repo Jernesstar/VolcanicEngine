@@ -2,7 +2,17 @@
 
 #include <Core/Application.h>
 #include <Core/Log.h>
+
 #include <Events/EventSystem.h>
+
+#include <Renderer/RendererAPI.h>
+#include <Object/Shader.h>
+#include <Object/Texture.h>
+#include <Renderer/StereographicCamera.h>
+#include <Renderer/OrthographicCamera.h>
+#include <Renderer/CameraController.h>
+
+#include <OpenGL/Renderer.h>
 
 using namespace VolcaniCore;
 
@@ -27,10 +37,10 @@ Template::Template() {
 	EventSystem::RegisterListener<KeyPressedEvent>(
 	[](const KeyPressedEvent& event) {
 		if(event.Key == Key::K)
-		VOLCANICORE_LOG_INFO("Test1");
+		VOLCANICORE_LOG_INFO("Test Key K");
 	});
 
-	VOLCANICORE_LOG_INFO("Test");
+	VOLCANICORE_LOG_INFO("Template Project Started");
 }
 
 void Template::OnUpdate(TimeStep ts) {

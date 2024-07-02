@@ -24,7 +24,7 @@ public:
 	void Begin(Ref<VolcaniCore::Camera> camera) override;
 	void End() override;
 
-	void Render(Ref<VolcaniCore::RenderPass> pass) override;
+	void StartPass(Ref<VolcaniCore::RenderPass> pass) override;
 	void RenderFrameBuffer(Ref<VolcaniCore::FrameBuffer> buffer) override;
 
 	void DrawCubemap(Ref<VolcaniCore::Cubemap> cubemap) override;
