@@ -13,6 +13,7 @@
 #include <Renderer/CameraController.h>
 
 #include <OpenGL/Renderer.h>
+#include <OpenGL/FrameBuffer.h>
 
 using namespace VolcaniCore;
 
@@ -25,23 +26,19 @@ public:
 	void OnUpdate(TimeStep ts);
 
 private:
-	Ref<StereographicCamera> camera = CreateRef<StereographicCamera>(75.0f, 0.01f, 100.0f, 800, 600);
-	// Ref<OrthographicCamera> camera = CreateRef<OrthographicCamera>(800, 600, 0.01f, 100.0f);
-	CameraController controller{ camera };
+	Ref<StereographicCamera> camera;
+	// Ref<OrthographicCamera> camera;
+	Ref<CameraController> controller;
 
-	Ref<FrameBuffer> frameBuffer = FrameBuffer::Create(800, 600);
-	Ref<Texture> stone = Texture::Create("Sandbox/assets/images/stone.png");
-	Ref<ShaderPipeline> pixelateShader = ShaderPipeline::Create({
-		{ "Sandbox/assets/shaders/Pixelate.glsl.vert", ShaderType::Vertex },
-		{ "Sandbox/assets/shaders/Pixelate.glsl.frag", ShaderType::Fragment }
-	});
-	Ref<ShaderPipeline> cullShader = ShaderPipeline::Create({
-		{ "Sandbox/assets/shaders/Cull.glsl.vert", ShaderType::Vertex },
-		{ "Sandbox/assets/shaders/Cull.glsl.geom", ShaderType::Geometry }
-	});
+	Ref<ShaderPipeline> pixelateShader;
+	// Ref<ShaderPipeline> cullShader;
+
+	Ref<Texture> stone;
 
 	Ref<RenderPass> drawPass;
 	Ref<RenderPass> pixelatePass;
+
+	Ref<OpenGL::FrameBuffer> frameBuffer;
 };
 
 Cube::Cube() {
@@ -55,8 +52,23 @@ Cube::Cube() {
 		camera->Resize(event.Width, event.Height);
 	});
 
+	camera = CreateRef<StereographicCamera>(75.0f, 0.01f, 100.0f, 800, 600);
+	// camera = CreateRef<OrthographicCamera>(800, 600, 0.01f, 100.0f);
 	camera->SetPosition({ 2.5f, 2.5f, 2.5f });
 	camera->SetDirection({ -0.5f, -0.5f, -0.5f });
+
+	controller = CreateRef<CameraController>(camera);
+	controller->TranslationSpeed = 0.2f;
+
+	stone = Texture::Create("Sandbox/assets/images/stone.png");
+	pixelateShader = ShaderPipeline::Create({
+		{ "Sandbox/assets/shaders/Pixelate.glsl.vert", ShaderType::Vertex },
+		{ "Sandbox/assets/shaders/Pixelate.glsl.frag", ShaderType::Fragment }
+	});
+	// cullShader = ShaderPipeline::Create({
+	// 	{ "Sandbox/assets/shaders/Cull.glsl.vert", ShaderType::Vertex },
+	// 	{ "Sandbox/assets/shaders/Cull.glsl.geom", ShaderType::Geometry }
+	// });
 
 	// cullPass = CreateRef<RenderPass>("Cull Pass", cullShader);
 	// drawPass = CreateRef<RenderPass>("Draw Pass", ShaderLibrary::Get("Cube"));
@@ -64,22 +76,30 @@ Cube::Cube() {
 
 	// drawPass->SetOutput(frameBuffer);
 	// pixelatePass->SetInput(frameBuffer);
+
+	std::vector<OpenGL::Attachment> attachments{
+		{ OpenGL::AttachmentTarget::Color, OpenGL::AttachmentType::Texture },
+		{ OpenGL::AttachmentTarget::Depth, OpenGL::AttachmentType::Texture }
+	};
+	frameBuffer = CreateRef<OpenGL::FrameBuffer>(400, 300, attachments);
+	controller->OnResize(400, 300);
 }
 
 void Cube::OnUpdate(TimeStep ts) {
-	controller.OnUpdate(ts);
-
 	RendererAPI::Get()->Clear();
+	controller->OnUpdate(ts);
 
+	frameBuffer->Bind();
 	// RendererAPI::Get()->StartPass(drawPass);
 	// {
 		RendererAPI::Get()->Begin(camera);
+		RendererAPI::Get()->Clear();
 		RendererAPI::Get()->Draw3DCube(stone);
 		RendererAPI::Get()->End();
-	// 	// RendererAPI::Get()->Draw2DQuad({ 0.3125f, 0.234375f, 0.078125f, 1.0f });
-
 	// }
 	// RendererAPI::Get()->EndPass();
+	frameBuffer->Unbind();
+	RendererAPI::Get()->RenderFrameBuffer(frameBuffer);
 
 	// // RendererAPI::Get()->StartPass(cullPass);
 	// RendererAPI::Get()->StartPass(pixelatePass);

@@ -36,7 +36,7 @@ class FrameBuffer : public VolcaniCore::FrameBuffer {
 public:
 	FrameBuffer(uint32_t width, uint32_t height);
 	FrameBuffer(uint32_t witdth, uint32_t height,
-				const std::initializer_list<Attachment>& attachments);
+				const std::vector<Attachment>& attachments);
 	~FrameBuffer();
 
 	// TODO: Possibly delete

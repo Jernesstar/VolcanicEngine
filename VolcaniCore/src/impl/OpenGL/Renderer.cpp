@@ -320,9 +320,11 @@ void Renderer::RenderFrameBuffer(Ref<VolcaniCore::FrameBuffer> buffer)
 	glDisable(GL_DEPTH_TEST);
 	glCullFace(GL_FRONT);
 
+	auto nativeBuffer = buffer->As<OpenGL::FrameBuffer>();
 	// ShaderLibrary::Get("FrameBuffer")->Bind();
-	// if(buffer->Has(AttachmentTarget::Color))
-	// 	buffer->Get(AttachmentTarget::Color).Bind();
+	s_Data.FrameBufferShader->Bind();
+	if(nativeBuffer->Has(AttachmentTarget::Color))
+		nativeBuffer->Get(AttachmentTarget::Color).Bind();
 	// else if(buffer->Has(AttachmentTarget::Depth))
 	// 	buffer->Get(AttachmentTarget::Depth).Bind();
 

@@ -35,15 +35,15 @@ private:
 
 	Vertex vertices[8] = 
 	{
-		{ { -0.5f,  0.5f,  0.5 } }, // 0 Front Top Left
-		{ {  0.5f,  0.5f,  0.5 } }, // 1 Front Top Right
-		{ { -0.5f, -0.5f,  0.5 } }, // 2 Front Bottom Left
-		{ {  0.5f, -0.5f,  0.5 } }, // 3 Front Bottom Right
+		{ { -0.5f,  0.5f,  0.5f }, { 0.0f, 1.0f } }, // 0 Front Top Left
+		{ {  0.5f,  0.5f,  0.5f }, { 1.0f, 1.0f } }, // 1 Front Top Right
+		{ { -0.5f, -0.5f,  0.5f }, { 0.0f, 0.0f } }, // 2 Front Bottom Left
+		{ {  0.5f, -0.5f,  0.5f }, { 1.0f, 0.0f } }, // 3 Front Bottom Right
 
-		{ { -0.5f,  0.5f, -0.5 } }, // 4 Back Top Left 
-		{ {  0.5f,  0.5f, -0.5 } }, // 5 Back Top Right
-		{ { -0.5f, -0.5f, -0.5 } }, // 6 Back Bottom Left
-		{ {  0.5f, -0.5f, -0.5 } }, // 7 Back Bottom Right
+		{ { -0.5f,  0.5f, -0.5f }, { 0.0f, 1.0f } }, // 4 Back Top Left
+		{ {  0.5f,  0.5f, -0.5f }, { 1.0f, 1.0f } }, // 5 Back Top Right
+		{ { -0.5f, -0.5f, -0.5f }, { 0.0f, 0.0f } }, // 6 Back Bottom Left
+		{ {  0.5f, -0.5f, -0.5f }, { 1.0f, 0.0f } }, // 7 Back Bottom Right
 	};
 
 	uint32_t indices[36] =
@@ -68,7 +68,8 @@ private:
 	};
 
 	BufferLayout cubeLayout = {
-		{ "a_Position", BufferDataType::Vec3 },
+		{ "a_Position",			 BufferDataType::Vec3 },
+		{ "a_TextureCoordinate", BufferDataType::Vec2 }
 	};
 
 	BufferLayout matLayout = {
@@ -84,6 +85,8 @@ private:
 		{ "Sandbox/assets/shaders/Instancing.glsl.vert", ShaderType::Vertex },
 		{ "Sandbox/assets/shaders/Instancing.glsl.frag", ShaderType::Fragment }
 	});
+
+	Ref<Texture> cubeTexture;
 
 	Ref<Camera> camera;
 	Ref<CameraController> controller;
@@ -107,13 +110,7 @@ Instancing::Instancing() {
 		mats[i] = t.GetTransform();
 	}
 
-	camera = CreateRef<StereographicCamera>(75.0f, 0.01f, 100.0f, 800, 600);
-	camera->SetPosition({ 5.0f, 0.0f, 10.0f });
-	// camera->SetDirection({ -0.5f, -0.5f, -0.5f });
-
-	controller = CreateRef<CameraController>(camera);
-
-	matrixBuffer = new VertexBuffer(InstanceCount * 4, matLayout, mats.data());
+	matrixBuffer = new VertexBuffer(InstanceCount, matLayout, mats.data());
 	cubeBuffer = new VertexBuffer(vertices, cubeLayout);
 	indexBuffer = new IndexBuffer(indices);
 
@@ -122,8 +119,15 @@ Instancing::Instancing() {
 	array->AddVertexBuffer(cubeBuffer);
 	array->AddVertexBuffer(matrixBuffer);
 
-	array->Bind();
+	cubeTexture = Texture::Create("Sandbox/assets/images/stone.png");
 	instancingShader->Bind();
+	instancingShader->SetTexture("u_Texture", cubeTexture, 0);
+
+	camera = CreateRef<StereographicCamera>(75.0f, 0.01f, 100.0f, 800, 600);
+	camera->SetPosition({ 5.0f, 0.0f, 10.0f });
+	// camera->SetDirection({ -0.5f, -0.5f, -0.5f });
+	controller = CreateRef<CameraController>(camera);
+	controller->TranslationSpeed = 0.5f;
 }
 
 void Instancing::OnUpdate(TimeStep ts) {

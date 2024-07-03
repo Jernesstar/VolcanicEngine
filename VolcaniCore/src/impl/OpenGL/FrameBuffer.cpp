@@ -28,7 +28,7 @@ FrameBuffer::FrameBuffer(uint32_t width, uint32_t height)
 }
 
 FrameBuffer::FrameBuffer(uint32_t width, uint32_t height,
-						 const std::initializer_list<Attachment>& attachments)
+						 const std::vector<Attachment>& attachments)
 	: VolcaniCore::FrameBuffer(width, height)
 {
 	glGenFramebuffers(1, &m_BufferID);
