@@ -58,7 +58,6 @@ Cube::Cube() {
 	camera->SetDirection({ -0.5f, -0.5f, -0.5f });
 
 	controller = CreateRef<CameraController>(camera);
-	controller->TranslationSpeed = 0.2f;
 
 	stone = Texture::Create("Sandbox/assets/images/stone.png");
 	pixelateShader = ShaderPipeline::Create({
@@ -81,13 +80,14 @@ Cube::Cube() {
 		{ OpenGL::AttachmentTarget::Color, OpenGL::AttachmentType::Texture },
 		{ OpenGL::AttachmentTarget::Depth, OpenGL::AttachmentType::Texture }
 	};
-	frameBuffer = CreateRef<OpenGL::FrameBuffer>(400, 300, attachments);
-	controller->OnResize(400, 300);
+	frameBuffer = CreateRef<OpenGL::FrameBuffer>(225, 150, attachments);
 }
 
 void Cube::OnUpdate(TimeStep ts) {
 	RendererAPI::Get()->Clear();
 	controller->OnUpdate(ts);
+
+	glViewport(0, 0, 225, 150);
 
 	frameBuffer->Bind();
 	// RendererAPI::Get()->StartPass(drawPass);
@@ -99,6 +99,9 @@ void Cube::OnUpdate(TimeStep ts) {
 	// }
 	// RendererAPI::Get()->EndPass();
 	frameBuffer->Unbind();
+
+	glViewport(0, 0, 800, 600);
+
 	RendererAPI::Get()->RenderFrameBuffer(frameBuffer);
 
 	// // RendererAPI::Get()->StartPass(cullPass);

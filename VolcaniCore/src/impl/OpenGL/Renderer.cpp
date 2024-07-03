@@ -94,7 +94,7 @@ struct RendererData {
 	Ptr<VertexArray> FrameBufferArray;
 
 	glm::mat4 ViewProjection;
-	uint32_t Depth;
+	uint32_t ViewportWidth, ViewportHeight;
 };
 
 static RendererData s_Data;
@@ -293,6 +293,8 @@ void Renderer::Clear(const glm::vec4& color) {
 }
 
 void Renderer::Resize(uint32_t width, uint32_t height) {
+	s_Data.ViewportWidth = width;
+	s_Data.ViewportHeight = height;
 	glViewport(0, 0, width, height);
 	s_Data.FrameBuffer2D->Resize(width, height);
 }
