@@ -106,22 +106,22 @@ void Init() {
 	io.FontDefault = io.Fonts->AddFontFromFileTTF(
 			"VolcaniCore/assets/fonts/JetBrainsMono-Regular.ttf", fontSize);
 
-	EventSystem::RegisterListener<MouseButtonPressedEvent>(
-	[&io, &window](MouseButtonPressedEvent& event) {
-		event.Handled = io.WantCaptureMouse;
-	});
-	EventSystem::RegisterListener<MouseButtonReleasedEvent>(
-	[&io](MouseButtonReleasedEvent& event) {
-		event.Handled = io.WantCaptureMouse;
-	});
-	EventSystem::RegisterListener<MouseScrolledEvent>(
-	[&io](MouseScrolledEvent& event) {
-		event.Handled = io.WantCaptureMouse;
-	});
-	EventSystem::RegisterListener<MouseMovedEvent>(
-	[&io](MouseMovedEvent& event) {
-		event.Handled = io.WantCaptureMouse;
-	});
+	// EventSystem::RegisterListener<MouseButtonPressedEvent>(
+	// [&io](MouseButtonPressedEvent& event) {
+	// 	event.Handled = io.WantCaptureMouse;
+	// });
+	// EventSystem::RegisterListener<MouseButtonReleasedEvent>(
+	// [&io](MouseButtonReleasedEvent& event) {
+	// 	event.Handled = io.WantCaptureMouse;
+	// });
+	// EventSystem::RegisterListener<MouseScrolledEvent>(
+	// [&io](MouseScrolledEvent& event) {
+	// 	event.Handled = io.WantCaptureMouse;
+	// });
+	// EventSystem::RegisterListener<MouseMovedEvent>(
+	// [&io](MouseMovedEvent& event) {
+	// 	event.Handled = io.WantCaptureMouse;
+	// });
 	EventSystem::RegisterListener<WindowResizedEvent>(
 	[&io](const WindowResizedEvent& event) {
 		io.DisplaySize = ImVec2(event.Width, event.Height);

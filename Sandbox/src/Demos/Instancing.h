@@ -26,10 +26,11 @@ public:
 	void OnUpdate(TimeStep ts);
 
 private:
-	const uint32_t InstanceCount = 2500;
+	const uint32_t InstanceCount = 500;
 
 	struct Vertex {
 		glm::vec3 Position;
+		glm::vec2 TextureCoordinate;
 	};
 
 	Vertex vertices[8] = 
@@ -66,8 +67,7 @@ private:
 		2, 6, 7,
 	};
 
-	BufferLayout cubeLayout =
-	{
+	BufferLayout cubeLayout = {
 		{ "a_Position", BufferDataType::Vec3 },
 	};
 
@@ -82,7 +82,7 @@ private:
 
 	Ref<ShaderPipeline> instancingShader = ShaderPipeline::Create({
 		{ "Sandbox/assets/shaders/Instancing.glsl.vert", ShaderType::Vertex },
-		{ "Sandbox/assets/shaders/Instancing.glsl.geom", ShaderType::Fragment }
+		{ "Sandbox/assets/shaders/Instancing.glsl.frag", ShaderType::Fragment }
 	});
 
 	Ref<Camera> camera;
@@ -99,27 +99,30 @@ Instancing::Instancing() {
 	std::vector<glm::mat4> mats;
 	mats.reserve(InstanceCount);
 
-	for(uint32_t y = 0; y < InstanceCount / 50; y++) {
-		for(uint32_t x = 0; x < InstanceCount / 50; x++) {
-			Transform t{ .Translation = glm::vec3(x, 0.0f, y) };
-			mats[y*50 + x] = t.GetTransform();
-		}
+	float offset = 0.0f;
+	for(uint32_t i = 0; i < InstanceCount; i++) {
+		Transform t{
+			.Translation = { (offset += 5.0f), 0.0f, 0.0f }
+		};
+		mats[i] = t.GetTransform();
 	}
 
 	camera = CreateRef<StereographicCamera>(75.0f, 0.01f, 100.0f, 800, 600);
-	camera->SetPosition({ 2.5f, 2.5f, 2.5f });
-	camera->SetDirection({ -0.5f, -0.5f, -0.5f });
+	camera->SetPosition({ 5.0f, 0.0f, 10.0f });
+	// camera->SetDirection({ -0.5f, -0.5f, -0.5f });
 
 	controller = CreateRef<CameraController>(camera);
 
-	matrixBuffer = new VertexBuffer(InstanceCount, matLayout, mats.data());
+	matrixBuffer = new VertexBuffer(InstanceCount * 4, matLayout, mats.data());
 	cubeBuffer = new VertexBuffer(vertices, cubeLayout);
 	indexBuffer = new IndexBuffer(indices);
 
 	array = CreateRef<VertexArray>();
+	array->SetIndexBuffer(indexBuffer);
 	array->AddVertexBuffer(cubeBuffer);
 	array->AddVertexBuffer(matrixBuffer);
-	array->SetIndexBuffer(indexBuffer);
+
+	array->Bind();
 	instancingShader->Bind();
 }
 

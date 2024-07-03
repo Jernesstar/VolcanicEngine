@@ -333,7 +333,6 @@ void Renderer::RenderFrameBuffer(Ref<VolcaniCore::FrameBuffer> buffer)
 	glEnable(GL_DEPTH_TEST);
 }
 
-
 void Renderer::DrawCubemap(Ref<VolcaniCore::Cubemap> cubemap) {
 	glDepthMask(GL_FALSE);
 
