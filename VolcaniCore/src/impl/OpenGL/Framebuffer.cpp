@@ -1,4 +1,4 @@
-#include "FrameBuffer.h"
+#include "Framebuffer.h"
 
 #include <glad/glad.h>
 
@@ -14,22 +14,21 @@ Attachment::~Attachment() {
 }
 
 void Attachment::Bind() const {
-	if(Type == AttachmentType::Texture)
+	if(this->Type == AttachmentType::Texture)
 		glBindTexture(GL_TEXTURE_2D, m_RendererID);
-	else if(Type == AttachmentType::RenderBuffer)
+	else if(this->Type == AttachmentType::RenderBuffer)
 		glBindRenderbuffer(GL_RENDERBUFFER, m_RendererID);
 }
 
-
-FrameBuffer::FrameBuffer(uint32_t width, uint32_t height)
-	: VolcaniCore::FrameBuffer(width, height)
+Framebuffer::Framebuffer(uint32_t width, uint32_t height)
+	: VolcaniCore::Framebuffer(width, height)
 {
 
 }
 
-FrameBuffer::FrameBuffer(uint32_t width, uint32_t height,
+Framebuffer::Framebuffer(uint32_t width, uint32_t height,
 						 const std::vector<Attachment>& attachments)
-	: VolcaniCore::FrameBuffer(width, height)
+	: VolcaniCore::Framebuffer(width, height)
 {
 	glGenFramebuffers(1, &m_BufferID);
 	glBindFramebuffer(GL_FRAMEBUFFER, m_BufferID);
@@ -51,7 +50,7 @@ FrameBuffer::FrameBuffer(uint32_t width, uint32_t height,
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void FrameBuffer::CreateColorAttachment(Attachment& attachment) {
+void Framebuffer::CreateColorAttachment(Attachment& attachment) {
 	if(attachment.Type == AttachmentType::Texture) {
 		glGenTextures(1, &attachment.m_RendererID);
 
@@ -74,7 +73,7 @@ void FrameBuffer::CreateColorAttachment(Attachment& attachment) {
 	}
 }
 
-void FrameBuffer::CreateDepthAttachment(Attachment& attachment) {
+void Framebuffer::CreateDepthAttachment(Attachment& attachment) {
 	if(attachment.Type == AttachmentType::RenderBuffer)
 	{
 		if(this->Has(AttachmentTarget::Stencil)) {
@@ -108,18 +107,18 @@ void FrameBuffer::CreateDepthAttachment(Attachment& attachment) {
 	}
 }
 
-void FrameBuffer::CreateStencilAttachment(Attachment& attachment) {
+void Framebuffer::CreateStencilAttachment(Attachment& attachment) {
 	// TODO: Implement
 }
 
-FrameBuffer::~FrameBuffer() {
+Framebuffer::~Framebuffer() {
 	glDeleteBuffers(1, &m_BufferID);
 }
 
-void FrameBuffer::Bind() const {
+void Framebuffer::Bind() const {
 	glBindFramebuffer(GL_FRAMEBUFFER, m_BufferID);
 }
-void FrameBuffer::Unbind() const {
+void Framebuffer::Unbind() const {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 

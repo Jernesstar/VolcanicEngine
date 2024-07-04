@@ -16,7 +16,7 @@
 namespace VolcaniCore {
 
 enum class ShaderType { Vertex, Geometry, Fragment, Compute, Unknown };
-enum class Shader { Simple, Cubemap, Model, FrameBuffer };
+enum class Shader { Simple, Cubemap, Model, Framebuffer };
 
 struct ShaderFile {
 	const std::string Path;

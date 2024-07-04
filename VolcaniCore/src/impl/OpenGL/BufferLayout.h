@@ -17,7 +17,7 @@ public:
 	const uint32_t Count;
 
 	BufferElement(const std::string& name, BufferDataType type,
-					bool normalized = true)
+				  bool normalized = true)
 		: Name(name), Type(type), Normalized(normalized), Size(CalcSize(type)),
 			Count(CalcCount(type)) { }
 
@@ -26,15 +26,18 @@ private:
 	static uint32_t CalcCount(BufferDataType type);
 };
 
+
+// TODO: Take out of OpenGL subnamespace ? or some version of this
 class BufferLayout {
 public:
 	const std::vector<BufferElement> Elements;
 	const uint32_t Stride;
+	const bool StructureOfArrays;
 	const bool Dynamic;
 
 public:
 	BufferLayout(const std::initializer_list<BufferElement>& elements,
-					bool dynamic = true)
+				 bool structureOfArrays = false, bool dynamic = true)
 		: Elements(elements), Stride(CalcStride(elements)), Dynamic(dynamic) { }
 
 	std::vector<BufferElement>::const_iterator begin() const {

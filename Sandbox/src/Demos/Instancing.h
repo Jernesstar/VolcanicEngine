@@ -72,13 +72,13 @@ private:
 		{ "a_TextureCoordinate", BufferDataType::Vec2 }
 	};
 
-	BufferLayout matLayout = {
+	BufferLayout layout = {
 		{ "a_Transform", BufferDataType::Mat4 }
 	};
 
-	VertexBuffer* cubeBuffer;
-	IndexBuffer* indexBuffer;
-	VertexBuffer* matrixBuffer;
+	Ref<IndexBuffer> indexBuffer;
+	Ref<VertexBuffer> cubeBuffer;
+	Ref<VertexBuffer> matrixBuffer;
 	Ref<VertexArray> array;
 
 	Ref<ShaderPipeline> instancingShader = ShaderPipeline::Create({
@@ -110,9 +110,9 @@ Instancing::Instancing() {
 		mats[i] = t.GetTransform();
 	}
 
-	matrixBuffer = new VertexBuffer(InstanceCount, matLayout, mats.data());
-	cubeBuffer = new VertexBuffer(vertices, cubeLayout);
-	indexBuffer = new IndexBuffer(indices);
+	matrixBuffer = CreateRef<VertexBuffer>(InstanceCount, layout, mats.data());
+	cubeBuffer	 = CreateRef<VertexBuffer>(vertices, cubeLayout);
+	indexBuffer  = CreateRef<IndexBuffer>(indices);
 
 	array = CreateRef<VertexArray>();
 	array->SetIndexBuffer(indexBuffer);
@@ -136,8 +136,9 @@ void Instancing::OnUpdate(TimeStep ts) {
 
 	instancingShader->SetMat4("u_ViewProj", camera->GetViewProjection());
 
-	glDrawElementsInstanced(GL_TRIANGLES, indexBuffer->Count,
-							GL_UNSIGNED_INT, 0, InstanceCount);
+	RendererAPI::Get()->As<OpenGL::Renderer>()
+	->DrawInstanced(array, InstanceCount);
 }
+
 
 }

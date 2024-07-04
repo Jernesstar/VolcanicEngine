@@ -8,7 +8,7 @@
 #include <ImGuiFileDialog/ImGuiFileDialog.h>
 
 #include <OpenGL/Texture2D.h>
-#include <OpenGL/FrameBuffer.h>
+#include <OpenGL/Framebuffer.h>
 
 #include <VolcaniCore/Core/Application.h>
 #include <VolcaniCore/Core/Log.h>
@@ -33,7 +33,7 @@ EditorLayer::EditorLayer() {
 	m_CurrentScene = SceneSerializer::Deserialize(
 											"Magma/assets/scenes/temp.volc");
 	m_SceneHierarchyPanel = CreateRef<SceneHierarchyPanel>(m_CurrentScene);
-	m_FrameBuffer = FrameBuffer::Create(800, 600);
+	m_Framebuffer = Framebuffer::Create(800, 600);
 
 	m_IconPlay 	= Texture::Create("Magma/assets/icons/PlayButton.png");
 	m_IconPause = Texture::Create("Magma/assets/icons/PauseButton.png");
@@ -152,9 +152,9 @@ void EditorLayer::Render() {
 		m_ViewportHovered = ImGui::IsWindowHovered();
 
 		// TODO:
-		// auto& colorAttachment = m_FrameBuffer->Get(AttachmentTarget::Color);
+		// auto& colorAttachment = m_Framebuffer->Get(AttachmentTarget::Color);
 		// uint64_t textureID = colorAttachment->GetRendererID();
-		// m_FrameBuffer->Bind();
+		// m_Framebuffer->Bind();
 		// colorAttachment->Bind();
 		// ImGui::Image(reinterpret_cast<void*>(textureID),
 		// 			 ImVec2{ m_ViewportSize.x, m_ViewportSize.y },

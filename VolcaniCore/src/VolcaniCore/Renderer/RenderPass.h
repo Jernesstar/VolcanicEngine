@@ -2,7 +2,8 @@
 
 #include "Object/Shader.h"
 #include "Object/UniformBuffer.h"
-#include "Object/FrameBuffer.h"
+#include "Object/Framebuffer.h"
+
 #include "Renderer/Camera.h"
 
 namespace VolcaniCore {
@@ -16,14 +17,14 @@ public:
 	~RenderPass();
 
 	// void SetInput(Ref<UniformBuffer> buffer);
-	// void SetOutput(Ref<FrameBuffer> buffer);
+	// void SetOutput(Ref<Framebuffer> buffer);
 
-	Ref<FrameBuffer> GetOutput();
+	Ref<Framebuffer> GetOutput();
 	Ref<ShaderPipeline> GetPipeline() const { return m_Pipeline; }
 
 private:
 	// std::vector<UniformBuffer> m_Inputs;
-	Ref<FrameBuffer> m_Output;
+	Ref<Framebuffer> m_Output;
 	Ref<ShaderPipeline> m_Pipeline;
 };
 

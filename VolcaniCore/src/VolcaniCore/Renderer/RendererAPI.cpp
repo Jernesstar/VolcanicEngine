@@ -16,5 +16,9 @@ void RendererAPI::Create(RendererBackend backend) {
 	s_Instance->Init();
 }
 
+void RendererAPI::Close() {
+	s_Instance->Close();
+}
+
 
 }

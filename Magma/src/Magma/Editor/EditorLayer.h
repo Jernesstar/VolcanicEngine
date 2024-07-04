@@ -4,7 +4,7 @@
 
 #include <VolcaniCore/Core/Time.h>
 #include <VolcaniCore/Object/Texture.h>
-#include <VolcaniCore/Object/FrameBuffer.h>
+#include <VolcaniCore/Object/Framebuffer.h>
 
 #include "Scene/Scene.h"
 #include "SceneHierarchyPanel.h"
@@ -22,7 +22,7 @@ public:
 private:
 	Ref<Scene> m_CurrentScene;
 	Ref<SceneHierarchyPanel> m_SceneHierarchyPanel;
-	Ref<FrameBuffer> m_FrameBuffer;
+	Ref<Framebuffer> m_Framebuffer;
 	Ref<Texture> m_IconPlay, m_IconPause, m_IconStop;
 	
 	enum class SceneState { Edit, Play, Pause };

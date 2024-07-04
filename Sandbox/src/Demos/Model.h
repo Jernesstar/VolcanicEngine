@@ -66,12 +66,11 @@ private:
 		{ "a_Position", OpenGL::BufferDataType::Vec3, true },
 	};
 
-	OpenGL::IndexBuffer* indexBuffer = new OpenGL::IndexBuffer(indices);
-	OpenGL::VertexBuffer* lightBuffer = new OpenGL::VertexBuffer(vertices, l1);
-	Ref<OpenGL::VertexArray> lightArray = CreateRef<OpenGL::VertexArray>(
-													lightBuffer, indexBuffer);
+	Ref<IndexBuffer>  indexBuffer = CreateRef<IndexBuffer>(indices);
+	Ref<VertexBuffer> lightBuffer = CreateRef<VertexBuffer>(vertices, l1);
+	Ref<VertexArray>  lightArray  = CreateRef<OpenGL::VertexArray>();
 
-	Ref<ShaderPipeline> model_shader = ShaderPipeline::Create({
+	Ref<ShaderPipeline> modelShader = ShaderPipeline::Create({
 		{ "VolcaniCore/assets/shaders/Model.glsl.vert", ShaderType::Vertex },
 		{ "VolcaniCore/assets/shaders/Model.glsl.frag", ShaderType::Fragment }
 	});
@@ -80,11 +79,13 @@ private:
 	// 	{ "Sandbox/assets/shaders/Light.glsl.frag", ShaderType::Fragment }
 	// });
 
-	glm::vec3 light_pos = { 1.2f, 1.0f, 2.0f }, light_color = { 1.0f, 1.0f, 1.0f };
-	glm::mat4 light_model = glm::scale(glm::translate(glm::mat4(1.0f), light_pos), glm::vec3(0.2f));
+	glm::vec3 lightPos = { 1.2f, 1.0f, 2.0f };
+	glm::vec3 lightColor = { 1.0f, 1.0f, 1.0f };
+	glm::mat4 lightModel = glm::scale(glm::translate(glm::mat4(1.0f), lightPos),
+									  glm::vec3(0.2f));
 
-	Ref<StereographicCamera> m_Camera = CreateRef<StereographicCamera>(90.0f, 0.1f, 100.0f, 1600, 900);
-	CameraController m_Controller{ m_Camera };
+	Ref<StereographicCamera> m_Camera;
+	Ref<CameraController> m_Controller;
 
 	Ref<VolcaniCore::Model> m_Model;
 };
@@ -101,34 +102,28 @@ Model::Model()
 		this->m_Camera->Resize(event.Width, event.Height);
 	});
 
+	m_Camera = CreateRef<StereographicCamera>(90.0f, 0.1f, 100.0f, 1600, 900);
 	m_Camera->SetPosition({ 0.0f, 0.0f, 5.0f });
 
-	model_shader->Bind();
-	model_shader->SetMat4("u_Model", glm::mat4(1.0f));
-	model_shader->SetVec3("u_LightPosition", light_pos);
-	model_shader->SetVec3("u_LightColor", light_color);
+	controller = CreateRef<CameraController>(camera);
 
-	// light_shader->As<OpenGL::ShaderProgram>()->Bind();
-	// light_shader->SetVec3("u_LightColor", light_color);
-	// light_shader->SetMat4("u_Model", light_model);
+	// TODO: Move to Renderer
+	// modelShader->Bind();
+	// modelShader->SetMat4("u_Model", glm::mat4(1.0f));
+	// modelShader->SetVec3("u_LightPosition", lightPos);
+	// modelShader->SetVec3("u_LightColor", lightColor);
 
-	m_Model = VolcaniCore::Model::Create("Sandbox/assets/models/cat_waiters/Cat Waiter-1.fbx");
+	model = Model::Create("Sandbox/assets/models/cat_waiters/Cat Waiter-1.fbx");
 }
 
 void Model::OnUpdate(TimeStep ts)
 {
 	RendererAPI::Get()->Clear();
 
-	m_Controller.OnUpdate(ts);
+	controller->OnUpdate(ts);
 
-	// light_shader->As<OpenGL::ShaderProgram>()->Bind();
-	// light_shader->SetMat4("u_ViewProj", m_Camera->GetViewProjection());
-	// RendererAPI::Get()->Draw3DCube(nullptr);
-
-	model_shader->Bind();
-	model_shader->SetMat4("u_ViewProj", m_Camera->GetViewProjection());
-	model_shader->SetVec3("u_CameraPosition", m_Camera->GetPosition());
-	RendererAPI::Get()->Draw3DModel(m_Model);
+	RendererAPI::Get()->Begin(camera);
+	RendererAPI::Get()->Draw3DModel(model);
 }
 
 }

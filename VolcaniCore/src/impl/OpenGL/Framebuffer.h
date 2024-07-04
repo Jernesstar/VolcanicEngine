@@ -8,13 +8,11 @@
 
 namespace VolcaniCore::OpenGL {
 
-enum class AttachmentTarget { Color, Depth, Stencil };
-enum class AttachmentType	{ Texture, RenderBuffer, None };
+enum class AttachmentType { Texture, RenderBuffer, None };
 
-// TODO: Have this become the base class
 class Attachment {
 public:
-	AttachmentTarget Target;
+	VolcaniCore::AttachmentTarget Target;
 	AttachmentType Type;
 
 public:
@@ -31,7 +29,6 @@ private:
 	friend class FrameBuffer;
 };
 
-// TODO: Rename to Framebuffer
 class FrameBuffer : public VolcaniCore::FrameBuffer {
 public:
 	FrameBuffer(uint32_t width, uint32_t height);
@@ -39,7 +36,6 @@ public:
 				const std::vector<Attachment>& attachments);
 	~FrameBuffer();
 
-	// TODO: Possibly delete
 	void Resize(uint32_t width, uint32_t height) override { }
 	void Bind() const override;
 	void Unbind() const override;

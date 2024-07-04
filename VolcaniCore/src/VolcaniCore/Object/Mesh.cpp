@@ -3,16 +3,15 @@
 #include "OpenGL/Model.h"
 
 #include "Core/Application.h"
-#include "Core/Assert.h"
 
 namespace VolcaniCore {
 
-Ref<Model> Model::Create(const std::string& path) {
+Ref<Mesh> Mesh::Create() {
 	RendererBackend backend = RendererAPI::Get()->Backend;
 
 	switch(backend) {
 		case RendererBackend::OpenGL:
-			return CreateRef<OpenGL::Model>(path);
+			return CreateRef<OpenGL::Mesh>();
 			break;
 	}
 }

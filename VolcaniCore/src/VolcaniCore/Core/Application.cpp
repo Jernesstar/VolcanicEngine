@@ -6,7 +6,10 @@
 #include <GLFW/glfw3.h>
 
 #include "Assert.h"
+
 #include "Events/Events.h"
+
+#include "Renderer/Renderer.h"
 #include "Renderer/RendererAPI.h"
 
 namespace VolcaniCore {
@@ -27,12 +30,15 @@ void Application::Init() {
 	EventSystem::Init();
 
 	RendererAPI::Create(RendererBackend::OpenGL);
+	Renderer::Init();
 }
 
 void Application::Close() {
 	delete s_Instance;
 
-	RendererAPI::Get()->Close();
+	Renderer::Close();
+	RendererAPI::Close();
+
 	// glfwTerminate();
 	exit(0);
 }

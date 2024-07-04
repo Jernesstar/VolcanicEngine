@@ -13,7 +13,7 @@
 #include <Renderer/CameraController.h>
 
 #include <OpenGL/Renderer.h>
-#include <OpenGL/FrameBuffer.h>
+#include <OpenGL/Framebuffer.h>
 
 using namespace VolcaniCore;
 
@@ -38,7 +38,7 @@ private:
 	Ref<RenderPass> drawPass;
 	Ref<RenderPass> pixelatePass;
 
-	Ref<OpenGL::FrameBuffer> frameBuffer;
+	Ref<OpenGL::Framebuffer> frameBuffer;
 };
 
 Cube::Cube() {
@@ -80,7 +80,7 @@ Cube::Cube() {
 		{ OpenGL::AttachmentTarget::Color, OpenGL::AttachmentType::Texture },
 		{ OpenGL::AttachmentTarget::Depth, OpenGL::AttachmentType::Texture }
 	};
-	frameBuffer = CreateRef<OpenGL::FrameBuffer>(225, 150, attachments);
+	frameBuffer = CreateRef<OpenGL::Framebuffer>(225, 150, attachments);
 }
 
 void Cube::OnUpdate(TimeStep ts) {
@@ -102,7 +102,7 @@ void Cube::OnUpdate(TimeStep ts) {
 
 	glViewport(0, 0, 800, 600);
 
-	RendererAPI::Get()->RenderFrameBuffer(frameBuffer);
+	RendererAPI::Get()->RenderFramebuffer(frameBuffer);
 
 	// // RendererAPI::Get()->StartPass(cullPass);
 	// RendererAPI::Get()->StartPass(pixelatePass);

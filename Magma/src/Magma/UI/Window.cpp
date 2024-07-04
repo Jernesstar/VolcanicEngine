@@ -53,7 +53,7 @@ void Window::Draw() {
 }
 
 bool Window::OnAttach() {
-	return false; // For now; more complex docking behavior to come
+	return false; // TODO: For now; more complex docking behavior to come
 }
 
 // TODO: Reposition the element within the window
