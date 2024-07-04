@@ -10,6 +10,7 @@
 
 namespace VolcaniCore {
 
+
 class Mesh {
 public:
 	Mesh() = default;
@@ -17,5 +18,6 @@ public:
 
 	Ref<Mesh> Create();
 };
+
 
 }

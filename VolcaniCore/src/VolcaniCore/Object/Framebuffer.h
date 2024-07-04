@@ -2,10 +2,11 @@
 
 #include "Core/Defines.h"
 
-enum class AttachmentTarget { Color, Depth, Stencil };
 
 namespace VolcaniCore {
 
+
+enum class AttachmentTarget { Color, Depth, Stencil };
 
 class Framebuffer {
 public:

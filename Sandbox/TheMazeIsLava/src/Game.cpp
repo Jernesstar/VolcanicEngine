@@ -2,11 +2,11 @@
 
 #include <Core/Input.h>
 #include <Core/Assert.h>
-#include <Renderer/RendererAPI.h>
-#include <Renderer/StereographicCamera.h>
 #include <Events/EventSystem.h>
 
-#include <OpenGL/Renderer.h>
+#include <Renderer/Renderer.h>
+#include <Renderer/Renderer3D.h>
+#include <Renderer/StereographicCamera.h>
 
 #include "GameState.h"
 
@@ -50,15 +50,18 @@ void Game::OnUpdate(TimeStep ts) {
 	m_TimeStep = ts;
 	m_CameraController->OnUpdate(ts);
 
-	RendererAPI::Get()->Clear();
-	RendererAPI::Get()->Begin(m_Camera);
+	Renderer::Clear();
 
+	Renderer::Begin();
+	Renderer3D::Begin(m_Camera);
 	UI::Begin();
 
 	m_CurrentScreen();
 	m_CurrentUI->Render();
 
 	UI::End();
+	Renderer3D::End();
+	Renderer::End();
 }
 
 void Game::StartScreen() {

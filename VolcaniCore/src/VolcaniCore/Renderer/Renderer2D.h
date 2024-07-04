@@ -5,6 +5,7 @@
 #include "Object/Texture.h"
 
 #include "Renderer/OrthographicCamera.h"
+#include "Renderer/Transform.h"
 
 namespace VolcaniCore {
 

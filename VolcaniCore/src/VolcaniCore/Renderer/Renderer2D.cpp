@@ -5,10 +5,26 @@
 #include "Renderer/RendererAPI.h"
 #include "Renderer/OrthographicCamera.h"
 
+#include "Object/Shader.h"
+
+#include "OpenGL/Renderer.h"
+#include "OpenGL/VertexArray.h"
+#include "OpenGL/Texture2D.h"
+
+using namespace VolcaniCore::OpenGL;
+
 namespace VolcaniCore {
 
 
+struct QuadVertex {
+	glm::vec4 Position;
+	glm::vec4 Color;
+	glm::vec2 TextureCoordinate;
+	int32_t TextureIndex;
+};
+
 struct RendererData2D {
+	// This should be universal, placed in Renderer
 	static const uint32_t MaxQuads = 150;
 	static const uint32_t MaxVertices = MaxQuads * 4;
 	static const uint32_t MaxIndices = MaxQuads * 6;
@@ -51,8 +67,8 @@ struct RendererData2D {
 		{ 0.0f, 0.0f }, // Top left,     3
 	};
 
-	Ref<VolcaniCore::FrameBuffer> FrameBuffer2D;
-	Ref<ShaderPipeline> FrameBufferShader;
+	Ref<VolcaniCore::Framebuffer> Framebuffer2D;
+	Ref<ShaderPipeline> FramebufferShader;
 	Ref<ShaderPipeline> QuadShader;
 
 	glm::mat4 ViewProjection;
@@ -64,7 +80,7 @@ void Renderer2D::Init() {
 	s_Data.QuadVertexBufferBase = new QuadVertex[RendererData2D::MaxVertices];
 	uint32_t* indices = new uint32_t[RendererData2D::MaxIndices];
 
-	for(uint32_t i = 0; i < RendererData::MaxQuads; i++)
+	for(uint32_t i = 0; i < RendererData2D::MaxQuads; i++)
 	{
 		indices[6*i + 0] = 4*i + 0;
 		indices[6*i + 1] = 4*i + 1;
@@ -74,19 +90,19 @@ void Renderer2D::Init() {
 		indices[6*i + 4] = 4*i + 3;
 		indices[6*i + 5] = 4*i + 0;
 	}
-	s_Data.QuadIndexBuffer = CreateRef<IndexBuffer>(indices,
-													RendererData2D::MaxIndices);
+	s_Data.QuadIndexBuffer = CreateRef<IndexBuffer>(
+								 indices, (uint32_t)RendererData2D::MaxIndices);
 	delete[] indices;
 
 	BufferLayout l =
 	{
-		{ "Position",		   BufferDataType::Vec4 },
-		{ "Color",			   BufferDataType::Vec4 },
-		{ "TextureCoordinate", BufferDataType::Vec2 },
-		{ "TextureIndex",	   BufferDataType::Int }
+		{ "Position",	  BufferDataType::Vec4 },
+		{ "Color",		  BufferDataType::Vec4 },
+		{ "TexCoord",	  BufferDataType::Vec2 },
+		{ "TextureIndex", BufferDataType::Int }
 	};
-	s_Data.QuadVertexBuffer
-		= CreateRef<VertexBuffer>(Renderer2DData::MaxVertices, l);
+	s_Data.QuadVertexBuffer = CreateRef<VertexBuffer>(
+									  (uint32_t)RendererData2D::MaxVertices, l);
 	s_Data.QuadVertexArray = CreateRef<VertexArray>(s_Data.QuadVertexBuffer,
 													s_Data.QuadIndexBuffer);
 
@@ -94,9 +110,6 @@ void Renderer2D::Init() {
 		{ "VolcaniCore/assets/shaders/Quad.glsl.vert", ShaderType::Vertex },
 		{ "VolcaniCore/assets/shaders/Quad.glsl.frag", ShaderType::Fragment }
 	});
-
-	s_Data.FrameBufferShader->Bind();
-	s_Data.FrameBufferShader->SetInt("u_ScreenTexture", 0);
 }
 
 void Renderer2D::Close() {
@@ -109,7 +122,7 @@ void Renderer2D::Begin(Ref<OrthographicCamera> camera) {
 	s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
 	s_Data.QuadIndexCount = 0;
 	s_Data.TextureSlotIndex = 0;
-	s_Data.TextSlotIndex = s_Data.MaxTextureSlots - 1;
+	// s_Data.TextSlotIndex = s_Data.MaxTextureSlots - 1;
 }
 
 void Renderer2D::End() {

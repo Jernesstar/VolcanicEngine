@@ -1,12 +1,11 @@
 #pragma once
 
 #include <vector>
-#include <memory>
 
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 
-#include "Object/Texture.h"
+#include "Object/Mesh.h"
 
 namespace VolcaniCore {
 

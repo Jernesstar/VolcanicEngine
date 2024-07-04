@@ -7,25 +7,27 @@
 
 #include "Core/Log.h"
 
+using namespace VolcaniCore;
+
 namespace VolcaniCore::OpenGL {
 
 VertexArray::VertexArray() {
 	glCreateVertexArrays(1, &m_VertexArrayID);
 }
 
-VertexArray::VertexArray(VertexBuffer* vertexBuffer, IndexBuffer* indexBuffer) {
+VertexArray::VertexArray(Ref<VertexBuffer> vertexBuffer, Ref<IndexBuffer> indexBuffer) {
 	glCreateVertexArrays(1, &m_VertexArrayID);
 	AddVertexBuffer(vertexBuffer);
 	SetIndexBuffer(indexBuffer);
 }
 
-VertexArray::VertexArray(std::initializer_list<VertexBuffer*> vertexBuffers,
-						 IndexBuffer* indexBuffer)
+VertexArray::VertexArray(std::initializer_list<Ref<VertexBuffer>> vertexBuffers,
+						 Ref<IndexBuffer> indexBuffer)
 {
 	glCreateVertexArrays(1, &m_VertexArrayID);
 	SetIndexBuffer(indexBuffer);
 
-	for(auto* buffer : vertexBuffers)
+	for(auto buffer : vertexBuffers)
 		AddVertexBuffer(buffer);
 }
 
@@ -41,7 +43,7 @@ void VertexArray::Unbind() const {
 	glBindVertexArray(0);
 }
 
-void VertexArray::AddVertexBuffer(VertexBuffer* vertexBuffer) {
+void VertexArray::AddVertexBuffer(Ref<VertexBuffer> vertexBuffer) {
 	if(!vertexBuffer) {
 		VOLCANICORE_LOG_WARNING("Vertex buffer is nullptr");
 		return;
@@ -102,7 +104,7 @@ void VertexArray::AddVertexBuffer(VertexBuffer* vertexBuffer) {
 	m_VertexBuffers.push_back(vertexBuffer);
 }
 
-void VertexArray::SetIndexBuffer(IndexBuffer* indexBuffer) {
+void VertexArray::SetIndexBuffer(Ref<IndexBuffer> indexBuffer) {
 	if(!indexBuffer)
 		return;
 

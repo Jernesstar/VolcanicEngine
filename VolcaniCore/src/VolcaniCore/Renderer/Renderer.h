@@ -18,7 +18,9 @@ public:
 	static void End();
 
 	static void StartPass(Ref<RenderPass> pass);
-	static void EndPass(Ref<RenderPass> pass);
+	static void EndPass();
+
+	static void Flush();
 
 	static FrameData& GetFrameData() { return s_FrameData; }
 

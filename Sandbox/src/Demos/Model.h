@@ -1,21 +1,22 @@
 #pragma once
 
-#include <OpenGL/Renderer.h>
-#include <OpenGL/Shader.h>
-#include <OpenGL/Model.h>
-
 #include <Core/Application.h>
-
 #include <Events/EventSystem.h>
 
-#include <Renderer/RendererAPI.h>
 #include <Object/Model.h>
+
+#include <Renderer/Renderer.h>
+#include <Renderer/Renderer3D.h>
 #include <Renderer/StereographicCamera.h>
 #include <Renderer/CameraController.h>
 
+#include <OpenGL/VertexArray.h>
+
 using namespace VolcaniCore;
+using namespace VolcaniCore::OpenGL;
 
 namespace Demo {
+
 
 class Model : public Application {
 public:
@@ -84,10 +85,10 @@ private:
 	glm::mat4 lightModel = glm::scale(glm::translate(glm::mat4(1.0f), lightPos),
 									  glm::vec3(0.2f));
 
-	Ref<StereographicCamera> m_Camera;
-	Ref<CameraController> m_Controller;
+	Ref<StereographicCamera> camera;
+	Ref<CameraController> controller;
 
-	Ref<VolcaniCore::Model> m_Model;
+	Ref<VolcaniCore::Model> model;
 };
 
 Model::Model()
@@ -99,11 +100,11 @@ Model::Model()
 	});
 	EventSystem::RegisterListener<WindowResizedEvent>(
 	[this](const WindowResizedEvent& event) {
-		this->m_Camera->Resize(event.Width, event.Height);
+		this->camera->Resize(event.Width, event.Height);
 	});
 
-	m_Camera = CreateRef<StereographicCamera>(90.0f, 0.1f, 100.0f, 1600, 900);
-	m_Camera->SetPosition({ 0.0f, 0.0f, 5.0f });
+	camera = CreateRef<StereographicCamera>(90.0f, 0.1f, 100.0f, 1600, 900);
+	camera->SetPosition({ 0.0f, 0.0f, 5.0f });
 
 	controller = CreateRef<CameraController>(camera);
 
@@ -113,17 +114,23 @@ Model::Model()
 	// modelShader->SetVec3("u_LightPosition", lightPos);
 	// modelShader->SetVec3("u_LightColor", lightColor);
 
-	model = Model::Create("Sandbox/assets/models/cat_waiters/Cat Waiter-1.fbx");
+	model = VolcaniCore::Model::Create(
+			"Sandbox/assets/models/cat_waiters/Cat Waiter-1.fbx");
 }
 
 void Model::OnUpdate(TimeStep ts)
 {
-	RendererAPI::Get()->Clear();
-
 	controller->OnUpdate(ts);
+	VolcaniCore::Renderer::Clear();
 
-	RendererAPI::Get()->Begin(camera);
-	RendererAPI::Get()->Draw3DModel(model);
+	VolcaniCore::Renderer::Begin();
+	Renderer3D::Begin(camera);
+
+	Renderer3D::DrawModel(model);
+
+	Renderer3D::End();
+	VolcaniCore::Renderer::End();
 }
+
 
 }

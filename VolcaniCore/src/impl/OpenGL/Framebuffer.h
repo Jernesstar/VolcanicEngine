@@ -4,7 +4,7 @@
 #include <vector>
 #include <unordered_map>
 
-#include "Object/FrameBuffer.h"
+#include "Object/Framebuffer.h"
 
 namespace VolcaniCore::OpenGL {
 
@@ -26,15 +26,15 @@ public:
 private:
 	uint32_t m_RendererID;
 
-	friend class FrameBuffer;
+	friend class Framebuffer;
 };
 
-class FrameBuffer : public VolcaniCore::FrameBuffer {
+class Framebuffer : public VolcaniCore::Framebuffer {
 public:
-	FrameBuffer(uint32_t width, uint32_t height);
-	FrameBuffer(uint32_t witdth, uint32_t height,
+	Framebuffer(uint32_t width, uint32_t height);
+	Framebuffer(uint32_t witdth, uint32_t height,
 				const std::vector<Attachment>& attachments);
-	~FrameBuffer();
+	~Framebuffer();
 
 	void Resize(uint32_t width, uint32_t height) override { }
 	void Bind() const override;

@@ -15,7 +15,7 @@ enum class RendererBackend { OpenGL, Vulkan, DirectX };
 class RendererAPI {
 public:
 	static void Create(RendererBackend backend);
-	static void Close();
+	static void Shutdown();
 	static Ref<RendererAPI> Get() { return s_Instance; }
 
 public:
@@ -37,6 +37,10 @@ public:
 
 	// virtual void DrawIndexed(FrameData data) = 0;
 	// virtual void DrawInstanced(FrameData data) = 0;
+	
+	// TODO: Remove
+	template<typename Derived>
+	Derived* As() const { return (Derived*)(this); }
 
 protected:
 	virtual void Init() = 0;

@@ -2,6 +2,12 @@
 
 #include "Core/Assert.h"
 
+#include "RendererAPI.h"
+
+#include "OpenGL/VertexArray.h"
+
+using namespace VolcaniCore::OpenGL;
+
 namespace VolcaniCore {
 
 
@@ -32,9 +38,9 @@ void Renderer3D::Begin(Ref<Camera> camera) {
 	s_Data.ViewProjection = camera->GetViewProjection();
 	s_Data.CameraPosition = camera->GetPosition();
 
-	s_Data.CubeShader->Bind();
-	s_Data.MeshShader->SetVec3("u_CameraPosition", s_Data.ViewProjection);
-	s_Data.MeshShader->SetMat4("u_ViewProj", s_Data.CameraPosition);
+	s_Data.MeshShader->Bind();
+	s_Data.MeshShader->SetVec3("u_CameraPosition", s_Data.CameraPosition);
+	s_Data.MeshShader->SetMat4("u_ViewProj", s_Data.ViewProjection);
 }
 
 void Renderer3D::End() {
@@ -42,15 +48,15 @@ void Renderer3D::End() {
 }
 
 void Renderer3D::DrawCubemap(Ref<Cubemap> cubemap) {
-	Renderer::Get()->DrawCubemap(cubemap);
+	RendererAPI::Get()->DrawCubemap(cubemap);
 }
 
-void Renderer3D::DrawMesh(Ref<Mesh> texture, Transform t) {
+void Renderer3D::DrawMesh(Ref<Mesh> mesh, Transform t) {
 
 }
 
 void Renderer3D::DrawModel(Ref<Model> model, Transform t) {
-	for(auto mesh : model)
+	for(auto& mesh : *model)
 		DrawMesh(mesh);
 }
 

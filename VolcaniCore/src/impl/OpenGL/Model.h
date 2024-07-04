@@ -41,7 +41,7 @@ public:
 	const std::string Path;
 
 public:
-	Model(const std::string& folder_path);
+	Model(const std::string& folderPath);
 	~Model();
 
 	void Bind() const { m_VertexArray->Bind(); }
@@ -53,7 +53,7 @@ public:
 private:
 	enum BufferIndex {
 		Position,
-		TextureCoordinate,
+		TexCoord,
 		Normal
 	};
 
@@ -65,8 +65,8 @@ private:
 	std::vector<glm::vec2> m_TextureCoords;
 	std::vector<uint32_t> m_Indices;
 
-	Ptr<OpenGL::VertexBuffer> m_Buffers[3];
-	Ptr<OpenGL::IndexBuffer> m_IndexBuffer;
+	Ref<OpenGL::VertexBuffer> m_Buffers[3];
+	Ref<OpenGL::IndexBuffer> m_IndexBuffer;
 	Ptr<OpenGL::VertexArray> m_VertexArray;
 
 	void Clear();

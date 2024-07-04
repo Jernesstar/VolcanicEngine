@@ -4,8 +4,8 @@
 
 #include "OpenGL/Shader.h"
 
-#include "Core/Application.h"
 #include "Core/Assert.h"
+#include "Renderer/RendererAPI.h"
 
 namespace VolcaniCore {
 

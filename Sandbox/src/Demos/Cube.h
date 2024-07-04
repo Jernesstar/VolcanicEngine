@@ -1,23 +1,23 @@
 #pragma once
 
 #include <Core/Application.h>
-#include <Core/Log.h>
-
 #include <Events/EventSystem.h>
 
-#include <Renderer/RendererAPI.h>
 #include <Object/Shader.h>
 #include <Object/Texture.h>
+
+#include <Renderer/Renderer.h>
+#include <Renderer/Renderer3D.h>
 #include <Renderer/StereographicCamera.h>
 #include <Renderer/OrthographicCamera.h>
 #include <Renderer/CameraController.h>
 
-#include <OpenGL/Renderer.h>
 #include <OpenGL/Framebuffer.h>
 
 using namespace VolcaniCore;
 
 namespace Demo {
+
 
 class Cube : public Application {
 public:
@@ -38,7 +38,7 @@ private:
 	Ref<RenderPass> drawPass;
 	Ref<RenderPass> pixelatePass;
 
-	Ref<OpenGL::Framebuffer> frameBuffer;
+	Ref<OpenGL::Framebuffer> framebuffer;
 };
 
 Cube::Cube() {
@@ -77,35 +77,39 @@ Cube::Cube() {
 	// pixelatePass->SetInput(frameBuffer);
 
 	std::vector<OpenGL::Attachment> attachments{
-		{ OpenGL::AttachmentTarget::Color, OpenGL::AttachmentType::Texture },
-		{ OpenGL::AttachmentTarget::Depth, OpenGL::AttachmentType::Texture }
+		{ AttachmentTarget::Color, OpenGL::AttachmentType::Texture },
+		{ AttachmentTarget::Depth, OpenGL::AttachmentType::Texture }
 	};
-	frameBuffer = CreateRef<OpenGL::Framebuffer>(225, 150, attachments);
+	framebuffer = CreateRef<OpenGL::Framebuffer>(225, 150, attachments);
 }
 
 void Cube::OnUpdate(TimeStep ts) {
-	RendererAPI::Get()->Clear();
+	// TODO: RenderPass
+	
+	VolcaniCore::Renderer::Clear();
 	controller->OnUpdate(ts);
 
-	glViewport(0, 0, 225, 150);
+	VolcaniCore::Renderer::Begin();
 
-	frameBuffer->Bind();
-	// RendererAPI::Get()->StartPass(drawPass);
+	RendererAPI::Get()->Resize(225, 150);
+	framebuffer->Bind();
+	// VolcaniCore::Renderer::StartPass(drawPass);
 	// {
-		RendererAPI::Get()->Begin(camera);
-		RendererAPI::Get()->Clear();
-		RendererAPI::Get()->Draw3DCube(stone);
-		RendererAPI::Get()->End();
+		Renderer3D::Begin(camera);
+		VolcaniCore::Renderer::Clear();
+		// VolcaniCore::Renderer::DrawMesh(cube);
+		Renderer3D::End();
 	// }
-	// RendererAPI::Get()->EndPass();
-	frameBuffer->Unbind();
+	// VolcaniCore::Renderer::EndPass();
+	framebuffer->Unbind();
+	RendererAPI::Get()->Resize(800, 600);
 
-	glViewport(0, 0, 800, 600);
+	RendererAPI::Get()->RenderFramebuffer(framebuffer, AttachmentTarget::Color);
+	VolcaniCore::Renderer::End();
 
-	RendererAPI::Get()->RenderFramebuffer(frameBuffer);
-
-	// // RendererAPI::Get()->StartPass(cullPass);
-	// RendererAPI::Get()->StartPass(pixelatePass);
+	// // VolcaniCore::Renderer::StartPass(cullPass);
+	// VolcaniCore::Renderer::StartPass(pixelatePass);
 }
+
 
 }

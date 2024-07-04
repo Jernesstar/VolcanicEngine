@@ -2,7 +2,7 @@
 
 #include "OpenGL/Texture2D.h"
 
-#include "Core/Application.h"
+#include "Renderer/RendererAPI.h"
 
 namespace VolcaniCore {
 

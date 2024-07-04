@@ -37,7 +37,7 @@ void Application::Close() {
 	delete s_Instance;
 
 	Renderer::Close();
-	RendererAPI::Close();
+	RendererAPI::Shutdown();
 
 	// glfwTerminate();
 	exit(0);

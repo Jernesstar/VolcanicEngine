@@ -38,7 +38,8 @@ public:
 public:
 	BufferLayout(const std::initializer_list<BufferElement>& elements,
 				 bool structureOfArrays = false, bool dynamic = true)
-		: Elements(elements), Stride(CalcStride(elements)), Dynamic(dynamic) { }
+		: Elements(elements), Stride(CalcStride(elements)),
+			StructureOfArrays(structureOfArrays), Dynamic(dynamic) { }
 
 	std::vector<BufferElement>::const_iterator begin() const {
 		return Elements.begin();

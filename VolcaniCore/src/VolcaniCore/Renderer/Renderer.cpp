@@ -3,6 +3,8 @@
 #include "Core/Assert.h"
 
 #include "Renderer/RendererAPI.h"
+#include "Renderer/Renderer3D.h"
+#include "Renderer/Renderer2D.h"
 
 namespace VolcaniCore {
 
@@ -29,11 +31,11 @@ void Renderer::Begin() {
 
 }
 
-void StartPass(Ref<RenderPass> pass) {
+void Renderer::StartPass(Ref<RenderPass> pass) {
 
 }
 
-void EndPass(Ref<RenderPass> pass) {
+void Renderer::EndPass() {
 
 }
 

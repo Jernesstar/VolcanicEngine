@@ -16,8 +16,7 @@
 
 using namespace VolcaniCore;
 
-Application* CreateApplication(const CommandLineArgs& args)
-{
+Application* CreateApplication(const CommandLineArgs& args) {
 	std::string project = args[1];
 
 	if(project == "Template")	return new Demo::Template();
