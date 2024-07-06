@@ -10,13 +10,13 @@
 
 namespace VolcaniCore {
 
-// TODO: Rename ?
-// struct RenderPassData {
 struct FrameData {
 	std::vector<Ref<Quad>> Quads3D;
 	std::vector<Ref<Quad>> Quads2D;
 
 	std::unordered_map<Ref<Mesh>, uint32_t> Meshes;
+
+	Ref<RenderPass> CurrentPass;
 };
 
 class Renderer {

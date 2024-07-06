@@ -13,11 +13,11 @@ RenderPass::RenderPass(const std::string& name, Ref<ShaderPipeline> pipeline) {
 }
 
 void RenderPass::AddInput(Ref<Framebuffer> input) {
-
+	m_Inputs.push_back(input);
 }
 
 void RenderPass::SetOutput(Ref<Framebuffer> output) {
-
+	m_Output = output;
 }
 
 }

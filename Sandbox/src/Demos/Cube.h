@@ -63,10 +63,10 @@ private:
 	Ref<ShaderPipeline> pixelateShader;
 	// Ref<ShaderPipeline> cullShader;
 
+	Ref<OpenGL::Framebuffer> framebuffer;
+
 	Ref<RenderPass> drawPass;
 	Ref<RenderPass> pixelatePass;
-
-	Ref<OpenGL::Framebuffer> framebuffer;
 
 	Ref<StereographicCamera> camera;
 	// Ref<OrthographicCamera> camera;
@@ -128,19 +128,19 @@ Cube::Cube() {
 void Cube::OnUpdate(TimeStep ts) {
 	controller->OnUpdate(ts);
 
-	// Renderer::StartPass(drawPass);
-	// {
-	// 	Renderer::Clear();
-	// 	Renderer3D::Begin(camera);
+	Renderer::StartPass(drawPass);
+	{
+		VolcaniCore::Renderer::Clear();
+		Renderer3D::Begin(camera);
 
 		Renderer3D::DrawMesh(cube);
 
-	// 	Renderer3D::End();
-	// }
-	// Renderer::EndPass();
+		Renderer3D::End();
+	}
+	Renderer::EndPass();
 
-	// Renderer::StartPass(pixelatePass);
-	// Renderer::EndPass();
+	Renderer::StartPass(pixelatePass);
+	Renderer::EndPass();
 }
 
 }
