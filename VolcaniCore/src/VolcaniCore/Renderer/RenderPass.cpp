@@ -2,12 +2,14 @@
 
 namespace VolcaniCore {
 
-// RenderPass::RenderPass() {
-	
-// }
+Ref<RenderPass> RenderPass::Create(const std::string& name,
+								   Ref<ShaderPipeline> pipeline)
+{
+	return CreateRef<RenderPass>(name, pipeline);
+}
 
-// RenderPass::~RenderPass() {
+RenderPass::RenderPass(const std::string& name, Ref<ShaderPipeline> pipeline) {
 	
-// }
+}
 
 }

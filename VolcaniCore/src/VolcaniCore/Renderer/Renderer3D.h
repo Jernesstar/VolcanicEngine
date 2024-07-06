@@ -12,7 +12,6 @@
 
 namespace VolcaniCore {
 
-
 class Renderer3D {
 public:
 	static void Begin(Ref<Camera> camera);
@@ -38,6 +37,5 @@ private:
 
 	friend class Renderer;
 };
-
 
 }

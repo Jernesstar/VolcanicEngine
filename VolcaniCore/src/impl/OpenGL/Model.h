@@ -19,63 +19,28 @@ namespace VolcaniCore::OpenGL {
 
 class Model : public VolcaniCore::Model {
 public:
-	struct Mesh {
-		uint32_t BaseVertex = 0;
-		uint32_t BaseIndex = 0;
-		uint32_t IndexCount = 0;
-		uint32_t MaterialIndex = 0;
-	};
-
-	struct Material {
-		Ref<Texture> Diffuse;
-		Ref<Texture> Specular;
-		Ref<Texture> Roughness;
-
-		void Bind() const {
-			if(Diffuse) Diffuse->As<OpenGL::Texture2D>()->Bind();
-			if(Specular) Specular->As<OpenGL::Texture2D>()->Bind();
-			if(Roughness) Roughness->As<OpenGL::Texture2D>()->Bind();
-		}
-	};
-
 	const std::string Path;
 
 public:
-	Model(const std::string& folderPath);
+	Model(const std::string& path);
 	~Model();
 
-	void Bind() const { m_VertexArray->Bind(); }
-
-	uint32_t GetMeshCount() 		const { return m_Meshes.size(); }
-	const Mesh& GetMesh(uint32_t i) const { return m_Meshes[i]; }
-	const Material& GetMaterial(uint32_t index) const { return m_Materials[index]; }
+	void Bind() const {
+		m_VertexArray->Bind();
+	}
 
 private:
-	enum BufferIndex {
-		Position,
-		TexCoord,
-		Normal
-	};
+	void Load(const std::string& path);
+	void Unload();
 
-	std::vector<Mesh> m_Meshes;
-	std::vector<Material> m_Materials;
+	void LoadMesh(const aiMesh* mesh, const aiMaterial* material);
 
-	std::vector<glm::vec3> m_Positions;
-	std::vector<glm::vec3> m_Normals;
-	std::vector<glm::vec2> m_TextureCoords;
-	std::vector<uint32_t> m_Indices;
+	Material LoadMaterial(const std::string& path
+						  const aiMaterial* mat);
 
-	Ref<OpenGL::VertexBuffer> m_Buffers[3];
-	Ref<OpenGL::IndexBuffer> m_IndexBuffer;
-	Ptr<OpenGL::VertexArray> m_VertexArray;
-
-	void Clear();
-	void LoadMesh(const std::string& path);
-	void LoadSubMesh(const aiMesh* mesh);
-	void LoadMaterial(const aiMaterial* material, const std::string& path, uint32_t index);
-	Ref<Texture> LoadTexture(const aiMaterial* material, const std::string& dir, aiTextureType type);
-
-	friend class Renderer;
+	Ref<Texture> LoadTexture(const std::string& dir,
+							 const aiMaterial* mat,
+							 aiTextureType type);
 };
 
 }

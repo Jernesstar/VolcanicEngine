@@ -18,7 +18,7 @@ namespace VolcaniCore::OpenGL {
 
 
 Renderer::Renderer()
-	: ::RendererAPI(RendererBackend::OpenGL)
+	: RendererAPI(RendererBackend::OpenGL)
 {
 	VOLCANICORE_ASSERT(gladLoadGL(), "Glad could not load OpenGL");
 
@@ -34,6 +34,7 @@ struct RendererData {
 	// static const uint32_t MaxIndices = MaxQuads * 6;
 	// static const uint32_t MaxTextureSlots = 32;
 
+	Ptr<VertexBuffer> MeshBuffer;
 	Ptr<VertexArray> CubemapArray;
 	Ptr<VertexArray> FramebufferArray;
 
@@ -115,22 +116,24 @@ void Renderer::Init() {
 	};
 
 
-	Ref<VertexBuffer> cubemapBuffer = CreateRef<VertexBuffer>(cubemapVertices,
-	BufferLayout{
-		{ "Position", BufferDataType::Vec3 }
-	});
+	Ref<VertexBuffer> cubemapBuffer = CreateRef<VertexBuffer>(
+		BufferLayout{
+			{ "Position", BufferDataType::Vec3 }
+		}, cubemapVertices
+	);
 	s_Data.CubemapArray = CreatePtr<VertexArray>(cubemapBuffer);
 
-	Ref<VertexBuffer> buffer = CreateRef<VertexBuffer>(framebufferVertices,
-	BufferLayout{
-		{ "Coordinate", OpenGL::BufferDataType::Vec2 },
-		{ "TextureCoordinate", OpenGL::BufferDataType::Vec2 },
-	});
+	Ref<VertexBuffer> buffer = CreateRef<VertexBuffer>(
+		BufferLayout{
+			{ "Coordinate", OpenGL::BufferDataType::Vec2 },
+			{ "TexCoord",	OpenGL::BufferDataType::Vec2 },
+		}, framebufferVertices
+	);
 	s_Data.FramebufferArray = CreatePtr<VertexArray>(buffer);
 
 	s_Data.FramebufferShader = ShaderPipeline::Create({
-		{ "VolcaniCore/assets/shaders/Framebuffer.glsl.vert", ShaderType::Vertex },
-		{ "VolcaniCore/assets/shaders/Framebuffer.glsl.frag", ShaderType::Fragment }
+		"VolcaniCore/assets/shaders/Framebuffer.glsl.vert",
+		"VolcaniCore/assets/shaders/Framebuffer.glsl.frag"
 	});
 
 	s_Data.FramebufferShader->Bind();
@@ -161,7 +164,8 @@ void Renderer::DrawCubemap(Ref<VolcaniCore::Cubemap> cubemap) {
 }
 
 void Renderer::DrawMesh(Ref<VolcaniCore::Mesh> mesh, Transform t) {
-
+	auto nativeMesh = mesh->As<OpenGL::Mesh>();
+	DrawIndexed(nativeMesh->m_VertexArray);
 }
 
 void Renderer::RenderFramebuffer(Ref<VolcaniCore::Framebuffer> buffer,

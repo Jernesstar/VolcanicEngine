@@ -110,8 +110,8 @@ Instancing::Instancing() {
 		mats[i] = t.GetTransform();
 	}
 
-	matrixBuffer = CreateRef<VertexBuffer>(InstanceCount, layout, mats.data());
-	cubeBuffer	 = CreateRef<VertexBuffer>(vertices, cubeLayout);
+	matrixBuffer = CreateRef<VertexBuffer>(layout, InstanceCount, mats.data());
+	cubeBuffer	 = CreateRef<VertexBuffer>(cubeLayout, vertices);
 	indexBuffer  = CreateRef<IndexBuffer>(indices);
 
 	array = CreateRef<VertexArray>();

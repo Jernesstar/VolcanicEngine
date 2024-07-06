@@ -6,149 +6,116 @@
 #include "Core/Log.h"
 #include "Core/Assert.h"
 
-#include "BufferLayout.h"
-#include "VertexArray.h"
-
 using namespace VolcaniCore;
 
 namespace VolcaniCore::OpenGL {
 
-
+// TODO: Move to Object/Model.cpp, as this is not renderer-specific
 Model::Model(const std::string& path)
 	: Path(path)
 {
-	// VOLCANICORE_ASSERT(path != "");
-
-	// LoadMesh(path);
+	VOLCANICORE_ASSERT(path != "");
+	Load(path);
 }
 
 Model::~Model() {
-	// Clear();
+	Unload();
 }
 
-void Model::Clear() {
-	// m_Meshes.clear();
-	// m_Materials.clear();
+void Model::Unload() {
 
-	// m_Positions.clear();
-	// m_Normals.clear();
-	// m_TextureCoords.clear();
-	// m_Indices.clear();
-
-	// m_Buffers[BufferIndex::Position].reset();
-	// m_Buffers[BufferIndex::TexCoord].reset();
-	// m_Buffers[BufferIndex::Normal].reset();
-	// m_IndexBuffer.reset();
-	// m_VertexArray.reset();
 }
 
-void Model::LoadMesh(const std::string& path) {
-	// Assimp::Importer importer;
-	// uint32_t loadFlags = aiProcess_Triangulate
-	// 					| aiProcess_GenSmoothNormals
-	// 					| aiProcess_FlipUVs
-	// 					| aiProcess_JoinIdenticalVertices;
-	// const aiScene* scene = importer.ReadFile(path.c_str(), loadFlags);
+void Model::Load(const std::string& path) {
+	Assimp::Importer importer;
+	uint32_t loadFlags = aiProcess_Triangulate
+						| aiProcess_GenSmoothNormals
+						| aiProcess_FlipUVs
+						| aiProcess_JoinIdenticalVertices;
+	const aiScene* scene = importer.ReadFile(path.c_str(), loadFlags);
 
-	// VOLCANICORE_ASSERT_ARGS(scene, "Error importing model(s) from %s: %s",
-	// 								path.c_str(), importer.GetErrorString());
+	VOLCANICORE_ASSERT_ARGS(scene, "Error importing model(s) from %s: %s",
+									path.c_str(), importer.GetErrorString());
 
-	// m_Meshes.resize(scene->mNumMeshes);
-	// m_Materials.resize(scene->mNumMaterials);
+	m_Meshes.resize(scene->mNumMeshes);
 
-	// uint32_t vertexCount = 0;
-	// uint32_t indexCount = 0;
+	for(uint32_t i = 0; i < m_Meshes.size(); i++)
+		LoadMesh(scene->mMeshes[i],
+				 scene->mMaterials[scene->mMeshes[i].mMaterialIndex]);
 
-	// for(uint32_t i = 0; i < m_Meshes.size(); i++) {
-	// 	aiMesh* incomingMesh = scene->mMeshes[i];
-	// 	Mesh& outputMesh = m_Meshes[i];
-	// 	outputMesh.MaterialIndex = incomingMesh->mMaterialIndex;
-	// 	outputMesh.IndexCount = incomingMesh->mNumFaces * 3;
-	// 	outputMesh.BaseVertex = vertexCount;
-	// 	outputMesh.BaseIndex = indexCount;
-
-	// 	vertexCount += incomingMesh->mNumVertices;
-	// 	indexCount += outputMesh.IndexCount;
-	// }
-
-	// m_Positions.reserve(vertexCount);
-	// m_TextureCoords.reserve(vertexCount);
-	// m_Normals.reserve(vertexCount);
-	// m_Indices.reserve(indexCount);
-
-	// for(uint32_t i = 0; i < m_Meshes.size(); i++)
-	// 	LoadSubMesh(scene->mMeshes[i]);
-
-	// for(uint32_t i = 0; i < scene->mNumMaterials; i++)
-	// 	LoadMaterial(scene->mMaterials[i], path, i);
-
-	// BufferLayout l1({ { "Position", BufferDataType::Vec3 } }, true);
-	// BufferLayout l2({ { "TexCoord", BufferDataType::Vec2 } }, true);
-	// BufferLayout l3({ { "Normal",   BufferDataType::Vec3 } }, true);
-
-	// m_Buffers[BufferIndex::Position] = CreatePtr<VertexBuffer>(m_Positions.size(), l1, &m_Positions[0]);
-	// m_Buffers[BufferIndex::TexCoord] = CreatePtr<VertexBuffer>(m_TextureCoords.size(), l2, &m_TextureCoords[0]);
-	// m_Buffers[BufferIndex::Normal]   = CreatePtr<VertexBuffer>(m_Normals.size(),       l3, &m_Normals[0]);
-
-	// m_IndexBuffer = CreateRef<IndexBuffer>(&m_Indices[0], m_Indices.size());
-
-	// m_VertexArray = CreatePtr<VertexArray>();
-	// m_VertexArray->SetIndexBuffer(m_IndexBuffer);
-	// m_VertexArray->AddVertexBuffer(m_Buffers[BufferIndex::Position]);
-	// m_VertexArray->AddVertexBuffer(m_Buffers[BufferIndex::TexCoord]);
-	// m_VertexArray->AddVertexBuffer(m_Buffers[BufferIndex::Normal]);
-
-	// delete scene;
+	delete scene;
 }
 
-void Model::LoadSubMesh(const aiMesh* mesh) {
-	// for(uint32_t i = 0; i < mesh->mNumVertices; i++) {
-	// 	const aiVector3D& position = mesh->mVertices[i];
-	// 	const aiVector3D& normal = mesh->mNormals[i];
-	// 	const aiVector3D& texCoord =
-	// 		mesh->HasTextureCoords(0) ? mesh->mTextureCoords[0][i]
-	// 								  : aiVector3D(0.0f, 0.0f, 0.0f);
+void Model::LoadMesh(const aiMesh* mesh, const aiMaterial* material) {
+	std::vector<Vertex> vertices;
+	std::vector<uint32_t> indices;
 
-	// 	m_Positions.push_back(glm::vec3(position.x, position.y, position.z));
-	// 	m_Normals.push_back(glm::vec3(normal.x, normal.y, normal.z));
-	// 	m_TextureCoords.push_back(glm::vec2(texCoord.x, texCoord.y));
-	// }
+	vertices.reserve(mesh->mNumVertices);
+	indices.reserve(mesh->mNumFaces * 3);
 
-	// for(uint32_t i = 0; i < mesh->mNumFaces; i++) {
-	// 	const aiFace& face = mesh->mFaces[i];
-	// 	m_Indices.push_back(face.mIndices[0]);
-	// 	m_Indices.push_back(face.mIndices[1]);
-	// 	m_Indices.push_back(face.mIndices[2]);
-	// }
+	for(uint32_t i = 0; i < mesh->mNumVertices; i++) {
+		const aiVector3D& pos	   = mesh->mVertices[i];
+		const aiVector3D& normal   = mesh->mNormals[i];
+		const aiVector3D& texCoord =
+			mesh->HasTextureCoords(0) ? mesh->mTextureCoords[0][i] // Multiple textures supported
+									  : aiVector3D(0.0f, 0.0f, 0.0f);
+
+		Vertex v{
+			.Position		   = glm::vec3(pos.x, pos.y, pos.z),
+			.Normal			   = glm::vec3(normal.x, normal.y, normal.z),
+			.TextureCoordinate = glm::vec2(texCoord.x, texCoord.y)
+		}
+		m_Vertices.push_back(v);
+	}
+
+	for(uint32_t i = 0; i < mesh->mNumFaces; i++) {
+		const aiFace& face = mesh->mFaces[i];
+		indices.push_back(face.mIndices[0]);
+		indices.push_back(face.mIndices[1]);
+		indices.push_back(face.mIndices[2]);
+	}
+
+	Material material = LoadMaterial(path, material);
+
+	m_Meshes.push_back(Mesh::Create(vertices, indices, material));
 }
 
-void Model::LoadMaterial(const aiMaterial* material, const std::string& path, uint32_t index) {
-	// std::size_t slash_index = path.find("textures");
-	// std::string dir;
+void Model::LoadMaterial(const std::string& path,
+						 const aiMaterial* mat)
+{
+	std::size_t slashIndex = path.find("textures");
+	std::string dir;
 
-	// if(slash_index == std::string::npos)
-	// 	dir = ".";
-	// else if(slash_index == 0)
-	// 	dir = "/";
-	// else
-	// 	dir = path.substr(0, slash_index);
+	if(slashIndex == std::string::npos)
+		dir = ".";
+	else if(slashIndex == 0)
+		dir = "/";
+	else
+		dir = path.substr(0, slashIndex);
+	
+	Material material {
+		.Diffuse   = LoadTexture(dir, mat, aiTextureType_DIFFUSE);
+		.Specular  = LoadTexture(dir, mat, aiTextureType_SPECULAR);
+		.Roughness = LoadTexture(dir, mat, aiTextureType_DIFFUSE_ROUGHNESS);
+	}
 
-	// m_Materials[index].Diffuse = LoadTexture(material, dir, aiTextureType_DIFFUSE);
-	// m_Materials[index].Specular = LoadTexture(material, dir, aiTextureType_SPECULAR);
-	// m_Materials[index].Roughness = LoadTexture(material, dir, aiTextureType_DIFFUSE_ROUGHNESS);
+	return material;
 }
 
-Ref<Texture> Model::LoadTexture(const aiMaterial* material, const std::string& dir, aiTextureType type) {
-	// if(material->GetTextureCount(type) == 0)
-	// 	return nullptr;
+Ref<Texture> Model::LoadTexture(const std::string& dir,
+								const aiMaterial* material,
+								aiTextureType type)
+{
+	if(material->GetTextureCount(type) == 0)
+		return nullptr;
 
-	// aiString path;
-	// if(material->GetTexture(type, 0, &path) == AI_FAILURE)
-	// 	return nullptr;
-	// std::string p(path.data);
+	aiString path;
+	if(material->GetTexture(type, 0, &path) == AI_FAILURE)
+		return nullptr;
+	std::string p(path.data);
 
-	// std::string full_path = dir + "/" + p;
-	// return Texture::Create(full_path);
+	std::string full_path = dir + "/" + p;
+	return Texture::Create(full_path);
 }
 
 }

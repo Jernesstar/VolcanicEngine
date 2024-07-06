@@ -15,7 +15,9 @@ VertexArray::VertexArray() {
 	glCreateVertexArrays(1, &m_VertexArrayID);
 }
 
-VertexArray::VertexArray(Ref<VertexBuffer> vertexBuffer, Ref<IndexBuffer> indexBuffer) {
+VertexArray::VertexArray(Ref<VertexBuffer> vertexBuffer,
+						 Ref<IndexBuffer> indexBuffer)
+{
 	glCreateVertexArrays(1, &m_VertexArrayID);
 	AddVertexBuffer(vertexBuffer);
 	SetIndexBuffer(indexBuffer);
@@ -56,8 +58,8 @@ void VertexArray::AddVertexBuffer(Ref<VertexBuffer> vertexBuffer) {
 	const auto& layout = vertexBuffer->Layout;
 	uint32_t stride = layout.Stride;
 
-	// if(layout.Elements.size() == 1) // Structure of Arrays
-	// 	stride = 0;
+	if(layout.StructureOfArrays)
+		stride = 0;
 
 	for(auto& element : layout) {
 		switch(element.Type) {

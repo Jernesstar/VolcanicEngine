@@ -1,10 +1,5 @@
 #pragma once
 
-#include <vector>
-
-#include <glm/vec2.hpp>
-#include <glm/vec3.hpp>
-
 #include "Object/Mesh.h"
 
 namespace VolcaniCore {
@@ -18,6 +13,13 @@ public:
 	}
 	std::vector<Ref<Mesh>>::const_iterator end() const {
 		return m_Meshes.end();
+	}
+
+	uint32_t GetMeshCount() const {
+		return m_Meshes.size();
+	}
+	Ref<Mesh> GetMesh(uint32_t i) const {
+		return m_Meshes[i];
 	}
 
 	template<typename Derived>

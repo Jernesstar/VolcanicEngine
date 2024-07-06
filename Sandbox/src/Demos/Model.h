@@ -68,7 +68,7 @@ private:
 	};
 
 	Ref<IndexBuffer>  indexBuffer = CreateRef<IndexBuffer>(indices);
-	Ref<VertexBuffer> lightBuffer = CreateRef<VertexBuffer>(vertices, l1);
+	Ref<VertexBuffer> lightBuffer = CreateRef<VertexBuffer>(l1, vertices);
 	Ref<VertexArray>  lightArray  = CreateRef<OpenGL::VertexArray>();
 
 	Ref<ShaderPipeline> modelShader = ShaderPipeline::Create({
@@ -107,13 +107,6 @@ Model::Model()
 	camera->SetPosition({ 0.0f, 0.0f, 5.0f });
 
 	controller = CreateRef<CameraController>(camera);
-
-	// TODO: Move to Renderer
-	// modelShader->Bind();
-	// modelShader->SetMat4("u_Model", glm::mat4(1.0f));
-	// modelShader->SetVec3("u_LightPosition", lightPos);
-	// modelShader->SetVec3("u_LightColor", lightColor);
-
 	model = VolcaniCore::Model::Create(
 			"Sandbox/assets/models/cat_waiters/Cat Waiter-1.fbx");
 }

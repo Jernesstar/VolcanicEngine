@@ -50,10 +50,13 @@ void Application::Run() {
 		s_LastFrame = time;
 
 		EventSystem::PollEvents();
-		s_Instance->OnUpdate(ts);
 
-		ApplicationUpdatedEvent event(ts);
-		EventSystem::Dispatch(event);
+		Renderer::BeginFrame();
+		{
+			s_Instance->OnUpdate(ts);
+			// s_Instance->OnRender();
+		}
+		Renderer::EndFrame();
 
 		s_Window->Update();
 	}

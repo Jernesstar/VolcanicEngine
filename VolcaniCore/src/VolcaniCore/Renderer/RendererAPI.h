@@ -12,6 +12,7 @@ namespace VolcaniCore {
 enum class RendererBackend { OpenGL, Vulkan, DirectX };
 
 // Generate the backend specific buffers to be used every frame
+// Is responsible for how to batch the render calls
 class RendererAPI {
 public:
 	static void Create(RendererBackend backend);
@@ -35,9 +36,10 @@ public:
 	virtual void DrawCubemap(Ref<Cubemap> cubemap) = 0;
 	virtual void DrawMesh(Ref<Mesh> model, Transform t = { }) = 0;
 
-	// virtual void DrawIndexed(FrameData data) = 0;
-	// virtual void DrawInstanced(FrameData data) = 0;
-	
+	// virtual void BeginFrame() = 0;
+	// virtual void EndFrame() = 0;
+	// virtual void Render() = 0;
+
 	// TODO: Remove
 	template<typename Derived>
 	Derived* As() const { return (Derived*)(this); }

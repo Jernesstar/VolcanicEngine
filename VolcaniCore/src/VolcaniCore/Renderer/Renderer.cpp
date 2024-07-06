@@ -8,6 +8,7 @@
 
 namespace VolcaniCore {
 
+static Ref<RenderPass> CurrentPass;
 
 void Renderer::Init() {
 	Renderer3D::Init();
@@ -24,27 +25,38 @@ void Renderer::Clear(const glm::vec4& color) {
 }
 
 void Renderer::Resize(uint32_t width, uint32_t height) {
-
+	RendererAPI::Get()->Resize(width, height);
 }
 
-void Renderer::Begin() {
-
+void Renderer::BeginFrame() {
+	// RendererAPI::Get()->BeginFrame();
 }
 
 void Renderer::StartPass(Ref<RenderPass> pass) {
+	CurrentPass = pass;
+	auto framebuffer = pass->Output;
 
+	if(framebuffer) {
+		framebuffer->Bind();
+		Resize(framebuffer->GetWidth(), framebuffer->GetHeight());
+	}
 }
 
 void Renderer::EndPass() {
+	auto framebuffer = CurrentPass->GetOutput;
 
+	if(framebuffer) {
+		framebuffer->Unbind();
+		auto window = Application::GetWindow();
+		Resize(window->GetWidth(), window->GetHeight());
+	}
+	
+	// Actually send the info to be rendered to the framebuffer
+	// RendererAPI::Get()->Render();
 }
 
-void Renderer::End() {
-	Flush();
-}
-
-void Renderer::Flush() {
-
+void Renderer::EndFrame() {
+	// RendererAPI::Get()->EndFrame();
 }
 
 

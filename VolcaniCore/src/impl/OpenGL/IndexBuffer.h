@@ -12,30 +12,36 @@ public:
 	IndexBuffer(const uint32_t (&indices)[Count])
 		: Count(Count)
 	{
-		glCreateBuffers(1, &m_IndexBufferID);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IndexBufferID);
+		glCreateBuffers(1, &m_BufferID);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_BufferID);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, Count * sizeof(uint32_t), indices,
 					 GL_STATIC_DRAW);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
 
-	IndexBuffer(const uint32_t* indices, uint32_t count)
+	IndexBuffer(uint32_t count, const uint32_t* indices)
 		: Count(count)
 	{
-		glCreateBuffers(1, &m_IndexBufferID);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IndexBufferID);
+		glCreateBuffers(1, &m_BufferID);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_BufferID);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, Count * sizeof(uint32_t), indices,
 					 GL_STATIC_DRAW);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
 
-	~IndexBuffer() { glDeleteBuffers(1, &m_IndexBufferID); }
+	~IndexBuffer() {
+		glDeleteBuffers(1, &m_BufferID);
+	}
 
-	void Bind() const { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IndexBufferID); }
-	void Unbind() const { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); }
+	void Bind() const {
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_BufferID);
+	}
+	void Unbind() const {
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	}
 
 private:
-	uint32_t m_IndexBufferID;
+	uint32_t m_BufferID;
 };
 
 }
