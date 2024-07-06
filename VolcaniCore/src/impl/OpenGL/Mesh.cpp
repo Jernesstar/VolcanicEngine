@@ -16,7 +16,7 @@ Mesh::Mesh(std::vector<Vertex> vertices,
 	m_VertexBuffer = CreateRef<VertexBuffer>(layout, m_Vertices.size(),
 													&m_Vertices[0]);
 	m_IndexBuffer = CreateRef<IndexBuffer>(indices.size(), &indices[0]);
-	m_VertexArray = CreatePtr<VertexArray>(m_VertexBuffer, m_IndexBuffer);
+	m_VertexArray = CreateRef<VertexArray>(m_VertexBuffer, m_IndexBuffer);
 }
 
 Mesh::~Mesh() { }

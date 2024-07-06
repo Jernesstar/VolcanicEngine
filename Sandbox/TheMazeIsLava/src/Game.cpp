@@ -52,16 +52,14 @@ void Game::OnUpdate(TimeStep ts) {
 
 	Renderer::Clear();
 
-	Renderer::Begin();
-	Renderer3D::Begin(m_Camera);
 	UI::Begin();
+	Renderer3D::Begin(m_Camera);
 
 	m_CurrentScreen();
 	m_CurrentUI->Render();
 
-	UI::End();
 	Renderer3D::End();
-	Renderer::End();
+	UI::End();
 }
 
 void Game::StartScreen() {

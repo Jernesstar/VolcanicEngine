@@ -33,14 +33,20 @@ private:
 	void Load(const std::string& path);
 	void Unload();
 
-	void LoadMesh(const aiMesh* mesh, const aiMaterial* material);
+	void LoadMesh(const std::string& path,
+				  const aiMesh* mesh,
+				  const aiMaterial* material);
 
-	Material LoadMaterial(const std::string& path
+	Material LoadMaterial(const std::string& path,
 						  const aiMaterial* mat);
 
 	Ref<Texture> LoadTexture(const std::string& dir,
 							 const aiMaterial* mat,
 							 aiTextureType type);
+
+	Ref<VertexBuffer> m_VertexBuffer;
+	Ref<IndexBuffer> m_IndexBuffer;
+	Ptr<VertexArray> m_VertexArray;
 };
 
 }

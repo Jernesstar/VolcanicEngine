@@ -116,13 +116,11 @@ void Model::OnUpdate(TimeStep ts)
 	controller->OnUpdate(ts);
 	VolcaniCore::Renderer::Clear();
 
-	VolcaniCore::Renderer::Begin();
 	Renderer3D::Begin(camera);
 
 	Renderer3D::DrawModel(model);
 
 	Renderer3D::End();
-	VolcaniCore::Renderer::End();
 }
 
 

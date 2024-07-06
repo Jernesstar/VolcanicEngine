@@ -59,6 +59,7 @@ private:
 		2, 6, 7,
 	};
 
+	Ref<ShaderPipeline> meshShader;
 	Ref<ShaderPipeline> pixelateShader;
 	// Ref<ShaderPipeline> cullShader;
 
@@ -85,6 +86,10 @@ Cube::Cube() {
 		camera->Resize(event.Width, event.Height);
 	});
 
+	// meshShader = ShaderPipeline::Create({
+	// 	{ "VolcaniCore/assets/shaders/Mesh.glsl.vert", ShaderType::Vertex },
+	// 	{ "VolcaniCore/assets/shaders/Mesh.glsl.frag", ShaderType::Fragment }
+	// });
 	pixelateShader = ShaderPipeline::Create({
 		{ "Sandbox/assets/shaders/Pixelate.glsl.vert", ShaderType::Vertex },
 		{ "Sandbox/assets/shaders/Pixelate.glsl.frag", ShaderType::Fragment }
@@ -99,11 +104,12 @@ Cube::Cube() {
 	};
 	framebuffer = CreateRef<OpenGL::Framebuffer>(225, 150, attachments);
 
-	drawPass = CreateRef<RenderPass>("Draw Pass", ShaderLibrary::Get("Mesh"));
+	// drawPass = CreateRef<RenderPass>("Draw Pass", ShaderLibrary::Get("Mesh"));
+	drawPass = CreateRef<RenderPass>("Draw Pass", meshShader);
 	pixelatePass = CreateRef<RenderPass>("Pixelate Pass", pixelateShader);
 
-	drawPass->SetOutput(frameBuffer);
-	pixelatePass->SetInput(frameBuffer);
+	drawPass->SetOutput(framebuffer);
+	pixelatePass->AddInput(framebuffer);
 	// If a RenderPass has no output, it's implied that it renders to the screen
 
 	camera = CreateRef<StereographicCamera>(75.0f, 0.01f, 100.0f, 800, 600);
@@ -113,25 +119,28 @@ Cube::Cube() {
 
 	controller = CreateRef<CameraController>(camera);
 
-	cube = Mesh::Create(vertices, indices);
+	cube = Mesh::Create(vertices, indices,
+		Material{
+			.Diffuse = Texture::Create("Sandbox/assets/images/stone.png")
+		});
 }
 
 void Cube::OnUpdate(TimeStep ts) {
 	controller->OnUpdate(ts);
 
-	Renderer::StartPass(drawPass);
-	{
-		Renderer::Clear();
-		Renderer3D::Begin(camera);
+	// Renderer::StartPass(drawPass);
+	// {
+	// 	Renderer::Clear();
+	// 	Renderer3D::Begin(camera);
 
-		Renderer::DrawMesh(cube);
+		Renderer3D::DrawMesh(cube);
 
-		Renderer3D::End();
-	}
-	Renderer::EndPass();
+	// 	Renderer3D::End();
+	// }
+	// Renderer::EndPass();
 
-	Renderer::StartPass(pixelatePass);
-	Renderer::EndPass();
+	// Renderer::StartPass(pixelatePass);
+	// Renderer::EndPass();
 }
 
 }

@@ -7,8 +7,6 @@
 
 #include "Object/Shader.h"
 
-using namespace VolcaniCore::OpenGL;
-
 namespace VolcaniCore {
 
 struct RendererData2D {

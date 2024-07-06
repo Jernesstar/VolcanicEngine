@@ -13,7 +13,7 @@ struct Vertex {
 	glm::vec3 Position;
 	glm::vec3 Normal;
 	glm::vec2 TextureCoordinate;
-}
+};
 
 struct Material {
 	Ref<Texture> Diffuse;
@@ -22,6 +22,11 @@ struct Material {
 };
 
 class Mesh {
+public:
+	static Ref<Mesh> Create(std::vector<Vertex> vertices,
+							std::vector<uint32_t> indices,
+							Material material);
+
 public:
 	Mesh(std::vector<Vertex> vertices,
 		 std::vector<uint32_t> indices,
@@ -33,9 +38,8 @@ public:
 		m_Indices.clear();
 	}
 
-	static Ref<Mesh> Create(std::vector<Vertex> vertices,
-							std::vector<uint32_t> indices,
-							Material material);
+	template<typename Derived>
+	Derived* As() const { return (Derived*)(this); }
 
 protected:
 	std::vector<Vertex> m_Vertices;

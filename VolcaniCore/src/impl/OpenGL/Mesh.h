@@ -23,7 +23,7 @@ public:
 private:
 	Ref<OpenGL::VertexBuffer> m_VertexBuffer;
 	Ref<OpenGL::IndexBuffer> m_IndexBuffer;
-	Ptr<OpenGL::VertexArray> m_VertexArray;
+	Ref<OpenGL::VertexArray> m_VertexArray;
 
 	friend class Renderer;
 };

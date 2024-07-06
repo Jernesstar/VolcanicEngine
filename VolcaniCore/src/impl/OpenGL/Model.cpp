@@ -40,13 +40,16 @@ void Model::Load(const std::string& path) {
 	m_Meshes.resize(scene->mNumMeshes);
 
 	for(uint32_t i = 0; i < m_Meshes.size(); i++)
-		LoadMesh(scene->mMeshes[i],
-				 scene->mMaterials[scene->mMeshes[i].mMaterialIndex]);
+		LoadMesh(path, scene->mMeshes[i],
+				 scene->mMaterials[scene->mMeshes[i]->mMaterialIndex]);
 
 	delete scene;
 }
 
-void Model::LoadMesh(const aiMesh* mesh, const aiMaterial* material) {
+void Model::LoadMesh(const std::string& path,
+					 const aiMesh* mesh,
+					 const aiMaterial* mat){
+
 	std::vector<Vertex> vertices;
 	std::vector<uint32_t> indices;
 
@@ -64,8 +67,8 @@ void Model::LoadMesh(const aiMesh* mesh, const aiMaterial* material) {
 			.Position		   = glm::vec3(pos.x, pos.y, pos.z),
 			.Normal			   = glm::vec3(normal.x, normal.y, normal.z),
 			.TextureCoordinate = glm::vec2(texCoord.x, texCoord.y)
-		}
-		m_Vertices.push_back(v);
+		};
+		vertices.push_back(v);
 	}
 
 	for(uint32_t i = 0; i < mesh->mNumFaces; i++) {
@@ -75,12 +78,12 @@ void Model::LoadMesh(const aiMesh* mesh, const aiMaterial* material) {
 		indices.push_back(face.mIndices[2]);
 	}
 
-	Material material = LoadMaterial(path, material);
+	Material material = LoadMaterial(path, mat);
 
 	m_Meshes.push_back(Mesh::Create(vertices, indices, material));
 }
 
-void Model::LoadMaterial(const std::string& path,
+Material Model::LoadMaterial(const std::string& path,
 						 const aiMaterial* mat)
 {
 	std::size_t slashIndex = path.find("textures");
@@ -94,10 +97,10 @@ void Model::LoadMaterial(const std::string& path,
 		dir = path.substr(0, slashIndex);
 	
 	Material material {
-		.Diffuse   = LoadTexture(dir, mat, aiTextureType_DIFFUSE);
-		.Specular  = LoadTexture(dir, mat, aiTextureType_SPECULAR);
-		.Roughness = LoadTexture(dir, mat, aiTextureType_DIFFUSE_ROUGHNESS);
-	}
+		.Diffuse   = LoadTexture(dir, mat, aiTextureType_DIFFUSE),
+		.Specular  = LoadTexture(dir, mat, aiTextureType_SPECULAR),
+		.Roughness = LoadTexture(dir, mat, aiTextureType_DIFFUSE_ROUGHNESS)
+	};
 
 	return material;
 }

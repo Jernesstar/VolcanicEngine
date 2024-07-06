@@ -49,7 +49,7 @@ project "Sandbox"
         -- "bx",
         "glfw",
         "glad",
-        -- "assimp",
+        "assimp",
         "freetype",
         "stb_image"
     }

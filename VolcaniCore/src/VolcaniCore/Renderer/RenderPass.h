@@ -10,7 +10,7 @@ namespace VolcaniCore {
 class RenderPass {
 public:
 	static Ref<RenderPass> Create(const std::string& name,
-								  Ref<ShaderPipeline> pipeline)
+								  Ref<ShaderPipeline> pipeline);
 public:
 	const std::string Name;
 

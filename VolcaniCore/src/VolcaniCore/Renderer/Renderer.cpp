@@ -1,5 +1,6 @@
 #include "Renderer.h"
 
+#include "Core/Application.h"
 #include "Core/Assert.h"
 
 #include "Renderer/RendererAPI.h"
@@ -34,7 +35,7 @@ void Renderer::BeginFrame() {
 
 void Renderer::StartPass(Ref<RenderPass> pass) {
 	CurrentPass = pass;
-	auto framebuffer = pass->Output;
+	auto framebuffer = pass->GetOutput();
 
 	if(framebuffer) {
 		framebuffer->Bind();
@@ -43,7 +44,7 @@ void Renderer::StartPass(Ref<RenderPass> pass) {
 }
 
 void Renderer::EndPass() {
-	auto framebuffer = CurrentPass->GetOutput;
+	auto framebuffer = CurrentPass->GetOutput();
 
 	if(framebuffer) {
 		framebuffer->Unbind();

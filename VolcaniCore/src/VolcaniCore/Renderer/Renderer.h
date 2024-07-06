@@ -5,6 +5,9 @@
 
 #include "Renderer/RenderPass.h"
 
+#include "Object/Quad.h"
+#include "Object/Mesh.h"
+
 namespace VolcaniCore {
 
 // TODO: Rename ?

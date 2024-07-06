@@ -4,8 +4,12 @@
 
 #include "Core/Assert.h"
 #include "Events/EventSystem.h"
+
 #include "Renderer/OrthographicCamera.h"
 
+#include "Shader.h"
+
+#include "Mesh.h"
 #include "Model.h"
 #include "Cubemap.h"
 #include "Texture2D.h"
@@ -131,7 +135,7 @@ void Renderer::Init() {
 	);
 	s_Data.FramebufferArray = CreatePtr<VertexArray>(buffer);
 
-	s_Data.FramebufferShader = ShaderPipeline::Create({
+	s_Data.FramebufferShader = ShaderPipeline::Create(std::vector<std::string>{
 		"VolcaniCore/assets/shaders/Framebuffer.glsl.vert",
 		"VolcaniCore/assets/shaders/Framebuffer.glsl.frag"
 	});
