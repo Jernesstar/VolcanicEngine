@@ -20,18 +20,18 @@ public:
 	void Clear(const glm::vec4& color = { 0.0f, 0.0f, 0.0f, 0.0f }) override;
 	void Resize(uint32_t width, uint32_t height) override;
 
-	// void RenderFrame(Ref<FrameData> data) override;
+	void DrawCubemap(Ref<VolcaniCore::Cubemap> cubemap) override;
+	void DrawMesh(Ref<VolcaniCore::Mesh> model, Transform t = { }) override;
+
+	void Render() override;
 
 	void RenderFramebuffer(Ref<VolcaniCore::Framebuffer> buffer,
 						   AttachmentTarget target) override;
 
-	void DrawCubemap(Ref<VolcaniCore::Cubemap> cubemap) override;
-	void DrawMesh(Ref<VolcaniCore::Mesh> model, Transform t = { }) override;
-
+private:
 	void DrawIndexed(Ref<VertexArray> vertexArray, uint32_t indices = 0);
 	void DrawInstanced(Ref<VertexArray> vertexArray, uint32_t instanceCount);
 
-private:
 	void Init() override;
 	void Close() override;
 };

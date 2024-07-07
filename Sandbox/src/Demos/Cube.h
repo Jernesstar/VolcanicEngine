@@ -90,14 +90,6 @@ Cube::Cube() {
 	// 	{ "VolcaniCore/assets/shaders/Mesh.glsl.vert", ShaderType::Vertex },
 	// 	{ "VolcaniCore/assets/shaders/Mesh.glsl.frag", ShaderType::Fragment }
 	// });
-	pixelateShader = ShaderPipeline::Create({
-		{ "Sandbox/assets/shaders/Pixelate.glsl.vert", ShaderType::Vertex },
-		{ "Sandbox/assets/shaders/Pixelate.glsl.frag", ShaderType::Fragment }
-	});
-	// cullShader = ShaderPipeline::Create({
-	// 	{ "Sandbox/assets/shaders/Cull.glsl.vert", ShaderType::Vertex },
-	// 	{ "Sandbox/assets/shaders/Cull.glsl.geom", ShaderType::Geometry }
-	// });
 	std::vector<OpenGL::Attachment> attachments{
 		{ AttachmentTarget::Color, OpenGL::AttachmentType::Texture },
 		{ AttachmentTarget::Depth, OpenGL::AttachmentType::Texture }
@@ -106,11 +98,8 @@ Cube::Cube() {
 
 	// drawPass = CreateRef<RenderPass>("Draw Pass", ShaderLibrary::Get("Mesh"));
 	drawPass = CreateRef<RenderPass>("Draw Pass", meshShader);
-	pixelatePass = CreateRef<RenderPass>("Pixelate Pass", pixelateShader);
 
 	drawPass->SetOutput(framebuffer);
-	pixelatePass->AddInput(framebuffer);
-	// If a RenderPass has no output, it's implied that it renders to the screen
 
 	camera = CreateRef<StereographicCamera>(75.0f, 0.01f, 100.0f, 800, 600);
 	// camera = CreateRef<OrthographicCamera>(800, 600, 0.01f, 100.0f);
@@ -139,8 +128,7 @@ void Cube::OnUpdate(TimeStep ts) {
 	}
 	Renderer::EndPass();
 
-	Renderer::StartPass(pixelatePass);
-	Renderer::EndPass();
+	RendererAPI::Get()->RenderFramebuffer(framebuffer, AttachmentTarget::Color);
 }
 
 }

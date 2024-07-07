@@ -38,13 +38,17 @@ struct RendererData {
 	// static const uint32_t MaxIndices = MaxQuads * 6;
 	// static const uint32_t MaxTextureSlots = 32;
 
-	Ptr<VertexBuffer> MeshBuffer;
 	Ptr<VertexArray> CubemapArray;
 	Ptr<VertexArray> FramebufferArray;
 
 	Ref<ShaderPipeline> FramebufferShader;
 
-	uint32_t ViewportWidth, ViewportHeight;
+	Ref<VertexBuffer> MeshBuffer;
+	Ptr<VertexArray> MeshArray;
+	Ref<ShaderPipeline> MeshShader;
+
+	std::vector<Ref<Quad>> Quads;
+	std::unordered_map<Ref<Mesh>, uint32_t> Meshes;
 };
 
 static RendererData s_Data;
@@ -120,6 +124,15 @@ void Renderer::Init() {
 	};
 
 
+	// MeshBuffer = CreateRef<VertexBuffer>(
+	// 	BufferLayout{
+	// 		{ "Position", BufferDataType::Vec3 }
+	// 		{ "", BufferDataType::Vec3 }
+	// 		{ "Position", BufferDataType::Vec3 }
+	// 	}, cubemapVertices
+	// );
+	// s_Data.CubemapArray = CreatePtr<VertexArray>(cubemapBuffer);
+
 	Ref<VertexBuffer> cubemapBuffer = CreateRef<VertexBuffer>(
 		BufferLayout{
 			{ "Position", BufferDataType::Vec3 }
@@ -135,9 +148,15 @@ void Renderer::Init() {
 	);
 	s_Data.FramebufferArray = CreatePtr<VertexArray>(buffer);
 
-	s_Data.FramebufferShader = ShaderPipeline::Create(std::vector<std::string>{
-		"VolcaniCore/assets/shaders/Framebuffer.glsl.vert",
-		"VolcaniCore/assets/shaders/Framebuffer.glsl.frag"
+	s_Data.FramebufferShader = ShaderPipeline::Create({
+		{ "VolcaniCore/assets/shaders/Framebuffer.glsl.vert",
+			ShaderType::Vertex },
+		{ "VolcaniCore/assets/shaders/Framebuffer.glsl.frag",
+			ShaderType::Fragment }
+	});
+	s_Data.MeshShader = ShaderPipeline::Create({
+		{ "VolcaniCore/assets/shaders/Mesh.glsl.vert", ShaderType::Vertex },
+		{ "VolcaniCore/assets/shaders/Mesh.glsl.frag", ShaderType::Fragment }
 	});
 
 	s_Data.FramebufferShader->Bind();
@@ -169,7 +188,22 @@ void Renderer::DrawCubemap(Ref<VolcaniCore::Cubemap> cubemap) {
 
 void Renderer::DrawMesh(Ref<VolcaniCore::Mesh> mesh, Transform t) {
 	auto nativeMesh = mesh->As<OpenGL::Mesh>();
-	DrawIndexed(nativeMesh->m_VertexArray);
+	Material& material = mesh->GetMaterial();
+
+	s_Data.MeshShader->Bind();
+	s_Data.MeshShader->SetTexture("u_Diffuse", material.Diffuse, 0);
+	// s_Data.MeshShader->SetTexture("u_Specular", material.Specular, 0);
+	// s_Data.MeshShader->SetTexture("u_Roughness", material.Roughness, 0);
+	s_Data.MeshShader->SetMat4("u_Model", t.GetTransform());
+
+	s_Data.MeshArray->Bind();
+
+	// TODO: Move to RenderCommand
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+}
+
+void Renderer::Render() {
+
 }
 
 void Renderer::RenderFramebuffer(Ref<VolcaniCore::Framebuffer> buffer,

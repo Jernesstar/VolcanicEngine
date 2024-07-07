@@ -9,6 +9,8 @@
 
 namespace VolcaniCore {
 
+static Ref<RenderPass> CurrentPass;
+
 void Renderer::Init() {
 	Renderer3D::Init();
 	Renderer2D::Init();
@@ -32,26 +34,29 @@ void Renderer::BeginFrame() {
 }
 
 void Renderer::StartPass(Ref<RenderPass> pass) {
-	s_FrameData.CurrentPass = pass;
+	CurrentPass = pass;
 	auto framebuffer = pass->GetOutput();
 
 	if(framebuffer) {
 		framebuffer->Bind();
 		Resize(framebuffer->GetWidth(), framebuffer->GetHeight());
 	}
+
+	pass->GetPipeline()->Bind();
 }
 
 void Renderer::EndPass() {
-	auto framebuffer = s_FrameData.CurrentPass->GetOutput();
+	auto framebuffer = CurrentPass->GetOutput();
 
 	if(framebuffer) {
 		framebuffer->Unbind();
 		auto window = Application::GetWindow();
 		Resize(window->GetWidth(), window->GetHeight());
 	}
-	
+
 	// Actually send the info to be rendered to the framebuffer
-	// RendererAPI::Get()->Render();
+	RendererAPI::Get()->Render();
+	pass->GetPipeline()->Unbind();
 }
 
 void Renderer::EndFrame() {

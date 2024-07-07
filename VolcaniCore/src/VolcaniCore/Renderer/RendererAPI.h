@@ -30,19 +30,13 @@ public:
 	virtual void Clear(const glm::vec4& color = { 0.0f, 0.0f, 0.0f, 0.0f }) = 0;
 	virtual void Resize(uint32_t width, uint32_t height) = 0;
 
-	virtual void RenderFramebuffer(Ref<Framebuffer> buffer,
-								   AttachmentTarget target) = 0;
-
 	virtual void DrawCubemap(Ref<Cubemap> cubemap) = 0;
 	virtual void DrawMesh(Ref<Mesh> model, Transform t = { }) = 0;
 
-	// virtual void BeginFrame() = 0;
-	// virtual void EndFrame() = 0;
-	// virtual void Render() = 0;
+	virtual void Render() = 0;
 
-	// TODO: Remove
-	template<typename Derived>
-	Derived* As() const { return (Derived*)(this); }
+	virtual void RenderFramebuffer(Ref<Framebuffer> buffer,
+								   AttachmentTarget target) = 0;
 
 protected:
 	virtual void Init() = 0;

@@ -85,7 +85,10 @@ private:
 		{ "Sandbox/assets/shaders/Instancing.glsl.vert", ShaderType::Vertex },
 		{ "Sandbox/assets/shaders/Instancing.glsl.frag", ShaderType::Fragment }
 	});
-
+	// cullShader = ShaderPipeline::Create({
+	// 	{ "Sandbox/assets/shaders/Cull.glsl.vert", ShaderType::Vertex },
+	// 	{ "Sandbox/assets/shaders/Cull.glsl.geom", ShaderType::Geometry }
+	// });
 	Ref<Texture> cubeTexture;
 
 	Ref<Camera> camera;
@@ -136,8 +139,8 @@ void Instancing::OnUpdate(TimeStep ts) {
 
 	instancingShader->SetMat4("u_ViewProj", camera->GetViewProjection());
 
-	RendererAPI::Get()->As<OpenGL::Renderer>()
-	->DrawInstanced(array, InstanceCount);
+	// RendererAPI::Get()->As<OpenGL::Renderer>()
+	// ->DrawInstanced(array, InstanceCount);
 }
 
 

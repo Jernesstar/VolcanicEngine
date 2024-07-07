@@ -8,8 +8,10 @@ Ref<RenderPass> RenderPass::Create(const std::string& name,
 	return CreateRef<RenderPass>(name, pipeline);
 }
 
-RenderPass::RenderPass(const std::string& name, Ref<ShaderPipeline> pipeline) {
-	
+RenderPass::RenderPass(const std::string& name, Ref<ShaderPipeline> pipeline)
+	: Name(name), m_Pipeline(pipeline)
+{
+
 }
 
 void RenderPass::AddInput(Ref<Framebuffer> input) {

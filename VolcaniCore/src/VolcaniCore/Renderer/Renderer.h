@@ -10,15 +10,6 @@
 
 namespace VolcaniCore {
 
-struct FrameData {
-	std::vector<Ref<Quad>> Quads3D;
-	std::vector<Ref<Quad>> Quads2D;
-
-	std::unordered_map<Ref<Mesh>, uint32_t> Meshes;
-
-	Ref<RenderPass> CurrentPass;
-};
-
 class Renderer {
 public:
 	static void Clear(const glm::vec4& color = { 0.0f, 0.0f, 0.0f, 0.0f });
@@ -30,16 +21,11 @@ public:
 	static void StartPass(Ref<RenderPass> pass);
 	static void EndPass();
 
-	static FrameData& GetFrameData() { return s_FrameData; }
-
 private:
-	inline static FrameData s_FrameData;
-
 	static void Init();
 	static void Close();
 
 	friend class Application;
 };
-
 
 }
