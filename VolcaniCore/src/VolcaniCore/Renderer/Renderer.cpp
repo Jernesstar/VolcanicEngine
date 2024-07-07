@@ -9,7 +9,7 @@
 
 namespace VolcaniCore {
 
-static Ref<RenderPass> CurrentPass;
+static Ref<RenderPass> s_CurrentPass;
 
 void Renderer::Init() {
 	Renderer3D::Init();
@@ -34,19 +34,19 @@ void Renderer::BeginFrame() {
 }
 
 void Renderer::StartPass(Ref<RenderPass> pass) {
-	CurrentPass = pass;
+	s_CurrentPass = pass;
 	auto framebuffer = pass->GetOutput();
 
 	if(framebuffer) {
-		framebuffer->Bind();
 		Resize(framebuffer->GetWidth(), framebuffer->GetHeight());
+		framebuffer->Bind();
 	}
 
 	pass->GetPipeline()->Bind();
 }
 
 void Renderer::EndPass() {
-	auto framebuffer = CurrentPass->GetOutput();
+	auto framebuffer = s_CurrentPass->GetOutput();
 
 	if(framebuffer) {
 		framebuffer->Unbind();
@@ -56,7 +56,11 @@ void Renderer::EndPass() {
 
 	// Actually send the info to be rendered to the framebuffer
 	RendererAPI::Get()->Render();
-	pass->GetPipeline()->Unbind();
+	s_CurrentPass->GetPipeline()->Unbind();
+}
+
+Ref<RenderPass> Renderer::GetPass() {
+	return s_CurrentPass;
 }
 
 void Renderer::EndFrame() {

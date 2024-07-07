@@ -9,6 +9,8 @@
 
 #include "Shader.h"
 
+#include "Object/Quad.h"
+
 #include "Mesh.h"
 #include "Model.h"
 #include "Cubemap.h"
@@ -49,6 +51,8 @@ struct RendererData {
 
 	std::vector<Ref<Quad>> Quads;
 	std::unordered_map<Ref<Mesh>, uint32_t> Meshes;
+
+	uint32_t ViewportWidth, ViewportHeight;
 };
 
 static RendererData s_Data;
@@ -154,10 +158,6 @@ void Renderer::Init() {
 		{ "VolcaniCore/assets/shaders/Framebuffer.glsl.frag",
 			ShaderType::Fragment }
 	});
-	s_Data.MeshShader = ShaderPipeline::Create({
-		{ "VolcaniCore/assets/shaders/Mesh.glsl.vert", ShaderType::Vertex },
-		{ "VolcaniCore/assets/shaders/Mesh.glsl.frag", ShaderType::Fragment }
-	});
 
 	s_Data.FramebufferShader->Bind();
 	s_Data.FramebufferShader->SetInt("u_ScreenTexture", 0);
@@ -188,18 +188,7 @@ void Renderer::DrawCubemap(Ref<VolcaniCore::Cubemap> cubemap) {
 
 void Renderer::DrawMesh(Ref<VolcaniCore::Mesh> mesh, Transform t) {
 	auto nativeMesh = mesh->As<OpenGL::Mesh>();
-	Material& material = mesh->GetMaterial();
-
-	s_Data.MeshShader->Bind();
-	s_Data.MeshShader->SetTexture("u_Diffuse", material.Diffuse, 0);
-	// s_Data.MeshShader->SetTexture("u_Specular", material.Specular, 0);
-	// s_Data.MeshShader->SetTexture("u_Roughness", material.Roughness, 0);
-	s_Data.MeshShader->SetMat4("u_Model", t.GetTransform());
-
-	s_Data.MeshArray->Bind();
-
-	// TODO: Move to RenderCommand
-	glDrawArrays(GL_TRIANGLES, 0, 36);
+	DrawIndexed(nativeMesh->m_VertexArray);
 }
 
 void Renderer::Render() {

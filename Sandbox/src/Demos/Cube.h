@@ -59,6 +59,12 @@ private:
 		2, 6, 7,
 	};
 
+	std::vector<uint32_t> quadIndices =
+	{
+		0, 2, 3,
+		3, 1, 0
+	};
+
 	Ref<ShaderPipeline> meshShader;
 	Ref<ShaderPipeline> pixelateShader;
 	// Ref<ShaderPipeline> cullShader;
@@ -73,6 +79,7 @@ private:
 	Ref<CameraController> controller;
 
 	Ref<Mesh> cube;
+	Ref<Mesh> quad;
 };
 
 Cube::Cube() {
@@ -86,10 +93,10 @@ Cube::Cube() {
 		camera->Resize(event.Width, event.Height);
 	});
 
-	// meshShader = ShaderPipeline::Create({
-	// 	{ "VolcaniCore/assets/shaders/Mesh.glsl.vert", ShaderType::Vertex },
-	// 	{ "VolcaniCore/assets/shaders/Mesh.glsl.frag", ShaderType::Fragment }
-	// });
+	meshShader = ShaderPipeline::Create({
+		{ "VolcaniCore/assets/shaders/Mesh.glsl.vert", ShaderType::Vertex },
+		{ "VolcaniCore/assets/shaders/Mesh.glsl.frag", ShaderType::Fragment }
+	});
 	std::vector<OpenGL::Attachment> attachments{
 		{ AttachmentTarget::Color, OpenGL::AttachmentType::Texture },
 		{ AttachmentTarget::Depth, OpenGL::AttachmentType::Texture }
@@ -108,9 +115,14 @@ Cube::Cube() {
 
 	controller = CreateRef<CameraController>(camera);
 
+	Ref<Texture> texture = Texture::Create("Sandbox/assets/images/stone.png");
 	cube = Mesh::Create(vertices, indices,
 		Material{
-			.Diffuse = Texture::Create("Sandbox/assets/images/stone.png")
+			.Diffuse = texture
+		});
+	quad = Mesh::Create(vertices, quadIndices,
+		Material{
+			.Diffuse = texture
 		});
 }
 
@@ -120,10 +132,11 @@ void Cube::OnUpdate(TimeStep ts) {
 	Renderer::StartPass(drawPass);
 	{
 		VolcaniCore::Renderer::Clear();
+
 		Renderer3D::Begin(camera);
-
-		Renderer3D::DrawMesh(cube);
-
+		// Renderer3D::DrawMesh(cube);
+		// Renderer3D::DrawMesh(cube, { .Translation = { 10.0f, 1.0f, 1.0f } });
+		Renderer3D::DrawMesh(quad);
 		Renderer3D::End();
 	}
 	Renderer::EndPass();

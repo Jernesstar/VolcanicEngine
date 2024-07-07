@@ -14,6 +14,7 @@ layout(location = 2) out vec2 v_TexCoords;
 void main()
 {
     gl_Position = u_ViewProj * u_Model * vec4(a_Position, 1.0);
+
     v_Position = vec3(u_Model * vec4(a_Position, 1.0));
     v_Normal = a_Normal;
     v_TexCoords = a_TexCoords;

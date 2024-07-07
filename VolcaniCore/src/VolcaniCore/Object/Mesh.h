@@ -38,6 +38,8 @@ public:
 		m_Indices.clear();
 	}
 
+	Material& GetMaterial() { return m_Material; }
+
 	template<typename Derived>
 	Derived* As() const { return (Derived*)(this); }
 

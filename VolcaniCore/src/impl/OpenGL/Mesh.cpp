@@ -9,8 +9,8 @@ Mesh::Mesh(std::vector<Vertex> vertices,
 {
 	BufferLayout layout({
 		{ "Position", BufferDataType::Vec3 },
-		{ "TexCoord", BufferDataType::Vec2 },
-		{ "Normal",   BufferDataType::Vec3 }
+		{ "Normal",   BufferDataType::Vec3 },
+		{ "TexCoord", BufferDataType::Vec2 }
 	});
 
 	m_VertexBuffer = CreateRef<VertexBuffer>(layout, m_Vertices.size(),

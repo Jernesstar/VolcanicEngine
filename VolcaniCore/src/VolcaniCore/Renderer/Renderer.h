@@ -21,6 +21,8 @@ public:
 	static void StartPass(Ref<RenderPass> pass);
 	static void EndPass();
 
+	static Ref<RenderPass> GetPass();
+
 private:
 	static void Init();
 	static void Close();
