@@ -1,13 +1,13 @@
 #pragma once
 
+#include <OpenGL/VertexArray.h>
+
 #include "Object/Framebuffer.h"
 #include "Object/Shader.h"
 #include "Object/Mesh.h"
 
 #include "Renderer/RendererAPI.h"
 #include "Renderer/Camera.h"
-
-#include "VertexArray.h"
 
 namespace VolcaniCore::OpenGL {
 
@@ -24,12 +24,15 @@ public:
 	void RenderFramebuffer(Ref<VolcaniCore::Framebuffer> buffer,
 						   AttachmentTarget target) override;
 
-private:
-	void DrawIndexed(Ptr<VertexArray> vertexArray, uint32_t indices = 0);
-	void DrawInstanced(Ptr<VertexArray> vertexArray, uint32_t instanceCount);
+	void DrawCubemap(Ref<VolcaniCore::Cubemap> cubemap) override;
+	void DrawMesh(Ref<VolcaniCore::Mesh> model, Transform t = { }) override;
 
+	void DrawIndexed(Ref<VertexArray> vertexArray, uint32_t indices = 0);
+	void DrawInstanced(Ref<VertexArray> vertexArray, uint32_t instanceCount);
+
+private:
 	void Init() override;
-	void Close() override;
+	void Close() override;	
 };
 
 }

@@ -6,35 +6,7 @@
 
 namespace VolcaniCore {
 
-static std::vector<Vertex> CubeVertices;
-// static std::vector<Vertex> QuadVertices;
-
-static std::vector<uint32_t> CubeIndices;
-static std::vector<uint32_t> QuadIndices;
-
-Ref<Mesh> Mesh::Create(std::vector<Vertex> vertices,
-					   std::vector<uint32_t> indices,
-					   Material material)
-{
-	RendererBackend backend = RendererAPI::Get()->Backend;
-
-	switch(backend) {
-		case RendererBackend::OpenGL:
-			return CreateRef<OpenGL::Mesh>(vertices, indices, material);
-			break;
-	}
-}
-
-Ref<Mesh> Create(MeshPrimitive primitive, Material material) {
-	switch(primitive) {
-		case MeshPrimitive::Cube:
-			return Create(CubeVertices, CubeIndices, material);
-		case MeshPrimitive::Quad:
-			return Create(CubeVertices, QuadIndices, material);
-	}
-}
-
-CubeVertices =
+static std::vector<Vertex> CubeVertices =
 {
 	{ { -0.5f,  0.5f,  0.5f }, {  0.0f,  0.0f,  1.0f }, { 0.0f, 1.0f } },	// 0 Front Top Left
 	{ {  0.5f,  0.5f,  0.5f }, {  0.0f,  0.0f,  1.0f }, { 1.0f, 1.0f } },	// 1 Front Top Right
@@ -47,7 +19,7 @@ CubeVertices =
 	{ {  0.5f, -0.5f, -0.5f }, {  0.0f,  0.0f, -1.0f }, { 1.0f, 0.0f } },	// 7 Back Bottom Right
 };
 
-CubeIndices =
+static std::vector<uint32_t> CubeIndices =
 {
 	0, 2, 3,
 	3, 1, 0,
@@ -68,11 +40,34 @@ CubeIndices =
 	2, 6, 7,
 };
 
-QuadIndices =
+static std::vector<uint32_t> QuadIndices =
 {
 	0, 2, 3,
 	3, 1, 0
 };
 
+Ref<Mesh> Mesh::Create(std::vector<Vertex> vertices,
+					   std::vector<uint32_t> indices,
+					   VolcaniCore::Material material)
+{
+	RendererBackend backend = RendererAPI::Get()->Backend;
+
+	switch(backend) {
+		case RendererBackend::OpenGL:
+			return CreateRef<OpenGL::Mesh>(vertices, indices, material);
+			break;
+	}
+}
+
+Ref<Mesh> Mesh::Create(MeshPrimitive primitive,
+					   VolcaniCore::Material material)
+{
+	switch(primitive) {
+		case MeshPrimitive::Cube:
+			return Create(CubeVertices, CubeIndices, material);
+		case MeshPrimitive::Quad:
+			return Create(CubeVertices, QuadIndices, material);
+	}
+}
 
 }

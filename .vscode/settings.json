@@ -2,6 +2,11 @@
 	"editor.detectIndentation": true,
 	"editor.insertSpaces": false,
 	"files.associations": {
+		"*.vert": "hlsl",
+		"*.frag": "hlsl",
+		"*.vs": "hlsl",
+		"*.fs": "hlsl",
+		"*.gs": "hlsl",
 		"any": "cpp",
 		"array": "cpp",
 		"atomic": "cpp",
@@ -74,6 +79,7 @@
 		"typeinfo": "cpp",
 		"valarray": "cpp",
 		"variant": "cpp",
-		"zutil.h": "c"
+		"zutil.h": "c",
+		"*.hpp11": "cpp"
 	}
 }

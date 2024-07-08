@@ -31,24 +31,22 @@ public:
 	static Ref<Mesh> Create(MeshPrimitive primitive, Material material);
 
 public:
-	const std::vector<Vertex> Vertices;
-	const std::vector<uint32_t> Indices;
-	const Material Material;
-
 	Mesh(std::vector<Vertex> vertices,
 		 std::vector<uint32_t> indices,
 		 Material material)
-			: Vertices(vertices), Indices(indices), Material(material) { }
+			: m_Vertices(vertices), m_Indices(indices), m_Material(material) { }
 
-	~Mesh() {
-		Vertices.clear();
-		Indices.clear();
-	}
+	virtual ~Mesh() = default;
 
-	Material& GetMaterial() { return Material; }
+	Material& GetMaterial() { return m_Material; }
 
 	template<typename Derived>
 	Derived* As() const { return (Derived*)(this); }
+
+protected:
+	std::vector<Vertex> m_Vertices;
+	std::vector<uint32_t> m_Indices;
+	Material m_Material;
 };
 
 }

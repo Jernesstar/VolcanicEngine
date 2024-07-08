@@ -56,7 +56,6 @@ void Renderer::EndPass() {
 		Resize(window->GetWidth(), window->GetHeight());
 	}
 
-	// Actually send the info to be rendered to the framebuffer
 	s_CurrentPass->GetPipeline()->Unbind();
 }
 

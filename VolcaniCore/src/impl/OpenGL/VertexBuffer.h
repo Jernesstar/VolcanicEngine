@@ -49,7 +49,8 @@ public:
 		glBufferSubData(GL_ARRAY_BUFFER, 0, TCount * Layout.Stride, vertices);
 	}
 
-	void SetData(std::size_t count, const void* data, const uint32_t offset) {
+	void SetData(std::size_t count, const void* data, const uint32_t offset = 0)
+	{
 		glBindBuffer(GL_ARRAY_BUFFER, m_BufferID);
 		glBufferSubData(GL_ARRAY_BUFFER, offset * Layout.Stride,
 						count * Layout.Stride, data);

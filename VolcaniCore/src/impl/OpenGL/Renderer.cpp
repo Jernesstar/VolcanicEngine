@@ -1,6 +1,10 @@
 #include "Renderer.h"
 
+#include <unordered_map>
+
 #include <glad/glad.h>
+
+#include <glm/gtc/type_ptr.hpp>
 
 #include "Core/Assert.h"
 #include "Events/EventSystem.h"
@@ -22,7 +26,6 @@ using namespace VolcaniCore;
 
 namespace VolcaniCore::OpenGL {
 
-
 Renderer::Renderer()
 	: RendererAPI(RendererBackend::OpenGL)
 {
@@ -34,23 +37,17 @@ Renderer::Renderer()
 	});
 }
 
+static const uint32_t MaxInstances = 1000;
+
 struct RendererData {
-	static const uint32_t MaxQuads = 150;
-	static const uint32_t MaxVertices = MaxQuads * 4;
-	static const uint32_t MaxIndices = MaxQuads * 6;
-	static const uint32_t MaxTextureSlots = 32;
 
 	Ptr<VertexArray> CubemapArray;
 	Ptr<VertexArray> FramebufferArray;
 
 	Ref<ShaderPipeline> FramebufferShader;
+	Ref<ShaderPipeline> MeshShader;
 
-	Ref<VertexBuffer> MeshBuffer;
-	Ref<VertexBuffer> TransformBuffer;
-	Ptr<VertexArray> MeshArray;
-
-	Ref<Mesh> CurrentMesh;
-	uint32_t Index = 0;
+	std::unordered_map<Ref<VolcaniCore::Mesh>, uint32_t> Meshes;
 };
 
 static RendererData s_Data;
@@ -147,24 +144,10 @@ void Renderer::Init() {
 			ShaderType::Fragment }
 	});
 
-	BufferLayout layout1({
-		{ "Position", BufferDataType::Vec3 },
-		{ "Normal",   BufferDataType::Vec3 },
-		{ "TexCoord", BufferDataType::Vec2 }
+	s_Data.MeshShader = ShaderPipeline::Create({
+		{ "VolcaniCore/assets/shaders/Mesh.glsl.vert", ShaderType::Vertex },
+		{ "VolcaniCore/assets/shaders/Mesh.glsl.frag", ShaderType::Fragment }
 	});
-
-	BufferLayout layout2 = {
-		{ "a_Transform", BufferDataType::Mat4 }
-	};
-
-	MeshBuffer 	= CreateRef<VertexBuffer>(layout1, RendererData::MaxVertices);
-	TranformBuffer	= CreateRef<VertexBuffer>(layout2, RendererData::MaxQuads);
-	MeshIndexBuffer = CreateRef<IndexBuffer>(MaxInstanceCount * 3);
-
-	MeshArray = CreateRef<VertexArray>();
-	MeshArray->SetIndexBuffer(indexBuffer);
-	MeshArray->AddVertexBuffer(cubeBuffer);
-	MeshArray->AddVertexBuffer(matrixBuffer);
 
 	s_Data.FramebufferShader->Bind();
 	s_Data.FramebufferShader->SetInt("u_ScreenTexture", 0);
@@ -192,19 +175,25 @@ void Renderer::DrawCubemap(Ref<VolcaniCore::Cubemap> cubemap) {
 }
 
 void Renderer::DrawMesh(Ref<VolcaniCore::Mesh> mesh, Transform t) {
-	if(mesh != s_Data.CurrentMesh) {
-		Render();
-		MeshBuffer->SetData(&mesh.Vertices[0], &mesh.Vertices.size());
-		MeshIndexBuffer->SetData(&mesh.Indices[0], &mesh.Indices.size());
-	}
+	auto& count = s_Data.Meshes.emplace(mesh, 0).first->second;
 
-	glm::mat4 transform = t.GetTransform();
-	TransformBuffer->SetData((void*)&transform, 1, Index++);
+	auto nativeMesh = mesh->As<OpenGL::Mesh>();
+	glm::mat4 mat = t.GetTransform();
+
+	nativeMesh->m_TransformBuffer->SetData(1, glm::value_ptr(mat), count++);
 }
 
 void Renderer::Render() {
-	DrawInstanced(s_Data.MeshArray, Index);
-	Index = 0;
+	for(auto& [mesh, instanceCount] : s_Data.Meshes) {
+		Material& material = mesh->GetMaterial();
+
+		auto nativeMesh = mesh->As<OpenGL::Mesh>();
+		DrawInstanced(nativeMesh->m_VertexArray, instanceCount);
+
+		instanceCount = 0;
+	}
+
+	s_Data.Meshes.clear();
 }
 
 void Renderer::RenderFramebuffer(Ref<VolcaniCore::Framebuffer> buffer,
@@ -228,7 +217,7 @@ void Renderer::RenderFramebuffer(Ref<VolcaniCore::Framebuffer> buffer,
 	glEnable(GL_DEPTH_TEST);
 }
 
-void Renderer::DrawIndexed(Ptr<VertexArray> array, uint32_t indices) {
+void Renderer::DrawIndexed(Ref<VertexArray> array, uint32_t indices) {
 	if(!array->HasIndexBuffer()) {
 		VOLCANICORE_LOG_WARNING("Attempt to execute indexed draw call \
 								without index buffer bound has failed");
@@ -241,16 +230,16 @@ void Renderer::DrawIndexed(Ptr<VertexArray> array, uint32_t indices) {
 				   GL_UNSIGNED_INT, nullptr);
 }
 
-void Renderer::DrawInstanced(Ptr<VertexArray> array, uint32_t instanceCount) {
+void Renderer::DrawInstanced(Ref<VertexArray> array, uint32_t instanceCount) {
 	if(!array->HasIndexBuffer()) {
 		VOLCANICORE_LOG_WARNING("Attempt to execute instanced draw call \
-								without index buffer bound has failed");
+								 without index buffer bound has failed");
 		return;
 	}
-	Ref<IndexBuffer> indexBuffer = array->GetIndexBuffer();
+	uint32_t count = array->GetIndexBuffer()->Count;
 
 	array->Bind();
-	glDrawElementsInstanced(GL_TRIANGLES, indexBuffer->Count,
+	glDrawElementsInstanced(GL_TRIANGLES, count,
 							GL_UNSIGNED_INT, 0, instanceCount);
 }
 

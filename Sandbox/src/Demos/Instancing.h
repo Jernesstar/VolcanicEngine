@@ -28,55 +28,11 @@ public:
 private:
 	const uint32_t InstanceCount = 500;
 
-	struct Vertex {
-		glm::vec3 Position;
-		glm::vec2 TextureCoordinate;
-	};
-
-	Vertex vertices[8] = 
-	{
-		{ { -0.5f,  0.5f,  0.5f }, { 0.0f, 1.0f } }, // 0 Front Top Left
-		{ {  0.5f,  0.5f,  0.5f }, { 1.0f, 1.0f } }, // 1 Front Top Right
-		{ { -0.5f, -0.5f,  0.5f }, { 0.0f, 0.0f } }, // 2 Front Bottom Left
-		{ {  0.5f, -0.5f,  0.5f }, { 1.0f, 0.0f } }, // 3 Front Bottom Right
-
-		{ { -0.5f,  0.5f, -0.5f }, { 0.0f, 1.0f } }, // 4 Back Top Left
-		{ {  0.5f,  0.5f, -0.5f }, { 1.0f, 1.0f } }, // 5 Back Top Right
-		{ { -0.5f, -0.5f, -0.5f }, { 0.0f, 0.0f } }, // 6 Back Bottom Left
-		{ {  0.5f, -0.5f, -0.5f }, { 1.0f, 0.0f } }, // 7 Back Bottom Right
-	};
-
-	uint32_t indices[36] =
-	{
-		0, 2, 3,
-		3, 1, 0,
-
-		5, 7, 6,
-		6, 4, 5,
-
-		4, 6, 2,
-		2, 0, 4,
-
-		1, 3, 7,
-		7, 5, 1,
-
-		4, 0, 1,
-		1, 5, 4,
-
-		7, 3, 2,
-		2, 6, 7,
-	};
-
-	BufferLayout cubeLayout = {
-		{ "a_Position",			 BufferDataType::Vec3 },
-		{ "a_TextureCoordinate", BufferDataType::Vec2 }
-	};
-
 	Ref<ShaderPipeline> instancingShader = ShaderPipeline::Create({
 		{ "Sandbox/assets/shaders/Instancing.glsl.vert", ShaderType::Vertex },
 		{ "Sandbox/assets/shaders/Instancing.glsl.frag", ShaderType::Fragment }
 	});
-	Ref<Texture> cubeTexture;
+	Ref<Texture> texture;
 	Ref<Mesh> cube;
 
 	Ref<Camera> camera;
@@ -93,11 +49,8 @@ Instancing::Instancing() {
 	std::vector<glm::mat4> mats;
 	mats.reserve(InstanceCount);
 
-	cubeTexture = Texture::Create("Sandbox/assets/images/stone.png");
-	cube = Mesh::Create(vertices, indices,
-		Material{
-			.Diffuse = texture
-		});
+	texture = Texture::Create("Sandbox/assets/images/stone.png");
+	cube = Mesh::Create(MeshPrimitive::Cube, Material{ .Diffuse = texture });
 
 	camera = CreateRef<StereographicCamera>(75.0f, 0.01f, 100.0f, 800, 600);
 	camera->SetPosition({ 5.0f, 0.0f, 10.0f });
@@ -106,7 +59,7 @@ Instancing::Instancing() {
 	controller->TranslationSpeed = 0.5f;
 
 	instancingShader->Bind();
-	instancingShader->SetTexture("u_Texture", cubeTexture, 0);
+	instancingShader->SetTexture("u_Texture", texture, 0);
 }
 
 void Instancing::OnUpdate(TimeStep ts) {

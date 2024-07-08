@@ -7,7 +7,9 @@
 #include <Object/Texture.h>
 
 #include <Renderer/Renderer.h>
+#include <Renderer/RendererAPI.h>
 #include <Renderer/Renderer3D.h>
+
 #include <Renderer/StereographicCamera.h>
 #include <Renderer/OrthographicCamera.h>
 #include <Renderer/CameraController.h>
@@ -38,8 +40,11 @@ private:
 	// Ref<OrthographicCamera> camera;
 	Ref<CameraController> controller;
 
-	Ref<Mesh> cube;
-	Ref<Mesh> quad;
+	// Ref<Mesh> quad;
+	// Ref<Mesh> cube;
+	Ref<VolcaniCore::Mesh> quad;
+	Ref<VolcaniCore::Mesh> cube;
+	Ref<Texture> texture;
 };
 
 Cube::Cube() {
@@ -75,9 +80,10 @@ Cube::Cube() {
 
 	controller = CreateRef<CameraController>(camera);
 
-	Ref<Texture> texture = Texture::Create("Sandbox/assets/images/stone.png");
-	cube = Mesh::Create(MeshPrimitive::Cube, Material{ .Diffuse = texture });
-	quad = Mesh::Create(MeshPrimitive::Quad, Material{ .Diffuse = texture });
+	texture = Texture::Create("Sandbox/assets/images/stone.png");
+	// cube = Mesh::Create(MeshPrimitive::Cube, Material{ .Diffuse = texture });
+	// quad = Mesh::Create(MeshPrimitive::Quad, Material{ .Diffuse = texture });
+	cube = VolcaniCore::Mesh::Create(MeshPrimitive::Cube, Material{ .Diffuse = texture });
 }
 
 void Cube::OnUpdate(TimeStep ts) {
@@ -88,9 +94,10 @@ void Cube::OnUpdate(TimeStep ts) {
 		VolcaniCore::Renderer::Clear();
 
 		Renderer3D::Begin(camera);
-		// Renderer3D::DrawMesh(cube);
-		// Renderer3D::DrawMesh(cube, { .Translation = { 10.0f, 1.0f, 1.0f } });
-		Renderer3D::DrawMesh(quad);
+		Renderer3D::DrawMesh(cube);
+		Renderer3D::DrawMesh(cube, { .Translation = { 0.0f, 2.0f, 0.0f } });
+		meshShader->SetTexture("u_Diffuse", texture, 0);
+	
 		Renderer3D::End();
 	}
 	Renderer::EndPass();

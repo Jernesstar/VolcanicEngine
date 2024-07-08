@@ -20,10 +20,11 @@ public:
 		m_VertexArray->Bind();
 	}
 
+	Ref<OpenGL::VertexArray> m_VertexArray;
+	Ref<OpenGL::VertexBuffer> m_TransformBuffer;
 private:
 	Ref<OpenGL::VertexBuffer> m_VertexBuffer;
 	Ref<OpenGL::IndexBuffer> m_IndexBuffer;
-	Ref<OpenGL::VertexArray> m_VertexArray;
 
 	friend class Renderer;
 };
