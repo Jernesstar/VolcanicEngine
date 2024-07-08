@@ -19,10 +19,9 @@ public:
 	~Texture2D();
 
 	void Bind(uint32_t slot = 0);
-	void SetData(const std::string& path);
-	void SetData(const void* data, uint32_t size);
-	void SetData(const void* data,
-				 const glm::ivec2& pos, const glm::ivec2& size);
+	void SetData(uint32_t size, const void* data);
+	void SetData(const glm::ivec2& pos, const glm::ivec2& size,
+				 const void* data);
 
 	const std::string& GetPath() { return m_Path; }
 

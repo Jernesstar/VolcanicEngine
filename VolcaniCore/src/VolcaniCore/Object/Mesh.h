@@ -21,32 +21,34 @@ struct Material {
 	Ref<Texture> Roughness;
 };
 
+enum class MeshPrimitive { Line, Quad, Cube, Pyramid };
+
 class Mesh {
 public:
 	static Ref<Mesh> Create(std::vector<Vertex> vertices,
 							std::vector<uint32_t> indices,
 							Material material);
+	static Ref<Mesh> Create(MeshPrimitive primitive, Material material);
 
 public:
+	const std::vector<Vertex> Vertices;
+	const std::vector<uint32_t> Indices;
+	const Material Material;
+
 	Mesh(std::vector<Vertex> vertices,
 		 std::vector<uint32_t> indices,
 		 Material material)
-			: m_Vertices(vertices), m_Indices(indices), m_Material(material) { }
+			: Vertices(vertices), Indices(indices), Material(material) { }
 
 	~Mesh() {
-		m_Vertices.clear();
-		m_Indices.clear();
+		Vertices.clear();
+		Indices.clear();
 	}
 
-	Material& GetMaterial() { return m_Material; }
+	Material& GetMaterial() { return Material; }
 
 	template<typename Derived>
 	Derived* As() const { return (Derived*)(this); }
-
-protected:
-	std::vector<Vertex> m_Vertices;
-	std::vector<uint32_t> m_Indices;
-	Material m_Material;
 };
 
 }

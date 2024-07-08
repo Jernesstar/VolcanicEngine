@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Object/Mesh.h>
 #include <Object/Model.h>
 
 #include <Magma/UI/UI.h>
@@ -38,6 +39,8 @@ public:
 
 	inline static Ref<Texture> Stone;
 	inline static Ref<Texture> Lava;
+	inline static Ref<Mesh> Wall;
+
 	// inline static Ref<Texture> Door;
 
 	// One can unlock different playable characters

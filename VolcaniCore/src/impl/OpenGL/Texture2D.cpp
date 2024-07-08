@@ -53,16 +53,18 @@ void Texture2D::Bind(uint32_t slot)
 	glBindTextureUnit(slot, m_TextureID);
 }
 
-void Texture2D::SetData(const void* data, uint32_t size)
+void Texture2D::SetData(uint32_t size, const void* data)
 {
-	VOLCANICORE_ASSERT(size == m_Width * m_Height * 4, "Data must be the whole size of the texture.");
+	VOLCANICORE_ASSERT(size == m_Width * m_Height * 4,
+					   "Data must be the whole size of the texture.");
 	glTextureSubImage2D(m_TextureID, 0, 0, 0, m_Width, m_Height, DataFormat,
 						GL_UNSIGNED_BYTE, data);
 }
 
-void Texture2D::SetData(const void* data, const glm::ivec2& pos, const glm::ivec2& size)
+void Texture2D::SetData(const glm::ivec2& pos, const glm::ivec2& size, const void* data)
 {
-	VOLCANICORE_ASSERT(pos.x + size.x <= m_Width && pos.y + size.y <= m_Height, "Offset and size must within the bounds of the texture.");
+	VOLCANICORE_ASSERT(pos.x + size.x <= m_Width && pos.y + size.y <= m_Height,
+					   "Coordinates must be within the bounds of the texture.");
 	glTextureSubImage2D(m_TextureID, 0, pos.x, pos.y, size.x, size.y, DataFormat,
 						GL_UNSIGNED_BYTE, data);
 }

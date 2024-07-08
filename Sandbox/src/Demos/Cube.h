@@ -25,46 +25,6 @@ public:
 	void OnUpdate(TimeStep ts);
 
 private:
-	std::vector<Vertex> vertices = 
-	{
-		{ { -0.5f,  0.5f,  0.5f }, {  0.0f,  0.0f,  1.0f }, { 0.0f, 1.0f } },	// 0 Front Top Left
-		{ {  0.5f,  0.5f,  0.5f }, {  0.0f,  0.0f,  1.0f }, { 1.0f, 1.0f } },	// 1 Front Top Right
-		{ { -0.5f, -0.5f,  0.5f }, {  0.0f,  0.0f,  1.0f }, { 0.0f, 0.0f } },	// 2 Front Bottom Left
-		{ {  0.5f, -0.5f,  0.5f }, {  0.0f,  0.0f,  1.0f }, { 1.0f, 0.0f } },	// 3 Front Bottom Right
-
-		{ { -0.5f,  0.5f, -0.5f }, {  0.0f,  0.0f, -1.0f }, { 0.0f, 1.0f } },	// 4 Back Top Left
-		{ {  0.5f,  0.5f, -0.5f }, {  0.0f,  0.0f, -1.0f }, { 1.0f, 1.0f } },	// 5 Back Top Right
-		{ { -0.5f, -0.5f, -0.5f }, {  0.0f,  0.0f, -1.0f }, { 0.0f, 0.0f } },	// 6 Back Bottom Left
-		{ {  0.5f, -0.5f, -0.5f }, {  0.0f,  0.0f, -1.0f }, { 1.0f, 0.0f } },	// 7 Back Bottom Right
-	};
-
-	std::vector<uint32_t> indices =
-	{
-		0, 2, 3,
-		3, 1, 0,
-
-		5, 7, 6,
-		6, 4, 5,
-
-		4, 6, 2,
-		2, 0, 4,
-
-		1, 3, 7,
-		7, 5, 1,
-
-		4, 0, 1,
-		1, 5, 4,
-
-		7, 3, 2,
-		2, 6, 7,
-	};
-
-	std::vector<uint32_t> quadIndices =
-	{
-		0, 2, 3,
-		3, 1, 0
-	};
-
 	Ref<ShaderPipeline> meshShader;
 	Ref<ShaderPipeline> pixelateShader;
 	// Ref<ShaderPipeline> cullShader;
@@ -116,14 +76,8 @@ Cube::Cube() {
 	controller = CreateRef<CameraController>(camera);
 
 	Ref<Texture> texture = Texture::Create("Sandbox/assets/images/stone.png");
-	cube = Mesh::Create(vertices, indices,
-		Material{
-			.Diffuse = texture
-		});
-	quad = Mesh::Create(vertices, quadIndices,
-		Material{
-			.Diffuse = texture
-		});
+	cube = Mesh::Create(MeshPrimitive::Cube, Material{ .Diffuse = texture });
+	quad = Mesh::Create(MeshPrimitive::Quad, Material{ .Diffuse = texture });
 }
 
 void Cube::OnUpdate(TimeStep ts) {

@@ -72,24 +72,12 @@ private:
 		{ "a_TextureCoordinate", BufferDataType::Vec2 }
 	};
 
-	BufferLayout layout = {
-		{ "a_Transform", BufferDataType::Mat4 }
-	};
-
-	Ref<IndexBuffer> indexBuffer;
-	Ref<VertexBuffer> cubeBuffer;
-	Ref<VertexBuffer> matrixBuffer;
-	Ref<VertexArray> array;
-
 	Ref<ShaderPipeline> instancingShader = ShaderPipeline::Create({
 		{ "Sandbox/assets/shaders/Instancing.glsl.vert", ShaderType::Vertex },
 		{ "Sandbox/assets/shaders/Instancing.glsl.frag", ShaderType::Fragment }
 	});
-	// cullShader = ShaderPipeline::Create({
-	// 	{ "Sandbox/assets/shaders/Cull.glsl.vert", ShaderType::Vertex },
-	// 	{ "Sandbox/assets/shaders/Cull.glsl.geom", ShaderType::Geometry }
-	// });
 	Ref<Texture> cubeTexture;
+	Ref<Mesh> cube;
 
 	Ref<Camera> camera;
 	Ref<CameraController> controller;
@@ -105,32 +93,20 @@ Instancing::Instancing() {
 	std::vector<glm::mat4> mats;
 	mats.reserve(InstanceCount);
 
-	float offset = 0.0f;
-	for(uint32_t i = 0; i < InstanceCount; i++) {
-		Transform t{
-			.Translation = { (offset += 5.0f), 0.0f, 0.0f }
-		};
-		mats[i] = t.GetTransform();
-	}
-
-	matrixBuffer = CreateRef<VertexBuffer>(layout, InstanceCount, mats.data());
-	cubeBuffer	 = CreateRef<VertexBuffer>(cubeLayout, vertices);
-	indexBuffer  = CreateRef<IndexBuffer>(indices);
-
-	array = CreateRef<VertexArray>();
-	array->SetIndexBuffer(indexBuffer);
-	array->AddVertexBuffer(cubeBuffer);
-	array->AddVertexBuffer(matrixBuffer);
-
 	cubeTexture = Texture::Create("Sandbox/assets/images/stone.png");
-	instancingShader->Bind();
-	instancingShader->SetTexture("u_Texture", cubeTexture, 0);
+	cube = Mesh::Create(vertices, indices,
+		Material{
+			.Diffuse = texture
+		});
 
 	camera = CreateRef<StereographicCamera>(75.0f, 0.01f, 100.0f, 800, 600);
 	camera->SetPosition({ 5.0f, 0.0f, 10.0f });
 	// camera->SetDirection({ -0.5f, -0.5f, -0.5f });
 	controller = CreateRef<CameraController>(camera);
 	controller->TranslationSpeed = 0.5f;
+
+	instancingShader->Bind();
+	instancingShader->SetTexture("u_Texture", cubeTexture, 0);
 }
 
 void Instancing::OnUpdate(TimeStep ts) {
@@ -139,8 +115,17 @@ void Instancing::OnUpdate(TimeStep ts) {
 
 	instancingShader->SetMat4("u_ViewProj", camera->GetViewProjection());
 
-	// RendererAPI::Get()->As<OpenGL::Renderer>()
-	// ->DrawInstanced(array, InstanceCount);
+	VolcaniCore::Renderer::Clear();
+
+	Renderer3D::Begin(camera);
+	float offset = 0.0f;
+	for(uint32_t i = 0; i < InstanceCount; i++) {
+		Transform t{
+			.Translation = { (offset += 5.0f), 0.0f, 0.0f }
+		};
+		Renderer3D::DrawMesh(cube, t);
+	}
+	Renderer3D::End();
 }
 
 

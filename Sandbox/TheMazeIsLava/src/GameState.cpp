@@ -29,6 +29,7 @@ void GameState::Reset() {
 
 void GameState::InitAssets() {
 	Stone = Texture::Create("Sandbox/TheMazeIsLava/assets/images/stone.png");
+	Wall = Mesh::Create(MeshPrimitive::Cube);
 	// Lava  = Texture::Create("Sandbox/TheMazeIsLava/assets/images/lava.png");
 	// Door  = Texture::Create("Sandbox/TheMazeIsLava/assets/images/door.png");
 	// PlayerModel1 = Model::Create(

@@ -46,6 +46,8 @@ void Renderer::StartPass(Ref<RenderPass> pass) {
 }
 
 void Renderer::EndPass() {
+	if(!s_CurrentPass)
+		return;
 	auto framebuffer = s_CurrentPass->GetOutput();
 
 	if(framebuffer) {
@@ -55,7 +57,6 @@ void Renderer::EndPass() {
 	}
 
 	// Actually send the info to be rendered to the framebuffer
-	RendererAPI::Get()->Render();
 	s_CurrentPass->GetPipeline()->Unbind();
 }
 

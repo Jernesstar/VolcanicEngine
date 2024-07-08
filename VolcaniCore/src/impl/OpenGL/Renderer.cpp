@@ -35,10 +35,10 @@ Renderer::Renderer()
 }
 
 struct RendererData {
-	// static const uint32_t MaxQuads = 150;
-	// static const uint32_t MaxVertices = MaxQuads * 4;
-	// static const uint32_t MaxIndices = MaxQuads * 6;
-	// static const uint32_t MaxTextureSlots = 32;
+	static const uint32_t MaxQuads = 150;
+	static const uint32_t MaxVertices = MaxQuads * 4;
+	static const uint32_t MaxIndices = MaxQuads * 6;
+	static const uint32_t MaxTextureSlots = 32;
 
 	Ptr<VertexArray> CubemapArray;
 	Ptr<VertexArray> FramebufferArray;
@@ -46,13 +46,11 @@ struct RendererData {
 	Ref<ShaderPipeline> FramebufferShader;
 
 	Ref<VertexBuffer> MeshBuffer;
+	Ref<VertexBuffer> TransformBuffer;
 	Ptr<VertexArray> MeshArray;
-	Ref<ShaderPipeline> MeshShader;
 
-	std::vector<Ref<Quad>> Quads;
-	std::unordered_map<Ref<Mesh>, uint32_t> Meshes;
-
-	uint32_t ViewportWidth, ViewportHeight;
+	Ref<Mesh> CurrentMesh;
+	uint32_t Index = 0;
 };
 
 static RendererData s_Data;
@@ -127,16 +125,6 @@ void Renderer::Init() {
 		-1.0f,  1.0f,  0.0f, 1.0f
 	};
 
-
-	// MeshBuffer = CreateRef<VertexBuffer>(
-	// 	BufferLayout{
-	// 		{ "Position", BufferDataType::Vec3 }
-	// 		{ "", BufferDataType::Vec3 }
-	// 		{ "Position", BufferDataType::Vec3 }
-	// 	}, cubemapVertices
-	// );
-	// s_Data.CubemapArray = CreatePtr<VertexArray>(cubemapBuffer);
-
 	Ref<VertexBuffer> cubemapBuffer = CreateRef<VertexBuffer>(
 		BufferLayout{
 			{ "Position", BufferDataType::Vec3 }
@@ -159,6 +147,25 @@ void Renderer::Init() {
 			ShaderType::Fragment }
 	});
 
+	BufferLayout layout1({
+		{ "Position", BufferDataType::Vec3 },
+		{ "Normal",   BufferDataType::Vec3 },
+		{ "TexCoord", BufferDataType::Vec2 }
+	});
+
+	BufferLayout layout2 = {
+		{ "a_Transform", BufferDataType::Mat4 }
+	};
+
+	MeshBuffer 	= CreateRef<VertexBuffer>(layout1, RendererData::MaxVertices);
+	TranformBuffer	= CreateRef<VertexBuffer>(layout2, RendererData::MaxQuads);
+	MeshIndexBuffer = CreateRef<IndexBuffer>(MaxInstanceCount * 3);
+
+	MeshArray = CreateRef<VertexArray>();
+	MeshArray->SetIndexBuffer(indexBuffer);
+	MeshArray->AddVertexBuffer(cubeBuffer);
+	MeshArray->AddVertexBuffer(matrixBuffer);
+
 	s_Data.FramebufferShader->Bind();
 	s_Data.FramebufferShader->SetInt("u_ScreenTexture", 0);
 }
@@ -171,8 +178,6 @@ void Renderer::Clear(const glm::vec4& color) {
 }
 
 void Renderer::Resize(uint32_t width, uint32_t height) {
-	s_Data.ViewportWidth = width;
-	s_Data.ViewportHeight = height;
 	glViewport(0, 0, width, height);
 }
 
@@ -187,12 +192,19 @@ void Renderer::DrawCubemap(Ref<VolcaniCore::Cubemap> cubemap) {
 }
 
 void Renderer::DrawMesh(Ref<VolcaniCore::Mesh> mesh, Transform t) {
-	auto nativeMesh = mesh->As<OpenGL::Mesh>();
-	DrawIndexed(nativeMesh->m_VertexArray);
+	if(mesh != s_Data.CurrentMesh) {
+		Render();
+		MeshBuffer->SetData(&mesh.Vertices[0], &mesh.Vertices.size());
+		MeshIndexBuffer->SetData(&mesh.Indices[0], &mesh.Indices.size());
+	}
+
+	glm::mat4 transform = t.GetTransform();
+	TransformBuffer->SetData((void*)&transform, 1, Index++);
 }
 
 void Renderer::Render() {
-
+	DrawInstanced(s_Data.MeshArray, Index);
+	Index = 0;
 }
 
 void Renderer::RenderFramebuffer(Ref<VolcaniCore::Framebuffer> buffer,
@@ -216,7 +228,7 @@ void Renderer::RenderFramebuffer(Ref<VolcaniCore::Framebuffer> buffer,
 	glEnable(GL_DEPTH_TEST);
 }
 
-void Renderer::DrawIndexed(Ref<VertexArray> array, uint32_t indices) {
+void Renderer::DrawIndexed(Ptr<VertexArray> array, uint32_t indices) {
 	if(!array->HasIndexBuffer()) {
 		VOLCANICORE_LOG_WARNING("Attempt to execute indexed draw call \
 								without index buffer bound has failed");
@@ -229,7 +241,7 @@ void Renderer::DrawIndexed(Ref<VertexArray> array, uint32_t indices) {
 				   GL_UNSIGNED_INT, nullptr);
 }
 
-void Renderer::DrawInstanced(Ref<VertexArray> array, uint32_t instanceCount) {
+void Renderer::DrawInstanced(Ptr<VertexArray> array, uint32_t instanceCount) {
 	if(!array->HasIndexBuffer()) {
 		VOLCANICORE_LOG_WARNING("Attempt to execute instanced draw call \
 								without index buffer bound has failed");

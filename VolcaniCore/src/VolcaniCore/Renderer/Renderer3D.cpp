@@ -33,24 +33,14 @@ void Renderer3D::Begin(Ref<Camera> camera) {
 }
 
 void Renderer3D::End() {
-
+	RendererAPI::Get()->Render();
 }
 
 void Renderer3D::DrawCubemap(Ref<Cubemap> cubemap) {
-
+	RendererAPI::Get()->DrawCubemap(cubemap);
 }
 
 void Renderer3D::DrawMesh(Ref<Mesh> mesh, Transform t) {
-
-	auto pipeline = Renderer::GetPass()->GetPipeline();
-	pipeline->Bind();
-
-	Material& material = mesh->GetMaterial();
-	pipeline->SetTexture("u_Diffuse", material.Diffuse, 0);
-	// pipeline->SetTexture("u_Specular", material.Specular, 1);
-	// pipeline->SetTexture("u_Roughness", material.Roughness, 2);
-	pipeline->SetMat4("u_Model", t.GetTransform());
-
 	RendererAPI::Get()->DrawMesh(mesh, t);
 }
 

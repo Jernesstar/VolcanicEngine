@@ -19,7 +19,7 @@ public:
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
 
-	IndexBuffer(uint32_t count, const uint32_t* indices)
+	IndexBuffer(uint32_t count, const uint32_t* indices = nullptr)
 		: Count(count)
 	{
 		glCreateBuffers(1, &m_BufferID);
