@@ -8,7 +8,6 @@ using namespace VolcaniCore;
 
 namespace TheMazeIsLava {
 
-
 Player::Player() {
 
 }
@@ -25,9 +24,8 @@ void Player::Move() {
 }
 
 void Player::Render() {
-	// RendererAPI::Get()->RenderModel(GameState::PlayerModel1,
-							// Transform{ .Translation = { x, 0.0f, y } });
+	RendererAPI::Get()->RenderModel(GameState::PlayerModel1,
+							Transform{ .Translation = { x, 0.0f, y } });
 }
-
 
 }

@@ -15,7 +15,6 @@ using namespace Magma;
 
 namespace TheMazeIsLava {
 
-
 Game::Game()
 	: Application(800, 600, "The Maze is Lava")
 {
@@ -32,7 +31,6 @@ Game::Game()
 		{  5.0f,  2.0f,  5.0f },
 		{ -0.5f, -0.5f, -0.5f }
 	);
-	m_CameraController = CreateRef<CameraController>(m_Camera);
 
 	UI::Init();
 	GameState::Reset();
@@ -121,6 +119,5 @@ void Game::OverScreen() {
 		return;
 	}
 }
-
 
 }
