@@ -1,5 +1,7 @@
 #include "Level.h"
 
+#include <Renderer/Renderer3D.h>
+
 #include "GameState.h"
 
 using namespace VolcaniCore;
@@ -39,14 +41,18 @@ void Level::PropagateLava() {
 void Level::DrawStoneBlocks() {
 	TraverseTilemap(
 	[this](uint32_t x, uint32_t y) {
-		// Renderer3D::DrawMesh(GameState::Cube,
-			// Transform{ .Translation = glm::vec3{ x, 0.0f, y } });
+		Renderer3D::DrawMesh(GameState::Wall,
+			Transform{ .Translation = glm::vec3{ x, 0.0f, y } });
 
 		if(!IsWall(x, y))
 			return;
-		// Renderer3D::DrawMesh(GameState::Cube,
-			// Transform{ .Translation = glm::vec3{ x, 1.0f, y } });
+		Renderer3D::DrawMesh(GameState::Wall,
+			Transform{ .Translation = glm::vec3{ x, 1.0f, y } });
 	});
+
+	GameState::MeshShader->Bind();
+	GameState::MeshShader->SetTexture("u_Diffuse",
+									  GameState::Wall->GetMaterial().Diffuse, 0);
 }
 
 void Level::TraverseTilemap(

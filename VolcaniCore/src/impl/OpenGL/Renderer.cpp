@@ -179,21 +179,16 @@ void Renderer::DrawMesh(Ref<VolcaniCore::Mesh> mesh, Transform t) {
 
 	auto nativeMesh = mesh->As<OpenGL::Mesh>();
 	glm::mat4 mat = t.GetTransform();
-
 	nativeMesh->m_TransformBuffer->SetData(1, glm::value_ptr(mat), count++);
 }
 
+void Renderer::DrawInstanced(Ref<VolcaniCore::Mesh> mesh) {
+	auto nativeMesh = mesh->As<OpenGL::Mesh>();
+	DrawInstanced(nativeMesh->m_VertexArray, s_Data.Meshes[mesh]);
+}
+
 void Renderer::Render() {
-	for(auto& [mesh, instanceCount] : s_Data.Meshes) {
-		Material& material = mesh->GetMaterial();
 
-		auto nativeMesh = mesh->As<OpenGL::Mesh>();
-		DrawInstanced(nativeMesh->m_VertexArray, instanceCount);
-
-		instanceCount = 0;
-	}
-
-	s_Data.Meshes.clear();
 }
 
 void Renderer::RenderFramebuffer(Ref<VolcaniCore::Framebuffer> buffer,

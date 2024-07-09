@@ -12,9 +12,7 @@
 
 using namespace VolcaniCore;
 using namespace Magma;
-
 namespace TheMazeIsLava {
-
 
 Game::Game()
 	: Application(800, 600, "The Maze is Lava")
@@ -54,6 +52,7 @@ void Game::OnUpdate(TimeStep ts) {
 
 	UI::Begin();
 	Renderer3D::Begin(m_Camera);
+	GameState::MeshShader->SetMat4("u_ViewProj", m_Camera->GetViewProjection());
 
 	m_CurrentScreen();
 	m_CurrentUI->Render();
@@ -86,9 +85,6 @@ void Game::LevelScreen() {
 
 void Game::PlayScreen() {
 	// Gameplay
-
-	RendererAPI::Get()->Clear(glm::vec4(0.0f));
-
 	GameState::GetCurrentLevel().Render(m_TimeStep);
 
 	if(m_GameOver) {
@@ -121,6 +117,5 @@ void Game::OverScreen() {
 		return;
 	}
 }
-
 
 }

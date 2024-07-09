@@ -2,6 +2,7 @@
 
 #include <Object/Mesh.h>
 #include <Object/Model.h>
+#include <Object/Shader.h>
 
 #include <Magma/UI/UI.h>
 
@@ -40,6 +41,8 @@ public:
 	inline static Ref<Texture> Stone;
 	inline static Ref<Texture> Lava;
 	inline static Ref<Mesh> Wall;
+
+	inline static Ref<ShaderPipeline> MeshShader;
 
 	// inline static Ref<Texture> Door;
 

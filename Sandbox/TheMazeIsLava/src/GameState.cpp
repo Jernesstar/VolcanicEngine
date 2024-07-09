@@ -10,7 +10,6 @@
 
 namespace TheMazeIsLava {
 
-
 void GameState::Load() {
 	LoadState();
 	InitAssets();
@@ -34,6 +33,11 @@ void GameState::InitAssets() {
 	// Door  = Texture::Create("Sandbox/TheMazeIsLava/assets/images/door.png");
 	// PlayerModel1 = Model::Create(
 	// 					"Sandbox/TheMazeIsLava/assets/models/player.fbx");
+	
+	MeshShader = ShaderPipeline::Create({
+		{ "VolcaniCore/assets/shaders/Mesh.glsl.vert", ShaderType::Vertex },
+		{ "VolcaniCore/assets/shaders/Mesh.glsl.frag", ShaderType::Fragment }
+	});
 }
 
 void GameState::InitUI() {

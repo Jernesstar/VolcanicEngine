@@ -40,11 +40,9 @@ private:
 	// Ref<OrthographicCamera> camera;
 	Ref<CameraController> controller;
 
-	// Ref<Mesh> quad;
-	// Ref<Mesh> cube;
-	Ref<VolcaniCore::Mesh> quad;
-	Ref<VolcaniCore::Mesh> cube;
 	Ref<Texture> texture;
+	Ref<Mesh> quad;
+	Ref<Mesh> cube;
 };
 
 Cube::Cube() {
@@ -88,6 +86,7 @@ Cube::Cube() {
 
 void Cube::OnUpdate(TimeStep ts) {
 	controller->OnUpdate(ts);
+	meshShader->SetMat4("u_ViewProj", camera->GetViewProjection());
 
 	Renderer::StartPass(drawPass);
 	{
@@ -96,8 +95,7 @@ void Cube::OnUpdate(TimeStep ts) {
 		Renderer3D::Begin(camera);
 		Renderer3D::DrawMesh(cube);
 		Renderer3D::DrawMesh(cube, { .Translation = { 0.0f, 2.0f, 0.0f } });
-		meshShader->SetTexture("u_Diffuse", texture, 0);
-	
+
 		Renderer3D::End();
 	}
 	Renderer::EndPass();

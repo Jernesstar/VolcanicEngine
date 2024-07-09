@@ -29,8 +29,8 @@ private:
 	const uint32_t InstanceCount = 500;
 
 	Ref<ShaderPipeline> instancingShader = ShaderPipeline::Create({
-		{ "Sandbox/assets/shaders/Instancing.glsl.vert", ShaderType::Vertex },
-		{ "Sandbox/assets/shaders/Instancing.glsl.frag", ShaderType::Fragment }
+		{ "VolcaniCore/assets/shaders/Mesh.glsl.vert", ShaderType::Vertex },
+		{ "VolcaniCore/assets/shaders/Mesh.glsl.frag", ShaderType::Fragment }
 	});
 	Ref<Texture> texture;
 	Ref<Mesh> cube;
@@ -59,13 +59,10 @@ Instancing::Instancing() {
 	controller->TranslationSpeed = 0.5f;
 
 	instancingShader->Bind();
-	instancingShader->SetTexture("u_Texture", texture, 0);
 }
 
 void Instancing::OnUpdate(TimeStep ts) {
 	controller->OnUpdate(ts);
-	RendererAPI::Get()->Clear();
-
 	instancingShader->SetMat4("u_ViewProj", camera->GetViewProjection());
 
 	VolcaniCore::Renderer::Clear();
@@ -78,8 +75,8 @@ void Instancing::OnUpdate(TimeStep ts) {
 		};
 		Renderer3D::DrawMesh(cube, t);
 	}
+	instancingShader->SetTexture("u_Diffuse", texture, 0);
 	Renderer3D::End();
 }
-
 
 }

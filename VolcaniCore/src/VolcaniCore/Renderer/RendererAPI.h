@@ -38,6 +38,8 @@ public:
 	virtual void RenderFramebuffer(Ref<Framebuffer> buffer,
 								   AttachmentTarget target) = 0;
 
+	virtual void DrawInstanced(Ref<Mesh> mesh) = 0;
+
 protected:
 	virtual void Init() = 0;
 	virtual void Close() = 0;
