@@ -55,7 +55,7 @@ Instancing::Instancing() {
 	camera->SetPosition({ 5.0f, 0.0f, 10.0f });
 	// camera->SetDirection({ -0.5f, -0.5f, -0.5f });
 	controller = CreateRef<CameraController>(camera);
-	controller->TranslationSpeed = 0.5f;
+	controller->TranslationSpeed = 0.05f;
 
 	instancingShader->Bind();
 }

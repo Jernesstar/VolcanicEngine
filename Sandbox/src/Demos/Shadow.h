@@ -65,11 +65,12 @@ Shadow::Shadow() {
 	shadowPass = RenderPass::Create("Shadow Pass", shadowShader);
 
 	std::vector<OpenGL::Attachment> attachments{
-		{ AttachmentTarget::Depth, OpenGL::AttachmentType::Texture }
+		{ AttachmentTarget::Depth, OpenGL::AttachmentType::Texture },
+		{ AttachmentTarget::Color, OpenGL::AttachmentType::Texture }
 	};
 	depthMap = CreateRef<OpenGL::Framebuffer>(1024, 1024, attachments);
 
-	// torch = Model::Create("Sandbox/assets/models/Torch.obj");
+	// torch = ::Model::Create("Sandbox/assets/models/mc-torch/Torch.obj");
 	cube = Mesh::Create(MeshPrimitive::Cube,
 		Material{
 			.Diffuse = Texture::Create("Sandbox/assets/images/wood.png")
@@ -96,6 +97,7 @@ void Shadow::OnUpdate(TimeStep ts) {
 		lightSpaceMatrix = lightProjection * lightView;
 
 		depthShader->SetMat4("u_LightSpaceMatrix", lightSpaceMatrix);
+
 		RenderScene(depthCamera);
 	}
 	VolcaniCore::Renderer::EndPass();
@@ -106,7 +108,7 @@ void Shadow::OnUpdate(TimeStep ts) {
 	// {
 		// VolcaniCore::Renderer::Clear();
 
-		// auto pass = Renderer::GetPass();
+		// auto pass = VolcaniCore::Renderer::GetPass();
 		// auto pipeline = pass->GetPipeline();
 		// pipeline->SetTexture("u_Diffuse", cube->GetMaterial().Diffuse, 0);
 
@@ -116,17 +118,16 @@ void Shadow::OnUpdate(TimeStep ts) {
 }
 
 void Shadow::RenderScene(Ref<Camera> camera) {
-	// Renderer3D::Begin(camera);
+	Renderer3D::Begin(camera);
 
 	Renderer3D::DrawMesh(cube,
 		{
 			.Translation = { 0.0f, -20.0f, 0.0f },
 			.Scale = glm::vec3(2.0f)
 		});
-	Renderer3D::DrawMesh(cube, { .Translation = { -2.0f,  0.0f,  0.0f } });
-	Renderer3D::DrawMesh(cube, { .Translation = {  2.0f,  0.0f,  0.0f } });
-	Renderer3D::DrawMesh(cube, { .Translation = {  0.0f,  0.0f, -2.0f } });
-	Renderer3D::DrawMesh(cube, { .Translation = {  0.0f,  0.0f,  2.0f } });
+	Renderer3D::DrawMesh(cube, { .Translation = { 0.0f, 1.5f, 0.0f } });
+	Renderer3D::DrawMesh(cube, { .Translation = { 2.0f, 0.0f, 1.0f } });
+	Renderer3D::DrawMesh(cube, { .Translation = { -1.0f, 0.0f, 2.0 } });
 
 	RendererAPI::Get()->DrawInstanced(cube);
 }

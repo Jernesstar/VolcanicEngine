@@ -31,7 +31,6 @@ void Application::Init() {
 	EventSystem::Init();
 
 	RendererAPI::Create(RendererBackend::OpenGL);
-	ShaderLibrary::Init();
 	Renderer::Init();
 }
 

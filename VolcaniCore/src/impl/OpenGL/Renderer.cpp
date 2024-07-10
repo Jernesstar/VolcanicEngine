@@ -9,7 +9,7 @@
 #include "Core/Assert.h"
 #include "Events/EventSystem.h"
 
-#include "Renderer/OrthographicCamera.h"
+#include "Renderer/ShaderLibrary.h"
 
 #include "Shader.h"
 
@@ -130,8 +130,8 @@ void Renderer::Init() {
 		}, framebufferVertices);
 	s_Data.FramebufferArray = CreatePtr<VertexArray>(buffer);
 
-	->Bind();
-	s_Data.FramebufferShader->SetInt("u_ScreenTexture", 0);
+	ShaderLibrary::Get("Framebuffer")->Bind();
+	ShaderLibrary::Get("Framebuffer")->SetInt("u_ScreenTexture", 0);
 }
 
 void Renderer::Close() { }
@@ -178,15 +178,15 @@ void Renderer::RenderFramebuffer(Ref<VolcaniCore::Framebuffer> buffer,
 	glDisable(GL_DEPTH_TEST);
 	glCullFace(GL_FRONT);
 
-	ShaderLibrary::Get("Framebuffer")->Bind();
-	s_Data.FramebufferShader->Bind();
 	if(!buffer->Has(target)) {
 		VOLCANICORE_LOG_WARNING("Framebuffer does not have needed attachment");
 		return;
 	}
 
+	ShaderLibrary::Get("Framebuffer")->Bind();
 	buffer->As<OpenGL::Framebuffer>()->Get(target).Bind();
 	s_Data.FramebufferArray->Bind();
+
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 
 	glCullFace(GL_BACK);

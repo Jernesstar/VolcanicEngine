@@ -1,5 +1,7 @@
 #include "RendererAPI.h"
 
+#include "ShaderLibrary.h"
+
 #include "OpenGL/Renderer.h"
 
 namespace VolcaniCore {
@@ -12,6 +14,8 @@ void RendererAPI::Create(RendererBackend backend) {
 		// case RenderAPI::Vulkan:
 		// 	s_Instance = CreateRef<Vulkan::Renderer>();
 	}
+
+	ShaderLibrary::Init();
 
 	s_Instance->Init();
 }
