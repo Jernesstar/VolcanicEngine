@@ -28,7 +28,8 @@ public:
 	void OnUpdate(TimeStep ts);
 
 private:
-	void RenderScene(Ref<Camera> camera);
+	// void RenderScene(Ref<Camera> camera);
+	void RenderScene();
 
 	Ref<ShaderPipeline> depthShader;
 	Ref<ShaderPipeline> shadowShader;
@@ -98,7 +99,7 @@ void Shadow::OnUpdate(TimeStep ts) {
 
 		depthShader->SetMat4("u_LightSpaceMatrix", lightSpaceMatrix);
 
-		RenderScene(depthCamera);
+		RenderScene();
 	}
 	VolcaniCore::Renderer::EndPass();
 
@@ -117,19 +118,8 @@ void Shadow::OnUpdate(TimeStep ts) {
 	// VolcaniCore::Renderer::EndPass();
 }
 
-void Shadow::RenderScene(Ref<Camera> camera) {
-	Renderer3D::Begin(camera);
+void Shadow::RenderScene() {
 
-	Renderer3D::DrawMesh(cube,
-		{
-			.Translation = { 0.0f, -20.0f, 0.0f },
-			.Scale = glm::vec3(2.0f)
-		});
-	Renderer3D::DrawMesh(cube, { .Translation = { 0.0f, 1.5f, 0.0f } });
-	Renderer3D::DrawMesh(cube, { .Translation = { 2.0f, 0.0f, 1.0f } });
-	Renderer3D::DrawMesh(cube, { .Translation = { -1.0f, 0.0f, 2.0 } });
-
-	RendererAPI::Get()->DrawInstanced(cube);
 }
 
 }

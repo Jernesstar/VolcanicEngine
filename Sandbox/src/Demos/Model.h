@@ -24,16 +24,6 @@ public:
 	void OnUpdate(TimeStep ts) override;
 
 private:
-	Ref<ShaderPipeline> modelShader = ShaderPipeline::Create({
-		{ "VolcaniCore/assets/shaders/Model.glsl.vert", ShaderType::Vertex },
-		{ "VolcaniCore/assets/shaders/Model.glsl.frag", ShaderType::Fragment }
-	});
-
-	glm::vec3 lightPos = { 1.2f, 1.0f, 2.0f };
-	glm::vec3 lightColor = { 1.0f, 1.0f, 1.0f };
-	glm::mat4 lightModel = glm::scale(glm::translate(glm::mat4(1.0f), lightPos),
-									  glm::vec3(0.2f));
-
 	Ref<StereographicCamera> camera;
 	Ref<CameraController> controller;
 
@@ -56,18 +46,24 @@ Model::Model()
 	camera->SetPosition({ 0.0f, 0.0f, 5.0f });
 
 	controller = CreateRef<CameraController>(camera);
-	// model = ::Model::Create("Sandbox/assets/models/mc-torch/Torch.obj");
+	model = ::Model::Create("Sandbox/assets/models/mc-torch/Torch.obj");
 }
 
 void Model::OnUpdate(TimeStep ts) {
 	controller->OnUpdate(ts);
 	VolcaniCore::Renderer::Clear();
 
-	// Renderer3D::Begin(camera);
+	ShaderLibrary::Get("Mesh")->Bind();
+	ShaderLibrary::Get("Mesh")
+		->SetMat4("u_ViewProj", camera->GetViewProjection());
 
-	// Renderer3D::DrawModel(model);
+	Renderer3D::Begin(camera);
 
-	// Renderer3D::End();
+	for(auto& mesh : *model) {
+		RendererAPI->DrawIndexed(mesh);
+	}
+
+	Renderer3D::End();
 }
 
 

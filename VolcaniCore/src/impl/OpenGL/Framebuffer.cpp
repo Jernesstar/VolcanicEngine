@@ -126,9 +126,9 @@ Framebuffer::~Framebuffer() {
 void Framebuffer::Bind() const {
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_BufferID);
 }
+
 void Framebuffer::Unbind() const {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
-
 
 }

@@ -19,9 +19,6 @@ namespace VolcaniCore::OpenGL {
 
 class Model : public VolcaniCore::Model {
 public:
-	const std::string Path;
-
-public:
 	Model(const std::string& path);
 	~Model();
 

@@ -12,7 +12,7 @@ namespace VolcaniCore::OpenGL {
 
 // TODO: Move to Object/Model.cpp, as this is not renderer-specific
 Model::Model(const std::string& path)
-	: Path(path)
+	: ::Model(path)
 {
 	VOLCANICORE_ASSERT(path != "");
 	Load(path);
@@ -39,11 +39,11 @@ void Model::Load(const std::string& path) {
 
 	m_Meshes.resize(scene->mNumMeshes);
 
-	for(uint32_t i = 0; i < m_Meshes.size(); i++)
-		LoadMesh(path, scene->mMeshes[i],
-				 scene->mMaterials[scene->mMeshes[i]->mMaterialIndex]);
+	// for(uint32_t i = 0; i < m_Meshes.size(); i++)
+	// 	LoadMesh(path, scene->mMeshes[i],
+	// 			 scene->mMaterials[scene->mMeshes[i]->mMaterialIndex]);
 
-	delete scene;
+	// delete scene;
 }
 
 void Model::LoadMesh(const std::string& path,

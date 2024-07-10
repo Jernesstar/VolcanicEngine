@@ -39,6 +39,7 @@ public:
 								   AttachmentTarget target) = 0;
 
 	virtual void DrawInstanced(Ref<Mesh> mesh) = 0;
+	virtual void DrawIndexed(Ref<Mesh> mesh) = 0;
 
 protected:
 	virtual void Init() = 0;

@@ -8,6 +8,13 @@ class Model {
 public:
 	static Ref<Model> Create(const std::string& path);
 
+public:
+	const std::string Path;
+
+	Model(const std::string& path)
+		: Path(path) { }
+	virtual ~Model() = default;
+
 	std::vector<Ref<Mesh>>::const_iterator begin() const {
 		return m_Meshes.begin();
 	}
