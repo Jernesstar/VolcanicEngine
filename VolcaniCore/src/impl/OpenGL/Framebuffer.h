@@ -36,14 +36,14 @@ public:
 				const std::vector<Attachment>& attachments);
 	~Framebuffer();
 
+	// TODO: Implement
 	void Resize(uint32_t width, uint32_t height) override { }
 	void Bind() const override;
 	void Unbind() const override;
 
-	bool Has(AttachmentTarget target) {
-		if(m_Attachments.count(target) == 1) {
+	bool Has(AttachmentTarget target) override {
+		if(m_Attachments.count(target) == 1)
 			return m_Attachments[target].Type != AttachmentType::None;
-		}
 
 		return false;
 	}

@@ -9,7 +9,6 @@
 
 namespace VolcaniCore::OpenGL {
 
-
 Texture2D::Texture2D(uint32_t width, uint32_t height)
 	: VolcaniCore::Texture(width, height),
 		InternalFormat(GL_RGBA8), DataFormat(GL_RGBA)

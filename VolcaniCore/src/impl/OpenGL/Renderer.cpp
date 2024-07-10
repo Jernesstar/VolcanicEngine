@@ -13,8 +13,6 @@
 
 #include "Shader.h"
 
-#include "Object/Quad.h"
-
 #include "Mesh.h"
 #include "Model.h"
 #include "Cubemap.h"
@@ -40,12 +38,8 @@ Renderer::Renderer()
 static const uint32_t MaxInstances = 1000;
 
 struct RendererData {
-
 	Ptr<VertexArray> CubemapArray;
 	Ptr<VertexArray> FramebufferArray;
-
-	Ref<ShaderPipeline> FramebufferShader;
-	Ref<ShaderPipeline> MeshShader;
 
 	std::unordered_map<Ref<VolcaniCore::Mesh>, uint32_t> Meshes;
 };
@@ -112,7 +106,7 @@ void Renderer::Init() {
 
 	float framebufferVertices[] =
 	{
-		// Coords    // TexCoords
+		// Coords      // TexCoords
 		 1.0f, -1.0f,  1.0f, 0.0f,
 		-1.0f, -1.0f,  0.0f, 0.0f,
 		-1.0f,  1.0f,  0.0f, 1.0f,
@@ -133,23 +127,10 @@ void Renderer::Init() {
 		BufferLayout{
 			{ "Coordinate", OpenGL::BufferDataType::Vec2 },
 			{ "TexCoord",	OpenGL::BufferDataType::Vec2 },
-		}, framebufferVertices
-	);
+		}, framebufferVertices);
 	s_Data.FramebufferArray = CreatePtr<VertexArray>(buffer);
 
-	s_Data.FramebufferShader = ShaderPipeline::Create({
-		{ "VolcaniCore/assets/shaders/Framebuffer.glsl.vert",
-			ShaderType::Vertex },
-		{ "VolcaniCore/assets/shaders/Framebuffer.glsl.frag",
-			ShaderType::Fragment }
-	});
-
-	s_Data.MeshShader = ShaderPipeline::Create({
-		{ "VolcaniCore/assets/shaders/Mesh.glsl.vert", ShaderType::Vertex },
-		{ "VolcaniCore/assets/shaders/Mesh.glsl.frag", ShaderType::Fragment }
-	});
-
-	s_Data.FramebufferShader->Bind();
+	->Bind();
 	s_Data.FramebufferShader->SetInt("u_ScreenTexture", 0);
 }
 
@@ -167,8 +148,8 @@ void Renderer::Resize(uint32_t width, uint32_t height) {
 void Renderer::DrawCubemap(Ref<VolcaniCore::Cubemap> cubemap) {
 	glDepthMask(GL_FALSE);
 
-	s_Data.CubemapArray->Bind();
 	cubemap->As<OpenGL::Cubemap>()->Bind();
+	s_Data.CubemapArray->Bind();
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 
 	glDepthMask(GL_TRUE);
@@ -197,9 +178,9 @@ void Renderer::RenderFramebuffer(Ref<VolcaniCore::Framebuffer> buffer,
 	glDisable(GL_DEPTH_TEST);
 	glCullFace(GL_FRONT);
 
-	// ShaderLibrary::Get("Framebuffer")->Bind();
+	ShaderLibrary::Get("Framebuffer")->Bind();
 	s_Data.FramebufferShader->Bind();
-	if(!buffer->As<OpenGL::Framebuffer>()->Has(target)) {
+	if(!buffer->Has(target)) {
 		VOLCANICORE_LOG_WARNING("Framebuffer does not have needed attachment");
 		return;
 	}
