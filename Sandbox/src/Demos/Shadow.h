@@ -66,8 +66,8 @@ Shadow::Shadow() {
 	shadowPass = RenderPass::Create("Shadow Pass", shadowShader);
 
 	std::vector<OpenGL::Attachment> attachments{
-		{ AttachmentTarget::Depth, OpenGL::AttachmentType::Texture },
-		{ AttachmentTarget::Color, OpenGL::AttachmentType::Texture }
+		{ AttachmentTarget::Color, OpenGL::AttachmentType::Texture },
+		{ AttachmentTarget::Depth, OpenGL::AttachmentType::Texture }
 	};
 	depthMap = CreateRef<OpenGL::Framebuffer>(1024, 1024, attachments);
 

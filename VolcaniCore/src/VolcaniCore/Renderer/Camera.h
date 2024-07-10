@@ -36,6 +36,8 @@ public:
 		CalculateView();
 	}
 
+	virtual void Resize(uint32_t width, uint32_t height) = 0;
+
 	template<typename Derived>
 	Derived* As() const { return (Derived*)(this); }
 
@@ -53,7 +55,6 @@ protected:
 
 	virtual void CalculateView() = 0;
 	virtual void CalculateProjection() = 0;
-	virtual void Resize(uint32_t width, uint32_t height) = 0;
 
 	friend class CameraController;
 };

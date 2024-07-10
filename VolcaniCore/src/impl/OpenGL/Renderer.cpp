@@ -219,6 +219,4 @@ void Renderer::DrawInstanced(Ref<VertexArray> array, uint32_t instanceCount) {
 							GL_UNSIGNED_INT, 0, instanceCount);
 }
 
-void Renderer::DrawIndexed(Ref<Mesh> mesh, Tran)
-
 }

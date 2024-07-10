@@ -9,6 +9,7 @@
 #include <Renderer/Renderer3D.h>
 #include <Renderer/StereographicCamera.h>
 #include <Renderer/CameraController.h>
+#include <Renderer/ShaderLibrary.h>
 
 #include <OpenGL/VertexArray.h>
 
@@ -59,9 +60,9 @@ void Model::OnUpdate(TimeStep ts) {
 
 	Renderer3D::Begin(camera);
 
-	for(auto& mesh : *model) {
-		RendererAPI->DrawIndexed(mesh);
-	}
+	// for(auto& mesh : *model) {
+	// 	RendererAPI->DrawIndexed(mesh);
+	// }
 
 	Renderer3D::End();
 }

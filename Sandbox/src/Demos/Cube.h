@@ -37,8 +37,7 @@ private:
 	Ref<RenderPass> drawPass;
 	Ref<RenderPass> pixelatePass;
 
-	Ref<StereographicCamera> camera;
-	// Ref<OrthographicCamera> camera;
+	Ref<Camera> camera;
 	Ref<CameraController> controller;
 
 	Ref<Texture> texture;
@@ -66,12 +65,13 @@ Cube::Cube() {
 	drawPass = CreateRef<RenderPass>("Draw Pass", ShaderLibrary::Get("Mesh"));
 	drawPass->SetOutput(framebuffer);
 
-	camera = CreateRef<StereographicCamera>(75.0f, 0.01f, 100.0f, 800, 600);
+	camera = CreateRef<StereographicCamera>(75.0f, 0.01f, 1000.0f, 800, 600);
 	// camera = CreateRef<OrthographicCamera>(800, 600, 0.1f, 100.0f);
 	camera->SetPosition({ 2.5f, 2.5f, 2.5f });
 	camera->SetDirection({ -0.5f, -0.5f, -0.5f });
 
 	controller = CreateRef<CameraController>(camera);
+	controller->TranslationSpeed = 0.008f;
 
 	texture = Texture::Create("Sandbox/assets/images/stone.png");
 	cube = Mesh::Create(MeshPrimitive::Cube, Material{ .Diffuse = texture });
