@@ -15,7 +15,6 @@ using namespace Magma;
 
 namespace TheMazeIsLava {
 
-
 class Game : public Application {
 public:
 	Game();
@@ -36,7 +35,6 @@ private:
 	Ref<UI::UIElement> m_CurrentUI;
 	Ref<Scene> m_Scene;
 	Ref<StereographicCamera> m_Camera;
-	Ref<CameraController> m_CameraController;
 
 	TimeStep m_TimeStep;
 	std::function<void(void)> m_CurrentScreen;
@@ -44,6 +42,5 @@ private:
 	bool m_ReturnPressed = false;
 	bool m_GameOver = false;
 };
-
 
 }

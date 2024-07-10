@@ -9,7 +9,7 @@
 #include "Demos/Cube.h"
 #include "Demos/ECS.h"
 #include "Demos/Instancing.h"
-#include "Demos/Lighting.h"
+// #include "Demos/Lighting.h"
 #include "Demos/Model.h"
 #include "Demos/UI.h"
 
@@ -24,7 +24,7 @@ Application* CreateApplication(const CommandLineArgs& args) {
 	if(project == "Cube")		return new Demo::Cube();
 	if(project == "ECS")		return new Demo::ECS();
 	if(project == "Instancing") return new Demo::Instancing();
-	if(project == "Lighting")	return new Demo::Lighting();
+	// if(project == "Lighting")	return new Demo::Lighting();
 	if(project == "Model")		return new Demo::Model();
 	if(project == "UI")			return new Demo::GameUI();
 

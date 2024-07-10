@@ -11,6 +11,7 @@
 
 #include "Renderer/Renderer.h"
 #include "Renderer/RendererAPI.h"
+#include "Renderer/ShaderLibrary.h"
 
 namespace VolcaniCore {
 
@@ -30,6 +31,7 @@ void Application::Init() {
 	EventSystem::Init();
 
 	RendererAPI::Create(RendererBackend::OpenGL);
+	ShaderLibrary::Init();
 	Renderer::Init();
 }
 

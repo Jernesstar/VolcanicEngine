@@ -2,12 +2,13 @@
 
 #include <unordered_map>
 
-#include "Shader.h"
+#include "Object/Shader.h"
 
 namespace VolcaniCore {
 
 class ShaderLibrary {
 public:
+	static void Init();
 	static Ref<ShaderPipeline> Get(const std::string& name);
 
 private:

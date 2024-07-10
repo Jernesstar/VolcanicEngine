@@ -1,6 +1,7 @@
 #include "Player.h"
 
 #include <Core/Input.h>
+#include <Renderer/Renderer3D.h>
 
 #include "GameState.h"
 
@@ -24,8 +25,8 @@ void Player::Move() {
 }
 
 void Player::Render() {
-	RendererAPI::Get()->RenderModel(GameState::PlayerModel1,
-							Transform{ .Translation = { x, 0.0f, y } });
+	// Renderer3D::DrawModel(GameState::PlayerModel1,
+	// 						Transform{ .Translation = { x, 0.0f, y } });
 }
 
 }

@@ -9,6 +9,7 @@
 #include <Renderer/Renderer.h>
 #include <Renderer/RendererAPI.h>
 #include <Renderer/Renderer3D.h>
+#include <Renderer/ShaderLibrary.h>
 
 #include <Renderer/StereographicCamera.h>
 #include <Renderer/OrthographicCamera.h>
@@ -56,37 +57,29 @@ Cube::Cube() {
 		camera->Resize(event.Width, event.Height);
 	});
 
-	meshShader = ShaderPipeline::Create({
-		{ "VolcaniCore/assets/shaders/Mesh.glsl.vert", ShaderType::Vertex },
-		{ "VolcaniCore/assets/shaders/Mesh.glsl.frag", ShaderType::Fragment }
-	});
 	std::vector<OpenGL::Attachment> attachments{
 		{ AttachmentTarget::Color, OpenGL::AttachmentType::Texture },
 		{ AttachmentTarget::Depth, OpenGL::AttachmentType::Texture }
 	};
 	framebuffer = CreateRef<OpenGL::Framebuffer>(225, 150, attachments);
 
-	// drawPass = CreateRef<RenderPass>("Draw Pass", ShaderLibrary::Get("Mesh"));
-	drawPass = CreateRef<RenderPass>("Draw Pass", meshShader);
-
+	drawPass = CreateRef<RenderPass>("Draw Pass", ShaderLibrary::Get("Mesh"));
 	drawPass->SetOutput(framebuffer);
 
 	camera = CreateRef<StereographicCamera>(75.0f, 0.01f, 100.0f, 800, 600);
-	// camera = CreateRef<OrthographicCamera>(800, 600, 0.01f, 100.0f);
+	// camera = CreateRef<OrthographicCamera>(800, 600, 0.1f, 100.0f);
 	camera->SetPosition({ 2.5f, 2.5f, 2.5f });
 	camera->SetDirection({ -0.5f, -0.5f, -0.5f });
 
 	controller = CreateRef<CameraController>(camera);
 
 	texture = Texture::Create("Sandbox/assets/images/stone.png");
-	// cube = Mesh::Create(MeshPrimitive::Cube, Material{ .Diffuse = texture });
+	cube = Mesh::Create(MeshPrimitive::Cube, Material{ .Diffuse = texture });
 	// quad = Mesh::Create(MeshPrimitive::Quad, Material{ .Diffuse = texture });
-	cube = VolcaniCore::Mesh::Create(MeshPrimitive::Cube, Material{ .Diffuse = texture });
 }
 
 void Cube::OnUpdate(TimeStep ts) {
 	controller->OnUpdate(ts);
-	meshShader->SetMat4("u_ViewProj", camera->GetViewProjection());
 
 	Renderer::StartPass(drawPass);
 	{

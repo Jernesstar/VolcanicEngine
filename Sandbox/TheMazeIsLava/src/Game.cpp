@@ -12,6 +12,7 @@
 
 using namespace VolcaniCore;
 using namespace Magma;
+
 namespace TheMazeIsLava {
 
 Game::Game()
@@ -45,7 +46,6 @@ Game::~Game() {
 
 void Game::OnUpdate(TimeStep ts) {
 	m_TimeStep = ts;
-	m_CameraController->OnUpdate(ts);
 
 	Renderer::Clear();
 
@@ -61,7 +61,7 @@ void Game::OnUpdate(TimeStep ts) {
 }
 
 void Game::StartScreen() {
-	// Front picture, level load, settings
+	// // Front picture, level load, settings
 
 	if(m_ReturnPressed) {
 		m_ReturnPressed = false;
@@ -72,7 +72,7 @@ void Game::StartScreen() {
 }
 
 void Game::LevelScreen() {
-	// Staircase like level selection
+	// // Staircase like level selection
 
 	if(m_ReturnPressed) {
 		m_ReturnPressed = false;
@@ -83,7 +83,7 @@ void Game::LevelScreen() {
 }
 
 void Game::PlayScreen() {
-	// Gameplay
+	// // Gameplay
 	GameState::GetCurrentLevel().Render(m_TimeStep);
 
 	if(m_GameOver) {
