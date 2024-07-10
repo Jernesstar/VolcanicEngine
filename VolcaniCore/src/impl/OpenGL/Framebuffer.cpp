@@ -36,12 +36,10 @@ Framebuffer::Framebuffer(uint32_t width, uint32_t height,
 	for(auto& attachment : attachments)
 		m_Attachments.insert({ attachment.Target, attachment });
 
-	for(auto& [_, attachment] : m_Attachments) {
-		if(attachment.Target == AttachmentTarget::Color)
-			CreateColorAttachment(attachment);
-		if(attachment.Target == AttachmentTarget::Depth)
-			CreateDepthAttachment(attachment);
-		if(attachment.Target == AttachmentTarget::Stencil)
+	for(auto& [target, attachment] : m_Attachments) {
+		if(target == AttachmentTarget::Color) CreateColorAttachment(attachment);
+		if(target == AttachmentTarget::Depth) CreateDepthAttachment(attachment);
+		if(target == AttachmentTarget::Stencil) 
 			CreateStencilAttachment(attachment);
 	}
 

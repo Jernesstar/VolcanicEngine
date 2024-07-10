@@ -2,20 +2,20 @@
 
 #include <Core/Application.h>
 #include <Core/Log.h>
-
 #include <Events/EventSystem.h>
 
-#include <Renderer/RendererAPI.h>
 #include <Object/Shader.h>
 #include <Object/Texture.h>
+
+#include <Renderer/RendererAPI.h>
 #include <Renderer/StereographicCamera.h>
 #include <Renderer/OrthographicCamera.h>
 #include <Renderer/CameraController.h>
+#include <Renderer/ShaderLibrary.h>
 
 #include <OpenGL/Renderer.h>
 
 using namespace VolcaniCore;
-using namespace VolcaniCore::OpenGL;
 
 namespace Demo {
 
@@ -28,12 +28,9 @@ public:
 private:
 	const uint32_t InstanceCount = 500;
 
-	Ref<ShaderPipeline> instancingShader = ShaderPipeline::Create({
-		{ "VolcaniCore/assets/shaders/Mesh.glsl.vert", ShaderType::Vertex },
-		{ "VolcaniCore/assets/shaders/Mesh.glsl.frag", ShaderType::Fragment }
-	});
 	Ref<Texture> texture;
 	Ref<Mesh> cube;
+	Ref<ShaderPipeline> instancingShader;
 
 	Ref<Camera> camera;
 	Ref<CameraController> controller;
@@ -51,6 +48,8 @@ Instancing::Instancing() {
 
 	texture = Texture::Create("Sandbox/assets/images/stone.png");
 	cube = Mesh::Create(MeshPrimitive::Cube, Material{ .Diffuse = texture });
+
+	instancingShader = ShaderLibrary::Get("Mesh");
 
 	camera = CreateRef<StereographicCamera>(75.0f, 0.01f, 100.0f, 800, 600);
 	camera->SetPosition({ 5.0f, 0.0f, 10.0f });
