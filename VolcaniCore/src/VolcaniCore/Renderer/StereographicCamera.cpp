@@ -6,8 +6,9 @@
 
 namespace VolcaniCore {
 
-StereographicCamera::StereographicCamera(float verticalFov, float nearClip,
-										 float farClip,
+// TODO: Switch width, height, and near, far
+StereographicCamera::StereographicCamera(float verticalFov,
+										 float nearClip, float farClip,
 										 uint32_t width, uint32_t height,
 										 float rotationSpeed)
 	: Camera(CameraType::Stereo),

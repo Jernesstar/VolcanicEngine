@@ -40,8 +40,12 @@ public:
 	void Bind() const override;
 	void Unbind() const override;
 
-	bool Has(AttachmentTarget target) const {
-		return m_Attachments.count(target) == 1;
+	bool Has(AttachmentTarget target) {
+		if(m_Attachments.count(target) == 1) {
+			return m_Attachments[target].Type != AttachmentType::None;
+		}
+
+		return false;
 	}
 
 	const Attachment& Get(AttachmentTarget target) {
