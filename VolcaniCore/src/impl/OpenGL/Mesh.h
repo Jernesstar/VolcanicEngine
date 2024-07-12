@@ -14,15 +14,14 @@ public:
 	Mesh(std::vector<Vertex> vertices,
 		 std::vector<uint32_t> indices,
 		 Material material);
-	~Mesh();
 
 	void Bind() const {
 		m_VertexArray->Bind();
 	}
 
+private:
 	Ref<OpenGL::VertexArray> m_VertexArray;
 	Ref<OpenGL::VertexBuffer> m_TransformBuffer;
-private:
 	Ref<OpenGL::VertexBuffer> m_VertexBuffer;
 	Ref<OpenGL::IndexBuffer> m_IndexBuffer;
 

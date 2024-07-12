@@ -20,7 +20,7 @@ namespace VolcaniCore::OpenGL {
 class Model : public VolcaniCore::Model {
 public:
 	Model(const std::string& path);
-	~Model();
+	// ~Model();
 
 	void Bind() const {
 		m_VertexArray->Bind();
@@ -28,14 +28,11 @@ public:
 
 private:
 	void Load(const std::string& path);
-	void Unload();
+	// void Unload();
 
 	void LoadMesh(const std::string& path,
-				  const aiMesh* mesh,
-				  const aiMaterial* material);
-
-	Material LoadMaterial(const std::string& path,
-						  const aiMaterial* mat);
+						const aiScene* scene,
+						uint32_t meshIndex);
 
 	Ref<Texture> LoadTexture(const std::string& dir,
 							 const aiMaterial* mat,

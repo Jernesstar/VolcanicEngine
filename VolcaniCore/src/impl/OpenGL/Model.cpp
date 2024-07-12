@@ -18,13 +18,13 @@ Model::Model(const std::string& path)
 	Load(path);
 }
 
-Model::~Model() {
-	Unload();
-}
+// Model::~Model() {
 
-void Model::Unload() {
+// }
 
-}
+// void Model::Unload() {
+
+// }
 
 void Model::Load(const std::string& path) {
 	Assimp::Importer importer;
@@ -39,16 +39,16 @@ void Model::Load(const std::string& path) {
 
 	m_Meshes.resize(scene->mNumMeshes);
 
-	// for(uint32_t i = 0; i < m_Meshes.size(); i++)
-	// 	LoadMesh(path, scene->mMeshes[i],
-	// 			 scene->mMaterials[scene->mMeshes[i]->mMaterialIndex]);
-
-	// delete scene;
+	for(uint32_t i = 0; i < m_Meshes.size(); i++)
+		LoadMesh(path, scene, i);
 }
 
 void Model::LoadMesh(const std::string& path,
-					 const aiMesh* mesh,
-					 const aiMaterial* mat){
+					 const aiScene* scene,
+					 uint32_t meshIndex)
+{
+	auto mesh = scene->mMeshes[meshIndex];
+	auto mat = scene->mMaterials[mesh->mMaterialIndex];
 
 	std::vector<Vertex> vertices;
 	std::vector<uint32_t> indices;
@@ -68,24 +68,17 @@ void Model::LoadMesh(const std::string& path,
 			.Normal			   = glm::vec3(normal.x, normal.y, normal.z),
 			.TextureCoordinate = glm::vec2(texCoord.x, texCoord.y)
 		};
-		vertices.push_back(v);
+		vertices[i] = v;
+		VOLCANICORE_LOG_INFO("{ %ff, %ff, %ff }", v.Position.x, v.Position.y, v.Position.z);
 	}
 
 	for(uint32_t i = 0; i < mesh->mNumFaces; i++) {
 		const aiFace& face = mesh->mFaces[i];
-		indices.push_back(face.mIndices[0]);
-		indices.push_back(face.mIndices[1]);
-		indices.push_back(face.mIndices[2]);
+		indices[i + 0] = face.mIndices[0];
+		indices[i + 1] = face.mIndices[1];
+		indices[i + 2] = face.mIndices[2];
 	}
 
-	Material material = LoadMaterial(path, mat);
-
-	m_Meshes.push_back(Mesh::Create(vertices, indices, material));
-}
-
-Material Model::LoadMaterial(const std::string& path,
-						 const aiMaterial* mat)
-{
 	std::size_t slashIndex = path.find("textures");
 	std::string dir;
 
@@ -96,13 +89,15 @@ Material Model::LoadMaterial(const std::string& path,
 	else
 		dir = path.substr(0, slashIndex);
 	
-	Material material {
-		.Diffuse   = LoadTexture(dir, mat, aiTextureType_DIFFUSE),
-		.Specular  = LoadTexture(dir, mat, aiTextureType_SPECULAR),
-		.Roughness = LoadTexture(dir, mat, aiTextureType_DIFFUSE_ROUGHNESS)
-	};
-
-	return material;
+	auto newMesh = Mesh::Create(vertices, indices,
+		Material{
+			.Diffuse   = LoadTexture(dir, mat, aiTextureType_DIFFUSE),
+			.Specular  = LoadTexture(dir, mat, aiTextureType_SPECULAR),
+			.Roughness = LoadTexture(dir, mat, aiTextureType_DIFFUSE_ROUGHNESS),
+			// .Emissive = LoadTexture(dir, mat, aiTextureType_EMISSIVE)
+		}
+	);
+	m_Meshes[meshIndex] = newMesh;
 }
 
 Ref<Texture> Model::LoadTexture(const std::string& dir,

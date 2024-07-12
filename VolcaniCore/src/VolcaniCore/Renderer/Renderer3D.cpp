@@ -45,7 +45,7 @@ void Renderer3D::End() {
 			auto pipeline = pass->GetPipeline();
 			Material& material = mesh->GetMaterial();
 
-			pipeline->SetTexture("u_Diffuse",   material.Diffuse,   0);
+			pipeline->SetTexture("u_Diffuse", material.Diffuse, 0);
 			// pipeline->SetTexture("u_Specular",  material.Specular,  1);
 			// pipeline->SetTexture("u_Roughness", material.Roughness, 2);
 		}
@@ -67,8 +67,11 @@ void Renderer3D::DrawMesh(Ref<Mesh> mesh, Transform t) {
 }
 
 void Renderer3D::DrawModel(Ref<Model> model, Transform t) {
-	for(auto& mesh : *model)
-		DrawMesh(mesh, t);
+	// for(auto& mesh : *model)
+	// 	DrawMesh(mesh, t);
+
+	auto mesh = model->GetMesh(0);
+	DrawMesh(mesh, t);
 }
 
 void Renderer3D::DrawQuad(Ref<Quad> quad, Transform t) {

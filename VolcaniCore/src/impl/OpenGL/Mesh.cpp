@@ -28,6 +28,4 @@ Mesh::Mesh(std::vector<Vertex> vertices,
 	m_VertexArray->AddVertexBuffer(m_TransformBuffer);
 }
 
-Mesh::~Mesh() { }
-
 }

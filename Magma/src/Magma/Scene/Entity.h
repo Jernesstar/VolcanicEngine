@@ -21,23 +21,26 @@ public:
 	template<typename TComponent, typename ...Args>
 	requires std::derived_from<TComponent, Component>
 	TComponent& Add(Args&&... args) {
-		if(Has<TComponent>()) return Get<TComponent>();
-		m_Components[TypeOf<TComponent>::Get()]
-			= new TComponent(std::forward<Args>(args)...);
+		if(Has<TComponent>())
+			return Get<TComponent>();
+		m_Components[TypeOf<TComponent>::Get()] = new TComponent(
+												   std::forward<Args>(args)...);
 		return *((TComponent*)m_Components[TypeOf<TComponent>::Get()]);
 	}
 
 	template<typename TComponent>
 	requires std::derived_from<TComponent, Component>
 	TComponent& Get() {
-		if(!Has<TComponent>()) return Add<TComponent>();
+		if(!Has<TComponent>())
+			return Add<TComponent>();
 		return *((TComponent*)m_Components[TypeOf<TComponent>::Get()]);
 	}
 
 	template<typename TComponent>
 	requires std::derived_from<TComponent, Component>
 	void Remove() {
-		if(!Has<TComponent>()) return;
+		if(!Has<TComponent>())
+			return;
 		m_Components.erase(TypeOf<TComponent>::Get());
 	}
 
@@ -48,7 +51,9 @@ private:
 	std::unordered_map<ComponentType, Component*> m_Components;
 
 	template<typename TComponent>
-	struct TypeOf { static ComponentType Get() { return ComponentType::Unknown; } };
+	struct TypeOf {
+		static ComponentType Get() { return ComponentType::Unknown; }
+	};
 };
 
 template<>

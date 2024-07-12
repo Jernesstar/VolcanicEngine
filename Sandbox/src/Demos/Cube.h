@@ -75,6 +75,8 @@ Cube::Cube() {
 
 	texture = Texture::Create("Sandbox/assets/images/stone.png");
 	cube = Mesh::Create(MeshPrimitive::Cube, Material{ .Diffuse = texture });
+
+	// TODO: Fix, this is causing a segfault
 	// quad = Mesh::Create(MeshPrimitive::Quad, Material{ .Diffuse = texture });
 }
 
@@ -88,6 +90,11 @@ void Cube::OnUpdate(TimeStep ts) {
 		Renderer3D::Begin(camera);
 		Renderer3D::DrawMesh(cube);
 		Renderer3D::DrawMesh(cube, { .Translation = { 0.0f, 2.0f, 0.0f } });
+
+		// Renderer3D::DrawMesh(quad, { .Translation = {  2.0f, 0.0f,  0.0f } });
+		// Renderer3D::DrawMesh(quad, { .Translation = { -2.0f, 0.0f,  0.0f } });
+		// Renderer3D::DrawMesh(quad, { .Translation = {  0.0f, 0.0f,  2.0f } });
+		// Renderer3D::DrawMesh(quad, { .Translation = {  0.0f, 0.0f, -2.0f } });
 
 		Renderer3D::End();
 	}

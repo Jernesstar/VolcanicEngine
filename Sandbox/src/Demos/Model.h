@@ -6,15 +6,13 @@
 #include <Object/Model.h>
 
 #include <Renderer/Renderer.h>
+#include <Renderer/RendererAPI.h>
 #include <Renderer/Renderer3D.h>
 #include <Renderer/StereographicCamera.h>
 #include <Renderer/CameraController.h>
 #include <Renderer/ShaderLibrary.h>
 
-#include <OpenGL/VertexArray.h>
-
 using namespace VolcaniCore;
-using namespace VolcaniCore::OpenGL;
 
 namespace Demo {
 
@@ -25,6 +23,8 @@ public:
 	void OnUpdate(TimeStep ts) override;
 
 private:
+	Ref<RenderPass> drawPass;
+
 	Ref<StereographicCamera> camera;
 	Ref<CameraController> controller;
 
@@ -43,10 +43,13 @@ Model::Model()
 		this->camera->Resize(event.Width, event.Height);
 	});
 
+	drawPass = CreateRef<RenderPass>("Draw Pass", ShaderLibrary::Get("Mesh"));
+
 	camera = CreateRef<StereographicCamera>(90.0f, 0.1f, 100.0f, 1600, 900);
 	camera->SetPosition({ 0.0f, 0.0f, 5.0f });
 
 	controller = CreateRef<CameraController>(camera);
+
 	model = ::Model::Create("Sandbox/assets/models/mc-torch/Torch.obj");
 }
 
@@ -54,17 +57,16 @@ void Model::OnUpdate(TimeStep ts) {
 	controller->OnUpdate(ts);
 	VolcaniCore::Renderer::Clear();
 
-	ShaderLibrary::Get("Mesh")->Bind();
-	ShaderLibrary::Get("Mesh")
-		->SetMat4("u_ViewProj", camera->GetViewProjection());
+	Renderer::StartPass(drawPass);
+	{
+		Renderer3D::Begin(camera);
 
-	Renderer3D::Begin(camera);
+		Renderer3D::DrawModel(model, { .Scale = glm::vec3(20.0f) });
 
-	// for(auto& mesh : *model) {
-	// 	RendererAPI->DrawIndexed(mesh);
-	// }
+		Renderer3D::End();
+	}
+	Renderer::EndPass();
 
-	Renderer3D::End();
 }
 
 
