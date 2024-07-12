@@ -28,6 +28,7 @@ private:
 	Ref<StereographicCamera> camera;
 	Ref<CameraController> controller;
 
+	Ref<Mesh> cube;
 	Ref<VolcaniCore::Model> model;
 };
 
@@ -45,11 +46,17 @@ Model::Model()
 
 	drawPass = CreateRef<RenderPass>("Draw Pass", ShaderLibrary::Get("Mesh"));
 
-	camera = CreateRef<StereographicCamera>(90.0f, 0.1f, 100.0f, 1600, 900);
+	camera = CreateRef<StereographicCamera>(90.0f, 0.1f, 100.0f, 800, 600);
 	camera->SetPosition({ 0.0f, 0.0f, 5.0f });
 
 	controller = CreateRef<CameraController>(camera);
+	controller->TranslationSpeed = 0.05f;
 
+	// TODO: Bug: initializing both causes segfault
+	// cube = Mesh::Create(MeshPrimitive::Cube,
+	// 	Material{
+	// 		.Diffuse = Texture::Create("Sandbox/assets/images/stone.png")
+	// 	});
 	model = ::Model::Create("Sandbox/assets/models/mc-torch/Torch.obj");
 }
 
@@ -61,7 +68,8 @@ void Model::OnUpdate(TimeStep ts) {
 	{
 		Renderer3D::Begin(camera);
 
-		Renderer3D::DrawModel(model, { .Scale = glm::vec3(20.0f) });
+		// Renderer3D::DrawMesh(cube);
+		Renderer3D::DrawMesh(model->GetMesh(0), { .Scale = glm::vec3(1.0f) });
 
 		Renderer3D::End();
 	}

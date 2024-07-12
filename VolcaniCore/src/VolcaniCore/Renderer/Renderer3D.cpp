@@ -67,11 +67,8 @@ void Renderer3D::DrawMesh(Ref<Mesh> mesh, Transform t) {
 }
 
 void Renderer3D::DrawModel(Ref<Model> model, Transform t) {
-	// for(auto& mesh : *model)
-	// 	DrawMesh(mesh, t);
-
-	auto mesh = model->GetMesh(0);
-	DrawMesh(mesh, t);
+	for(auto& mesh : *model)
+		DrawMesh(mesh, t);
 }
 
 void Renderer3D::DrawQuad(Ref<Quad> quad, Transform t) {

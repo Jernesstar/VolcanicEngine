@@ -37,9 +37,9 @@ void Model::Load(const std::string& path) {
 	VOLCANICORE_ASSERT_ARGS(scene, "Error importing model(s) from %s: %s",
 									path.c_str(), importer.GetErrorString());
 
-	m_Meshes.resize(scene->mNumMeshes);
+	// m_Meshes.resize(scene->mNumMeshes);
 
-	for(uint32_t i = 0; i < m_Meshes.size(); i++)
+	for(uint32_t i = 0; i < scene->mNumMeshes; i++)
 		LoadMesh(path, scene, i);
 }
 
@@ -69,7 +69,9 @@ void Model::LoadMesh(const std::string& path,
 			.TextureCoordinate = glm::vec2(texCoord.x, texCoord.y)
 		};
 		vertices[i] = v;
-		VOLCANICORE_LOG_INFO("{ %ff, %ff, %ff }", v.Position.x, v.Position.y, v.Position.z);
+		VOLCANICORE_LOG_INFO("Position:  { %ff, %ff, %ff }", v.Position.x, v.Position.y, v.Position.z);
+		VOLCANICORE_LOG_INFO("Normal:	 { %ff, %ff, %ff }", v.Normal.x, v.Normal.y, v.Normal.z);
+		VOLCANICORE_LOG_INFO("Tex Coord: { %ff, %ff }", v.TextureCoordinate.x, v.TextureCoordinate.y);
 	}
 
 	for(uint32_t i = 0; i < mesh->mNumFaces; i++) {
@@ -77,6 +79,7 @@ void Model::LoadMesh(const std::string& path,
 		indices[i + 0] = face.mIndices[0];
 		indices[i + 1] = face.mIndices[1];
 		indices[i + 2] = face.mIndices[2];
+		VOLCANICORE_LOG_INFO("{ %d, %d, %d }", indices[i+0], indices[i+1], indices[i+2]);
 	}
 
 	std::size_t slashIndex = path.find("textures");
@@ -88,16 +91,24 @@ void Model::LoadMesh(const std::string& path,
 		dir = "/";
 	else
 		dir = path.substr(0, slashIndex);
-	
-	auto newMesh = Mesh::Create(vertices, indices,
+
+	// Ref<Mesh> newMesh = Mesh::Create(vertices, indices,
+	// 	Material{
+	// 		.Diffuse   = LoadTexture(dir, mat, aiTextureType_DIFFUSE),
+	// 		.Specular  = LoadTexture(dir, mat, aiTextureType_SPECULAR),
+	// 		.Roughness = LoadTexture(dir, mat, aiTextureType_DIFFUSE_ROUGHNESS)
+	// 		// .Emissive = LoadTexture(dir, mat, aiTextureType_EMISSIVE)
+	// 	}
+	// );
+	Ref<Mesh> newMesh = Mesh::Create(MeshPrimitive::Cube,
 		Material{
 			.Diffuse   = LoadTexture(dir, mat, aiTextureType_DIFFUSE),
 			.Specular  = LoadTexture(dir, mat, aiTextureType_SPECULAR),
-			.Roughness = LoadTexture(dir, mat, aiTextureType_DIFFUSE_ROUGHNESS),
+			.Roughness = LoadTexture(dir, mat, aiTextureType_DIFFUSE_ROUGHNESS)
 			// .Emissive = LoadTexture(dir, mat, aiTextureType_EMISSIVE)
 		}
 	);
-	m_Meshes[meshIndex] = newMesh;
+	m_Meshes.push_back(std::move(newMesh));
 }
 
 Ref<Texture> Model::LoadTexture(const std::string& dir,

@@ -55,10 +55,9 @@ void Renderer::Init() {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	// glDisable(GL_CULL_FACE);
-	glEnable(GL_CULL_FACE);
-	glFrontFace(GL_CCW);
-	glCullFace(GL_BACK);
+	// glEnable(GL_CULL_FACE);
+	// glFrontFace(GL_CCW);
+	// glCullFace(GL_BACK);
 
 	float cubemapVertices[] =
 	{
@@ -200,10 +199,10 @@ void Renderer::DrawIndexed(Ref<VertexArray> array, uint32_t indices) {
 								without index buffer bound has failed");
 		return;
 	}
-	Ref<IndexBuffer> indexBuffer = array->GetIndexBuffer();
+	uint32_t count = array->GetIndexBuffer()->Count;
 
 	array->Bind();
-	glDrawElements(GL_TRIANGLES, indices != 0 ? indices : indexBuffer->Count,
+	glDrawElements(GL_TRIANGLES, indices != 0 ? indices : count,
 				   GL_UNSIGNED_INT, nullptr);
 }
 

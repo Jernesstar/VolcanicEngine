@@ -6,6 +6,7 @@
 
 namespace VolcaniCore {
 
+// TODO: Fix
 static std::vector<Vertex> CubeVertices =
 {
 	{ { -0.5f,  0.5f,  0.5f }, {  0.0f,  0.0f,  1.0f }, { 0.0f, 1.0f } },	// 0 Front Top Left
@@ -17,6 +18,15 @@ static std::vector<Vertex> CubeVertices =
 	{ {  0.5f,  0.5f, -0.5f }, {  0.0f,  0.0f, -1.0f }, { 1.0f, 1.0f } },	// 5 Back Top Right
 	{ { -0.5f, -0.5f, -0.5f }, {  0.0f,  0.0f, -1.0f }, { 0.0f, 0.0f } },	// 6 Back Bottom Left
 	{ {  0.5f, -0.5f, -0.5f }, {  0.0f,  0.0f, -1.0f }, { 1.0f, 0.0f } },	// 7 Back Bottom Right
+
+	// { { -1.0f,  1.0f,  1.0f, }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f } },
+	// { {  1.0f,  1.0f,  1.0f, }, { 0.0f, 0.0f, 0.0f }, { 1.0f, 1.0f } },
+	// { { -1.0f, -1.0f,  1.0f, }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } },
+	// { {  1.0f, -1.0f,  1.0f, }, { 0.0f, 0.0f, 0.0f }, { 1.0f, 0.0f } },
+	// { { -1.0f,  1.0f, -1.0f, }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } },
+	// { {  1.0f,  1.0f, -1.0f, }, { 0.0f, 0.0f, 0.0f }, { 1.0f, 1.0f } },
+	// { { -1.0f, -1.0f, -1.0f, }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } },
+	// { {  1.0f, -1.0f, -1.0f, }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } },
 };
 
 static std::vector<uint32_t> CubeIndices =
@@ -38,6 +48,19 @@ static std::vector<uint32_t> CubeIndices =
 
 	7, 3, 2,
 	2, 6, 7,
+
+	// 0, 1, 2, // 0
+	// 1, 3, 2,
+	// 4, 6, 5, // 2
+	// 5, 6, 7,
+	// 0, 2, 4, // 4
+	// 4, 2, 6,
+	// 1, 5, 3, // 6
+	// 5, 7, 3,
+	// 0, 4, 1, // 8
+	// 4, 5, 1,
+	// 2, 3, 6, // 10
+	// 6, 3, 7,
 };
 
 static std::vector<uint32_t> QuadIndices =
@@ -48,7 +71,7 @@ static std::vector<uint32_t> QuadIndices =
 
 Ref<Mesh> Mesh::Create(std::vector<Vertex> vertices,
 					   std::vector<uint32_t> indices,
-					   VolcaniCore::Material material)
+					   Material material)
 {
 	RendererBackend backend = RendererAPI::Get()->Backend;
 
@@ -59,8 +82,7 @@ Ref<Mesh> Mesh::Create(std::vector<Vertex> vertices,
 	}
 }
 
-Ref<Mesh> Mesh::Create(MeshPrimitive primitive,
-					   VolcaniCore::Material material)
+Ref<Mesh> Mesh::Create(MeshPrimitive primitive, Material material)
 {
 	switch(primitive) {
 		case MeshPrimitive::Cube:
