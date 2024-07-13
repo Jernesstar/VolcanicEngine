@@ -1,5 +1,7 @@
 #pragma once
 
+#include <glad/glad.h>
+
 #include <Core/Application.h>
 #include <Core/Log.h>
 
@@ -10,6 +12,8 @@
 #include <Object/Shader.h>
 #include <Object/Texture.h>
 
+#include <Renderer/Renderer.h>
+#include <Renderer/Renderer3D.h>
 #include <Renderer/RendererAPI.h>
 #include <Renderer/StereographicCamera.h>
 #include <Renderer/OrthographicCamera.h>
@@ -79,8 +83,6 @@ Shadows::Shadows() {
 	
 	depthCamera = CreateRef<OrthographicCamera>(20.0f, 20.0f, 1.0f, 7.5f);
 	sceneCamera = CreateRef<StereographicCamera>(75.0f, 0.1f, 100.0f, 800, 600);
-
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 }
 
 void Shadows::OnUpdate(TimeStep ts) {

@@ -6,12 +6,10 @@
 #include <Magma/Editor/Editor.h>
 
 #include "Demos/Template.h"
-#include "Demos/Cube.h"
-#include "Demos/ECS.h"
-#include "Demos/Instancing.h"
-#include "Demos/Shadow.h"
+#include "Demos/Lighting.h"
 #include "Demos/Model.h"
-#include "Demos/UI.h"
+#include "Demos/Shadows.h"
+#include "Demos/Selection.h"
 
 #include "Sandbox/TheMazeIsLava/src/Game.h"
 

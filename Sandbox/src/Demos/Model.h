@@ -1,5 +1,7 @@
 #pragma once
 
+#include <glad/glad.h>
+
 #include <Core/Application.h>
 #include <Events/EventSystem.h>
 
@@ -23,8 +25,7 @@ public:
 	void OnUpdate(TimeStep ts) override;
 
 private:
-	Ref<RenderPass> drawPass;
-
+	Ref<ShaderPipeline> shader;
 	Ref<StereographicCamera> camera;
 	Ref<CameraController> controller;
 
@@ -44,37 +45,35 @@ Model::Model()
 		this->camera->Resize(event.Width, event.Height);
 	});
 
-	drawPass = CreateRef<RenderPass>("Draw Pass", ShaderLibrary::Get("Mesh"));
+	shader = ShaderPipeline::Create({
+		{ "Sandbox/assets/shaders/Model.glsl.vert", ShaderType::Vertex },
+		{ "Sandbox/assets/shaders/Model.glsl.frag", ShaderType::Fragment }
+	});
 
 	camera = CreateRef<StereographicCamera>(90.0f, 0.1f, 100.0f, 800, 600);
-	camera->SetPosition({ 0.0f, 0.0f, 5.0f });
+	camera->SetPosition({ 2.5f, 2.5f, 2.5f });
+	camera->SetDirection({ -0.5f, -0.5f, -0.5f });
 
 	controller = CreateRef<CameraController>(camera);
-	controller->TranslationSpeed = 0.05f;
 
 	// TODO: Bug: initializing both causes segfault
-	// cube = Mesh::Create(MeshPrimitive::Cube,
-	// 	Material{
-	// 		.Diffuse = Texture::Create("Sandbox/assets/images/stone.png")
-	// 	});
-	model = ::Model::Create("Sandbox/assets/models/mc-torch/Torch.obj");
+	cube = Mesh::Create(MeshPrimitive::Cube,
+		Material{
+			.Diffuse = Texture::Create("Sandbox/assets/images/stone.png")
+		});
+	// model = ::Model::Create("Sandbox/assets/models/mc-torch/Torch.obj");
+	shader->Bind();
 }
 
 void Model::OnUpdate(TimeStep ts) {
 	controller->OnUpdate(ts);
-	VolcaniCore::Renderer::Clear();
+	Renderer::Clear();
+	
+	Material& material = cube->GetMaterial();
+	shader->SetTexture("u_Diffuse", material.Diffuse, 0);
+	shader->SetMat4("u_Model", Transform{ }.GetTransform());
 
-	Renderer::StartPass(drawPass);
-	{
-		Renderer3D::Begin(camera);
-
-		// Renderer3D::DrawMesh(cube);
-		Renderer3D::DrawMesh(model->GetMesh(0), { .Scale = glm::vec3(1.0f) });
-
-		Renderer3D::End();
-	}
-	Renderer::EndPass();
-
+	Renderer3D::DrawMesh(cube);
 }
 
 

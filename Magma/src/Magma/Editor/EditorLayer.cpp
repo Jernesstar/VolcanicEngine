@@ -151,8 +151,8 @@ void EditorLayer::Render() {
 		m_ViewportFocused = ImGui::IsWindowFocused();
 		m_ViewportHovered = ImGui::IsWindowHovered();
 
-		auto& colorAttachment = m_Framebuffer->Get(AttachmentTarget::Color);
-		uint64_t textureID = colorAttachment->GetRendererID();
+		auto& colorAttachment = m_Framebuffer->As<OpenGL::Framebuffer>()->Get(AttachmentTarget::Color);
+		uint64_t textureID = colorAttachment.GetRendererID();
 		m_Framebuffer->Bind();
 		colorAttachment.Bind();
 		ImGui::Image(reinterpret_cast<void*>(textureID),

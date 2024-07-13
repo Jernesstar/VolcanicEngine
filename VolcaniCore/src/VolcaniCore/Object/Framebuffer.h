@@ -2,7 +2,6 @@
 
 #include "Core/Defines.h"
 
-
 namespace VolcaniCore {
 
 
@@ -10,11 +9,12 @@ enum class AttachmentTarget { Color, Depth, Stencil };
 
 class Framebuffer {
 public:
+	static Ref<Framebuffer> Create(uint32_t width, uint32_t height);
+
+public:
 	Framebuffer(uint32_t width, uint32_t height)
 		: m_Width(width), m_Height(height) { }
 	virtual ~Framebuffer() = default;
-
-	static Ref<Framebuffer> Create(uint32_t width, uint32_t height);
 
 	virtual void Bind() const = 0;
 	virtual void Unbind() const = 0;

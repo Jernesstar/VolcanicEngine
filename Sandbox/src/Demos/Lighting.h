@@ -36,10 +36,10 @@ struct PointLight : public Light {
 	float Quadratic;
 };
 
-struct SpotLight : public Light, public DirectionalLight {
-	float CutoffAngle;
-	float OuterCutoffAngle;
-};
+// struct SpotLight : public Light, public DirectionalLight {
+// 	float CutoffAngle;
+// 	float OuterCutoffAngle;
+// };
 
 class Lighting : public Application {
 public:
@@ -72,23 +72,23 @@ Lighting::Lighting() {
 	// camera = CreateRef<OrthographicCamera>(800, 600, 0.1f, 100.0f);
 	camera->SetPosition({ 2.5f, 2.5f, 2.5f });
 	camera->SetDirection({ -0.5f, -0.5f, -0.5f });
+	controller = CreateRef<CameraController>(camera);
+
 	cube = Mesh::Create(MeshPrimitive::Cube,
 		Material{
 			.Diffuse = Texture::Create("Sandbox/assets/images/wood.png"),
-			.Specular =
-				Texture::Create("Sandbox/assets/images/wood_specular.png"),
+			.Specular = Texture::Create("Sandbox/assets/images/wood_specular.png"),
 		}
 	);
-	PointLight light{ 
-		.Position = { 0.0f, 2.0f, 0.0f },
-		.Ambient  = { 0.2f, 0.2f, 0.2f },
-		.Diffuse  = { 0.5f, 0.5f, 0.5f },
-		.Specular = { 1.0f, 1.0f, 1.0f },
-
+	PointLight light{
 		.Constant  = 0.3f,
 		.Linear    = 0.0f,
 		.Quadratic = 0.032f,
 	};
+	light.Position = { 0.0f, 2.0f, 0.0f },
+	light.Ambient  = { 0.2f, 0.2f, 0.2f },
+	light.Diffuse  = { 0.5f, 0.5f, 0.5f },
+	light.Specular = { 1.0f, 1.0f, 1.0f },
 
 	shader->SetInt("u_PointLightCount", 1);
 	shader->SetVec3("u_PointLights[0].Position", light.Position);
@@ -96,12 +96,12 @@ Lighting::Lighting() {
 	shader->SetVec3("u_PointLights[0].Diffuse",  light.Diffuse);
 	shader->SetVec3("u_PointLights[0].Specular", light.Specular);
 
-	shader->SetVec3("u_PointLights[0].Constant",  light.Constant);
-	shader->SetVec3("u_PointLights[0].Linear",    light.Linear);
-	shader->SetVec3("u_PointLights[0].Quadratic", light.Quadratic);
+	shader->SetFloat("u_PointLights[0].Constant",  light.Constant);
+	shader->SetFloat("u_PointLights[0].Linear",    light.Linear);
+	shader->SetFloat("u_PointLights[0].Quadratic", light.Quadratic);
 
-	shader->SetTexture("u_Material.Diffuse", texture);
-	shader->SetTexture("u_Material.Specular", texture);
+	shader->SetTexture("u_Material.Diffuse", cube->GetMaterial().Diffuse, 0);
+	shader->SetTexture("u_Material.Specular", cube->GetMaterial().Specular, 1);
 	shader->SetFloat("u_Material.Shininess", 32.0f);
 }
 
@@ -112,10 +112,10 @@ void Lighting::OnUpdate(TimeStep ts) {
 	shader->SetVec3("u_CameraPosition", camera->GetPosition());
 
 	Renderer3D::DrawMesh(cube);
-	Renderer3D::DrawMesh(cube, { .Translation = { -2.0f,  0.0f,  0.0f } });
-	Renderer3D::DrawMesh(cube, { .Translation = {  2.0f,  0.0f,  0.0f } });
-	Renderer3D::DrawMesh(cube, { .Translation = {  0.0f,  0.0f, -2.0f } });
-	Renderer3D::DrawMesh(cube, { .Translation = {  0.0f,  0.0f,  2.0f } });
+	// Renderer3D::DrawMesh(cube, { .Translation = { -2.0f,  0.0f,  0.0f } });
+	// Renderer3D::DrawMesh(cube, { .Translation = {  2.0f,  0.0f,  0.0f } });
+	// Renderer3D::DrawMesh(cube, { .Translation = {  0.0f,  0.0f, -2.0f } });
+	// Renderer3D::DrawMesh(cube, { .Translation = {  0.0f,  0.0f,  2.0f } });
 }
 
 }

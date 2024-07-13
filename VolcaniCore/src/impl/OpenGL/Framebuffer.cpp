@@ -20,6 +20,10 @@ void Attachment::Bind() const {
 		glBindRenderbuffer(GL_RENDERBUFFER, m_RendererID);
 }
 
+uint32_t Attachment::GetRendererID() const {
+	return m_RendererID;
+}
+
 Framebuffer::Framebuffer(uint32_t width, uint32_t height)
 	: VolcaniCore::Framebuffer(width, height)
 {

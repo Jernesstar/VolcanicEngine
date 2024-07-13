@@ -14,11 +14,11 @@
 #include "Shader.h"
 
 #include "Mesh.h"
-#include "Model.h"
 #include "Cubemap.h"
 #include "Texture2D.h"
-#include "VertexBuffer.h"
 #include "Framebuffer.h"
+
+#include "VertexArray.h"
 
 using namespace VolcaniCore;
 
@@ -53,9 +53,9 @@ void Renderer::Init() {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	// glEnable(GL_CULL_FACE);
-	// glFrontFace(GL_CCW);
-	// glCullFace(GL_BACK);
+	glEnable(GL_CULL_FACE);
+	glFrontFace(GL_CCW);
+	glCullFace(GL_BACK);
 
 	float cubemapVertices[] =
 	{
@@ -156,12 +156,8 @@ void Renderer::DrawCubemap(Ref<VolcaniCore::Cubemap> cubemap) {
 void Renderer::DrawMesh(Ref<VolcaniCore::Mesh> mesh, Transform t) {
 	auto nativeMesh = mesh->As<OpenGL::Mesh>();
 
-	DrawIndexed(mesh->m_VertexArray);
-}
-
-// void Renderer::Render() {
-
-// }
+	DrawIndexed(nativeMesh->m_VertexArray);
+}{}
 
 void Renderer::RenderFramebuffer(Ref<VolcaniCore::Framebuffer> buffer,
 								 AttachmentTarget target)
@@ -194,7 +190,7 @@ void Renderer::DrawIndexed(Ref<VertexArray> array, uint32_t indices) {
 
 	array->Bind();
 	glDrawElements(GL_TRIANGLES, indices != 0 ? indices : count,
-				   GL_UNSIGNED_INT, nullptr);
+				   GL_UNSIGNED_INT, 0);
 }
 
 void Renderer::DrawInstanced(Ref<VertexArray> array, uint32_t instanceCount) {

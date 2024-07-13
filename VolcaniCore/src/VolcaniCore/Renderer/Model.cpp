@@ -1,5 +1,6 @@
 #include "Model.h"
 
+#include <assimp/scene.h>
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 
@@ -15,7 +16,6 @@ Ref<Model> Model::Create(const std::string& path) {
 Model::Model(const std::string& path)
 	: Path(path)
 {
-	VOLCANICORE_ASSERT(path != "");
 	Load(path);
 }
 
@@ -23,7 +23,12 @@ Model::Model(const std::string& path)
 
 // }
 
+static Ref<Mesh> LoadMesh(const std::string& path,
+						  const aiScene* scene, uint32_t meshIndex);
+
 void Model::Load(const std::string& path) {
+	VOLCANICORE_ASSERT(path != "");
+
 	Assimp::Importer importer;
 	uint32_t loadFlags = aiProcess_Triangulate
 						| aiProcess_GenSmoothNormals
@@ -37,20 +42,17 @@ void Model::Load(const std::string& path) {
 	m_Meshes.resize(scene->mNumMeshes);
 
 	for(uint32_t i = 0; i < scene->mNumMeshes; i++)
-		LoadMesh(path, scene, i);
+		m_Meshes[i] = LoadMesh(path, scene, i);
 }
 
 // void Model::Unload() {
 
 // }
 
-static void LoadMesh(const std::string& path,
-					 const aiScene* scene, uint32_t meshIndex);
-
 static Ref<Texture> LoadTexture(const std::string& dir,
 								const aiMaterial* mat, aiTextureType type);
 
-void Model::LoadMesh(const std::string& path,
+Ref<Mesh> LoadMesh(const std::string& path,
 					 const aiScene* scene,
 					 uint32_t meshIndex)
 {
@@ -103,10 +105,10 @@ void Model::LoadMesh(const std::string& path,
 			// .Emissive = LoadTexture(dir, mat, aiTextureType_EMISSIVE)
 		}
 	);
-	m_Meshes[meshIndex] = std::move(newMesh);
+	return std::move(newMesh);
 }
 
-Ref<Texture> Model::LoadTexture(const std::string& dir,
+Ref<Texture> LoadTexture(const std::string& dir,
 								const aiMaterial* material,
 								aiTextureType type)
 {

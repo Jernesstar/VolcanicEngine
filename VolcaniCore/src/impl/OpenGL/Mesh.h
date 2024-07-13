@@ -21,7 +21,6 @@ public:
 
 private:
 	Ref<OpenGL::VertexArray> m_VertexArray;
-	Ref<OpenGL::VertexBuffer> m_TransformBuffer;
 	Ref<OpenGL::VertexBuffer> m_VertexBuffer;
 	Ref<OpenGL::IndexBuffer> m_IndexBuffer;
 

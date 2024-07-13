@@ -17,9 +17,9 @@ using namespace VolcaniCore;
 
 namespace Demo {
 
-class Template : public Application {
+class Selection : public Application {
 public:
-	Template();
+	Selection();
 
 	void OnUpdate(TimeStep ts);
 
@@ -27,7 +27,7 @@ private:
 	
 };
 
-Template::Template() {
+Selection::Selection() {
 	EventSystem::RegisterListener<KeyPressedEvent>(
 	[](const KeyPressedEvent& event) {
 		if(event.Key == Key::Escape)
@@ -39,10 +39,10 @@ Template::Template() {
 		VOLCANICORE_LOG_INFO("Test Key K");
 	});
 
-	VOLCANICORE_LOG_INFO("Template Project Started");
+	VOLCANICORE_LOG_INFO("Selection Project Started");
 }
 
-void Template::OnUpdate(TimeStep ts) {
+void Selection::OnUpdate(TimeStep ts) {
 
 }
 

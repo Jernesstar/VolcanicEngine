@@ -33,12 +33,8 @@ public:
 	virtual void DrawCubemap(Ref<Cubemap> cubemap) = 0;
 	virtual void DrawMesh(Ref<Mesh> model, Transform t = { }) = 0;
 
-	virtual void Render() = 0;
-
 	virtual void RenderFramebuffer(Ref<Framebuffer> buffer,
 								   AttachmentTarget target) = 0;
-
-	virtual void DrawInstanced(Ref<Mesh> mesh) = 0;
 
 protected:
 	virtual void Init() = 0;

@@ -22,6 +22,7 @@ public:
 	~Attachment();
 
 	void Bind() const;
+	uint32_t GetRendererID() const;
 
 private:
 	uint32_t m_RendererID;

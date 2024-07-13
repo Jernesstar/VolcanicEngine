@@ -31,7 +31,9 @@ public:
 	template<typename Derived>
 	Derived* As() const { return (Derived*)(this); }
 
-protected:
+private:
+	void Load(const std::string& path);
+
 	std::vector<Ref<Mesh>> m_Meshes;
 };
 

@@ -6,6 +6,8 @@
 #include <Events/EventSystem.h>
 
 #include <Renderer/Renderer.h>
+#include <Renderer/Renderer2D.h>
+#include <Renderer/Renderer3D.h>
 #include <Renderer/RendererAPI.h>
 #include <Renderer/Camera.h>
 #include <Renderer/StereographicCamera.h>
