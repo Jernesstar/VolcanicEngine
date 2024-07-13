@@ -21,8 +21,8 @@ public:
 	const uint32_t InternalFormat, DataFormat;
 
 public:
-	Texture2D(uint32_t width, uint32_t height);
 	Texture2D(const std::string& path);
+	Texture2D(uint32_t width, uint32_t height);
 	Texture2D(const Texture2D& other) = default;
 	~Texture2D();
 
@@ -44,8 +44,6 @@ public:
 private:
 	uint32_t m_TextureID;
 	int m_Width = 0, m_Height = 0;
-
-	std::string m_Path;
 };
 
 }

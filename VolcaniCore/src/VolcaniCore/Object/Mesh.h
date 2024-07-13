@@ -39,6 +39,7 @@ public:
 	virtual ~Mesh() = default;
 
 	Material& GetMaterial() { return m_Material; }
+	std::vector<Vertex>& GetVertices() { return m_Vertices; }
 
 	template<typename Derived>
 	Derived* As() const { return (Derived*)(this); }

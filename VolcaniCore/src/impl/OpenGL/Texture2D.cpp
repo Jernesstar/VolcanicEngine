@@ -10,7 +10,7 @@
 namespace VolcaniCore::OpenGL {
 
 Texture2D::Texture2D(uint32_t width, uint32_t height)
-	: VolcaniCore::Texture(width, height),
+	: Texture(width, height),
 		InternalFormat(GL_RGBA8), DataFormat(GL_RGBA)
 {
 	glCreateTextures(GL_TEXTURE_2D, 1, &m_TextureID);
@@ -24,7 +24,7 @@ Texture2D::Texture2D(uint32_t width, uint32_t height)
 }
 
 Texture2D::Texture2D(const std::string& path)
-	: InternalFormat(GL_RGBA8), DataFormat(GL_RGBA)
+	: Texture(path), InternalFormat(GL_RGBA8), DataFormat(GL_RGBA)
 {
 	unsigned char* pixel_data = FileUtils::ReadImage(path.c_str(),
 													 m_Width, m_Height,

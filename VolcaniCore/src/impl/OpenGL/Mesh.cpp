@@ -1,5 +1,7 @@
 #include "Mesh.h"
 
+#include "Core/Log.h"
+
 namespace VolcaniCore::OpenGL {
 
 Mesh::Mesh(const std::vector<Vertex>& vertices,

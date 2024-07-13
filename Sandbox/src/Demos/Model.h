@@ -68,8 +68,8 @@ Model::Model()
 			.Diffuse = Texture::Create("Sandbox/assets/images/stone.png")
 		}
 	);
-	// model = ::Model::Create("Sandbox/assets/models/mc-torch/Torch.obj");
-	model = ::Model::Create("Sandbox/assets/models/sphere/wooden_sphere.obj");
+	model = ::Model::Create("Sandbox/assets/models/mc-torch/Torch.obj");
+	// model = ::Model::Create("Sandbox/assets/models/sphere/wooden_sphere.obj");
 	shader->Bind();
 }
 

@@ -7,6 +7,8 @@
 #include "Core/Log.h"
 #include "Core/Assert.h"
 
+#include "OpenGL/Mesh.h"
+
 namespace VolcaniCore {
 
 Ref<Model> Model::Create(const std::string& path) {
@@ -42,9 +44,7 @@ void Model::Load(const std::string& path) {
 	m_Meshes.reserve(scene->mNumMeshes);
 
 	for(uint32_t i = 0; i < scene->mNumMeshes; i++)
-		m_Meshes[i] = std::move(LoadMesh(path, scene, i));
-	for(uint32_t i = 0; i < scene->mNumMeshes; i++)
-		VOLCANICORE_LOG_INFO("%s", m_Meshes[i]->GetMaterial().Diffuse->GetPath().c_str());
+		m_Meshes.push_back(std::move(LoadMesh(path, scene, i)));
 }
 
 // void Model::Unload() {
@@ -55,8 +55,8 @@ static Ref<Texture> LoadTexture(const std::string& dir,
 								const aiMaterial* mat, aiTextureType type);
 
 Ref<Mesh> LoadMesh(const std::string& path,
-					 const aiScene* scene,
-					 uint32_t meshIndex)
+				   const aiScene* scene,
+				   uint32_t meshIndex)
 {
 	auto mesh = scene->mMeshes[meshIndex];
 	auto mat = scene->mMaterials[mesh->mMaterialIndex];
@@ -79,14 +79,14 @@ Ref<Mesh> LoadMesh(const std::string& path,
 			.Normal			   = glm::vec3(normal.x, normal.y, normal.z),
 			.TextureCoordinate = glm::vec2(texCoord.x, texCoord.y)
 		};
-		vertices[i] = v;
+		vertices.push_back(v);
 	}
 
 	for(uint32_t i = 0; i < mesh->mNumFaces; i++) {
 		const aiFace& face = mesh->mFaces[i];
-		indices[i + 0] = face.mIndices[0];
-		indices[i + 1] = face.mIndices[1];
-		indices[i + 2] = face.mIndices[2];
+		indices.push_back(face.mIndices[0]);
+		indices.push_back(face.mIndices[1]);
+		indices.push_back(face.mIndices[2]);
 	}
 
 	std::size_t slashIndex = path.find("textures");
@@ -107,6 +107,7 @@ Ref<Mesh> LoadMesh(const std::string& path,
 			// .Emissive = LoadTexture(dir, mat, aiTextureType_EMISSIVE)
 		}
 	);
+
 	return std::move(newMesh);
 }
 
