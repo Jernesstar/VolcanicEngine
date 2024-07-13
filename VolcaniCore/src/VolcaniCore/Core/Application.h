@@ -1,13 +1,12 @@
  #pragma once
 
+#include "Time.h"
 #include "Defines.h"
 #include "Window.h"
-#include "Time.h"
 
 int main(int argc, char** argv);
 
 namespace VolcaniCore {
-
 
 class Application {
 public:
@@ -35,6 +34,5 @@ private:
 
 	friend int ::main(int argc, char** argv);
 };
-
 
 }

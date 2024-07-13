@@ -69,6 +69,9 @@ Model::Model()
 
 void Model::OnUpdate(TimeStep ts) {
 	controller->OnUpdate(ts);
+	shader->SetMat4("u_ViewProj", camera->GetViewProjection());
+	shader->SetVec3("u_CameraPosition", camera->GetPosition());
+
 	Renderer::Clear();
 	
 	Material& material = cube->GetMaterial();
