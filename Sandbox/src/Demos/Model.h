@@ -3,7 +3,7 @@
 #include <Core/Application.h>
 #include <Events/EventSystem.h>
 
-#include <Object/Model.h>
+#include <Renderer/Model.h>
 
 #include <Renderer/Renderer.h>
 #include <Renderer/RendererAPI.h>

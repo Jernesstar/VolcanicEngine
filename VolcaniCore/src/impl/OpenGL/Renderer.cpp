@@ -40,8 +40,6 @@ static const uint32_t MaxInstances = 1000;
 struct RendererData {
 	Ptr<VertexArray> CubemapArray;
 	Ptr<VertexArray> FramebufferArray;
-
-	std::unordered_map<Ref<VolcaniCore::Mesh>, uint32_t> Meshes;
 };
 
 static RendererData s_Data;
@@ -156,21 +154,14 @@ void Renderer::DrawCubemap(Ref<VolcaniCore::Cubemap> cubemap) {
 }
 
 void Renderer::DrawMesh(Ref<VolcaniCore::Mesh> mesh, Transform t) {
-	auto& count = s_Data.Meshes.emplace(mesh, 0).first->second;
-
 	auto nativeMesh = mesh->As<OpenGL::Mesh>();
-	glm::mat4 mat = t.GetTransform();
-	nativeMesh->m_TransformBuffer->SetData(1, glm::value_ptr(mat), count++);
+
+	DrawIndexed(mesh->m_VertexArray);
 }
 
-void Renderer::DrawInstanced(Ref<VolcaniCore::Mesh> mesh) {
-	auto nativeMesh = mesh->As<OpenGL::Mesh>();
-	DrawInstanced(nativeMesh->m_VertexArray, s_Data.Meshes[mesh]);
-}
+// void Renderer::Render() {
 
-void Renderer::Render() {
-
-}
+// }
 
 void Renderer::RenderFramebuffer(Ref<VolcaniCore::Framebuffer> buffer,
 								 AttachmentTarget target)

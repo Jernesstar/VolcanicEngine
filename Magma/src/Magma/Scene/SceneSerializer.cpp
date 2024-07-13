@@ -182,12 +182,6 @@ void DeserializeEntity(YAML::Node entityNode, Ref<Scene> scene) {
 	auto components = entityNode["Components"];
 	if(!components) return;
 
-	// TODO: Scripting ?
-	// auto eventlistener = components["EventListenerComponent"];
-	// if(eventlistener) {
-	// 	entity.Add<EventListenerComponent>();
-	// }
-
 	auto tag = components["TagComponent"];
 	if(tag)
 		entity.Add<TagComponent>(tag["Tag"].as<std::string>());

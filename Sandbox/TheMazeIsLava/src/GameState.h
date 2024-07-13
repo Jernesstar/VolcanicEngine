@@ -1,7 +1,8 @@
 #pragma once
 
+#include <Renderer/Model.h>
+
 #include <Object/Mesh.h>
-#include <Object/Model.h>
 #include <Object/Shader.h>
 
 #include <Magma/UI/UI.h>

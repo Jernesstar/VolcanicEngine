@@ -20,13 +20,10 @@ using namespace VolcaniCore;
 Application* CreateApplication(const CommandLineArgs& args) {
 	std::string project = args[1];
 
-	if(project == "Template")	return new Demo::Template();
-	if(project == "Cube")		return new Demo::Cube();
-	if(project == "ECS")		return new Demo::ECS();
-	if(project == "Instancing") return new Demo::Instancing();
-	if(project == "Shadow")		return new Demo::Shadow();
-	if(project == "Model")		return new Demo::Model();
-	if(project == "UI")			return new Demo::GameUI();
+	if(project == "Lighting")  return new Demo::Lighting();
+	if(project == "Model")	   return new Demo::Model();
+	if(project == "Shadows")   return new Demo::Shadows();
+	if(project == "Selection") return new Demo::Model();
 
 	if(project == "Editor") return new Magma::Editor();
 	if(project == "Game")	return new TheMazeIsLava::Game();

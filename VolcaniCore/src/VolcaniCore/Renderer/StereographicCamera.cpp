@@ -15,7 +15,8 @@ StereographicCamera::StereographicCamera(float verticalFov,
 		m_ViewportWidth(width), m_ViewportHeight(height),
 		m_RotationSpeed(rotationSpeed)
 {
-	VOLCANICORE_ASSERT(m_ViewportWidth != 0 && m_ViewportHeight != 0, "Viewport width and height must not be 0");
+	VOLCANICORE_ASSERT(m_ViewportWidth != 0 && m_ViewportHeight != 0,
+					   "Viewport width and height must not be 0");
 	SetProjection(verticalFov, nearClip, farClip);
 }
 
@@ -52,9 +53,9 @@ void StereographicCamera::CalculateView() {
 
 void StereographicCamera::CalculateProjection() {
 	Projection = glm::perspectiveFov(glm::radians(m_VerticalFOV),
-									(float)m_ViewportWidth,
-									(float)m_ViewportHeight,
-									m_NearClip, m_FarClip);
+									 (float)m_ViewportWidth,
+									 (float)m_ViewportHeight,
+									 m_NearClip, m_FarClip);
 	InverseProjection = glm::inverse(Projection);
 	ViewProjection = Projection * View;
 }

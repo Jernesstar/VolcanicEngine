@@ -27,7 +27,6 @@ private:
 };
 
 
-// TODO: Take out of OpenGL subnamespace ? or some version of this
 class BufferLayout {
 public:
 	const std::vector<BufferElement> Elements;

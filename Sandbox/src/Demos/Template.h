@@ -5,13 +5,14 @@
 
 #include <Events/EventSystem.h>
 
+#include <Renderer/Renderer.h>
+#include <Renderer/RendererAPI.h>
+#include <Renderer/Camera.h>
+#include <Renderer/StereographicCamera.h>
+#include <Renderer/CameraController.h>
+
 #include <Object/Shader.h>
 #include <Object/Texture.h>
-
-#include <Renderer/RendererAPI.h>
-#include <Renderer/StereographicCamera.h>
-#include <Renderer/OrthographicCamera.h>
-#include <Renderer/CameraController.h>
 
 using namespace VolcaniCore;
 

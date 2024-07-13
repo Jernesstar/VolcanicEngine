@@ -27,14 +27,12 @@ public:
 	void DrawCubemap(Ref<VolcaniCore::Cubemap> cubemap) override;
 	void DrawMesh(Ref<VolcaniCore::Mesh> model, Transform t = { }) override;
 
-	void DrawInstanced(Ref<VolcaniCore::Mesh> mesh) override;
-
 private:
 	void DrawIndexed(Ref<VertexArray> vertexArray, uint32_t indices = 0);
 	void DrawInstanced(Ref<VertexArray> vertexArray, uint32_t instanceCount);
 
 	void Init() override;
-	void Close() override;	
+	void Close() override;
 };
 
 }

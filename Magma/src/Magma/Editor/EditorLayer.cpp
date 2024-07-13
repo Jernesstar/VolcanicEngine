@@ -151,14 +151,13 @@ void EditorLayer::Render() {
 		m_ViewportFocused = ImGui::IsWindowFocused();
 		m_ViewportHovered = ImGui::IsWindowHovered();
 
-		// TODO:
-		// auto& colorAttachment = m_Framebuffer->Get(AttachmentTarget::Color);
-		// uint64_t textureID = colorAttachment->GetRendererID();
-		// m_Framebuffer->Bind();
-		// colorAttachment->Bind();
-		// ImGui::Image(reinterpret_cast<void*>(textureID),
-		// 			 ImVec2{ m_ViewportSize.x, m_ViewportSize.y },
-		// 			 ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+		auto& colorAttachment = m_Framebuffer->Get(AttachmentTarget::Color);
+		uint64_t textureID = colorAttachment->GetRendererID();
+		m_Framebuffer->Bind();
+		colorAttachment.Bind();
+		ImGui::Image(reinterpret_cast<void*>(textureID),
+					 ImVec2{ m_ViewportSize.x, m_ViewportSize.y },
+					 ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
 
 		if(ImGui::BeginDragDropTarget()) {
 			if(const ImGuiPayload* payload =
