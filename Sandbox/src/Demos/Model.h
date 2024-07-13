@@ -73,8 +73,10 @@ void Model::OnUpdate(TimeStep ts) {
 	shader->SetTexture("u_Diffuse", material.Diffuse, 0);
 	shader->SetMat4("u_Model", Transform{ }.GetTransform());
 
-	Renderer3D::DrawMesh(cube);
-}
+	auto mesh = cube->As<OpenGL::Mesh>();
 
+	mesh->m_VertexArray->Bind();
+	glDrawElements(GL_TRIANGLES, mesh->m_IndexBuffer->Count, GL_UNSIGNED_INT, 0);
+}
 
 }

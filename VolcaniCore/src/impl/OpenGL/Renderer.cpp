@@ -157,7 +157,7 @@ void Renderer::DrawMesh(Ref<VolcaniCore::Mesh> mesh, Transform t) {
 	auto nativeMesh = mesh->As<OpenGL::Mesh>();
 
 	DrawIndexed(nativeMesh->m_VertexArray);
-}{}
+}
 
 void Renderer::RenderFramebuffer(Ref<VolcaniCore::Framebuffer> buffer,
 								 AttachmentTarget target)

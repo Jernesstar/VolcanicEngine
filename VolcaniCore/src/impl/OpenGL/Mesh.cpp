@@ -7,19 +7,16 @@ Mesh::Mesh(std::vector<Vertex> vertices,
 		   Material material)
 	: VolcaniCore::Mesh(vertices, indices, material)
 {
-	BufferLayout layout({
+	BufferLayout la({
 		{ "Position", BufferDataType::Vec3 },
 		{ "Normal",   BufferDataType::Vec3 },
 		{ "TexCoord", BufferDataType::Vec2 }
 	});
 
-	m_VertexBuffer = CreateRef<VertexBuffer>(layout, vertices.size(),
-											 &vertices[0]);
+	m_VertexBuffer = CreateRef<VertexBuffer>(la, vertices.size(), &vertices[0]);
 	m_IndexBuffer = CreateRef<IndexBuffer>(indices.size(), &indices[0]);
 	
-	m_VertexArray = CreateRef<VertexArray>();
-	m_VertexArray->SetIndexBuffer(m_IndexBuffer);
-	m_VertexArray->AddVertexBuffer(m_VertexBuffer);
+	m_VertexArray = CreateRef<VertexArray>(m_VertexBuffer, m_IndexBuffer);
 }
 
 }

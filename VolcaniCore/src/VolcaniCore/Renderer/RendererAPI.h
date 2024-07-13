@@ -36,6 +36,9 @@ public:
 	virtual void RenderFramebuffer(Ref<Framebuffer> buffer,
 								   AttachmentTarget target) = 0;
 
+	template<typename Derived>
+	Derived* As() const { return (Derived*)(this); }
+
 protected:
 	virtual void Init() = 0;
 	virtual void Close() = 0;
