@@ -39,8 +39,12 @@ void Model::Load(const std::string& path) {
 	VOLCANICORE_ASSERT_ARGS(scene, "Error importing model(s) from %s: %s",
 									path.c_str(), importer.GetErrorString());
 
+	m_Meshes.reserve(scene->mNumMeshes);
+
 	for(uint32_t i = 0; i < scene->mNumMeshes; i++)
-		m_Meshes.push_back(LoadMesh(path, scene, i));
+		m_Meshes[i] = std::move(LoadMesh(path, scene, i));
+	for(uint32_t i = 0; i < scene->mNumMeshes; i++)
+		VOLCANICORE_LOG_INFO("%d", (bool)m_Meshes[i]->GetMaterial().Diffuse->HasPath());
 }
 
 // void Model::Unload() {

@@ -18,6 +18,7 @@ Mesh::Mesh(const std::vector<Vertex>& vertices,
 	m_IndexBuffer = CreateRef<IndexBuffer>(m_Indices.size(), &m_Indices[0]);
 	
 	m_VertexArray = CreateRef<VertexArray>(m_VertexBuffer, m_IndexBuffer);
+	m_VertexArray->Unbind();
 }
 
 }

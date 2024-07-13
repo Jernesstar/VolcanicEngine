@@ -32,6 +32,7 @@ private:
 	Ref<CameraController> controller;
 
 	Ref<Mesh> cube;
+	Ref<Mesh> otherMesh;
 	Ref<VolcaniCore::Model> model;
 };
 
@@ -58,16 +59,17 @@ Model::Model()
 
 	controller = CreateRef<CameraController>(camera);
 
-	// TODO: Bug: initializing both causes segfault
 	cube = Mesh::Create(MeshPrimitive::Cube,
 		Material{
 			.Diffuse = Texture::Create("Sandbox/assets/images/stone.png")
 		});
+	otherMesh = Mesh::Create(MeshPrimitive::Quad,
+		Material{
+			.Diffuse = Texture::Create("Sandbox/assets/images/stone.png")
+		}
+	);
 	// model = ::Model::Create("Sandbox/assets/models/mc-torch/Torch.obj");
-	// model = ::Model::Create("Sandbox/assets/models/sphere/wooden_sphere.obj");
-	Ref<Mesh> otherMesh = Mesh::Create(MeshPrimitive::Quad, Material{
-		.Diffuse = Texture::Create("Sandbox/assets/images/stone.png")
-	});
+	model = ::Model::Create("Sandbox/assets/models/sphere/wooden_sphere.obj");
 	shader->Bind();
 }
 
@@ -77,13 +79,15 @@ void Model::OnUpdate(TimeStep ts) {
 	// shader->SetVec3("u_CameraPosition", camera->GetPosition());
 
 	Renderer::Clear();
-	
-	Material& material = cube->GetMaterial();
+
+	auto testMesh = model->GetMesh(0);
+	// auto testMesh = cube;
+	Material& material = testMesh->GetMaterial();
 	Transform t = { };
 	shader->SetTexture("u_Diffuse", material.Diffuse, 0);
 	shader->SetMat4("u_Model", glm::mat4(1.0f));
 
-	auto mesh = cube->As<OpenGL::Mesh>();
+	auto mesh = testMesh->As<OpenGL::Mesh>();
 	auto count = mesh->m_IndexBuffer->Count;
 
 	mesh->m_VertexArray->Bind();

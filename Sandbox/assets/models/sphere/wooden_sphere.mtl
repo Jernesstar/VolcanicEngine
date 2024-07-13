@@ -12,8 +12,8 @@ newmtl wood_Mat
 	Kd 1.000000 1.000000 1.000000
 	Ks 0.000000 0.000000 0.000000
 	Ke 0.000000 0.000000 0.000000
-	map_Ka textures/wood_Mat_Diffuse.png
-	map_Kd textures/wood_Mat_Diffuse.png
-	map_Ks textures/wood_Mat_Specular.png
-	map_bump textures/wood_Mat_Normal.png
-	bump textures/wood_Mat_Normal.png
+	map_Ka Sandbox/assets/models/sphere/textures/wood_Mat_Diffuse.png
+	map_Kd Sandbox/assets/models/sphere/textures/wood_Mat_Diffuse.png
+	map_Ks Sandbox/assets/models/sphere/textures/wood_Mat_Specular.png
+	map_bump Sandbox/assets/models/sphere/textures/wood_Mat_Normal.png
+	bump Sandbox/assets/models/sphere/textures/wood_Mat_Normal.png
