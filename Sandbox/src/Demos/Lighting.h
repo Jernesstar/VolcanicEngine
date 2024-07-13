@@ -63,11 +63,6 @@ Lighting::Lighting() {
 			Application::Close();
 	});
 
-	shader = ShaderPipeline::Create({
-		{ "Sandbox/assets/shaders/Lighting.glsl.vert", ShaderType::Vertex },
-		{ "Sandbox/assets/shaders/Lighting.glsl.frag", ShaderType::Fragment }
-	});
-
 	camera = CreateRef<StereographicCamera>(75.0f, 0.01f, 1000.0f, 800, 600);
 	// camera = CreateRef<OrthographicCamera>(800, 600, 0.1f, 100.0f);
 	camera->SetPosition({ 2.5f, 2.5f, 2.5f });
@@ -90,6 +85,13 @@ Lighting::Lighting() {
 	light.Diffuse  = { 0.5f, 0.5f, 0.5f },
 	light.Specular = { 1.0f, 1.0f, 1.0f },
 
+	shader = ShaderPipeline::Create({
+		{ "Sandbox/assets/shaders/Lighting.glsl.vert", ShaderType::Vertex },
+		{ "Sandbox/assets/shaders/Lighting.glsl.frag", ShaderType::Fragment }
+	});
+
+	shader->Bind();
+
 	shader->SetInt("u_PointLightCount", 1);
 	shader->SetVec3("u_PointLights[0].Position", light.Position);
 	shader->SetVec3("u_PointLights[0].Ambient",  light.Ambient);
@@ -107,15 +109,30 @@ Lighting::Lighting() {
 
 void Lighting::OnUpdate(TimeStep ts) {
 	controller->OnUpdate(ts);
-
 	shader->SetMat4("u_ViewProj", camera->GetViewProjection());
 	shader->SetVec3("u_CameraPosition", camera->GetPosition());
 
+	Renderer::Clear();
+
+	Material& material = cube->GetMaterial();
+	Transform t = { };
+
+	shader->SetTexture("u_Diffuse", material.Diffuse, 0);
+
 	Renderer3D::DrawMesh(cube);
-	// Renderer3D::DrawMesh(cube, { .Translation = { -2.0f,  0.0f,  0.0f } });
-	// Renderer3D::DrawMesh(cube, { .Translation = {  2.0f,  0.0f,  0.0f } });
-	// Renderer3D::DrawMesh(cube, { .Translation = {  0.0f,  0.0f, -2.0f } });
-	// Renderer3D::DrawMesh(cube, { .Translation = {  0.0f,  0.0f,  2.0f } });
+	shader->SetMat4("u_Model", t.GetTransform());
+	Renderer3D::DrawMesh(cube, { .Translation = { -2.0f,  0.0f,  0.0f } });
+	t.Translation = { -2.0f,  0.0f,  0.0f };
+	shader->SetMat4("u_Model", t.GetTransform());
+	Renderer3D::DrawMesh(cube, { .Translation = {  2.0f,  0.0f,  0.0f } });
+	t.Translation = {  2.0f,  0.0f,  0.0f };
+	shader->SetMat4("u_Model", t.GetTransform());
+	Renderer3D::DrawMesh(cube, { .Translation = {  0.0f,  0.0f, -2.0f } });
+	t.Translation = {  0.0f,  0.0f, -2.0f };
+	shader->SetMat4("u_Model", t.GetTransform());
+	Renderer3D::DrawMesh(cube, { .Translation = {  0.0f,  0.0f,  2.0f } });
+	t.Translation = {  0.0f,  0.0f,  2.0f };
+	shader->SetMat4("u_Model", t.GetTransform());
 }
 
 }

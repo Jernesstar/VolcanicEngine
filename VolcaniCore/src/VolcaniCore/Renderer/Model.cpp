@@ -39,10 +39,8 @@ void Model::Load(const std::string& path) {
 	VOLCANICORE_ASSERT_ARGS(scene, "Error importing model(s) from %s: %s",
 									path.c_str(), importer.GetErrorString());
 
-	m_Meshes.resize(scene->mNumMeshes);
-
 	for(uint32_t i = 0; i < scene->mNumMeshes; i++)
-		m_Meshes[i] = LoadMesh(path, scene, i);
+		m_Meshes.push_back(LoadMesh(path, scene, i));
 }
 
 // void Model::Unload() {

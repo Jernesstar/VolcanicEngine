@@ -2,19 +2,20 @@
 
 namespace VolcaniCore::OpenGL {
 
-Mesh::Mesh(std::vector<Vertex> vertices,
-		   std::vector<uint32_t> indices,
-		   Material material)
+Mesh::Mesh(const std::vector<Vertex>& vertices,
+		   const std::vector<uint32_t>& indices,
+		   const Material& material)
 	: VolcaniCore::Mesh(vertices, indices, material)
 {
-	BufferLayout la({
+	BufferLayout layout({
 		{ "Position", BufferDataType::Vec3 },
 		{ "Normal",   BufferDataType::Vec3 },
 		{ "TexCoord", BufferDataType::Vec2 }
 	});
 
-	m_VertexBuffer = CreateRef<VertexBuffer>(la, vertices.size(), &vertices[0]);
-	m_IndexBuffer = CreateRef<IndexBuffer>(indices.size(), &indices[0]);
+	m_VertexBuffer
+		= CreateRef<VertexBuffer>(layout, m_Vertices.size(), &m_Vertices[0]);
+	m_IndexBuffer = CreateRef<IndexBuffer>(m_Indices.size(), &m_Indices[0]);
 	
 	m_VertexArray = CreateRef<VertexArray>(m_VertexBuffer, m_IndexBuffer);
 }

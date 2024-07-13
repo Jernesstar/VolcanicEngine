@@ -64,13 +64,17 @@ Model::Model()
 			.Diffuse = Texture::Create("Sandbox/assets/images/stone.png")
 		});
 	// model = ::Model::Create("Sandbox/assets/models/mc-torch/Torch.obj");
+	// model = ::Model::Create("Sandbox/assets/models/sphere/wooden_sphere.obj");
+	Ref<Mesh> otherMesh = Mesh::Create(MeshPrimitive::Quad, Material{
+		.Diffuse = Texture::Create("Sandbox/assets/images/stone.png")
+	});
 	shader->Bind();
 }
 
 void Model::OnUpdate(TimeStep ts) {
 	controller->OnUpdate(ts);
 	shader->SetMat4("u_ViewProj", camera->GetViewProjection());
-	shader->SetVec3("u_CameraPosition", camera->GetPosition());
+	// shader->SetVec3("u_CameraPosition", camera->GetPosition());
 
 	Renderer::Clear();
 	

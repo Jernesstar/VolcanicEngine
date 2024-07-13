@@ -25,15 +25,15 @@ enum class MeshPrimitive { Line, Quad, Cube, Pyramid };
 
 class Mesh {
 public:
-	static Ref<Mesh> Create(std::vector<Vertex> vertices,
-							std::vector<uint32_t> indices,
-							Material material);
+	static Ref<Mesh> Create(const std::vector<Vertex>& vertices,
+							const std::vector<uint32_t>& indices,
+							const Material& material);
 	static Ref<Mesh> Create(MeshPrimitive primitive, Material material);
 
 public:
-	Mesh(std::vector<Vertex> vertices,
-		 std::vector<uint32_t> indices,
-		 Material material)
+	Mesh(const std::vector<Vertex>& vertices,
+		 const std::vector<uint32_t>& indices,
+		 const Material& material)
 			: m_Vertices(vertices), m_Indices(indices), m_Material(material) { }
 
 	virtual ~Mesh() = default;

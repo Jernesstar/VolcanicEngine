@@ -11,9 +11,9 @@ namespace VolcaniCore::OpenGL {
 
 class Mesh : public VolcaniCore::Mesh {
 public:
-	Mesh(std::vector<Vertex> vertices,
-		 std::vector<uint32_t> indices,
-		 Material material);
+	Mesh(const std::vector<Vertex>& vertices,
+		 const std::vector<uint32_t>& indices,
+		 const Material& material);
 
 // private:
 	Ref<OpenGL::VertexArray> m_VertexArray;
