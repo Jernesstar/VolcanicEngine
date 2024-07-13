@@ -44,7 +44,7 @@ void Model::Load(const std::string& path) {
 	for(uint32_t i = 0; i < scene->mNumMeshes; i++)
 		m_Meshes[i] = std::move(LoadMesh(path, scene, i));
 	for(uint32_t i = 0; i < scene->mNumMeshes; i++)
-		VOLCANICORE_LOG_INFO("%d", (bool)m_Meshes[i]->GetMaterial().Diffuse->HasPath());
+		VOLCANICORE_LOG_INFO("%s", m_Meshes[i]->GetMaterial().Diffuse->GetPath().c_str());
 }
 
 // void Model::Unload() {

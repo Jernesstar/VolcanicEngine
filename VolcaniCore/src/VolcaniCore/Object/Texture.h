@@ -14,6 +14,7 @@ public:
 
 	uint32_t GetWidth() const { return m_Width; }
 	uint32_t GetHeight() const { return m_Height; }
+
 	bool HasPath() const { return m_Path != ""; }
 	std::string GetPath() const { return m_Path; }
 

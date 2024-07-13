@@ -14,7 +14,8 @@ Ref<Mesh> Mesh::Create(const std::vector<Vertex>& vertices,
 
 	switch(backend) {
 		case RendererBackend::OpenGL:
-			return CreateRef<OpenGL::Mesh>(vertices, indices, material);
+			return std::move(
+						CreateRef<OpenGL::Mesh>(vertices, indices, material));
 			break;
 	}
 }
