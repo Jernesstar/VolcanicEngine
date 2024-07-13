@@ -14,6 +14,8 @@
 #include <Renderer/CameraController.h>
 #include <Renderer/ShaderLibrary.h>
 
+#include <OpenGL/Mesh.h>
+
 using namespace VolcaniCore;
 
 namespace Demo {
@@ -50,7 +52,7 @@ Model::Model()
 		{ "Sandbox/assets/shaders/Model.glsl.frag", ShaderType::Fragment }
 	});
 
-	camera = CreateRef<StereographicCamera>(90.0f, 0.1f, 100.0f, 800, 600);
+	camera = CreateRef<StereographicCamera>(90.0f, 0.01f, 1000.0f, 800, 600);
 	camera->SetPosition({ 2.5f, 2.5f, 2.5f });
 	camera->SetDirection({ -0.5f, -0.5f, -0.5f });
 
@@ -70,13 +72,15 @@ void Model::OnUpdate(TimeStep ts) {
 	Renderer::Clear();
 	
 	Material& material = cube->GetMaterial();
+	Transform t = { };
 	shader->SetTexture("u_Diffuse", material.Diffuse, 0);
-	shader->SetMat4("u_Model", Transform{ }.GetTransform());
+	shader->SetMat4("u_Model", glm::mat4(1.0f));
 
 	auto mesh = cube->As<OpenGL::Mesh>();
+	auto count = mesh->m_IndexBuffer->Count;
 
 	mesh->m_VertexArray->Bind();
-	glDrawElements(GL_TRIANGLES, mesh->m_IndexBuffer->Count, GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, 0);
 }
 
 }
