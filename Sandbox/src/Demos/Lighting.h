@@ -130,7 +130,7 @@ void Lighting::OnUpdate(TimeStep ts) {
 		Renderer3D::DrawMesh(cube, { .Translation = {  0.0f,  0.0f,  2.0f } });
 
 		Renderer3D::DrawMesh(cube, {
-										.Translation = { 0.0f, -2.0f, 0.0f},
+										.Translation = { 0.0f, -13.0f, 0.0f},
 										.Scale = glm::vec3(20.0f)
 								   });
 

@@ -37,18 +37,16 @@ private:
 
 	Ref<ShaderPipeline> depthShader;
 	Ref<ShaderPipeline> shadowShader;
-	// Ref<RenderPass> depthPass;
-	// Ref<RenderPass> shadowPass;
+	Ref<RenderPass> depthPass;
+	Ref<RenderPass> shadowPass;
 
 	Ref<Mesh> torch;
 	Ref<Mesh> cube;
 
-	// Ref<OpenGL::Framebuffer> depthMap;
+	Ref<OpenGL::Framebuffer> depthMap;
 
 	// Ref<Camera> depthCamera;
 	// Ref<Camera> sceneCamera;
-
-	uint32_t depthMap;
 };
 
 Shadows::Shadows() {
@@ -67,15 +65,15 @@ Shadows::Shadows() {
 		{ "Sandbox/assets/shaders/Shadow.glsl.frag", ShaderType::Fragment }
 	});
 
-	// depthPass = RenderPass::Create("Depth Pass", depthShader);
-	// depthPass->SetOutput(depthMap);
-	// shadowPass = RenderPass::Create("Shadow Pass", shadowShader);
+	std::vector<OpenGL::Attachment> attachments{
+		{ AttachmentTarget::Color, OpenGL::AttachmentType::Texture },
+		{ AttachmentTarget::Depth, OpenGL::AttachmentType::Texture }
+	};
+	depthMap = CreateRef<OpenGL::Framebuffer>(1024, 1024, attachments);
 
-	// std::vector<OpenGL::Attachment> attachments{
-	// 	{ AttachmentTarget::Color, OpenGL::AttachmentType::Texture },
-	// 	{ AttachmentTarget::Depth, OpenGL::AttachmentType::Texture }
-	// };
-	// depthMap = CreateRef<OpenGL::Framebuffer>(1024, 1024, attachments);
+	depthPass = RenderPass::Create("Depth Pass", depthShader);
+	depthPass->SetOutput(depthMap);
+	shadowPass = RenderPass::Create("Shadow Pass", shadowShader);
 
 	cube = Mesh::Create(MeshPrimitive::Cube,
 		Material{
@@ -88,36 +86,40 @@ Shadows::Shadows() {
 }
 
 void Shadows::OnUpdate(TimeStep ts) {
-	// Renderer::Clear();
+	Renderer::StartPass(depthPass);
+	{
+		Renderer::Clear();
 
-	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glm::mat4 lightProjection, lightView, lightSpaceMatrix;
+		glm::vec3 lightPos = glm::vec3(-2.0f, 4.0f, -1.0f);
+		float near = 1.0f, far = 7.5f;
+		lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near, far);
+		lightView = glm::lookAt(lightPos, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		lightSpaceMatrix = lightProjection * lightView;
+		// render scene from light's point of view
+		depthShader->SetMat4("u_LightSpaceMatrix", lightSpaceMatrix);
 
-	glm::mat4 lightProjection, lightView, lightSpaceMatrix;
-	float near = 1.0f, far = 7.5f;
-	lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near, far);
-	lightView = glm::lookAt(lightPos, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-	lightSpaceMatrix = lightProjection * lightView;
-	// render scene from light's point of view
-	depthShader->Bind();
-	depthShader->SetMat4("u_LightSpaceMatrix", lightSpaceMatrix);
-
-	glViewport(0, 0, 1024, 1024);
-	depthMap->Bind();
-	glClear(GL_DEPTH_BUFFER_BIT);
-
-	RenderScene(simpleDepthShader);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	// reset viewport
-	glViewport(0, 0, 800, 600);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		RenderScene();
+	}
+	Renderer::EndPass();
 
 	RendererAPI::Get()->RenderFramebuffer(depthMap, AttachmentTarget::Depth);
 }
 
 void Shadows::RenderScene() {
-	
+	// Renderer3D::Begin(camera);
+
+	Renderer3D::DrawMesh(cube, { .Translation = { -2.0f,  0.0f,  0.0f } });
+	Renderer3D::DrawMesh(cube, { .Translation = {  2.0f,  0.0f,  0.0f } });
+	Renderer3D::DrawMesh(cube, { .Translation = {  0.0f,  0.0f, -2.0f } });
+	Renderer3D::DrawMesh(cube, { .Translation = {  0.0f,  0.0f,  2.0f } });
+
+	Renderer3D::DrawMesh(cube, {
+									.Translation = { 0.0f, -13.0f, 0.0f},
+									.Scale = glm::vec3(20.0f)
+							   });
+
+	// Renderer3D::End();
 }
 
 }
