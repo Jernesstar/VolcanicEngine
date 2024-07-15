@@ -49,11 +49,15 @@ public:
 
 private:
 	Ref<ShaderPipeline> shader;
+	Ref<RenderPass> drawPass;
 
 	Ref<Camera> camera;
 	Ref<CameraController> controller;
 
 	Ref<Mesh> cube;
+	Ref<Model> torch;
+
+	PointLight light;
 };
 
 Lighting::Lighting() {
@@ -63,32 +67,29 @@ Lighting::Lighting() {
 			Application::Close();
 	});
 
-	camera = CreateRef<StereographicCamera>(75.0f, 0.01f, 1000.0f, 800, 600);
-	// camera = CreateRef<OrthographicCamera>(800, 600, 0.1f, 100.0f);
-	camera->SetPosition({ 2.5f, 2.5f, 2.5f });
-	camera->SetDirection({ -0.5f, -0.5f, -0.5f });
-	controller = CreateRef<CameraController>(camera);
-
 	cube = Mesh::Create(MeshPrimitive::Cube,
 		Material{
 			.Diffuse = Texture::Create("Sandbox/assets/images/wood.png"),
 			.Specular = Texture::Create("Sandbox/assets/images/wood_specular.png"),
 		}
 	);
-	PointLight light{
-		.Constant  = 0.3f,
-		.Linear    = 0.0f,
-		.Quadratic = 0.032f,
-	};
-	light.Position = { 0.0f, 2.0f, 0.0f },
-	light.Ambient  = { 0.2f, 0.2f, 0.2f },
-	light.Diffuse  = { 0.5f, 0.5f, 0.5f },
-	light.Specular = { 1.0f, 1.0f, 1.0f },
+	torch = ::Model::Create("Sandbox/assets/models/mc-torch/Torch.obj");
 
 	shader = ShaderPipeline::Create({
 		{ "Sandbox/assets/shaders/Lighting.glsl.vert", ShaderType::Vertex },
 		{ "Sandbox/assets/shaders/Lighting.glsl.frag", ShaderType::Fragment }
 	});
+	drawPass = RenderPass::Create("Draw Pass", shader);
+
+	light = PointLight{
+		.Constant  = 0.3f,
+		.Linear    = 0.0f,
+		.Quadratic = 0.032f,
+	};
+	light.Position = { 0.0f, -1.0f, 0.0f },
+	light.Ambient  = { 0.2f, 0.2f, 0.2f },
+	light.Diffuse  = { 0.5f, 0.5f, 0.5f },
+	light.Specular = { 1.0f, 1.0f, 1.0f },
 
 	shader->Bind();
 
@@ -105,34 +106,37 @@ Lighting::Lighting() {
 	shader->SetTexture("u_Material.Diffuse", cube->GetMaterial().Diffuse, 0);
 	shader->SetTexture("u_Material.Specular", cube->GetMaterial().Specular, 1);
 	shader->SetFloat("u_Material.Shininess", 32.0f);
+
+	camera = CreateRef<StereographicCamera>(75.0f, 0.01f, 1000.0f, 800, 600);
+	// camera = CreateRef<OrthographicCamera>(800, 600, 0.1f, 100.0f);
+	camera->SetPosition({ 2.5f, 2.5f, 2.5f });
+	camera->SetDirection({ -0.5f, -0.5f, -0.5f });
+	controller = CreateRef<CameraController>(camera);
 }
 
 void Lighting::OnUpdate(TimeStep ts) {
 	controller->OnUpdate(ts);
-	shader->SetMat4("u_ViewProj", camera->GetViewProjection());
-	shader->SetVec3("u_CameraPosition", camera->GetPosition());
 
-	Renderer::Clear();
+	Renderer::StartPass(drawPass);
+	{
+		Renderer::Clear();
 
-	Material& material = cube->GetMaterial();
-	Transform t = { };
+		Renderer3D::Begin(camera);
 
-	shader->SetTexture("u_Diffuse", material.Diffuse, 0);
+		Renderer3D::DrawMesh(torch->GetMesh(0), { .Translation = light.Position });
+		Renderer3D::DrawMesh(cube, { .Translation = { -2.0f,  0.0f,  0.0f } });
+		Renderer3D::DrawMesh(cube, { .Translation = {  2.0f,  0.0f,  0.0f } });
+		Renderer3D::DrawMesh(cube, { .Translation = {  0.0f,  0.0f, -2.0f } });
+		Renderer3D::DrawMesh(cube, { .Translation = {  0.0f,  0.0f,  2.0f } });
 
-	Renderer3D::DrawMesh(cube);
-	shader->SetMat4("u_Model", t.GetTransform());
-	Renderer3D::DrawMesh(cube, { .Translation = { -2.0f,  0.0f,  0.0f } });
-	t.Translation = { -2.0f,  0.0f,  0.0f };
-	shader->SetMat4("u_Model", t.GetTransform());
-	Renderer3D::DrawMesh(cube, { .Translation = {  2.0f,  0.0f,  0.0f } });
-	t.Translation = {  2.0f,  0.0f,  0.0f };
-	shader->SetMat4("u_Model", t.GetTransform());
-	Renderer3D::DrawMesh(cube, { .Translation = {  0.0f,  0.0f, -2.0f } });
-	t.Translation = {  0.0f,  0.0f, -2.0f };
-	shader->SetMat4("u_Model", t.GetTransform());
-	Renderer3D::DrawMesh(cube, { .Translation = {  0.0f,  0.0f,  2.0f } });
-	t.Translation = {  0.0f,  0.0f,  2.0f };
-	shader->SetMat4("u_Model", t.GetTransform());
+		Renderer3D::DrawMesh(cube, {
+										.Translation = { 0.0f, -2.0f, 0.0f},
+										.Scale = glm::vec3(20.0f)
+								   });
+
+		Renderer3D::End();
+	}
+	Renderer::EndPass();
 }
 
 }

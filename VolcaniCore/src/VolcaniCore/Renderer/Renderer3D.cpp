@@ -34,12 +34,12 @@ void Renderer3D::DrawCubemap(Ref<Cubemap> cubemap) {
 }
 
 void Renderer3D::DrawMesh(Ref<Mesh> mesh, Transform t) {
-	// auto pass = Renderer::GetPass();
-	// auto pipeline = pass->GetPipeline();
-	// Material& material = mesh->GetMaterial();
+	auto pass = Renderer::GetPass();
+	auto pipeline = pass->GetPipeline();
+	Material& material = mesh->GetMaterial();
 
-	// pipeline->SetTexture("u_Diffuse", material.Diffuse, 0);
-	// pipeline->SetMat4("u_Model", t.GetTransform());
+	pipeline->SetMat4("u_Model", t.GetTransform());
+	pipeline->SetTexture("u_Diffuse", material.Diffuse, 0);
 	// pipeline->SetTexture("u_Specular",  material.Specular,  1);
 	// pipeline->SetTexture("u_Roughness", material.Roughness, 2);
 
