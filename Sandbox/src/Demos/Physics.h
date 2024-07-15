@@ -17,9 +17,9 @@ using namespace VolcaniCore;
 
 namespace Demo {
 
-class Selection : public Application {
+class Physics : public Application {
 public:
-	Selection();
+	Physics();
 
 	void OnUpdate(TimeStep ts);
 
@@ -27,22 +27,15 @@ private:
 	
 };
 
-Selection::Selection() {
+Physics::Physics() {
 	EventSystem::RegisterListener<KeyPressedEvent>(
 	[](const KeyPressedEvent& event) {
 		if(event.Key == Key::Escape)
 			Application::Close();
 	});
-	EventSystem::RegisterListener<KeyPressedEvent>(
-	[](const KeyPressedEvent& event) {
-		if(event.Key == Key::K)
-		VOLCANICORE_LOG_INFO("Test Key K");
-	});
-
-	VOLCANICORE_LOG_INFO("Selection Project Started");
 }
 
-void Selection::OnUpdate(TimeStep ts) {
+void Physics::OnUpdate(TimeStep ts) {
 
 }
 

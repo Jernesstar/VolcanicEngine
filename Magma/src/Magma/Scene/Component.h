@@ -15,7 +15,7 @@ using namespace VolcaniCore;
 
 namespace Magma {
 
-enum class ComponentType { EventListener, Tag, Texture, Transform, Unknown };
+enum class ComponentType { Mesh, Script, Tag, Texture, Transform, Unknown };
 
 struct Component {
 	const ComponentType Type;
@@ -24,47 +24,22 @@ struct Component {
 	virtual ~Component() = default;
 };
 
-struct EventListenerComponent : public Component {
-	EventCallback<KeyPressedEvent>          OnKeyPressed;
-	EventCallback<KeyReleasedEvent>         OnKeyReleased;
-	EventCallback<MouseMovedEvent>          OnMouseMoved;
-	EventCallback<MouseScrolledEvent>       OnMouseScrolled;
-	EventCallback<MouseButtonPressedEvent>  OnMouseButtonPressed;
-	EventCallback<MouseButtonReleasedEvent> OnMouseButtonReleased;
-	EventCallback<WindowResizedEvent>       OnWindowResized;
-	EventCallback<WindowClosedEvent>        OnWindowClosed;
+struct MeshComponent : public Component {
+	Ref<VolcaniCore::Mesh> Mesh;
 
-	EventListenerComponent() : Component(ComponentType::EventListener) { }
-	EventListenerComponent(const EventListenerComponent& other) = default;
+	MeshComponent(Ref<VolcaniCore::Mesh> mesh)
+		: Component(ComponentType::Mesh), Mesh(mesh) { }
+};
 
-	void RegisterCallbacks() {
-		if(OnKeyPressed)          EventSystem::RegisterListener(OnKeyPressed);
-		if(OnKeyReleased)         EventSystem::RegisterListener(OnKeyReleased);
-		if(OnMouseMoved)          EventSystem::RegisterListener(OnMouseMoved);
-		if(OnMouseScrolled)       EventSystem::RegisterListener(OnMouseScrolled);
-		if(OnMouseButtonPressed)  EventSystem::RegisterListener(OnMouseButtonPressed);
-		if(OnMouseButtonReleased) EventSystem::RegisterListener(OnMouseButtonReleased);
-		if(OnWindowResized)       EventSystem::RegisterListener(OnWindowResized);
-		if(OnWindowClosed)        EventSystem::RegisterListener(OnWindowClosed);
-	}
+struct ScriptComponent : public Component {
 
-	void UnregisterCallbacks() {
-		if(OnKeyPressed)          EventSystem::UnregisterListener(OnKeyPressed);
-		if(OnKeyReleased)         EventSystem::UnregisterListener(OnKeyReleased);
-		if(OnMouseMoved)          EventSystem::UnregisterListener(OnMouseMoved);
-		if(OnMouseScrolled)       EventSystem::UnregisterListener(OnMouseScrolled);
-		if(OnMouseButtonPressed)  EventSystem::UnregisterListener(OnMouseButtonPressed);
-		if(OnMouseButtonReleased) EventSystem::UnregisterListener(OnMouseButtonReleased);
-		if(OnWindowResized)       EventSystem::UnregisterListener(OnWindowResized);
-		if(OnWindowClosed)        EventSystem::UnregisterListener(OnWindowClosed);
-	}
 };
 
 struct TagComponent : public Component {
 	std::string Tag;
 
 	TagComponent()
-		: Component(ComponentType::Tag), Tag("Null Tag") { }
+		: Component(ComponentType::Tag), Tag("Unnamed Entity") { }
 	TagComponent(const std::string_view& tag)
 		: Component(ComponentType::Tag), Tag(tag) { }
 	TagComponent(const TagComponent& other) = default;
@@ -88,12 +63,12 @@ struct TransformComponent : public Component {
 	glm::vec3 Rotation = { 0.0f, 0.0f, 0.0f };
 	glm::vec3 Scale = { 1.0f, 1.0f, 1.0f };
 
-	TransformComponent(const TransformComponent& other) = default;
 	TransformComponent()
 		: Component(ComponentType::Transform) { }
 	TransformComponent(glm::vec3 t, glm::vec3 r, glm::vec3 s)
 		: Component(ComponentType::Transform),
 			Translation(t), Rotation(r), Scale(s) { }
+	TransformComponent(const TransformComponent& other) = default;
 
 	glm::mat4 GetTransform() {
 		return glm::translate(glm::mat4(1.0f), Translation)

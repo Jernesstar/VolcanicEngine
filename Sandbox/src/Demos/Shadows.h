@@ -75,7 +75,7 @@ Shadows::Shadows() {
 	};
 	depthMap = CreateRef<OpenGL::Framebuffer>(1024, 1024, attachments);
 
-	// torch = ::Model::Create("Sandbox/assets/models/mc-torch/Torch.obj");
+	torch = ::Model::Create("Sandbox/assets/models/mc-torch/Torch.obj");
 	cube = Mesh::Create(MeshPrimitive::Cube,
 		Material{
 			.Diffuse = Texture::Create("Sandbox/assets/images/wood.png")
@@ -88,24 +88,7 @@ Shadows::Shadows() {
 void Shadows::OnUpdate(TimeStep ts) {
 	VolcaniCore::Renderer::Clear();
 
-	VolcaniCore::Renderer::StartPass(depthPass);
-	{
-		glClear(GL_DEPTH_BUFFER_BIT);
-		glm::mat4 lightProjection, lightView, lightSpaceMatrix;
-		glm::vec3 lightPos = glm::vec3(-2.0f, 4.0f, -1.0f);
-		float near = 1.0f, far = 7.5f;
-		lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near, far);
-		lightView = glm::lookAt(lightPos,
-								glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
-		lightSpaceMatrix = lightProjection * lightView;
-
-		depthShader->SetMat4("u_LightSpaceMatrix", lightSpaceMatrix);
-
-		RenderScene();
-	}
-	VolcaniCore::Renderer::EndPass();
-
-	RendererAPI::Get()->RenderFramebuffer(depthMap, AttachmentTarget::Depth);
+	Renderer3D::DrawModel(cube, { .Scale =  })
 }
 
 void Shadows::RenderScene() {
