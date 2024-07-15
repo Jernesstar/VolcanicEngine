@@ -24,6 +24,8 @@ project "Magma"
         "%{Includes.imgui}/imgui",
         "%{Includes.yaml_cpp}",
         "%{Includes.ImGuiFileDialog}",
+        "%{Includes.flecs}",
+        "%{Includes.PhysX}",
     }
 
     filter "system:windows"
@@ -33,3 +35,5 @@ project "Magma"
 include "Magma/scripts/imgui"
 include "Magma/scripts/yaml-cpp"
 include "Magma/scripts/ImGuiFileDialog"
+include "Magma/scripts/flecs"
+include "Magma/scripts/PhysX"

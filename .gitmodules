@@ -36,3 +36,9 @@
 	path = Magma/vendor/imgui
 	url = https://github.com/ocornut/imgui.git
 	branch = docking
+[submodule "Magma/vendor/flecs"]
+	path = Magma/vendor/flecs
+	url = https://github.com/SanderMertens/flecs.git
+[submodule "Magma/vendor/PhysX"]
+	path = Magma/vendor/PhysX
+	url = https://github.com/NVIDIA-Omniverse/PhysX.git

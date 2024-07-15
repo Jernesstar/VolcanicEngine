@@ -43,6 +43,8 @@ project "Sandbox"
         "imgui",
         "yaml-cpp",
         "ImGuiFileDialog",
+        "flecs",
+        "PhysX",
 
         -- "bgfx",
         -- "bimg",
