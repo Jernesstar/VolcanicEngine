@@ -9,6 +9,8 @@
 
 #include <VolcaniCore/Events/EventCallback.h>
 #include <VolcaniCore/Events/EventSystem.h>
+
+#include <VolcaniCore/Object/Mesh.h>
 #include <VolcaniCore/Object/Texture.h>
 
 using namespace VolcaniCore;

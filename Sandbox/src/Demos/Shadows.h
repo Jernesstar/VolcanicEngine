@@ -75,7 +75,6 @@ Shadows::Shadows() {
 	};
 	depthMap = CreateRef<OpenGL::Framebuffer>(1024, 1024, attachments);
 
-	torch = ::Model::Create("Sandbox/assets/models/mc-torch/Torch.obj");
 	cube = Mesh::Create(MeshPrimitive::Cube,
 		Material{
 			.Diffuse = Texture::Create("Sandbox/assets/images/wood.png")
@@ -87,8 +86,6 @@ Shadows::Shadows() {
 
 void Shadows::OnUpdate(TimeStep ts) {
 	VolcaniCore::Renderer::Clear();
-
-	Renderer3D::DrawModel(cube, { .Scale =  })
 }
 
 void Shadows::RenderScene() {

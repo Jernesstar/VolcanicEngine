@@ -132,14 +132,14 @@ void SerializeEntity(YAML::Emitter& out, Entity& entity) {
 	out << YAML::Key << "ID" << YAML::Value << entity.GetID();
 
 	out << YAML::Key << "Components" << YAML::Key << YAML::BeginMap; // Components
-	if(entity.Has<EventListenerComponent>()) {
-		auto& eventlistener = entity.Get<EventListenerComponent>();
+	// if(entity.Has<ScriptComponent>()) {
+	// 	auto& eventlistener = entity.Get<ScriptComponent>();
 
-		out << YAML::Key << "EventListenerComponent";
-		out << YAML::BeginMap;
+	// 	out << YAML::Key << "ScriptComponent";
+	// 	out << YAML::BeginMap;
 
-		out << YAML::EndMap;
-	}
+	// 	out << YAML::EndMap;
+	// }
 
 	if(entity.Has<TagComponent>()) {
 		auto& tag = entity.Get<TagComponent>().Tag;

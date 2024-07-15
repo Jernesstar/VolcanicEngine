@@ -10,10 +10,10 @@
 #include <Renderer/Camera.h>
 #include <Renderer/StereographicCamera.h>
 #include <Renderer/CameraController.h>
+#include <Renderer/Model.h>
 
 #include <Object/Shader.h>
 #include <Object/Texture.h>
-#include <Object/Mesh.h>
 
 using namespace VolcaniCore;
 
@@ -55,7 +55,7 @@ private:
 	Ref<CameraController> controller;
 
 	Ref<Mesh> cube;
-	Ref<Model> torch;
+	Ref<VolcaniCore::Model> torch;
 
 	PointLight light;
 };
