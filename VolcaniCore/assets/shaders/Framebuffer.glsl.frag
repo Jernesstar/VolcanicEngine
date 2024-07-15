@@ -1,10 +1,10 @@
 #version 450 core
 
-in vec2 v_TexCoords;
+layout(location = 0) in vec2 v_TexCoords;
+
+layout(location = 0) out vec4 FragColor;
 
 uniform sampler2D u_ScreenTexture;
-
-out vec4 FragColor;
 
 void main()
 {
