@@ -13,7 +13,7 @@ namespace Magma {
 class Scene {
 public:
 	const std::string Name;
-	Ref<Camera> Camera;
+	Ref<VolcaniCore::Camera> Camera;
 
 public:
 	Scene()

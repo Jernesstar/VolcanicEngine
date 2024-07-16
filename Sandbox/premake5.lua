@@ -33,7 +33,7 @@ project "Sandbox"
         "%{Includes.imgui}",
         "%{Includes.imgui}/imgui",
         "%{Includes.yaml_cpp}",
-        "%{Includes.ImGuiFileDialog}"
+        "%{Includes.ImGuiFileDialog}",
         "%{Includes.flecs}",
         "%{Includes.PhysX}"
     }

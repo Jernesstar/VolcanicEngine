@@ -2,6 +2,8 @@
 
 #include <PxPhysicsAPI.h>
 
+using namespace physx;
+
 using namespace VolcaniCore;
 
 namespace Demo {
@@ -13,7 +15,11 @@ public:
 	void OnUpdate(TimeStep ts);
 
 private:
-	physx::PxPhysics* pPhysicsSDK = NULL;
+	PxPhysics* pPhysicsSDK = NULL;
+	PxFoundation* mFoundation;
+
+	inline static PxDefaultErrorCallback gDefaultErrorCallback;
+	inline static PxDefaultAllocator gDefaultAllocatorCallback;
 };
 
 Physics::Physics() {
@@ -22,6 +28,9 @@ Physics::Physics() {
 		if(event.Key == Key::Escape)
 			Application::Close();
 	});
+
+	mFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, gDefaultAllocatorCallback, gDefaultErrorCallback);
+	VOLCANICORE_ASSERT(mFoundation, "PxCreateFoundation failed!");
 }
 
 void Physics::OnUpdate(TimeStep ts) {

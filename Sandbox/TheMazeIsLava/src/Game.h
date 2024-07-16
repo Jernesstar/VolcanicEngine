@@ -5,7 +5,7 @@
 #include <Renderer/StereographicCamera.h>
 #include <Renderer/CameraController.h>
 
-#include <Magma/Scene/Scene.h>
+#include <Magma/Editor/Scene.h>
 #include <Magma/UI/UI.h>
 
 #include "Level.h"
@@ -23,7 +23,7 @@ public:
 	void OnUpdate(TimeStep ts) override;
 
 private:
-	void Reset();
+	// void Reset();
 
 	void StartScreen();
 	void LevelScreen();

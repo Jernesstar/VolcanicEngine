@@ -25,7 +25,6 @@
 #include <Magma/UI/UIElements.h>
 
 #include "Demos/Template.h"
-#include "Demos/Model.h"
 #include "Demos/Lighting.h"
 #include "Demos/Shadows.h"
 #include "Demos/ECS.h"

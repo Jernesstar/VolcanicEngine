@@ -15,14 +15,14 @@ project "flecs"
     }
 
     defines {
-        "FLECS_CUSTOM_BUILD",
-        "FLECS_CPP",
-        "FLECS_ALERTS",
-        "FLECS_LOG",
-        "FLECS_METRICS",
-        "FLECS_STATS",
-        "FLECS_SYSTEM",
-        "FLECS_PIPELINE"
+        -- "FLECS_CUSTOM_BUILD",
+        -- "FLECS_CPP",
+        -- "FLECS_ALERTS",
+        -- "FLECS_LOG",
+        -- "FLECS_METRICS",
+        -- "FLECS_STATS",
+        -- "FLECS_SYSTEM",
+        -- "FLECS_PIPELINE"
     }
 
     buildoptions {

@@ -4,7 +4,7 @@
 
 #include <VolcaniCore/Object/Texture.h>
 
-#include "Scene/Scene.h"
+#include "Scene.h"
 
 namespace Magma {
 
