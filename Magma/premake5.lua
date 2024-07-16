@@ -17,15 +17,16 @@ project "Magma"
         "%{RootPath}/VolcaniCore/src/VolcaniCore",
         "%{RootPath}/VolcaniCore/src/impl/",
 
-        "%{Includes.glm}",
-        "%{Includes.glad}",
-        "%{Includes.glfw}",
-        "%{Includes.imgui}",
         "%{Includes.imgui}/imgui",
         "%{Includes.yaml_cpp}",
         "%{Includes.ImGuiFileDialog}",
         "%{Includes.flecs}",
         "%{Includes.PhysX}",
+
+        "%{Includes.glm}",
+        "%{Includes.glad}",
+        "%{Includes.glfw}",
+        "%{Includes.imgui}",
     }
 
     filter "system:windows"

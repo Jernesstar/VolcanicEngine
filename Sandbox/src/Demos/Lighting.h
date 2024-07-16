@@ -1,20 +1,5 @@
 #pragma once
 
-#include <Core/Application.h>
-#include <Core/Log.h>
-
-#include <Events/EventSystem.h>
-
-#include <Renderer/Renderer.h>
-#include <Renderer/RendererAPI.h>
-#include <Renderer/Camera.h>
-#include <Renderer/StereographicCamera.h>
-#include <Renderer/CameraController.h>
-#include <Renderer/Model.h>
-
-#include <Object/Shader.h>
-#include <Object/Texture.h>
-
 using namespace VolcaniCore;
 
 namespace Demo {

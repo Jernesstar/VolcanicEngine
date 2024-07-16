@@ -7,10 +7,10 @@ project "PhysX"
     targetdir ("%{RootPath}/build/Magma/lib")
 
     files {
-        "%{VendorPaths.PhysX}/*.h",
-        "%{VendorPaths.PhysX}/*.cpp",
+        "%{VendorPaths.PhysX}/physx/*.h",
+        "%{VendorPaths.PhysX}/physx/*.cpp",
     }
 
     includedirs {
-        "%{Includes.PhysX}",
+        "%{Includes.PhysX}/physx",
     }

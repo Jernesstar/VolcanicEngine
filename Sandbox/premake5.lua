@@ -15,14 +15,14 @@ project "Sandbox"
     }
 
     includedirs {
+        "%{RootPath}",
         "%{RootPath}/VolcaniCore/src",
         "%{RootPath}/VolcaniCore/src/VolcaniCore",
         "%{RootPath}/VolcaniCore/src/impl",
         "%{RootPath}/Magma/src",
         "%{RootPath}/Magma/src/Magma",
-        "%{RootPath}",
 
-        "%{Includes.bgfx}",
+        -- "%{Includes.bgfx}",
         "%{Includes.glfw}",
         "%{Includes.glad}",
         "%{Includes.glm}",
@@ -34,6 +34,8 @@ project "Sandbox"
         "%{Includes.imgui}/imgui",
         "%{Includes.yaml_cpp}",
         "%{Includes.ImGuiFileDialog}"
+        "%{Includes.flecs}",
+        "%{Includes.PhysX}"
     }
 
     links {
@@ -61,7 +63,8 @@ project "Sandbox"
         links {
             "gdi32",
             "kernel32",
-            "psapi"
+            "psapi",
+            "Ws2_32"
         }
     filter "system:linux"
         links {

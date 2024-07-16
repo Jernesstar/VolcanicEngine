@@ -1,17 +1,6 @@
 #pragma once
 
-#include <Core/Application.h>
-#include <Core/Log.h>
-
-#include <Events/EventSystem.h>
-
-#include <Object/Shader.h>
-#include <Object/Texture.h>
-
-#include <Renderer/RendererAPI.h>
-#include <Renderer/StereographicCamera.h>
-#include <Renderer/OrthographicCamera.h>
-#include <Renderer/CameraController.h>
+#include <PxPhysicsAPI.h>
 
 using namespace VolcaniCore;
 
@@ -24,7 +13,7 @@ public:
 	void OnUpdate(TimeStep ts);
 
 private:
-	
+	physx::PxPhysics* pPhysicsSDK = NULL;
 };
 
 Physics::Physics() {

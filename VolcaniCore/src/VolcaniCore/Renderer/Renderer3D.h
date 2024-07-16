@@ -6,7 +6,7 @@
 #include "Object/Texture.h"
 #include "Object/Shader.h"
 
-#include "Renderer/Model.h"
+#include "Object/Model.h"
 #include "Renderer/Camera.h"
 #include "Renderer/Transform.h"
 

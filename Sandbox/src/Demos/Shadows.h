@@ -1,24 +1,5 @@
 #pragma once
 
-#include <glad/glad.h>
-
-#include <Core/Application.h>
-#include <Core/Log.h>
-
-#include <Events/EventSystem.h>
-
-#include <Object/Mesh.h>
-#include <Renderer/Model.h>
-#include <Object/Shader.h>
-#include <Object/Texture.h>
-
-#include <Renderer/Renderer.h>
-#include <Renderer/Renderer3D.h>
-#include <Renderer/RendererAPI.h>
-#include <Renderer/StereographicCamera.h>
-#include <Renderer/OrthographicCamera.h>
-#include <Renderer/CameraController.h>
-
 #include <OpenGL/Framebuffer.h>
 
 using namespace VolcaniCore;

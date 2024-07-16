@@ -7,8 +7,6 @@
 #include "Core/Log.h"
 #include "Core/Assert.h"
 
-#include "OpenGL/Mesh.h"
-
 namespace VolcaniCore {
 
 Ref<Model> Model::Create(const std::string& path) {
