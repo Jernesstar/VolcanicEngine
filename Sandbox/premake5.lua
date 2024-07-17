@@ -58,6 +58,10 @@ project "Sandbox"
         "stb_image"
     }
 
+    buildoptions {
+        "-Wno-format-security"
+    }
+
     filter "system:windows"
         systemversion "latest"
         links {
