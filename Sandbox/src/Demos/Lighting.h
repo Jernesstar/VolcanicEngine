@@ -53,11 +53,10 @@ Lighting::Lighting() {
 	});
 
 	cube = Mesh::Create(MeshPrimitive::Cube,
-		Material{
-			.Diffuse = Texture::Create("Sandbox/assets/images/wood.png"),
-			.Specular = Texture::Create("Sandbox/assets/images/wood_specular.png"),
-		}
-	);
+	Material{
+		.Diffuse = Texture::Create("Sandbox/assets/images/wood.png"),
+		.Specular = Texture::Create("Sandbox/assets/images/wood_specular.png"),
+	});
 	torch = ::Model::Create("Sandbox/assets/models/mc-torch/Torch.obj");
 
 	shader = ShaderPipeline::Create({

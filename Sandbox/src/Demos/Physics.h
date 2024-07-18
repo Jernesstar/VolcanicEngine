@@ -4,12 +4,7 @@
 #include <PxPhysicsAPI.h>
 
 using namespace physx;
-
 using namespace VolcaniCore;
-
-namespace Demo {
-
-using namespace physx;
 
 static PxDefaultAllocator		gAllocator;
 static PxDefaultErrorCallback	gErrorCallback;
@@ -22,9 +17,12 @@ static PxPvd*					gPvd        = nullptr;
 
 static PxReal stackZ = 10.0f;
 
-static PxRigidDynamic* createDynamic(const PxTransform& t, const PxGeometry& geometry, const PxVec3& velocity=PxVec3(0))
+static PxRigidDynamic* createDynamic(const PxTransform& t,
+									 const PxGeometry& geometry,
+									 const PxVec3& velocity=PxVec3(0))
 {
-	PxRigidDynamic* dynamic = PxCreateDynamic(*gPhysics, t, geometry, *gMaterial, 10.0f);
+	PxRigidDynamic* dynamic = PxCreateDynamic(*gPhysics, t, geometry,
+											  *gMaterial, 10.0f);
 	dynamic->setAngularDamping(0.5f);
 	dynamic->setLinearVelocity(velocity);
 	gScene->addActor(*dynamic);
@@ -33,10 +31,12 @@ static PxRigidDynamic* createDynamic(const PxTransform& t, const PxGeometry& geo
 
 static void createStack(const PxTransform& t, PxU32 size, PxReal halfExtent)
 {
-	PxShape* shape = gPhysics->createShape(PxBoxGeometry(halfExtent, halfExtent, halfExtent), *gMaterial);
-	for(PxU32 i=0; i<size;i++)
+	PxShape* shape = gPhysics->createShape(PxBoxGeometry(halfExtent, halfExtent,
+														 halfExtent),
+														 *gMaterial);
+	for(PxU32 i = 0; i < size; i++)
 	{
-		for(PxU32 j=0;j<size-i;j++)
+		for(PxU32 j = 0; j < size - i; j++)
 		{
 			PxTransform localTm(PxVec3(PxReal(j*2) - PxReal(size-i), PxReal(i*2+1), 0) * halfExtent);
 			PxRigidDynamic* body = gPhysics->createRigidDynamic(t.transform(localTm));
@@ -48,15 +48,12 @@ static void createStack(const PxTransform& t, PxU32 size, PxReal halfExtent)
 	shape->release();
 }
 
-void initPhysics(bool interactive)
+void initPhysics()
 {
-	gFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, gAllocator, gErrorCallback);
-
-	// gPvd = PxCreatePvd(*gFoundation);
-	// PxPvdTransport* transport = PxDefaultPvdSocketTransportCreate(PVD_HOST, 5425, 10);
-	// gPvd->connect(*transport,PxPvdInstrumentationFlag::eALL);
-
-	gPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *gFoundation, PxTolerancesScale(), true, gPvd);
+	gFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, gAllocator,
+									 gErrorCallback);
+	gPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *gFoundation,
+							   PxTolerancesScale(), true, nullptr);
 
 	PxSceneDesc sceneDesc(gPhysics->getTolerancesScale());
 	sceneDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f);
@@ -65,46 +62,36 @@ void initPhysics(bool interactive)
 	sceneDesc.filterShader	= PxDefaultSimulationFilterShader;
 	gScene = gPhysics->createScene(sceneDesc);
 
-	PxPvdSceneClient* pvdClient = gScene->getScenePvdClient();
-	if(pvdClient)
-	{
-		pvdClient->setScenePvdFlag(PxPvdSceneFlag::eTRANSMIT_CONSTRAINTS, true);
-		pvdClient->setScenePvdFlag(PxPvdSceneFlag::eTRANSMIT_CONTACTS, true);
-		pvdClient->setScenePvdFlag(PxPvdSceneFlag::eTRANSMIT_SCENEQUERIES, true);
-	}
 	gMaterial = gPhysics->createMaterial(0.5f, 0.5f, 0.6f);
 
 	PxRigidStatic* groundPlane = PxCreatePlane(*gPhysics, PxPlane(0,1,0,0), *gMaterial);
 	gScene->addActor(*groundPlane);
 
-	for(PxU32 i=0;i<5;i++)
-		createStack(PxTransform(PxVec3(0,0,stackZ-=10.0f)), 10, 2.0f);
-
-	if(!interactive)
-		createDynamic(PxTransform(PxVec3(0,40,100)), PxSphereGeometry(10), PxVec3(0,-50,-100));
+	int n = 1;
+	for(PxU32 i = 0; i < n; i++)
+		createStack(PxTransform(PxVec3(0, 0, stackZ -= 10.0f)), 10, 2.0f);
 }
 
-void stepPhysics(bool /*interactive*/)
+void stepPhysics(TimeStep ts)
 {
-	gScene->simulate(1.0f/60.0f);
+	gScene->simulate((float)ts);
 	gScene->fetchResults(true);
 }
 	
-void cleanupPhysics(bool /*interactive*/)
+void cleanupPhysics()
 {
 	PX_RELEASE(gScene);
 	PX_RELEASE(gDispatcher);
 	PX_RELEASE(gPhysics);
-	if(gPvd)
-	{
+	if(gPvd) {
 		PxPvdTransport* transport = gPvd->getTransport();
 		PX_RELEASE(gPvd);
 		PX_RELEASE(transport);
 	}
 	PX_RELEASE(gFoundation);
-	
-	printf("SnippetHelloWorld done.\n");
 }
+
+namespace Demo {
 
 class Physics : public Application {
 public:
@@ -114,8 +101,8 @@ public:
 	void OnUpdate(TimeStep ts);
 
 private:
-	PxPhysics* pPhysicsSDK = nullptr;
-	PxFoundation* mFoundation;
+	Ref<ShaderPipeline> shader;
+	Ref<Mesh> cube;
 };
 
 Physics::Physics() {
@@ -125,15 +112,52 @@ Physics::Physics() {
 			Application::Close();
 	});
 
-	initPhysics(false);
+	initPhysics();
+	// EventSystem::RegisterListener<MouseButtonPressed>(
+	// [](const MouseButtonPressedEvent& event) {
+	// 	PxRaycastHit hitInfo;
+	// 	const PxU32 maxHits = 1;
+	// 	const PxHitFlags hitFlags = PxHitFlag::ePOSITION
+	// 								| PxHitFlag::eNORMAL
+	// 								| PxHitFlag::eUV;
+	// 	PxU32 hitCount = PxGeometryQuery::raycast(origin, unitDir, geom, pose,
+	// 											  maxDist, hitFlags, maxHits,
+	// 											  &hitInfo);
+	// });
+
+	cube = Mesh::Create(MeshPrimitive::Cube,
+	Material{
+		.Diffuse = Texture::Create("Sandbox/assets/images/wood.png"),
+		.Specular = Texture::Create("Sandbox/assets/images/wood_specular.png"),
+	});
+	shader = ShaderPipeline::Create({
+		{ "VolcaniCore/assets/shaders/Mesh.glsl.vert", ShaderType::Vertex },
+		{ "VolcaniCore/assets/shaders/Mesh.glsl.frag", ShaderType::Fragment }
+	});
+	shader->Bind();
 }
 
 Physics::~Physics() {
-	cleanupPhysics(false);
+	cleanupPhysics();
 }
 
 void Physics::OnUpdate(TimeStep ts) {
-	stepPhysics(false);
+	stepPhysics(ts);
+
+	// retrieve array of actors that moved
+	PxU32 nbActiveActors;
+	PxActor** activeActors = gScene->getActiveActors(nbActiveActors);
+
+	Renderer::Clear();
+
+	// update each render object with the new transform
+	for(PxU32 i = 0; i < nbActiveActors; i++) {
+		// MyRenderObject* renderObject = static_cast<MyRenderObject*>(activeActors[i]->userData);
+
+		auto mat4 = activeActors[i]->getGlobalPose();
+		shader->SetMat4("u_Model", mat4);
+		Renderer3D::DrawMesh(cube);
+	}
 }
 
 }
