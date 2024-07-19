@@ -1,21 +1,21 @@
-#pragma once
+// #pragma once
 
-#include <Object/Model.h>
+// #include <Object/Model.h>
 
-namespace TheMazeIsLava {
+// namespace TheMazeIsLava {
 
-class Player : public Entity {
-public:
-	Player();
-	~Player();
+// class Player : public Entity {
+// public:
+// 	Player();
+// 	~Player();
 
-	// NOTE: InputProvider ?
-	void Move();
-	void Render();
+// 	// NOTE: InputProvider ?
+// 	void Move();
+// 	void Render();
 
-private:
-	float x, y;
-	// Ref<Model> m_Model;
-};
+// private:
+// 	float x, y;
+// 	// Ref<Model> m_Model;
+// };
 
-}
+// }

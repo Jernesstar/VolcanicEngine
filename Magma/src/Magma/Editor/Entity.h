@@ -6,8 +6,8 @@ namespace Magma {
 
 class Entity {
 public:
-	Entity(EntitySystem& world) {
-		m_Entity = world.CreateEntity();
+	Entity(/*EntitySystem& world */) {
+		// m_Entity = world.CreateEntity();
 	}
 	~Entity() {
 
@@ -40,8 +40,8 @@ public:
 
 	}
 
-	bool operator ==(const Entity& other) const { 
-		return this->m_ID == other.m_ID; 
+	bool operator ==(const Entity& other) const {
+		return this->m_ID == other.m_ID;
 	}
 
 private:

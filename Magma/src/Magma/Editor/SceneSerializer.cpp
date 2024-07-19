@@ -177,26 +177,26 @@ void SerializeEntity(YAML::Emitter& out, Entity& entity) {
 }
 
 void DeserializeEntity(YAML::Node entityNode, Ref<Scene> scene) {
-	Entity& entity = scene->GetEntitySystem().AddEntity();
+	// Entity& entity = scene->GetEntitySystem().AddEntity();
 
-	auto components = entityNode["Components"];
-	if(!components) return;
+	// auto components = entityNode["Components"];
+	// if(!components) return;
 
-	auto tag = components["TagComponent"];
-	if(tag)
-		entity.Add<TagComponent>(tag["Tag"].as<std::string>());
+	// auto tag = components["TagComponent"];
+	// if(tag)
+	// 	entity.Add<TagComponent>(tag["Tag"].as<std::string>());
 
-	auto texture = components["TextureComponent"];
-	if(texture)
-		entity.Add<TextureComponent>(texture["Texture"].as<std::string>());
+	// auto texture = components["TextureComponent"];
+	// if(texture)
+	// 	entity.Add<TextureComponent>(texture["Texture"].as<std::string>());
 
-	auto transform = components["TransformComponent"];
-	if(transform) {
-		auto& tc = entity.Add<TransformComponent>();
-		tc.Translation = transform["Translation"].as<glm::vec3>();
-		tc.Rotation = transform["Rotation"].as<glm::vec3>();
-		tc.Scale = transform["Scale"].as<glm::vec3>();
-	}
+	// auto transform = components["TransformComponent"];
+	// if(transform) {
+	// 	auto& tc = entity.Add<TransformComponent>();
+	// 	tc.Translation = transform["Translation"].as<glm::vec3>();
+	// 	tc.Rotation = transform["Rotation"].as<glm::vec3>();
+	// 	tc.Scale = transform["Scale"].as<glm::vec3>();
+	// }
 }
 
 }
