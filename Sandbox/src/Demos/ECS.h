@@ -27,28 +27,13 @@ ECS::ECS() {
 			Application::Close();
 	});
 
-	auto e = world.entity();
-	VOLCANICORE_LOG_INFO("Alive: %d", e.is_alive());
-
-	e.destruct();
-	VOLCANICORE_LOG_INFO("Alive: %d", e.is_alive());
-
-	auto entity = world.entity();
-	
-	// Add a component. This creates the component in the ECS storage, but does not
-	// assign it with a value.
-	entity.add<Velocity>();
-
-	// Set the value for the Position & Velocity components. A component will be
-	// added if the entity doesn't have it yet.
-	entity.set<Position>({10, 20})
+	auto e = world.entity("Bob");
+	auto ent2 = world.lookup("Bob");
+	e
+	.set<Position>({10, 20})
 	.set<Velocity>({1, 2});
 
-	// Get a component
-	const Position *p = entity.get<Position>();
-	
-	// Remove component
-	entity.remove<Position>();
+	const Position *p = e.get<Position>(); // Returns nullptr if the component is missing
 }
 
 void ECS::OnUpdate(TimeStep ts) {

@@ -6,9 +6,12 @@ namespace Magma {
 
 class Entity {
 public:
-	Entity()
-		: m_ID() { }
-	~Entity() {	}
+	Entity(EntitySystem& world) {
+		m_Entity = world.CreateEntity();
+	}
+	~Entity() {
+
+	}
 	
 	UUID GetID() { return m_ID; }
 	operator uint32_t() const { return m_ID; }

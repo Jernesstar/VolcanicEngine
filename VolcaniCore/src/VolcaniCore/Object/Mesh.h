@@ -31,12 +31,15 @@ public:
 	static Ref<Mesh> Create(MeshPrimitive primitive, Material material);
 
 public:
+	Mesh() = default;
 	Mesh(const std::vector<Vertex>& vertices,
 		 const std::vector<uint32_t>& indices,
 		 const Material& material)
 			: m_Vertices(vertices), m_Indices(indices), m_Material(material) { }
 
 	virtual ~Mesh() = default;
+	Mesh(Mesh&&) = default;
+	Mesh& operator =(const Mesh&) = default;
 
 	Material& GetMaterial() { return m_Material; }
 	std::vector<Vertex>& GetVertices() { return m_Vertices; }

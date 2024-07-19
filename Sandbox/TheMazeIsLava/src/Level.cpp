@@ -29,7 +29,11 @@ void Level::Render(TimeStep ts) {
 	m_TimeSinceLevelStart += (float)ts;
 
 	DrawStoneBlocks();
-	PropagateLava(); // Fluid simulation
+
+	if(!m_Paused)
+		PropagateLava(); // Fluid simulation
+	// else
+	// 	PauseUI->Render();
 }
 
 void Level::PropagateLava() {
@@ -49,10 +53,6 @@ void Level::DrawStoneBlocks() {
 		Renderer3D::DrawMesh(GameState::Wall,
 			Transform{ .Translation = glm::vec3{ x, 1.0f, y } });
 	});
-
-	GameState::MeshShader->Bind();
-	GameState::MeshShader->SetTexture("u_Diffuse",
-									  GameState::Wall->GetMaterial().Diffuse, 0);
 }
 
 void Level::TraverseTilemap(

@@ -4,7 +4,7 @@
 
 namespace TheMazeIsLava {
 
-class Player {
+class Player : public Entity {
 public:
 	Player();
 	~Player();

@@ -17,10 +17,8 @@ workspace "VolcanicEngine"
     filter "configurations:Release"
         optimize "Full"
 
-    --     }
     filter "action:vs*"
         startproject "Sandbox"
-
 
 include "VolcaniCore"
 include "Magma"

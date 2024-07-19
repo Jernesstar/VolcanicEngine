@@ -17,7 +17,15 @@ using namespace VolcaniCore;
 
 namespace Magma {
 
-enum class ComponentType { Mesh, Script, Tag, Texture, Transform, Unknown };
+enum class ComponentType {
+	Mesh,
+	// RigidBody,
+	// Script,
+	Tag,
+	Texture,
+	Transform,
+	Unknown
+};
 
 struct Component {
 	const ComponentType Type;
@@ -31,6 +39,10 @@ struct MeshComponent : public Component {
 
 	MeshComponent(Ref<VolcaniCore::Mesh> mesh)
 		: Component(ComponentType::Mesh), Mesh(mesh) { }
+};
+
+struct RigidBodyComponent : public Component {
+
 };
 
 struct ScriptComponent : public Component {
