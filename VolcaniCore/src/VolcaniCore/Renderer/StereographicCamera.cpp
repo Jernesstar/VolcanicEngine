@@ -47,7 +47,7 @@ void StereographicCamera::Resize(uint32_t width, uint32_t height) {
 void StereographicCamera::CalculateView() {
 	View = glm::lookAt(Position, Position + ForwardDirection,
 						glm::vec3(0, 1, 0));
-	InverseView = glm::inverse(View);
+	// InverseView = glm::inverse(View);
 	ViewProjection = Projection * View;
 }
 
@@ -56,7 +56,7 @@ void StereographicCamera::CalculateProjection() {
 									 (float)m_ViewportWidth,
 									 (float)m_ViewportHeight,
 									 m_NearClip, m_FarClip);
-	InverseProjection = glm::inverse(Projection);
+	// InverseProjection = glm::inverse(Projection);
 	ViewProjection = Projection * View;
 }
 

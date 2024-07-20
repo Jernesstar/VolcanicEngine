@@ -1,6 +1,5 @@
 {
 	"editor.detectIndentation": true,
-	""
 	"editor.insertSpaces": false,
 	"files.associations": {
 		"*.vert": "hlsl",

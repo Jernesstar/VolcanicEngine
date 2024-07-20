@@ -41,6 +41,8 @@ Application* CreateApplication(const CommandLineArgs& args) {
 	if(project == "Shadows")   return new Demo::Shadows();
 	if(project == "ECS")	   return new Demo::ECS();
 	if(project == "Physics")   return new Demo::Physics();
+	if(project == "Raycast")   return new Demo::Raycast();
+	if(project == "Collision")   return new Demo::Collision();
 
 	if(project == "Editor") return new Magma::Editor();
 	if(project == "Game")	return new TheMazeIsLava::Game();

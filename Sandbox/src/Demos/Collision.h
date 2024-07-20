@@ -2,6 +2,7 @@
 
 #include <PxPhysics.h>
 #include <PxPhysicsAPI.h>
+#include <PxSceneDesc.h>
 
 using namespace physx;
 using namespace VolcaniCore;
@@ -29,19 +30,18 @@ static PxRigidDynamic* createDynamic(const PxTransform& t,
 	return dynamic;
 }
 
-static void createStack(const PxTransform& t, PxU32 size, PxReal halfExtent)
+static void createWall(const PxTransform& t, PxU32 size, PxReal halfExtent)
 {
 	PxShape* shape = gPhysics->createShape(PxBoxGeometry(halfExtent, halfExtent,
 														 halfExtent),
 														 *gMaterial);
 	for(PxU32 i = 0; i < size; i++)
 	{
-		for(PxU32 j = 0; j < size - i; j++)
+		for(PxU32 j = 0; j < size; j++)
 		{
 			PxTransform localTm(PxVec3(PxReal(j*2) - PxReal(size-i), PxReal(i*2+1), 0) * halfExtent);
-			PxRigidDynamic* body = gPhysics->createRigidDynamic(t.transform(localTm));
+			PxRigidStatic* body = gPhysics->createRigidStatic(t.transform(localTm));
 			body->attachShape(*shape);
-			PxRigidBodyExt::updateMassAndInertia(*body, 10.0f);
 			gScene->addActor(*body);
 		}
 	}
@@ -65,12 +65,13 @@ void initPhysics()
 
 	gMaterial = gPhysics->createMaterial(0.5f, 0.5f, 0.6f);
 
-	PxRigidStatic* groundPlane = PxCreatePlane(*gPhysics, PxPlane(0,1,0,0), *gMaterial);
+	PxRigidStatic* groundPlane = PxCreatePlane(*gPhysics, PxPlane(0, 1, 0, 0),
+											   *gMaterial);
 	gScene->addActor(*groundPlane);
 
 	int n = 5;
 	for(PxU32 i = 0; i < n; i++)
-		createStack(PxTransform(PxVec3(0, 0, stackZ -= 10.0f)), 10, 0.5f);
+		createWall(PxTransform(PxVec3(0, 0, stackZ -= 10.0f)), 10, 0.5f);
 }
 
 void stepPhysics(TimeStep ts)
@@ -85,20 +86,15 @@ void cleanupPhysics()
 	PX_RELEASE(gScene);
 	PX_RELEASE(gDispatcher);
 	PX_RELEASE(gPhysics);
-	if(gPvd) {
-		PxPvdTransport* transport = gPvd->getTransport();
-		PX_RELEASE(gPvd);
-		PX_RELEASE(transport);
-	}
 	PX_RELEASE(gFoundation);
 }
 
 namespace Demo {
 
-class Physics : public Application {
+class Collision : public Application {
 public:
-	Physics();
-	~Physics();
+	Collision();
+	~Collision();
 
 	void OnUpdate(TimeStep ts);
 
@@ -110,7 +106,7 @@ private:
 	Ref<CameraController> controller;
 };
 
-Physics::Physics() {
+Collision::Collision() {
 	EventSystem::RegisterListener<KeyPressedEvent>(
 	[](const KeyPressedEvent& event) {
 		if(event.Key == Key::Escape)
@@ -146,44 +142,19 @@ Physics::Physics() {
 	controller = CreateRef<CameraController>(camera);
 
 	initPhysics();
+
+	RigidBody player;
+	RididBody wall;
+
+	player.CollidesWith(wall, CollisionBehaviour::Stop); // The wall is inmovable
 }
 
-Physics::~Physics() {
+Collision::~Collision() {
 	cleanupPhysics();
 }
 
-void Physics::OnUpdate(TimeStep ts) {
+void Collision::OnUpdate(TimeStep ts) {
 	stepPhysics(ts);
-	controller->OnUpdate(ts);
-	shader->SetMat4("u_ViewProj", camera->GetViewProjection());
-
-	Renderer::Clear();
-
-	// retrieve array of actors that moved
-	PxU32 nbActiveActors;
-	PxActor** activeActors = gScene->getActiveActors(nbActiveActors);
-
-	VOLCANICORE_LOG_INFO("%d", nbActiveActors);
-
-	// update each render object with the new transform
-	for(PxU32 i = 0; i < nbActiveActors; i++) {
-		// MyRenderObject* renderObject = static_cast<MyRenderObject*>(activeActors[i]->userData);
-
-		VOLCANICORE_LOG_INFO("Here");
-		if(activeActors[i]->getConcreteType() == PxConcreteType::eRIGID_DYNAMIC)
-		{
-			VOLCANICORE_LOG_INFO("Jere");
-			PxRigidDynamic& rd = static_cast<PxRigidDynamic&>(*activeActors[i]);
-			auto pose = rd.getGlobalPose();
-
-			Transform t{
-				.Translation = { pose.p.x, pose.p.y, pose.p.z },
-				// .Rotation	 = { pose.q.x, pose.q.y, pose.q.z }
-			};
-			shader->SetMat4("u_Model", t.GetTransform());
-			Renderer3D::DrawMesh(cube);
-		}
-	}
 }
 
 }
