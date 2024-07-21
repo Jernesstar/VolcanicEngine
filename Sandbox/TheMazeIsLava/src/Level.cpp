@@ -47,9 +47,6 @@ void Level::DrawStoneBlocks() {
 	[this](uint32_t x, uint32_t y) {
 		Renderer3D::DrawMesh(GameState::Wall,
 			Transform{ .Translation = glm::vec3{ x, 0.0f, y } });
-		
-		pipeline->SetMat4("u_Model", t.GetTransform());
-		pipeline->SetTexture("u_Diffuse", material.Diffuse, 0);
 
 		if(!IsWall(x, y))
 			return;

@@ -4,7 +4,6 @@
 #include <PxPhysicsAPI.h>
 
 using namespace physx;
-using namespace VolcaniCore;
 
 static PxDefaultAllocator		gAllocator;
 static PxDefaultErrorCallback	gErrorCallback;
@@ -67,10 +66,6 @@ void initPhysics()
 
 	PxRigidStatic* groundPlane = PxCreatePlane(*gPhysics, PxPlane(0,1,0,0), *gMaterial);
 	gScene->addActor(*groundPlane);
-
-	int n = 5;
-	for(PxU32 i = 0; i < n; i++)
-		createStack(PxTransform(PxVec3(0, 0, stackZ -= 10.0f)), 10, 0.5f);
 }
 
 void stepPhysics(TimeStep ts)
@@ -85,11 +80,6 @@ void cleanupPhysics()
 	PX_RELEASE(gScene);
 	PX_RELEASE(gDispatcher);
 	PX_RELEASE(gPhysics);
-	if(gPvd) {
-		PxPvdTransport* transport = gPvd->getTransport();
-		PX_RELEASE(gPvd);
-		PX_RELEASE(transport);
-	}
 	PX_RELEASE(gFoundation);
 }
 
@@ -146,6 +136,10 @@ Physics::Physics() {
 	controller = CreateRef<CameraController>(camera);
 
 	initPhysics();
+
+	int n = 5;
+	for(PxU32 i = 0; i < n; i++)
+		createStack(PxTransform(PxVec3(0, 0, stackZ -= 10.0f)), 10, 0.5f);
 }
 
 Physics::~Physics() {

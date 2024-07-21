@@ -3,10 +3,13 @@
 #include <PxPhysics.h>
 #include <PxPhysicsAPI.h>
 
+using namespace physx;
+
 static PxDefaultAllocator		gAllocator;
 static PxDefaultErrorCallback	gErrorCallback;
 static PxFoundation*			gFoundation = nullptr;
 static PxPhysics*				gPhysics	= nullptr;
+static PxDefaultCpuDispatcher*	gDispatcher = nullptr;
 
 namespace Magma::Physics {
 

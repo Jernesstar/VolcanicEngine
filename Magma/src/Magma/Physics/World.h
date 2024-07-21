@@ -3,6 +3,12 @@
 #include <PxPhysics.h>
 #include <PxPhysicsAPI.h>
 
+using namespace physx;
+
+#include <VolcaniCore/Core/Time.h>
+
+using namespace VolcaniCore;
+
 namespace Magma::Physics {
 
 class World {

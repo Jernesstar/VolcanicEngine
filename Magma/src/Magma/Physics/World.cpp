@@ -1,5 +1,10 @@
 #include "World.h"
 
+#include <PxPhysics.h>
+#include <PxPhysicsAPI.h>
+
+using namespace physx;
+
 namespace Magma::Physics {
 
 World::World() {

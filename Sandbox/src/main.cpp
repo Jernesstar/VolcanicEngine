@@ -21,18 +21,20 @@
 #include <VolcaniCore/Object/Texture.h>
 
 #include <Magma/Editor/Editor.h>
-#include <Magma/Physics/Physics.h>
 #include <Magma/UI/UIElements.h>
+#include <Magma/Physics/Physics.h>
+
+using namespace VolcaniCore;
 
 #include "Demos/Template.h"
 #include "Demos/Lighting.h"
 #include "Demos/Shadows.h"
 #include "Demos/ECS.h"
 #include "Demos/Physics.h"
+#include "Demos/Raycast.h"
+#include "Demos/Collision.h"
 
 #include "Sandbox/TheMazeIsLava/src/Game.h"
-
-using namespace VolcaniCore;
 
 Application* CreateApplication(const CommandLineArgs& args) {
 	std::string project = args[1];
