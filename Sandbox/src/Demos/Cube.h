@@ -6,6 +6,46 @@ using namespace VolcaniCore;
 
 namespace Demo {
 
+class IsometricCamera : public Camera {
+public:
+	IsometricCamera()
+		: Camera(CameraType::Ortho)
+	{
+		float r = 2.0f;
+		m_Position = r * glm::vec3{
+			glm::sin(glm::radians(45.0f)),
+			glm::sin(glm::radians(35.264f)),
+			glm::cos(glm::radians(45.0f))
+		};
+
+		m_ForwardDirection = r * glm::vec3{
+								0.0f,
+								glm::sin(glm::radians(90.0f - 35.254f)),
+								0.0f
+							};
+	}
+	~IsometricCamera() = default;
+
+private:
+	void CalculateProjection() override {
+		glm::vec3 up = { 0.0f, 1.0f, 0.0f };
+		View = glm::lookAt(Position, Position + ForwardDirection, up);
+		ViewProjection = Projection * View;
+	}
+	void CalculateView() override {
+		Projection = glm::perspectiveFov(glm::radians(m_VerticalFOV),
+										 (float)m_ViewportWidth,
+										 (float)m_ViewportHeight,
+										 m_NearClip, m_FarClip);
+		ViewProjection = Projection * View;
+
+		// Projection = glm::ortho(-m_ViewportWidth/2.0f, m_ViewportWidth/2.0f,
+		// 				-m_ViewportHeight/2.0f, m_ViewportHeight/2.0f,
+		// 				m_Near, m_Far);
+		// ViewProjection = Projection * View;
+	}
+};
+
 class Shadows : public Application {
 public:
 	Shadows();
@@ -13,21 +53,13 @@ public:
 	void OnUpdate(TimeStep ts);
 
 private:
-	// void RenderScene(Ref<Camera> camera);
-	void RenderScene();
-
-	Ref<ShaderPipeline> depthShader;
-	Ref<ShaderPipeline> shadowShader;
-	Ref<RenderPass> depthPass;
-	Ref<RenderPass> shadowPass;
+	Ref<ShaderPipeline> shader;
+	Ref<RenderPass> renderPass;
 
 	Ref<Mesh> torch;
 	Ref<Mesh> cube;
 
-	Ref<OpenGL::Framebuffer> depthMap;
-
-	// Ref<Camera> depthCamera;
-	// Ref<Camera> sceneCamera;
+	Ref<Camera> camera;
 };
 
 Shadows::Shadows() {
@@ -37,68 +69,38 @@ Shadows::Shadows() {
 			Application::Close();
 	});
 
-	depthShader = ShaderPipeline::Create({
-		{ "Sandbox/assets/shaders/Depth.glsl.vert", ShaderType::Vertex },
-		{ "Sandbox/assets/shaders/Depth.glsl.frag", ShaderType::Fragment }
-	});
-	shadowShader = ShaderPipeline::Create({
-		{ "Sandbox/assets/shaders/Shadow.glsl.vert", ShaderType::Vertex },
-		{ "Sandbox/assets/shaders/Shadow.glsl.frag", ShaderType::Fragment }
+	shader = ShaderPipeline::Create({
+		{ "Sandbox/assets/shaders/Mesh.glsl.vert", ShaderType::Vertex },
+		{ "Sandbox/assets/shaders/Mesh.glsl.frag", ShaderType::Fragment }
 	});
 
-	std::vector<OpenGL::Attachment> attachments{
-		{ AttachmentTarget::Color, OpenGL::AttachmentType::Texture },
-		{ AttachmentTarget::Depth, OpenGL::AttachmentType::Texture }
-	};
-	depthMap = CreateRef<OpenGL::Framebuffer>(1024, 1024, attachments);
-
-	depthPass = RenderPass::Create("Depth Pass", depthShader);
-	depthPass->SetOutput(depthMap);
-	shadowPass = RenderPass::Create("Shadow Pass", shadowShader);
+	renderPass = RenderPass::Create("Render Pass", shader);
 
 	cube = Mesh::Create(MeshPrimitive::Cube,
 		Material{
 			.Diffuse = Texture::Create("Sandbox/assets/images/wood.png")
 		});
 
-	// depthCamera = CreateRef<OrthographicCamera>(20.0f, 20.0f, 1.0f, 7.5f);
-	// sceneCamera = CreateRef<StereographicCamera>(75.0f);
+	// camera = CreateRef<StereographicCamera>(75.0f);
+	// camera = CreateRef<OrthographicCamera>(800, 600, 0.1f, 100.0f);
+	camera = CreateRef<IsometricCamera>();
+	controller = CreateRef<CameraController>(camera);
 }
 
 void Shadows::OnUpdate(TimeStep ts) {
-	Renderer::StartPass(depthPass);
+	controller->OnUpdate(ts);
+
+	Renderer::StartPass(renderPass);
 	{
 		Renderer::Clear();
 
-		glm::mat4 lightProjection, lightView, lightSpaceMatrix;
-		glm::vec3 lightPos = glm::vec3(-2.0f, 4.0f, -1.0f);
-		float near = 1.0f, far = 7.5f;
-		lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near, far);
-		lightView = glm::lookAt(lightPos, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		lightSpaceMatrix = lightProjection * lightView;
-		// render scene from light's point of view
-		depthShader->SetMat4("u_LightSpaceMatrix", lightSpaceMatrix);
+		Renderer3D::Begin(camera);
 
-		RenderScene();
+		Renderer3D::DrawMesh(cube);
+
+		Renderer3D::End();
 	}
 	Renderer::EndPass();
-
-	RendererAPI::Get()->RenderFramebuffer(depthMap, AttachmentTarget::Depth);
-}
-
-void Shadows::RenderScene() {
-	// Renderer3D::Begin(camera);
-
-	Renderer3D::DrawMesh(cube, { .Translation = { -2.0f,  0.0f,  0.0f } });
-	Renderer3D::DrawMesh(cube, { .Translation = {  2.0f,  0.0f,  0.0f } });
-	Renderer3D::DrawMesh(cube, { .Translation = {  0.0f,  0.0f, -2.0f } });
-	Renderer3D::DrawMesh(cube, { .Translation = {  0.0f,  0.0f,  2.0f } });
-
-	Renderer3D::DrawMesh(cube, {
-									.Translation = { 0.0f, -13.0f, 0.0f},
-									.Scale = glm::vec3(20.0f)
-							   });
-
 }
 
 }
