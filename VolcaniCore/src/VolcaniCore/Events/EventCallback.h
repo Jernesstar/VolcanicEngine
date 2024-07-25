@@ -9,16 +9,22 @@ namespace VolcaniCore {
 template<typename TEvent>
 class EventCallback {
 public:
-	EventCallback(const std::function<void(TEvent&)>& callback
-					= [](TEvent& event) { }) : m_ID(), m_Callback(callback) { }
+	EventCallback(
+		const std::function<void(TEvent&)>& callback = [](TEvent& event) { })
+			: m_ID(), m_Callback(callback) { }
 
 	const UUID& GetID() const { return m_ID; }
-	const std::function<void(TEvent&)>& GetCallback() const { return m_Callback; }
+	const std::function<void(TEvent&)>& GetCallback() const {
+		return m_Callback;
+	}
 
 	void operator ()(TEvent& event) const { this->m_Callback(event); }
 
-	EventCallback<TEvent>& operator =(const EventCallback<TEvent>& other) = default;
-	EventCallback<TEvent>& operator =(const std::function<void(TEvent&)>& callback) {
+	EventCallback<TEvent>& operator =(
+		const EventCallback<TEvent>& other) = default;
+	EventCallback<TEvent>& operator =(
+		const std::function<void(TEvent&)>& callback)
+	{
 		m_Callback = callback;
 		return *this;
 	}

@@ -38,11 +38,10 @@ public:
 			: m_Vertices(vertices), m_Indices(indices), m_Material(material) { }
 
 	virtual ~Mesh() = default;
-	Mesh(Mesh&&) = default;
-	Mesh& operator =(const Mesh&) = default;
 
-	Material& GetMaterial() { return m_Material; }
 	std::vector<Vertex>& GetVertices() { return m_Vertices; }
+	std::vector<uint32_t>& GetIndices() { return m_Indices; }
+	Material& GetMaterial() { return m_Material; }
 
 	template<typename Derived>
 	Derived* As() const { return (Derived*)(this); }

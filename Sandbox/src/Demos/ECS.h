@@ -17,7 +17,7 @@ public:
 	void OnUpdate(TimeStep ts);
 
 private:
-	flecs::world world;
+	Scene scene;
 };
 
 ECS::ECS() {
@@ -27,17 +27,20 @@ ECS::ECS() {
 			Application::Close();
 	});
 
-	auto e = world.entity("Bob");
-	auto ent2 = world.lookup("Bob");
-	e
-	.set<Position>({10, 20})
-	.set<Velocity>({1, 2});
+	auto& world = scene.GetEntitySystem.GetWorld();
 
-	const Position *p = e.get<Position>(); // Returns nullptr if the component is missing
+	Entity entity(world);
+	entity
+	.Add<TransformComponent>()
+	.Add<MeshComponent>(MeshPrimitive::Cube,
+		Material{
+			.Diffuse = Texture::Create("Sandbox/assets/images/wood.png")
+		});
 }
 
 void ECS::OnUpdate(TimeStep ts) {
-
+	scene.OnUpdate(ts);
+	scene.OnRender();
 }
 
 }

@@ -22,11 +22,11 @@ public:
 		: Name(name) { }
 	~Scene() = default;
 
-	EntitySystem& GetEntitySystem() { return m_EntitySystem; }
-	// PhysicsSystem& GetPhysiscsSystem() { return m_PhysicsSystem; }
-
 	void OnUpdate(TimeStep ts); // Run physics
 	void OnRender(); // Render
+
+	EntitySystem& GetEntitySystem() { return m_EntitySystem; }
+	// PhysicsSystem& GetPhysiscsSystem() { return m_PhysicsSystem; }
 
 private:
 	EntitySystem m_EntitySystem;

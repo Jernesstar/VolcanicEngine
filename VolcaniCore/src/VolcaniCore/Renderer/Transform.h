@@ -1,6 +1,5 @@
 #pragma once
 
-#include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
 #include <glm/geometric.hpp>
@@ -19,6 +18,8 @@ struct Transform {
 			 * glm::toMat4(glm::quat(Rotation))
 			 * glm::scale(glm::mat4(1.0f), Scale);
 	}
+
+	operator glm::mat4() { return GetTransform(); }
 };
 
 }

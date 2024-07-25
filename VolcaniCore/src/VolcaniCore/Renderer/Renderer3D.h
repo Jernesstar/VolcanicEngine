@@ -19,20 +19,20 @@ public:
 
 	static void DrawCubemap(Ref<Cubemap> cubemap);
 
-	// Can draw meshes loaded from files or defined in the code, such as cubes
-	static void DrawMesh(Ref<Mesh> mesh,	Transform t = { });
-	static void DrawModel(Ref<Model> model, Transform t = { });
+	static void DrawMesh(Ref<Mesh> mesh,	const glm::mat4& transform = { });
+	static void DrawModel(Ref<Model> model, const glm::mat4& transform = { });
 
-	static void DrawQuad(Ref<Quad> quad,		 Transform t = { });
-	static void DrawQuad(Ref<Texture> texture,	 Transform t = { });
-	static void DrawQuad(const glm::vec4& color, Transform t = { });
+	static void DrawQuad(Ref<Quad> quad, const glm::mat4& transform = { });
+	static void DrawQuad(Ref<Texture> texture,
+						 const glm::mat4& transform = { });
+	static void DrawQuad(const glm::vec4& color,
+						 const glm::mat4& transform = { });
 
-	static void DrawText(Ref<Text> text, Transform t = { });
+	static void DrawText(Ref<Text> text, const glm::mat4& transform = { });
 
 private:
 	static void Init();
 	static void Close();
-
 	static void Flush();
 
 	friend class Renderer;

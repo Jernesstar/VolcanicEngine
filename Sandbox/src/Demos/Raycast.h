@@ -97,6 +97,9 @@ Raycast::Raycast() {
 	initPhysics();
 
 	createActor(PxTransform(PxVec3(0.0, 0.0, 0.0)), 0.55);
+
+	gScene->setVisualizationParameter(PxVisualizationParameter::eSCALE, 1.0f);
+	gScene->setVisualizationParameter(PxVisualizationParameter::eACTOR_AXES, 1.0f);
 }
 
 Raycast::~Raycast() {
@@ -118,6 +121,20 @@ void Raycast::OnUpdate(TimeStep ts) {
 	};
 	shader->SetMat4("u_Model", t.GetTransform());
 	Renderer3D::DrawMesh(cube);
+
+	const PxRenderBuffer& rb = scene->getRenderBuffer();
+
+	for(PxU32 i=0; i < rb.getNbPoints(); i++)
+	{
+		const PxDebugPoint& point = rb.getPoints()[i];
+		// render the point
+	}
+
+	for(PxU32 i=0; i < rb.getNbLines(); i++)
+	{
+		const PxDebugLine& line = rb.getLines()[i];
+		// render the line
+	}
 }
 
 }

@@ -18,11 +18,13 @@ public:
 
 	void OnUpdate(TimeStep ts);
 
+	// void AddActor(Ref<RigidBody> body);
+
 	// Sends a ray through the scene to see if it hits something
 	// HitInfo Raycast(uint32_t x, uint32_t y);
 
 private:
-	PxScene* gScene;
+	PxScene* m_Scene;
 };
 
 }
