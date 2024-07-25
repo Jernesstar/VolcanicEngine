@@ -7,9 +7,6 @@ using namespace Magma;
 
 namespace Demo {
 
-struct Position { float x, y; };
-struct Velocity { float x, y; };
-
 class ECS : public Application {
 public:
 	ECS();

@@ -115,7 +115,7 @@ Collision::Collision() {
 	shader->Bind();
 	shader->SetTexture("u_Diffuse", cube->GetMaterial().Diffuse, 0);
 
-	camera = CreateRef<StereographicCamera>(75.0f, 0.01f, 1000.0f, 800, 600);
+	camera = CreateRef<StereographicCamera>(75.0f);
 	camera->SetPosition({ 0.0f, 2.0f, -1.5f });
 	controller = CreateRef<CameraController>(camera);
 

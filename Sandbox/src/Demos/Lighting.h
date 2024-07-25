@@ -91,7 +91,7 @@ Lighting::Lighting() {
 	shader->SetTexture("u_Material.Specular", cube->GetMaterial().Specular, 1);
 	shader->SetFloat("u_Material.Shininess", 32.0f);
 
-	camera = CreateRef<StereographicCamera>(75.0f, 0.01f, 1000.0f, 800, 600);
+	camera = CreateRef<StereographicCamera>(75.0f);
 	// camera = CreateRef<OrthographicCamera>(800, 600, 0.1f, 100.0f);
 	camera->SetPosition({ 2.5f, 2.5f, 2.5f });
 	camera->SetDirection({ -0.5f, -0.5f, -0.5f });

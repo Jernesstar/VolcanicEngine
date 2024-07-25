@@ -24,22 +24,6 @@ Physics::Physics() {
 			Application::Close();
 	});
 
-	cube = Mesh::Create(MeshPrimitive::Cube,
-	Material{
-		.Diffuse = Texture::Create("Sandbox/assets/images/wood.png")
-		// .Specular = Texture::Create("Sandbox/assets/images/wood_specular.png"),
-	});
-	shader = ShaderPipeline::Create({
-		{ "VolcaniCore/assets/shaders/Mesh.glsl.vert", ShaderType::Vertex },
-		{ "VolcaniCore/assets/shaders/Mesh.glsl.frag", ShaderType::Fragment }
-	});
-	shader->Bind();
-	shader->SetTexture("u_Diffuse", cube->GetMaterial().Diffuse, 0);
-
-	camera = CreateRef<StereographicCamera>(75.0f, 0.01f, 1000.0f, 800, 600);
-	camera->SetPosition({ 0.0f, 2.0f, -1.5f });
-	controller = CreateRef<CameraController>(camera);
-
 	initPhysics();
 
 	static const PxVec3 convexVerts[] = // Vertices for a square pyramid

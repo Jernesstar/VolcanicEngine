@@ -6,48 +6,42 @@
 
 namespace VolcaniCore {
 
-// TODO: Switch width, height, and near, far
-StereographicCamera::StereographicCamera(float verticalFov,
-										 float nearClip, float farClip,
-										 uint32_t width, uint32_t height,
-										 float rotationSpeed)
-	: Camera(CameraType::Stereo),
-		m_ViewportWidth(width), m_ViewportHeight(height),
-		m_RotationSpeed(rotationSpeed)
+StereographicCamera::StereographicCamera()
+	: Camera(CameraType::Stereo) { }
+
+StereographicCamera::StereographicCamera(float verticalFov)
+	: Camera(CameraType::Stereo), m_VerticalFOV(verticalFov)
 {
-	VOLCANICORE_ASSERT(m_ViewportWidth != 0 && m_ViewportHeight != 0,
-					   "Viewport width and height must not be 0");
-	SetProjection(verticalFov, nearClip, farClip);
+	CalculateProjection();
+	CalculateView();
+}
+
+StereographicCamera::StereographicCamera(float verticalFov,
+										 uint32_t width, uint32_t height,
+										 float near, float far,
+										 float rotation)
+	: Camera(CameraType::Stereo, width, height, near, far, rotation),
+		m_VerticalFOV(verticalFov)
+{
+	CalculateProjection();
+	CalculateView();
 }
 
 void StereographicCamera::SetProjection(float verticalFov,
-										float nearClip, float farClip)
+										float near, float far)
 {
-	VOLCANICORE_ASSERT(nearClip != 0, "Near clip must not be 0");
+	VOLCANICORE_ASSERT(near != 0, "Near clip must not be 0");
 
 	m_VerticalFOV = verticalFov;
-	m_NearClip = nearClip;
-	m_FarClip = farClip;
+	m_Near = near;
+	m_Far = far;
 
-	CalculateProjection();
-}
-
-void StereographicCamera::Resize(uint32_t width, uint32_t height) {
-	if(width == m_ViewportWidth && height == m_ViewportHeight)
-		return;
-
-	VOLCANICORE_ASSERT(width != 0 && height != 0,
-						"Viewport width and height must not be 0");
-
-	m_ViewportWidth = width;
-	m_ViewportHeight = height;
 	CalculateProjection();
 }
 
 void StereographicCamera::CalculateView() {
-	View = glm::lookAt(Position, Position + ForwardDirection,
-						glm::vec3(0, 1, 0));
-	// InverseView = glm::inverse(View);
+	glm::vec3 up = { 0.0f, 1.0f, 0.0f };
+	View = glm::lookAt(Position, Position + ForwardDirection, up);
 	ViewProjection = Projection * View;
 }
 
@@ -56,7 +50,6 @@ void StereographicCamera::CalculateProjection() {
 									 (float)m_ViewportWidth,
 									 (float)m_ViewportHeight,
 									 m_NearClip, m_FarClip);
-	// InverseProjection = glm::inverse(Projection);
 	ViewProjection = Projection * View;
 }
 

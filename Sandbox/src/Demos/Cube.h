@@ -63,7 +63,6 @@ Shadows::Shadows() {
 
 	// depthCamera = CreateRef<OrthographicCamera>(20.0f, 20.0f, 1.0f, 7.5f);
 	// sceneCamera = CreateRef<StereographicCamera>(75.0f);
-
 }
 
 void Shadows::OnUpdate(TimeStep ts) {
@@ -100,7 +99,6 @@ void Shadows::RenderScene() {
 									.Scale = glm::vec3(20.0f)
 							   });
 
-	// Renderer3D::End();
 }
 
 }
