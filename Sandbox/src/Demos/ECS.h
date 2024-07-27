@@ -24,7 +24,7 @@ ECS::ECS() {
 			Application::Close();
 	});
 
-	auto& world = scene.GetEntitySystem.GetWorld();
+	auto& world = scene.GetEntitySystem().GetWorld();
 
 	Entity entity(world);
 	entity

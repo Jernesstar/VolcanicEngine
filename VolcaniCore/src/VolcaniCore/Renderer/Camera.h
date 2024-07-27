@@ -3,6 +3,8 @@
 #include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
 
+#include <Core/Assert.h>
+
 namespace VolcaniCore {
 
 enum class CameraType { Ortho, Stereo };
@@ -12,11 +14,7 @@ public:
 	const CameraType Type;
 
 	Camera(CameraType type)
-		: Type(type)
-	{
-		CalculateProjection();
-		CalculateView();
-	}
+		: Type(type) { }
 	Camera(CameraType type,
 		   uint32_t width, uint32_t height,
 		   float near, float far, float rotation)
@@ -79,13 +77,14 @@ public:
 	Derived* As() const { return (Derived*)(this); }
 
 protected:
+	// TODO: Consistent naming conventions?
 	glm::vec3 Position = { 0.0f, 0.0f, 0.0f };
 	glm::vec3 ForwardDirection = { 0.0f, 0.0f, -1.0f };
 
-	float m_NearClip = 0.1f;
-	float m_FarClip	 = 100.0f;
+	float m_Near = 0.1f;
+	float m_Far	 = 100.0f;
 	float m_Rotation = 0.0f;
-	uint32_t m_ViewportWidth  = 800,
+	uint32_t m_ViewportWidth  = 800;
 	uint32_t m_ViewportHeight = 600;
 
 	glm::mat4 Projection{ 1.0f };

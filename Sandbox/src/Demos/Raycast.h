@@ -96,6 +96,13 @@ Raycast::Raycast() {
 
 	initPhysics();
 
+	PxSceneDesc sceneDesc(gPhysics->getTolerancesScale());
+	sceneDesc.gravity = PxVec3(0.0f, -90.81f, 0.0f);
+	sceneDesc.cpuDispatcher	= gDispatcher;
+	sceneDesc.filterShader	= PxDefaultSimulationFilterShader;
+	sceneDesc.flags = PxSceneFlag::eENABLE_ACTIVE_ACTORS;
+	gScene = gPhysics->createScene(sceneDesc);
+
 	createActor(PxTransform(PxVec3(0.0, 0.0, 0.0)), 0.55);
 
 	gScene->setVisualizationParameter(PxVisualizationParameter::eSCALE, 1.0f);
@@ -122,12 +129,12 @@ void Raycast::OnUpdate(TimeStep ts) {
 	shader->SetMat4("u_Model", t.GetTransform());
 	Renderer3D::DrawMesh(cube);
 
-	const PxRenderBuffer& rb = scene->getRenderBuffer();
+	const PxRenderBuffer& rb = gScene->getRenderBuffer();
 
 	for(PxU32 i=0; i < rb.getNbPoints(); i++)
 	{
 		const PxDebugPoint& point = rb.getPoints()[i];
-		// render the point
+		
 	}
 
 	for(PxU32 i=0; i < rb.getNbLines(); i++)

@@ -1,32 +1,36 @@
 #include "Scene.h"
 
+#include <VolcaniCore/Renderer/Renderer3D.h>
+
 namespace Magma {
 
-Scene::Scene() {
-	auto world = m_PhysicsSystem.GetWorld();
+Scene::Scene(const std::string& name)
+	: Name(name)
+{
+	auto world = m_EntitySystem.GetWorld();
 
 	flecs::system physicsUpdateSys =
 		world
+		.system<RigidBodyComponent, TransformComponent>("Update")
 		.kind(flecs::OnUpdate)
-		.system<const RigidBodyComponent, TransformComponent>("Update")
 		.each(
 		[](const RigidBodyComponent& r, TransformComponent& t) {
-			t = r.RigidBody.GetTransform();
+			// t = r.Body.GetTransform();
 		});
 	flecs::system renderSys =
 		world
+		.system<TransformComponent, MeshComponent>("Render")
 		.kind(flecs::OnUpdate)
-		.system<const TransformComponent, const MeshComponent>("Render")
 		.each(
-		[](const TransformComponent& t, const MeshComponent& m) {
-			Renderer3D::DrawMesh(m.GetMesh(), t.GetTransform())
+		[](TransformComponent& t, MeshComponent& m) {
+			Renderer3D::DrawMesh(m.Mesh, t);
 		});
 }
 
 void Scene::OnUpdate(TimeStep ts) {
 	// m_PhysicsSystem.OnUpdate(ts);
 
-	auto world = m_PhysicsSystem.GetWorld();
+	auto world = m_EntitySystem.GetWorld();
 	world.progress((float)ts);
 }
 

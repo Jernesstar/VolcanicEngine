@@ -39,32 +39,29 @@ void SceneSerializer::Serialize(Ref<Scene> scene, const std::string& filepath) {
 	out << YAML::Key << "Scene" << YAML::Value << YAML::BeginMap; // Scene
 	out << YAML::Key << "Name" << YAML::Value <<  scene->Name;
 
+	auto& cam = scene->Camera;
 	out << YAML::Key << "Camera" << YAML::Value << YAML::BeginMap; // Camera
-	out << YAML::Key << "Type" << YAML::Value << (scene->Camera->GetType() == CameraType::Stereo ? "Stereographic" : "Orthographic");
-	out << YAML::Key << "Position" << YAML::Value << scene->Camera->GetPosition();
-	out << YAML::Key << "Direction" << YAML::Value << scene->Camera->GetDirection();
+	out << YAML::Key << "Type" << YAML::Value
+		<< (cam->Type == CameraType::Stereo ? "Stereographic" : "Orthographic");
+	out << YAML::Key << "Position" << YAML::Value << cam->GetPosition();
+	out << YAML::Key << "Direction" << YAML::Value << cam->GetDirection();
 
-	if(scene->Camera->GetType() == CameraType::Stereo) {
-		auto c = scene->Camera->As<StereographicCamera>();
-		out << YAML::Key << "VerticalFOV" 	<< YAML::Value << c->GetVerticalFOV();
-		out << YAML::Key << "NearClip" 		<< YAML::Value << c->GetNearClip();
-		out << YAML::Key << "FarClip" 		<< YAML::Value << c->GetFarClip();
-		out << YAML::Key << "RotationSpeed" << YAML::Value << c->GetRotationSpeed();
-		out << YAML::Key << "ViewportWidth" << YAML::Value << c->GetViewportWidth();
-		out << YAML::Key << "ViewportHeight" << YAML::Value << c->GetViewportHeight();
+	if(cam->Type == CameraType::Stereo) {
+		auto c = cam->As<StereographicCamera>();
+		out << YAML::Key << "VerticalFOV" << YAML::Value << c->GetVerticalFOV();
 	}
-	else if(scene->Camera->GetType() == CameraType::Ortho) {
-		auto c = scene->Camera->As<OrthographicCamera>();
-		out << YAML::Key << "Width"		<< YAML::Value << c->GetWidth();
-		out << YAML::Key << "Height"	<< YAML::Value << c->GetHeight();
-		out << YAML::Key << "Near"		<< YAML::Value << c->GetNear();
-		out << YAML::Key << "Far"		<< YAML::Value << c->GetFar();
-		out << YAML::Key << "Rotation"	<< YAML::Value << c->GetRotation();
-	}
+	out << YAML::Key << "Near"			<< YAML::Value << cam->GetNear();
+	out << YAML::Key << "Far"			<< YAML::Value << cam->GetFar();
+	out << YAML::Key << "Rotation"		<< YAML::Value << cam->GetRotation();
+	out << YAML::Key << "ViewportWidth"
+		<< YAML::Value << cam->GetViewportWidth();
+	out << YAML::Key << "ViewportHeight"
+		<< YAML::Value << cam->GetViewportHeight();
 	out << YAML::EndMap; // Camera
 
 	out << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq; // Entities
-	scene->GetEntitySystem().ForEach(
+	scene->GetEntitySystem().GetWorld()
+	.each(
 	[&](Entity& entity) {
 		out << YAML::BeginMap; // Entity
 		SerializeEntity(out, entity);
@@ -129,7 +126,7 @@ Ref<Scene> SceneSerializer::Deserialize(const std::string& filepath) {
 
 void SerializeEntity(YAML::Emitter& out, Entity& entity) {
 	out << YAML::Key << "Entity" << YAML::Value << YAML::BeginMap; // Entity
-	out << YAML::Key << "ID" << YAML::Value << entity.GetID();
+	// out << YAML::Key << "ID" << YAML::Value << entity.GetID();
 
 	out << YAML::Key << "Components" << YAML::Key << YAML::BeginMap; // Components
 	// if(entity.Has<ScriptComponent>()) {

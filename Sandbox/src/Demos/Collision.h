@@ -23,15 +23,15 @@ class ContactCallback : public PxSimulationEventCallback {
 	void onSleep(PxActor** actors, PxU32 count)							{ }
 	void onAdvance(const PxRigidBody* const *, const PxTransform*, const PxU32) { }
 	void onTrigger(PxTriggerPair* pairs, PxU32 count);
-	void onTrigger(const PxContactPairHeader& pairHeader, const PxContactPair* pairs, PxU32 nbPairs);
-}
+	void onContact(const PxContactPairHeader& pairHeader, const PxContactPair* pairs, PxU32 nbPairs);
+};
 
 void ContactCallback::onContact(const PxContactPairHeader& pairHeader,
 								const PxContactPair* pairs, PxU32 nbPairs)
 {
 	// Retrieve the current poses and velocities of the two actors involved in the contact event.
-	const PxTransform pose1 = pairHeader.actors[0]->getGlobalPose();
-	const PxTransform pose2 = pairHeader.actors[1]->getGlobalPose();
+	// const PxTransform pose1 = pairHeader.actors[0]->getGlobalPose();
+	// const PxTransform pose2 = pairHeader.actors[1]->getGlobalPose();
 }
 
 bool gCheckpointReached;
@@ -45,11 +45,11 @@ void ContactCallback::onTrigger(PxTriggerPair* pairs, PxU32 count)
 			continue;
 
 		// Detect for example that a player entered a checkpoint zone
-		if((&pairs[i].otherShape->getActor() == gPlayerActor) &&
-			(&pairs[i].triggerShape->getActor() == gSensorActor))
-		{
-			gCheckpointReached = true;
-		}
+		// if((&pairs[i].otherShape->getActor() == gPlayerActor) &&
+		// 	(&pairs[i].triggerShape->getActor() == gSensorActor))
+		// {
+		// 	gCheckpointReached = true;
+		// }
 	}
 }
 

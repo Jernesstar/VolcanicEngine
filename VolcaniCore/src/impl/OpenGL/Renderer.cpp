@@ -153,7 +153,8 @@ void Renderer::DrawCubemap(Ref<VolcaniCore::Cubemap> cubemap) {
 	glDepthMask(GL_TRUE);
 }
 
-void Renderer::DrawMesh(Ref<VolcaniCore::Mesh> mesh, Transform t) {
+void Renderer::DrawMesh(Ref<VolcaniCore::Mesh> mesh, const glm::mat4& transform)
+{
 	auto nativeMesh = mesh->As<OpenGL::Mesh>();
 
 	DrawIndexed(nativeMesh->m_VertexArray);

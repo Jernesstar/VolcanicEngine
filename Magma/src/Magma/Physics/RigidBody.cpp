@@ -1,21 +1,19 @@
 #include "RigidBody.h"
 
-namespace Magma {
+#include <Physics/Physics.h>
 
-RigidBody::RigidBody(Type type)
+namespace Magma::Physics {
+
+RigidBody::RigidBody(RigidBodyType type)
 	: Type(type)
 {
-	if(type == Type::Static)
-		m_Actor = gPhysics->createRigidStatic(t);
-	if(type == Type::Dynamic)
-		m_Actor = gPhysics->createRigidDynamic(t);
-
-	float r = 1.0f;
+	auto physics = PhysicsSystem::s_Physics;
 	PxTransform t(PxVec3(0.0, 0.0, 0.0));
-	PxShape* shape = gPhysics->createShape(PxBoxGeometry(r, r, r), *material);
 
-	m_Actor->attachShape(*shape);
-	shape->release();
+	if(type == RigidBodyType::Static)
+		m_Actor = physics->createRigidStatic(PxTransform());
+	if(type == RigidBodyType::Dynamic)
+		m_Actor = physics->createRigidDynamic(PxTransform());
 }
 
 RigidBody::~RigidBody() {
@@ -23,15 +21,15 @@ RigidBody::~RigidBody() {
 }
 
 StaticBody::StaticBody()
-	: RigidBody(Type::Static)
+	: RigidBody(RigidBodyType::Static)
 {
 
 }
 
 DynamicBody::DynamicBody()
-	: RigidBody(Type::Dynamic)
+	: RigidBody(RigidBodyType::Dynamic)
 {
-	PxRigidBodyExt::updateMassAndInertia(*m_Actor, 10.0f);
+	PxRigidBodyExt::updateMassAndInertia(*m_Actor->is<PxRigidDynamic>(), 10.0f);
 }
 
 }

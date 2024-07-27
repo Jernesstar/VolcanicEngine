@@ -23,7 +23,8 @@ public:
 							AttachmentTarget target) override;
 
 	void DrawCubemap(Ref<VolcaniCore::Cubemap> cubemap) override;
-	void DrawMesh(Ref<VolcaniCore::Mesh> model, Transform t = { }) override;
+	void DrawMesh(Ref<VolcaniCore::Mesh> model,
+				  const glm::mat4& transform) override;
 
 private:
 	void DrawIndexed(Ref<VertexArray> vertexArray, uint32_t indices = 0);

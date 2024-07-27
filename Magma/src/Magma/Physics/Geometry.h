@@ -1,6 +1,11 @@
 #pragma once
 
+#include <PxPhysics.h>
+#include <PxPhysicsAPI.h>
+
 #include <VolcaniCore/Object/Mesh.h>
+
+using namespace physx;
 
 namespace Magma {
 

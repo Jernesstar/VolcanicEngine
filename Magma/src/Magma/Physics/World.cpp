@@ -3,6 +3,8 @@
 #include <PxPhysics.h>
 #include <PxPhysicsAPI.h>
 
+#include "Physics/Physics.h"
+
 using namespace physx;
 
 namespace Magma::Physics {
@@ -10,7 +12,7 @@ namespace Magma::Physics {
 World::World() {
 	auto physicsLib = PhysicsSystem::s_Physics;
 	PxSceneDesc sceneDesc(physicsLib->getTolerancesScale());
-	sceneDesc.cpuDispatcher	= gDispatcher;
+	sceneDesc.cpuDispatcher	= PhysicsSystem::s_Dispatcher;
 	sceneDesc.gravity		= PxVec3(0.0f, -9.81f, 0.0f);
 	sceneDesc.filterShader	= PxDefaultSimulationFilterShader;
 	sceneDesc.flags			= PxSceneFlag::eENABLE_ACTIVE_ACTORS;

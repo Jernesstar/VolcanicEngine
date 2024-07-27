@@ -12,17 +12,20 @@ public:
 		: Camera(CameraType::Ortho)
 	{
 		float r = 2.0f;
-		m_Position = r * glm::vec3{
+		Position = r * glm::vec3{
 			glm::sin(glm::radians(45.0f)),
 			glm::sin(glm::radians(35.264f)),
 			glm::cos(glm::radians(45.0f))
 		};
 
-		m_ForwardDirection = r * glm::vec3{
+		ForwardDirection = r * glm::vec3{
 								0.0f,
 								glm::sin(glm::radians(90.0f - 35.254f)),
 								0.0f
 							};
+
+		CalculateProjection();
+		CalculateView();
 	}
 	~IsometricCamera() = default;
 
@@ -33,22 +36,22 @@ private:
 		ViewProjection = Projection * View;
 	}
 	void CalculateView() override {
-		Projection = glm::perspectiveFov(glm::radians(m_VerticalFOV),
+		Projection = glm::perspectiveFov(glm::radians(75.0f),
 										 (float)m_ViewportWidth,
 										 (float)m_ViewportHeight,
-										 m_NearClip, m_FarClip);
-		ViewProjection = Projection * View;
+										 m_Near, m_Far);
 
 		// Projection = glm::ortho(-m_ViewportWidth/2.0f, m_ViewportWidth/2.0f,
 		// 				-m_ViewportHeight/2.0f, m_ViewportHeight/2.0f,
 		// 				m_Near, m_Far);
-		// ViewProjection = Projection * View;
+
+		ViewProjection = Projection * View;
 	}
 };
 
-class Shadows : public Application {
+class Cube : public Application {
 public:
-	Shadows();
+	Cube();
 
 	void OnUpdate(TimeStep ts);
 
@@ -60,9 +63,10 @@ private:
 	Ref<Mesh> cube;
 
 	Ref<Camera> camera;
+	Ref<CameraController> controller;
 };
 
-Shadows::Shadows() {
+Cube::Cube() {
 	EventSystem::RegisterListener<KeyPressedEvent>(
 	[](const KeyPressedEvent& event) {
 		if(event.Key == Key::Escape)
@@ -70,8 +74,8 @@ Shadows::Shadows() {
 	});
 
 	shader = ShaderPipeline::Create({
-		{ "Sandbox/assets/shaders/Mesh.glsl.vert", ShaderType::Vertex },
-		{ "Sandbox/assets/shaders/Mesh.glsl.frag", ShaderType::Fragment }
+		{ "VolcaniCore/assets/shaders/Mesh.glsl.vert", ShaderType::Vertex },
+		{ "VolcaniCore/assets/shaders/Mesh.glsl.frag", ShaderType::Fragment }
 	});
 
 	renderPass = RenderPass::Create("Render Pass", shader);
@@ -84,11 +88,11 @@ Shadows::Shadows() {
 	// camera = CreateRef<StereographicCamera>(75.0f);
 	// camera = CreateRef<OrthographicCamera>(800, 600, 0.1f, 100.0f);
 	camera = CreateRef<IsometricCamera>();
-	controller = CreateRef<CameraController>(camera);
+	// controller = CreateRef<CameraController>(camera);
 }
 
-void Shadows::OnUpdate(TimeStep ts) {
-	controller->OnUpdate(ts);
+void Cube::OnUpdate(TimeStep ts) {
+	// controller->OnUpdate(ts);
 
 	Renderer::StartPass(renderPass);
 	{
@@ -96,7 +100,7 @@ void Shadows::OnUpdate(TimeStep ts) {
 
 		Renderer3D::Begin(camera);
 
-		Renderer3D::DrawMesh(cube);
+		Renderer3D::DrawMesh(cube, { .Translation = { 0.0f, 0.0f, -3.0f } });
 
 		Renderer3D::End();
 	}

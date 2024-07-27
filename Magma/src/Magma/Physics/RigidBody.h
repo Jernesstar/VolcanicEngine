@@ -1,19 +1,21 @@
 #pragma once
 
-namespace Magma {
+#include <PxPhysics.h>
+#include <PxPhysicsAPI.h>
+
+using namespace physx;
+
+namespace Magma::Physics {
+
+enum class RigidBodyType { Static, Dynamic };
 
 class RigidBody {
 public:
-	enum class Type {
-		Static, // Infinte mass/inertia
-		Dynamic
-	};
-
-	const Type Type;
+	const RigidBodyType Type;
 
 public:
-	RigidBody(Type type);
-	// RigidBody(Type type, const Shape& shape);
+	RigidBody(RigidBodyType type);
+	// RigidBody(RigidBodyType type, const Shape& shape);
 	~RigidBody();
 
 protected:
@@ -23,7 +25,7 @@ protected:
 class StaticBody : public RigidBody {
 public:
 	StaticBody();
-	~StaticBody();
+	~StaticBody() = default;
 
 private:
 	
@@ -32,7 +34,7 @@ private:
 class DynamicBody : public RigidBody {
 public:
 	DynamicBody();
-	~DynamicBody();
+	~DynamicBody() = default;
 
 private:
 	

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <flecs.h>
+
 #include "Component.h"
 
 namespace Magma {
@@ -12,9 +14,6 @@ public:
 	~Entity() {
 		m_Handle.destruct();
 	}
-	
-	UUID GetID() { return m_ID; }
-	operator uint32_t() const { return m_ID; }
 
 	template<typename TComponent>
 	requires std::derived_from<TComponent, Component>
@@ -24,8 +23,9 @@ public:
 
 	template<typename TComponent, typename ...Args>
 	requires std::derived_from<TComponent, Component>
-	TComponent& Add(Args&&... args) {
-		return *m_Handle.set<TComponent>(std::forward<Args>(args...));
+	Entity& Add(Args&&... args) {
+		m_Handle.set<TComponent>(TComponent(std::forward<Args>(args)...));
+		return *this;
 	}
 
 	template<typename TComponent>

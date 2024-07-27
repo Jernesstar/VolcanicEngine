@@ -7,7 +7,11 @@
 namespace VolcaniCore {
 
 StereographicCamera::StereographicCamera()
-	: Camera(CameraType::Stereo) { }
+	: Camera(CameraType::Stereo)
+{
+	CalculateProjection();
+	CalculateView();
+}
 
 StereographicCamera::StereographicCamera(float verticalFov)
 	: Camera(CameraType::Stereo), m_VerticalFOV(verticalFov)
@@ -30,7 +34,7 @@ StereographicCamera::StereographicCamera(float verticalFov,
 void StereographicCamera::SetProjection(float verticalFov,
 										float near, float far)
 {
-	VOLCANICORE_ASSERT(near != 0, "Near clip must not be 0");
+	VOLCANICORE_ASSERT(near != 0, "Near and far clip must not be 0");
 
 	m_VerticalFOV = verticalFov;
 	m_Near = near;
@@ -48,8 +52,7 @@ void StereographicCamera::CalculateView() {
 void StereographicCamera::CalculateProjection() {
 	Projection = glm::perspectiveFov(glm::radians(m_VerticalFOV),
 									 (float)m_ViewportWidth,
-									 (float)m_ViewportHeight,
-									 m_NearClip, m_FarClip);
+									 (float)m_ViewportHeight, m_Near, m_Far);
 	ViewProjection = Projection * View;
 }
 

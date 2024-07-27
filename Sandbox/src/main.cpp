@@ -27,6 +27,7 @@
 using namespace VolcaniCore;
 
 #include "Demos/Template.h"
+#include "Demos/Cube.h"
 #include "Demos/Lighting.h"
 #include "Demos/Shadows.h"
 #include "Demos/ECS.h"
@@ -39,12 +40,12 @@ using namespace VolcaniCore;
 Application* CreateApplication(const CommandLineArgs& args) {
 	std::string project = args[1];
 
+	if(project == "Cube")	   return new Demo::Cube();
 	if(project == "Lighting")  return new Demo::Lighting();
 	if(project == "Shadows")   return new Demo::Shadows();
 	if(project == "ECS")	   return new Demo::ECS();
-	if(project == "Physics")   return new Demo::Physics();
 	if(project == "Raycast")   return new Demo::Raycast();
-	if(project == "Collision")   return new Demo::Collision();
+	if(project == "Collision") return new Demo::Collision();
 
 	if(project == "Editor") return new Magma::Editor();
 	if(project == "Game")	return new TheMazeIsLava::Game();

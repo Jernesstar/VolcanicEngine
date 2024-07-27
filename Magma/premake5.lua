@@ -29,6 +29,10 @@ project "Magma"
         "%{Includes.imgui}",
     }
 
+    buildoptions {
+        "-Wno-format-security"
+    }
+
     filter "system:windows"
         systemversion "latest"
 

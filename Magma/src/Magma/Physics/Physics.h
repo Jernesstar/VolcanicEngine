@@ -13,9 +13,11 @@ public:
 	static void Close();
 
 private:
-	inline static PxPhysics* s_Physics = nullptr;
+	inline static PxPhysics* s_Physics				   = nullptr;
+	inline static PxDefaultCpuDispatcher* s_Dispatcher = nullptr;
 
 	friend class World;
+	friend class RigidBody;
 };
 
 }

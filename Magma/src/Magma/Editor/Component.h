@@ -12,12 +12,15 @@
 #include <VolcaniCore/Object/Mesh.h>
 #include <VolcaniCore/Object/Texture.h>
 
+#include <Physics/RigidBody.h>
+
 using namespace VolcaniCore;
+using namespace Magma::Physics;
 
 namespace Magma {
 
 struct Component {
-	Component(ComponentType type) = default;
+	Component() = default;
 	Component(const Component& other) = default;
 	virtual ~Component() = default;
 };
@@ -69,9 +72,7 @@ struct TextureComponent : public Component {
 	Ref<VolcaniCore::Texture> Texture;
 
 	TextureComponent() = default;
-	TextureComponent(const std::string& path)
-		: Component(ComponentType::Texture)
-	{
+	TextureComponent(const std::string& path) {
 		Texture = Texture::Create(path);
 	}
 	TextureComponent(const TextureComponent& other) = default;

@@ -16,10 +16,7 @@ public:
 	Ref<VolcaniCore::Camera> Camera;
 
 public:
-	Scene()
-		: Name("Untitled Scene") { }
-	Scene(const std::string& name)
-		: Name(name) { }
+	Scene(const std::string& name = "Untitled Scene");
 	~Scene() = default;
 
 	void OnUpdate(TimeStep ts); // Run physics
