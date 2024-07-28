@@ -15,7 +15,6 @@ using namespace VolcaniCore;
 
 namespace Magma::UI {
 
-
 void Init();
 void Begin();
 void End();
@@ -46,7 +45,7 @@ public:
 		auto oldParent = element->m_Parent;
 		element->m_Parent = this;
 
-		if(!element->OnAttach()) {
+		if(!element->OnAttach()) { // Try and see if element accepts new parent
 			element->m_Parent = oldParent;
 			return std::static_pointer_cast<TElement>(element);
 		}

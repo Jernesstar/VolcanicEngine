@@ -80,7 +80,16 @@ void Renderer3D::DrawQuad(Ref<Quad> quad,
 void Renderer3D::DrawQuad(Ref<Quad> quad,
 						  const glm::mat4& transform)
 {
-	// TODO: Implement
+	// TODO: Continue implementing
+	DrawMesh(
+		Mesh::Create(MeshPrimitive::Quad,
+		Material{
+			.Diffuse = quad.IsTextured ? quad.GetTexture()
+									   : Texture::Create(quad.GetWidth(),
+														 quad.GetHeight())
+		}),
+		transform
+	);
 }
 
 void Renderer3D::DrawQuad(Ref<Texture> texture,

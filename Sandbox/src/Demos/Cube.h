@@ -11,7 +11,7 @@ public:
 	IsometricCamera()
 		: Camera(CameraType::Ortho)
 	{
-		float r = 2.0f;
+		float r = 4.0f;
 		Position = r * glm::vec3{
 			glm::sin(glm::radians(45.0f)),
 			glm::sin(glm::radians(35.264f)),

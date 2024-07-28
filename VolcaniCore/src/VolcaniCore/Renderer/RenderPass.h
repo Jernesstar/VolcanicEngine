@@ -5,8 +5,6 @@
 
 namespace VolcaniCore {
 
-// Don't quite know what to do with this just yet
-// TODO: Implement Deferred Rendering to figure out how to use this class
 class RenderPass {
 public:
 	static Ref<RenderPass> Create(const std::string& name,
@@ -14,6 +12,8 @@ public:
 
 public:
 	const std::string Name;
+	// TODO: Handles.
+	// eg. { "a_SomeProperty", [](Ref<TAnything> anything) { return anything.Something } }
 
 public:
 	RenderPass(const std::string& name, Ref<ShaderPipeline> pipeline);

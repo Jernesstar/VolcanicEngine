@@ -4,12 +4,9 @@
 #include <Renderer/RendererAPI.h>
 #include <Events/EventSystem.h>
 
-#include <OpenGL/Renderer.h>
-
 using namespace VolcaniCore;
 
 namespace Magma::UI {
-
 
 // UIElement::UIElement()
 // 	: UIElement(UIType::Type)
@@ -51,7 +48,7 @@ Ref<UIElement> UIElement::Add(Ref<UIElement> element) {
 
 void UIElement::Render() {
 	// if(m_Border)
-	// 	RendererAPI::Get()->Draw2DQuad(m_Border);
+	// 	Renderer2D::DrawQuad(m_Border);
 
 	Draw();
 

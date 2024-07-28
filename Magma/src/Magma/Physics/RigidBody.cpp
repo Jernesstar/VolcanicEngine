@@ -14,6 +14,8 @@ RigidBody::RigidBody(RigidBodyType type)
 		m_Actor = physics->createRigidStatic(PxTransform());
 	if(type == RigidBodyType::Dynamic)
 		m_Actor = physics->createRigidDynamic(PxTransform());
+
+	m_Actor->userData = this;
 }
 
 RigidBody::~RigidBody() {

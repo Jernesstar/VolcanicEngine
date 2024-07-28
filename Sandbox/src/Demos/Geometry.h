@@ -26,6 +26,13 @@ Physics::Physics() {
 
 	initPhysics();
 
+	PxSceneDesc sceneDesc(gPhysics->getTolerancesScale());
+	sceneDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f);
+	sceneDesc.cpuDispatcher = gDispatcher;
+	sceneDesc.filterShader	= PxDefaultFilterShader;
+	// sceneDesc.simulationEventCallback = ;
+	gScene = gPhysics->createScene(sceneDesc);
+
 	static const PxVec3 convexVerts[] = // Vertices for a square pyramid
 	{
 		PxVec3( 0,  1,  0),

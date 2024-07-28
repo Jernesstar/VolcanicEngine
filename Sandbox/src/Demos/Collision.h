@@ -34,7 +34,7 @@ void ContactCallback::onContact(const PxContactPairHeader& pairHeader,
 	// const PxTransform pose2 = pairHeader.actors[1]->getGlobalPose();
 }
 
-bool gCheckpointReached;
+// bool gCheckpointReached;
 
 void ContactCallback::onTrigger(PxTriggerPair* pairs, PxU32 count)
 {
@@ -121,14 +121,14 @@ Collision::Collision() {
 
 	initPhysics();
 
-	createWall(PxTransform(PxVec3(0, 0, 0)), 10, 0.5f);
-
 	PxSceneDesc sceneDesc(gPhysics->getTolerancesScale());
 	sceneDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f);
 	sceneDesc.cpuDispatcher	= gDispatcher;
 	sceneDesc.filterShader	= FilterShaderExample;
 	sceneDesc.simulationEventCallback = &gCallback;
 	gScene = gPhysics->createScene(sceneDesc);
+
+	createWall(PxTransform(PxVec3(0, 0, 0)), 10, 0.5f);
 
 	PxRigidStatic* groundPlane = PxCreatePlane(*gPhysics, PxPlane(0,1,0,0), *gMaterial);
 	gScene->addActor(*groundPlane);
