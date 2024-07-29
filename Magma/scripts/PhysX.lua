@@ -14,19 +14,21 @@ project "PhysX"
         "%{VendorPaths.PhysX}/physx/source/task/src/*.cpp",
         "%{VendorPaths.PhysX}/physx/source/foundation/*.cpp",
         "%{VendorPaths.PhysX}/physx/source/geomutils/src/**.cpp",
+        "%{VendorPaths.PhysX}/physx/source/scenequery/src/*.cpp",
+        "%{VendorPaths.PhysX}/physx/source/simulationcontroller/src/*.cpp",
         "%{VendorPaths.PhysX}/physx/source/lowlevel/api/src/*.cpp",
         "%{VendorPaths.PhysX}/physx/source/lowlevel/software/src/*.cpp",
         "%{VendorPaths.PhysX}/physx/source/lowlevel/common/src/pipeline/*.cpp",
         "%{VendorPaths.PhysX}/physx/source/lowlevelaabb/src/*.cpp",
         "%{VendorPaths.PhysX}/physx/source/lowleveldynamics/src/*.cpp",
+        "%{VendorPaths.PhysX}/physx/source/physxcooking/src/Cooking.cpp",
         "%{VendorPaths.PhysX}/physx/source/physxextensions/src/ExtDefaultErrorCallback.cpp",
         "%{VendorPaths.PhysX}/physx/source/physxextensions/src/ExtDefaultCpuDispatcher.cpp",
         "%{VendorPaths.PhysX}/physx/source/physxextensions/src/ExtCpuWorkerThread.cpp",
         "%{VendorPaths.PhysX}/physx/source/physxextensions/src/ExtSimpleFactory.cpp",
         "%{VendorPaths.PhysX}/physx/source/physxextensions/src/ExtRigidBodyExt.cpp",
         "%{VendorPaths.PhysX}/physx/source/physxextensions/src/ExtDefaultSimulationFilterShader.cpp",
-        "%{VendorPaths.PhysX}/physx/source/scenequery/src/*.cpp",
-        "%{VendorPaths.PhysX}/physx/source/simulationcontroller/src/*.cpp",
+        "%{VendorPaths.PhysX}/physx/source/physxextensions/src/ExtDefaultStreams.cpp",
     }
 
     includedirs {

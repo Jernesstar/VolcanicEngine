@@ -5,14 +5,14 @@
 
 using namespace physx;
 
-static PxRigidStatic* gActor = nullptr;
-
-static void createActor(const PxTransform& t, PxReal radius) {
-	PxShape* shape = gPhysics->createShape(
-		PxBoxGeometry(radius, radius, radius), *gMaterial);
-	gActor = gPhysics->createRigidStatic(t);
-	gActor->attachShape(*shape);
-	gScene->addActor(*gActor);
+static void createActors() {
+	PxShape* shape = gPhysics->createShape(PxBoxGeometry(0.5, 0.5, 0.5), *gMaterial);
+	for(uint32_t x = 0; x < 10; x++) {
+		auto actor = gPhysics->createRigidStatic(PxTransform(PxVec3(x * 2.0f, 0.0f, 0.0f)));
+		actor->attachShape(*shape);
+		actor->userData = (void*)(uint64_t)x;
+		gScene->addActor(*actor);
+	}
 	shape->release();
 }
 
@@ -41,7 +41,7 @@ Raycast::Raycast() {
 	});
 
 	EventSystem::RegisterListener<MouseButtonPressedEvent>(
-	[&](const MouseButtonPressedEvent& event) {
+	[this](const MouseButtonPressedEvent& event) {
 		glm::vec4 originNDC{
 			(event.x/800.0f - 0.5f) * 2.0f,
 			(event.y/600.0f - 0.5f) * 2.0f,
@@ -50,7 +50,7 @@ Raycast::Raycast() {
 		glm::vec4 endNDC{
 			(event.x/800.0f - 0.5f) * 2.0f,
 			(event.y/600.0f - 0.5f) * 2.0f,
-			0.0f, 1.0f
+			1.0f, 1.0f
 		};
 
 		glm::mat4 invViewProj = glm::inverse(camera->GetViewProjection());
@@ -60,7 +60,7 @@ Raycast::Raycast() {
 		worldEnd   /= worldEnd.w;
 		glm::vec3 rayDir = glm::normalize(glm::vec3(worldEnd - worldStart));
 
-		PxReal maxDist = 10000;
+		PxReal maxDist = 100000;
 		PxHitFlags flags = PxHitFlag::ePOSITION
 						 | PxHitFlag::eNORMAL
 						 | PxHitFlag::eUV;
@@ -71,8 +71,10 @@ Raycast::Raycast() {
 
 		bool hit = gScene->raycast(start, dir, maxDist, hitInfo, flags);
 		if(hit) {
-			glm::vec3 n{ hitInfo.block.normal.x, hitInfo.block.normal.y, hitInfo.block.normal.z };
-			VOLCANICORE_LOG_INFO("{ %f, %f, %f }", n.x, n.y, n.z);
+			VOLCANICORE_LOG_INFO("{");
+			VOLCANICORE_LOG_INFO("\tIndex: %i", (uint32_t)(uint64_t)hitInfo.block.actor->userData);
+			VOLCANICORE_LOG_INFO("\tDistance: %i", (int)hitInfo.block.distance);
+			VOLCANICORE_LOG_INFO("}\n");
 		}
 		else
 			VOLCANICORE_LOG_INFO("No hit");
@@ -100,13 +102,13 @@ Raycast::Raycast() {
 	sceneDesc.gravity = PxVec3(0.0f, -90.81f, 0.0f);
 	sceneDesc.cpuDispatcher	= gDispatcher;
 	sceneDesc.filterShader	= PxDefaultSimulationFilterShader;
-	sceneDesc.flags = PxSceneFlag::eENABLE_ACTIVE_ACTORS;
+	// sceneDesc.flags = PxSceneFlag::eENABLE_ACTIVE_ACTORS;
 	gScene = gPhysics->createScene(sceneDesc);
 
-	createActor(PxTransform(PxVec3(0.0, 0.0, 0.0)), 0.55);
+	createActors();
 
-	gScene->setVisualizationParameter(PxVisualizationParameter::eSCALE, 1.0f);
-	gScene->setVisualizationParameter(PxVisualizationParameter::eACTOR_AXES, 1.0f);
+	// gScene->setVisualizationParameter(PxVisualizationParameter::eSCALE, 1.0f);
+	// gScene->setVisualizationParameter(PxVisualizationParameter::eACTOR_AXES, 1.0f);
 }
 
 Raycast::~Raycast() {
@@ -120,28 +122,38 @@ void Raycast::OnUpdate(TimeStep ts) {
 
 	Renderer::Clear();
 
-	auto pose = gActor->getGlobalPose();
+	PxU32 nbActors;
+	PxActor** actors = (PxActor**)malloc(20 * sizeof(PxActor*));
+	nbActors = gScene->getActors(PxActorTypeFlag::eRIGID_STATIC, actors, 10);
 
-	Transform t{
-		.Translation = { pose.p.x, pose.p.y, pose.p.z },
-		.Rotation	 = { pose.q.x, pose.q.y, pose.q.z }
-	};
-	shader->SetMat4("u_Model", t.GetTransform());
-	Renderer3D::DrawMesh(cube);
+	// update each render object with the new transform
+	for(PxU32 i = 0; i < nbActors; i++) {
+		// RigidBody* body = static_cast<RigidBody*>(actors[i]->userData);
 
-	const PxRenderBuffer& rb = gScene->getRenderBuffer();
+		PxRigidActor& rd = static_cast<PxRigidActor&>(*actors[i]);
+		auto pose = rd.getGlobalPose();
 
-	for(PxU32 i=0; i < rb.getNbPoints(); i++)
-	{
-		const PxDebugPoint& point = rb.getPoints()[i];
+		Transform t{
+			.Translation = { pose.p.x, pose.p.y, pose.p.z },
+			// .Rotation	 = { pose.q.x, pose.q.y, pose.q.z }
+		};
+		shader->SetMat4("u_Model", t.GetTransform());
+		Renderer3D::DrawMesh(cube);
+	}
+
+	// const PxRenderBuffer& rb = gScene->getRenderBuffer();
+
+	// for(PxU32 i=0; i < rb.getNbPoints(); i++)
+	// {
+	// 	const PxDebugPoint& point = rb.getPoints()[i];
 		
-	}
+	// }
 
-	for(PxU32 i=0; i < rb.getNbLines(); i++)
-	{
-		const PxDebugLine& line = rb.getLines()[i];
-		// render the line
-	}
+	// for(PxU32 i=0; i < rb.getNbLines(); i++)
+	// {
+	// 	const PxDebugLine& line = rb.getLines()[i];
+		
+	// }
 }
 
 }

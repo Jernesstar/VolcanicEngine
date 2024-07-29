@@ -20,9 +20,13 @@ Ref<Mesh> Mesh::Create(const std::vector<Vertex>& vertices,
 }
 
 Ref<Mesh> Mesh::Create(MeshPrimitive primitive, Material material) {
+	std::vector<uint32_t> indices;
+	std::vector<Vertex> vertices;
+
 	switch(primitive) {
 		case MeshPrimitive::Cube:
-			std::vector<Vertex> vertices =
+		{
+			vertices =
 			{
 				{ { -0.5, -0.5, -0.5 }, {  0.0,  0.0, -1.0 }, { 0.0, 0.0 } },
 				{ {  0.5, -0.5, -0.5 }, {  0.0,  0.0, -1.0 }, { 1.0, 0.0 } },
@@ -52,7 +56,7 @@ Ref<Mesh> Mesh::Create(MeshPrimitive primitive, Material material) {
 				{ {  0.5,  0.5,  0.5 }, {  0.0,  1.0,  0.0 }, { 0.0, 1.0 } },
 			};
 			// index data
-			std::vector<uint32_t> indices =
+			indices =
 			{
 				0,  3,  2, // Front
 				2,  1,  0,
@@ -72,27 +76,31 @@ Ref<Mesh> Mesh::Create(MeshPrimitive primitive, Material material) {
 				20, 21, 22, // Top
 				22, 23, 20
 			};
-			return Create(vertices, indices, material);
+
+			break;
+		}
 
 		case MeshPrimitive::Quad:
-			std::vector<Vertex> vertices =
+		{
+			vertices =
 			{
 				{ { -0.5,  0.5,  0.5 }, { 0.0, 0.0, 1.0 }, { 0.0, 1.0 } },
 				{ {  0.5,  0.5,  0.5 }, { 0.0, 0.0, 1.0 }, { 1.0, 1.0 } },
 				{ { -0.5, -0.5,  0.5 }, { 0.0, 0.0, 1.0 }, { 0.0, 0.0 } },
 				{ {  0.5, -0.5,  0.5 }, { 0.0, 0.0, 1.0 }, { 1.0, 0.0 } },
 			};
-			std::vector<uint32_t> indices =
+			indices =
 			{
 				0, 2, 3,
 				3, 1, 0,
 			};
-
-			return Create(vertices, indices, material);
+		}
 		
 		case MeshPrimitive::Line:
 			break;
 	}
+
+	return Create(vertices, indices, material);
 }
 
 }

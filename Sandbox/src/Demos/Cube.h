@@ -11,18 +11,21 @@ public:
 	IsometricCamera()
 		: Camera(CameraType::Ortho)
 	{
-		float r = 4.0f;
+		float r = 1.0f;
 		Position = r * glm::vec3{
 			glm::sin(glm::radians(45.0f)),
 			glm::sin(glm::radians(35.264f)),
 			glm::cos(glm::radians(45.0f))
 		};
 
-		ForwardDirection = r * glm::vec3{
-								0.0f,
-								glm::sin(glm::radians(90.0f - 35.254f)),
-								0.0f
-							};
+		ForwardDirection = r * glm::normalize(
+								glm::vec3{
+									// 0.0f, 0.0f,
+									-glm::sin(glm::radians(45.0f)),
+									-glm::sin(glm::radians(90.0f - 35.254f)),
+									-1.0f
+									}
+								);
 
 		CalculateProjection();
 		CalculateView();
@@ -41,9 +44,9 @@ private:
 										 (float)m_ViewportHeight,
 										 m_Near, m_Far);
 
-		// Projection = glm::ortho(-m_ViewportWidth/2.0f, m_ViewportWidth/2.0f,
-		// 				-m_ViewportHeight/2.0f, m_ViewportHeight/2.0f,
-		// 				m_Near, m_Far);
+		Projection = glm::ortho(-m_ViewportWidth/2.0f, m_ViewportWidth/2.0f,
+								-m_ViewportHeight/2.0f, m_ViewportHeight/2.0f,
+								m_Near, m_Far);
 
 		ViewProjection = Projection * View;
 	}

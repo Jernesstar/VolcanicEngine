@@ -2,10 +2,10 @@
 
 namespace Demo {
 
-class Physics : public Application {
+class Geometry : public Application {
 public:
-	Physics();
-	~Physics();
+	Geometry();
+	~Geometry();
 
 	void OnUpdate(TimeStep ts);
 
@@ -17,7 +17,7 @@ private:
 	Ref<CameraController> controller;
 };
 
-Physics::Physics() {
+Geometry::Geometry() {
 	EventSystem::RegisterListener<KeyPressedEvent>(
 	[](const KeyPressedEvent& event) {
 		if(event.Key == Key::Escape)
@@ -29,8 +29,7 @@ Physics::Physics() {
 	PxSceneDesc sceneDesc(gPhysics->getTolerancesScale());
 	sceneDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f);
 	sceneDesc.cpuDispatcher = gDispatcher;
-	sceneDesc.filterShader	= PxDefaultFilterShader;
-	// sceneDesc.simulationEventCallback = ;
+	sceneDesc.filterShader	= PxDefaultSimulationFilterShader;
 	gScene = gPhysics->createScene(sceneDesc);
 
 	static const PxVec3 convexVerts[] = // Vertices for a square pyramid
@@ -60,28 +59,29 @@ Physics::Physics() {
 	PxDefaultMemoryInputData input(buf.getData(), buf.getSize());
 	PxConvexMesh* convexMesh = gPhysics->createConvexMesh(input);
 	PxShape* convexShape =
-		gPhysics->createShape(PxConvexMeshGeometry(convexMesh), gMaterial, true);
+		gPhysics->createShape(PxConvexMeshGeometry(convexMesh), *gMaterial, true);
 												 // true, it will not be shared
 
-	Mesh mesh = Mesh::Create(MeshPrimitive::Cube,
+	Ref<Mesh> mesh = Mesh::Create(MeshPrimitive::Cube,
 		Material{
 			.Diffuse = Texture::Create("Sandbox/assets/images/wood.png")
 		});
 	PxTriangleMeshDesc meshDesc;
-	meshDesc.points.count  = mesh.GetVertices().size();
+	meshDesc.points.count  = mesh->GetVertices().size();
 	meshDesc.points.stride = sizeof(Vertex);
-	meshDesc.points.data   = &mesh.GetVertices()[0];
+	meshDesc.points.data   = &mesh->GetVertices()[0];
 
-	meshDesc.triangles.count  = mesh.GetIndices().size();
+	meshDesc.triangles.count  = mesh->GetIndices().size();
 	meshDesc.triangles.stride = 3 * sizeof(PxU32);
-	meshDesc.triangles.data   = &mesh.GetIndices()[0];
+	meshDesc.triangles.data   = &mesh->GetIndices()[0];
 
-	PxTolerancesScale scale;
-	PxCookingParams params(scale);
+	// PxTolerancesScale scale;
+	// PxCookingParams params(scale);
 
 	PxDefaultMemoryOutputStream writeBuffer;
-	PxTriangleMeshCookingResult::Enum result;
-	bool status = PxCookTriangleMesh(params, meshDesc, writeBuffer, result);
+	PxTriangleMeshCookingResult::Enum res;
+	status = PxCookTriangleMesh(params, meshDesc, writeBuffer, &res);
+	// bool status = PxCookTriangleMesh(params, meshDesc, writeBuffer, &res);
 	if(!status)
 		VOLCANICORE_LOG_ERROR("Failed to create triangle mesh");
 
@@ -89,14 +89,14 @@ Physics::Physics() {
 										writeBuffer.getSize());
 	PxTriangleMesh* triangleMesh = gPhysics->createTriangleMesh(readBuffer);
 	PxShape* triangleShape = gPhysics->createShape(
-		PxTriangleMeshGeometry(triangleMesh), gMaterial, true);
+		PxTriangleMeshGeometry(triangleMesh), *gMaterial, true);
 }
 
-Physics::~Physics() {
+Geometry::~Geometry() {
 	cleanupPhysics();
 }
 
-void Physics::OnUpdate(TimeStep ts) {
+void Geometry::OnUpdate(TimeStep ts) {
 	stepPhysics(ts);
 }
 

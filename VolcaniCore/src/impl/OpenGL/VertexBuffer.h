@@ -12,8 +12,7 @@ public:
 
 public:
 	VertexBuffer(const BufferLayout& layout,
-				 uint32_t count,
-				 const void* data = nullptr)
+				 uint32_t count, const void* data = nullptr)
 		: Layout(layout)
 	{
 		glCreateBuffers(1, &m_BufferID);

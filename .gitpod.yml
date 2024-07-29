@@ -7,4 +7,4 @@ ports:
     protocol: "http"
 tasks:
   - command: "git pull && git submodule update --init \
-          &&  scripts/premake.sh && scripts/build.sh"
+              && scripts/premake.sh && scripts/build.sh"

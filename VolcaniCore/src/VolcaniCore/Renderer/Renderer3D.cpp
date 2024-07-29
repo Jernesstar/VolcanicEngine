@@ -84,9 +84,9 @@ void Renderer3D::DrawQuad(Ref<Quad> quad,
 	DrawMesh(
 		Mesh::Create(MeshPrimitive::Quad,
 		Material{
-			.Diffuse = quad.IsTextured ? quad.GetTexture()
-									   : Texture::Create(quad.GetWidth(),
-														 quad.GetHeight())
+			.Diffuse = quad->IsTextured ? quad->GetTexture()
+									   : Texture::Create(quad->GetWidth(),
+														 quad->GetHeight())
 		}),
 		transform
 	);

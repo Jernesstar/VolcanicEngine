@@ -18,7 +18,7 @@ public:
 
 public:
 	Quad(Ref<Texture> texture)
-		: IsTexture(true), m_Texture(texture),
+		: IsTextured(true), m_Texture(texture),
 			m_Width(texture->GetWidth()), m_Height(texture->GetHeight())
 	{
 
@@ -32,6 +32,11 @@ public:
 	}
 	Quad(const glm::vec4& color = glm::vec4(1.0f))
 		: IsTextured(false), m_Color(color) { }
+
+	Ref<Texture> GetTexture() const { return m_Texture; }
+
+	uint32_t GetWidth() const { return m_Width; }
+	uint32_t GetHeight() const { return m_Height; }
 
 protected:
 	uint32_t m_Width = 1, m_Height = 1;
