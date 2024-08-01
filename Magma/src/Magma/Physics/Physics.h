@@ -7,10 +7,10 @@ using namespace physx;
 
 namespace Magma::Physics {
 
-static void Init();
-static void Close();
+void Init();
+void Close();
 
-inline static PxPhysics*			  s_Physics	   = nullptr;
-inline static PxDefaultCpuDispatcher* s_Dispatcher = nullptr;
+extern PxPhysics* GetPhysicsLib();
+extern PxDefaultCpuDispatcher* GetDispatcher();
 
 }

@@ -30,6 +30,8 @@
 #include <Magma/Physics/World.h>
 
 using namespace VolcaniCore;
+using namespace Magma;
+using namespace Magma::Physics;
 
 #include "Demos/Template.h"
 #include "Demos/Cube.h"
@@ -44,6 +46,8 @@ using namespace VolcaniCore;
 
 Application* CreateApplication(const CommandLineArgs& args) {
 	std::string project = args[1];
+
+	Physics::Init();
 
 	if(project == "Cube")	   return new Demo::Cube();
 	if(project == "Lighting")  return new Demo::Lighting();

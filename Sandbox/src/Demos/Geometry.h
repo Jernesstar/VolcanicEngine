@@ -16,7 +16,7 @@ private:
 	Ref<Camera> camera;
 	Ref<CameraController> controller;
 
-	PHysics::World world;
+	Physics::World world;
 };
 
 Geometry::Geometry() {

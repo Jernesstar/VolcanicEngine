@@ -1,7 +1,8 @@
 #pragma once
 
-#include <PxPhysics.h>
-#include <PxPhysicsAPI.h>
+#include <VolcaniCore/Renderer/Transform.h>
+
+#include "Shape.h"
 
 using namespace physx;
 
@@ -17,7 +18,7 @@ public:
 	RigidBody(RigidBodyType type, const Shape& shape, const Transform& t = { });
 	~RigidBody();
 
-	void UpdateTransform() const;
+	void UpdateTransform();
 	Transform GetTransform() const { return m_Transform; }
 
 	template<typename TDerived>
@@ -33,7 +34,7 @@ protected:
 
 class StaticBody : public RigidBody {
 public:
-	StaticBody();
+	StaticBody(const Shape& shape, const Transform& t = { });
 	~StaticBody() = default;
 
 private:
@@ -42,7 +43,7 @@ private:
 
 class DynamicBody : public RigidBody {
 public:
-	DynamicBody();
+	DynamicBody(const Shape& shape, const Transform& t = { });
 	~DynamicBody() = default;
 
 	// void SetVelocity(const glm::vec3& velocity);

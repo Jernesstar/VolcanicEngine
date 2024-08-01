@@ -6,8 +6,9 @@ static void createWall(Physics::World& world) {
 		for(uint32_t j = 0; j < 4; j++) {
 			RigidBody body(RigidBodyType::Dynamic, box,
 				Transform{
-					.Translation = 0.5f * { j*2 - (4 - i), i*2 + 1, 0.0f },
-				});
+					.Translation = { j*2 - (4 - i), i*2 + 1, 0.0f },
+				}
+			);
 			
 			world.AddActor(body);
 		}

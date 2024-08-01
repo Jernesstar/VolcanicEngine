@@ -9,7 +9,7 @@ using namespace physx;
 
 using namespace VolcaniCore;
 
-namespace Magma {
+namespace Magma::Physics {
 
 enum class ShapeType { Box, Sphere, Plane, Capsule, ConvexMesh, TriangleMesh };
 
@@ -24,12 +24,14 @@ public:
 	Shape(ShapeType type);
 	Shape(Ref<Mesh> mesh);
 	// Shape(Buffer<Vertex> data);
-	Shape(const Shape& other) = delete;
-	Shape& operator =(const Shape& other) = delete;
+	// Shape(const Shape& other) = delete;
+	// Shape& operator =(const Shape& other) = delete;
 	~Shape();
 
 private:
 	PxShape* m_Shape;
+
+	friend class RigidBody;
 };
 
 }

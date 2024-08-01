@@ -39,7 +39,7 @@ struct RigidBodyComponent : public Component {
 	RigidBody Body;
 
 	RigidBodyComponent()
-		: Body(RigidBodyType::Static) { }
+		: Body(RigidBodyType::Static, Shape(ShapeType::Box)) { }
 	RigidBodyComponent(const RigidBody& body)
 		: Body(body) { }
 	RigidBodyComponent(const RigidBodyComponent& other) = default;

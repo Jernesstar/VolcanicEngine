@@ -2,7 +2,7 @@
 
 #include <VolcaniCore/Core/Application.h>
 
-#include "Physics/Physics.h"
+#include "Physics.h"
 
 using namespace physx;
 
@@ -10,14 +10,14 @@ namespace Magma::Physics {
 
 // TODO:
 World::World() {
-	PxSceneDesc sceneDesc(s_Physics->getTolerancesScale());
-	sceneDesc.cpuDispatcher	= PhysicsSystem::s_Dispatcher;
+	PxSceneDesc sceneDesc(Physics::GetPhysicsLib()->getTolerancesScale());
+	sceneDesc.cpuDispatcher	= Physics::GetDispatcher();
 	sceneDesc.gravity		= PxVec3(0.0f, -9.81f, 0.0f);
 	sceneDesc.filterShader	= PxDefaultSimulationFilterShader;
 	// sceneDesc.filterShader	= FilterShaderExample;
 	sceneDesc.simulationEventCallback = &m_ContactCallback;
 	// sceneDesc.flags			= PxSceneFlag::eENABLE_ACTIVE_ACTORS;
-	m_Scene = s_Physics->createScene(sceneDesc);
+	m_Scene = GetPhysicsLib()->createScene(sceneDesc);
 
 	Reallocate(1000);
 }
@@ -50,12 +50,13 @@ HitInfo World::Raycast(const glm::vec3& start,
 
 	bool hit = m_Scene->raycast(st, dir, maxDist, hitInfo, flags);
 	if(hit)
-		return HitInfo(hitInfo.block.actor->userData, hitInfo.block.distance);
+		return HitInfo((RigidBody*)hitInfo.block.actor->userData,
+					   hitInfo.block.distance);
 	else
 		return HitInfo();
 }
 
-void World::AddActor(RigidBody& body) {
+void World::AddActor(const RigidBody& body) {
 	m_Scene->addActor(*body.m_Actor);
 	m_ActorCount++;
 
@@ -64,16 +65,15 @@ void World::AddActor(RigidBody& body) {
 }
 
 // TODO: Optimize
-std::vector<RigidBody*> GetActors() {
+std::vector<RigidBody*> World::GetActors() const {
 	std::vector<RigidBody*> actors;
 	PxU32 nbActors = m_Scene->getActors(PxActorTypeFlag::eRIGID_DYNAMIC
 									  | PxActorTypeFlag::eRIGID_STATIC, m_Actors,
 									  	m_ActorCount);
 
 	for(PxU32 i = 0; i < nbActors; i++) {
-		RigidBody* body = static_cast<RigidBody*>(actors[i]->userData);
+		RigidBody* body = static_cast<RigidBody*>(m_Actors[i]->userData);
 
-		body->UpdateTransform();
 		actors.push_back(body);
 	}
 
@@ -86,7 +86,7 @@ void World::Reallocate(uint64_t maxCount) {
 	m_MaxActorCount = maxCount;
 
 	delete m_Actors;
-	PxActor** m_Actors = (PxActor**)malloc(maxCount * sizeof(PxActor*));
+	m_Actors = (PxActor**)malloc(maxCount * sizeof(PxActor*));
 }
 
 void ContactCallback::onTrigger(PxTriggerPair* pairs, PxU32 count)
@@ -109,8 +109,8 @@ void ContactCallback::onTrigger(PxTriggerPair* pairs, PxU32 count)
 void ContactCallback::onContact(const PxContactPairHeader& pairHeader,
 								const PxContactPair* pairs, PxU32 nbPairs)
 {
-	RigidActor& a1 = static_cast<RigidActor&>(*pairHeader.actors[0]->userData);
-	RigidActor& a2 = static_cast<RigidActor&>(*pairHeader.actors[1]->userData);
+	RigidBody& a1 = *static_cast<RigidBody*>(pairHeader.actors[0]->userData);
+	RigidBody& a2 = *static_cast<RigidBody*>(pairHeader.actors[1]->userData);
 
 	for(auto callback : m_Callbacks) {
 		callback(a1, a2);

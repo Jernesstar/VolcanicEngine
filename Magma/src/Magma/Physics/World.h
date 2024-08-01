@@ -45,11 +45,11 @@ public:
 
 private:
 	RigidBody* m_Actor;
-}
+};
 
 class World {
 public:
-	static const float StepSize = 1.0f / 60.0f;
+	static constexpr float StepSize = 1.0f / 60.0f;
 
 public:
 	World();
@@ -57,7 +57,7 @@ public:
 
 	void OnUpdate(TimeStep ts);
 
-	void AddActor(RigidBody& body);
+	void AddActor(const RigidBody& body);
 	// RigidBody CreateActor();
 	// RigidBody CreatePlane();
 
@@ -68,17 +68,17 @@ public:
 
 	// Sends a ray through the scene to see if it hits something
 	HitInfo Raycast(const glm::vec3& start,
-					const glm::vec3& direction, float maxDist = 10000.0f)
+					const glm::vec3& direction, float maxDist = 10000.0f);
 
 private:
 	void Reallocate(uint64_t maxCount);
 
 	ContactCallback m_ContactCallback;
 
-	PxScene* m_Scene;
+	PxScene* m_Scene = nullptr;
 	uint64_t m_ActorCount = 0;
 	uint64_t m_MaxActorCount = 0;
-	PxActor** m_Actors;
+	PxActor** m_Actors = nullptr;
 
 	float m_Accumulator = 0.0f;
 };

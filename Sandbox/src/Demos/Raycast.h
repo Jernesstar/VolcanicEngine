@@ -1,10 +1,11 @@
 #pragma once
 
 static void createActors(Physics::World& world) {
-	Shape box(SphapeType::Box);
+	Shape box(ShapeType::Box);
 	for(uint32_t x = 0; x < 10; x++) {
-		RigidBody body(RigidBodyType::Dynamic, box,
-			Transform{ .Translation = 0.5f * { x * 2.0f, 0.0f, 0.0f } });
+		RigidBody body(RigidBodyType::Static, box,
+			Transform{ .Translation = { x * 2.0f, 0.0f, 0.0f } }
+		);
 
 		world.AddActor(body);
 	}
@@ -26,7 +27,7 @@ private:
 	Ref<Camera> camera;
 	Ref<CameraController> controller;
 
-	PHysics::World world;
+	Physics::World world;
 };
 
 Raycast::Raycast() {
@@ -86,7 +87,6 @@ Raycast::Raycast() {
 	camera->SetPosition({ 0.0f, 0.0f, 3.0f });
 	controller = CreateRef<CameraController>(camera);
 
-	Physics::Init();
 	createActors(world);
 
 	// gScene->setVisualizationParameter(PxVisualizationParameter::eSCALE, 1.0f);
@@ -106,7 +106,8 @@ void Raycast::OnUpdate(TimeStep ts) {
 	Renderer::Clear();
 
 	for(auto* body : world.GetActors()) {
-		shader->SetMat4("u_Model", body->GetTransform());
+		body->UpdateTransform();
+		// shader->SetMat4("u_Model", body->GetTransform());
 		Renderer3D::DrawMesh(cube);
 	}
 
