@@ -22,7 +22,7 @@ struct Material {
 	Ref<Texture> Roughness;
 };
 
-enum class MeshPrimitive { Line, Quad, Cube, Pyramid };
+enum class MeshPrimitive { Point, Line, Quad, Cube, Pyramid };
 
 class Mesh {
 public:
@@ -44,10 +44,12 @@ public:
 	std::vector<uint32_t>& GetIndices() { return m_Indices; }
 	Material& GetMaterial() { return m_Material; }
 
-	template<typename Derived>
-	Derived* As() const { return (Derived*)(this); }
+	template<typename TDerived>
+	requires std::derived_from<TDerived, Mesh>
+	TDerived* As() const { return (TDerived*)(this); }
 
 protected:
+	// TODO: Replace vectors with Buffer<T> type
 	std::vector<Vertex> m_Vertices;
 	std::vector<uint32_t> m_Indices;
 	Material m_Material;

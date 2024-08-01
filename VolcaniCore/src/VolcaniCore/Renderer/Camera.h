@@ -73,8 +73,9 @@ public:
 	float GetFar()	const { return m_Far; }
 	float GetRotation() const { return m_Rotation; }
 
-	template<typename Derived>
-	Derived* As() const { return (Derived*)(this); }
+	template<typename TDerived>
+	requires std::derived_from<TDerived, Camera>
+	TDerived* As() const { return (TDerived*)(this); }
 
 protected:
 	// TODO: Consistent naming conventions?

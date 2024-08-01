@@ -20,8 +20,7 @@ static PxRigidDynamic* createDynamic(const PxTransform& t,
 									 const PxGeometry& geometry,
 									 const PxVec3& velocity=PxVec3(0))
 {
-	PxRigidDynamic* dynamic = PxCreateDynamic(*gPhysics, t, geometry,
-											  *gMaterial, 10.0f);
+	PxRigidDynamic* dynamic = PxCreateDynamic(*gPhysics, t, geometry, *gMaterial, 10.0f);
 	dynamic->setAngularDamping(0.5f);
 	dynamic->setLinearVelocity(velocity);
 	gScene->addActor(*dynamic);
@@ -49,26 +48,26 @@ static void createStack(const PxTransform& t, PxU32 size, PxReal halfExtent)
 
 void initPhysics()
 {
-	gFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, gAllocator,
-									 gErrorCallback);
-	gPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *gFoundation,
-							   PxTolerancesScale(), true, gPvd);
-	gDispatcher = PxDefaultCpuDispatcherCreate(2);
+	// gFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, gAllocator,
+	// 								 gErrorCallback);
+	// gPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *gFoundation,
+	// 						   PxTolerancesScale(), true, gPvd);
+	// gDispatcher = PxDefaultCpuDispatcherCreate(2);
 
-	gMaterial = gPhysics->createMaterial(0.5f, 0.5f, 0.6f);
+	// gMaterial = gPhysics->createMaterial(0.5f, 0.5f, 0.6f);
 }
 
 void stepPhysics(TimeStep ts)
 {
-	gScene->simulate(1.0f/60.0f);
+	// gScene->simulate(1.0f/60.0f);
 	// gScene->simulate((float)ts);
-	gScene->fetchResults(true);
+	// gScene->fetchResults(true);
 }
 	
 void cleanupPhysics()
 {
-	PX_RELEASE(gScene);
-	PX_RELEASE(gDispatcher);
-	PX_RELEASE(gPhysics);
-	PX_RELEASE(gFoundation);
+	// PX_RELEASE(gScene);
+	// PX_RELEASE(gDispatcher);
+	// PX_RELEASE(gPhysics);
+	// PX_RELEASE(gFoundation);
 }

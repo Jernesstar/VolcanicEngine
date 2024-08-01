@@ -8,7 +8,6 @@
 
 namespace VolcaniCore {
 
-
 enum class RendererBackend { OpenGL, Vulkan, DirectX };
 
 // Generate the backend specific buffers to be used every frame
@@ -36,8 +35,9 @@ public:
 	virtual void RenderFramebuffer(Ref<Framebuffer> buffer,
 								   AttachmentTarget target) = 0;
 
-	template<typename Derived>
-	Derived* As() const { return (Derived*)(this); }
+	template<typename TDerived>
+	requires std::derived_from<TDerived, RendererAPI>
+	TDerived* As() const { return (TDerived*)(this); }
 
 protected:
 	virtual void Init() = 0;

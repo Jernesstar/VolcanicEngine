@@ -1,56 +1,17 @@
 #pragma once
 
-static void createWall(const PxTransform& t, PxU32 size, PxReal halfExtent)
-{
-	PxShape* shape = gPhysics->createShape(
-		PxBoxGeometry(halfExtent, halfExtent, halfExtent), *gMaterial);
-	for(PxU32 i = 0; i < size; i++)
-	{
-		for(PxU32 j = 0; j < size; j++)
-		{
-			PxTransform localTm(PxVec3(PxReal(j*2) - PxReal(size-i), PxReal(i*2+1), 0) * halfExtent);
-			PxRigidDynamic* body = gPhysics->createRigidDynamic(t.transform(localTm));
-			body->attachShape(*shape);
-			gScene->addActor(*body);
+static void createWall(Physics::World& world) {
+	Shape box(ShapeType::Box);
+	for(uint32_t i = 0; i < 4; i++) {
+		for(uint32_t j = 0; j < 4; j++) {
+			RigidBody body(RigidBodyType::Dynamic, box,
+				Transform{
+					.Translation = 0.5f * { j*2 - (4 - i), i*2 + 1, 0.0f },
+				});
+			
+			world.AddActor(body);
 		}
 	}
-	shape->release();
-}
-
-class ContactCallback : public PxSimulationEventCallback {
-	void onConstraintBreak(PxConstraintInfo* constraints, PxU32 count)	{ }
-	void onWake(PxActor** actors, PxU32 count)							{ }
-	void onSleep(PxActor** actors, PxU32 count)							{ }
-	void onAdvance(const PxRigidBody* const *, const PxTransform*, const PxU32) { }
-	void onTrigger(PxTriggerPair* pairs, PxU32 count);
-	void onContact(const PxContactPairHeader& pairHeader, const PxContactPair* pairs, PxU32 nbPairs);
-};
-
-void ContactCallback::onTrigger(PxTriggerPair* pairs, PxU32 count)
-{
-	// for(PxU32 i=0; i<count; i++)
-	// {
-	// 	ignore pairs when shapes have been deleted
-	// 	if(pairs[i].flags & (PxTriggerPairFlag::eREMOVED_SHAPE_TRIGGER | PxTriggerPairFlag::eREMOVED_SHAPE_OTHER))
-	// 		continue;
-
-	// 	Detect for example that a player entered a checkpoint zone
-	// 	if((&pairs[i].otherShape->getActor() == gPlayerActor) &&
-	// 		(&pairs[i].triggerShape->getActor() == gSensorActor))
-	// 	{
-	// 		gCheckpointReached = true;
-	// 	}
-	// }
-}
-
-void ContactCallback::onContact(const PxContactPairHeader& pairHeader,
-								const PxContactPair* pairs, PxU32 nbPairs)
-{
-	// Retrieve the current poses and velocities of the two actors involved in the contact event.
-	PxRigidActor& actor1 = static_cast<PxRigidActor&>(*pairHeader.actors[0]);
-	PxRigidActor& actor2 = static_cast<PxRigidActor&>(*pairHeader.actors[1]);
-
-	VOLCANICORE_LOG_INFO("It's working");
 }
 
 PxFilterFlags FilterShaderExample(
@@ -58,8 +19,6 @@ PxFilterFlags FilterShaderExample(
 	PxFilterObjectAttributes attributes1, PxFilterData filterData1,
 	PxPairFlags& pairFlags, const void* constantBlock, PxU32 constantBlockSize)
 {
-	VOLCANICORE_LOG_INFO("This is working instead");
-
 	// // let triggers through
 	// if(PxFilterObjectIsTrigger(attributes0) || PxFilterObjectIsTrigger(attributes1))
 	// {
@@ -79,7 +38,7 @@ PxFilterFlags FilterShaderExample(
 	// all initial and persisting reports for everything, with per-point data
 	pairFlags = PxPairFlag::eSOLVE_CONTACT
 				| PxPairFlag::eDETECT_DISCRETE_CONTACT
-				| PxPairFlag::eNOTIFY_TOUCH_FOUND 
+				| PxPairFlag::eNOTIFY_TOUCH_FOUND
 				| PxPairFlag::eNOTIFY_TOUCH_PERSISTS
 				| PxPairFlag::eNOTIFY_CONTACT_POINTS;
 
@@ -102,7 +61,7 @@ private:
 	Ref<Camera> camera;
 	Ref<CameraController> controller;
 
-	ContactCallback gCallback;
+	Physics::World world;
 };
 
 Collision::Collision() {
@@ -128,54 +87,28 @@ Collision::Collision() {
 	camera->SetPosition({ 0.0f, 0.5f, 3.0f });
 	controller = CreateRef<CameraController>(camera);
 
-	initPhysics();
+	Physics::Init();
 
-	PxSceneDesc sceneDesc(gPhysics->getTolerancesScale());
-	sceneDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f);
-	sceneDesc.cpuDispatcher	= gDispatcher;
-	sceneDesc.filterShader	= FilterShaderExample;
-	// sceneDesc.simulationEventCallback = new ContactCallback();
-	sceneDesc.simulationEventCallback = &gCallback;
-	gScene = gPhysics->createScene(sceneDesc);
+	createWall(world);
 
-	createWall(PxTransform(PxVec3(0, 0, 0)), 4, 0.5f);
-
-	PxRigidStatic* groundPlane = PxCreatePlane(*gPhysics, PxPlane(0,1,0,0), *gMaterial);
-	gScene->addActor(*groundPlane);
+	world.AddActor(RigidBody(RigidBodyType::Static, Shape(ShapeType::Plane)));
 }
 
 Collision::~Collision() {
-	cleanupPhysics();
+	Physics::Close();
 }
 
 void Collision::OnUpdate(TimeStep ts) {
-	stepPhysics(ts);
+	world.OnUpdate(ts);
 
 	controller->OnUpdate(ts);
 	shader->SetMat4("u_ViewProj", camera->GetViewProjection());
 
 	Renderer::Clear();
 
-	PxU32 nbActors;
-	PxActor** actors = (PxActor**)malloc(20 * sizeof(PxActor*));
-	nbActors = gScene->getActors(PxActorTypeFlag::eRIGID_DYNAMIC, actors, 20);
-
-	// update each render object with the new transform
-	for(PxU32 i = 0; i < nbActors; i++) {
-		// RigidBody* body = static_cast<RigidBody*>(actors[i]->userData);
-
-		if(actors[i]->getConcreteType() == PxConcreteType::eRIGID_DYNAMIC)
-		{
-			PxRigidDynamic& rd = static_cast<PxRigidDynamic&>(*actors[i]);
-			auto pose = rd.getGlobalPose();
-
-			Transform t{
-				.Translation = { pose.p.x, pose.p.y, pose.p.z },
-				// .Rotation	 = { pose.q.x, pose.q.y, pose.q.z }
-			};
-			shader->SetMat4("u_Model", t.GetTransform());
-			Renderer3D::DrawMesh(cube);
-		}
+	for(auto* body : world.GetActors()) {
+		shader->SetMat4("u_Model", body->GetTransform());
+		Renderer3D::DrawMesh(cube);
 	}
 }
 

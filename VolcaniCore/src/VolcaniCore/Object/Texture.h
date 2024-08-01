@@ -22,8 +22,9 @@ public:
 	bool HasPath() const { return m_Path != ""; }
 	std::string GetPath() const { return m_Path; }
 
-	template<typename Derived>
-	Derived* As() const { return (Derived*)(this); }
+	template<typename TDerived>
+	requires std::derived_from<TDerived, Texture>
+	TDerived* As() const { return (TDerived*)(this); }
 
 protected:
 	std::string m_Path;

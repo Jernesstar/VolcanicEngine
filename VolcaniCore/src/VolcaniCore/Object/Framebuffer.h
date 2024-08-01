@@ -24,8 +24,9 @@ public:
 	uint32_t GetWidth() const { return m_Width; }
 	uint32_t GetHeight() const { return m_Height; }
 
-	template<typename Derived>
-	Derived* As() const { return (Derived*)(this); }
+	template<typename TDerived>
+	requires std::derived_from<TDerived, Framebuffer>
+	TDerived* As() const { return (TDerived*)(this); }
 
 protected:
 	uint32_t m_Width, m_Height;

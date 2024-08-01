@@ -28,9 +28,6 @@ public:
 		return m_Meshes[i];
 	}
 
-	template<typename Derived>
-	Derived* As() const { return (Derived*)(this); }
-
 private:
 	void Load(const std::string& path);
 

@@ -21,8 +21,13 @@
 #include <VolcaniCore/Object/Texture.h>
 
 #include <Magma/Editor/Editor.h>
+
 #include <Magma/UI/UIElements.h>
+
 #include <Magma/Physics/Physics.h>
+#include <Magma/Physics/RigidBody.h>
+#include <Magma/Physics/Shape.h>
+#include <Magma/Physics/World.h>
 
 using namespace VolcaniCore;
 
@@ -31,7 +36,6 @@ using namespace VolcaniCore;
 #include "Demos/Lighting.h"
 #include "Demos/Shadows.h"
 #include "Demos/ECS.h"
-#include "Demos/Physics.h"
 #include "Demos/Raycast.h"
 #include "Demos/Collision.h"
 #include "Demos/Geometry.h"
