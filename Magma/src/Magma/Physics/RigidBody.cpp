@@ -8,7 +8,6 @@ namespace Magma::Physics {
 RigidBody::RigidBody(RigidBodyType type, const Shape& shape, const Transform& t)
 	: Type(type), m_Transform(t)
 {
-	VOLCANICORE_LOG_INFO("Count: %f", m_Transform.Translation.x);
 	// VOLCANICORE_LOG_INFO("Count: %i", shape.m_Shape->getReferenceCount());
 	PxTransform tr(t.Translation.x, t.Translation.y, t.Translation.z);
 	if(type == RigidBodyType::Static)
@@ -17,12 +16,11 @@ RigidBody::RigidBody(RigidBodyType type, const Shape& shape, const Transform& t)
 		m_Actor = GetPhysicsLib()->createRigidDynamic(tr);
 
 	m_Actor->attachShape(*shape.m_Shape);
-
 	m_Actor->userData = static_cast<void*>(this);
 }
 
 RigidBody::~RigidBody() {
-	// m_Actor->release();
+	m_Actor->release();
 }
 
 void RigidBody::UpdateTransform() {

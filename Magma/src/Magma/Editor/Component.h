@@ -68,16 +68,6 @@ struct TagComponent : public Component {
 	TagComponent(const TagComponent& other) = default;
 };
 
-struct TextureComponent : public Component {
-	Ref<VolcaniCore::Texture> Texture;
-
-	TextureComponent() = default;
-	TextureComponent(const std::string& path) {
-		Texture = Texture::Create(path);
-	}
-	TextureComponent(const TextureComponent& other) = default;
-};
-
 struct TransformComponent : public Component {
 	glm::vec3 Translation = { 0.0f, 0.0f, 0.0f };
 	glm::vec3 Rotation	  = { 0.0f, 0.0f, 0.0f };
@@ -89,14 +79,6 @@ struct TransformComponent : public Component {
 					   const glm::vec3& s)
 		: Translation(t), Rotation(r), Scale(s) { }
 	TransformComponent(const TransformComponent& other) = default;
-
-	glm::mat4 GetTransform() {
-		return glm::translate(glm::mat4(1.0f), Translation)
-			 * glm::toMat4(glm::quat(Rotation))
-			 * glm::scale(glm::mat4(1.0f), Scale);
-	}
-
-	operator glm::mat4() { return GetTransform(); }
 };
 
 }

@@ -64,21 +64,25 @@ public:
 	void AddContactCallback(
 		const std::function<void(RigidBody&, RigidBody&)>& callback);
 
-	std::vector<RigidBody*> GetActors() const;
+	const std::vector<Ref<RigidBody>>& GetActors() const { return m_Actors; }
 
+	std::vector<Ref<RigidBody>>::const_iterator begin() {
+		return m_Actors.begin();
+	}
+	std::vector<Ref<RigidBody>>::const_iterator end() {
+		return m_Actors.end();
+	}
 	// Sends a ray through the scene to see if it hits something
 	HitInfo Raycast(const glm::vec3& start,
 					const glm::vec3& direction, float maxDist = 10000.0f);
 
 private:
-	void Reallocate(uint64_t maxCount);
-
 	ContactCallback m_ContactCallback;
 
 	PxScene* m_Scene = nullptr;
 	uint64_t m_ActorCount = 0;
 	uint64_t m_MaxActorCount = 0;
-	PxActor** m_Actors = nullptr;
+	std::vector<Ref<RigidBody>> m_Actors;
 
 	float m_Accumulator = 0.0f;
 };

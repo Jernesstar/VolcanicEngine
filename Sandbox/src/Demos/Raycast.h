@@ -3,9 +3,10 @@
 static void createActors(Physics::World& world) {
 	Shape box(ShapeType::Box);
 	for(uint32_t x = 0; x < 10; x++) {
-		Ref<RigidBody> body = CreateRef<RigidBody>(RigidBodyType::Static, box,
-			Transform{ .Translation = { x * 2.0f, 0.0f, 0.0f } }
-		);
+		Ref<RigidBody> body =
+			CreateRef<RigidBody>(RigidBodyType::Static, box,
+				Transform{ .Translation = { x * 2.0f, 0.0f, 0.0f } }
+			);
 
 		world.AddActor(body);
 	}
@@ -105,11 +106,11 @@ void Raycast::OnUpdate(TimeStep ts) {
 
 	Renderer::Clear();
 
-	for(auto* body : world.GetActors()) {
-		// body->UpdateTransform();
-		// VOLCANICORE_LOG_INFO("Count: %f", (float)body->GetTransform().Translation.x);
+	for(Ref<RigidBody> actor : world) {
+		// actor->UpdateTransform();
+		VOLCANICORE_LOG_INFO("Count: %f", (float)actor->GetTransform().Translation.x);
 
-		shader->SetMat4("u_Model", body->GetTransform());
+		shader->SetMat4("u_Model", actor->GetTransform());
 		Renderer3D::DrawMesh(cube);
 	}
 

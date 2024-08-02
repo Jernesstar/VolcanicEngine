@@ -15,11 +15,9 @@ World::World() {
 	sceneDesc.gravity		= PxVec3(0.0f, -9.81f, 0.0f);
 	sceneDesc.filterShader	= PxDefaultSimulationFilterShader;
 	// sceneDesc.filterShader	= FilterShaderExample;
-	sceneDesc.simulationEventCallback = &m_ContactCallback;
+	// sceneDesc.simulationEventCallback = &m_ContactCallback;
 	// sceneDesc.flags			= PxSceneFlag::eENABLE_ACTIVE_ACTORS;
 	m_Scene = GetPhysicsLib()->createScene(sceneDesc);
-
-	Reallocate(100);
 }
 
 World::~World() {
@@ -27,14 +25,20 @@ World::~World() {
 }
 
 void World::OnUpdate(TimeStep ts) {
-	// m_Accumulator += (float)ts;
-	// if(m_Accumulator < StepSize)
-	// 	return;
+	m_Accumulator += (float)ts;
+	if(m_Accumulator < StepSize)
+		return;
 
-	// m_Accumulator -= StepSize;
+	m_Accumulator -= StepSize;
 
 	m_Scene->simulate(StepSize);
 	m_Scene->fetchResults(true);
+}
+
+void World::AddActor(Ref<RigidBody> body) {
+	m_Scene->addActor(*body->m_Actor);
+	m_Actors.push_back(body);
+	m_ActorCount++;
 }
 
 HitInfo World::Raycast(const glm::vec3& start,
@@ -54,39 +58,6 @@ HitInfo World::Raycast(const glm::vec3& start,
 					   hitInfo.block.distance);
 	else
 		return HitInfo();
-}
-
-void World::AddActor(Ref<RigidBody> body) {
-	m_Scene->addActor(*body->m_Actor);
-	m_ActorCount++;
-
-	if(m_ActorCount >= m_MaxActorCount)
-		Reallocate(m_ActorCount + 100);
-}
-
-// TODO: Optimize
-std::vector<RigidBody*> World::GetActors() const {
-	std::vector<RigidBody*> actors;
-	PxU32 nbActors = m_Scene->getActors(PxActorTypeFlag::eRIGID_DYNAMIC
-									  | PxActorTypeFlag::eRIGID_STATIC, m_Actors,
-									  	m_ActorCount);
-
-	for(PxU32 i = 0; i < nbActors; i++) {
-		RigidBody* body = static_cast<RigidBody*>(m_Actors[i]->userData);
-
-		actors.push_back(body);
-	}
-
-	return actors;
-}
-
-void World::Reallocate(uint64_t maxCount) {
-	if(m_MaxActorCount > maxCount)
-		return;
-	m_MaxActorCount = maxCount;
-
-	delete m_Actors;
-	m_Actors = (PxActor**)malloc(maxCount * sizeof(PxActor*));
 }
 
 void ContactCallback::onTrigger(PxTriggerPair* pairs, PxU32 count)

@@ -48,10 +48,6 @@ Shape::Shape(ShapeType type)
 	}
 }
 
-Shape::~Shape() {
-	m_Shape->release();
-}
-
 PxShape* CreateBox() {
 	auto* material = GetPhysicsLib()->createMaterial(0.5f, 0.5f, 0.6f);
 	return GetPhysicsLib()

@@ -108,10 +108,10 @@ void Collision::OnUpdate(TimeStep ts) {
 
 	Renderer::Clear();
 
-	for(auto* body : world.GetActors()) {
-		shader->SetMat4("u_Model", body->GetTransform());
-		Renderer3D::DrawMesh(cube);
-	}
+	// for(auto* body : world.GetActors()) {
+	// 	shader->SetMat4("u_Model", body->GetTransform());
+	// 	Renderer3D::DrawMesh(cube);
+	// }
 }
 
 }
