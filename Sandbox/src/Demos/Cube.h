@@ -88,9 +88,9 @@ Cube::Cube() {
 			.Diffuse = Texture::Create("Sandbox/assets/images/wood.png")
 		});
 
-	// camera = CreateRef<StereographicCamera>(75.0f);
+	camera = CreateRef<StereographicCamera>(75.0f);
 	// camera = CreateRef<OrthographicCamera>(800, 600, 0.1f, 100.0f);
-	camera = CreateRef<IsometricCamera>();
+	// camera = CreateRef<IsometricCamera>();
 	// controller = CreateRef<CameraController>(camera);
 }
 

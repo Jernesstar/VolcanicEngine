@@ -3,7 +3,7 @@
 static void createActors(Physics::World& world) {
 	Shape box(ShapeType::Box);
 	for(uint32_t x = 0; x < 10; x++) {
-		RigidBody body(RigidBodyType::Static, box,
+		Ref<RigidBody> body = CreateRef<RigidBody>(RigidBodyType::Static, box,
 			Transform{ .Translation = { x * 2.0f, 0.0f, 0.0f } }
 		);
 
@@ -84,7 +84,7 @@ Raycast::Raycast() {
 	shader->SetTexture("u_Diffuse", cube->GetMaterial().Diffuse, 0);
 
 	camera = CreateRef<StereographicCamera>(75.0f);
-	camera->SetPosition({ 0.0f, 0.0f, 3.0f });
+	camera->SetPosition({ 0.0f, 0.0f, -0.0f });
 	controller = CreateRef<CameraController>(camera);
 
 	createActors(world);
@@ -106,8 +106,10 @@ void Raycast::OnUpdate(TimeStep ts) {
 	Renderer::Clear();
 
 	for(auto* body : world.GetActors()) {
-		body->UpdateTransform();
-		// shader->SetMat4("u_Model", body->GetTransform());
+		// body->UpdateTransform();
+		// VOLCANICORE_LOG_INFO("Count: %f", (float)body->GetTransform().Translation.x);
+
+		shader->SetMat4("u_Model", body->GetTransform());
 		Renderer3D::DrawMesh(cube);
 	}
 

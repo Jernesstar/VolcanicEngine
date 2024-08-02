@@ -21,7 +21,7 @@ struct Transform {
 			 * glm::scale(glm::mat4(1.0f), Scale);
 	}
 
-	operator glm::mat4() { return GetTransform(); }
+	operator glm::mat4() const { return GetTransform(); }
 };
 
 }

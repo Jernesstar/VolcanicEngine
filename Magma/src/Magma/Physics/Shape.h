@@ -25,16 +25,18 @@ public:
 	Shape(ShapeType type);
 	Shape(Ref<Mesh> mesh);
 	// Shape(Buffer<Vertex> data);
-	Shape(const Shape& other) {
+	Shape(const Shape& other)
+		: Type(other.Type)
+	{
 		m_Shape = other.m_Shape;
 		m_Shape->acquireReference();
 		VOLCANICORE_LOG_INFO("The copy constructor ran");
-
 	}
 	Shape& operator =(const Shape& other) {
 		m_Shape = other.m_Shape;
 		m_Shape->acquireReference();
 		VOLCANICORE_LOG_INFO("The copy assigment operator ran");
+		return *this;
 	}
 	~Shape();
 

@@ -57,7 +57,7 @@ public:
 
 	void OnUpdate(TimeStep ts);
 
-	void AddActor(const RigidBody& body);
+	void AddActor(Ref<RigidBody> body);
 	// RigidBody CreateActor();
 	// RigidBody CreatePlane();
 

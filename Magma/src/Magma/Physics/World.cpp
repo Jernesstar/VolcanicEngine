@@ -19,7 +19,7 @@ World::World() {
 	// sceneDesc.flags			= PxSceneFlag::eENABLE_ACTIVE_ACTORS;
 	m_Scene = GetPhysicsLib()->createScene(sceneDesc);
 
-	Reallocate(1000);
+	Reallocate(100);
 }
 
 World::~World() {
@@ -27,11 +27,11 @@ World::~World() {
 }
 
 void World::OnUpdate(TimeStep ts) {
-	m_Accumulator += (float)ts;
-	if(m_Accumulator < StepSize)
-		return;
+	// m_Accumulator += (float)ts;
+	// if(m_Accumulator < StepSize)
+	// 	return;
 
-	m_Accumulator -= StepSize;
+	// m_Accumulator -= StepSize;
 
 	m_Scene->simulate(StepSize);
 	m_Scene->fetchResults(true);
@@ -56,12 +56,12 @@ HitInfo World::Raycast(const glm::vec3& start,
 		return HitInfo();
 }
 
-void World::AddActor(const RigidBody& body) {
-	m_Scene->addActor(*body.m_Actor);
+void World::AddActor(Ref<RigidBody> body) {
+	m_Scene->addActor(*body->m_Actor);
 	m_ActorCount++;
 
 	if(m_ActorCount >= m_MaxActorCount)
-		Reallocate(m_ActorCount + 500);
+		Reallocate(m_ActorCount + 100);
 }
 
 // TODO: Optimize

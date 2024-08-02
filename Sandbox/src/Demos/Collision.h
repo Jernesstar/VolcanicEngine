@@ -4,13 +4,13 @@ static void createWall(Physics::World& world) {
 	Shape box(ShapeType::Box);
 	for(uint32_t i = 0; i < 4; i++) {
 		for(uint32_t j = 0; j < 4; j++) {
-			RigidBody body(RigidBodyType::Dynamic, box,
-				Transform{
-					.Translation = { j*2 - (4 - i), i*2 + 1, 0.0f },
-				}
-			);
+			// RigidBody body(RigidBodyType::Dynamic, box,
+			// 	Transform{
+			// 		.Translation = { j*2 - (4 - i), i*2 + 1, 0.0f },
+			// 	}
+			// );
 			
-			world.AddActor(body);
+			// world.AddActor(body);
 		}
 	}
 }
@@ -92,8 +92,8 @@ Collision::Collision() {
 
 	createWall(world);
 	
-	auto plane = RigidBody(RigidBodyType::Static, Shape(ShapeType::Plane));
-	world.AddActor(plane);
+	// auto plane = RigidBody(RigidBodyType::Static, Shape(ShapeType::Plane));
+	// world.AddActor(plane);
 }
 
 Collision::~Collision() {
