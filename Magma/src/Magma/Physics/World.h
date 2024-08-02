@@ -33,10 +33,10 @@ public:
 	const float Distance;
 
 public:
-	HitInfo(RigidBody* actor, float distance)
-		: m_Actor(actor), HasHit(true), Distance(distance) { }
 	HitInfo()
-		: m_Actor(nullptr), HasHit(false), Distance(0.0f) { }
+		: HasHit(false), Distance(0.0f), m_Actor(nullptr) { }
+	HitInfo(RigidBody* actor, float distance)
+		: HasHit(true), Distance(distance), m_Actor(actor) { }
 
 	// Call only if HasHit is true
 	RigidBody& GetActor() {

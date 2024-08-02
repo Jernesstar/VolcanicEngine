@@ -1,16 +1,16 @@
-#include "PhysicsSystem.h"
+#include "System.h"
 
 namespace Magma {
 
 struct Collide { };
 
-void RegisterForCollision(Entity& e1, Entity& e2) {
+void PhysicsSystem::RegisterForCollision(Entity& e1, Entity& e2) {
 	if(!e1.Has<RigidBodyComponent>() || !e2.Has<RigidBodyComponent>()) {
 		
 	}
 }
 
-bool Collides(Entity& e1, Entity& e2) {
+bool PhysicsSystem::Collides(Entity& e1, Entity& e2) {
 
 }
 

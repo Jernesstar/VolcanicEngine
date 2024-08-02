@@ -23,7 +23,12 @@ Scene::Scene(const std::string& name)
 		.kind(flecs::OnUpdate)
 		.each(
 		[](TransformComponent& t, MeshComponent& m) {
-			Renderer3D::DrawMesh(m.Mesh, t);
+			Transform tr{
+				.Translation = t.Translation,
+				.Rotation	 = t.Rotation,
+				.Scale		 = t.Scale
+			};
+			Renderer3D::DrawMesh(m.Mesh, tr);
 		});
 }
 

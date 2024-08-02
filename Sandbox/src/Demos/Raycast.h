@@ -53,18 +53,18 @@ Raycast::Raycast() {
 			1.0f, 1.0f
 		};
 
-		glm::mat4 invViewProj = glm::inverse(camera->GetViewProjection());
-		glm::vec4 worldStart = invViewProj * originNDC;
-		glm::vec4 worldEnd   = invViewProj * endNDC;
+		glm::mat4 inverseViewProj = glm::inverse(camera->GetViewProjection());
+		glm::vec4 worldStart = inverseViewProj * originNDC;
+		glm::vec4 worldEnd   = inverseViewProj * endNDC;
 		worldStart /= worldStart.w;
 		worldEnd   /= worldEnd.w;
-		glm::vec3 rayDir = glm::normalize(glm::vec3(worldEnd - worldStart));
+		glm::vec3 rayDir = glm::vec3(worldEnd - worldStart);
 		float maxDist = 10000.0f;
 
 		auto hitInfo = world.Raycast(worldStart, rayDir, maxDist);
 		if(hitInfo.HasHit) {
 			VOLCANICORE_LOG_INFO("{");
-			VOLCANICORE_LOG_INFO("\tx: %d", hitInfo.GetActor().GetTransform().Translation.x);
+			VOLCANICORE_LOG_INFO("\tx: %d", hitInfo.GetActor().GetTransform().Scale.x);
 			VOLCANICORE_LOG_INFO("\tDistance: %d", hitInfo.Distance);
 			VOLCANICORE_LOG_INFO("}\n");
 		}
@@ -85,7 +85,7 @@ Raycast::Raycast() {
 	shader->SetTexture("u_Diffuse", cube->GetMaterial().Diffuse, 0);
 
 	camera = CreateRef<StereographicCamera>(75.0f);
-	camera->SetPosition({ 0.0f, 0.0f, -0.0f });
+	camera->SetPosition({ 0.0f, 0.0f, 3.0f });
 	controller = CreateRef<CameraController>(camera);
 
 	createActors(world);
@@ -107,9 +107,7 @@ void Raycast::OnUpdate(TimeStep ts) {
 	Renderer::Clear();
 
 	for(Ref<RigidBody> actor : world) {
-		// actor->UpdateTransform();
-		VOLCANICORE_LOG_INFO("Count: %f", (float)actor->GetTransform().Translation.x);
-
+		actor->UpdateTransform();
 		shader->SetMat4("u_Model", actor->GetTransform());
 		Renderer3D::DrawMesh(cube);
 	}

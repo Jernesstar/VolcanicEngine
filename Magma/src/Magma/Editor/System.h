@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Entity.h"
+
 namespace Magma {
 
 class System {

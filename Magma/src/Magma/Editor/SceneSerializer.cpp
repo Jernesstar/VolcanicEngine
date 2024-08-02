@@ -147,14 +147,14 @@ void SerializeEntity(YAML::Emitter& out, Entity& entity) {
 		out << YAML::EndMap;
 	}
 
-	if(entity.Has<TextureComponent>()) {
-		auto texture = entity.Get<TextureComponent>().Texture->GetPath();
+	// if(entity.Has<TextureComponent>()) {
+	// 	auto texture = entity.Get<TextureComponent>().Texture->GetPath();
 
-		out << YAML::Key << "TextureComponent";
-		out << YAML::BeginMap;
-		out << YAML::Key << "Texture" << YAML::Value << texture;
-		out << YAML::EndMap;
-	}
+	// 	out << YAML::Key << "TextureComponent";
+	// 	out << YAML::BeginMap;
+	// 	out << YAML::Key << "Texture" << YAML::Value << texture;
+	// 	out << YAML::EndMap;
+	// }
 
 	if(entity.Has<TransformComponent>()) {
 		auto& tr = entity.Get<TransformComponent>().Translation;

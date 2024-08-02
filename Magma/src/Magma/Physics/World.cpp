@@ -44,13 +44,14 @@ void World::AddActor(Ref<RigidBody> body) {
 HitInfo World::Raycast(const glm::vec3& start,
 					   const glm::vec3& direction, float maxDist)
 {
+	glm::vec3 rayDir = glm::normalize(direction);
 	PxHitFlags flags = PxHitFlag::ePOSITION;
 					//  | PxHitFlag::eNORMAL
 					//  | PxHitFlag::eUV;
 	// PxReal maxDist = 10.0e+5;
 	PxRaycastBuffer hitInfo;
 	PxVec3 st{ start.x, start.y, start.z };
-	PxVec3 dir{ direction.x, direction.y, direction.z };
+	PxVec3 dir{ rayDir.x, rayDir.y, rayDir.z };
 
 	bool hit = m_Scene->raycast(st, dir, maxDist, hitInfo, flags);
 	if(hit)
