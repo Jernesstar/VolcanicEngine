@@ -5,6 +5,7 @@
 
 using namespace physx;
 
+#include <VolcaniCore/Core/Log.h>
 #include <VolcaniCore/Object/Mesh.h>
 
 using namespace VolcaniCore;
@@ -24,8 +25,17 @@ public:
 	Shape(ShapeType type);
 	Shape(Ref<Mesh> mesh);
 	// Shape(Buffer<Vertex> data);
-	// Shape(const Shape& other) = delete;
-	// Shape& operator =(const Shape& other) = delete;
+	Shape(const Shape& other) {
+		m_Shape = other.m_Shape;
+		m_Shape->acquireReference();
+		VOLCANICORE_LOG_INFO("The copy constructor ran");
+
+	}
+	Shape& operator =(const Shape& other) {
+		m_Shape = other.m_Shape;
+		m_Shape->acquireReference();
+		VOLCANICORE_LOG_INFO("The copy assigment operator ran");
+	}
 	~Shape();
 
 private:

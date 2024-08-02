@@ -91,8 +91,9 @@ Collision::Collision() {
 	Physics::Init();
 
 	createWall(world);
-
-	world.AddActor(RigidBody(RigidBodyType::Static, Shape(ShapeType::Plane)));
+	
+	auto plane = RigidBody(RigidBodyType::Static, Shape(ShapeType::Plane));
+	world.AddActor(plane);
 }
 
 Collision::~Collision() {

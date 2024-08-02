@@ -51,8 +51,6 @@ Shape::Shape(ShapeType type)
 Shape::~Shape() {
 	if(m_Shape)
 		m_Shape->release();
-	
-	m_Shape = nullptr;
 }
 
 PxShape* CreateBox() {

@@ -8,6 +8,7 @@ namespace Magma::Physics {
 RigidBody::RigidBody(RigidBodyType type, const Shape& shape, const Transform& t)
 	: Type(type), m_Transform(t)
 {
+	VOLCANICORE_LOG_INFO("Inside Rigid body constructor");
 	PxTransform tr(t.Translation.x, t.Translation.y, t.Translation.z);
 	if(type == RigidBodyType::Static)
 		m_Actor = GetPhysicsLib()->createRigidStatic(tr);
@@ -29,13 +30,13 @@ void RigidBody::UpdateTransform() {
 	// m_Transform.Rotation	= { pose.q.x, pose.q.y, pose.q.z };
 }
 
-StaticBody::StaticBody(const Shape& shape, const Transform& t)
+StaticBody::StaticBody(Shape& shape, const Transform& t)
 	: RigidBody(RigidBodyType::Static, shape, t)
 {
 
 }
 
-DynamicBody::DynamicBody(const Shape& shape, const Transform& t)
+DynamicBody::DynamicBody(Shape& shape, const Transform& t)
 	: RigidBody(RigidBodyType::Dynamic, shape, t)
 {
 	PxRigidBodyExt::updateMassAndInertia(*m_Actor->is<PxRigidDynamic>(), 10.0f);
