@@ -14,6 +14,13 @@ using namespace VolcaniCore;
 namespace Magma::Physics {
 
 class ContactCallback : public PxSimulationEventCallback {
+public:
+	void AddCallback(
+		const std::function<void(RigidBody&, RigidBody&)>& callback)
+	{
+		m_Callbacks.push_back(callback);
+	}
+
 private:
 	void onConstraintBreak(PxConstraintInfo* constraints, PxU32 count) { }
 	void onWake(PxActor** actors, PxU32 count) { }

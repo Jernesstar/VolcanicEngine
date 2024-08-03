@@ -1,12 +1,15 @@
 #pragma once
 
+#include "Object/Shader.h"
 #include "Object/Cubemap.h"
 #include "Object/Quad.h"
 #include "Object/Text.h"
 #include "Object/Texture.h"
-#include "Object/Shader.h"
-
+#include "Object/Mesh.h"
 #include "Object/Model.h"
+#include "Object/Point.h"
+#include "Object/Line.h"
+
 #include "Renderer/Camera.h"
 #include "Renderer/Transform.h"
 

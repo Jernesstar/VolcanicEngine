@@ -183,20 +183,18 @@ void Renderer::DrawCubemap(Ref<VolcaniCore::Cubemap> cubemap) {
 	glDepthMask(GL_TRUE);
 }
 
-void Renderer::DrawMesh(Ref<VolcaniCore::Mesh> mesh, const glm::mat4& transform)
-{
+void Renderer::DrawMesh(Ref<VolcaniCore::Mesh> mesh, const glm::mat4& tr) {
 	auto nativeMesh = mesh->As<OpenGL::Mesh>();
 
 	DrawIndexed(nativeMesh->m_VertexArray);
 }
 
-void Renderer::DrawLine(Ref<VolcaniCore::Line> line, const glm::mat4& transform)
-{
+void Renderer::DrawLine(const VolcaniCore::Line& line, const glm::mat4& tr) {
 	// s_Data.LineVAO->Bind();
 	// glDrawArrays(GL_LINES, 0, 2);
 }
 
-void Renderer::DrawPoint(Ref<VolcaniCore::Point> point, const glm::mat4& tr) {
+void Renderer::DrawPoint(const VolcaniCore::Point& point, const glm::mat4& tr) {
 
 }
 

@@ -63,8 +63,8 @@ Raycast::Raycast() {
 		auto hitInfo = world.Raycast(worldStart, rayDir, maxDist);
 		if(hitInfo.HasHit) {
 			VOLCANICORE_LOG_INFO("{");
-			VOLCANICORE_LOG_INFO("\tScale: %d", hitInfo.GetActor().GetTransform().Scale.x);
-			VOLCANICORE_LOG_INFO("\tDistance: %d", hitInfo.Distance);
+			VOLCANICORE_LOG_INFO("\tx: %f", hitInfo.GetActor().GetTransform().Translation.x);
+			VOLCANICORE_LOG_INFO("\tDistance: %f", hitInfo.Distance);
 			VOLCANICORE_LOG_INFO("}\n");
 		}
 		else

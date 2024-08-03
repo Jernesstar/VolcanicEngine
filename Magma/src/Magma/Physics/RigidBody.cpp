@@ -6,12 +6,12 @@ namespace Magma::Physics {
 
 Ref<RigidBody> RigidBody::Create(RigidBodyType type,
 								 const Shape& shape,
-								 const Transform& t = { })
+								 const Transform& t)
 {
 	if(type == RigidBodyType::Static)
-		return CreateRef<DynamicBody>(shape, t);
-	if(type == RigidBodyType::Dynamic)
 		return CreateRef<StaticBody>(shape, t);
+	if(type == RigidBodyType::Dynamic)
+		return CreateRef<DynamicBody>(shape, t);
 }
 
 // TODO: Scaled transforms

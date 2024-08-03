@@ -4,13 +4,13 @@ static void createWall(Physics::World& world) {
 	Shape box(ShapeType::Box);
 	for(uint32_t i = 0; i < 4; i++) {
 		for(uint32_t j = 0; j < 4; j++) {
-			// RigidBody body(RigidBodyType::Dynamic, box,
-			// 	Transform{
-			// 		.Translation = { j*2 - (4 - i), i*2 + 1, 0.0f },
-			// 	}
-			// );
+			Ref<RigidBody> body =
+				RigidBody::Create(RigidBodyType::Dynamic, box,
+					Transform{
+						.Translation = { j*2 - (4 - i), i*2 + 1, 0.0f },
+					});
 			
-			// world.AddActor(body);
+			world.AddActor(body);
 		}
 	}
 }
@@ -88,11 +88,9 @@ Collision::Collision() {
 	camera->SetPosition({ 0.0f, 0.5f, 3.0f });
 	controller = CreateRef<CameraController>(camera);
 
-	Physics::Init();
-
 	createWall(world);
-	
-	// auto plane = RigidBody(RigidBodyType::Static, Shape(ShapeType::Plane));
+
+	// auto plane = RigidBody::Create(RigidBodyType::Static, Shape(ShapeType::Plane));
 	// world.AddActor(plane);
 }
 
@@ -108,10 +106,11 @@ void Collision::OnUpdate(TimeStep ts) {
 
 	Renderer::Clear();
 
-	// for(auto* body : world.GetActors()) {
-	// 	shader->SetMat4("u_Model", body->GetTransform());
-	// 	Renderer3D::DrawMesh(cube);
-	// }
+	for(auto body : world) {
+		body->UpdateTransform();
+		shader->SetMat4("u_Model", body->GetTransform());
+		Renderer3D::DrawMesh(cube);
+	}
 }
 
 }

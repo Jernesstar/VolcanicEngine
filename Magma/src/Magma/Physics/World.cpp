@@ -15,7 +15,7 @@ World::World() {
 	sceneDesc.gravity		= PxVec3(0.0f, -9.81f, 0.0f);
 	sceneDesc.filterShader	= PxDefaultSimulationFilterShader;
 	// sceneDesc.filterShader	= FilterShaderExample;
-	// sceneDesc.simulationEventCallback = &m_ContactCallback;
+	sceneDesc.simulationEventCallback = &m_ContactCallback;
 	// sceneDesc.flags			= PxSceneFlag::eENABLE_ACTIVE_ACTORS;
 	m_Scene = GetPhysicsLib()->createScene(sceneDesc);
 }
@@ -59,6 +59,12 @@ HitInfo World::Raycast(const glm::vec3& start,
 					   hitInfo.block.distance);
 	else
 		return HitInfo();
+}
+
+void World::AddContactCallback(
+	const std::function<void(RigidBody&, RigidBody&)>& callback)
+{
+	m_ContactCallback.AddCallback(callback);
 }
 
 void ContactCallback::onTrigger(PxTriggerPair* pairs, PxU32 count)

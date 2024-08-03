@@ -15,7 +15,7 @@ public:
 	void Resize(uint32_t width, uint32_t height) override;
 
 	void DrawCubemap(Ref<VolcaniCore::Cubemap> cubemap) override;
-0
+
 	void DrawMesh(Ref<VolcaniCore::Mesh> model, const glm::mat4& tr) override;
 
 	void DrawLine(const Line& line, const glm::mat4& transform) override;

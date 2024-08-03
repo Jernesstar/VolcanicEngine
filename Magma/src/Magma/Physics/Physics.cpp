@@ -5,7 +5,7 @@ using namespace physx;
 static PxDefaultAllocator	   s_Allocator;
 static PxDefaultErrorCallback  s_ErrorCallback;
 static PxFoundation*		   s_Foundation = nullptr;
-static PxPhysics*			   s_Physics	   = nullptr;
+static PxPhysics*			   s_Physics	= nullptr;
 static PxDefaultCpuDispatcher* s_Dispatcher = nullptr;
 
 namespace Magma::Physics {

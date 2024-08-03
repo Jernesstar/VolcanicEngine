@@ -35,10 +35,13 @@ Shape::Shape(ShapeType type)
 	switch(type) {
 		case ShapeType::Box:
 			m_Shape = CreateBox();
+			break;
 		case ShapeType::Sphere:
 			m_Shape = CreateSphere();
+			break;
 		case ShapeType::Plane:
 			m_Shape = CreatePlane();
+			break;
 		// case ShapeType::Capsule:
 		// 	m_Shape = CreateCapsule();
 		// case ShapeType::TriangleMesh:
@@ -46,6 +49,22 @@ Shape::Shape(ShapeType type)
 		// case ShapeType::ConvexMesh:
 		// 	m_Shape = CreateConvexMesh();
 	}
+}
+
+// Shape::Shape(const Shape& other)
+// 	: Type(other.Type)
+// {
+// 	m_Shape = other.m_Shape;
+// 	// m_Shape->acquireReference();
+// }
+// Shape& Shape::operator =(const Shape& other) {
+// 	m_Shape = other.m_Shape;
+// 	// m_Shape->acquireReference();
+// 	return *this;
+// }
+
+Shape::~Shape() {
+	m_Shape->release();
 }
 
 PxShape* CreateBox() {
@@ -61,6 +80,7 @@ PxShape* CreateSphere() {
 }
 
 PxShape* CreatePlane() {
+	// PxRigidStatic* groundPlane = PxCreatePlane(*gPhysics, PxPlane(0,1,0,0), *gMaterial);
 	auto* material = GetPhysicsLib()->createMaterial(0.5f, 0.5f, 0.6f);
 	return GetPhysicsLib()
 			->createShape(PxPlaneGeometry(), *material);
