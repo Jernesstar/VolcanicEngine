@@ -4,9 +4,8 @@ static void createActors(Physics::World& world) {
 	Shape box(ShapeType::Box);
 	for(uint32_t x = 0; x < 10; x++) {
 		Ref<RigidBody> body =
-			CreateRef<RigidBody>(RigidBodyType::Static, box,
-				Transform{ .Translation = { x * 2.0f, 0.0f, 0.0f } }
-			);
+			RigidBody::Create(RigidBodyType::Static, box,
+				Transform{ .Translation = { x * 2.0f, 0.0f, 0.0f } });
 
 		world.AddActor(body);
 	}
@@ -64,7 +63,7 @@ Raycast::Raycast() {
 		auto hitInfo = world.Raycast(worldStart, rayDir, maxDist);
 		if(hitInfo.HasHit) {
 			VOLCANICORE_LOG_INFO("{");
-			VOLCANICORE_LOG_INFO("\tx: %d", hitInfo.GetActor().GetTransform().Scale.x);
+			VOLCANICORE_LOG_INFO("\tScale: %d", hitInfo.GetActor().GetTransform().Scale.x);
 			VOLCANICORE_LOG_INFO("\tDistance: %d", hitInfo.Distance);
 			VOLCANICORE_LOG_INFO("}\n");
 		}
@@ -90,8 +89,9 @@ Raycast::Raycast() {
 
 	createActors(world);
 
-	// gScene->setVisualizationParameter(PxVisualizationParameter::eSCALE, 1.0f);
-	// gScene->setVisualizationParameter(PxVisualizationParameter::eACTOR_AXES, 1.0f);
+	// auto scene = world.GetScene();
+	// scene->setVisualizationParameter(PxVisualizationParameter::eSCALE, 1.0f);
+	// scene->setVisualizationParameter(PxVisualizationParameter::eACTOR_AXES, 1.0f);
 }
 
 Raycast::~Raycast() {
@@ -112,12 +112,13 @@ void Raycast::OnUpdate(TimeStep ts) {
 		Renderer3D::DrawMesh(cube);
 	}
 
-	// const PxRenderBuffer& rb = gScene->getRenderBuffer();
+	// auto scene = world.GetScene();
+	// const PxRenderBuffer& rb = scene->getRenderBuffer();
 
 	// for(PxU32 i=0; i < rb.getNbPoints(); i++)
 	// {
 	// 	const PxDebugPoint& point = rb.getPoints()[i];
-		
+
 	// }
 
 	// for(PxU32 i=0; i < rb.getNbLines(); i++)

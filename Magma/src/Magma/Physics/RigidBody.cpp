@@ -4,12 +4,21 @@
 
 namespace Magma::Physics {
 
+Ref<RigidBody> RigidBody::Create(RigidBodyType type,
+								 const Shape& shape,
+								 const Transform& t = { })
+{
+	if(type == RigidBodyType::Static)
+		return CreateRef<DynamicBody>(shape, t);
+	if(type == RigidBodyType::Dynamic)
+		return CreateRef<StaticBody>(shape, t);
+}
+
 // TODO: Scaled transforms
 RigidBody::RigidBody(RigidBodyType type, const Shape& shape, const Transform& t)
 	: Type(type), m_Transform(t)
 {
-	// VOLCANICORE_LOG_INFO("Count: %i", shape.m_Shape->getReferenceCount());
-	PxTransform tr(t.Translation.x, t.Translation.y, t.Translation.z);
+	PxTransform tr(PxVec3(t.Translation.x, t.Translation.y, t.Translation.z));
 	if(type == RigidBodyType::Static)
 		m_Actor = GetPhysicsLib()->createRigidStatic(tr);
 	if(type == RigidBodyType::Dynamic)

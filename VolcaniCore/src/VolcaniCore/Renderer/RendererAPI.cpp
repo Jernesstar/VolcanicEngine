@@ -15,6 +15,7 @@ void RendererAPI::Create(RendererBackend backend) {
 		// 	s_Instance = CreateRef<Vulkan::Renderer>();
 	}
 
+	// TODO: Get rid of ShaderLibrary?
 	ShaderLibrary::Init();
 
 	s_Instance->Init();

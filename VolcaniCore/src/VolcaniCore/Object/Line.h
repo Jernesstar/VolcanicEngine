@@ -1,14 +1,11 @@
 #pragma once
 
+#include "Point.h"
+
 namespace VolcaniCore {
 
-class Line {
-public:
-	Line();
-	~Line();
-
-private:
-	
+struct Line {
+	std::vector<Point> Points;
 };
 
 }

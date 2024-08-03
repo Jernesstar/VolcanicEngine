@@ -25,6 +25,15 @@ public:
 	static void DrawModel(Ref<Model> model, const Transform& t = { });
 	static void DrawModel(Ref<Model> model, const glm::mat4& tr);
 
+	static void DrawPoint(const Point& point, const Transform& t = { });
+	static void DrawPoint(const Point& point, const glm::mat4& tr);
+
+	static void DrawLine(const Line& line, const Transform& t = { });
+	static void DrawLine(const Line& line, const glm::mat4& tr);
+	// static void DrawLine(const Point& p0, const Point& p1,
+	// 					 const Transform& t = { });
+	// static void DrawLine(const Point& p0, const Point& p1, const glm::mat4& tr);
+
 	static void DrawQuad(Ref<Quad> quad, const Transform& t = { });
 	static void DrawQuad(Ref<Quad> quad, const glm::mat4& tr);
 

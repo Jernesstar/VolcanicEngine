@@ -40,6 +40,14 @@ static const uint32_t MaxInstances = 1000;
 struct RendererData {
 	Ptr<VertexArray> CubemapArray;
 	Ptr<VertexArray> FramebufferArray;
+
+	Ref<VertexBuffer> MeshBuffer;
+	Ref<VertexBuffer> LineBuffer;
+	Ref<VertexBuffer> PointBuffer;
+
+	Ptr<VertexArray> MeshArray;
+	Ptr<VertexArray> LineArray;
+	Ptr<VertexArray> PointArray;
 };
 
 static RendererData s_Data;
@@ -123,10 +131,32 @@ void Renderer::Init() {
 
 	Ref<VertexBuffer> buffer = CreateRef<VertexBuffer>(
 		BufferLayout{
-			{ "Coordinate", OpenGL::BufferDataType::Vec2 },
-			{ "TexCoord",	OpenGL::BufferDataType::Vec2 },
+			{ "Coordinate", BufferDataType::Vec2 },
+			{ "TexCoord",	BufferDataType::Vec2 },
 		}, framebufferVertices);
 	s_Data.FramebufferArray = CreatePtr<VertexArray>(buffer);
+
+	// s_Data.MeshBuffer = CreateRef<VertexBuffer>(
+	// 	BufferLayout{
+	// 		{ "Coordinate", BufferDataType::Vec3 },
+	// 		{ "Normal",		BufferDataType::Vec3 },
+	// 		{ "TexCoord_Color", BufferDataType::Vec4 },
+	// 	});
+	// s_Data.MeshArray = CreatePtr<VertexArray>(buffer);
+
+	// s_Data.LineBuffer = CreateRef<VertexBuffer>(
+	// 	BufferLayout{
+	// 		{ "Coordinate", BufferDataType::Vec3 },
+	// 		{ "Color",		BufferDataType::Vec3 },
+	// 	});
+	// s_Data.LineArray = CreatePtr<VertexArray>(buffer);
+
+	// s_Data.PointBuffer = CreateRef<VertexBuffer>(
+	// 	BufferLayout{
+	// 		{ "Coordinate", BufferDataType::Vec3 },
+	// 		{ "Color",		BufferDataType::Vec3 },
+	// 	});
+	// s_Data.PointArray = CreatePtr<VertexArray>(buffer);
 
 	ShaderLibrary::Get("Framebuffer")->Bind();
 	ShaderLibrary::Get("Framebuffer")->SetInt("u_ScreenTexture", 0);
@@ -158,6 +188,16 @@ void Renderer::DrawMesh(Ref<VolcaniCore::Mesh> mesh, const glm::mat4& transform)
 	auto nativeMesh = mesh->As<OpenGL::Mesh>();
 
 	DrawIndexed(nativeMesh->m_VertexArray);
+}
+
+void Renderer::DrawLine(Ref<VolcaniCore::Line> line, const glm::mat4& transform)
+{
+	// s_Data.LineVAO->Bind();
+	// glDrawArrays(GL_LINES, 0, 2);
+}
+
+void Renderer::DrawPoint(Ref<VolcaniCore::Point> point, const glm::mat4& tr) {
+
 }
 
 void Renderer::RenderFramebuffer(Ref<VolcaniCore::Framebuffer> buffer,

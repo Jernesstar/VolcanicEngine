@@ -85,11 +85,35 @@ void Renderer3D::DrawQuad(Ref<Quad> quad,
 		Mesh::Create(MeshPrimitive::Quad,
 		Material{
 			.Diffuse = quad->IsTextured ? quad->GetTexture()
-									   : Texture::Create(quad->GetWidth(),
-														 quad->GetHeight())
+										: Texture::Create(quad->GetWidth(),
+														  quad->GetHeight())
 		}),
 		transform
 	);
+}
+
+void Renderer3D::DrawPoint(const Point& point,
+						   const Transform& t)
+{
+	DrawPoint(point, t.GetTransform());
+}
+
+void Renderer3D::DrawPoint(const Point& point,
+						   const glm::mat4& transform)
+{
+	// TODO: Implement
+}
+
+void Renderer3D::DrawLine(const Line& line,
+						  const Transform& t)
+{
+	DrawLine(line, t.GetTransform());
+}
+
+void Renderer3D::DrawLine(const Line& line,
+						  const glm::mat4& transform)
+{
+	// TODO: Implement
 }
 
 void Renderer3D::DrawQuad(Ref<Texture> texture,

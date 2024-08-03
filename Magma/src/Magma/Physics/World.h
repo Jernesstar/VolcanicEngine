@@ -76,6 +76,8 @@ public:
 	HitInfo Raycast(const glm::vec3& start,
 					const glm::vec3& direction, float maxDist = 10000.0f);
 
+	PxScene* GetScene() { return m_Scene; }
+
 private:
 	ContactCallback m_ContactCallback;
 

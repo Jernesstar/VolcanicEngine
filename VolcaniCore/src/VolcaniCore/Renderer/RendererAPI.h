@@ -30,7 +30,12 @@ public:
 	virtual void Resize(uint32_t width, uint32_t height) = 0;
 
 	virtual void DrawCubemap(Ref<Cubemap> cubemap) = 0;
+
 	virtual void DrawMesh(Ref<Mesh> model, const glm::mat4& transform) = 0;
+
+	virtual void DrawPoint(const Point& point, const glm::mat4& transform) = 0;
+
+	virtual void DrawLine(const Line& line, const glm::mat4& transform) = 0;
 
 	virtual void RenderFramebuffer(Ref<Framebuffer> buffer,
 								   AttachmentTarget target) = 0;

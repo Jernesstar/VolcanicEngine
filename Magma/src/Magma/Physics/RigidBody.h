@@ -12,6 +12,11 @@ enum class RigidBodyType { Static, Dynamic };
 
 class RigidBody {
 public:
+	static Ref<RigidBody> Create(RigidBodyType type,
+								 const Shape& shape,
+								 const Transform& t = { });
+
+public:
 	const RigidBodyType Type;
 
 public:
