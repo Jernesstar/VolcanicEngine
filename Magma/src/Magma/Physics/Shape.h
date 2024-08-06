@@ -11,22 +11,33 @@ using namespace VolcaniCore;
 
 namespace Magma::Physics {
 
-enum class ShapeType { Box, Sphere, Plane, Capsule, ConvexMesh, TriangleMesh };
-
 class Shape {
 public:
-	static Shape Create(ShapeType type);
+	enum class Type {
+		Box,
+		Sphere,
+		Plane,
+		Capsule,
+		ConvexMesh,
+		TriangleMesh
+	};
 
 public:
-	const ShapeType Type;
+	static Shape Create(Shape::Type type);
 
 public:
-	Shape(ShapeType type);
+	Shape(Shape::Type type);
 	Shape(Ref<Mesh> mesh);
 	// Shape(Buffer<Vertex> data);
+	Shape(const Shape& other);
+	Shape& operator =(const Shape& other);
 	~Shape();
 
+	Shape::Type GetType() const { return m_Type; }
+
 private:
+	Type m_Type;
+
 	PxShape* m_Shape;
 
 	friend class RigidBody;

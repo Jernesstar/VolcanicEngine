@@ -39,7 +39,7 @@ void SceneHierarchyPanel::SetSelectedEntity(Entity& entity) {
 void SceneHierarchyPanel::Render() {
 	// ImGui::Begin("Scene Hierarchy");
 	// {
-	// 	// m_Context->GetEntitySystem().ForEach(
+	// 	// m_Context->GetEntityWorld().ForEach(
 	// 	// [&](Entity& entity) {
 	// 	// 	DrawEntityNode(entity);
 	// 	// });
@@ -49,7 +49,7 @@ void SceneHierarchyPanel::Render() {
 
 	// 	if(ImGui::BeginPopupContextWindow(0, ImGuiPopupFlags_NoOpenOverItems)) {
 	// 		// if (ImGui::MenuItem("Create Empty Entity"))
-	// 		// 	m_SelectionContext = &m_Context->GetEntitySystem()
+	// 		// 	m_SelectionContext = &m_Context->GetEntityWorld()
 	// 		// 									.AddEntity("Empty Entity");
 
 	// 		ImGui::EndPopup();
@@ -144,7 +144,7 @@ void SceneHierarchyPanel::DrawEntityNode(Entity& entity) {
 	// 	ImGui::TreePop();
 
 	// if(entityDeleted) {
-	// 	m_Context->GetEntitySystem().RemoveEntity(entity);
+	// 	m_Context->GetEntityWorld().RemoveEntity(entity);
 	// 	if(m_SelectionContext)
 	// 		if(*m_SelectionContext == entity)
 	// 			m_SelectionContext = nullptr;

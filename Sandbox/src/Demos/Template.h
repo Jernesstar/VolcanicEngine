@@ -1,7 +1,5 @@
 #pragma once
 
-using namespace VolcaniCore;
-
 namespace Demo {
 
 class Template : public Application {

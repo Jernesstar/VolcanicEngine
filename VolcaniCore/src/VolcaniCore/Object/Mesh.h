@@ -12,14 +12,12 @@ namespace VolcaniCore {
 struct Vertex {
 	glm::vec3 Position;
 	glm::vec3 Normal;
-	glm::vec2 TextureCoordinate;
-	// TODO: glm::vec4 TextureCoordinate_Color;
+	glm::vec4 TexCoord_Color; // if the alpha channel is 0, used as tex coord
 };
 
 struct Material {
-	Ref<Texture> Diffuse;
-	Ref<Texture> Specular;
-	Ref<Texture> Roughness;
+	Ref<Texture> Diffuse = nullptr;
+	Ref<Texture> Specular = nullptr;
 };
 
 enum class MeshPrimitive { Point, Line, Quad, Cube, Pyramid };
@@ -28,8 +26,9 @@ class Mesh {
 public:
 	static Ref<Mesh> Create(const std::vector<Vertex>& vertices,
 							const std::vector<uint32_t>& indices,
-							const Material& material);
-	static Ref<Mesh> Create(MeshPrimitive primitive, Material material);
+							const Material& material = { });
+	static Ref<Mesh> Create(MeshPrimitive primitive,
+							const Material& material = { });
 
 public:
 	Mesh() = default;
@@ -40,8 +39,8 @@ public:
 
 	virtual ~Mesh() = default;
 
-	std::vector<Vertex>& GetVertices() { return m_Vertices; }
-	std::vector<uint32_t>& GetIndices() { return m_Indices; }
+	const std::vector<Vertex>& GetVertices() { return m_Vertices; }
+	const std::vector<uint32_t>& GetIndices() { return m_Indices; }
 	Material& GetMaterial() { return m_Material; }
 
 	template<typename TDerived>

@@ -23,9 +23,12 @@ YAML::Emitter& operator <<(YAML::Emitter& out, const glm::vec4& v) {
 	return out;
 }
 
-YAML::Emitter& operator <<(YAML::Emitter& out, const glm::mat4& v) {
+YAML::Emitter& operator <<(YAML::Emitter& out, VolcaniCore::Vertex& v)
+{
 	out << YAML::Flow;
-	out << YAML::BeginSeq << v[0] << v[1] << v[2] << v[3] << YAML::EndSeq;
+	out << YAML::BeginSeq;
+	out << v.Position << v.Normal << v.TexCoord_Color;
+	out << YAML::EndSeq;
 	return out;
 }
 
@@ -60,8 +63,8 @@ void SceneSerializer::Serialize(Ref<Scene> scene, const std::string& filepath) {
 	out << YAML::EndMap; // Camera
 
 	out << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq; // Entities
-	scene->GetEntitySystem().GetWorld()
-	.each(
+	scene->GetEntityWorld()
+	.ForEach(
 	[&](Entity& entity) {
 		out << YAML::BeginMap; // Entity
 		SerializeEntity(out, entity);
@@ -89,30 +92,32 @@ Ref<Scene> SceneSerializer::Deserialize(const std::string& filepath) {
 	auto scene = file["Scene"];
 	auto camera = scene["Camera"];
 
+	// TODO: MAGMA_ASSERT
+
 	VOLCANICORE_ASSERT(scene);
 	VOLCANICORE_ASSERT(camera);
 
 	Ref<Scene> newScene = CreateRef<Scene>(scene["Name"].as<std::string>());
 
 	if(camera["Type"].as<std::string>() == "Stereographic") {
-		auto fov 	= camera["VerticalFOV"].as<float>();
-		auto near 	= camera["NearClip"].as<float>();
-		auto far 	= camera["FarClip"].as<float>();
-		auto speed 	= camera["RotationSpeed"].as<float>();
-		auto width 	= camera["ViewportWidth"].as<uint32_t>();
+		auto fov	= camera["VerticalFOV"]	  .as<float>();
+		auto width	= camera["ViewportWidth"] .as<uint32_t>();
 		auto height = camera["ViewportHeight"].as<uint32_t>();
+		auto near	= camera["NearClip"]	  .as<float>();
+		auto far	= camera["FarClip"]		  .as<float>();
 
-		newScene->Camera = CreateRef<StereographicCamera>(fov, near, far,
-														  width, height, speed);
+		newScene->Camera =
+			CreateRef<StereographicCamera>(fov, width, height, near, far);
 	}
 	else if(camera["Type"].as<std::string>() == "Orthographic") {
-		auto width	= camera["Width"].as<float>();
-		auto height	= camera["Height"].as<float>();
-		auto near	= camera["Near"].as<float>();
-		auto far	= camera["Far"].as<float>();
+		auto width	= camera["Width"]	.as<float>();
+		auto height	= camera["Height"]	.as<float>();
+		auto near	= camera["Near"]	.as<float>();
+		auto far	= camera["Far"]		.as<float>();
 		auto ro		= camera["Rotation"].as<float>();
 
-		newScene->Camera = CreateRef<OrthographicCamera>(width, height, near, far, ro);
+		newScene->Camera =
+			CreateRef<OrthographicCamera>(width, height, near, far, ro);
 	}
 
 	newScene->Camera->SetPositionDirection(camera["Position"].as<glm::vec3>(),
@@ -125,48 +130,99 @@ Ref<Scene> SceneSerializer::Deserialize(const std::string& filepath) {
 }
 
 void SerializeEntity(YAML::Emitter& out, Entity& entity) {
-	out << YAML::Key << "Entity" << YAML::Value << YAML::BeginMap; // Entity
-	// out << YAML::Key << "ID" << YAML::Value << entity.GetID();
+	out << YAML::Key << "Entity" << YAML::BeginMap; // Entity
+	out << YAML::Key << "ID" << YAML::Value << (uint64_t)entity.GetHandle();
 
-	out << YAML::Key << "Components" << YAML::Key << YAML::BeginMap; // Components
-	// if(entity.Has<ScriptComponent>()) {
-	// 	auto& eventlistener = entity.Get<ScriptComponent>();
+	out << YAML::Key << "Components" << YAML::Value << YAML::BeginMap; // Components
 
-	// 	out << YAML::Key << "ScriptComponent";
-	// 	out << YAML::BeginMap;
+	if(entity.Has<MeshComponent>()) {
+		auto& mesh = entity.Get<MeshComponent>().Mesh;
+		auto& mat = mesh->GetMaterial();
 
-	// 	out << YAML::EndMap;
-	// }
+		out << YAML::Key << "MeshComponent" << YAML::BeginMap; // MeshComponent
+
+		out << YAML::Key << "Mesh" << YAML::BeginMap; // Mesh
+		out << YAML::Key << "Vertices" << YAML::Value << mesh->GetVertices();
+		out << YAML::Key << "Indices" << YAML::Value << mesh->GetIndices();
+
+		out << YAML::Key << "Material" << YAML::BeginMap; // Material
+		if(mat.Diffuse) {
+			out << YAML::Key << "Diffuse" << YAML::BeginMap; // Diffuse
+			out << YAML::Key << "Path" << YAML::Value << mat.Diffuse->GetPath();
+			out << YAML::EndMap; // Diffuse
+		}
+		if(mat.Specular) {
+			out << YAML::Key << "Specular" << YAML::BeginMap; // Specular
+			out << YAML::Key << "Path" << YAML::Value << mat.Specular->GetPath();
+			out << YAML::EndMap; // Specular
+		}
+		out << YAML::EndMap; // Material
+		out << YAML::EndMap; // Mesh
+
+		out << YAML::EndMap; // MeshComponent
+	}
+
+	if(entity.Has<RigidBodyComponent>()) {
+		auto& body = entity.Get<RigidBodyComponent>().Body;
+
+		out << YAML::Key << "RigidBodyComponent" << YAML::BeginMap; // RigidBodyComponent
+		out << YAML::Key << "Body" << YAML::Value << YAML::BeginMap; // Body
+		out << YAML::Key << "Type" << YAML::Value <<
+			(body->GetType() == RigidBody::Type::Static) ? "Static" : "Dynamic";
+
+		out << YAML::Key << "Shape Type" << YAML::Value;
+		switch(body->GetShapeType()) {
+			case Shape::Type::Box:
+				out << "Box";
+				break;
+			case Shape::Type::Sphere:
+				out << "Sphere";
+				break;
+			case Shape::Type::Plane:
+				out << "Plane";
+				break;
+			case Shape::Type::Capsule:
+				out << "Capsule";
+				break;
+			case Shape::Type::ConvexMesh:
+				out << "ConvexMesh";
+				break;
+			case Shape::Type::TriangleMesh:
+				out << "TriangleMesh";
+				break;
+		}
+		out << YAML::EndMap; // Body
+		out << YAML::EndMap; // RigidBodyComponent
+	}
+
+	if(entity.Has<ScriptComponent>()) {
+		// std::string& path = entity.Get<ScriptComponent>().Path;
+
+		out << YAML::Key << "ScriptComponent" << YAML::BeginMap; // ScriptComponent
+		// out << YAML::Key << "Path" << YAML::Value << path;
+		out << YAML::EndMap; // ScriptComponent
+	}
 
 	if(entity.Has<TagComponent>()) {
 		auto& tag = entity.Get<TagComponent>().Tag;
 
-		out << YAML::Key << "TagComponent";
-		out << YAML::BeginMap;
+		out << YAML::Key << "TagComponent" << YAML::BeginMap; // TagComponent
 		out << YAML::Key << "Tag" << YAML::Value << tag;
-		out << YAML::EndMap;
+		out << YAML::EndMap; // TagComponent
 	}
-
-	// if(entity.Has<TextureComponent>()) {
-	// 	auto texture = entity.Get<TextureComponent>().Texture->GetPath();
-
-	// 	out << YAML::Key << "TextureComponent";
-	// 	out << YAML::BeginMap;
-	// 	out << YAML::Key << "Texture" << YAML::Value << texture;
-	// 	out << YAML::EndMap;
-	// }
 
 	if(entity.Has<TransformComponent>()) {
 		auto& tr = entity.Get<TransformComponent>().Translation;
 		auto& ro = entity.Get<TransformComponent>().Rotation;
 		auto& sc = entity.Get<TransformComponent>().Scale;
 
-		out << YAML::Key << "TrasformComponent";
-		out << YAML::BeginMap;
+		out << YAML::Key << "TrasformComponent" << YAML::BeginMap; // TransformComponent
+
 		out << YAML::Key << "Translation" << YAML::Value << tr;
-		out << YAML::Key << "Rotation" << YAML::Value << ro;
-		out << YAML::Key << "Scale" << YAML::Value << sc;
-		out << YAML::EndMap;
+		out << YAML::Key << "Rotation"	  << YAML::Value << ro;
+		out << YAML::Key << "Scale"		  << YAML::Value << sc;
+
+		out << YAML::EndMap; // TransformComponent
 	}
 	out << YAML::EndMap; // Components
  
@@ -174,26 +230,87 @@ void SerializeEntity(YAML::Emitter& out, Entity& entity) {
 }
 
 void DeserializeEntity(YAML::Node entityNode, Ref<Scene> scene) {
-	// Entity& entity = scene->GetEntitySystem().AddEntity();
+	VolcaniCore::UUID id(entityNode["ID"].as<uint64_t>());
+	Entity entity = scene->GetEntityWorld().AddEntity(id);
 
-	// auto components = entityNode["Components"];
-	// if(!components) return;
+	auto components = entityNode["Components"];
+	if(!components) return;
 
-	// auto tag = components["TagComponent"];
-	// if(tag)
-	// 	entity.Add<TagComponent>(tag["Tag"].as<std::string>());
+	auto meshComponentNode = components["MeshComponent"];
+	if(meshComponentNode) {
+		auto meshNode = meshComponentNode["Mesh"];
+		auto verts = meshNode["Vertices"].as<std::vector<VolcaniCore::Vertex>>();
+		auto indices = meshNode["Indices"].as<std::vector<uint32_t>>();
+		auto diffuseNode = meshNode["Material"]["Diffuse"];
+		auto specularNode = meshNode["Material"]["Specular"];
 
-	// auto texture = components["TextureComponent"];
-	// if(texture)
-	// 	entity.Add<TextureComponent>(texture["Texture"].as<std::string>());
+		Material mat;
+		if(diffuseNode) {
+			auto path = diffuseNode["Path"].as<std::string>();
+			mat.Diffuse = Texture::Create(path);
+		}
+		if(specularNode) {
+			auto path = specularNode["Path"].as<std::string>();
+			mat.Diffuse = Texture::Create(path);
+		}
 
-	// auto transform = components["TransformComponent"];
-	// if(transform) {
-	// 	auto& tc = entity.Add<TransformComponent>();
-	// 	tc.Translation = transform["Translation"].as<glm::vec3>();
-	// 	tc.Rotation = transform["Rotation"].as<glm::vec3>();
-	// 	tc.Scale = transform["Scale"].as<glm::vec3>();
-	// }
+		MeshComponent& mc = entity.Add<MeshComponent>(vertices, indices, mat);
+	}
+
+	auto rigidBodyComponentNode = components["RigidBodyComponent"];
+	if(rigidBodyComponentNode) {
+		auto rigidBodyNode = rigidBodyComponentNode["Body"];
+		auto typeStr   = rigidBodyNode["Type"].as<std::string>();
+		auto shapeTypeStr = rigidBodyNode["Shape Type"].as<std::string>();
+
+		RigidBody::Type type = (typeStr == "Static") ? RigidBody::Type::Static
+							 						 : RigidBody::Type::Dynamic;
+
+		Shape::Type shapeType;
+		if(shapeType == "Box")			shapeType = Shape::Type::Box;
+		else if(shapeType == "Sphere")	shapeType = Shape::Type::Sphere;
+		else if(shapeType == "Plane")	shapeType = Shape::Type::Plane;
+		else if(shapeType == "Capsule") shapeType = Shape::Type::Capsule;
+
+		// else if(shapeType == "ConvexMesh") {
+		// 	shapeType = Shape::Type::ConvexMesh;
+		// }
+		else if(shapeType == "TriangleMesh") {
+			Shape shape(entity.Get<MeshComponent>().Mesh);
+			body->SetShape(shape);
+		}
+
+		RigidBodyComponent& rc = entity.Add<RigidBodyComponent>(type, shape);
+	}
+
+	auto scriptComponentNode = components["ScriptComponent"];
+	if(scriptComponentNode) {
+		// auto scriptNode = scriptComponentNode["Path"];
+		// std::string path = scriptNode.as<std::string>();
+
+		// ScriptComponent& sc = entity.Add<ScriptComponent>(path);
+
+		ScriptComponent& sc = entity.Add<ScriptComponent>();
+	}
+
+	auto tagComponentNode = components["TagComponent"];
+	if(tagComponentNode) {
+		auto tag = tagComponentNode["Tag"].as<std::string>();
+
+		entity.Add<TagComponent>(tag);
+	}
+
+	auto transformComponentNode = components["TransformComponent"];
+	if(transformComponentNode) {
+		auto translationNode = transformComponentNode["Translation"];
+		auto rotationNode	 = transformComponentNode["Rotation"];
+		auto scaleNode		 = transformComponentNode["Scale"];
+
+		TransformComponent& tc = entity.Add<TransformComponent>();
+		tc.Translation = translationNode.as<glm::vec3>();
+		tc.Rotation	   = rotationNode	.as<glm::vec3>();
+		tc.Scale	   = scaleNode		.as<glm::vec3>();
+	}
 }
 
 }
@@ -248,15 +365,19 @@ struct convert<glm::vec4> {
 };
 
 template<>
-struct convert<VolcaniCore::UUID> {
-	static Node encode(const VolcaniCore::UUID& uuid) {
+struct convert<VolcaniCore::Vertex> {
+	static Node encode(const VolcaniCore::Vertex& vertex) {
 		Node node;
-		node.push_back((uint64_t)uuid);
+		node.push_back(vertex.Position);
+		node.push_back(vertex.Normal);
+		node.push_back(vertex.TexCoord_Color);
 		return node;
 	}
 
-	static bool decode(const Node& node, VolcaniCore::UUID& uuid) {
-		uuid = node.as<uint64_t>();
+	static bool decode(const Node& node, VolcaniCore::Vertex& vertex) {
+		vertex.Position		  = node[0].as<glm::vec3>();
+		vertex.Normal		  = node[1].as<glm::vec3>();
+		vertex.TexCoord_Color = node[2].as<glm::vec4>();
 		return true;
 	}
 };

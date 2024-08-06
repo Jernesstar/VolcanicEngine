@@ -27,7 +27,7 @@ public:
 	TDerived* As() const { return (TDerived*)(this); }
 
 protected:
-	std::string m_Path;
+	std::string m_Path = "";
 	uint32_t m_Width, m_Height;
 };
 

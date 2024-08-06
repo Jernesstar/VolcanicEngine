@@ -6,6 +6,7 @@
 #include <Object/Shader.h>
 
 #include <Magma/UI/UI.h>
+#include <Magma/Editor/Scene.h>
 
 #include "Level.h"
 
@@ -21,16 +22,13 @@ public:
 	static void Save();
 	static void Reset();
 
-	// static void SetUI();
-	// static void Update(TimeStep ts);
-
-	static Level& GetCurrentLevel() { return Levels[CurrentLevel - 1]; }
+	static Level& GetCurrentLevel() { return Levels[SelectedLevel - 1]; }
 
 public:
 	inline static const uint32_t LevelCount = 3;
 
-	inline static uint32_t Coins;
-	inline static uint32_t CurrentLevel;
+	inline static uint32_t MaxLevel; // The highest level reached so far
+	inline static uint32_t SelectedLevel; // The one being played right now
 	inline static std::vector<Level> Levels;
 
 	inline static Ref<UI::UIElement> EmptyUI;
@@ -39,8 +37,6 @@ public:
 	inline static Ref<UI::UIElement> PauseUI;
 	inline static Ref<UI::UIElement> GameOverUI;
 
-	inline static Ref<Texture> Stone;
-	inline static Ref<Texture> Lava;
 	inline static Ref<Mesh> Wall;
 
 	inline static Ref<ShaderPipeline> MeshShader;

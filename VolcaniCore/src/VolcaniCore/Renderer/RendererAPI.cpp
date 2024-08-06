@@ -11,11 +11,12 @@ void RendererAPI::Create(RendererBackend backend) {
 	switch(backend) {
 		case RendererBackend::OpenGL:
 			s_Instance = CreateRef<OpenGL::Renderer>();
+			break;
 		// case RenderAPI::Vulkan:
 		// 	s_Instance = CreateRef<Vulkan::Renderer>();
+		// 	break;
 	}
 
-	// TODO: Get rid of ShaderLibrary?
 	ShaderLibrary::Init();
 
 	s_Instance->Init();

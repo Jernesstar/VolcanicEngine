@@ -13,55 +13,57 @@ static PxShape* CreatePlane();
 static PxShape* CreateTriangleMesh(Ref<Mesh> mesh);
 // static PxShape* CreateConvexMesh(Buffer<Vertex> data);
 
-Shape Shape::Create(ShapeType type) {
+Shape Shape::Create(Shape::Type type) {
 	
 }
 
 Shape::Shape(Ref<Mesh> mesh)
-	: Type(ShapeType::TriangleMesh)
+	: m_Type(Shape::Type::TriangleMesh)
 {
 	m_Shape = CreateTriangleMesh(mesh);
 }
 
 // Shape::Shape(Buffer<Vertex> data)
-// 	: Type(ShapeType::ConvexShape)
+// 	: Type(Shape::Type::ConvexShape)
 // {
 // 	m_Shape = CreateConvexShape(mesh);
 // }
 
-Shape::Shape(ShapeType type)
-	: Type(type)
+Shape::Shape(Shape::Type type)
+	: m_Type(type)
 {
 	switch(type) {
-		case ShapeType::Box:
+		case Shape::Type::Box:
 			m_Shape = CreateBox();
 			break;
-		case ShapeType::Sphere:
+		case Shape::Type::Sphere:
 			m_Shape = CreateSphere();
 			break;
-		case ShapeType::Plane:
+		case Shape::Type::Plane:
 			m_Shape = CreatePlane();
 			break;
-		// case ShapeType::Capsule:
+		// case Shape::Type::Capsule:
 		// 	m_Shape = CreateCapsule();
-		// case ShapeType::TriangleMesh:
+		// case Shape::Type::TriangleMesh:
 		// 	m_Shape = CreateTriangleMesh();
-		// case ShapeType::ConvexMesh:
+		// case Shape::Type::ConvexMesh:
 		// 	m_Shape = CreateConvexMesh();
 	}
 }
 
-// Shape::Shape(const Shape& other)
-// 	: Type(other.Type)
-// {
-// 	m_Shape = other.m_Shape;
-// 	// m_Shape->acquireReference();
-// }
-// Shape& Shape::operator =(const Shape& other) {
-// 	m_Shape = other.m_Shape;
-// 	// m_Shape->acquireReference();
-// 	return *this;
-// }
+Shape::Shape(const Shape& other)
+	: m_Type(other.Type)
+{
+	m_Shape = other.m_Shape;
+	m_Shape->acquireReference();
+}
+
+Shape& Shape::operator =(const Shape& other) {
+	m_Type = other.m_Type;
+	m_Shape = other.m_Shape;
+	m_Shape->acquireReference();
+	return *this;
+}
 
 Shape::~Shape() {
 	m_Shape->release();

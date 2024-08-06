@@ -49,7 +49,7 @@ public:
 		return false;
 	}
 
-	const Attachment& Get(AttachmentTarget target) {
+	const Attachment& Get(AttachmentTarget target) const {
 		return m_Attachments[target];
 	}
 

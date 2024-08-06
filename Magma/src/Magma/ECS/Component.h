@@ -1,11 +1,6 @@
 #pragma once
 
-#define GLM_ENABLE_EXPERIMENTAL
-
 #include <glm/vec3.hpp>
-#include <glm/mat4x4.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtx/quaternion.hpp>
 
 #include <VolcaniCore/Core/Defines.h>
 #include <VolcaniCore/Events/EventCallback.h>
@@ -16,10 +11,7 @@
 
 #include <Physics/RigidBody.h>
 
-using namespace VolcaniCore;
-using namespace Magma::Physics;
-
-namespace Magma {
+namespace Magma::ECS {
 
 struct Component {
 	Component() = default;
@@ -32,26 +24,35 @@ struct MeshComponent : public Component {
 
 	MeshComponent(Ref<VolcaniCore::Mesh> mesh)
 		: Mesh(mesh) { }
-	MeshComponent(MeshPrimitive primitive, Material material) {
+	MeshComponent(const std::vector<VolcaniCore::Vertex>& vertices,
+				  const std::vector<uint32_t> indices, const Material& material)
+	{
+		Mesh = Mesh::Create(vertices, indices, material);
+	}
+	MeshComponent(MeshPrimitive primitive, const Material& material) {
 		Mesh = Mesh::Create(primitive, material);
 	}
 };
 
 struct RigidBodyComponent : public Component {
-	RigidBody Body;
+	Ref<Physics::RigidBody> Body;
 
-	RigidBodyComponent()
-		: Body(RigidBodyType::Static, Shape(ShapeType::Box)) { }
-	RigidBodyComponent(const RigidBody& body)
+	RigidBodyComponent() = default;
+	RigidBodyComponent(Ref<Physics::RigidBody> body)
 		: Body(body) { }
+	RigidBodyComponent(Rigid::Body::Type type, const Shape& shape) {
+		Body = RigidBody::Create(type, shape);
+	}
 	RigidBodyComponent(const RigidBodyComponent& other) = default;
 };
 
+// TODO: Keep like this for now, proper scripting later
 struct ScriptComponent : public Component {
-	std::string Path;
+	// std::string Path;
+	
+	std::function<void(TransformComponent&)> OnInput;
 
-	ScriptComponent()
-		: Path("") { }
+	ScriptComponent() = default;
 	ScriptComponent(const std::string_view& path)
 		: Path(path)
 	{

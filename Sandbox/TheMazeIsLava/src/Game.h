@@ -28,13 +28,11 @@ private:
 	void StartScreen();
 	void LevelScreen();
 	void PlayScreen();
-	void PauseScreen();
 	void OverScreen();
 
 private:
 	Ref<UI::UIElement> m_CurrentUI;
 	Ref<Scene> m_Scene;
-	Ref<StereographicCamera> m_Camera;
 
 	TimeStep m_TimeStep;
 	std::function<void(void)> m_CurrentScreen;

@@ -227,8 +227,7 @@ void EditorLayer::AddEntity() {
 		ImGui::InputText("##EntityName", &s);
 
 		if(ImGui::Button("Add Entity")) {
-			// auto& entity = m_CurrentScene->GetEntitySystem().AddEntity();
-			// entity.Add<TagComponent>(s);
+			Entity entity = m_CurrentScene->GetEntityWorld().AddEntity(s);
 
 			menu.edit.addEntity = false;
 		}

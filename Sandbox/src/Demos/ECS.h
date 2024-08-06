@@ -1,10 +1,5 @@
 #pragma once
 
-#include <flecs.h>
-
-using namespace VolcaniCore;
-using namespace Magma;
-
 namespace Demo {
 
 class ECS : public Application {
@@ -14,7 +9,7 @@ public:
 	void OnUpdate(TimeStep ts);
 
 private:
-	Scene scene;
+	Ref<Scene> scene;
 };
 
 ECS::ECS() {
@@ -24,15 +19,20 @@ ECS::ECS() {
 			Application::Close();
 	});
 
-	auto& world = scene.GetEntitySystem().GetWorld();
+	auto& world = scene->GetEntityWorld().Get();
 
-	Entity entity(world);
-	entity
+	ECS::Entity entity = ECS::EntityBuilder(world)
 	.Add<TransformComponent>()
 	.Add<MeshComponent>(MeshPrimitive::Cube,
 		Material{
 			.Diffuse = Texture::Create("Sandbox/assets/images/wood.png")
-		});
+		})
+	.Add<RigidBodyComponent>(RigidBody::Type::Static)
+	.Finalize();
+
+	SceneSerializer::Serialize(scene, "Sandbox/assets/scenes/test.volc");
+	Ref<Scene> test
+		= SceneSerializer::Deserialize("Sandbox/assets/scenes/test.volc");
 }
 
 void ECS::OnUpdate(TimeStep ts) {

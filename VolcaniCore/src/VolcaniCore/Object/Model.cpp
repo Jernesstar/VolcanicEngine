@@ -53,8 +53,7 @@ static Ref<Texture> LoadTexture(const std::string& dir,
 								const aiMaterial* mat, aiTextureType type);
 
 Ref<Mesh> LoadMesh(const std::string& path,
-				   const aiScene* scene,
-				   uint32_t meshIndex)
+				   const aiScene* scene, uint32_t meshIndex)
 {
 	auto mesh = scene->mMeshes[meshIndex];
 	auto mat = scene->mMaterials[mesh->mMaterialIndex];
@@ -73,9 +72,9 @@ Ref<Mesh> LoadMesh(const std::string& path,
 										: aiVector3D(0.0f, 0.0f, 0.0f);
 
 		Vertex v{
-			.Position		   = glm::vec3(pos.x, pos.y, pos.z),
-			.Normal			   = glm::vec3(normal.x, normal.y, normal.z),
-			.TextureCoordinate = glm::vec2(texCoord.x, texCoord.y)
+			.Position		= glm::vec3(pos.x, pos.y, pos.z),
+			.Normal			= glm::vec3(normal.x, normal.y, normal.z),
+			.TexCoord_Color	= glm::vec4(texCoord.x, texCoord.y, 0, 0);
 		};
 		vertices.push_back(v);
 	}
@@ -101,7 +100,7 @@ Ref<Mesh> LoadMesh(const std::string& path,
 		Material{
 			.Diffuse   = LoadTexture(dir, mat, aiTextureType_DIFFUSE),
 			.Specular  = LoadTexture(dir, mat, aiTextureType_SPECULAR),
-			.Roughness = LoadTexture(dir, mat, aiTextureType_DIFFUSE_ROUGHNESS)
+			// .Roughness = LoadTexture(dir, mat, aiTextureType_DIFFUSE_ROUGHNESS)
 			// .Emissive = LoadTexture(dir, mat, aiTextureType_EMISSIVE)
 		}
 	);
@@ -110,8 +109,7 @@ Ref<Mesh> LoadMesh(const std::string& path,
 }
 
 Ref<Texture> LoadTexture(const std::string& dir,
-								const aiMaterial* material,
-								aiTextureType type)
+						 const aiMaterial* material, aiTextureType type)
 {
 	if(material->GetTextureCount(type) == 0)
 		return nullptr;
@@ -121,8 +119,8 @@ Ref<Texture> LoadTexture(const std::string& dir,
 		return nullptr;
 	std::string p(path.data);
 
-	std::string full_path = dir + "/" + p;
-	return Texture::Create(full_path);
+	std::string fullPath = dir + "/" + p;
+	return Texture::Create(fullPath);
 }
 
 }

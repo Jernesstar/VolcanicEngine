@@ -4,7 +4,7 @@ static void createActors(Physics::World& world) {
 	Shape box(ShapeType::Box);
 	for(uint32_t x = 0; x < 10; x++) {
 		Ref<RigidBody> body =
-			RigidBody::Create(RigidBodyType::Static, box,
+			RigidBody::Create(RigidBody::Type::Static, box,
 				Transform{ .Translation = { x * 2.0f, 0.0f, 0.0f } });
 
 		world.AddActor(body);
@@ -89,7 +89,7 @@ Raycast::Raycast() {
 
 	createActors(world);
 
-	// auto scene = world.GetScene();
+	// auto scene = world.Get();
 	// scene->setVisualizationParameter(PxVisualizationParameter::eSCALE, 1.0f);
 	// scene->setVisualizationParameter(PxVisualizationParameter::eACTOR_AXES, 1.0f);
 }
@@ -112,7 +112,7 @@ void Raycast::OnUpdate(TimeStep ts) {
 		Renderer3D::DrawMesh(cube);
 	}
 
-	// auto scene = world.GetScene();
+	// auto scene = world.Get();
 	// const PxRenderBuffer& rb = scene->getRenderBuffer();
 
 	// for(PxU32 i=0; i < rb.getNbPoints(); i++)

@@ -1,21 +1,13 @@
-// #pragma once
+#pragma once
 
-// #include <Object/Model.h>
+#include <Magma/ECS/Entity.h>
 
-// namespace TheMazeIsLava {
+namespace TheMazeIsLava {
 
-// class Player : public Entity {
-// public:
-// 	Player();
-// 	~Player();
+class Player : public Entity {
+public:
+	Player();
+	~Player() = default;
+};
 
-// 	// NOTE: InputProvider ?
-// 	void Move();
-// 	void Render();
-
-// private:
-// 	float x, y;
-// 	// Ref<Model> m_Model;
-// };
-
-// }
+}

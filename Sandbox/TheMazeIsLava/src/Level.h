@@ -6,10 +6,14 @@
 
 #include <glm/vec2.hpp>
 
-#include <Core/Time.h>
-#include <Object/Texture.h>
+#include <VolcaniCore/Core/Time.h>
+
+#include <VolcaniCore/Object/Texture.h>
+
+#include <Magma/Editor/Scene.h>
 
 using namespace VolcaniCore;
+using namespace Magma;
 
 namespace TheMazeIsLava {
 
@@ -27,13 +31,12 @@ public:
 	Level(const std::string& name, std::vector<std::vector<uint32_t>> map);
 	~Level();
 
-	void Render(TimeStep ts);
-
 	std::vector<std::vector<uint32_t>> GetTilemap() const { return m_Tilemap; }
+
+	Ref<Scene> Load();
 
 private:
 	void PropagateLava();
-	void DrawStoneBlocks();
 	void TraverseTilemap(
 			const std::function<void(uint32_t x, uint32_t y)>& func);
 

@@ -4,7 +4,9 @@
 
 #include <Renderer/Camera.h>
 
-#include "EntitySystem.h"
+#include "ECS/World.h"
+
+#include "Physics/World.h"
 
 using namespace VolcaniCore;
 
@@ -13,21 +15,27 @@ namespace Magma {
 class Scene {
 public:
 	const std::string Name;
-	Ref<VolcaniCore::Camera> Camera;
 
 public:
 	Scene(const std::string& name = "Untitled Scene");
 	~Scene() = default;
 
-	void OnUpdate(TimeStep ts); // Run physics
-	void OnRender(); // Render
+	void OnUpdate(TimeStep ts);
+	void OnRender();
 
-	EntitySystem& GetEntitySystem() { return m_EntitySystem; }
-	// PhysicsSystem& GetPhysiscsSystem() { return m_PhysicsSystem; }
+	ECS::World& GetEntityWorld() { return m_EntityWorld; }
+	Physics::World& GetPhysiscsWorld() { return m_PhysicsWorld; }
 
 private:
-	EntitySystem m_EntitySystem;
-	// PhysicsSystem m_PhysicsSystem;
+	void RegisterSystems();
+	void RegisterObservers();
+
+	Ref<Camera> m_Camera;
+
+	ECS::World m_EntityWorld;
+	Physics::World m_PhysicsWorld;
+
+	friend class Editor;
 };
 
 }

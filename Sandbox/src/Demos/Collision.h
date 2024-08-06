@@ -1,11 +1,11 @@
 #pragma once
 
 static void createWall(Physics::World& world) {
-	Shape box(ShapeType::Box);
+	Shape box(Shape::Type::Box);
 	for(uint32_t i = 0; i < 4; i++) {
 		for(uint32_t j = 0; j < 4; j++) {
 			Ref<RigidBody> body =
-				RigidBody::Create(RigidBodyType::Dynamic, box,
+				RigidBody::Create(RigidBody::Type::Dynamic, box,
 					Transform{
 						.Translation = { j*2 - (4 - i), i*2 + 1, 0.0f },
 					});
@@ -90,7 +90,7 @@ Collision::Collision() {
 
 	createWall(world);
 
-	// auto plane = RigidBody::Create(RigidBodyType::Static, Shape(ShapeType::Plane));
+	// auto plane = RigidBody::Create(RigidBody::Type::Static, Shape(Shape::Type::Plane));
 	// world.AddActor(plane);
 }
 

@@ -16,21 +16,20 @@ void GameState::Load() {
 	InitUI();
 }
 
-void GameState::Save() {
-	SaveState();
-}
-
 void GameState::Reset() {
 	LoadState(true);
 	InitAssets();
 	InitUI();
 }
 
+void GameState::Save() {
+	SaveState();
+}
+
 void GameState::InitAssets() {
-	Stone = Texture::Create("Sandbox/TheMazeIsLava/assets/images/stone.png");
-	Wall = Mesh::Create(MeshPrimitive::Cube, Material{ .Diffuse = Stone });
-	// Lava  = Texture::Create("Sandbox/TheMazeIsLava/assets/images/lava.png");
-	// Door  = Texture::Create("Sandbox/TheMazeIsLava/assets/images/door.png");
+	auto tex = Texture::Create("Sandbox/TheMazeIsLava/assets/images/stone.png");
+	Wall = Mesh::Create(MeshPrimitive::Cube, Material{ .Diffuse = tex });
+	// Wall = Model::Create();
 	// PlayerModel1 = Model::Create(
 	// 					"Sandbox/TheMazeIsLava/assets/models/player.fbx");
 
@@ -77,22 +76,13 @@ void GameState::InitUI() {
 		LevelSelectUI
 		->Add<UI::Button>(color, std::to_string(i))
 		->SetOnPressed(
-		[&i]() {
+		[i]() {
 			VOLCANICORE_LOG_INFO("Here:");
-			CurrentLevel = 2;
+			CurrentLevel = i;
 		})
 		->SetSize(70, 50)
 		->SetPosition(i * 70 + (offset += 40.0f), 100.0f);
 	}
-}
-
-YAML::Emitter& operator <<(YAML::Emitter& out, std::vector<uint32_t>& row) {
-	out << YAML::Flow;
-	out << YAML::BeginSeq;
-	for(auto tile : row)
-		out << tile;
-	out << YAML::EndSeq;
-	return out;
 }
 
 Level LoadLevel(YAML::Node levelNode) {
@@ -115,11 +105,12 @@ void GameState::LoadState(bool newState) {
 	}
 	auto save = file["Save"];
 
-	CurrentLevel = save["Current Level"].as<uint32_t>();
-	Coins = save["Coins"].as<uint32_t>();
+	MaxLevel = save["Current Level"].as<uint32_t>();
 
 	for(auto node : save["Levels"])
 		Levels.push_back(LoadLevel(node["Level"]));
+
+	SelectedLevel = 0;
 }
 
 void SaveLevel(YAML::Emitter& out, Level& level) {
@@ -139,8 +130,7 @@ void GameState::SaveState() {
 	out << YAML::BeginMap; // File
 	out << YAML::Key << "Save" << YAML::Value << YAML::BeginMap; // Save
 
-	out << YAML::Key << "Current Level" << YAML::Value << CurrentLevel;
-	out << YAML::Key << "Coins" << YAML::Value << Coins;
+	out << YAML::Key << "Current Level" << YAML::Value << MaxLevel;
 
 	out << YAML::Key << "Levels" << YAML::Value << YAML::BeginSeq; // Levels
 	for(auto level : Levels) {

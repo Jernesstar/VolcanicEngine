@@ -25,15 +25,11 @@ Game::Game()
 		if(event.Key == Key::Return && event.IsRepeat == false)
 			m_ReturnPressed = true;
 	});
-	
-	m_Camera = CreateRef<StereographicCamera>(75.0f, 0.01f, 100.0f, 800, 600);
-	m_Camera->SetPositionDirection(
-		{  5.0f,  2.0f,  5.0f },
-		{ -0.5f, -0.5f, -0.5f }
-	);
 
 	UI::Init();
 	GameState::Reset();
+
+	m_Scene = GameState::LoadLevel()
 
 	m_CurrentUI = GameState::HomeUI;
 	m_CurrentScreen = std::bind(&Game::StartScreen, this);
@@ -49,14 +45,10 @@ void Game::OnUpdate(TimeStep ts) {
 
 	Renderer::Clear();
 
-	UI::Begin();
-	Renderer3D::Begin(m_Camera);
-	GameState::MeshShader->SetMat4("u_ViewProj", m_Camera->GetViewProjection());
-
 	m_CurrentScreen();
-	m_CurrentUI->Render();
 
-	Renderer3D::End();
+	UI::Begin();
+	m_CurrentUI->Render();
 	UI::End();
 }
 
@@ -72,19 +64,21 @@ void Game::StartScreen() {
 }
 
 void Game::LevelScreen() {
-	// // Staircase like level selection
+	// Staircase like level selection
 
-	if(m_ReturnPressed) {
-		m_ReturnPressed = false;
-		m_CurrentUI = GameState::EmptyUI;
-		m_CurrentScreen = std::bind(&Game::PlayScreen, this);
+	// TODO:
+	// DrawStairs();
+
+	if(GameState::GetSelectedLevel() == 0)
 		return;
-	}
+
+	m_Scene = GameState::GetSelectedLevel().Load();
+	m_CurrentUI = GameState::EmptyUI;
+	m_CurrentScreen = std::bind(&Game::PlayScreen, this);
 }
 
 void Game::PlayScreen() {
-	// // Gameplay
-	GameState::GetCurrentLevel().Render(m_TimeStep);
+	// Gameplay
 
 	if(m_GameOver) {
 		m_CurrentUI = GameState::GameOverUI;
@@ -93,13 +87,10 @@ void Game::PlayScreen() {
 	}
 	if(m_ReturnPressed) {
 		m_ReturnPressed = false;
+		m_Paused = true;
 		m_CurrentUI = GameState::PauseUI;
-		m_CurrentScreen = std::bind(&Game::PauseScreen, this);
 		return;
 	}
-}
-
-void Game::PauseScreen() {
 	if(m_ReturnPressed) {
 		m_ReturnPressed = false;
 		m_CurrentUI = GameState::EmptyUI;

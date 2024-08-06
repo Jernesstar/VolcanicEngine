@@ -5,6 +5,7 @@
 #include "GameState.h"
 
 using namespace VolcaniCore;
+using namespace Magma;
 
 namespace TheMazeIsLava {
 
@@ -13,8 +14,6 @@ Level::Level(const std::string& name, std::vector<std::vector<uint32_t>> map)
 {
 	TraverseTilemap(
 	[this](uint32_t x, uint32_t y) {
-		if(IsGoal(x, y))
-			m_Goal = { x, m_Height - y };
 		if(IsLava(x, y))
 			m_LavaPoints.push_back({ x, y });
 	});
@@ -28,12 +27,7 @@ void Level::Render(TimeStep ts) {
 	m_TimeStep = ts;
 	m_TimeSinceLevelStart += (float)ts;
 
-	DrawStoneBlocks();
-
-	// if(!m_Paused)
-	// 	PropagateLava(); // Fluid simulation
-	// else
-	// 	PauseUI->Render();
+	PropagateLava();
 }
 
 void Level::PropagateLava() {
@@ -42,17 +36,34 @@ void Level::PropagateLava() {
 	// Propagate the lava in tile space, flow animation interpolates smoothly
 }
 
-void Level::DrawStoneBlocks() {
+Ref<Scene> Level::Load() {
+	Ref<Scene> scene = CreateRef<Scene>();
+	auto& world = scene->GetEntityWorld();
+
 	TraverseTilemap(
 	[this](uint32_t x, uint32_t y) {
-		Renderer3D::DrawMesh(GameState::Wall,
-			Transform{ .Translation = glm::vec3{ x, 0.0f, y } });
+		ECS::Entity floor = ECS::EntityBuilder(world)
+		.Add<TransformComponent>({ .Translation = { x, 0.0f, y } })
+		.Add<MeshComponent>(GameState::Wall)
+		.Finalize();
 
-		if(!IsWall(x, y))
-			return;
-		Renderer3D::DrawMesh(GameState::Wall,
-			Transform{ .Translation = glm::vec3{ x, 1.0f, y } });
+		if(!IsWall(x, y)) return;
+
+		ECS::Entity wall = ECS::EntityBuilder(world)
+		.Add<TransformComponent>({ .Translation = { x, 1.0f, y } })
+		.Add<MeshComponent>(GameState::Wall)
+		.Finalize();
+
+		if(!IsGoal(x, y)) return;
+
+		// TODO: Staircase model
+		ECS::Entity stairs = ECS::EntityBuilder(world)
+		.Add<TransformComponent>({ .Translation = { x, 1.0f, y } })
+		// .Add<MeshComponent>(GameState::StairModel)
+		.Finalize();
 	});
+
+	return scene;
 }
 
 void Level::TraverseTilemap(

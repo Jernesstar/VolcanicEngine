@@ -6,12 +6,20 @@
 
 namespace Magma {
 
-class Entity {
+class Entity::ECS {
 public:
-	Entity(flecs::world& world) {
-		m_Handle = world.entity();
+	Entity(flecs::entity handle)
+		: m_Handle(handle) { }
+
+	~Entity() = default;
+
+	bool operator ==(const Entity& other) const {
+		return this->m_Handle == other.m_Handle;
 	}
-	~Entity() {
+
+	flecs::entity GetHandle() const { return m_Handle; }
+
+	void Delete() {
 		m_Handle.destruct();
 	}
 
@@ -23,9 +31,8 @@ public:
 
 	template<typename TComponent, typename ...Args>
 	requires std::derived_from<TComponent, Component>
-	Entity& Add(Args&&... args) {
-		m_Handle.set<TComponent>(TComponent(std::forward<Args>(args)...));
-		return *this;
+	TComponent& Add(Args&&... args) {
+		return m_Handle.set<TComponent>(TComponent(std::forward<Args>(args)...));
 	}
 
 	template<typename TComponent>
@@ -38,10 +45,6 @@ public:
 	requires std::derived_from<TComponent, Component>
 	void Remove() {
 		m_Handle.remove<TComponent>();
-	}
-
-	bool operator ==(const Entity& other) const {
-		return this->m_Handle == other.m_Handle;
 	}
 
 private:

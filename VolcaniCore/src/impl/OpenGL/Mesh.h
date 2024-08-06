@@ -15,7 +15,7 @@ public:
 		 const std::vector<uint32_t>& indices,
 		 const Material& material);
 
-// private:
+private:
 	Ref<OpenGL::VertexArray> m_VertexArray;
 	Ref<OpenGL::VertexBuffer> m_VertexBuffer;
 	Ref<OpenGL::IndexBuffer> m_IndexBuffer;

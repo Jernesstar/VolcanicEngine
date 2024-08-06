@@ -2,8 +2,6 @@
 
 #include <OpenGL/Framebuffer.h>
 
-using namespace VolcaniCore;
-
 namespace Demo {
 
 class Shadows : public Application {

@@ -8,8 +8,7 @@ using namespace physx;
 
 namespace Magma::Physics {
 
-// TODO:
-World::World() {
+World::Wporld() {
 	PxSceneDesc sceneDesc(Physics::GetPhysicsLib()->getTolerancesScale());
 	sceneDesc.cpuDispatcher	= Physics::GetDispatcher();
 	sceneDesc.gravity		= PxVec3(0.0f, -9.81f, 0.0f);
@@ -65,6 +64,19 @@ void World::AddContactCallback(
 	const std::function<void(RigidBody&, RigidBody&)>& callback)
 {
 	m_ContactCallback.AddCallback(callback);
+}
+
+void World::AddContactCallback(RigidBody& actor1, RigidBody& actor2,
+	const std::function<void(RigidBody&, RigidBody&)>& callback)
+{
+	m_ContactCallback.AddCallback(
+	[](RigidBody& body1, RigidBody& body2) {
+		if(((body1 == actor1) || (body1 == actor2)) &&
+		   ((body2 == actor1) || (body2 == actor2)))
+		{
+			callback(body1, body2);
+		}
+	});
 }
 
 void ContactCallback::onTrigger(PxTriggerPair* pairs, PxU32 count)
