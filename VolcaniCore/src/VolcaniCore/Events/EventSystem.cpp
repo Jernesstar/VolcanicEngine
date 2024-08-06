@@ -48,7 +48,8 @@ void EventSystem::ErrorCallback(int error, const char* description) {
 	VOLCANICORE_ASSERT(false, description);
 }
 
-void EventSystem::KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+void EventSystem::KeyCallback(GLFWwindow* window, int key, int scancode,
+							  int action, int mods)
 {
 	if(action == GLFW_PRESS) {
 		KeyPressedEvent event((KeyCode)key);
@@ -74,23 +75,31 @@ void EventSystem::MouseMovedCallback(GLFWwindow* window, double x, double y) {
 	Dispatch(event);
 }
 
-void EventSystem::MouseScrolledCallback(GLFWwindow* window, double scrollX, double scrollY) {
+void EventSystem::MouseScrolledCallback(GLFWwindow* window,
+										double scrollX, double scrollY)
+{
 	MouseScrolledEvent event((float)scrollX, (float)scrollY);
 	Dispatch(event);
 }
 
-void EventSystem::MouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
+void EventSystem::MouseButtonCallback(GLFWwindow* window, int button,
+									  int action, int mods)
+{
 	if(action == GLFW_PRESS) {
-		MouseButtonPressedEvent event((MouseCode)button, Input::GetMouseX(), Input::GetMouseY());
+		MouseButtonPressedEvent event((MouseCode)button,
+									  Input::GetMouseX(), Input::GetMouseY());
 		Dispatch(event);
 	}
 	if(action == GLFW_RELEASE) {
-		MouseButtonReleasedEvent event((MouseCode)button, Input::GetMouseX(), Input::GetMouseY());
+		MouseButtonReleasedEvent event((MouseCode)button,
+									   Input::GetMouseX(), Input::GetMouseY());
 		Dispatch(event);
 	}
 }
 
-void EventSystem::WindowResizedCallback(GLFWwindow* window, int width, int height) {
+void EventSystem::WindowResizedCallback(GLFWwindow* window,
+										int width, int height)
+{
 	WindowResizedEvent event(width, height);
 	Dispatch(event);
 }

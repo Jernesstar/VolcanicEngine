@@ -13,7 +13,7 @@ class Mesh : public VolcaniCore::Mesh {
 public:
 	Mesh(const std::vector<Vertex>& vertices,
 		 const std::vector<uint32_t>& indices,
-		 const Material& material);
+		 const Material& material = { });
 
 private:
 	Ref<OpenGL::VertexArray> m_VertexArray;
