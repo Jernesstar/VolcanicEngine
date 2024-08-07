@@ -19,10 +19,6 @@ Model::Model(const std::string& path)
 	Load(path);
 }
 
-// Model::~Model() {
-
-// }
-
 static Ref<Mesh> LoadMesh(const std::string& path,
 						  const aiScene* scene, uint32_t meshIndex);
 
@@ -74,7 +70,7 @@ Ref<Mesh> LoadMesh(const std::string& path,
 		Vertex v{
 			.Position		= glm::vec3(pos.x, pos.y, pos.z),
 			.Normal			= glm::vec3(normal.x, normal.y, normal.z),
-			.TexCoord_Color	= glm::vec4(texCoord.x, texCoord.y, 0, 0);
+			.TexCoord_Color	= glm::vec4(texCoord.x, texCoord.y, 0, 0)
 		};
 		vertices.push_back(v);
 	}

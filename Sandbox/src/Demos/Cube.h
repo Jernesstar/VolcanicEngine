@@ -9,7 +9,7 @@ namespace Demo {
 class IsometricCamera : public Camera {
 public:
 	IsometricCamera()
-		: Camera(CameraType::Ortho)
+		: Camera(Camera::Type::Ortho)
 	{
 		float r = 1.0f;
 		Position = r * glm::vec3{

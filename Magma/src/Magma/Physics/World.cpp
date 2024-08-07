@@ -8,7 +8,7 @@ using namespace physx;
 
 namespace Magma::Physics {
 
-World::Wporld() {
+World::World() {
 	PxSceneDesc sceneDesc(Physics::GetPhysicsLib()->getTolerancesScale());
 	sceneDesc.cpuDispatcher	= Physics::GetDispatcher();
 	sceneDesc.gravity		= PxVec3(0.0f, -9.81f, 0.0f);
@@ -61,18 +61,19 @@ HitInfo World::Raycast(const glm::vec3& start,
 }
 
 void World::AddContactCallback(
-	const std::function<void(RigidBody&, RigidBody&)>& callback)
+	const std::function<void(Ref<RigidBody>, Ref<RigidBody>)>& callback)
 {
 	m_ContactCallback.AddCallback(callback);
 }
 
-void World::AddContactCallback(RigidBody& actor1, RigidBody& actor2,
-	const std::function<void(RigidBody&, RigidBody&)>& callback)
+void World::AddContactCallback(Ref<RigidBody> actor1, Ref<RigidBody> actor2,
+	const std::function<void(Ref<RigidBody>, Ref<RigidBody>)>& callback)
 {
 	m_ContactCallback.AddCallback(
-	[](RigidBody& body1, RigidBody& body2) {
-		if(((body1 == actor1) || (body1 == actor2)) &&
-		   ((body2 == actor1) || (body2 == actor2)))
+	[callback, actor1, actor2]
+	(Ref<RigidBody> body1, Ref<RigidBody> body2) {
+		if(((*body1 == *actor1) || (*body1 == *actor2)) &&
+		   ((*body2 == *actor1) || (*body2 == *actor2)))
 		{
 			callback(body1, body2);
 		}
@@ -99,11 +100,11 @@ void ContactCallback::onTrigger(PxTriggerPair* pairs, PxU32 count)
 void ContactCallback::onContact(const PxContactPairHeader& pairHeader,
 								const PxContactPair* pairs, PxU32 nbPairs)
 {
-	RigidBody& a1 = *static_cast<RigidBody*>(pairHeader.actors[0]->userData);
-	RigidBody& a2 = *static_cast<RigidBody*>(pairHeader.actors[1]->userData);
+	RigidBody* a1 = static_cast<RigidBody*>(pairHeader.actors[0]->userData);
+	RigidBody* a2 = static_cast<RigidBody*>(pairHeader.actors[1]->userData);
 
 	for(auto callback : m_Callbacks) {
-		callback(a1, a2);
+		callback(Ref<RigidBody>(a1), Ref<RigidBody>(a2));
 	}
 }
 

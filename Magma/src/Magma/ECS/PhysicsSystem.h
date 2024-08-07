@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Entity.h"
+#include "ECS/Entity.h"
 
 #include "Physics/World.h"
 
@@ -10,7 +10,8 @@ class PhysicsSystem {
 public:
 	static void Register(Physics::World& world, Entity& entity);
 
-	static void RegisterForCollisionDetection(Entity& e1, Entity& e2);
+	static void RegisterForCollisionDetection(Physics::World& world,
+											  Entity& e1, Entity& e2);
 	static bool Collides(Entity& e1, Entity& e2);
 };
 

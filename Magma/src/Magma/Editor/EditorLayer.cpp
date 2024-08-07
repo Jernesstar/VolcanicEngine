@@ -17,6 +17,7 @@
 #include "SceneSerializer.h"
 
 using namespace VolcaniCore;
+using namespace Magma::ECS;
 
 namespace Magma {
 

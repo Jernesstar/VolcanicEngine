@@ -71,14 +71,14 @@ void GameState::InitUI() {
 	float offset = 0.0f;
 	for(uint32_t i = 1; i <= LevelCount; i++) {
 		glm::vec4 color = { 0.3125f, 0.234375f, 0.078125f, 1.0f };
-		if(i > CurrentLevel)
+		if(i > MaxLevel)
 			color.a = 0.7f; // Buttons for locked levels are darker
 		LevelSelectUI
 		->Add<UI::Button>(color, std::to_string(i))
 		->SetOnPressed(
 		[i]() {
-			VOLCANICORE_LOG_INFO("Here:");
-			CurrentLevel = i;
+			VOLCANICORE_LOG_INFO("Level Selected: %i", i);
+			SelectedLevel = i;
 		})
 		->SetSize(70, 50)
 		->SetPosition(i * 70 + (offset += 40.0f), 100.0f);

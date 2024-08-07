@@ -7,36 +7,55 @@
 
 namespace VolcaniCore {
 
-enum class CameraType { Ortho, Stereo };
-
 class Camera {
 public:
-	const CameraType Type;
+	enum class Type { Ortho, Stereo };
 
-	Camera(CameraType type)
-		: Type(type) { }
-	Camera(CameraType type,
-		   uint32_t width, uint32_t height,
-		   float near, float far, float rotation)
-		: Type(type), m_ViewportWidth(width), m_ViewportHeight(height),
-			m_Near(near), m_Far(far), m_Rotation(rotation)
+public:
+	Camera(Camera::Type type)
+		: m_Type(type) { }
+
+	Camera(Camera::Type type,
+			uint32_t width, uint32_t height, float near, float far)
+		: m_Type(type), m_ViewportWidth(width), m_ViewportHeight(height),
+			m_Near(near), m_Far(far)
 	{
 		VOLCANICORE_ASSERT(width != 0 && height != 0,
-						   "Viewport width and height must not be 0");
+							"Viewport width and height must not be 0");
 		VOLCANICORE_ASSERT(near != 0 && far != 0,
-						   "Near and far clip must not be non-zero");
+							"Near and far clip must not be non-zero");
 	}
 	virtual ~Camera() = default;
 
-	void Resize(uint32_t width, uint32_t height) {
-		if(width == m_ViewportWidth && height == m_ViewportHeight)
-			return;
+	Camera::Type GetType() { return m_Type; }
 
-		VOLCANICORE_ASSERT(width != 0 && height != 0,
-						   "Viewport width and height must be non-zero");
+	void Resize(uint32_t width, uint32_t height) {
+		if(width == m_ViewportWidth && height == m_ViewportHeight) {
+			VOLCANICORE_LOG_WARNING("Viewport is already this size!");
+			return;
+		}
+		if(width == 0 || height == 0) {
+			VOLCANICORE_LOG_WARNING("Viewport width and height may not be 0");
+			return;
+		}
 
 		m_ViewportWidth = width;
 		m_ViewportHeight = height;
+		CalculateProjection();
+	}
+
+	void SetProjection(float near, float far) {
+		if(near == m_Near && far == m_Far) {
+			VOLCANICORE_LOG_WARNING("Projection is already this size!");
+			return;
+		}
+		if(near == 0 || far == 0) {
+			VOLCANICORE_LOG_WARNING("Near and far clips may not be 0");
+			return;
+		}
+	
+		m_Near = near;
+		m_Far = far;
 		CalculateProjection();
 	}
 
@@ -55,10 +74,6 @@ public:
 		ForwardDirection = direction;
 		CalculateView();
 	}
-	void SetRotation(float rotation) {
-		m_Rotation = rotation;
-		CalculateView();
-	}
 
 	const glm::vec3& GetPosition() const { return Position; }
 	const glm::vec3& GetDirection() const { return ForwardDirection; }
@@ -67,24 +82,24 @@ public:
 	const glm::mat4& GetProjection()     const { return Projection; }
 	const glm::mat4& GetViewProjection() const { return ViewProjection; }
 
-	float GetViewportWidth()  const { return m_ViewportWidth; }
+	float GetViewportWidth() const { return m_ViewportWidth; }
 	float GetViewportHeight() const { return m_ViewportHeight; }
 	float GetNear() const { return m_Near; }
 	float GetFar()	const { return m_Far; }
-	float GetRotation() const { return m_Rotation; }
 
 	template<typename TDerived>
 	requires std::derived_from<TDerived, Camera>
 	TDerived* As() const { return (TDerived*)(this); }
 
 protected:
+	const Camera::Type m_Type;
+
 	// TODO: Consistent naming conventions?
 	glm::vec3 Position = { 0.0f, 0.0f, 0.0f };
 	glm::vec3 ForwardDirection = { 0.0f, 0.0f, -1.0f };
 
 	float m_Near = 0.1f;
 	float m_Far	 = 100.0f;
-	float m_Rotation = 0.0f;
 	uint32_t m_ViewportWidth  = 800;
 	uint32_t m_ViewportHeight = 600;
 

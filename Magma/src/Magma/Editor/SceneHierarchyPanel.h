@@ -17,7 +17,7 @@ public:
 
 private:
 	Ref<Scene> m_Context;
-	Entity* m_SelectionContext;
+	ECS::Entity* m_SelectionContext;
 	std::filesystem::path m_BaseDirectory;
 	std::filesystem::path m_CurrentDirectory;
 
@@ -26,13 +26,13 @@ private:
 	void DisplayAddComponentEntry(const std::string& entryName);
 
 	template<typename TComponent, typename TUIFunction>
-	void DrawComponent(const std::string& name, Entity& entity,
+	void DrawComponent(const std::string& name, ECS::Entity& entity,
 					   TUIFunction uiFunction);
 
 	void SetContext(const Ref<Scene>& scene);
-	void SetSelectedEntity(Entity& entity);
-	void DrawEntityNode(Entity& entity);
-	void DrawComponents(Entity& entity);
+	void SetSelectedEntity(ECS::Entity& entity);
+	void DrawEntityNode(ECS::Entity& entity);
+	void DrawComponents(ECS::Entity& entity);
 };
 
 }

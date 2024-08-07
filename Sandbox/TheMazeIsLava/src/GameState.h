@@ -22,13 +22,14 @@ public:
 	static void Save();
 	static void Reset();
 
-	static Level& GetCurrentLevel() { return Levels[SelectedLevel - 1]; }
+	static Level& GetLevel(uint32_t level) { return Levels[level - 1]; }
+	static uint32_t GetSelectedLevel() { return SelectedLevel; }
 
 public:
 	inline static const uint32_t LevelCount = 3;
 
-	inline static uint32_t MaxLevel; // The highest level reached so far
-	inline static uint32_t SelectedLevel; // The one being played right now
+	inline static uint32_t MaxLevel = 1; // The highest level reached so far
+	inline static uint32_t SelectedLevel = 0; // The one being played right now
 	inline static std::vector<Level> Levels;
 
 	inline static Ref<UI::UIElement> EmptyUI;

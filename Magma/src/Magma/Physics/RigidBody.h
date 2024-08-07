@@ -24,8 +24,15 @@ public:
 			  const Shape& shape,
 			  const Transform& t = { });
 	RigidBody(RigidBody::Type type,
-			  const Transform& t = { })
+			  const Transform& t = { });
 	virtual ~RigidBody() = 0;
+
+	bool operator ==(const RigidBody& other) {
+		return m_Actor == other.m_Actor;
+	}
+	bool operator !=(const RigidBody& other) {
+		return m_Actor != other.m_Actor;
+	}
 
 	RigidBody::Type GetType() { return m_Type; }
 	Shape::Type GetShapeType() { return m_ShapeType; }
@@ -45,9 +52,10 @@ protected:
 	PxRigidActor* m_Actor;
 
 	RigidBody::Type m_Type;
+	Transform m_Transform; // TODO: Remove this?
+
 	Shape::Type m_ShapeType;
 	bool m_HasShape = false;
-	glm::mat4 m_Transform; // TODO: Remove this?
 
 	friend class World;
 };

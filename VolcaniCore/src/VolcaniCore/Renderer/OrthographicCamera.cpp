@@ -7,7 +7,14 @@
 namespace VolcaniCore {
 
 OrthographicCamera::OrthographicCamera()
-	: Camera(CameraType::Ortho)
+	: Camera(Camera::Type::Ortho)
+{
+	CalculateProjection();
+	CalculateView();
+}
+
+OrthographicCamera::OrthographicCamera(float rotation)
+	: Camera(Camera::Type::Ortho), m_Rotation(rotation)
 {
 	CalculateProjection();
 	CalculateView();
@@ -15,16 +22,16 @@ OrthographicCamera::OrthographicCamera()
 
 OrthographicCamera::OrthographicCamera(float width, float height,
 									   float near, float far, float rotation)
-	: Camera(CameraType::Ortho, width, height, near, far, rotation)
+	: Camera(Camera::Type::Ortho, width, height, near, far),
+		m_Rotation(rotation)
 {
 	CalculateProjection();
 	CalculateView();
 }
 
-void OrthographicCamera::SetProjection(float near, float far) {
-	m_Near = near;
-	m_Far = far;
-	CalculateProjection();
+void OrthographicCamera::SetRotation(float rotation) {
+	m_Rotation = rotation;
+	CalculateView();
 }
 
 void OrthographicCamera::CalculateView() {

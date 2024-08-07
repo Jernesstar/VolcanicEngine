@@ -42,15 +42,15 @@ public:
 	void Bind() const override;
 	void Unbind() const override;
 
-	bool Has(AttachmentTarget target) override {
+	bool Has(AttachmentTarget target) const override {
 		if(m_Attachments.count(target) == 1)
-			return m_Attachments[target].Type != AttachmentType::None;
+			return m_Attachments.at(target).Type != AttachmentType::None;
 
 		return false;
 	}
 
 	const Attachment& Get(AttachmentTarget target) const {
-		return m_Attachments[target];
+		return m_Attachments.at(target);
 	}
 
 private:

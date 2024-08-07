@@ -9,7 +9,10 @@
 #include <VolcaniCore/Renderer/StereographicCamera.h>
 #include <VolcaniCore/Renderer/OrthographicCamera.h>
 
-namespace Magma {
+using namespace Magma::ECS;
+using namespace Magma::Physics;
+
+namespace YAML {
 
 YAML::Emitter& operator <<(YAML::Emitter& out, const glm::vec3& v) {
 	out << YAML::Flow;
@@ -23,8 +26,7 @@ YAML::Emitter& operator <<(YAML::Emitter& out, const glm::vec4& v) {
 	return out;
 }
 
-YAML::Emitter& operator <<(YAML::Emitter& out, VolcaniCore::Vertex& v)
-{
+YAML::Emitter& operator <<(YAML::Emitter& out, const VolcaniCore::Vertex& v) {
 	out << YAML::Flow;
 	out << YAML::BeginSeq;
 	out << v.Position << v.Normal << v.TexCoord_Color;
@@ -32,37 +34,44 @@ YAML::Emitter& operator <<(YAML::Emitter& out, VolcaniCore::Vertex& v)
 	return out;
 }
 
+}
+
+namespace Magma {
+
 static void SerializeEntity(YAML::Emitter& out, Entity& entity);
 static void DeserializeEntity(YAML::Node entityNode, Ref<Scene> scene);
 
-void SceneSerializer::Serialize(Ref<Scene> scene, const std::string& filepath) {
+void SceneSerializer::Serialize(Ref<Scene> scene, const std::string& filePath) {
 	YAML::Emitter out;
 	out << YAML::BeginMap; // File
 
-	out << YAML::Key << "Scene" << YAML::Value << YAML::BeginMap; // Scene
+	out << YAML::Key << "Scene" << YAML::BeginMap; // Scene
 	out << YAML::Key << "Name" << YAML::Value <<  scene->Name;
 
-	auto& cam = scene->Camera;
-	out << YAML::Key << "Camera" << YAML::Value << YAML::BeginMap; // Camera
+	auto cam = scene->GetCamera();
+	out << YAML::Key << "Camera" << YAML::BeginMap; // Camera
 	out << YAML::Key << "Type" << YAML::Value
-		<< (cam->Type == CameraType::Stereo ? "Stereographic" : "Orthographic");
-	out << YAML::Key << "Position" << YAML::Value << cam->GetPosition();
-	out << YAML::Key << "Direction" << YAML::Value << cam->GetDirection();
-
-	if(cam->Type == CameraType::Stereo) {
+		<< (cam->GetType() == Camera::Type::Stereo ? "Stereographic"
+												   : "Orthographic");
+	if(cam->GetType() == Camera::Type::Stereo) {
 		auto c = cam->As<StereographicCamera>();
 		out << YAML::Key << "VerticalFOV" << YAML::Value << c->GetVerticalFOV();
 	}
-	out << YAML::Key << "Near"			<< YAML::Value << cam->GetNear();
-	out << YAML::Key << "Far"			<< YAML::Value << cam->GetFar();
-	out << YAML::Key << "Rotation"		<< YAML::Value << cam->GetRotation();
+	if(cam->GetType() == Camera::Type::Ortho) {
+		auto c = cam->As<OrthographicCamera>();
+		out << YAML::Key << "Rotation" << YAML::Value << c->GetRotation();
+	}
+	out << YAML::Key << "Position" << YAML::Value << cam->GetPosition();
+	out << YAML::Key << "Direction" << YAML::Value << cam->GetDirection();
 	out << YAML::Key << "ViewportWidth"
 		<< YAML::Value << cam->GetViewportWidth();
 	out << YAML::Key << "ViewportHeight"
 		<< YAML::Value << cam->GetViewportHeight();
+	out << YAML::Key << "Near"	   << YAML::Value << cam->GetNear();
+	out << YAML::Key << "Far"	   << YAML::Value << cam->GetFar();
 	out << YAML::EndMap; // Camera
 
-	out << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq; // Entities
+	out << YAML::Key << "Entities" << YAML::BeginSeq; // Entities
 	scene->GetEntityWorld()
 	.ForEach(
 	[&](Entity& entity) {
@@ -76,18 +85,18 @@ void SceneSerializer::Serialize(Ref<Scene> scene, const std::string& filepath) {
 
 	out << YAML::EndMap; // File
 
-	std::ofstream fout(filepath);
+	std::ofstream fout(filePath);
 	fout << out.c_str();
 }
 
-Ref<Scene> SceneSerializer::Deserialize(const std::string& filepath) {
+Ref<Scene> SceneSerializer::Deserialize(const std::string& filePath) {
 	YAML::Node file;
 	try {
-		file = YAML::LoadFile(filepath);
+		file = YAML::LoadFile(filePath);
 	}
 	catch(YAML::ParserException e) {
 		VOLCANICORE_ASSERT_ARGS(false, "Could not load file {0}: {1}",
-										filepath, e.what());
+										filePath, e.what());
 	}
 	auto scene = file["Scene"];
 	auto camera = scene["Camera"];
@@ -98,30 +107,25 @@ Ref<Scene> SceneSerializer::Deserialize(const std::string& filepath) {
 	VOLCANICORE_ASSERT(camera);
 
 	Ref<Scene> newScene = CreateRef<Scene>(scene["Name"].as<std::string>());
+	auto width	= camera["ViewportWidth"] .as<uint32_t>();
+	auto height = camera["ViewportHeight"].as<uint32_t>();
+	auto near	= camera["Near"]		  .as<float>();
+	auto far	= camera["Far"]			  .as<float>();
 
 	if(camera["Type"].as<std::string>() == "Stereographic") {
-		auto fov	= camera["VerticalFOV"]	  .as<float>();
-		auto width	= camera["ViewportWidth"] .as<uint32_t>();
-		auto height = camera["ViewportHeight"].as<uint32_t>();
-		auto near	= camera["NearClip"]	  .as<float>();
-		auto far	= camera["FarClip"]		  .as<float>();
-
-		newScene->Camera =
-			CreateRef<StereographicCamera>(fov, width, height, near, far);
+		auto fov = camera["VerticalFOV"].as<float>();
+		newScene->SetCamera(
+			CreateRef<StereographicCamera>(fov, width, height, near, far));
 	}
 	else if(camera["Type"].as<std::string>() == "Orthographic") {
-		auto width	= camera["Width"]	.as<float>();
-		auto height	= camera["Height"]	.as<float>();
-		auto near	= camera["Near"]	.as<float>();
-		auto far	= camera["Far"]		.as<float>();
-		auto ro		= camera["Rotation"].as<float>();
-
-		newScene->Camera =
-			CreateRef<OrthographicCamera>(width, height, near, far, ro);
+		auto ro = camera["Rotation"].as<float>();
+		newScene->SetCamera(
+			CreateRef<OrthographicCamera>(width, height, near, far, ro));
 	}
 
-	newScene->Camera->SetPositionDirection(camera["Position"].as<glm::vec3>(),
-										   camera["Direction"].as<glm::vec3>());
+	newScene->GetCamera()
+		->SetPositionDirection(camera["Position"].as<glm::vec3>(),
+							   camera["Direction"].as<glm::vec3>());
 
 	for(auto node : scene["Entities"])
 		DeserializeEntity(node["Entity"], newScene);
@@ -133,17 +137,17 @@ void SerializeEntity(YAML::Emitter& out, Entity& entity) {
 	out << YAML::Key << "Entity" << YAML::BeginMap; // Entity
 	out << YAML::Key << "ID" << YAML::Value << (uint64_t)entity.GetHandle();
 
-	out << YAML::Key << "Components" << YAML::Value << YAML::BeginMap; // Components
+	out << YAML::Key << "Components" << YAML::BeginMap; // Components
 
 	if(entity.Has<MeshComponent>()) {
-		auto& mesh = entity.Get<MeshComponent>().Mesh;
+		auto mesh = entity.Get<MeshComponent>().Mesh;
 		auto& mat = mesh->GetMaterial();
 
 		out << YAML::Key << "MeshComponent" << YAML::BeginMap; // MeshComponent
 
 		out << YAML::Key << "Mesh" << YAML::BeginMap; // Mesh
-		out << YAML::Key << "Vertices" << YAML::Value << mesh->GetVertices();
-		out << YAML::Key << "Indices" << YAML::Value << mesh->GetIndices();
+		out << YAML::Key << "Vertices" << YAML::Flow << mesh->GetVertices();
+		out << YAML::Key << "Indices" << YAML::Flow << mesh->GetIndices();
 
 		out << YAML::Key << "Material" << YAML::BeginMap; // Material
 		if(mat.Diffuse) {
@@ -168,7 +172,7 @@ void SerializeEntity(YAML::Emitter& out, Entity& entity) {
 		out << YAML::Key << "RigidBodyComponent" << YAML::BeginMap; // RigidBodyComponent
 		out << YAML::Key << "Body" << YAML::Value << YAML::BeginMap; // Body
 		out << YAML::Key << "Type" << YAML::Value <<
-			(body->GetType() == RigidBody::Type::Static) ? "Static" : "Dynamic";
+			(body->GetType() == RigidBody::Type::Static ? "Static" : "Dynamic");
 
 		out << YAML::Key << "Shape Type" << YAML::Value;
 		switch(body->GetShapeType()) {
@@ -212,15 +216,15 @@ void SerializeEntity(YAML::Emitter& out, Entity& entity) {
 	}
 
 	if(entity.Has<TransformComponent>()) {
-		auto& tr = entity.Get<TransformComponent>().Translation;
-		auto& ro = entity.Get<TransformComponent>().Rotation;
-		auto& sc = entity.Get<TransformComponent>().Scale;
+		auto& t = entity.Get<TransformComponent>().Translation;
+		auto& r = entity.Get<TransformComponent>().Rotation;
+		auto& s = entity.Get<TransformComponent>().Scale;
 
 		out << YAML::Key << "TrasformComponent" << YAML::BeginMap; // TransformComponent
 
-		out << YAML::Key << "Translation" << YAML::Value << tr;
-		out << YAML::Key << "Rotation"	  << YAML::Value << ro;
-		out << YAML::Key << "Scale"		  << YAML::Value << sc;
+		out << YAML::Key << "Translation" << YAML::Value << t;
+		out << YAML::Key << "Rotation"	  << YAML::Value << r;
+		out << YAML::Key << "Scale"		  << YAML::Value << s;
 
 		out << YAML::EndMap; // TransformComponent
 	}
@@ -254,33 +258,7 @@ void DeserializeEntity(YAML::Node entityNode, Ref<Scene> scene) {
 			mat.Diffuse = Texture::Create(path);
 		}
 
-		MeshComponent& mc = entity.Add<MeshComponent>(vertices, indices, mat);
-	}
-
-	auto rigidBodyComponentNode = components["RigidBodyComponent"];
-	if(rigidBodyComponentNode) {
-		auto rigidBodyNode = rigidBodyComponentNode["Body"];
-		auto typeStr   = rigidBodyNode["Type"].as<std::string>();
-		auto shapeTypeStr = rigidBodyNode["Shape Type"].as<std::string>();
-
-		RigidBody::Type type = (typeStr == "Static") ? RigidBody::Type::Static
-							 						 : RigidBody::Type::Dynamic;
-
-		Shape::Type shapeType;
-		if(shapeType == "Box")			shapeType = Shape::Type::Box;
-		else if(shapeType == "Sphere")	shapeType = Shape::Type::Sphere;
-		else if(shapeType == "Plane")	shapeType = Shape::Type::Plane;
-		else if(shapeType == "Capsule") shapeType = Shape::Type::Capsule;
-
-		// else if(shapeType == "ConvexMesh") {
-		// 	shapeType = Shape::Type::ConvexMesh;
-		// }
-		else if(shapeType == "TriangleMesh") {
-			Shape shape(entity.Get<MeshComponent>().Mesh);
-			body->SetShape(shape);
-		}
-
-		RigidBodyComponent& rc = entity.Add<RigidBodyComponent>(type, shape);
+		entity.Add<MeshComponent>(verts, indices, mat);
 	}
 
 	auto scriptComponentNode = components["ScriptComponent"];
@@ -311,6 +289,33 @@ void DeserializeEntity(YAML::Node entityNode, Ref<Scene> scene) {
 		tc.Rotation	   = rotationNode	.as<glm::vec3>();
 		tc.Scale	   = scaleNode		.as<glm::vec3>();
 	}
+
+	auto rigidBodyComponentNode = components["RigidBodyComponent"];
+	if(rigidBodyComponentNode) {
+		auto rigidBodyNode = rigidBodyComponentNode["Body"];
+		auto typeStr   = rigidBodyNode["Type"].as<std::string>();
+		auto shapeTypeStr = rigidBodyNode["Shape Type"].as<std::string>();
+
+		RigidBody::Type type = (typeStr == "Static") ? RigidBody::Type::Static
+							 						 : RigidBody::Type::Dynamic;
+		Shape::Type shapeType;
+		if(shapeTypeStr == "Box")		   shapeType = Shape::Type::Box;
+		if(shapeTypeStr == "Sphere")	   shapeType = Shape::Type::Sphere;
+		if(shapeTypeStr == "Plane")		   shapeType = Shape::Type::Plane;
+		if(shapeTypeStr == "Capsule")	   shapeType = Shape::Type::Capsule;
+		if(shapeTypeStr == "ConvexMesh")   shapeType = Shape::Type::ConvexMesh;
+		if(shapeTypeStr == "TriangleMesh") shapeType = Shape::Type::TriangleMesh;
+
+		if(shapeType != Shape::Type::ConvexMesh
+		&& shapeType != Shape::Type::TriangleMesh)
+		{
+			Shape shape(shapeType);
+			entity.Add<RigidBodyComponent>(type, shape);
+		}
+		else {
+			entity.Add<RigidBodyComponent>(type);
+		}
+	}
 }
 
 }
@@ -330,7 +335,7 @@ struct convert<glm::vec3> {
 	}
 
 	static bool decode(const Node& node, glm::vec3& v) {
-		if (!node.IsSequence() || node.size() != 3)
+		if(!node.IsSequence() || node.size() != 3)
 			return false;
 
 		v.x = node[0].as<float>();
@@ -353,7 +358,7 @@ struct convert<glm::vec4> {
 	}
 
 	static bool decode(const Node& node, glm::vec4& v) {
-		if (!node.IsSequence() || node.size() != 4)
+		if(!node.IsSequence() || node.size() != 4)
 			return false;
 
 		v.x = node[0].as<float>();
@@ -371,10 +376,14 @@ struct convert<VolcaniCore::Vertex> {
 		node.push_back(vertex.Position);
 		node.push_back(vertex.Normal);
 		node.push_back(vertex.TexCoord_Color);
+		node.SetStyle(EmitterStyle::Flow);
 		return node;
 	}
 
 	static bool decode(const Node& node, VolcaniCore::Vertex& vertex) {
+		if(!node.IsSequence() || node.size() != 3)
+			return false;
+
 		vertex.Position		  = node[0].as<glm::vec3>();
 		vertex.Normal		  = node[1].as<glm::vec3>();
 		vertex.TexCoord_Color = node[2].as<glm::vec4>();

@@ -11,12 +11,10 @@ public:
 	StereographicCamera();
 	StereographicCamera(float verticalFOV);
 	StereographicCamera(float verticalFOV,
-						uint32_t width, uint32_t height,
-						float near, float far, float rotation = 0.0f);
+						uint32_t width, uint32_t height, float near, float far);
 	~StereographicCamera() = default;
 
-	void SetProjection(float verticalFOV, float near, float far);
-
+	void SetVerticalFOV(float verticalFOV);
 	float GetVerticalFOV() const { return m_VerticalFOV; }
 
 private:

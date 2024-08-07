@@ -8,14 +8,9 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
-#include "Component.h"
+#include "ECS/Component.h"
 
-/* The Microsoft C++ compiler is non-compliant with the C++ standard and needs
-* the following definition to disable a security warning on std::strncpy().
-*/
-#ifdef _MSVC_LANG
-#define _CRT_SECURE_NO_WARNINGS
-#endif
+using namespace Magma::ECS;
 
 namespace Magma {
 
@@ -32,7 +27,7 @@ void SceneHierarchyPanel::SetContext(const Ref<Scene>& context) {
 	// m_SelectionContext = nullptr;
 }
 
-void SceneHierarchyPanel::SetSelectedEntity(Entity& entity) {
+void SceneHierarchyPanel::SetSelectedEntity(ECS::Entity& entity) {
 	// m_SelectionContext = &entity;
 }
 
@@ -64,7 +59,7 @@ void SceneHierarchyPanel::Render() {
 	// }
 }
 
-void SceneHierarchyPanel::DrawComponents(Entity& entity)
+void SceneHierarchyPanel::DrawComponents(ECS::Entity& entity)
 {
 	// if(entity.Has<TagComponent>()) {
 	// 	auto& tag = entity.Get<TagComponent>().Tag;
@@ -118,7 +113,7 @@ void SceneHierarchyPanel::DrawComponents(Entity& entity)
 	// });
 }
 
-void SceneHierarchyPanel::DrawEntityNode(Entity& entity) {
+void SceneHierarchyPanel::DrawEntityNode(ECS::Entity& entity) {
 	// auto& tag = entity.Get<TagComponent>().Tag;
 	
 	// ImGuiTreeNodeFlags flags;
@@ -162,7 +157,7 @@ void SceneHierarchyPanel::DisplayAddComponentEntry(const std::string& entryName)
 }
 
 template<typename TComponent, typename UIFunction>
-void SceneHierarchyPanel::DrawComponent(const std::string& name, Entity& entity,
+void SceneHierarchyPanel::DrawComponent(const std::string& name, ECS::Entity& entity,
 										UIFunction uiFunction)
 {
 	// if (!entity.Has<TComponent>())

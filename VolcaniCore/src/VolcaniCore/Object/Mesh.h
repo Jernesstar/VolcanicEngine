@@ -2,8 +2,8 @@
 
 #include <vector>
 
-#include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
 
 #include "Object/Texture.h"
 
@@ -39,8 +39,8 @@ public:
 
 	virtual ~Mesh() = default;
 
-	const std::vector<Vertex>& GetVertices() { return m_Vertices; }
-	const std::vector<uint32_t>& GetIndices() { return m_Indices; }
+	const std::vector<Vertex>& GetVertices() const { return m_Vertices; }
+	const std::vector<uint32_t>& GetIndices() const { return m_Indices; }
 	Material& GetMaterial() { return m_Material; }
 
 	template<typename TDerived>

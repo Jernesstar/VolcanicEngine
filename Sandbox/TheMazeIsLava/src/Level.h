@@ -35,6 +35,8 @@ public:
 
 	Ref<Scene> Load();
 
+	void Run(TimeStep ts);
+
 private:
 	void PropagateLava();
 	void TraverseTilemap(

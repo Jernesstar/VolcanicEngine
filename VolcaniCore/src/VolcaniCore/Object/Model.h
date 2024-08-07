@@ -12,7 +12,7 @@ public:
 	const std::string Path;
 
 	Model(const std::string& path);
-	virtual ~Model() = default;
+	~Model() = default;
 
 	std::vector<Ref<Mesh>>::const_iterator begin() const {
 		return m_Meshes.begin();

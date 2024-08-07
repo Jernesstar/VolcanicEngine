@@ -12,7 +12,7 @@ namespace Magma::ECS {
 
 class World {
 public:
-	World() = default;
+	World();
 	~World() = default;
 
 	void OnUpdate(TimeStep ts);
@@ -30,6 +30,8 @@ public:
 
 private:
 	flecs::world m_World;
+
+	flecs::query<> m_AllEntitiesQuery;
 };
 
 }

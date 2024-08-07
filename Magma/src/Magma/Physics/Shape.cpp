@@ -52,7 +52,7 @@ Shape::Shape(Shape::Type type)
 }
 
 Shape::Shape(const Shape& other)
-	: m_Type(other.Type)
+	: m_Type(other.m_Type)
 {
 	m_Shape = other.m_Shape;
 	m_Shape->acquireReference();

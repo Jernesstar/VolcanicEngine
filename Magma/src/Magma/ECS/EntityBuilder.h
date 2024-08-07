@@ -1,17 +1,16 @@
 #pragma once
 
-#include "Entity.h"
+#include "ECS/World.h"
 
 namespace Magma::ECS {
 
 class EntityBuilder {
 public:
-	EntityBuilder(ECS::World& world) {
-		m_Handle = world.entity();
+	EntityBuilder(World& world) {
+		m_Handle = world.AddEntity().GetHandle();
 	}
-	EntityBuilder(const std::string_view& tag) {
-		m_Handle = world.entity(tag);
-		Add<TagComponent>(tag);
+	EntityBuilder(World& world, const std::string& tag) {
+		m_Handle = world.AddEntity(tag).GetHandle();
 	}
 	~EntityBuilder() = default;
 
@@ -22,7 +21,7 @@ public:
 		return *this;
 	}
 
-	Entity Finalize() { return Entity{ m_Handle }; }
+	Entity Finalize() const { return Entity{ m_Handle }; }
 
 private:
 	flecs::entity m_Handle;

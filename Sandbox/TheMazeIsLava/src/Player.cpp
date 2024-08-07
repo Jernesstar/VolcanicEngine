@@ -6,10 +6,13 @@
 #include "GameState.h"
 
 using namespace VolcaniCore;
+using namespace Magma::Physics;
 
 namespace TheMazeIsLava {
 
-Player::Player() {
+Player::Player(ECS::World& world)
+	: Entity(world.AddEntity().GetHandle())
+{
 	Add<TransformComponent>();
 	// TODO:
 	// Add<MeshComponent>(GameState::PlayerModel1);
@@ -23,8 +26,8 @@ Player::Player() {
 				  -(Input::KeyPressed(Key::Down) || Input::KeyPressed(Key::S)));
 
 		tr.x += dx * 5.0f;
-		tr.t += dy * 5.0f
-	}
+		tr.t += dy * 5.0f;
+	};
 }
 
 }

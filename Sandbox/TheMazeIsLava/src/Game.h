@@ -38,6 +38,7 @@ private:
 	std::function<void(void)> m_CurrentScreen;
 	uint32_t m_CurrentLevel = 0;
 	bool m_ReturnPressed = false;
+	bool m_Paused = false;
 	bool m_GameOver = false;
 };
 

@@ -22,16 +22,18 @@ struct Component {
 struct MeshComponent : public Component {
 	Ref<VolcaniCore::Mesh> Mesh;
 
+	MeshComponent() = default;
 	MeshComponent(Ref<VolcaniCore::Mesh> mesh)
 		: Mesh(mesh) { }
+	MeshComponent(MeshPrimitive primitive, const Material& material) {
+		Mesh = Mesh::Create(primitive, material);
+	}
 	MeshComponent(const std::vector<VolcaniCore::Vertex>& vertices,
 				  const std::vector<uint32_t> indices, const Material& material)
 	{
 		Mesh = Mesh::Create(vertices, indices, material);
 	}
-	MeshComponent(MeshPrimitive primitive, const Material& material) {
-		Mesh = Mesh::Create(primitive, material);
-	}
+	MeshComponent(const MeshComponent& other) = default;
 };
 
 struct RigidBodyComponent : public Component {
@@ -40,25 +42,15 @@ struct RigidBodyComponent : public Component {
 	RigidBodyComponent() = default;
 	RigidBodyComponent(Ref<Physics::RigidBody> body)
 		: Body(body) { }
-	RigidBodyComponent(Rigid::Body::Type type, const Shape& shape) {
-		Body = RigidBody::Create(type, shape);
+	RigidBodyComponent(Physics::RigidBody::Type type) {
+		Body = Physics::RigidBody::Create(type);
+	}
+	RigidBodyComponent(Physics::RigidBody::Type type,
+					   const Physics::Shape& shape)
+	{
+		Body = Physics::RigidBody::Create(type, shape);
 	}
 	RigidBodyComponent(const RigidBodyComponent& other) = default;
-};
-
-// TODO: Keep like this for now, proper scripting later
-struct ScriptComponent : public Component {
-	// std::string Path;
-	
-	std::function<void(TransformComponent&)> OnInput;
-
-	ScriptComponent() = default;
-	ScriptComponent(const std::string_view& path)
-		: Path(path)
-	{
-		// ScriptLibrary::LoadScript(path);
-	}
-	ScriptComponent(const ScriptComponent& other) = default;
 };
 
 struct TagComponent : public Component {
@@ -81,7 +73,24 @@ struct TransformComponent : public Component {
 					   const glm::vec3& r,
 					   const glm::vec3& s)
 		: Translation(t), Rotation(r), Scale(s) { }
+	TransformComponent(const Transform& t)
+		: Translation(t.Translation), Rotation(t.Rotation), Scale(t.Scale) { }
 	TransformComponent(const TransformComponent& other) = default;
+};
+
+// TODO: Keep like this for now, proper scripting later
+struct ScriptComponent : public Component {
+	// std::string Path;
+	
+	std::function<void(TransformComponent&)> OnInput;
+
+	ScriptComponent() = default;
+	ScriptComponent(const std::string& path)
+		// : Path(path)
+	{
+		// ScriptLibrary::LoadScript(path);
+	}
+	ScriptComponent(const ScriptComponent& other) = default;
 };
 
 }

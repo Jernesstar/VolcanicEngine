@@ -1,5 +1,7 @@
 #pragma once
 
+using namespace Magma;
+
 namespace Demo {
 
 class ECS : public Application {
@@ -19,9 +21,10 @@ ECS::ECS() {
 			Application::Close();
 	});
 
-	auto& world = scene->GetEntityWorld().Get();
+	scene = CreateRef<Scene>();
+	auto& world = scene->GetEntityWorld();
 
-	ECS::Entity entity = ECS::EntityBuilder(world)
+	Magma::ECS::Entity entity = Magma::ECS::EntityBuilder(world)
 	.Add<TransformComponent>()
 	.Add<MeshComponent>(MeshPrimitive::Cube,
 		Material{
@@ -33,11 +36,20 @@ ECS::ECS() {
 	SceneSerializer::Serialize(scene, "Sandbox/assets/scenes/test.volc");
 	Ref<Scene> test
 		= SceneSerializer::Deserialize("Sandbox/assets/scenes/test.volc");
+	
+	test->GetEntityWorld()
+	.ForEach(
+	[](Entity& entity) {
+		for(auto& v : entity.Get<MeshComponent>().Mesh->GetVertices())
+			VOLCANICORE_LOG_INFO("Path: %f", v.TexCoord_Color.r);
+	});
+
+	VOLCANICORE_LOG_INFO("Success");
 }
 
 void ECS::OnUpdate(TimeStep ts) {
-	scene.OnUpdate(ts);
-	scene.OnRender();
+	scene->OnUpdate(ts);
+	scene->OnRender();
 }
 
 }

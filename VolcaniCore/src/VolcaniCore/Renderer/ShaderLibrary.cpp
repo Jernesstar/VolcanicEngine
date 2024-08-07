@@ -8,7 +8,7 @@ void ShaderLibrary::Init() {
 		{ "VolcaniCore/assets/shaders/Mesh.glsl.frag", ShaderType::Fragment }
 	});
 	s_Shaders["Framebuffer"] = ShaderPipeline::Create({
-		{ 
+		{
 			"VolcaniCore/assets/shaders/Framebuffer.glsl.vert",
 			ShaderType::Vertex
 		},

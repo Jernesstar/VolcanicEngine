@@ -1,24 +1,38 @@
 #include "Scene.h"
 
 #include <VolcaniCore/Renderer/Renderer3D.h>
+#include <VolcaniCore/Renderer/ShaderLibrary.h>
+#include <VolcaniCore/Renderer/StereographicCamera.h>
+
+#include "ECS/PhysicsSystem.h"
+
+using namespace Magma::ECS;
+using namespace Magma::Physics;
 
 namespace Magma {
 
 Scene::Scene(const std::string& name)
 	: Name(name)
 {
+	m_Camera = CreateRef<StereographicCamera>(75.0f);
+	m_Controller = CreateRef<CameraController>(m_Camera);
 	RegisterSystems();
 	RegisterObservers();
+
+	ShaderLibrary::Get("Mesh")->Bind();
 }
 
 void Scene::OnUpdate(TimeStep ts) {
 	m_EntityWorld.OnUpdate(ts);
+	m_Controller->OnUpdate(ts);
 }
 
 void Scene::OnRender() {
 	Renderer3D::Begin(m_Camera);
 
-	world.lookup("RenderSystem").get<flecs::System>()->run();
+	ShaderLibrary::Get("Mesh")->SetMat4("u_ViewProj", m_Camera->GetViewProjection());
+	ShaderLibrary::Get("Mesh")->SetVec3("u_CameraPosition", m_Camera->GetPosition());
+	m_RenderSys.run();
 
 	Renderer3D::End();
 }
@@ -27,17 +41,25 @@ void Scene::RegisterSystems() {
 	auto& world = m_EntityWorld.Get();
 
 	world
-	.system<ScriptComponent, TransformComponent>("InputUpdate")
+	.system<const ScriptComponent, TransformComponent>("InputUpdate")
 	.kind(flecs::PreUpdate)
 	.each(
 	[](const ScriptComponent& s, TransformComponent& t) {
 		s.OnInput(t);
 	});
+	world
+	.system<const TransformComponent, RigidBodyComponent>("RigidBodyUpdate")
+	.kind(flecs::PreUpdate)
+	.each(
+	[](const TransformComponent& t, RigidBodyComponent& r) {
+		r.Body->UpdateTransform({ t.Translation, t.Rotation, t.Scale });
+	});
 
 	world
 	.system("PhysicsUpdate")
 	.kind(flecs::OnUpdate)
-	.run([](flecs::iter& it) {
+	.run(
+	[&](flecs::iter& it) {
 		m_PhysicsWorld.OnUpdate(it.delta_time());
 	});
 
@@ -46,10 +68,13 @@ void Scene::RegisterSystems() {
 	.kind(flecs::PostUpdate)
 	.each(
 	[](const RigidBodyComponent& r, TransformComponent& t) {
-		t = r.Body->GetTransform();
+		Transform tr = r.Body->GetTransform();
+		t.Translation = tr.Translation;
+		t.Rotation	  = tr.Rotation;
+		t.Scale		  = tr.Scale;
 	});
 
-	world
+	m_RenderSys = world
 	.system<const TransformComponent, const MeshComponent>("RenderSystem")
 	.kind(0)
 	.each(
@@ -59,7 +84,13 @@ void Scene::RegisterSystems() {
 			.Rotation	 = t.Rotation,
 			.Scale		 = t.Scale
 		};
-		Renderer3D::DrawMesh(m.Mesh, tr);
+		auto mesh = m.Mesh;
+
+		Material& material = mesh->GetMaterial();
+
+		ShaderLibrary::Get("Mesh")->SetMat4("u_Model", tr);
+		ShaderLibrary::Get("Mesh")->SetTexture("u_Diffuse", material.Diffuse, 0);
+		Renderer3D::DrawMesh(mesh);
 	});
 }
 
@@ -70,14 +101,15 @@ void Scene::RegisterObservers() {
 	// Creating MeshComponent then RigidBodyComponent ==> tightly-fitting volume
 
 	world
-	.observer<RigidBodyComponent>("OnAddRigidBody")
-	.event(flecs::OnAdd)
+	.observer<RigidBodyComponent>("OnSetRigidBody")
+	.event(flecs::OnSet)
 	.each(
-	[](flecs::entity e, RigidBodyComponent& r) {
+	[&](flecs::entity e, RigidBodyComponent& r) {
 		Entity entity{ e };
 		// If the RigidBody was created without a shape,
 		// inherited the shape of the current mesh component
-		if(entity.Has<MeshComponent>() && !r.Body.HasShape()) {
+
+		if(entity.Has<MeshComponent>() && !r.Body->HasShape()) {
 			auto mesh = entity.Get<MeshComponent>().Mesh;
 			Shape shape(mesh);
 			r.Body->SetShape(shape);
@@ -89,8 +121,8 @@ void Scene::RegisterObservers() {
 				.Translation = t.Translation,
 				.Rotation	 = t.Rotation,
 				.Scale		 = t.Scale
-			}
-			r.Body->UpdateTransform(t)
+			};
+			r.Body->UpdateTransform(tr);
 		}
 
 		PhysicsSystem::Register(m_PhysicsWorld, entity);

@@ -4,9 +4,9 @@
 
 #include "Component.h"
 
-namespace Magma {
+namespace Magma::ECS {
 
-class Entity::ECS {
+class Entity {
 public:
 	Entity(flecs::entity handle)
 		: m_Handle(handle) { }
@@ -32,7 +32,8 @@ public:
 	template<typename TComponent, typename ...Args>
 	requires std::derived_from<TComponent, Component>
 	TComponent& Add(Args&&... args) {
-		return m_Handle.set<TComponent>(TComponent(std::forward<Args>(args)...));
+		m_Handle.set<TComponent>({ std::forward<Args>(args)... });
+		return Get<TComponent>();
 	}
 
 	template<typename TComponent>

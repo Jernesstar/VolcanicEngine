@@ -2,10 +2,12 @@
 
 #include <Renderer/Renderer3D.h>
 
+#include <Magma/ECS/EntityBuilder.h>
+
 #include "GameState.h"
 
 using namespace VolcaniCore;
-using namespace Magma;
+using namespace Magma::ECS;
 
 namespace TheMazeIsLava {
 
@@ -23,7 +25,7 @@ Level::~Level() {
 
 }
 
-void Level::Render(TimeStep ts) {
+void Level::Run(TimeStep ts) {
 	m_TimeStep = ts;
 	m_TimeSinceLevelStart += (float)ts;
 
@@ -41,16 +43,16 @@ Ref<Scene> Level::Load() {
 	auto& world = scene->GetEntityWorld();
 
 	TraverseTilemap(
-	[this](uint32_t x, uint32_t y) {
+	[&](uint32_t x, uint32_t y) {
 		ECS::Entity floor = ECS::EntityBuilder(world)
-		.Add<TransformComponent>({ .Translation = { x, 0.0f, y } })
+		.Add<TransformComponent>(Transform{ .Translation = { x, 0.0f, y } })
 		.Add<MeshComponent>(GameState::Wall)
 		.Finalize();
 
 		if(!IsWall(x, y)) return;
 
 		ECS::Entity wall = ECS::EntityBuilder(world)
-		.Add<TransformComponent>({ .Translation = { x, 1.0f, y } })
+		.Add<TransformComponent>(Transform{ .Translation = { x, 1.0f, y } })
 		.Add<MeshComponent>(GameState::Wall)
 		.Finalize();
 
@@ -58,7 +60,7 @@ Ref<Scene> Level::Load() {
 
 		// TODO: Staircase model
 		ECS::Entity stairs = ECS::EntityBuilder(world)
-		.Add<TransformComponent>({ .Translation = { x, 1.0f, y } })
+		.Add<TransformComponent>(Transform{ .Translation = { x, 1.0f, y } })
 		// .Add<MeshComponent>(GameState::StairModel)
 		.Finalize();
 	});

@@ -1,9 +1,7 @@
 #include "Button.h"
 
-#include <Renderer/RendererAPI.h>
 #include <Events/EventSystem.h>
 
-#include <OpenGL/Renderer.h>
 #include <OpenGL/Texture2D.h>
 
 using namespace VolcaniCore;
