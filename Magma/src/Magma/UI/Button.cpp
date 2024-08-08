@@ -13,17 +13,17 @@ static bool ButtonImage(Ref<UIElement>, ImVec2);
 
 static bool (*ButtonFunction)(Ref<UIElement>, ImVec2);
 
-Button::Button(const glm::vec4& color, Ref<Text> uiText)
-	: UIElement(UIType::Button, uiText->GetWidth(), uiText->GetHeight()),
+Button::Button(const glm::vec4& color, Ref<Text> text)
+	: UIElement(UIElement::Type::Button, text->GetWidth(), text->GetHeight()),
 		m_Color(color)
 {
-	Add(uiText);
+	Add(text);
 }
 
-Button::Button(Ref<Image> uiImage)
-	: UIElement(UIType::Button, uiImage->GetWidth(), uiImage->GetHeight())
+Button::Button(Ref<Image> image)
+	: UIElement(UIElement::Type::Button, image->GetWidth(), image->GetHeight())
 {
-	Add(uiImage);
+	Add(image);
 }
 
 void Button::Draw() {
@@ -40,7 +40,6 @@ void Button::Draw() {
 
 	ImGui::SetCursorPos(ImVec2(x, y));
 
-	// TODO: Fix bug where buttons sometimes doesn't respond
 	if(ButtonFunction(m_Display, ImVec2(m_Width, m_Height)))
 		OnPressed();
 	if(ImGui::IsItemDeactivated())
@@ -57,11 +56,11 @@ bool Button::OnAttach() {
 }
 
 bool Button::OnAddElement(Ref<UIElement> element) {
-	if(element->Type != UIType::Text && element->Type != UIType::Image)
-		return false;
+	if(element->GetType() != UIElement::Type::Text
+	&& element->GetType() != UIElement::Type::Image) return false;
 
 	m_Display = element;
-	hasText = element->Type == UIType::Text;
+	hasText = element->GetType() == UIElement::Type::Text;
 	hasImage = !hasText;
 
 	if(hasText)

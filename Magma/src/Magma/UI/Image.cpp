@@ -7,11 +7,11 @@ using namespace VolcaniCore;
 namespace Magma::UI {
 
 Image::Image(Ref<Texture> image)
-	: UIElement(UIType::Image, image->GetWidth(), image->GetHeight()),
+	: UIElement(UIElement::Type::Image, image->GetWidth(), image->GetHeight()),
 		m_Image(image) { }
 
 Image::Image(const std::string& imagePath)
-	: UIElement(UIType::Image)
+	: UIElement(UIElement::Type::Image)
 {
 	m_Image = Texture::Create(imagePath);
 	m_Width = m_Image->GetWidth();
@@ -26,7 +26,7 @@ void Image::Draw() {
 }
 
 bool Image::OnAttach() {
-	if(m_Parent->Type == UIType::Button)
+	if(m_Parent->GetType() == UIElement::Type::Button)
 		return false; // The button captures the image
 
 	return true;

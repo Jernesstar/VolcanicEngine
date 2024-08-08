@@ -40,8 +40,7 @@ void GameState::InitAssets() {
 }
 
 void GameState::InitUI() {
-	// TODO: Add a UI::UIElement::Create(UIElementDescripition) function
-	EmptyUI = CreateRef<UI::Empty>();
+	EmptyUI = UI::Empty::Create();
 	HomeUI = CreateRef<UI::Window>(
 		600, 400, glm::vec4{ 0.859375f, 0.76171875f, 0.5859375f, 1.0f },
 		10, 20, glm::vec4{ 0.3125f, 0.234375f, 0.078125f, 1.0f }

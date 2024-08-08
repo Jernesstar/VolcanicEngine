@@ -39,7 +39,7 @@ void RigidBody::SetShape(const Shape& shape) {
 	m_ShapeType = shape.GetType();
 }
 
-// TODO: Scaled transforms
+// TODO(Fix): Scaled transforms
 
 void RigidBody::UpdateTransform() {
 	PxTransform pose = m_Actor->getGlobalPose();

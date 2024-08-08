@@ -64,8 +64,8 @@ void Game::StartScreen() {
 void Game::LevelScreen() {
 	// Staircase like level selection
 
-	// TODO:
-	// DrawStairs();
+	// TODO(Implement):
+	// DrawLevelVisualizer();
 
 	uint32_t level;
 	if((level = GameState::GetSelectedLevel()) == 0)

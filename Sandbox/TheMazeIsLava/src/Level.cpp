@@ -58,7 +58,7 @@ Ref<Scene> Level::Load() {
 
 		if(!IsGoal(x, y)) return;
 
-		// TODO: Staircase model
+		// TODO(Implement): Staircase model
 		ECS::Entity stairs = ECS::EntityBuilder(world)
 		.Add<TransformComponent>(Transform{ .Translation = { x, 1.0f, y } })
 		// .Add<MeshComponent>(GameState::StairModel)
@@ -76,24 +76,20 @@ void Level::TraverseTilemap(
 			func(j, i);
 }
 
-bool Level::IsCheckpoint(uint32_t col, uint32_t row) {
-	return m_Tilemap[row][col] == 4; // TODO: New numbering system
+bool Level::IsWall(uint32_t col, uint32_t row) {
+	return m_Tilemap[row][col] == 0;
 }
-
 bool Level::IsPath(uint32_t col, uint32_t row) {
 	return m_Tilemap[row][col] == 1;
 }
-
 bool Level::IsLava(uint32_t col, uint32_t row) {
 	return m_Tilemap[row][col] == 2;
 }
-
-bool Level::IsGoal(uint32_t col, uint32_t row) {
+bool Level::IsCheckpoint(uint32_t col, uint32_t row) {
 	return m_Tilemap[row][col] == 3;
 }
-
-bool Level::IsWall(uint32_t col, uint32_t row) {
-	return m_Tilemap[row][col] == 0;
+bool Level::IsGoal(uint32_t col, uint32_t row) {
+	return m_Tilemap[row][col] == 4;
 }
 
 }

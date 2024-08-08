@@ -42,6 +42,7 @@ using namespace Magma::Physics;
 
 #include "Demos/Template.h"
 #include "Demos/Cube.h"
+#include "Demos/UI.h"
 #include "Demos/Lighting.h"
 #include "Demos/Shadows.h"
 #include "Demos/ECS.h"
@@ -57,6 +58,7 @@ Application* CreateApplication(const CommandLineArgs& args) {
 	Physics::Init();
 
 	if(project == "Cube")	   return new Demo::Cube();
+	if(project == "UI")		   return new Demo::UI();
 	if(project == "Lighting")  return new Demo::Lighting();
 	if(project == "Shadows")   return new Demo::Shadows();
 	if(project == "ECS")	   return new Demo::ECS();

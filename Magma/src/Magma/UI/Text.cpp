@@ -8,7 +8,7 @@ namespace Magma::UI {
 
 
 Text::Text(const std::string& text, const glm::vec4& color)
-	: UIElement(UIType::Text), m_Text(text), m_Color(color) { }
+	: UIElement(UIElement::Type::Text), m_Text(text), m_Color(color) { }
 
 void Text::Draw() {
 	ImGui::PushStyleColor(ImGuiCol_Text,
@@ -29,7 +29,7 @@ void Text::Draw() {
 }
 
 bool Text::OnAttach() {
-	if(m_Parent->Type == UIType::Button)
+	if(m_Parent->GetType() == UIElement::Type::Button)
 		return false; // The button captures the text
 
 	return true;

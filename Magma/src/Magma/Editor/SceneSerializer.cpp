@@ -101,7 +101,7 @@ Ref<Scene> SceneSerializer::Deserialize(const std::string& filePath) {
 	auto scene = file["Scene"];
 	auto camera = scene["Camera"];
 
-	// TODO: MAGMA_ASSERT
+	// TODO(Implement): MAGMA_ASSERT
 
 	VOLCANICORE_ASSERT(scene);
 	VOLCANICORE_ASSERT(camera);

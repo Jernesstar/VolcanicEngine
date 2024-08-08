@@ -52,7 +52,7 @@ protected:
 	PxRigidActor* m_Actor;
 
 	RigidBody::Type m_Type;
-	Transform m_Transform; // TODO: Remove this?
+	Transform m_Transform;
 
 	Shape::Type m_ShapeType;
 	bool m_HasShape = false;

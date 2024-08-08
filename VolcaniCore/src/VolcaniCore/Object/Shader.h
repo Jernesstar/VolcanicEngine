@@ -47,7 +47,7 @@ public:
 	virtual void SetTexture(const std::string& name, Ref<Texture> texture,
 							uint32_t slot) = 0;
 
-	// TODO: Implement
+	// TODO(Implement):
 	// template<typename T>
 	// virtual void SetUniformBuffer(const std::string& name,
 									//  Ref<UniformBuffer<T>> buffer) = 0;

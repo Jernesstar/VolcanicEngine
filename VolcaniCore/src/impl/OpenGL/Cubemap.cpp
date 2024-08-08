@@ -15,13 +15,11 @@ namespace VolcaniCore::OpenGL {
 std::vector<std::filesystem::path> GetImagePaths(const std::string& folder)
 {
 	std::vector<std::filesystem::path> paths;
-	for(const auto& path :
-		FileUtils::GetFiles(folder, { "png", "jpg", "jpeg" }))
+	for(auto path : FileUtils::GetFiles(folder, { "png", "jpg", "jpeg" }))
 	{
 		paths.push_back(path);
 
-		if(paths.size() == 6)
-			break;
+		if(paths.size() == 6) break;
 	}
 
 	if(paths.size() < 6)
@@ -40,9 +38,9 @@ Cubemap::Cubemap(const std::string& cubemap_folder)
 	std::vector<std::filesystem::path> faces = GetImagePaths(cubemap_folder);
 	std::unordered_map<std::string, int> map =
 	{
-		{ "right", 0 }, { "left", 1 },
-		{ "top", 2 }, { "bottom", 3 },
-		{ "front", 4 }, { "back", 5 }
+		{ "right", 0 }, { "left",	1 },
+		{ "top",   2 }, { "bottom", 3 },
+		{ "front", 4 }, { "back",	5 }
 	};
 
 	for(auto& face : faces)

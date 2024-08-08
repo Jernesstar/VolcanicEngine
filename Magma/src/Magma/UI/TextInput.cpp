@@ -10,7 +10,7 @@ using namespace VolcaniCore;
 namespace Magma::UI {
 
 TextInput::TextInput(uint32_t maxChars)
-	: UIElement(UIType::TextInput), MaxCharCount(maxChars), m_Text("")
+	: UIElement(UIElement::Type::TextInput), MaxCharCount(maxChars), m_Text("")
 {
 
 }

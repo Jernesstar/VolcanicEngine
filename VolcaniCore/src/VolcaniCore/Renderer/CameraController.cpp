@@ -61,7 +61,7 @@ void CameraController::OnUpdate(TimeStep ts)
 
 		glm::quat q = glm::cross(glm::angleAxis(-pitch_delta, rightDir),
 								 glm::angleAxis(-yaw_delta, upDir));
-		m_Camera->ForwardDirection = glm::rotate(glm::normalize(q), forwardDir);
+		m_Camera->Direction = glm::rotate(glm::normalize(q), forwardDir);
 		moved = true;
 	}
 

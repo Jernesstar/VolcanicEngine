@@ -12,7 +12,7 @@ public:
 
 public:
 	const std::string Name;
-	// TODO: Handles.
+	// TODO(Implement): Handles.
 	// eg. { "a_SomeProperty", [](Ref<TAnything> anything) { return anything.Something } }
 
 public:

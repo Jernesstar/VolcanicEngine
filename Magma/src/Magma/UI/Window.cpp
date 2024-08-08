@@ -8,7 +8,7 @@ namespace Magma::UI {
 Window::Window(uint32_t width, uint32_t height, const glm::vec4& bgColor,
 			   uint32_t borderWidth, uint32_t borderHeight,
 			   const glm::vec4& borderColor)
-	: UIElement(UIType::Window, width, height),
+	: UIElement(UIElement::Type::Window, width, height),
 		m_BackgroundColor(bgColor), m_BorderColor(borderColor),
 		m_BorderWidth(borderWidth), m_BorderHeight(borderHeight)
 {
@@ -53,7 +53,7 @@ void Window::Draw() {
 }
 
 bool Window::OnAttach() {
-	return false; // TODO: For now; more complex docking behavior to come
+	return false; // TODO(Implement): More complex docking behavior
 }
 
 // TODO: Reposition the element within the window

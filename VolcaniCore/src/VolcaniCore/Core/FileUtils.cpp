@@ -17,9 +17,8 @@ void FileUtils::CreateFile(const std::string& path) {
 	std::ofstream { path.c_str() };
 }
 
-std::vector<std::string> FileUtils::GetFiles(const std::string& dir,
-											 const std::vector<std::string>&
-											 						 extensions)
+std::vector<std::string> FileUtils::GetFiles(
+	const std::string& dir, const std::vector<std::string>& extensions)
 {
 	std::vector<std::string> files;
 	for(auto p : std::filesystem::directory_iterator(dir.c_str())) {

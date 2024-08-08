@@ -77,7 +77,7 @@ void Framebuffer::CreateColorAttachment(Attachment& attachment) {
 								GL_TEXTURE_2D, attachment.m_RendererID, 0);
 	}
 	else if(attachment.Type == AttachmentType::RenderBuffer) {
-		// TODO: Implement
+		// TODO(Implement):
 	}
 }
 
@@ -115,13 +115,13 @@ void Framebuffer::CreateDepthAttachment(Attachment& attachment) {
 			}
 		}
 		else {
-			// TODO: Implement
+			// TODO(Implement):
 		}
 	}
 }
 
 void Framebuffer::CreateStencilAttachment(Attachment& attachment) {
-	// TODO: Implement
+	// TODO(Implement):
 }
 
 Framebuffer::~Framebuffer() {

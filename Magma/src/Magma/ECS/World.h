@@ -25,7 +25,7 @@ public:
 
 	void ForEach(const std::function<void(Entity& entity)>& func);
 
-	// TODO: Queries
+	// TODO(Implement): Queries
 	flecs::world& Get() { return m_World; }
 
 private:

@@ -3,6 +3,7 @@
 #include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
 
+#include <Core/Defines.h>
 #include <Core/Assert.h>
 
 namespace VolcaniCore {
@@ -12,13 +13,17 @@ public:
 	enum class Type { Ortho, Stereo };
 
 public:
+	static Ref<Camera> Create(Camera::Type type);
+	static Ref<Camera> Create(Camera::Type type, float fov_rotation);
+
+public:
 	Camera(Camera::Type type)
 		: m_Type(type) { }
 
 	Camera(Camera::Type type,
 			uint32_t width, uint32_t height, float near, float far)
-		: m_Type(type), m_ViewportWidth(width), m_ViewportHeight(height),
-			m_Near(near), m_Far(far)
+		: m_Type(type), ViewportWidth(width), ViewportHeight(height),
+			Near(near), Far(far)
 	{
 		VOLCANICORE_ASSERT(width != 0 && height != 0,
 							"Viewport width and height must not be 0");
@@ -30,7 +35,7 @@ public:
 	Camera::Type GetType() { return m_Type; }
 
 	void Resize(uint32_t width, uint32_t height) {
-		if(width == m_ViewportWidth && height == m_ViewportHeight) {
+		if(width == ViewportWidth && height == ViewportHeight) {
 			VOLCANICORE_LOG_WARNING("Viewport is already this size!");
 			return;
 		}
@@ -39,23 +44,25 @@ public:
 			return;
 		}
 
-		m_ViewportWidth = width;
-		m_ViewportHeight = height;
+		ViewportWidth = width;
+		ViewportHeight = height;
 		CalculateProjection();
 	}
 
 	void SetProjection(float near, float far) {
-		if(near == m_Near && far == m_Far) {
-			VOLCANICORE_LOG_WARNING("Projection is already this size!");
+		if(near == Near && far == Far) {
+			VOLCANICORE_LOG_WARNING(
+				"[SetProjection]: Projection is already configured as such!");
 			return;
 		}
 		if(near == 0 || far == 0) {
-			VOLCANICORE_LOG_WARNING("Near and far clips may not be 0");
+			VOLCANICORE_LOG_WARNING(
+				"[SetProjection]: Near and far clips may not be 0");
 			return;
 		}
 	
-		m_Near = near;
-		m_Far = far;
+		Near = near;
+		Far = far;
 		CalculateProjection();
 	}
 
@@ -64,44 +71,41 @@ public:
 		CalculateView();
 	}
 	void SetDirection(const glm::vec3& direction) {
-		ForwardDirection = direction;
+		Direction = direction;
 		CalculateView();
 	}
 	void SetPositionDirection(const glm::vec3& position,
 							  const glm::vec3& direction)
 	{
 		Position = position;
-		ForwardDirection = direction;
+		Direction = direction;
 		CalculateView();
 	}
 
 	const glm::vec3& GetPosition() const { return Position; }
-	const glm::vec3& GetDirection() const { return ForwardDirection; }
+	const glm::vec3& GetDirection() const { return Direction; }
 
 	const glm::mat4& GetView()           const { return View; }
 	const glm::mat4& GetProjection()     const { return Projection; }
 	const glm::mat4& GetViewProjection() const { return ViewProjection; }
 
-	float GetViewportWidth() const { return m_ViewportWidth; }
-	float GetViewportHeight() const { return m_ViewportHeight; }
-	float GetNear() const { return m_Near; }
-	float GetFar()	const { return m_Far; }
+	float GetViewportWidth() const { return ViewportWidth; }
+	float GetViewportHeight() const { return ViewportHeight; }
+	float GetNear() const { return Near; }
+	float GetFar()	const { return Far; }
 
 	template<typename TDerived>
 	requires std::derived_from<TDerived, Camera>
 	TDerived* As() const { return (TDerived*)(this); }
 
 protected:
-	const Camera::Type m_Type;
+	glm::vec3 Position	= { 0.0f, 0.0f, 0.0f };
+	glm::vec3 Direction = { 0.0f, 0.0f, -1.0f };
 
-	// TODO: Consistent naming conventions?
-	glm::vec3 Position = { 0.0f, 0.0f, 0.0f };
-	glm::vec3 ForwardDirection = { 0.0f, 0.0f, -1.0f };
-
-	float m_Near = 0.1f;
-	float m_Far	 = 100.0f;
-	uint32_t m_ViewportWidth  = 800;
-	uint32_t m_ViewportHeight = 600;
+	float Near = 0.1f;
+	float Far  = 1000.0f;
+	uint32_t ViewportWidth  = 800;
+	uint32_t ViewportHeight = 600;
 
 	glm::mat4 Projection{ 1.0f };
 	glm::mat4 InverseProjection{ 1.0f };
@@ -109,8 +113,12 @@ protected:
 	glm::mat4 InverseView{ 1.0f };
 	glm::mat4 ViewProjection{ 1.0f };
 
+protected:
 	virtual void CalculateView() = 0;
 	virtual void CalculateProjection() = 0;
+
+private:
+	const Camera::Type m_Type;
 
 	friend class CameraController;
 };

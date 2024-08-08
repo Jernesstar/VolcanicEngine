@@ -18,7 +18,7 @@ public:
 			glm::cos(glm::radians(45.0f))
 		};
 
-		ForwardDirection = r * glm::normalize(
+		Direction = r * glm::normalize(
 								glm::vec3{
 									// 0.0f, 0.0f,
 									-glm::sin(glm::radians(45.0f)),
@@ -35,18 +35,18 @@ public:
 private:
 	void CalculateProjection() override {
 		glm::vec3 up = { 0.0f, 1.0f, 0.0f };
-		View = glm::lookAt(Position, Position + ForwardDirection, up);
+		View = glm::lookAt(Position, Position + Direction, up);
 		ViewProjection = Projection * View;
 	}
 	void CalculateView() override {
 		Projection = glm::perspectiveFov(glm::radians(75.0f),
 										 (float)m_ViewportWidth,
 										 (float)m_ViewportHeight,
-										 m_Near, m_Far);
+										 Near, Far);
 
 		Projection = glm::ortho(-m_ViewportWidth/2.0f, m_ViewportWidth/2.0f,
 								-m_ViewportHeight/2.0f, m_ViewportHeight/2.0f,
-								m_Near, m_Far);
+								Near, Far);
 
 		ViewProjection = Projection * View;
 	}

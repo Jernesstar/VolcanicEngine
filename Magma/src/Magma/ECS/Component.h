@@ -78,7 +78,6 @@ struct TransformComponent : public Component {
 	TransformComponent(const TransformComponent& other) = default;
 };
 
-// TODO: Keep like this for now, proper scripting later
 struct ScriptComponent : public Component {
 	// std::string Path;
 	

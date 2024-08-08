@@ -9,7 +9,7 @@ using namespace VolcaniCore;
 namespace Magma::UI {
 
 // UIElement::UIElement()
-// 	: UIElement(UIType::Type)
+// 	: UIElement(UIElement::Type::Type)
 // {
 
 // }
@@ -26,7 +26,7 @@ namespace Magma::UI {
 
 // }
 
-UIElement::UIElement(UIType type, uint32_t width, uint32_t height,
+UIElement::UIElement(UIElement::Type type, uint32_t width, uint32_t height,
 					 float x, float y, Ref<UIElement> parent)
 	: Type(type), m_Width(width), m_Height(height), x(x), y(y),
 		m_Parent(parent.get()) { }
@@ -55,7 +55,7 @@ void UIElement::Render() {
 	for(auto& child : m_Children)
 		child->Render();
 
-	if(this->Type == UIType::Window)
+	if(this->GetType() == UIElement::Type::Window)
 		ImGui::End();
 }
 

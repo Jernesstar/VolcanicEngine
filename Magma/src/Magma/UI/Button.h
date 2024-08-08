@@ -23,13 +23,13 @@ public:
 
 	Button(const glm::vec4& color, const std::string& text,
 		   const glm::vec4& textColor = glm::vec4(1.0f))
-		: UIElement(UIType::Button), m_Color(color)
+		: UIElement(UIElement::Type::Button), m_Color(color)
 	{
 		Add(CreateRef<UI::Text>(text, textColor));
 	}
 
 	Button(const std::string& imagePath)
-		: UIElement(UIType::Button)
+		: UIElement(UIElement::Type::Button)
 	{
 		Add(CreateRef<UI::Image>(imagePath));
 	}

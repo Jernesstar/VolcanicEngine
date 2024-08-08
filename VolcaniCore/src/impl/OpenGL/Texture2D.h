@@ -8,14 +8,6 @@
 
 namespace VolcaniCore::OpenGL {
 
-// TODO:
-    //    GLenum format;
-    //     if (nrComponents == 1)
-    //         format = GL_RED;
-    //     else if (nrComponents == 3)
-    //         format = GL_RGB;
-    //     else if (nrComponents == 4)
-    //         format = GL_RGBA;
 class Texture2D : public VolcaniCore::Texture {
 public:
 	const uint32_t InternalFormat, DataFormat;

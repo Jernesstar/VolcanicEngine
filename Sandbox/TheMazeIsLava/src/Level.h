@@ -26,7 +26,7 @@ public:
 	// of the time elapsed since the level started
 	// const std::function<float(float t)> LavaSpeed;
 
-	// TODO: Checkpoints
+	// TODO(Implement): Checkpoints
 public:
 	Level(const std::string& name, std::vector<std::vector<uint32_t>> map);
 	~Level();
@@ -42,11 +42,11 @@ private:
 	void TraverseTilemap(
 			const std::function<void(uint32_t x, uint32_t y)>& func);
 
-	bool IsCheckpoint(uint32_t col, uint32_t row);
+	bool IsWall(uint32_t col, uint32_t row);
 	bool IsPath(uint32_t col, uint32_t row);
 	bool IsLava(uint32_t col, uint32_t row);
+	bool IsCheckpoint(uint32_t col, uint32_t row);
 	bool IsGoal(uint32_t col, uint32_t row);
-	bool IsWall(uint32_t col, uint32_t row);
 
 	TimeStep m_TimeStep;
 	float m_TimeSinceLevelStart;

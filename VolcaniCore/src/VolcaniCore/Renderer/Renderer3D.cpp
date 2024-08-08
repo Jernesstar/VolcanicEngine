@@ -80,8 +80,8 @@ void Renderer3D::DrawQuad(Ref<Quad> quad,
 void Renderer3D::DrawQuad(Ref<Quad> quad,
 						  const glm::mat4& transform)
 {
-	// TODO: Continue implementing
-	DrawMesh(Mesh::Create(MeshPrimitive::Quad), transform);
+	// TODO(Implement): Mesh::Create(MeshPrimitive, const std::vector<glm::vec4>& color_per_vertex)
+	// DrawMesh(Mesh::Create(MeshPrimitive::Quad, quad->Color), transform);
 }
 
 void Renderer3D::DrawPoint(const Point& point,
@@ -93,7 +93,7 @@ void Renderer3D::DrawPoint(const Point& point,
 void Renderer3D::DrawPoint(const Point& point,
 						   const glm::mat4& transform)
 {
-	// TODO: Implement
+	// TODO(Implement)
 }
 
 void Renderer3D::DrawLine(const Line& line,
@@ -105,7 +105,7 @@ void Renderer3D::DrawLine(const Line& line,
 void Renderer3D::DrawLine(const Line& line,
 						  const glm::mat4& transform)
 {
-	// TODO: Implement
+	// TODO(Implement)
 }
 
 void Renderer3D::DrawQuad(Ref<Texture> texture,
@@ -141,7 +141,7 @@ void Renderer3D::DrawText(Ref<Text> text,
 void Renderer3D::DrawText(Ref<Text> text,
 						  const glm::mat4& transform)
 {
-	// TODO: Implement
+	// TODO(Implement)
 }
 
 }
