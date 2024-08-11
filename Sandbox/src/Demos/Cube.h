@@ -78,8 +78,10 @@ Cube::Cube() {
 		{ "VolcaniCore/assets/shaders/Mesh.glsl.vert", ShaderType::Vertex },
 		{ "VolcaniCore/assets/shaders/Mesh.glsl.frag", ShaderType::Fragment }
 	});
+	Ref<Framebuffer> framebuffer = CreateRef<OpenGL::Framebuffer>(200, 150);
 
 	renderPass = RenderPass::Create("Render Pass", shader);
+	renderPass->SetOutput(framebuffer);
 
 	cube = Mesh::Create(MeshPrimitive::Cube,
 		Material{
@@ -106,6 +108,8 @@ void Cube::OnUpdate(TimeStep ts) {
 		Renderer3D::End();
 	}
 	Renderer::EndPass();
+
+	RendererAPI::Get()->RenderFramebuffer(framebuffer, AttachmentTarget::Color);
 }
 
 }

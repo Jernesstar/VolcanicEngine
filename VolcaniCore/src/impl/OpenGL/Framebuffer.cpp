@@ -27,7 +27,20 @@ uint32_t Attachment::GetRendererID() const {
 Framebuffer::Framebuffer(uint32_t width, uint32_t height)
 	: VolcaniCore::Framebuffer(width, height)
 {
+	glGenFramebuffers(1, &m_BufferID);
+	glBindFramebuffer(GL_FRAMEBUFFER, m_BufferID);
 
+	m_Attachments.insert({ AttachmentTarget::Color,
+		Attachment{ AttachmentTarget::Color, AttachmentType::Texture } });
+	m_Attachments.insert({ AttachmentTarget::Depth,
+		Attachment{ AttachmentTarget::Depth, AttachmentType::Texture } });
+
+	CreateColorAttachment(m_Attachments[AttachmentTarget::Color]);
+	CreateDepthAttachment(m_Attachments[AttachmentTarget::Depth]);
+
+	VOLCANICORE_ASSERT(
+		glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 Framebuffer::Framebuffer(uint32_t width, uint32_t height,
