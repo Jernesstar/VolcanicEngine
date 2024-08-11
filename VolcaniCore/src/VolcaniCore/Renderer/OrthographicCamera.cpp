@@ -46,8 +46,8 @@ void OrthographicCamera::CalculateView() {
 }
 
 void OrthographicCamera::CalculateProjection() {
-	Projection = glm::ortho(-m_ViewportWidth  / 2.0f, m_ViewportWidth  / 2.0f,
-							-m_ViewportHeight / 2.0f, m_ViewportHeight / 2.0f,
+	Projection = glm::ortho(-ViewportWidth  / 2.0f, ViewportWidth  / 2.0f,
+							-ViewportHeight / 2.0f, ViewportHeight / 2.0f,
 							Near, Far);
 	ViewProjection = Projection * View;
 }

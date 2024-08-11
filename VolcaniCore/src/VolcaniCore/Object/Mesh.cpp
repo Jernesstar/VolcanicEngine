@@ -10,7 +10,7 @@ Ref<Mesh> Mesh::Create(const std::vector<Vertex>& vertices,
 					   const std::vector<uint32_t>& indices,
 					   const Material& material)
 {
-	RendererAPI::Backend backend = RendererAPI::Get()->Backend;
+	RendererAPI::Backend backend = RendererAPI::GetBackend();
 
 	switch(backend) {
 		case RendererAPI::Backend::OpenGL:

@@ -145,7 +145,7 @@ enum Key : KeyCode {
 	Shift = LeftShift + RightShift,
 	Alt   = LeftAlt   + RightAlt,
 
-	Invalid = 0;
+	Invalid = 0
 };
 
 using MouseCode = uint8_t;

@@ -24,8 +24,10 @@ std::vector<std::string> FileUtils::GetFiles(
 	for(auto p : std::filesystem::directory_iterator(dir.c_str())) {
 		for(auto ext : extensions)
 			if(p.path().extension() == ext)
-				files.push_back(p.path());
+				files.push_back(p.path().string());
 	}
+
+	return files;
 }
 
 std::string FileUtils::ReadFile(const std::string& file_path) {

@@ -7,7 +7,7 @@
 namespace VolcaniCore {
 
 Ref<Texture> Texture::Create(uint32_t width, uint32_t height) {
-	RendererAPI::Backend backend = RendererAPI::Get()->Backend;
+	RendererAPI::Backend backend = RendererAPI::GetBackend();
 
 	switch(backend) {
 		case RendererAPI::Backend::OpenGL:
@@ -17,7 +17,7 @@ Ref<Texture> Texture::Create(uint32_t width, uint32_t height) {
 }
 
 Ref<Texture> Texture::Create(const std::string& path) {
-	RendererAPI::Backend backend = RendererAPI::Get()->Backend;
+	RendererAPI::Backend backend = RendererAPI::GetBackend();
 
 	switch(backend) {
 		case RendererAPI::Backend::OpenGL:

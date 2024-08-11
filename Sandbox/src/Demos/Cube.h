@@ -11,7 +11,7 @@ public:
 	IsometricCamera()
 		: Camera(Camera::Type::Ortho)
 	{
-		float r = 1.0f;
+		float r = 4.0f;
 		Position = r * glm::vec3{
 			glm::sin(glm::radians(45.0f)),
 			glm::sin(glm::radians(35.264f)),
@@ -21,9 +21,9 @@ public:
 		Direction = r * glm::vec3{
 			// 0.0f, 0.0f,
 			-glm::sin(glm::radians(45.0f)),
-			-glm::sin(glm::radians(90.0f - 35.254f)),
-			-1.0f
-		}
+			-glm::sin(glm::radians(35.254f)),
+			-glm::cos(glm::radians(45.0f))
+		};
 
 		CalculateProjection();
 		CalculateView();
@@ -32,20 +32,19 @@ public:
 
 private:
 	void CalculateProjection() override {
-		// Projection = glm::perspectiveFov(glm::radians(75.0f),
-		// 								 (float)m_ViewportWidth,
-		// 								 (float)m_ViewportHeight,
-		// 								 Near, Far);
+		Projection = glm::perspectiveFov(glm::radians(75.0f),
+										 (float)ViewportWidth,
+										 (float)ViewportHeight,
+										 Near, Far);
 
-		Projection = glm::ortho(-m_ViewportWidth / 2.0f, m_ViewportWidth  / 2.0f,
-								-m_ViewportHeight/ 2.0f, m_ViewportHeight / 2.0f,
+		Projection = glm::ortho(-ViewportWidth / 2.0f, ViewportWidth  / 2.0f,
+								-ViewportHeight/ 2.0f, ViewportHeight / 2.0f,
 								Near, Far);
+		ViewProjection = Projection * View;
 	}
 	void CalculateView() override {
 		glm::vec3 up = { 0.0f, 1.0f, 0.0f };
 		View = glm::lookAt(Position, Position + Direction, up);
-		ViewProjection = Projection * View;
-
 		ViewProjection = Projection * View;
 	}
 };
@@ -59,6 +58,7 @@ public:
 private:
 	Ref<ShaderPipeline> shader;
 	Ref<RenderPass> renderPass;
+	Ref<Framebuffer> framebuffer;
 
 	Ref<Mesh> torch;
 	Ref<Mesh> cube;
@@ -78,7 +78,7 @@ Cube::Cube() {
 		{ "VolcaniCore/assets/shaders/Mesh.glsl.vert", ShaderType::Vertex },
 		{ "VolcaniCore/assets/shaders/Mesh.glsl.frag", ShaderType::Fragment }
 	});
-	Ref<Framebuffer> framebuffer = CreateRef<OpenGL::Framebuffer>(200, 150);
+	framebuffer = CreateRef<OpenGL::Framebuffer>(200, 150);
 
 	renderPass = RenderPass::Create("Render Pass", shader);
 	renderPass->SetOutput(framebuffer);
@@ -88,9 +88,9 @@ Cube::Cube() {
 			.Diffuse = Texture::Create("Sandbox/assets/images/wood.png")
 		});
 
-	camera = CreateRef<StereographicCamera>(75.0f);
+	// camera = CreateRef<StereographicCamera>(75.0f);
 	// camera = CreateRef<OrthographicCamera>(800, 600, 0.1f, 100.0f);
-	// camera = CreateRef<IsometricCamera>();
+	camera = CreateRef<IsometricCamera>();
 	// controller = CreateRef<CameraController>(camera);
 }
 

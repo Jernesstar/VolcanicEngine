@@ -9,7 +9,7 @@ public:
 	void OnUpdate(TimeStep ts);
 
 private:
-	Ref<UIElement> Root;
+	Ref<Magma::UI::UIElement> Root;
 };
 
 UI::UI() {
@@ -19,7 +19,7 @@ UI::UI() {
 			Application::Close();
 	});
 
-	Root = UIElement::Create()
+	// Root = Magma::UI::UIElement::Create();
 }
 
 void UI::OnUpdate(TimeStep ts) {

@@ -27,7 +27,7 @@ void CameraController::OnUpdate(TimeStep ts)
 	glm::vec3 rightDir = glm::cross(forwardDir, upDir);
 
 	bool moved = false;
-	glm::ivec3 xyz;
+	glm::vec3 xyz;
 	if(xyz.x = Input::KeyPressed(Controls[Control::Right])
 			 - Input::KeyPressed(Controls[Control::Left]))
 	{

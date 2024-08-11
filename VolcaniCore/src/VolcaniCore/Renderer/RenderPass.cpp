@@ -9,7 +9,7 @@ Ref<RenderPass> RenderPass::Create(const std::string& name,
 	return CreateRef<RenderPass>(name, pipeline, handles);
 }
 
-RenderPass::RenderPass(const std::string& name, Ref<ShaderPipeline> pipeline
+RenderPass::RenderPass(const std::string& name, Ref<ShaderPipeline> pipeline,
 					   const Handles& handles)
 	: Name(name), m_Pipeline(pipeline), m_Handles(handles)
 {

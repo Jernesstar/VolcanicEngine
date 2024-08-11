@@ -25,19 +25,19 @@ World::World() {
 	.with<ScriptComponent>()
 	.build();
 
-	m_MeshComponentQuery = m_World.query_builder()
+	m_MeshComponentQuery = m_World.query_builder<MeshComponent>()
 	.with<MeshComponent>()
 	.build();
-	m_RigidBodyComponentQuery = m_World.query_builder()
+	m_RigidBodyComponentQuery = m_World.query_builder<RigidBodyComponent>()
 	.with<RigidBodyComponent>()
 	.build();
-	m_TagComponentQuery = m_World.query_builder()
+	m_TagComponentQuery = m_World.query_builder<TagComponent>()
 	.with<TagComponent>()
 	.build();
-	m_TransformComponentQuery = m_World.query_builder()
+	m_TransformComponentQuery = m_World.query_builder<TransformComponent>()
 	.with<TransformComponent>()
 	.build();
-	m_ScriptComponentQuery = m_World.query_builder()
+	m_ScriptComponentQuery = m_World.query_builder<ScriptComponent>()
 	.with<ScriptComponent>()
 	.build();
 }

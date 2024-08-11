@@ -17,13 +17,11 @@ public:
 	static void Create(RendererAPI::Backend backend);
 	static void Shutdown();
 	static Ref<RendererAPI> Get() { return s_Instance; }
-
-public:
-	const RendererAPI::Backend Backend;
+	static RendererAPI::Backend GetBackend() { return s_Instance->m_Backend; }
 
 public:
 	RendererAPI(RendererAPI::Backend backend)
-		: Backend(backend) { }
+		: m_Backend(backend) { }
 	virtual ~RendererAPI() = default;
 
 	virtual void Clear(const glm::vec4& color = { 0.0f, 0.0f, 0.0f, 0.0f }) = 0;
@@ -43,6 +41,9 @@ public:
 	template<typename TDerived>
 	requires std::derived_from<TDerived, RendererAPI>
 	TDerived* As() const { return (TDerived*)(this); }
+
+protected:
+	const RendererAPI::Backend m_Backend;
 
 protected:
 	virtual void Init() = 0;

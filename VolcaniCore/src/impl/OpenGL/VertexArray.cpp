@@ -47,7 +47,7 @@ void VertexArray::Unbind() const {
 }
 
 void VertexArray::AddVertexBuffer(Ref<VertexBuffer> vertexBuffer) {
-	VOLCANICORE_ASSERT(indexBuffer, "Index buffer was null");
+	VOLCANICORE_ASSERT(vertexBuffer, "Vertex buffer was null");
 
 	glBindVertexArray(m_VertexArrayID);
 	vertexBuffer->Bind();
@@ -105,7 +105,8 @@ void VertexArray::AddVertexBuffer(Ref<VertexBuffer> vertexBuffer) {
 }
 
 void VertexArray::SetIndexBuffer(Ref<IndexBuffer> indexBuffer) {
-	VOLCANICORE_ASSERT(indexBuffer, "Index buffer was null");
+	if(!indexBuffer)
+		return;
 
 	glBindVertexArray(m_VertexArrayID);
 	indexBuffer->Bind();

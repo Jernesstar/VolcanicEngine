@@ -28,7 +28,7 @@ namespace Magma::UI {
 
 UIElement::UIElement(UIElement::Type type, uint32_t width, uint32_t height,
 					 float x, float y, Ref<UIElement> parent)
-	: Type(type), m_Width(width), m_Height(height), x(x), y(y),
+	: m_Type(type), m_Width(width), m_Height(height), x(x), y(y),
 		m_Parent(parent.get()) { }
 
 Ref<UIElement> UIElement::Add(Ref<UIElement> element) {
@@ -90,7 +90,7 @@ void Init() {
 				   | ImGuiConfigFlags_ViewportsEnable;
 	io.DisplaySize = ImVec2(window->GetWidth(), window->GetHeight());
 
-	if(RendererAPI::Get()->Backend == RendererAPI::Backend::OpenGL) {
+	if(RendererAPI::GetBackend() == RendererAPI::Backend::OpenGL) {
 		ImGui_ImplGlfw_InitForOpenGL(window->GetNativeWindow(), true);
 		ImGui_ImplOpenGL3_Init("#version 450");
 	}

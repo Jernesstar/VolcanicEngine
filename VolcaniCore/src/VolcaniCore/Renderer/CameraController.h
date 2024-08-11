@@ -35,7 +35,7 @@ private:
 	}
 
 	Key Get(const ControlMap& map, Control control, Key defaultVal) const {
-		return map.find(control) != map.end() ? map[control] : defaultVal;
+		return map.find(control) != map.end() ? map.at(control) : defaultVal;
 	}
 };
 

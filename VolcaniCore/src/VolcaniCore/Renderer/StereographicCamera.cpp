@@ -43,8 +43,8 @@ void StereographicCamera::CalculateView() {
 
 void StereographicCamera::CalculateProjection() {
 	Projection = glm::perspectiveFov(glm::radians(m_VerticalFOV),
-									 (float)m_ViewportWidth,
-									 (float)m_ViewportHeight, Near, Far);
+									 (float)ViewportWidth,
+									 (float)ViewportHeight, Near, Far);
 	ViewProjection = Projection * View;
 }
 
