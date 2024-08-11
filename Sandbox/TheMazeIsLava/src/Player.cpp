@@ -14,7 +14,7 @@ Player::Player(ECS::World& world)
 	: Entity(world.AddEntity().GetHandle())
 {
 	Add<TransformComponent>();
-	// TODO(Implement): Add Player model
+	// TODO(codespace): Add Player model
 	// Add<MeshComponent>(GameState::PlayerModel1);
 	Add<RigidBodyComponent>(RigidBody::Type::Dynamic);
 	Add<ScriptComponent>()

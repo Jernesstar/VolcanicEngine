@@ -48,7 +48,6 @@ public:
 	TDerived* As() const { return (TDerived*)(this); }
 
 protected:
-	// TODO(Implement): Replace vectors with Buffer<T> type
 	std::vector<Vertex> m_Vertices;
 	std::vector<uint32_t> m_Indices;
 	Material m_Material;

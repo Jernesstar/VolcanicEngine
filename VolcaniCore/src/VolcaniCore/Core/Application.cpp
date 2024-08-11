@@ -2,7 +2,7 @@
 
 #include "Assert.h"
 
-#include "Events/Events.h"
+#include "Event/Events.h"
 
 #include "Renderer/Renderer.h"
 #include "Renderer/RendererAPI.h"
@@ -23,9 +23,9 @@ void Application::Init() {
 	VOLCANICORE_ASSERT(glfwInit(), "Failed to initialize GLFW");
 
 	s_Window = CreateRef<Window>(800, 600);
-	EventSystem::Init();
+	Events::Init();
 
-	RendererAPI::Create(RendererBackend::OpenGL);
+	RendererAPI::Create(RendererAPI::Backend::OpenGL);
 	Renderer::Init();
 }
 
@@ -45,7 +45,7 @@ void Application::Run() {
 		TimeStep ts = time - s_LastFrame;
 		s_LastFrame = time;
 
-		EventSystem::PollEvents();
+		Events::PollEvents();
 
 		Renderer::BeginFrame();
 		{

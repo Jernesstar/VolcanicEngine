@@ -4,7 +4,7 @@
 #include <VolcaniCore/Core/Log.h>
 #include <VolcaniCore/Core/CommandLineArgs.h>
 
-#include <VolcaniCore/Events/EventSystem.h>
+#include <VolcaniCore/Event/Events.h>
 
 #include <VolcaniCore/Renderer/Renderer.h>
 #include <VolcaniCore/Renderer/RendererAPI.h>

@@ -3,19 +3,17 @@
 namespace VolcaniCore {
 
 Ref<RenderPass> RenderPass::Create(const std::string& name,
-								   Ref<ShaderPipeline> pipeline)
+								   Ref<ShaderPipeline> pipeline,
+								   const Handles& handles)
 {
-	return CreateRef<RenderPass>(name, pipeline);
+	return CreateRef<RenderPass>(name, pipeline, handles);
 }
 
-RenderPass::RenderPass(const std::string& name, Ref<ShaderPipeline> pipeline)
-	: Name(name), m_Pipeline(pipeline)
+RenderPass::RenderPass(const std::string& name, Ref<ShaderPipeline> pipeline
+					   const Handles& handles)
+	: Name(name), m_Pipeline(pipeline), m_Handles(handles)
 {
 
-}
-
-void RenderPass::AddInput(Ref<Framebuffer> input) {
-	m_Inputs.push_back(input);
 }
 
 void RenderPass::SetOutput(Ref<Framebuffer> output) {

@@ -14,13 +14,13 @@ public:
 	void Clear(const glm::vec4& color = { 0.0f, 0.0f, 0.0f, 0.0f }) override;
 	void Resize(uint32_t width, uint32_t height) override;
 
-	void DrawCubemap(Ref<VolcaniCore::Cubemap> cubemap) override;
-
-	void DrawMesh(Ref<VolcaniCore::Mesh> model, const glm::mat4& tr) override;
+	void DrawPoint(const Point& point, const glm::mat4& transform) override;
 
 	void DrawLine(const Line& line, const glm::mat4& transform) override;
 
-	void DrawPoint(const Point& point, const glm::mat4& transform) override;
+	void DrawMesh(Ref<VolcaniCore::Mesh> model, const glm::mat4& tr) override;
+
+	void DrawCubemap(Ref<VolcaniCore::Cubemap> cubemap) override;
 
 	void RenderFramebuffer(Ref<VolcaniCore::Framebuffer> buffer,
 						   AttachmentTarget target) override;

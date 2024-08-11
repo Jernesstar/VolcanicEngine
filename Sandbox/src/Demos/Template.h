@@ -14,12 +14,12 @@ private:
 };
 
 Template::Template() {
-	EventSystem::RegisterListener<KeyPressedEvent>(
+	Events::RegisterListener<KeyPressedEvent>(
 	[](const KeyPressedEvent& event) {
 		if(event.Key == Key::Escape)
 			Application::Close();
 	});
-	EventSystem::RegisterListener<KeyPressedEvent>(
+	Events::RegisterListener<KeyPressedEvent>(
 	[](const KeyPressedEvent& event) {
 		if(event.Key == Key::K)
 		VOLCANICORE_LOG_INFO("Test Key K");

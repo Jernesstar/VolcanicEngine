@@ -18,14 +18,12 @@ public:
 			glm::cos(glm::radians(45.0f))
 		};
 
-		Direction = r * glm::normalize(
-								glm::vec3{
-									// 0.0f, 0.0f,
-									-glm::sin(glm::radians(45.0f)),
-									-glm::sin(glm::radians(90.0f - 35.254f)),
-									-1.0f
-									}
-								);
+		Direction = r * glm::vec3{
+			// 0.0f, 0.0f,
+			-glm::sin(glm::radians(45.0f)),
+			-glm::sin(glm::radians(90.0f - 35.254f)),
+			-1.0f
+		}
 
 		CalculateProjection();
 		CalculateView();
@@ -34,19 +32,19 @@ public:
 
 private:
 	void CalculateProjection() override {
+		// Projection = glm::perspectiveFov(glm::radians(75.0f),
+		// 								 (float)m_ViewportWidth,
+		// 								 (float)m_ViewportHeight,
+		// 								 Near, Far);
+
+		Projection = glm::ortho(-m_ViewportWidth / 2.0f, m_ViewportWidth  / 2.0f,
+								-m_ViewportHeight/ 2.0f, m_ViewportHeight / 2.0f,
+								Near, Far);
+	}
+	void CalculateView() override {
 		glm::vec3 up = { 0.0f, 1.0f, 0.0f };
 		View = glm::lookAt(Position, Position + Direction, up);
 		ViewProjection = Projection * View;
-	}
-	void CalculateView() override {
-		Projection = glm::perspectiveFov(glm::radians(75.0f),
-										 (float)m_ViewportWidth,
-										 (float)m_ViewportHeight,
-										 Near, Far);
-
-		Projection = glm::ortho(-m_ViewportWidth/2.0f, m_ViewportWidth/2.0f,
-								-m_ViewportHeight/2.0f, m_ViewportHeight/2.0f,
-								Near, Far);
 
 		ViewProjection = Projection * View;
 	}
@@ -70,7 +68,7 @@ private:
 };
 
 Cube::Cube() {
-	EventSystem::RegisterListener<KeyPressedEvent>(
+	Events::RegisterListener<KeyPressedEvent>(
 	[](const KeyPressedEvent& event) {
 		if(event.Key == Key::Escape)
 			Application::Close();

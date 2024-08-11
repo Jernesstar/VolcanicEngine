@@ -1,4 +1,4 @@
-#include "EventSystem.h"
+#include "Events.h"
 
 #include <glad/glad.h>
 
@@ -9,28 +9,11 @@
 
 #define GET_CALLBACKS(TEvent) \
 template<> \
-Callbacks<TEvent>& EventSystem::GetCallbacks<TEvent>() \
-{ \
+Callbacks<TEvent>& Events::GetCallbacks<TEvent>() { \
 	return TEvent##Callbacks; \
 }
 
 namespace VolcaniCore {
-
-void EventSystem::Init()
-{
-	GLFWwindow* window = Application::GetWindow()->GetNativeWindow();
-
-	glfwSetErrorCallback(ErrorCallback);
-
-	glfwSetKeyCallback(window, KeyCallback);
-	glfwSetCharCallback(window, KeyCharCallback);
-	glfwSetCursorPosCallback(window, MouseMovedCallback);
-	glfwSetScrollCallback(window, MouseScrolledCallback);
-	glfwSetMouseButtonCallback(window, MouseButtonCallback);
-	glfwSetWindowPosCallback(window, WindowMovedCallback);
-	glfwSetWindowSizeCallback(window, WindowResizedCallback);
-	glfwSetWindowCloseCallback(window, WindowClosedCallback);
-}
 
 GET_CALLBACKS(KeyPressedEvent);
 GET_CALLBACKS(KeyReleasedEvent);
@@ -44,12 +27,27 @@ GET_CALLBACKS(WindowMovedEvent);
 GET_CALLBACKS(WindowClosedEvent);
 GET_CALLBACKS(ApplicationUpdatedEvent);
 
-void EventSystem::ErrorCallback(int error, const char* description) {
+void Events::Init() {
+	GLFWwindow* window = Application::GetWindow()->GetNativeWindow();
+
+	glfwSetErrorCallback(ErrorCallback);
+
+	glfwSetKeyCallback(window,         KeyCallback);
+	glfwSetCharCallback(window,        KeyCharCallback);
+	glfwSetCursorPosCallback(window,   MouseMovedCallback);
+	glfwSetScrollCallback(window,      MouseScrolledCallback);
+	glfwSetMouseButtonCallback(window, MouseButtonCallback);
+	glfwSetWindowPosCallback(window,   WindowMovedCallback);
+	glfwSetWindowSizeCallback(window,  WindowResizedCallback);
+	glfwSetWindowCloseCallback(window, WindowClosedCallback);
+}
+
+void Events::ErrorCallback(int error, const char* description) {
 	VOLCANICORE_ASSERT(false, description);
 }
 
-void EventSystem::KeyCallback(GLFWwindow* window, int key, int scancode,
-							  int action, int mods)
+void Events::KeyCallback(GLFWwindow* window, int key, int scancode,
+						 int action, int mods)
 {
 	if(action == GLFW_PRESS) {
 		KeyPressedEvent event((KeyCode)key);
@@ -65,25 +63,25 @@ void EventSystem::KeyCallback(GLFWwindow* window, int key, int scancode,
 	}
 }
 
-void EventSystem::KeyCharCallback(GLFWwindow* window, unsigned int codepoint) {
+void Events::KeyCharCallback(GLFWwindow* window, unsigned int codepoint) {
 	KeyCharEvent event((KeyCode)codepoint, (char)codepoint);
 	Dispatch(event);
 }
 
-void EventSystem::MouseMovedCallback(GLFWwindow* window, double x, double y) {
+void Events::MouseMovedCallback(GLFWwindow* window, double x, double y) {
 	MouseMovedEvent event((float)x, (float)y);
 	Dispatch(event);
 }
 
-void EventSystem::MouseScrolledCallback(GLFWwindow* window,
-										double scrollX, double scrollY)
+void Events::MouseScrolledCallback(GLFWwindow* window,
+								   double scrollX, double scrollY)
 {
 	MouseScrolledEvent event((float)scrollX, (float)scrollY);
 	Dispatch(event);
 }
 
-void EventSystem::MouseButtonCallback(GLFWwindow* window, int button,
-									  int action, int mods)
+void Events::MouseButtonCallback(GLFWwindow* window, int button,
+								 int action, int mods)
 {
 	if(action == GLFW_PRESS) {
 		MouseButtonPressedEvent event((MouseCode)button,
@@ -97,19 +95,17 @@ void EventSystem::MouseButtonCallback(GLFWwindow* window, int button,
 	}
 }
 
-void EventSystem::WindowResizedCallback(GLFWwindow* window,
-										int width, int height)
-{
+void Events::WindowResizedCallback(GLFWwindow* window, int width, int height) {
 	WindowResizedEvent event(width, height);
 	Dispatch(event);
 }
 
-void EventSystem::WindowMovedCallback(GLFWwindow* window, int x, int y) {
+void Events::WindowMovedCallback(GLFWwindow* window, int x, int y) {
 	WindowMovedEvent event(x, y);
 	Dispatch(event);
 }
 
-void EventSystem::WindowClosedCallback(GLFWwindow* window) {
+void Events::WindowClosedCallback(GLFWwindow* window) {
 	WindowClosedEvent event;
 	Dispatch(event);
 }

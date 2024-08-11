@@ -29,7 +29,7 @@ private:
 };
 
 Shadows::Shadows() {
-	EventSystem::RegisterListener<KeyPressedEvent>(
+	Events::RegisterListener<KeyPressedEvent>(
 	[](const KeyPressedEvent& event) {
 		if(event.Key == Key::Escape)
 			Application::Close();
@@ -61,7 +61,6 @@ Shadows::Shadows() {
 
 	// depthCamera = CreateRef<OrthographicCamera>(20.0f, 20.0f, 1.0f, 7.5f);
 	// sceneCamera = CreateRef<StereographicCamera>(75.0f);
-
 }
 
 void Shadows::OnUpdate(TimeStep ts) {
@@ -82,7 +81,15 @@ void Shadows::OnUpdate(TimeStep ts) {
 	}
 	Renderer::EndPass();
 
-	RendererAPI::Get()->RenderFramebuffer(depthMap, AttachmentTarget::Depth);
+	Renderer::StartPass(shadowPass);
+	{
+		Renderer::Clear();
+
+		RenderScene();
+	}
+	Renderer::EndPass();
+
+	// RendererAPI::Get()->RenderFramebuffer(depthMap, AttachmentTarget::Depth);
 }
 
 void Shadows::RenderScene() {

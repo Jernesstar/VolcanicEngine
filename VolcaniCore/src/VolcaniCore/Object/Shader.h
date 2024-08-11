@@ -15,8 +15,7 @@
 
 namespace VolcaniCore {
 
-enum class ShaderType { Vertex, Geometry, Fragment, Compute, Unknown };
-enum class Shader { Simple, Cubemap, Model, Framebuffer };
+enum class ShaderType { Vertex, Fragment, Geometry, Compute, Unknown };
 
 struct ShaderFile {
 	const std::string Path;
@@ -25,10 +24,6 @@ struct ShaderFile {
 
 class ShaderPipeline {
 public:
-	// NOTE: For later use in the future
-	// static void Init();
-	// static Ref<Shader> Get(ShaderType shader);
-
 	static Ref<ShaderPipeline> Create(const std::vector<ShaderFile>& shaders);
 	static Ref<ShaderPipeline> Create(const std::vector<std::string>& paths);
 	static Ref<ShaderPipeline> Create(const std::string& folderPath,
@@ -47,11 +42,6 @@ public:
 	virtual void SetTexture(const std::string& name, Ref<Texture> texture,
 							uint32_t slot) = 0;
 
-	// TODO(Implement):
-	// template<typename T>
-	// virtual void SetUniformBuffer(const std::string& name,
-									//  Ref<UniformBuffer<T>> buffer) = 0;
-
 	virtual void SetVec2(const std::string& name, const glm::vec2& vec) = 0;
 	virtual void SetVec3(const std::string& name, const glm::vec3& vec) = 0;
 	virtual void SetVec4(const std::string& name, const glm::vec4& vec) = 0;
@@ -59,6 +49,11 @@ public:
 	virtual void SetMat2(const std::string& name, const glm::mat2& mat) = 0;
 	virtual void SetMat3(const std::string& name, const glm::mat3& mat) = 0;
 	virtual void SetMat4(const std::string& name, const glm::mat4& mat) = 0;
+
+	// TODO(Implement):
+	// template<typename T>
+	// virtual void SetUniformBuffer(const std::string& name,
+									//  Ref<UniformBuffer<T>> buffer) = 0;
 };
 
 }

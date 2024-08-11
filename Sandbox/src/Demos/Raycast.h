@@ -31,13 +31,13 @@ private:
 };
 
 Raycast::Raycast() {
-	EventSystem::RegisterListener<KeyPressedEvent>(
+	Events::RegisterListener<KeyPressedEvent>(
 	[](const KeyPressedEvent& event) {
 		if(event.Key == Key::Escape)
 			Application::Close();
 	});
 
-	EventSystem::RegisterListener<MouseButtonPressedEvent>(
+	Events::RegisterListener<MouseButtonPressedEvent>(
 	[this](const MouseButtonPressedEvent& event) {
 		auto width = Application::GetWindow()->GetWidth();
 		auto height = Application::GetWindow()->GetHeight();

@@ -3,8 +3,7 @@
 #include <glm/vec3.hpp>
 
 #include <VolcaniCore/Core/Defines.h>
-#include <VolcaniCore/Events/EventCallback.h>
-#include <VolcaniCore/Events/EventSystem.h>
+#include <VolcaniCore/Event/Events.h>
 
 #include <VolcaniCore/Object/Mesh.h>
 #include <VolcaniCore/Object/Texture.h>

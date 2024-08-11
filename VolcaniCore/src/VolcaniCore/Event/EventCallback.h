@@ -3,10 +3,12 @@
 #include <functional>
 
 #include "Core/UUID.h"
+#include "Core/Event.h"
 
 namespace VolcaniCore {
 
 template<typename TEvent>
+requires std::derived_from<TEvent, Event>
 class EventCallback {
 public:
 	EventCallback(

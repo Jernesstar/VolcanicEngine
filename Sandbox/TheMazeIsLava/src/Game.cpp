@@ -2,7 +2,7 @@
 
 #include <Core/Input.h>
 #include <Core/Assert.h>
-#include <Events/EventSystem.h>
+#include <Event/Events.h>
 
 #include <Renderer/Renderer.h>
 #include <Renderer/Renderer3D.h>
@@ -18,7 +18,7 @@ namespace TheMazeIsLava {
 Game::Game()
 	: Application(800, 600, "The Maze is Lava")
 {
-	EventSystem::RegisterListener<KeyPressedEvent>(
+	Events::RegisterListener<KeyPressedEvent>(
 	[&](const KeyPressedEvent& event) {
 		if(event.Key == Key::Escape)
 			Application::Close();

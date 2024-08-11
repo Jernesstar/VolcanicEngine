@@ -9,34 +9,33 @@
 
 namespace VolcaniCore {
 
-enum class RendererBackend { OpenGL, Vulkan, DirectX };
-
-// Generate the backend specific buffers to be used every frame
-// Is responsible for how to batch the render calls
 class RendererAPI {
 public:
-	static void Create(RendererBackend backend);
+	enum class Backend { OpenGL, Vulkan, DirectX };
+
+public:
+	static void Create(RendererAPI::Backend backend);
 	static void Shutdown();
 	static Ref<RendererAPI> Get() { return s_Instance; }
 
 public:
-	const RendererBackend Backend;
+	const RendererAPI::Backend Backend;
 
 public:
-	RendererAPI(RendererBackend backend)
+	RendererAPI(RendererAPI::Backend backend)
 		: Backend(backend) { }
 	virtual ~RendererAPI() = default;
 
 	virtual void Clear(const glm::vec4& color = { 0.0f, 0.0f, 0.0f, 0.0f }) = 0;
 	virtual void Resize(uint32_t width, uint32_t height) = 0;
 
-	virtual void DrawCubemap(Ref<Cubemap> cubemap) = 0;
-
-	virtual void DrawMesh(Ref<Mesh> model, const glm::mat4& transform) = 0;
-
 	virtual void DrawPoint(const Point& point, const glm::mat4& transform) = 0;
 
 	virtual void DrawLine(const Line& line, const glm::mat4& transform) = 0;
+
+	virtual void DrawMesh(Ref<Mesh> model, const glm::mat4& transform) = 0;
+
+	virtual void DrawCubemap(Ref<Cubemap> cubemap) = 0;
 
 	virtual void RenderFramebuffer(Ref<Framebuffer> buffer,
 								   AttachmentTarget target) = 0;

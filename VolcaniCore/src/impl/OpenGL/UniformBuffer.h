@@ -14,8 +14,11 @@ public:
 	const uint32_t Size;
 
 public:
-	UniformBuffer() : Size(0), Binding(0) { }
-	UniformBuffer(uint32_t binding, std::size_t size, const void* data = nullptr)
+	UniformBuffer()
+		: Size(0), Binding(0) { }
+
+	UniformBuffer(uint32_t binding, std::size_t size,
+					const void* data = nullptr)
 		: Binding(binding), Size(size)
 	{
 		glCreateBuffers(1, &m_BufferID);
@@ -23,7 +26,9 @@ public:
 		glBindBufferBase(GL_UNIFORM_BUFFER, binding, m_BufferID);
 	}
 
-	~UniformBuffer() { glDeleteBuffers(1, &m_BufferID); }
+	~UniformBuffer() {
+		glDeleteBuffers(1, &m_BufferID);
+	}
 
 	void SetData(const void* data, uint32_t size = 0, uint32_t offset = 0)
 	{

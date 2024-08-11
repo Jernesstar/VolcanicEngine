@@ -4,17 +4,18 @@
 
 namespace VolcaniCore {
 
-using Clock = std::chrono::high_resolution_clock;
+using Clock		 = std::chrono::high_resolution_clock;
 using Time_Point = std::chrono::time_point<Clock>;
-using Duration = std::chrono::duration<float, std::milli>;
+using Duration	 = std::chrono::duration<float, std::milli>;
 
 class TimePoint {
 public:
 	TimePoint() = default;
-	TimePoint(const Time_Point& time_point) : m_TimePoint(time_point) { }
+	TimePoint(const Time_Point& timePoint)
+		: m_TimePoint(timePoint) { }
 	~TimePoint() = default;
 
-	float operator -(const TimePoint& other) {
+	float operator -(const Time_Point& other) {
 		Duration duration = this->m_TimePoint - other.m_TimePoint;
 		return (float)duration.count();
 	}
@@ -35,6 +36,9 @@ private:
 
 class Time {
 public:
-	static TimePoint GetTime() { return { Clock::now() }; }
+	static TimePoint GetTime() {
+		return { Clock::now() };
+	}
 };
+
 }

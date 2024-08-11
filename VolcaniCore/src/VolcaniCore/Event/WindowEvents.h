@@ -6,15 +6,15 @@ namespace VolcaniCore {
 
 struct WindowEvent : public Event {
 protected:
-	WindowEvent(EventType type)
-		: Event(EventCategory::Window, type) { }
+	WindowEvent(Event::Type type)
+		: Event(Event::Category::Window, type) { }
 };
 
 struct WindowResizedEvent : public WindowEvent {
 	const int Width, Height;
 
 	WindowResizedEvent(int width, int height)
-		: WindowEvent(EventType::WindowResized),
+		: WindowEvent(Event::Type::WindowResized),
 			Width(width), Height(height) { }
 };
 
@@ -22,12 +22,12 @@ struct WindowMovedEvent : public WindowEvent {
 	const int x, y;
 
 	WindowMovedEvent(int x, int y)
-		: WindowEvent(EventType::WindowMoved), x(x), y(y) { }
+		: WindowEvent(Event::Type::WindowMoved), x(x), y(y) { }
 };
 
 struct WindowClosedEvent : public WindowEvent {
 	WindowClosedEvent()
-		: WindowEvent(EventType::WindowClosed) { }
+		: WindowEvent(Event::Type::WindowClosed) { }
 };
 
 }

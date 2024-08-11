@@ -141,9 +141,11 @@ enum Key : KeyCode {
 	KP_Enter    = 335,
 
 	// General case between two buttons
-	Ctrl  = LeftCtrl + RightCtrl,
+	Ctrl  = LeftCtrl  + RightCtrl,
 	Shift = LeftShift + RightShift,
-	Alt   = LeftAlt + RightAlt,
+	Alt   = LeftAlt   + RightAlt,
+
+	Invalid = 0;
 };
 
 using MouseCode = uint8_t;

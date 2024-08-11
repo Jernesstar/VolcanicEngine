@@ -4,41 +4,38 @@
 
 #include "Camera.h"
 
-#include "Events/Events.h"
 #include "Core/Time.h"
 #include "Core/Codes.h"
+#include "Event/Events.h"
 
 namespace VolcaniCore {
 
 enum class Control { Up, Down, Left, Right, Forward, Backward };
 
-struct MovementControls {
-	std::unordered_map<Control, Key> Map;
+using ControlMap = std::unordered_map<Control, Key>;
 
-	MovementControls(std::unordered_map<Control, Key> map = { })
+struct MovementControls {
+	const ControlMap Map;
+
+	MovementControls(const ControlMap& map = { })
 		: Map(GetControls(map)) { }
 
-	Key operator [](const Control& control) const { return Map.at(control); }
+	Key operator [](Control control) const { return Map.at(control); }
 
 private:
-	std::unordered_map<Control, Key> GetControls(
-										std::unordered_map<Control, Key> map)
-	{
-		std::unordered_map<Control, Key> controls;
-		controls[Control::Up]       = Get(map, Control::Up,       Key::Q);
-		controls[Control::Down]     = Get(map, Control::Down,     Key::E);
-		controls[Control::Left]     = Get(map, Control::Left,     Key::A);
-		controls[Control::Right]    = Get(map, Control::Right,    Key::D);
-		controls[Control::Forward]  = Get(map, Control::Forward,  Key::W);
+	ControlMap GetControls(const ControlMap& map) const {
+		ControlMap controls;
+		controls[Control::Up]		= Get(map, Control::Up,		  Key::Q);
+		controls[Control::Down]		= Get(map, Control::Down,	  Key::E);
+		controls[Control::Left]		= Get(map, Control::Left,	  Key::A);
+		controls[Control::Right]	= Get(map, Control::Right,	  Key::D);
+		controls[Control::Forward]	= Get(map, Control::Forward,  Key::W);
 		controls[Control::Backward] = Get(map, Control::Backward, Key::S);
 		return controls;
 	}
 
-	Key Get(std::unordered_map<Control, Key> map,
-			Control control,
-			Key default_val)
-	{
-		return map.find(control) != map.end() ? map[control] : default_val;
+	Key Get(const ControlMap& map, Control control, Key defaultVal) const {
+		return map.find(control) != map.end() ? map[control] : defaultVal;
 	}
 };
 

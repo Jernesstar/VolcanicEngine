@@ -1,10 +1,10 @@
 #include "Shader.h"
 
-#include <filesystem>
-
 #include "OpenGL/Shader.h"
 
 #include "Core/Assert.h"
+#include "Core/FileUtils.h"
+
 #include "Renderer/RendererAPI.h"
 
 namespace VolcaniCore {
@@ -22,23 +22,27 @@ static std::vector<ShaderFile> GetShaders(const std::string& shaderFolder,
 
 // }
 
-Ref<ShaderPipeline> ShaderPipeline::Create(const std::vector<ShaderFile>& shaders) {
-	RendererBackend backend = RendererAPI::Get()->Backend;
+Ref<ShaderPipeline> ShaderPipeline::Create(
+						const std::vector<ShaderFile>& shaders)
+{
+	RendererAPI::Backend backend = RendererAPI::Get()->Backend;
 
 	switch(backend) {
-		case RendererBackend::OpenGL:
+		case RendererAPI::Backend::OpenGL:
 			return CreateRef<OpenGL::ShaderProgram>(shaders);
 			break;
 	}
 }
 
-Ref<ShaderPipeline> ShaderPipeline::Create(const std::vector<std::string>& paths) {
-	RendererBackend backend = RendererAPI::Get()->Backend;
+Ref<ShaderPipeline> ShaderPipeline::Create(
+						const std::vector<std::string>& paths)
+{
+	RendererAPI::Backend backend = RendererAPI::Get()->Backend;
 
 	auto shaders = GetShaders(paths);
 
 	switch(backend) {
-		case RendererBackend::OpenGL:
+		case RendererAPI::Backend::OpenGL:
 			return CreateRef<OpenGL::ShaderProgram>(shaders);
 			break;
 	}
@@ -47,12 +51,12 @@ Ref<ShaderPipeline> ShaderPipeline::Create(const std::vector<std::string>& paths
 Ref<ShaderPipeline> ShaderPipeline::Create(const std::string& folderPath,
 										   const std::string& name)
 {
-	RendererBackend backend = RendererAPI::Get()->Backend;
+	RendererAPI::Backend backend = RendererAPI::Get()->Backend;
 
 	auto shaders = GetShaders(folderPath, name);
 
 	switch(backend) {
-		case RendererBackend::OpenGL:
+		case RendererAPI::Backend::OpenGL:
 			return CreateRef<OpenGL::ShaderProgram>(shaders);
 			break;
 	}
@@ -73,7 +77,7 @@ std::vector<ShaderFile> GetShaders(const std::string& shaderFolder,
 {
 	std::vector<ShaderFile> shaders;
 
-	for(auto filepath : std::filesystem::directory_iterator(shaderFolder)) {
+	for(auto filepath : FileUtils::GetFiles(shaderFolder)) {
 		std::string path = filepath.path().string();
 		if(path.substr(0, path.find_first_of('.')) != name)
 			continue;

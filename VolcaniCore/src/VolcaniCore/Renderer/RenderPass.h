@@ -5,28 +5,48 @@
 
 namespace VolcaniCore {
 
+template<typename TOut>
+using HandleMap = std::unordererd_map<std::string, std::function<TOut(void)>>;
+
+template<typename TOut>
+using HandleList = std::vector<HandleMap<TOut>>;
+
+class Handles {
+	HandleList<uint32_t>	 IntHandles;
+	HandleList<float>		 FloatHandles;
+	HandleList<Ref<Texture>> TextureHandles;
+
+	HandleList<glm::vec2> Vec2Handles;
+	HandleList<glm::vec3> Vec3Handles;
+	HandleList<glm::vec4> Vec4Handles;
+
+	HandleList<glm::mat2> Mat2Handles;
+	HandleList<glm::mat3> Mat3Handles;
+	HandleList<glm::mat4> Mat4Handles;
+}
+
 class RenderPass {
 public:
 	static Ref<RenderPass> Create(const std::string& name,
-								  Ref<ShaderPipeline> pipeline);
+								  Ref<ShaderPipeline> pipeline,
+								  const Handles& = { });
 
 public:
 	const std::string Name;
-	// TODO(Implement): Handles.
-	// eg. { "a_SomeProperty", [](Ref<TAnything> anything) { return anything.Something } }
 
 public:
-	RenderPass(const std::string& name, Ref<ShaderPipeline> pipeline);
+	RenderPass(const std::string& name, Ref<ShaderPipeline> pipeline,
+			   const Handles& handles = { });
 	~RenderPass() = default;
 
-	void AddInput(Ref<Framebuffer> buffer);
+	// void AddInput();
 	void SetOutput(Ref<Framebuffer> buffer);
 
-	Ref<Framebuffer> GetOutput() const { return m_Output; }
 	Ref<ShaderPipeline> GetPipeline() const { return m_Pipeline; }
+	Ref<Framebuffer> GetOutput() const { return m_Output; }
 
 private:
-	std::vector<Ref<Framebuffer>> m_Inputs;
+	Handles m_Handles;
 	Ref<Framebuffer> m_Output;
 	Ref<ShaderPipeline> m_Pipeline;
 };

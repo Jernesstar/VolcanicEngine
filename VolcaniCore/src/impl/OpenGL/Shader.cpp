@@ -16,12 +16,21 @@ uint32_t CreateShader(const ShaderFile& shader);
 ShaderProgram::ShaderProgram(const std::vector<ShaderFile>& shaders) {
 	m_ProgramID = glCreateProgram();
 
-	for(auto shader : shaders)
+	for(const auto& shader : shaders)
 		AddShader(shader);
 	Compile();
 }
 
-ShaderProgram::~ShaderProgram() { glDeleteProgram(m_ProgramID); }
+ShaderProgram::~ShaderProgram() {
+	glDeleteProgram(m_ProgramID);
+}
+
+void ShaderProgram::Bind() const {
+	glUseProgram(m_ProgramID);
+}
+void ShaderProgram::Unbind() const {
+	glUseProgram(0);
+}
 
 void ShaderProgram::AddShader(const ShaderFile& shader) {
 	uint32_t shaderID = CreateShader(shader);
@@ -44,7 +53,8 @@ void ShaderProgram::Compile() {
 
 		glDeleteProgram(m_ProgramID);
 
-		VOLCANICORE_ASSERT_ARGS(false, "An linking error has occured: \n%s", message);
+		VOLCANICORE_ASSERT_ARGS(false, "An linking error has occured: \n%s",
+								message);
 	}
 
 	for(auto& shaderID : m_ShaderIDs) {
@@ -52,9 +62,6 @@ void ShaderProgram::Compile() {
 		glDeleteShader(shaderID);
 	}
 }
-
-void ShaderProgram::Bind() const { glUseProgram(m_ProgramID); }
-void ShaderProgram::Unbind() const { glUseProgram(0); }
 
 void ShaderProgram::SetInt(const std::string& name, int _int) {
 	GLint location = glGetUniformLocation(m_ProgramID, name.c_str());
@@ -67,7 +74,7 @@ void ShaderProgram::SetFloat(const std::string& name, float _float) {
 }
 
 void ShaderProgram::SetTexture(const std::string& name,
-								Ref<Texture> texture, uint32_t slot)
+							   Ref<Texture> texture, uint32_t slot)
 {
 	VOLCANICORE_ASSERT(slot >= 0);
 
@@ -108,16 +115,15 @@ void ShaderProgram::SetMat4(const std::string& name, const glm::mat4& matrix) {
 uint32_t GetShaderType(ShaderType type) {
 	switch(type) {
 		case ShaderType::Vertex:   return GL_VERTEX_SHADER;
-		case ShaderType::Geometry: return GL_GEOMETRY_SHADER;
 		case ShaderType::Fragment: return GL_FRAGMENT_SHADER;
+		case ShaderType::Geometry: return GL_GEOMETRY_SHADER;
 		case ShaderType::Compute:  return GL_COMPUTE_SHADER;
 	}
 
 	return 0;
 }
 
-uint32_t CreateShader(const ShaderFile& shader)
-{
+uint32_t CreateShader(const ShaderFile& shader) {
 	uint32_t type = GetShaderType(shader.Type);
 	uint32_t shaderID = glCreateShader(type);
 

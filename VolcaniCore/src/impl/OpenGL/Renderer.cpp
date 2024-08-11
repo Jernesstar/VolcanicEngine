@@ -7,12 +7,11 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "Core/Assert.h"
-#include "Events/EventSystem.h"
+#include "Event/Events.h"
 
 #include "Renderer/ShaderLibrary.h"
 
 #include "Shader.h"
-
 #include "Mesh.h"
 #include "Cubemap.h"
 #include "Texture2D.h"
@@ -25,11 +24,11 @@ using namespace VolcaniCore;
 namespace VolcaniCore::OpenGL {
 
 Renderer::Renderer()
-	: RendererAPI(RendererBackend::OpenGL)
+	: RendererAPI(RendererAPI::Backend::OpenGL)
 {
 	VOLCANICORE_ASSERT(gladLoadGL(), "Glad could not load OpenGL");
 
-	EventSystem::RegisterListener<WindowResizedEvent>(
+	Events::RegisterListener<WindowResizedEvent>(
 	[&](const WindowResizedEvent& event) {
 		Resize(event.Width, event.Height);
 	});
@@ -136,13 +135,12 @@ void Renderer::Init() {
 		}, framebufferVertices);
 	s_Data.FramebufferArray = CreatePtr<VertexArray>(buffer);
 
-	// s_Data.MeshBuffer = CreateRef<VertexBuffer>(
+	// s_Data.PointBuffer = CreateRef<VertexBuffer>(
 	// 	BufferLayout{
 	// 		{ "Coordinate", BufferDataType::Vec3 },
-	// 		{ "Normal",		BufferDataType::Vec3 },
-	// 		{ "TexCoord_Color", BufferDataType::Vec4 },
+	// 		{ "Color",		BufferDataType::Vec3 },
 	// 	});
-	// s_Data.MeshArray = CreatePtr<VertexArray>(buffer);
+	// s_Data.PointArray = CreatePtr<VertexArray>(buffer);
 
 	// s_Data.LineBuffer = CreateRef<VertexBuffer>(
 	// 	BufferLayout{
@@ -151,12 +149,13 @@ void Renderer::Init() {
 	// 	});
 	// s_Data.LineArray = CreatePtr<VertexArray>(buffer);
 
-	// s_Data.PointBuffer = CreateRef<VertexBuffer>(
+	// s_Data.MeshBuffer = CreateRef<VertexBuffer>(
 	// 	BufferLayout{
 	// 		{ "Coordinate", BufferDataType::Vec3 },
-	// 		{ "Color",		BufferDataType::Vec3 },
+	// 		{ "Normal",		BufferDataType::Vec3 },
+	// 		{ "TexCoord_Color", BufferDataType::Vec4 },
 	// 	});
-	// s_Data.PointArray = CreatePtr<VertexArray>(buffer);
+	// s_Data.MeshArray = CreatePtr<VertexArray>(buffer);
 
 	ShaderLibrary::Get("Framebuffer")->Bind();
 	ShaderLibrary::Get("Framebuffer")->SetInt("u_ScreenTexture", 0);
@@ -173,14 +172,13 @@ void Renderer::Resize(uint32_t width, uint32_t height) {
 	glViewport(0, 0, width, height);
 }
 
-void Renderer::DrawCubemap(Ref<VolcaniCore::Cubemap> cubemap) {
-	glDepthMask(GL_FALSE);
+void Renderer::DrawPoint(const VolcaniCore::Point& point, const glm::mat4& tr) {
 
-	cubemap->As<OpenGL::Cubemap>()->Bind();
-	s_Data.CubemapArray->Bind();
-	glDrawArrays(GL_TRIANGLES, 0, 36);
+}
 
-	glDepthMask(GL_TRUE);
+void Renderer::DrawLine(const VolcaniCore::Line& line, const glm::mat4& tr) {
+	// s_Data.LineVAO->Bind();
+	// glDrawArrays(GL_LINES, 0, 2);
 }
 
 void Renderer::DrawMesh(Ref<VolcaniCore::Mesh> mesh, const glm::mat4& tr) {
@@ -189,13 +187,14 @@ void Renderer::DrawMesh(Ref<VolcaniCore::Mesh> mesh, const glm::mat4& tr) {
 	DrawIndexed(nativeMesh->m_VertexArray);
 }
 
-void Renderer::DrawLine(const VolcaniCore::Line& line, const glm::mat4& tr) {
-	// s_Data.LineVAO->Bind();
-	// glDrawArrays(GL_LINES, 0, 2);
-}
+void Renderer::DrawCubemap(Ref<VolcaniCore::Cubemap> cubemap) {
+	glDepthMask(GL_FALSE);
 
-void Renderer::DrawPoint(const VolcaniCore::Point& point, const glm::mat4& tr) {
+	cubemap->As<OpenGL::Cubemap>()->Bind();
+	s_Data.CubemapArray->Bind();
+	glDrawArrays(GL_TRIANGLES, 0, 36);
 
+	glDepthMask(GL_TRUE);
 }
 
 void Renderer::RenderFramebuffer(Ref<VolcaniCore::Framebuffer> buffer,

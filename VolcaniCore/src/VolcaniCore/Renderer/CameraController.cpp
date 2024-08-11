@@ -5,7 +5,7 @@
 
 #include "Core/Application.h"
 #include "Core/Input.h"
-#include "Events/EventSystem.h"
+#include "Event/Events.h"
 
 namespace VolcaniCore {
 
@@ -27,40 +27,31 @@ void CameraController::OnUpdate(TimeStep ts)
 	glm::vec3 rightDir = glm::cross(forwardDir, upDir);
 
 	bool moved = false;
-	glm::vec3 xyz;
+	glm::ivec3 xyz;
 	if(xyz.x = Input::KeyPressed(Controls[Control::Right])
 			 - Input::KeyPressed(Controls[Control::Left]))
 	{
-		m_Camera->Position += (float)xyz.x
-							* rightDir
-							* TranslationSpeed
-							* (float)ts;
+		m_Camera->Position += xyz.x * rightDir * TranslationSpeed * (float)ts;
 	}
 	if(xyz.y = Input::KeyPressed(Controls[Control::Up])
 			 - Input::KeyPressed(Controls[Control::Down]))
 	{
-		m_Camera->Position += (float)xyz.y
-							* upDir
-							* TranslationSpeed
-							* (float)ts;
+		m_Camera->Position += xyz.y * upDir * TranslationSpeed * (float)ts;
 	}
 	if(xyz.z = Input::KeyPressed(Controls[Control::Forward])
 			 - Input::KeyPressed(Controls[Control::Backward]))
 	{
-		m_Camera->Position += (float)xyz.z
-							* forwardDir
-							* TranslationSpeed
-							* (float)ts;
+		m_Camera->Position += xyz.z * forwardDir * TranslationSpeed * (float)ts;
 	}
 	if(xyz.x || xyz.y || xyz.z)
 		moved = true;
 
 	if(delta.x != 0.0f || delta.y != 0.0f) {
-		float pitch_delta = delta.y * RotationSpeed;
-		float yaw_delta = delta.x * RotationSpeed;
+		float pitchDelta = delta.y * RotationSpeed;
+		float yawDelta = delta.x * RotationSpeed;
 
-		glm::quat q = glm::cross(glm::angleAxis(-pitch_delta, rightDir),
-								 glm::angleAxis(-yaw_delta, upDir));
+		glm::quat q = glm::cross(glm::angleAxis(-pitchDelta, rightDir),
+								 glm::angleAxis(-yawDelta, upDir));
 		m_Camera->Direction = glm::rotate(glm::normalize(q), forwardDir);
 		moved = true;
 	}

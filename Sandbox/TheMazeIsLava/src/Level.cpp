@@ -58,7 +58,7 @@ Ref<Scene> Level::Load() {
 
 		if(!IsGoal(x, y)) return;
 
-		// TODO(Implement): Staircase model
+		// TODO(codespace): Staircase model
 		ECS::Entity stairs = ECS::EntityBuilder(world)
 		.Add<TransformComponent>(Transform{ .Translation = { x, 1.0f, y } })
 		// .Add<MeshComponent>(GameState::StairModel)

@@ -13,7 +13,7 @@ private:
 };
 
 UI::UI() {
-	EventSystem::RegisterListener<KeyPressedEvent>(
+	Events::RegisterListener<KeyPressedEvent>(
 	[](const KeyPressedEvent& event) {
 		if(event.Key == Key::Escape)
 			Application::Close();

@@ -1,9 +1,20 @@
 #include "World.h"
 
 #include <VolcaniCore/Core/UUID.h>
-#include <VolcaniCore/Core/Log.h>
+
+#define GET_QUERY(TComponent) \
+template<> \
+flecs::query<TComponent>& World::GetQuery<TComponent>() { \
+	return m_##TComponent##Query; \
+}
 
 namespace Magma::ECS {
+
+GET_QUERY(MeshComponent)
+GET_QUERY(RigidBodyComponent)
+GET_QUERY(TagComponent)
+GET_QUERY(TransformComponent)
+GET_QUERY(ScriptComponent)
 
 World::World() {
 	m_AllEntitiesQuery = m_World.query_builder()
@@ -13,14 +24,31 @@ World::World() {
 	.with<TransformComponent>().or_()
 	.with<ScriptComponent>()
 	.build();
+
+	m_MeshComponentQuery = m_World.query_builder()
+	.with<MeshComponent>()
+	.build();
+	m_RigidBodyComponentQuery = m_World.query_builder()
+	.with<RigidBodyComponent>()
+	.build();
+	m_TagComponentQuery = m_World.query_builder()
+	.with<TagComponent>()
+	.build();
+	m_TransformComponentQuery = m_World.query_builder()
+	.with<TransformComponent>()
+	.build();
+	m_ScriptComponentQuery = m_World.query_builder()
+	.with<ScriptComponent>()
+	.build();
 }
 
 void World::OnUpdate(TimeStep ts) {
 	m_World.progress(ts);
 }
 
-Entity World::Get(const std::string& tag) {
-	return Entity{ m_World.lookup(tag.c_str()) };
+Entity World::GetEntity(const std::string& tag) {
+	flecs::entity handle = m_World.lookup(tag.c_str());
+	return Entity{ handle };
 }
 
 Entity World::AddEntity() {

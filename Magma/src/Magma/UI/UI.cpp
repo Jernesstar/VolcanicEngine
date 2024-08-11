@@ -2,7 +2,7 @@
 
 #include <Core/Application.h>
 #include <Renderer/RendererAPI.h>
-#include <Events/EventSystem.h>
+#include <Event/Events.h>
 
 using namespace VolcaniCore;
 
@@ -90,7 +90,7 @@ void Init() {
 				   | ImGuiConfigFlags_ViewportsEnable;
 	io.DisplaySize = ImVec2(window->GetWidth(), window->GetHeight());
 
-	if(RendererAPI::Get()->Backend == RendererBackend::OpenGL) {
+	if(RendererAPI::Get()->Backend == RendererAPI::Backend::OpenGL) {
 		ImGui_ImplGlfw_InitForOpenGL(window->GetNativeWindow(), true);
 		ImGui_ImplOpenGL3_Init("#version 450");
 	}
@@ -103,23 +103,23 @@ void Init() {
 	io.FontDefault = io.Fonts->AddFontFromFileTTF(
 			"VolcaniCore/assets/fonts/JetBrainsMono-Regular.ttf", fontSize);
 
-	// EventSystem::RegisterListener<MouseButtonPressedEvent>(
+	// Events::RegisterListener<MouseButtonPressedEvent>(
 	// [&io](MouseButtonPressedEvent& event) {
 	// 	event.Handled = io.WantCaptureMouse;
 	// });
-	// EventSystem::RegisterListener<MouseButtonReleasedEvent>(
+	// Events::RegisterListener<MouseButtonReleasedEvent>(
 	// [&io](MouseButtonReleasedEvent& event) {
 	// 	event.Handled = io.WantCaptureMouse;
 	// });
-	// EventSystem::RegisterListener<MouseScrolledEvent>(
+	// Events::RegisterListener<MouseScrolledEvent>(
 	// [&io](MouseScrolledEvent& event) {
 	// 	event.Handled = io.WantCaptureMouse;
 	// });
-	// EventSystem::RegisterListener<MouseMovedEvent>(
+	// Events::RegisterListener<MouseMovedEvent>(
 	// [&io](MouseMovedEvent& event) {
 	// 	event.Handled = io.WantCaptureMouse;
 	// });
-	EventSystem::RegisterListener<WindowResizedEvent>(
+	Events::RegisterListener<WindowResizedEvent>(
 	[&io](const WindowResizedEvent& event) {
 		io.DisplaySize = ImVec2(event.Width, event.Height);
 	});

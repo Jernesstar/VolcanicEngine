@@ -3,7 +3,7 @@
 #include "Application.h"
 #include "FileUtils.h"
 #include "Assert.h"
-#include "Events/EventSystem.h"
+#include "Event/Events.h"
 
 namespace VolcaniCore {
 
@@ -15,18 +15,19 @@ Window::Window(uint32_t width, uint32_t height) {
 
 	glfwMakeContextCurrent(m_NativeWindow);
 
-	EventSystem::RegisterListener<WindowClosedEvent>(
+	Events::RegisterListener<WindowClosedEvent>(
 	[](const WindowClosedEvent& event) {
 		Application::Close();
 	});
-	EventSystem::RegisterListener<WindowResizedEvent>(
+	Events::RegisterListener<WindowResizedEvent>(
 	[&](const WindowResizedEvent& event) {
-		Resize(event.Width, event.Height);
+		this->Resize(event.Width, event.Height);
 	});
 }
 
 Window::~Window() {
-	if(m_NativeWindow) glfwDestroyWindow(m_NativeWindow);
+	if(m_NativeWindow)
+		glfwDestroyWindow(m_NativeWindow);
 	m_NativeWindow = nullptr;
 }
 

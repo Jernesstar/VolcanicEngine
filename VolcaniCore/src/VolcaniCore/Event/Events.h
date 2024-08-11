@@ -2,7 +2,6 @@
 
 #include <iostream>
 #include <functional>
-#include <unordered_map>
 #include <map>
 
 #define GLFW_INCLUDE_NONE
@@ -23,12 +22,13 @@ namespace VolcaniCore {
 template<typename TEvent>
 using Callbacks = std::map<VolcaniCore::UUID, EventCallback<TEvent>>;
 
-class EventSystem {
+class Events {
 public:
 	static void Init();
 	static void PollEvents() { glfwPollEvents(); }
 
 	template<typename TEvent>
+	requires std::derived_from<TEvent, Event>
 	static void RegisterListener(const EventCallback<TEvent>& eventCallback) {
 		if(!eventCallback)
 			return;
@@ -38,6 +38,7 @@ public:
 	}
 
 	template<typename TEvent>
+	requires std::derived_from<TEvent, Event>
 	static EventCallback<TEvent> RegisterListener(
 		const std::function<void(TEvent&)>& callback)
 	{
@@ -47,6 +48,7 @@ public:
 	}
 
 	template<typename TEvent>
+	requires std::derived_from<TEvent, Event>
 	static void UnregisterListener(const EventCallback<TEvent>& eventCallback) {
 		Callbacks<TEvent>& callbacks = GetCallbacks<TEvent>();
 		if(callbacks.count(eventCallback.GetID()))
@@ -71,8 +73,12 @@ private:
 	static void Dispatch(TEvent& event) {
 		Callbacks<TEvent>& callbackList = GetCallbacks<TEvent>();
 	
-		for(auto& [_, callback] : callbackList)
-			if(!event.Handled) callback(event);
+		for(auto& [_, callback] : callbackList) {
+			if(event.Handled)
+				return;
+
+			callback(event);
+		}
 	}
 
 	template<typename TEvent>
@@ -88,9 +94,6 @@ private:
 	static void WindowResizedCallback(GLFWwindow* window, int width, int height);
 	static void WindowMovedCallback(GLFWwindow* window, int x, int y);
 	static void WindowClosedCallback(GLFWwindow* window);
-
-	friend class Application;
-	friend class Window;
 };
 
 }

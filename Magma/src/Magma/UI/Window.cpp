@@ -4,7 +4,6 @@ using namespace VolcaniCore;
 
 namespace Magma::UI {
 
-
 Window::Window(uint32_t width, uint32_t height, const glm::vec4& bgColor,
 			   uint32_t borderWidth, uint32_t borderHeight,
 			   const glm::vec4& borderColor)
@@ -56,7 +55,6 @@ bool Window::OnAttach() {
 	return false; // TODO(Implement): More complex docking behavior
 }
 
-// TODO: Reposition the element within the window
 bool Window::OnAddElement(Ref<UIElement> element) {
 	return true;
 }

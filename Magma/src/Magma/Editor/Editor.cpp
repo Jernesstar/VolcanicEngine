@@ -6,7 +6,7 @@
 
 #include <VolcaniCore/Core/Log.h>
 #include <VolcaniCore/Renderer/RendererAPI.h>
-#include <VolcaniCore/Events/EventSystem.h>
+#include <VolcaniCore/Event/Events.h>
 
 namespace Magma {
 
@@ -38,46 +38,46 @@ Editor::Editor() {
 	io.FontDefault = io.Fonts->AddFontFromFileTTF(
 			"VolcaniCore/assets/fonts/JetBrainsMono-Regular.ttf", fontSize);
 
-	EventSystem::RegisterListener<KeyPressedEvent>(
+	Events::RegisterListener<KeyPressedEvent>(
 	[&io](KeyPressedEvent& event) {
 		io.AddKeyEvent(KeyToImGuiKey(event.Key), true);
 		event.Handled = true;
 	});
-	EventSystem::RegisterListener<KeyReleasedEvent>(
+	Events::RegisterListener<KeyReleasedEvent>(
 	[&io](KeyReleasedEvent& event) {
 		io.AddKeyEvent(KeyToImGuiKey(event.Key), false);
 		event.Handled = true;
 	});
-	EventSystem::RegisterListener<KeyCharEvent>(
+	Events::RegisterListener<KeyCharEvent>(
 	[&io](KeyCharEvent& event) {
 		io.AddInputCharacter(event.Key);
 		event.Handled = true;
 	});
-	EventSystem::RegisterListener<MouseButtonPressedEvent>(
+	Events::RegisterListener<MouseButtonPressedEvent>(
 	[&io](MouseButtonPressedEvent& event) {
 		io.AddMouseButtonEvent(event.Button, true);
 		event.Handled = true;
 	});
-	EventSystem::RegisterListener<MouseButtonReleasedEvent>(
+	Events::RegisterListener<MouseButtonReleasedEvent>(
 	[&io](MouseButtonReleasedEvent& event) {
 		io.AddMouseButtonEvent(event.Button, false);
 		event.Handled = true;
 	});
-	EventSystem::RegisterListener<MouseScrolledEvent>(
+	Events::RegisterListener<MouseScrolledEvent>(
 	[&io](MouseScrolledEvent& event) {
 		io.AddMouseWheelEvent(event.ScrollX, event.ScrollY);
 		event.Handled = true;
 	});
-	EventSystem::RegisterListener<MouseMovedEvent>(
+	Events::RegisterListener<MouseMovedEvent>(
 	[&io](const MouseMovedEvent& event) {
 		io.AddMousePosEvent(event.x, event.y);
 	});
-	EventSystem::RegisterListener<WindowResizedEvent>(
+	Events::RegisterListener<WindowResizedEvent>(
 	[&io](const WindowResizedEvent& event) {
 		io.DisplaySize = ImVec2{ (float)event.Width, (float)event.Height };
 	});
 
-	EventSystem::RegisterListener<KeyPressedEvent>(
+	Events::RegisterListener<KeyPressedEvent>(
 	[](const KeyPressedEvent& event) {
 		if(event.Key == Key::Escape)
 			Application::Close();

@@ -4,12 +4,17 @@
 
 namespace VolcaniCore {
 
+// TODO(Implement):
 class Buffer {
 public:
 	Buffer(std::size_t size) {
 		m_Data = malloc(size);
 	}
-	~Buffer();
+	~Buffer() = default;
+
+	Delete() {
+		delete m_Data;
+	}
 
 private:
 	void* m_Data;
