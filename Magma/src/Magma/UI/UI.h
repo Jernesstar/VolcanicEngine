@@ -9,6 +9,7 @@
 #include <Core/Defines.h>
 #include <Event/Events.h>
 #include <Renderer/RendererAPI.h>
+
 #include <Object/Texture.h>
 
 using namespace VolcaniCore;
@@ -31,6 +32,18 @@ public:
 		Text,
 		Image
 	};
+
+	struct Specification {
+		uint32_t Width = 0;
+		uint32_t Height = 0;
+		float x = 0;
+		float y = 0;
+		glm::vec4 m_Color;
+		Ref<Texture> m_Border = nullptr;
+	}
+
+public:
+	static Ref<UIElement> Create(const UIElement::Specification& specs);
 
 public:
 	UIElement(UIElement::Type type, uint32_t width = 100, uint32_t height = 100,
@@ -83,8 +96,9 @@ public:
 		return std::static_pointer_cast<TElement>(element);
 	}
 
-	template<typename TDerived>
-	TDerived* As() const { return (TDerived*)(this); }
+	template<typename TUIElement>
+	requires std::derived_from<TUIElement, UIElement>
+	TUIElement* As() const { return (TUIElement*)(this); }
 
 protected:
 	virtual void Draw() = 0;

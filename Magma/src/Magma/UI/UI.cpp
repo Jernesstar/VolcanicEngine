@@ -26,6 +26,11 @@ namespace Magma::UI {
 
 // }
 
+// Ref<UIElement> UIElement::Create(const UIElement::Specification& specs) {
+// 	return CreateRef<UIElement>(UIElement::Type,
+// 								specs.Width, specs.Height, specs.x, specs.y)
+// }
+
 UIElement::UIElement(UIElement::Type type, uint32_t width, uint32_t height,
 					 float x, float y, Ref<UIElement> parent)
 	: m_Type(type), m_Width(width), m_Height(height), x(x), y(y),
