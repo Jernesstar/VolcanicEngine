@@ -8,22 +8,19 @@ namespace Demo {
 
 class IsometricCamera : public Camera {
 public:
+	float R = 5.0f;
+
+public:
 	IsometricCamera()
 		: Camera(Camera::Type::Ortho)
 	{
-		float r = 4.0f;
-		Position = r * glm::vec3{
+		Position = R * glm::vec3{
 			glm::sin(glm::radians(45.0f)),
 			glm::sin(glm::radians(35.264f)),
-			glm::cos(glm::radians(45.0f))
+			glm::sin(glm::radians(45.0f))
 		};
 
-		Direction = r * glm::vec3{
-			// 0.0f, 0.0f,
-			-glm::sin(glm::radians(45.0f)),
-			-glm::sin(glm::radians(35.254f)),
-			-glm::cos(glm::radians(45.0f))
-		};
+		Direction = -glm::normalize(Position);
 
 		CalculateProjection();
 		CalculateView();
@@ -32,14 +29,14 @@ public:
 
 private:
 	void CalculateProjection() override {
-		Projection = glm::perspectiveFov(glm::radians(75.0f),
-										 (float)ViewportWidth,
-										 (float)ViewportHeight,
-										 Near, Far);
+		// Projection = glm::perspectiveFov(glm::radians(75.0f),
+		// 								 (float)ViewportWidth,
+		// 								 (float)ViewportHeight,
+		// 								 Near, Far);
 
-		Projection = glm::ortho(-ViewportWidth / 2.0f, ViewportWidth  / 2.0f,
-								-ViewportHeight/ 2.0f, ViewportHeight / 2.0f,
-								Near, Far);
+		float asp = R * (ViewportWidth/ViewportHeight);
+		Projection = glm::ortho(-asp, asp, -R, R, Near, Far);
+
 		ViewProjection = Projection * View;
 	}
 	void CalculateView() override {
@@ -91,11 +88,11 @@ Cube::Cube() {
 	// camera = CreateRef<StereographicCamera>(75.0f);
 	// camera = CreateRef<OrthographicCamera>(800, 600, 0.1f, 100.0f);
 	camera = CreateRef<IsometricCamera>();
-	// controller = CreateRef<CameraController>(camera);
+	controller = CreateRef<CameraController>(camera);
 }
 
 void Cube::OnUpdate(TimeStep ts) {
-	// controller->OnUpdate(ts);
+	controller->OnUpdate(ts);
 
 	Renderer::StartPass(renderPass);
 	{
@@ -103,8 +100,10 @@ void Cube::OnUpdate(TimeStep ts) {
 
 		Renderer3D::Begin(camera);
 
-		Renderer3D::DrawMesh(cube, { .Translation = { 0.0f, 0.0f, -3.0f } });
-
+		for(int y = -5; y < 5; y++)
+			for(int x = -5; x < 5; x++)
+				Renderer3D::DrawMesh(cube, { .Translation = { x, 0.0f, y } });
+		
 		Renderer3D::End();
 	}
 	Renderer::EndPass();

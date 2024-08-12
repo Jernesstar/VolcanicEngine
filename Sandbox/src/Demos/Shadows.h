@@ -52,6 +52,7 @@ Shadows::Shadows() {
 
 	depthPass = RenderPass::Create("Depth Pass", depthShader);
 	depthPass->SetOutput(depthMap);
+
 	shadowPass = RenderPass::Create("Shadow Pass", shadowShader);
 
 	cube = Mesh::Create(MeshPrimitive::Cube,
@@ -64,17 +65,19 @@ Shadows::Shadows() {
 }
 
 void Shadows::OnUpdate(TimeStep ts) {
+	glm::mat4 lightProjection, lightView, lightSpaceMatrix;
+	glm::vec3 lightPos = glm::vec3(-2.0f, 4.0f, -1.0f);
+	float near = 1.0f, far = 7.5f;
+
+	lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near, far);
+	lightView = glm::lookAt(lightPos, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	lightSpaceMatrix = lightProjection * lightView;
+	// render scene from light's point of view
+
 	Renderer::StartPass(depthPass);
 	{
 		Renderer::Clear();
 
-		glm::mat4 lightProjection, lightView, lightSpaceMatrix;
-		glm::vec3 lightPos = glm::vec3(-2.0f, 4.0f, -1.0f);
-		float near = 1.0f, far = 7.5f;
-		lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near, far);
-		lightView = glm::lookAt(lightPos, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		lightSpaceMatrix = lightProjection * lightView;
-		// render scene from light's point of view
 		depthShader->SetMat4("u_LightSpaceMatrix", lightSpaceMatrix);
 
 		RenderScene();
@@ -85,10 +88,14 @@ void Shadows::OnUpdate(TimeStep ts) {
 	{
 		Renderer::Clear();
 
+		depthMap->Get(AttachmentTarget::Color).Bind();
+		shadowShader->SetInt("u_ShadowMap", 0);
+
+		shadowShader->SetMat4("u_LightSpaceMatrix", lightSpaceMatrix);
+
 		RenderScene();
 	}
 	Renderer::EndPass();
-
 	// RendererAPI::Get()->RenderFramebuffer(depthMap, AttachmentTarget::Depth);
 }
 

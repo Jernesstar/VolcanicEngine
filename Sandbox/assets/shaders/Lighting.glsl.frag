@@ -95,10 +95,10 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 viewDir)
 
 vec3 CalcDirLight(vec3 normal, vec3 viewDir)
 {
-    vec3 light_dir = normalize(u_DirectionalLight.Direction);
-    vec3 reflect_dir = reflect(light_dir, normal);
-    float diff = max(dot(normal, -light_dir), 0.0);
-    float spec = pow(max(dot(viewDir, reflect_dir), 0.0), u_Material.Shininess);
+    vec3 lightDir = normalize(u_DirectionalLight.Direction);
+    vec3 reflectDir = reflect(lightDir, normal);
+    float diff = max(dot(normal, -lightDir), 0.0);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), u_Material.Shininess);
 
     vec3 ambient  = u_DirectionalLight.Ambient  * 1.0  * vec3(texture(u_Material.Diffuse, v_TexCoord));
     vec3 diffuse  = u_DirectionalLight.Diffuse  * diff * vec3(texture(u_Material.Diffuse, v_TexCoord));
@@ -111,7 +111,7 @@ vec3 CalcSpotLight(vec3 normal, vec3 viewDir)
     float cutoff = cos(u_Spotlight.CutoffAngle);
     float outer = cos(u_Spotlight.OuterCutoffAngle);
 
-    vec3 lightDir = normalize(v_Position - u_Spotlight.Position.xyz);
+    vec3 lightDir = normalize(v_Position - u_Spotlight.Position);
     vec3 reflectDir = reflect(lightDir, normal);
     float diff = clamp(dot(normal, -lightDir), 0.0, 1.0);
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), u_Material.Shininess);
