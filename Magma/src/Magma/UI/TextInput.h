@@ -2,10 +2,7 @@
 
 #include "UI.h"
 
-using namespace VolcaniCore;
-
 namespace Magma::UI {
-
 
 class TextInput : public UIElement {
 public:
@@ -23,6 +20,5 @@ private:
 private:
 	std::string m_Text;
 };
-
 
 }

@@ -1,19 +1,10 @@
 #include "TextInput.h"
 
-#include <Renderer/RendererAPI.h>
-#include <Event/Events.h>
-
-#include <OpenGL/Renderer.h>
-
-using namespace VolcaniCore;
-
 namespace Magma::UI {
 
 TextInput::TextInput(uint32_t maxChars)
-	: UIElement(UIElement::Type::TextInput), MaxCharCount(maxChars), m_Text("")
-{
-
-}
+	: UIElement(UIElement::Type::TextInput), MaxCharCount(maxChars),
+		m_Text("") { }
 
 void TextInput::Draw() {
 	static char input[64]{""};

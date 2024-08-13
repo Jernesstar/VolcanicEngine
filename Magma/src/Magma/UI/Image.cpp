@@ -13,6 +13,16 @@ Image::Image(Ref<Texture> image)
 Image::Image(const std::string& imagePath)
 	: UIElement(UIElement::Type::Image)
 {
+	Set(imagePath);
+}
+
+void Image::Set(Ref<Texture> image) {
+	m_Image = image;
+	m_Width = m_Image->GetWidth();
+	m_Height = m_Image->GetHeight();
+}
+
+void Image::Set(const std::string& path) {
 	m_Image = Texture::Create(imagePath);
 	m_Width = m_Image->GetWidth();
 	m_Height = m_Image->GetHeight();

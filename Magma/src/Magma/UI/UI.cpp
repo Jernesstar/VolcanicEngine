@@ -1,8 +1,13 @@
 #include "UI.h"
 
+#include <imgui/imgui.h>
+#include <imgui/backends/imgui_impl_glfw.h>
+#include <imgui/backends/imgui_impl_opengl3.h>
+
 #include <Core/Application.h>
-#include <Renderer/RendererAPI.h>
+#include <Core/Defines.h>
 #include <Event/Events.h>
+#include <Renderer/RendererAPI.h>
 
 using namespace VolcaniCore;
 
@@ -37,24 +42,20 @@ UIElement::UIElement(UIElement::Type type, uint32_t width, uint32_t height,
 		m_Parent(parent.get()) { }
 
 Ref<UIElement> UIElement::Add(Ref<UIElement> element) {
-	if(!OnAddElement(element)) return element;
+	if(OnAddElement(element)) {
+		auto oldParent = element->m_Parent;
+		element->m_Parent = this;
 
-	auto oldParent = element->m_Parent;
-	element->m_Parent = this;
-
-	if(!element->OnAttach()) {
-		element->m_Parent = oldParent;
-		return element;
+		if(element->OnAttach()) // If element accepts new parent
+			m_Children.push_back(element);
+		else
+			element->m_Parent = oldParent;
 	}
 
-	m_Children.push_back(element);
 	return element;
 }
 
 void UIElement::Render() {
-	// if(m_Border)
-	// 	Renderer2D::DrawQuad(m_Border);
-
 	Draw();
 
 	for(auto& child : m_Children)
@@ -90,9 +91,9 @@ void Init() {
 
 	ImGuiIO& io = ImGui::GetIO();
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard
-				   | ImGuiConfigFlags_NavEnableSetMousePos
-				   | ImGuiConfigFlags_DockingEnable
-				   | ImGuiConfigFlags_ViewportsEnable;
+					| ImGuiConfigFlags_NavEnableSetMousePos
+					| ImGuiConfigFlags_DockingEnable
+					| ImGuiConfigFlags_ViewportsEnable;
 	io.DisplaySize = ImVec2(window->GetWidth(), window->GetHeight());
 
 	if(RendererAPI::GetBackend() == RendererAPI::Backend::OpenGL) {
@@ -105,17 +106,18 @@ void Init() {
 	float fontSize = 18.0f * 2.0f;
 	io.Fonts->AddFontFromFileTTF(
 			"VolcaniCore/assets/fonts/JetBrainsMono-Bold.ttf", fontSize);
-	io.FontDefault = io.Fonts->AddFontFromFileTTF(
+	io.FontDefault =
+		io.Fonts->AddFontFromFileTTF(
 			"VolcaniCore/assets/fonts/JetBrainsMono-Regular.ttf", fontSize);
 
-	// Events::RegisterListener<MouseButtonPressedEvent>(
-	// [&io](MouseButtonPressedEvent& event) {
-	// 	event.Handled = io.WantCaptureMouse;
-	// });
-	// Events::RegisterListener<MouseButtonReleasedEvent>(
-	// [&io](MouseButtonReleasedEvent& event) {
-	// 	event.Handled = io.WantCaptureMouse;
-	// });
+	Events::RegisterListener<MouseButtonPressedEvent>(
+	[&io](MouseButtonPressedEvent& event) {
+		event.Handled = io.WantCaptureMouse;
+	});
+	Events::RegisterListener<MouseButtonReleasedEvent>(
+	[&io](MouseButtonReleasedEvent& event) {
+		event.Handled = io.WantCaptureMouse;
+	});
 	// Events::RegisterListener<MouseScrolledEvent>(
 	// [&io](MouseScrolledEvent& event) {
 	// 	event.Handled = io.WantCaptureMouse;

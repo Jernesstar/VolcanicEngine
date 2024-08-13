@@ -105,7 +105,7 @@ void Lighting::OnUpdate(TimeStep ts) {
 
 		Renderer3D::Begin(camera);
 
-		Renderer3D::DrawMesh(torch->GetMesh(0), { .Translation = light.Position });
+		Renderer3D::DrawModel(torch, { .Translation = light.Position });
 		Renderer3D::DrawMesh(cube, { .Translation = { -2.0f,  0.0f,  0.0f } });
 		Renderer3D::DrawMesh(cube, { .Translation = {  2.0f,  0.0f,  0.0f } });
 		Renderer3D::DrawMesh(cube, { .Translation = {  0.0f,  0.0f, -2.0f } });

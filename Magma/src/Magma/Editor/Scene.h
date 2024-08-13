@@ -1,12 +1,9 @@
 #pragma once
 
 #include <VolcaniCore/Core/Time.h>
-
 #include <VolcaniCore/Renderer/Camera.h>
-#include <VolcaniCore/Renderer/CameraController.h>
 
 #include "ECS/World.h"
-
 #include "Physics/World.h"
 
 using namespace VolcaniCore;
@@ -28,7 +25,7 @@ public:
 	Ref<Camera> GetCamera() const { return m_Camera; }
 
 	ECS::World& GetEntityWorld() { return m_EntityWorld; }
-	Physics::World& GetPhysiscsWorld() { return m_PhysicsWorld; }
+	Physics::World& GetPhysicsWorld() { return m_PhysicsWorld; }
 
 private:
 	void RegisterSystems();

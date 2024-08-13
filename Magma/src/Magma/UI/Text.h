@@ -1,16 +1,8 @@
 #pragma once
 
-#include "UI.h"
-
 #include <string>
-#include <vector>
 
-#include <imgui/imgui.h>
-#include <glm/vec4.hpp>
-
-#include <Core/Defines.h>
-
-using namespace VolcaniCore;
+#include "UI.h"
 
 namespace Magma::UI {
 
@@ -29,7 +21,6 @@ private:
 
 private:
 	std::string m_Text;
-	glm::vec4 m_Color;
 };
 
 }

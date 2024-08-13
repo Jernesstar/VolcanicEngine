@@ -1,18 +1,21 @@
 #include "Window.h"
 
-using namespace VolcaniCore;
-
 namespace Magma::UI {
 
-Window::Window(uint32_t width, uint32_t height, const glm::vec4& bgColor,
-			   uint32_t borderWidth, uint32_t borderHeight,
-			   const glm::vec4& borderColor)
-	: UIElement(UIElement::Type::Window, width, height),
-		m_BackgroundColor(bgColor), m_BorderColor(borderColor),
-		m_BorderWidth(borderWidth), m_BorderHeight(borderHeight)
-{
-
+Ref<Window> Create(const Window::Specification& specs) {
+	return CreateRef<UI::Window>(
+		specs.Width, specs.Height, specs.x, specs.y, specs.Color,
+		specs.BorderWidth, specs.BorderHeight, specs.BorderColor
+	);
 }
+
+Window::Window(uint32_t width, uint32_t height, float x, float y,
+				const glm::vec4& bgColor,
+				uint32_t borderWidth, uint32_t borderHeight,
+				const glm::vec4& borderColor)
+	: UIElement(UIElement::Type::Window, width, height, x, y, bgColor),
+		m_BorderWidth(borderWidth), m_BorderHeight(borderHeight)
+		m_BorderColor(borderColor) { }
 
 void Window::Draw() {
 	ImGuiViewport* viewport = ImGui::GetMainViewport();
@@ -26,12 +29,7 @@ void Window::Draw() {
 						ImVec2(m_BorderWidth, m_BorderHeight));
 
 	ImGui::PushStyleColor(ImGuiCol_WindowBg,
-	ImVec4{
-		m_BackgroundColor.r,
-		m_BackgroundColor.g,
-		m_BackgroundColor.b,
-		m_BackgroundColor.a
-	});
+						  ImVec4{ m_Color.r, m_Color.g, m_Color.b, m_Color.a });
 
 	ImGuiWindowFlags windowFlags;
 	windowFlags |= ImGuiWindowFlags_NoDocking

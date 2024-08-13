@@ -1,8 +1,6 @@
 #include "Scene.h"
 
 #include <VolcaniCore/Renderer/Renderer3D.h>
-#include <VolcaniCore/Renderer/ShaderLibrary.h>
-#include <VolcaniCore/Renderer/StereographicCamera.h>
 
 #include "ECS/PhysicsSystem.h"
 
@@ -14,12 +12,8 @@ namespace Magma {
 Scene::Scene(const std::string& name)
 	: Name(name)
 {
-	m_Camera = CreateRef<StereographicCamera>(75.0f);
-	m_Controller = CreateRef<CameraController>(m_Camera);
 	RegisterSystems();
 	RegisterObservers();
-
-	ShaderLibrary::Get("Mesh")->Bind();
 }
 
 void Scene::OnUpdate(TimeStep ts) {
@@ -28,10 +22,11 @@ void Scene::OnUpdate(TimeStep ts) {
 }
 
 void Scene::OnRender() {
+	if(!m_Camera)
+		return;
+
 	Renderer3D::Begin(m_Camera);
 
-	ShaderLibrary::Get("Mesh")->SetMat4("u_ViewProj", m_Camera->GetViewProjection());
-	ShaderLibrary::Get("Mesh")->SetVec3("u_CameraPosition", m_Camera->GetPosition());
 	m_RenderSys.run();
 
 	Renderer3D::End();
@@ -84,13 +79,15 @@ void Scene::RegisterSystems() {
 			.Rotation	 = t.Rotation,
 			.Scale		 = t.Scale
 		};
-		auto mesh = m.Mesh;
 
+		auto mesh = m.Mesh;
 		Material& material = mesh->GetMaterial();
 
-		ShaderLibrary::Get("Mesh")->SetMat4("u_Model", tr);
-		ShaderLibrary::Get("Mesh")->SetTexture("u_Diffuse", material.Diffuse, 0);
-		Renderer3D::DrawMesh(mesh);
+		auto pass = Renderer::GetPass();
+		auto pipeline = pass->GetPipeline();
+
+		pipeline->SetTexture("u_Diffuse", material.Diffuse, 0);
+		Renderer3D::DrawMesh(mesh, tr);
 	});
 }
 

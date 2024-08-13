@@ -12,22 +12,21 @@ using namespace Magma::ECS;
 namespace TheMazeIsLava {
 
 Level::Level(const std::string& name, std::vector<std::vector<uint32_t>> map)
-	: Name(name), m_Tilemap(map), m_Width(map[0].size()), m_Height(map.size())
+	: Name(name), Tilemap(map), Width(map[0].size()), Height(map.size())
 {
 	TraverseTilemap(
-	[this](uint32_t x, uint32_t y) {
+	[&](uint32_t x, uint32_t y) {
 		if(IsLava(x, y))
 			m_LavaPoints.push_back({ x, y });
+		if(IsGoal(x, y))
+			m_Goal = { x, y };
+		if(m_Tilemap[y][x] == 5)
+			m_PlayerStart = { x, y };
 	});
 }
 
-Level::~Level() {
-
-}
-
-void Level::Run(TimeStep ts) {
+void Level::OnUpdate(TimeStep ts) {
 	m_TimeStep = ts;
-	m_TimeSinceLevelStart += (float)ts;
 
 	PropagateLava();
 }
@@ -44,25 +43,36 @@ Ref<Scene> Level::Load() {
 
 	TraverseTilemap(
 	[&](uint32_t x, uint32_t y) {
-		ECS::Entity floor = ECS::EntityBuilder(world)
-		.Add<TransformComponent>(Transform{ .Translation = { x, 0.0f, y } })
-		.Add<MeshComponent>(GameState::Wall)
-		.Finalize();
-
-		if(!IsWall(x, y)) return;
-
-		ECS::Entity wall = ECS::EntityBuilder(world)
-		.Add<TransformComponent>(Transform{ .Translation = { x, 1.0f, y } })
-		.Add<MeshComponent>(GameState::Wall)
-		.Finalize();
-
-		if(!IsGoal(x, y)) return;
-
-		// TODO(codespace): Staircase model
-		ECS::Entity stairs = ECS::EntityBuilder(world)
-		.Add<TransformComponent>(Transform{ .Translation = { x, 1.0f, y } })
-		// .Add<MeshComponent>(GameState::StairModel)
-		.Finalize();
+		if(IsWall(x, y)) {
+			ECS::Entity wall = ECS::EntityBuilder(world)
+			.Add<TransformComponent>(Transform{ .Translation = { x, 1.0f, y } })
+			.Add<RigidBodyComponent>(RigidBody::Type::Static)
+			.Add<MeshComponent>(Asset::Wall)
+			.Finalize();
+		}
+		if(IsPath(x, y)) {
+			ECS::Entity floor = ECS::EntityBuilder(world)
+			.Add<TransformComponent>(Transform{ .Translation = { x, 0.0f, y } })
+			.Add<RigidBodyComponent>(RigidBody::Type::Static)
+			.Add<MeshComponent>(Asset::Wall)
+			// .Add<MeshComponent>(PickPathMesh(x, y))
+			.Finalize();
+		}
+		if(IsLava(x, y)) {
+			ECS::Entity lava = ECS::EntityBuilder(world)
+			.Add<TransformComponent>(Transform{ .Translation = { x, 1.0f, y } })
+			.Add<RigidBodyComponent>(RigidBody::Type::Static)
+			.Add<MeshComponent>(Asset::Wall)
+			// .Add<MeshComponent>(PickPathMesh(x, y))
+			.Finalize();
+		}
+		if(IsGoal(x, y)) {
+			ECS::Entity stairs = ECS::EntityBuilder(world, "Goal")
+			.Add<TransformComponent>(Transform{ .Translation = { x, 1.0f, y } })
+			.Add<RigidBodyComponent>(RigidBody::Type::Static)
+			.Add<MeshComponent>(Asset::Stairs)
+			.Finalize();
+		}
 	});
 
 	return scene;
@@ -71,24 +81,30 @@ Ref<Scene> Level::Load() {
 void Level::TraverseTilemap(
 	const std::function<void(uint32_t x, uint32_t y)>& func)
 {
-	for(uint32_t i = 0; i < m_Height; i++)
-		for(uint32_t j = 0; j < m_Width; j++)
+	for(uint32_t i = 0; i < Height; i++)
+		for(uint32_t j = 0; j < Width; j++)
 			func(j, i);
+}
+
+bool Level::InBounds(uint32_t col, uint32_t row) {
+	return (0 <= col) && (col < Width)
+		&& (0 <= row) && (row < Height)
 }
 
 bool Level::IsWall(uint32_t col, uint32_t row) {
 	return m_Tilemap[row][col] == 0;
 }
 bool Level::IsPath(uint32_t col, uint32_t row) {
-	return m_Tilemap[row][col] == 1;
+	return m_Tilemap[row][col] == 1
+		&& m_Tilemap[row][col] == 5;
 }
 bool Level::IsLava(uint32_t col, uint32_t row) {
 	return m_Tilemap[row][col] == 2;
 }
-bool Level::IsCheckpoint(uint32_t col, uint32_t row) {
+bool Level::IsGoal(uint32_t col, uint32_t row) {
 	return m_Tilemap[row][col] == 3;
 }
-bool Level::IsGoal(uint32_t col, uint32_t row) {
+bool Level::IsCheckpoint(uint32_t col, uint32_t row) {
 	return m_Tilemap[row][col] == 4;
 }
 

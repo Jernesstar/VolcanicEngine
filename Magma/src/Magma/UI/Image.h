@@ -2,10 +2,7 @@
 
 #include "UI.h"
 
-using namespace VolcaniCore;
-
 namespace Magma::UI {
-
 
 class Image : public UIElement {
 public:
@@ -13,7 +10,8 @@ public:
 	Image(const std::string& imagePath);
 
 	void Set(Ref<Texture> texture);
-	// void Set(const std::string& imagePath); // AssetManager
+	void Set(const std::string& imagePath);
+
 	Ref<Texture> GetImage() { return m_Image; }
 
 private:
@@ -24,6 +22,5 @@ private:
 private:
 	Ref<Texture> m_Image;
 };
-
 
 }

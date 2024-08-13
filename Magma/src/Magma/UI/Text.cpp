@@ -1,14 +1,10 @@
 #include "Text.h"
 
-#include <Core/Log.h>
-
-using namespace VolcaniCore;
-
 namespace Magma::UI {
 
-
-Text::Text(const std::string& text, const glm::vec4& color)
-	: UIElement(UIElement::Type::Text), m_Text(text), m_Color(color) { }
+Text::Text(const std::string& text, const glm::vec4& textColor)
+	: UIElement(UIElement::Type::Text, 0, 0, 0.0f, 0.0f, textColor),
+		m_Text(text) { }
 
 void Text::Draw() {
 	ImGui::PushStyleColor(ImGuiCol_Text,
@@ -38,6 +34,5 @@ bool Text::OnAttach() {
 bool Text::OnAddElement(Ref<UIElement> element) {
 	return false;
 }
-
 
 }

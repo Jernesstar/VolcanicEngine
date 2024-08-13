@@ -1,3 +1,4 @@
+
 #pragma once
 
 #include <cstdint>
@@ -22,20 +23,21 @@ using Coordinate = glm::vec2;
 class Level {
 public:
 	const std::string Name;
-	// Return the speed of the lava as a function
-	// of the time elapsed since the level started
-	// const std::function<float(float t)> LavaSpeed;
+	const std::vector<std::vector<uint32_t>> Tilemap;
+	const uint32_t Width, Height;
 
-	// TODO(Implement): Checkpoints
 public:
 	Level(const std::string& name, std::vector<std::vector<uint32_t>> map);
-	~Level();
+	~Level() = default;
 
-	std::vector<std::vector<uint32_t>> GetTilemap() const { return m_Tilemap; }
+	void OnUpdate(TimeStep ts);
 
 	Ref<Scene> Load();
 
-	void Run(TimeStep ts);
+private:
+	Coordinate m_Goal;
+	Coordinate m_PlayerStart;
+	std::vector<Coordinate> m_LavaPoints;
 
 private:
 	void PropagateLava();
@@ -45,16 +47,8 @@ private:
 	bool IsWall(uint32_t col, uint32_t row);
 	bool IsPath(uint32_t col, uint32_t row);
 	bool IsLava(uint32_t col, uint32_t row);
-	bool IsCheckpoint(uint32_t col, uint32_t row);
 	bool IsGoal(uint32_t col, uint32_t row);
-
-	TimeStep m_TimeStep;
-	float m_TimeSinceLevelStart;
-	const uint32_t m_Width, m_Height;
-
-	Coordinate m_Goal;
-	std::vector<Coordinate> m_LavaPoints;
-	std::vector<std::vector<uint32_t>> m_Tilemap;
+	bool IsCheckpoint(uint32_t col, uint32_t row);
 };
 
 }

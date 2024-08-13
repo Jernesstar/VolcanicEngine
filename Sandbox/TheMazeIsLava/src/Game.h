@@ -1,14 +1,13 @@
 #pragma once
 
 #include <Core/Application.h>
+
+#include <Renderer/RenderPass.h>
 #include <Renderer/Camera.h>
-#include <Renderer/StereographicCamera.h>
 #include <Renderer/CameraController.h>
 
 #include <Magma/Editor/Scene.h>
 #include <Magma/UI/UI.h>
-
-#include "Level.h"
 
 using namespace VolcaniCore;
 using namespace Magma;
@@ -23,23 +22,26 @@ public:
 	void OnUpdate(TimeStep ts) override;
 
 private:
-	// void Reset();
-
-	void StartScreen();
+	void HomeScreen();
 	void LevelScreen();
 	void PlayScreen();
 	void OverScreen();
 
 private:
-	Ref<UI::UIElement> m_CurrentUI;
-	Ref<Scene> m_Scene;
-
 	TimeStep m_TimeStep;
+	Ref<UI::UIElement> m_CurrentUI;
 	std::function<void(void)> m_CurrentScreen;
-	uint32_t m_CurrentLevel = 0;
-	bool m_ReturnPressed = false;
+
+	Ref<Scene> m_Scene;
+	Ref<CameraController> m_Controller;
+
+	inline static Ref<RenderPass> m_LightingPass;
+	inline static Ref<RenderPass> m_ShadowPass;
+
 	bool m_Paused = false;
 	bool m_GameOver = false;
+	bool m_LevelPassed = false;
+	bool m_ReturnPressed = false;
 };
 
 }

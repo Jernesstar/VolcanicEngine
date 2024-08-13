@@ -15,8 +15,8 @@ void PhysicsSystem::Register(Physics::World& world, Entity& entity) {
 	world.AddActor(actor);
 }
 
-void PhysicsSystem::RegisterForCollisionDetection(Physics::World& world,
-												  Entity& e1, Entity& e2)
+void PhysicsSystem::RegisterForCollisionDetection(
+		Physics::World& world, Entity& e1, Entity& e2)
 {
 	if(e1 == e2)
 		return;
