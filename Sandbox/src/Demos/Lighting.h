@@ -38,7 +38,8 @@ private:
 	Ref<CameraController> controller;
 
 	Ref<Mesh> cube;
-	Ref<VolcaniCore::Model> torch;
+	Ref<Model> torch;
+	Ref<Model> stairs;
 
 	PointLight light;
 };
@@ -56,6 +57,7 @@ Lighting::Lighting() {
 		.Specular = Texture::Create("Sandbox/assets/images/wood_specular.png"),
 	});
 	torch = ::Model::Create("Sandbox/assets/models/mc-torch/Torch.obj");
+	stairs = ::Model::Create("Sandbox/TheMazeIsLava/assets/models/stairs/stairs.obj");
 
 	shader = ShaderPipeline::Create({
 		{ "Sandbox/assets/shaders/Lighting.glsl.vert", ShaderType::Vertex },
@@ -68,7 +70,7 @@ Lighting::Lighting() {
 		.Linear    = 0.0f,
 		.Quadratic = 0.032f,
 	};
-	light.Position = { 0.0f, -1.0f, 0.0f },
+	light.Position = { 0.0f, 1.0f, 0.0f },
 	light.Ambient  = { 0.2f, 0.2f, 0.2f },
 	light.Diffuse  = { 0.5f, 0.5f, 0.5f },
 	light.Specular = { 1.0f, 1.0f, 1.0f },
@@ -85,9 +87,9 @@ Lighting::Lighting() {
 	shader->SetFloat("u_PointLights[0].Linear",    light.Linear);
 	shader->SetFloat("u_PointLights[0].Quadratic", light.Quadratic);
 
-	shader->SetTexture("u_Material.Diffuse", cube->GetMaterial().Diffuse, 0);
-	shader->SetTexture("u_Material.Specular", cube->GetMaterial().Specular, 1);
-	shader->SetFloat("u_Material.Shininess", 32.0f);
+	// shader->SetTexture("u_Material.Diffuse", cube->GetMaterial().Diffuse, 0);
+	// shader->SetTexture("u_Material.Specular", cube->GetMaterial().Specular, 1);
+	// shader->SetFloat("u_Material.Shininess", 32.0f);
 
 	camera = CreateRef<StereographicCamera>(75.0f);
 	// camera = CreateRef<OrthographicCamera>(800, 600, 0.1f, 100.0f);
@@ -105,16 +107,19 @@ void Lighting::OnUpdate(TimeStep ts) {
 
 		Renderer3D::Begin(camera);
 
-		Renderer3D::DrawModel(torch, { .Translation = light.Position });
+		Renderer3D::DrawModel(torch,
+		{
+			.Translation = light.Position - glm::vec3{ 0.0f, .0f, 0.0f }
+		});
 		Renderer3D::DrawMesh(cube, { .Translation = { -2.0f,  0.0f,  0.0f } });
 		Renderer3D::DrawMesh(cube, { .Translation = {  2.0f,  0.0f,  0.0f } });
 		Renderer3D::DrawMesh(cube, { .Translation = {  0.0f,  0.0f, -2.0f } });
 		Renderer3D::DrawMesh(cube, { .Translation = {  0.0f,  0.0f,  2.0f } });
 
-		Renderer3D::DrawMesh(cube, {
-										.Translation = { 0.0f, -13.0f, 0.0f},
-										.Scale = glm::vec3(20.0f)
-								   });
+		Renderer3D::DrawModel(stairs,
+		{
+			.Translation = { 0.0f, -3.0f, 0.0f },
+		});
 
 		Renderer3D::End();
 	}

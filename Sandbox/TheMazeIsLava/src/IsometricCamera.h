@@ -8,12 +8,13 @@ namespace TheMazeIsLava {
 
 class IsometricCamera : public Camera {
 public:
-	float R = 5.0f;
+	float R = 6.3f;
 
 public:
 	IsometricCamera()
 		: Camera(Camera::Type::Ortho)
 	{
+		Near = -2 * R;
 		Position = R * glm::vec3{
 			glm::sin(glm::radians(45.0f)),
 			glm::sin(glm::radians(35.264f)),

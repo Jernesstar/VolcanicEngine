@@ -4,7 +4,7 @@ namespace Magma::ECS {
 
 Transform TransformSystem::GetTransform(Entity& entity) {
 	if(!entity.Has<TransformComponent>())
-		return;
+		return Transform{ };
 
 	auto& t = entity.Get<TransformComponent>();
 	return Transform{

@@ -40,7 +40,6 @@ void RigidBody::SetShape(const Shape& shape) {
 }
 
 // TODO(Fix): Scaled transforms
-
 void RigidBody::UpdateTransform() {
 	PxTransform pose = m_Actor->getGlobalPose();
 	m_Transform.Translation = { pose.p.x, pose.p.y, pose.p.z };
@@ -86,6 +85,7 @@ DynamicBody::DynamicBody(const Shape& shape, const Transform& t)
 	UpdateTransform(t);
 }
 
+// TODO(Fix): attachShape for non-kinematic dynamic bodies not supported
 DynamicBody::DynamicBody(const Transform& t)
 	: RigidBody(RigidBody::Type::Dynamic, t)
 {

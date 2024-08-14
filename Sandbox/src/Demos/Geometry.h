@@ -26,7 +26,7 @@ Geometry::Geometry() {
 			Application::Close();
 	});
 
-	Physics::Init();
+	// Physics::Init();
 
 	// static const PxVec3 convexVerts[] = // Vertices for a square pyramid
 	// {

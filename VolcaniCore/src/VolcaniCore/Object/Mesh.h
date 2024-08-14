@@ -27,8 +27,11 @@ public:
 	static Ref<Mesh> Create(const std::vector<Vertex>& vertices,
 							const std::vector<uint32_t>& indices,
 							const Material& material = { });
+
 	static Ref<Mesh> Create(MeshPrimitive primitive,
 							const Material& material = { });
+
+	static Ref<Mesh> Create(MeshPrimitive primitive, const glm::vec4& color);
 
 public:
 	Mesh() = default;

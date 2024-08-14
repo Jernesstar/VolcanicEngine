@@ -1,14 +1,19 @@
 #include "Game.h"
 
-#include <Core/Input.h>
-#include <Core/Assert.h>
-#include <Event/Events.h>
+#include <VolcaniCore/Core/Input.h>
+#include <VolcaniCore/Core/Assert.h>
+#include <VolcaniCore/Event/Events.h>
 
-#include <Renderer/Renderer.h>
-#include <Renderer/Renderer3D.h>
-#include <Renderer/StereographicCamera.h>
+#include <VolcaniCore/Renderer/Renderer.h>
+#include <VolcaniCore/Renderer/Renderer3D.h>
+#include <VolcaniCore/Renderer/StereographicCamera.h>
+#include <VolcaniCore/Renderer/ShaderLibrary.h>
 
+#include <Magma/ECS/Systems.h>
+
+#include "Asset.h"
 #include "GameState.h"
+#include "Player.h"
 #include "IsometricCamera.h"
 #include "Light.h"
 
@@ -26,39 +31,42 @@ Game::Game()
 	});
 
 	UI::Init();
+	Asset::Init();
 	GameState::Reset();
 
-	auto shader = ShaderPipeline::Create({
-		{ "Sandbox/assets/shaders/Lighting.glsl.vert", ShaderType::Vertex },
-		{ "Sandbox/assets/shaders/Lighting.glsl.frag", ShaderType::Fragment }
-	});
-	m_LightingPass = RendererPass::Create("Lighting", shader);
+	// auto shader = ShaderPipeline::Create({
+	// 	{ "Sandbox/assets/shaders/Lighting.glsl.vert", ShaderType::Vertex },
+	// 	{ "Sandbox/assets/shaders/Lighting.glsl.frag", ShaderType::Fragment }
+	// });
+	auto shader = ShaderLibrary::Get("Mesh");
+	m_LightingPass = RenderPass::Create("Lighting", shader);
 
-	light = PointLight{
-		.Constant  = 0.3f,
-		.Linear    = 0.0f,
-		.Quadratic = 0.032f,
-	};
+	PointLight light =
+		PointLight{
+			.Constant  = 0.3f,
+			.Linear    = 0.0f,
+			.Quadratic = 0.032f,
+		};
 	light.Position = { 0.0f, 2.0f, 0.0f },
 	light.Ambient  = { 0.2f, 0.2f, 0.2f },
 	light.Diffuse  = { 0.5f, 0.5f, 0.5f },
 	light.Specular = { 1.0f, 1.0f, 1.0f },
 
-	shader->Bind();
+	// shader->Bind();
 
-	shader->SetInt("u_PointLightCount", 1);
-	shader->SetVec3("u_PointLights[0].Position", light.Position);
-	shader->SetVec3("u_PointLights[0].Ambient",  light.Ambient);
-	shader->SetVec3("u_PointLights[0].Diffuse",  light.Diffuse);
-	shader->SetVec3("u_PointLights[0].Specular", light.Specular);
+	// shader->SetInt("u_PointLightCount", 1);
+	// shader->SetVec3("u_PointLights[0].Position", light.Position);
+	// shader->SetVec3("u_PointLights[0].Ambient",  light.Ambient);
+	// shader->SetVec3("u_PointLights[0].Diffuse",  light.Diffuse);
+	// shader->SetVec3("u_PointLights[0].Specular", light.Specular);
 
-	shader->SetFloat("u_PointLights[0].Constant",  light.Constant);
-	shader->SetFloat("u_PointLights[0].Linear",    light.Linear);
-	shader->SetFloat("u_PointLights[0].Quadratic", light.Quadratic);
+	// shader->SetFloat("u_PointLights[0].Constant",  light.Constant);
+	// shader->SetFloat("u_PointLights[0].Linear",    light.Linear);
+	// shader->SetFloat("u_PointLights[0].Quadratic", light.Quadratic);
 
-	shader->SetTexture("u_Material.Diffuse", cube->GetMaterial().Diffuse, 0);
-	shader->SetTexture("u_Material.Specular", cube->GetMaterial().Specular, 1);
-	shader->SetFloat("u_Material.Shininess", 32.0f);
+	// shader->SetTexture("u_Material.Diffuse", cube->GetMaterial().Diffuse, 0);
+	// shader->SetTexture("u_Material.Specular", cube->GetMaterial().Specular, 1);
+	// shader->SetFloat("u_Material.Shininess", 32.0f);
 
 	m_CurrentUI = GameState::HomeUI;
 	m_CurrentScreen = std::bind(&Game::HomeScreen, this);
@@ -103,10 +111,12 @@ void Game::LevelScreen() {
 
 	auto camera = CreateRef<IsometricCamera>();
 	m_Controller = CreateRef<CameraController>(camera,
-		MovementControls{
+		MovementControls(
+		ControlMap{
 			{ Control::Forward,  Key::Invalid },
 			{ Control::Backward, Key::Invalid },
-		});
+		})
+	);
 
 	auto& currLevel = GameState::GetLevel();
 	m_Scene = currLevel.Load();
@@ -117,7 +127,6 @@ void Game::LevelScreen() {
 	player
 	.Get<TransformComponent>().Translation = { start.x, 0.0f, start.y };
 
-	PhysicsSystem::Register(player);
 	// TODO(Implement): Collision with group
 	// PhysicsSystem::RegisterForCollisionDetection(player, m_LavaGroup);
 
@@ -128,10 +137,13 @@ void Game::LevelScreen() {
 void Game::PlayScreen() {
 	// Gameplay
 	GameState::GetLevel().OnUpdate(m_TimeStep);
+	m_Controller->OnUpdate(m_TimeStep);
+	m_Scene->OnUpdate(m_TimeStep);
 
 	Renderer::StartPass(m_LightingPass);
 	{
-		m_Scene->OnUpdate(m_TimeStep);
+		Renderer::Clear();
+
 		m_Scene->OnRender();
 	}
 	Renderer::EndPass();

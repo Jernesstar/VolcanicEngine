@@ -12,6 +12,9 @@ public:
 
 private:
 	Ref<Scene> scene;
+
+	Ref<ShaderPipeline> shader;
+	Ref<RenderPass> renderPass;
 };
 
 ECS::ECS() {
@@ -22,10 +25,11 @@ ECS::ECS() {
 	});
 
 	scene = CreateRef<Scene>();
+	scene->SetCamera(CreateRef<StereographicCamera>());
 	auto& world = scene->GetEntityWorld();
 
 	Magma::ECS::Entity entity = Magma::ECS::EntityBuilder(world)
-	.Add<TransformComponent>()
+	.Add<TransformComponent>(Transform{ .Translation = { 0.0f, 0.0f, -3.0f } })
 	.Add<MeshComponent>(MeshPrimitive::Cube,
 		Material{
 			.Diffuse = Texture::Create("Sandbox/assets/images/wood.png")
@@ -45,11 +49,25 @@ ECS::ECS() {
 	});
 
 	VOLCANICORE_LOG_INFO("Success");
+
+	shader = ShaderPipeline::Create({
+		{ "VolcaniCore/assets/shaders/Mesh.glsl.vert", ShaderType::Vertex },
+		{ "VolcaniCore/assets/shaders/Mesh.glsl.frag", ShaderType::Fragment }
+	});
+
+	renderPass = RenderPass::Create("Render Pass", shader);
 }
 
 void ECS::OnUpdate(TimeStep ts) {
-	scene->OnUpdate(ts);
-	scene->OnRender();
+	Renderer::StartPass(renderPass);
+	{
+		Renderer::Clear();
+
+		scene->OnUpdate(ts);
+		scene->OnRender();
+	}
+	Renderer::EndPass();
+
 }
 
 }

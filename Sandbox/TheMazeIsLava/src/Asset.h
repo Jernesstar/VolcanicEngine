@@ -3,16 +3,21 @@
 #include <Object/Mesh.h>
 #include <Object/Model.h>
 
+using namespace VolcaniCore;
+
 namespace TheMazeIsLava {
 
-struct Asset {
+class Asset {
+public:
 	static void Init();
 
+public:
 	inline static Ref<Mesh> Wall;
+	inline static Ref<Mesh> Lava;
 
-	inline static Ref<Model> Player;
-	inline static Ref<Model> Torch;
-	inline static Ref<Model> Stairs;
+	inline static Ref<Mesh> Player;
+	inline static Ref<Mesh> Torch;
+	inline static Ref<Mesh> Stairs;
 };
 
 }

@@ -13,7 +13,7 @@ public:
 		uint32_t Height = 100;
 		float x = 0;
 		float y = 0;
-		glm::vec4 m_Color = glm::vec4(1.0f);
+		glm::vec4 Color = glm::vec4(1.0f);
 
 		uint32_t BorderWidth = 0;
 		uint32_t BorderHeight = 0;
@@ -21,7 +21,7 @@ public:
 	};
 
 public:
-	static Ref<UI::Window> Create(const UI::Window::Specification& specs = { });
+	static Ref<UI::Window> Create(const UI::Window::Specification& specs);
 
 public:
 	Window(uint32_t width, uint32_t height, float x, float y,

@@ -1,5 +1,9 @@
 #include "Text.h"
 
+#include <imgui/imgui.h>
+#include <imgui/backends/imgui_impl_glfw.h>
+#include <imgui/backends/imgui_impl_opengl3.h>
+
 namespace Magma::UI {
 
 Text::Text(const std::string& text, const glm::vec4& textColor)

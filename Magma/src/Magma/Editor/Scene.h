@@ -32,7 +32,6 @@ private:
 	void RegisterObservers();
 
 	Ref<Camera> m_Camera;
-	Ref<CameraController> m_Controller;
 
 	flecs::system m_RenderSys;
 	ECS::World m_EntityWorld;

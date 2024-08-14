@@ -18,7 +18,6 @@ Scene::Scene(const std::string& name)
 
 void Scene::OnUpdate(TimeStep ts) {
 	m_EntityWorld.OnUpdate(ts);
-	m_Controller->OnUpdate(ts);
 }
 
 void Scene::OnRender() {
@@ -80,14 +79,7 @@ void Scene::RegisterSystems() {
 			.Scale		 = t.Scale
 		};
 
-		auto mesh = m.Mesh;
-		Material& material = mesh->GetMaterial();
-
-		auto pass = Renderer::GetPass();
-		auto pipeline = pass->GetPipeline();
-
-		pipeline->SetTexture("u_Diffuse", material.Diffuse, 0);
-		Renderer3D::DrawMesh(mesh, tr);
+		Renderer3D::DrawMesh(m.Mesh, tr);
 	});
 }
 
@@ -103,9 +95,9 @@ void Scene::RegisterObservers() {
 	.each(
 	[&](flecs::entity e, RigidBodyComponent& r) {
 		Entity entity{ e };
-		// If the RigidBody was created without a shape,
-		// inherited the shape of the current mesh component
 
+		// If the RigidBody was created without a shape,
+		// inherit the shape of the current mesh component
 		if(entity.Has<MeshComponent>() && !r.Body->HasShape()) {
 			auto mesh = entity.Get<MeshComponent>().Mesh;
 			Shape shape(mesh);

@@ -40,15 +40,15 @@ void GameState::InitUI() {
 		.Width = 600,
 		.Height = 400,
 		.x = 100.0f,
-		.y = 100.0f
+		.y = 100.0f,
 		.Color = glm::vec4{ 0.859375f, 0.76171875f, 0.5859375f, 1.0f },
 		.BorderWidth = 10,
 		.BorderHeight = 20,
 		.BorderColor = glm::vec4{ 0.3125f, 0.234375f, 0.078125f, 1.0f }
-	}
+	};
 	HomeUI		  = UI::Window::Create(specs);
 	LevelSelectUI = UI::Window::Create(specs);
-	PauseUI		  = UI::Window::Create(spces);
+	PauseUI		  = UI::Window::Create(specs);
 	GameOverUI	  = UI::Window::Create(specs);
 
 	HomeUI

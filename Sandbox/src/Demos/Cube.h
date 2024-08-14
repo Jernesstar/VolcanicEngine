@@ -1,5 +1,7 @@
 #pragma once
 
+#include <imgui/imgui.h>
+
 #include <OpenGL/Framebuffer.h>
 
 using namespace VolcaniCore;
@@ -14,6 +16,7 @@ public:
 	IsometricCamera()
 		: Camera(Camera::Type::Ortho)
 	{
+		Near = -R;
 		Position = R * glm::vec3{
 			glm::sin(glm::radians(45.0f)),
 			glm::sin(glm::radians(35.264f)),
@@ -27,13 +30,13 @@ public:
 	}
 	~IsometricCamera() = default;
 
+	void SetDistance(float r) {
+		R = r;
+		CalculateProjection();
+	}
+
 private:
 	void CalculateProjection() override {
-		// Projection = glm::perspectiveFov(glm::radians(75.0f),
-		// 								 (float)ViewportWidth,
-		// 								 (float)ViewportHeight,
-		// 								 Near, Far);
-
 		float asp = R * (ViewportWidth/ViewportHeight);
 		Projection = glm::ortho(-asp, asp, -R, R, Near, Far);
 
@@ -49,6 +52,7 @@ private:
 class Cube : public Application {
 public:
 	Cube();
+	~Cube();
 
 	void OnUpdate(TimeStep ts);
 
@@ -71,6 +75,8 @@ Cube::Cube() {
 			Application::Close();
 	});
 
+	UI::Init();
+
 	shader = ShaderPipeline::Create({
 		{ "VolcaniCore/assets/shaders/Mesh.glsl.vert", ShaderType::Vertex },
 		{ "VolcaniCore/assets/shaders/Mesh.glsl.frag", ShaderType::Fragment }
@@ -88,11 +94,34 @@ Cube::Cube() {
 	// camera = CreateRef<StereographicCamera>(75.0f);
 	// camera = CreateRef<OrthographicCamera>(800, 600, 0.1f, 100.0f);
 	camera = CreateRef<IsometricCamera>();
-	controller = CreateRef<CameraController>(camera);
+	controller = CreateRef<CameraController>(camera,
+		MovementControls(
+		ControlMap{
+			{ Control::Forward,  Key::Invalid },
+			{ Control::Backward, Key::Invalid },
+		})
+	);
+}
+
+Cube::~Cube() {
+	UI::Close();
 }
 
 void Cube::OnUpdate(TimeStep ts) {
 	controller->OnUpdate(ts);
+
+	Renderer::Clear();
+
+	UI::Begin();
+	ImGui::Begin("Light");
+	{
+		float r = camera->As<IsometricCamera>()->R;
+		ImGui::SliderFloat("Light.R", &r, 0.0f, 10.0f);
+
+		camera->As<IsometricCamera>()->SetDistance(r);
+	}
+	ImGui::End();
+	UI::End();
 
 	Renderer::StartPass(renderPass);
 	{

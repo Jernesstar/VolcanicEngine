@@ -2,9 +2,9 @@
 
 namespace Demo {
 
-class Deferred : public Application {
+class Bloom : public Application {
 public:
-	Deferred();
+	Bloom();
 
 	void OnUpdate(TimeStep ts);
 
@@ -12,11 +12,13 @@ private:
 	Ref<Camera> camera;
 	Ref<CameraController> controller;
 
+	Ref<Mesh> cube;
+
 	Ref<ShaderPipeline> shader;
 	Ref<RenderPass> bloomPass;
 };
 
-Deferred::Deferred() {
+Bloom::Bloom() {
 	Events::RegisterListener<KeyPressedEvent>(
 	[](const KeyPressedEvent& event) {
 		if(event.Key == Key::Escape)
@@ -34,6 +36,8 @@ Deferred::Deferred() {
 	});
 	bloomPass = RenderPass::Create("Bloom Pass", shader);
 
+	cube = Mesh::Create(MeshPrimitive::Cube, { 1.0f, 0.0f, 0.0f, 1.0f });
+
 	camera = CreateRef<StereographicCamera>(75.0f);
 	// camera = CreateRef<OrthographicCamera>(800, 600, 0.1f, 100.0f);
 	camera->SetPosition({ 2.5f, 2.5f, 2.5f });
@@ -41,10 +45,17 @@ Deferred::Deferred() {
 	controller = CreateRef<CameraController>(camera);
 }
 
-void Deferred::OnUpdate(TimeStep ts) {
+void Bloom::OnUpdate(TimeStep ts) {
+	controller->OnUpdate(ts);
+
 	Renderer::StartPass(bloomPass);
 	{
+		Renderer::Clear();
+		Renderer3D::Begin(camera);
+
 		Renderer3D::DrawMesh(cube);
+
+		Renderer3D::End();
 	}
 	Renderer::EndPass();
 }

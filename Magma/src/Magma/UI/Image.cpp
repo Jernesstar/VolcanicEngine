@@ -1,5 +1,9 @@
 #include "Image.h"
 
+#include <imgui/imgui.h>
+#include <imgui/backends/imgui_impl_glfw.h>
+#include <imgui/backends/imgui_impl_opengl3.h>
+
 #include <OpenGL/Texture2D.h>
 
 using namespace VolcaniCore;
@@ -22,7 +26,7 @@ void Image::Set(Ref<Texture> image) {
 	m_Height = m_Image->GetHeight();
 }
 
-void Image::Set(const std::string& path) {
+void Image::Set(const std::string& imagePath) {
 	m_Image = Texture::Create(imagePath);
 	m_Width = m_Image->GetWidth();
 	m_Height = m_Image->GetHeight();

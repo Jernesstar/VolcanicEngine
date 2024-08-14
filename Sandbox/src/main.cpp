@@ -40,15 +40,16 @@ using namespace Magma;
 using namespace Magma::ECS;
 using namespace Magma::Physics;
 
-#include "Demos/Template.h"
 #include "Demos/Cube.h"
-#include "Demos/UI.h"
 #include "Demos/Lighting.h"
 #include "Demos/Shadows.h"
+#include "Demos/Bloom.h"
+#include "Demos/UI.h"
 #include "Demos/ECS.h"
 #include "Demos/Raycast.h"
 #include "Demos/Collision.h"
 #include "Demos/Geometry.h"
+#include "Demos/Template.h"
 
 #include "Sandbox/TheMazeIsLava/src/Game.h"
 

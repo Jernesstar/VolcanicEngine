@@ -4,6 +4,8 @@
 
 #include <Core/Defines.h>
 
+#include <Object/Texture.h>
+
 using namespace VolcaniCore;
 
 namespace Magma::UI {
@@ -73,7 +75,7 @@ public:
 	requires std::derived_from<TElement, UIElement>
 	Ref<TElement> Add(Args&&... args) {
 		Ref<UIElement> element{ new TElement(std::forward<Args>(args)...) };
-		return std::static_pointer_cast<TElement>(AddElement(element));
+		return std::static_pointer_cast<TElement>(Add(element));
 
 		// if(OnAddElement(element)) {
 		// 	auto oldParent = element->m_Parent;

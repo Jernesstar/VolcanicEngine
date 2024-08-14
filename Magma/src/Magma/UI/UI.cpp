@@ -4,10 +4,9 @@
 #include <imgui/backends/imgui_impl_glfw.h>
 #include <imgui/backends/imgui_impl_opengl3.h>
 
-#include <Core/Application.h>
-#include <Core/Defines.h>
-#include <Event/Events.h>
-#include <Renderer/RendererAPI.h>
+#include <VolcaniCore/Core/Application.h>
+#include <VolcaniCore/Event/Events.h>
+#include <VolcaniCore/Renderer/RendererAPI.h>
 
 using namespace VolcaniCore;
 
@@ -37,8 +36,9 @@ namespace Magma::UI {
 // }
 
 UIElement::UIElement(UIElement::Type type, uint32_t width, uint32_t height,
-					 float x, float y, Ref<UIElement> parent)
-	: m_Type(type), m_Width(width), m_Height(height), x(x), y(y),
+					 float x, float y, const glm::vec4& color,
+					 Ref<UIElement> parent)
+	: m_Type(type), m_Width(width), m_Height(height), x(x), y(y), m_Color(color),
 		m_Parent(parent.get()) { }
 
 Ref<UIElement> UIElement::Add(Ref<UIElement> element) {

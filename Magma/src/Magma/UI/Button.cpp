@@ -1,5 +1,9 @@
 #include "Button.h"
 
+#include <imgui/imgui.h>
+#include <imgui/backends/imgui_impl_glfw.h>
+#include <imgui/backends/imgui_impl_opengl3.h>
+
 #include <OpenGL/Texture2D.h>
 
 namespace Magma::UI {

@@ -17,6 +17,8 @@ public:
 	static void Reset();
 	static void Save();
 
+	static void ResetUI();
+
 	static Level& GetLevel(uint32_t level = 0);
 
 public:

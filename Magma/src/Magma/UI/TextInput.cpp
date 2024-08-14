@@ -1,5 +1,9 @@
 #include "TextInput.h"
 
+#include <imgui/imgui.h>
+#include <imgui/backends/imgui_impl_glfw.h>
+#include <imgui/backends/imgui_impl_opengl3.h>
+
 namespace Magma::UI {
 
 TextInput::TextInput(uint32_t maxChars)

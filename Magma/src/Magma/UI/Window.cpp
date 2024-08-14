@@ -1,8 +1,12 @@
 #include "Window.h"
 
+#include <imgui/imgui.h>
+#include <imgui/backends/imgui_impl_glfw.h>
+#include <imgui/backends/imgui_impl_opengl3.h>
+
 namespace Magma::UI {
 
-Ref<Window> Create(const Window::Specification& specs) {
+Ref<Window> Window::Create(const Window::Specification& specs) {
 	return CreateRef<UI::Window>(
 		specs.Width, specs.Height, specs.x, specs.y, specs.Color,
 		specs.BorderWidth, specs.BorderHeight, specs.BorderColor
@@ -14,7 +18,7 @@ Window::Window(uint32_t width, uint32_t height, float x, float y,
 				uint32_t borderWidth, uint32_t borderHeight,
 				const glm::vec4& borderColor)
 	: UIElement(UIElement::Type::Window, width, height, x, y, bgColor),
-		m_BorderWidth(borderWidth), m_BorderHeight(borderHeight)
+		m_BorderWidth(borderWidth), m_BorderHeight(borderHeight),
 		m_BorderColor(borderColor) { }
 
 void Window::Draw() {

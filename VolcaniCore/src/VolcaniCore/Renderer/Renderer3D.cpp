@@ -49,9 +49,10 @@ void Renderer3D::DrawMesh(Ref<Mesh> mesh,
 		Material& material = mesh->GetMaterial();
 
 		pipeline->SetMat4("u_Model", transform);
-		pipeline->SetTexture("u_Diffuse", material.Diffuse, 0);
-		// pipeline->SetTexture("u_Specular",  material.Specular,  1);
-		// pipeline->SetTexture("u_Roughness", material.Roughness, 2);
+		if(material.Diffuse)
+			pipeline->SetTexture("u_Diffuse", material.Diffuse, 0);
+		if(material.Specular)
+			pipeline->SetTexture("u_Specular",  material.Specular, 1);
 	}
 
 	RendererAPI::Get()->DrawMesh(mesh, transform);
