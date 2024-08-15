@@ -11,19 +11,15 @@ Text::Text(const std::string& text, const glm::vec4& textColor)
 		m_Text(text) { }
 
 void Text::Draw() {
-	ImGui::PushStyleColor(ImGuiCol_Text,
-						  ImVec4(m_Color.r, m_Color.g, m_Color.b, m_Color.a));
-
-	ImVec2 pos;
-	pos.x = x;
-	pos.y = y;
 	ImVec2 size = ImGui::CalcTextSize(m_Text.c_str());
 	m_Width = size.x;
 	m_Height = size.y;
 
-	// pos.x = x + ((boundry.x / 2) - ((m_Width + charSize.x) / 2));
-	// pos.y = y + ((idx * m_Height) + ypadding);
-	// ImGui::RenderText(pos, m_Text.c_str(), 0, false);
+	ImVec4 color{m_Color.r, m_Color.g, m_Color.b, m_Color.a };
+	ImGui::PushStyleColor(ImGuiCol_Text, color);
+	ImGui::SetCursorPos(ImVec2(x, y));
+
+	ImGui::Text(m_Text.c_str());
 
 	ImGui::PopStyleColor();
 }

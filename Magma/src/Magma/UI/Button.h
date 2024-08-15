@@ -21,11 +21,11 @@ public:
 			const glm::vec4& textColor = glm::vec4(1.0f));
 	Button(const std::string& imagePath);
 
-	UIElement* SetOnPressed(const std::function<void(void)>& callback) {
+	Button* SetOnPressed(const std::function<void(void)>& callback) {
 		OnPressed = callback;
 		return this;
 	}
-	UIElement* SetOnReleased(const std::function<void(void)>& callback) {
+	Button* SetOnReleased(const std::function<void(void)>& callback) {
 		OnReleased = callback;
 		return this;
 	}

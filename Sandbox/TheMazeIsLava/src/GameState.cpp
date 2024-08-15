@@ -53,7 +53,12 @@ void GameState::InitUI() {
 
 	HomeUI
 	->Add<UI::Text>("The Maze is Lava", glm::vec4(0.0f, 0.0f, 0.0f, 1.0f))
-	->SetPosition(100, 100);
+	->SetPosition(160, 100);
+
+	HomeUI
+	->Add<UI::Text>("Press start to play", glm::vec4(0.0f, 0.0f, 0.0f, 1.0f))
+	->SetPosition(120, 150);
+
 	// HomeUI
 	// ->Add<UI::Image>("Sandbox/assets/images/background.png")
 	// ->SetPosition(100, 100);
@@ -72,8 +77,8 @@ void GameState::ResetUI() {
 		->Add<UI::Button>(color, std::to_string(i))
 		->SetOnPressed(
 		[i]() {
-			VOLCANICORE_LOG_INFO("Level Selected: %i", i);
-			SelectedLevel = i;
+			if(i <= MaxLevel)
+				SelectedLevel = i;
 		})
 		->SetSize(70, 50)
 		->SetPosition(i * 70 + (offset += 40.0f), 100.0f);

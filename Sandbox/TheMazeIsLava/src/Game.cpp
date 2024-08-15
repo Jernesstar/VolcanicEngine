@@ -109,6 +109,9 @@ void Game::LevelScreen() {
 	if(GameState::SelectedLevel == 0)
 		return;
 
+	auto& currLevel = GameState::GetLevel();
+	m_Scene = currLevel.Load();
+
 	auto camera = CreateRef<IsometricCamera>();
 	m_Controller = CreateRef<CameraController>(camera,
 		MovementControls(
@@ -117,9 +120,6 @@ void Game::LevelScreen() {
 			{ Control::Backward, Key::Invalid },
 		})
 	);
-
-	auto& currLevel = GameState::GetLevel();
-	m_Scene = currLevel.Load();
 	m_Scene->SetCamera(camera);
 
 	Coordinate start = currLevel.GetPlayerStart();
@@ -130,6 +130,7 @@ void Game::LevelScreen() {
 	// TODO(Implement): Collision with group
 	// PhysicsSystem::RegisterForCollisionDetection(player, m_LavaGroup);
 
+	GameState::SelectedLevel = 0;
 	m_CurrentUI = GameState::EmptyUI;
 	m_CurrentScreen = std::bind(&Game::PlayScreen, this);
 }

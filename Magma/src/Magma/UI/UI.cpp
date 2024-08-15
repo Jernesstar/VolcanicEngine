@@ -81,8 +81,6 @@ void End() {
 	glfwMakeContextCurrent(backup_current_context);
 }
 
-static ImGuiKey KeyToImGuiKey(int key);
-
 void Init() {
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -137,6 +135,5 @@ void Close() {
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();
 }
-
 
 }

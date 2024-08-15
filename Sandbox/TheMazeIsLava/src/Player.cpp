@@ -23,6 +23,9 @@ Player::Player(ECS::World& world)
 	Add<ScriptComponent>()
 	.OnInput =
 	[](TransformComponent& tc) {
+		if(Input::MouseButtonPressed(Mouse::LeftButton))
+			return;
+
 		auto& tr = tc.Translation;
 		int dx = (Input::KeyPressed(Key::Left)	|| Input::KeyPressed(Key::D))
 				-(Input::KeyPressed(Key::Right)	|| Input::KeyPressed(Key::A));

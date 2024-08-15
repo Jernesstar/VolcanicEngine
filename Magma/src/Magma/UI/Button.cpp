@@ -41,13 +41,14 @@ Button::Button(const std::string& imagePath)
 }
 
 void Button::Draw() {
+	ImVec4 color{ m_Color.r, m_Color.g, m_Color.b, m_Color.a };
+	ImVec4 hover{ m_Color.r, m_Color.g, m_Color.b, m_Color.a - 0.4f };
+	ImVec4 press{ m_Color.r, m_Color.g, m_Color.b, m_Color.a - 0.8f };
+
 	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 0, 0 });
-	ImGui::PushStyleColor(ImGuiCol_Button,
-		ImVec4(m_Color.r, m_Color.g, m_Color.b, m_Color.a));
-	ImGui::PushStyleColor(ImGuiCol_ButtonHovered,
-		ImVec4(m_Color.r, m_Color.g, m_Color.b, m_Color.a - 0.4f));
-	ImGui::PushStyleColor(ImGuiCol_ButtonActive,
-		ImVec4(m_Color.r, m_Color.g, m_Color.b, m_Color.a - 0.8f));
+	ImGui::PushStyleColor(ImGuiCol_Button, color);
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, hover);
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, press);
 
 	ImGui::SetCursorPos(ImVec2(x, y));
 
