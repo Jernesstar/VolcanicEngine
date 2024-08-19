@@ -41,6 +41,8 @@ private:
 	PxShape* m_Shape;
 
 	friend class RigidBody;
+	friend class StaticBody;
+	friend class DynamicBody;
 };
 
 }

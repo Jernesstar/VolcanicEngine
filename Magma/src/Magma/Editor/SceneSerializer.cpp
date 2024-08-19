@@ -146,21 +146,28 @@ void SerializeEntity(YAML::Emitter& out, Entity& entity) {
 		out << YAML::Key << "MeshComponent" << YAML::BeginMap; // MeshComponent
 
 		out << YAML::Key << "Mesh" << YAML::BeginMap; // Mesh
-		out << YAML::Key << "Vertices" << YAML::Flow << mesh->GetVertices();
-		out << YAML::Key << "Indices" << YAML::Flow << mesh->GetIndices();
+		if(mesh->Path != "") {
+			out << YAML::Key << "Path" << YAML::Value << mesh->Path;
+		}
+		else{
+			out << YAML::Key << "Vertices" << YAML::Flow << mesh->GetVertices();
+			out << YAML::Key << "Indices" << YAML::Flow << mesh->GetIndices();
 
-		out << YAML::Key << "Material" << YAML::BeginMap; // Material
-		if(mat.Diffuse) {
-			out << YAML::Key << "Diffuse" << YAML::BeginMap; // Diffuse
-			out << YAML::Key << "Path" << YAML::Value << mat.Diffuse->GetPath();
-			out << YAML::EndMap; // Diffuse
+			out << YAML::Key << "Material" << YAML::BeginMap; // Material
+			if(mat.Diffuse) {
+				out << YAML::Key << "Diffuse" << YAML::BeginMap; // Diffuse
+				out << YAML::Key << "Path" << YAML::Value
+					<< mat.Diffuse->GetPath();
+				out << YAML::EndMap; // Diffuse
+			}
+			if(mat.Specular) {
+				out << YAML::Key << "Specular" << YAML::BeginMap; // Specular
+				out << YAML::Key << "Path" << YAML::Value
+					<< mat.Specular->GetPath();
+				out << YAML::EndMap; // Specular
+			}
+			out << YAML::EndMap; // Material
 		}
-		if(mat.Specular) {
-			out << YAML::Key << "Specular" << YAML::BeginMap; // Specular
-			out << YAML::Key << "Path" << YAML::Value << mat.Specular->GetPath();
-			out << YAML::EndMap; // Specular
-		}
-		out << YAML::EndMap; // Material
 		out << YAML::EndMap; // Mesh
 
 		out << YAML::EndMap; // MeshComponent
@@ -243,22 +250,29 @@ void DeserializeEntity(YAML::Node entityNode, Ref<Scene> scene) {
 	auto meshComponentNode = components["MeshComponent"];
 	if(meshComponentNode) {
 		auto meshNode = meshComponentNode["Mesh"];
-		auto verts = meshNode["Vertices"].as<std::vector<VolcaniCore::Vertex>>();
-		auto indices = meshNode["Indices"].as<std::vector<uint32_t>>();
-		auto diffuseNode = meshNode["Material"]["Diffuse"];
-		auto specularNode = meshNode["Material"]["Specular"];
 
-		Material mat;
-		if(diffuseNode) {
-			auto path = diffuseNode["Path"].as<std::string>();
-			mat.Diffuse = Texture::Create(path);
+		if(meshNode["Path"]) {
+			Ref<Mesh> mesh = Mesh::Create(meshNode["Path"].as<std::string>());
+			entity.Add<MeshComponent>(mesh);
 		}
-		if(specularNode) {
-			auto path = specularNode["Path"].as<std::string>();
-			mat.Diffuse = Texture::Create(path);
+		else {
+			auto v = meshNode["Vertices"].as<std::vector<VolcaniCore::Vertex>>();
+			auto i = meshNode["Indices"].as<std::vector<uint32_t>>();
+			auto diffuseNode = meshNode["Material"]["Diffuse"];
+			auto specularNode = meshNode["Material"]["Specular"];
+
+			Material mat;
+			if(diffuseNode) {
+				auto path = diffuseNode["Path"].as<std::string>();
+				mat.Diffuse = Texture::Create(path);
+			}
+			if(specularNode) {
+				auto path = specularNode["Path"].as<std::string>();
+				mat.Diffuse = Texture::Create(path);
+			}
+			entity.Add<MeshComponent>(v, i, mat);
 		}
 
-		entity.Add<MeshComponent>(verts, indices, mat);
 	}
 
 	auto scriptComponentNode = components["ScriptComponent"];

@@ -37,6 +37,12 @@ ECS::ECS() {
 	.Add<RigidBodyComponent>(RigidBody::Type::Static)
 	.Finalize();
 
+	Magma::ECS::Entity ball = Magma::ECS::EntityBuilder(world)
+	.Add<TransformComponent>(Transform{ .Translation = { 0.0f, 0.0f, -3.0f } })
+	.Add<MeshComponent>("Sandbox/assets/models/sphere/wooden_sphere.obj")
+	.Add<RigidBodyComponent>(RigidBody::Type::Static)
+	.Finalize();
+
 	SceneSerializer::Serialize(scene, "Sandbox/assets/scenes/test.volc");
 	Ref<Scene> test
 		= SceneSerializer::Deserialize("Sandbox/assets/scenes/test.volc");
@@ -44,8 +50,7 @@ ECS::ECS() {
 	test->GetEntityWorld()
 	.ForEach(
 	[](Entity& entity) {
-		for(auto& v : entity.Get<MeshComponent>().Mesh->GetVertices())
-			VOLCANICORE_LOG_INFO("Path: %f", v.TexCoord_Color.r);
+		VOLCANICORE_LOG_INFO("Path: '%s'", entity.Get<MeshComponent>().Mesh->Path.c_str());
 	});
 
 	VOLCANICORE_LOG_INFO("Success");

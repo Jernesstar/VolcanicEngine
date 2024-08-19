@@ -27,8 +27,8 @@ Player::Player(ECS::World& world)
 			return;
 
 		auto& tr = tc.Translation;
-		int dx = (Input::KeyPressed(Key::Left)	|| Input::KeyPressed(Key::D))
-				-(Input::KeyPressed(Key::Right)	|| Input::KeyPressed(Key::A));
+		int dx = (Input::KeyPressed(Key::Right)	|| Input::KeyPressed(Key::D))
+				-(Input::KeyPressed(Key::Left)	|| Input::KeyPressed(Key::A));
 		int dz = (Input::KeyPressed(Key::Down)	|| Input::KeyPressed(Key::S))
 				-(Input::KeyPressed(Key::Up)	|| Input::KeyPressed(Key::W));
 

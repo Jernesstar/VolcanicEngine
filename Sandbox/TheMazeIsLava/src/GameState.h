@@ -23,7 +23,7 @@ public:
 
 public:
 	inline static uint32_t MaxLevel; // The highest level reached so far
-	inline static uint32_t SelectedLevel; // The one being played right now
+	inline static uint32_t SelectedLevel = 0; // The one being played right now
 	inline static std::vector<Level> Levels;
 
 	inline static Ref<UI::UIElement> EmptyUI;

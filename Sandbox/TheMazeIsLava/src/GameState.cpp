@@ -54,9 +54,15 @@ void GameState::InitUI() {
 	HomeUI
 	->Add<UI::Text>("The Maze is Lava", glm::vec4(0.0f, 0.0f, 0.0f, 1.0f))
 	->SetPosition(160, 100);
-
 	HomeUI
 	->Add<UI::Text>("Press start to play", glm::vec4(0.0f, 0.0f, 0.0f, 1.0f))
+	->SetPosition(120, 150);
+
+	PauseUI
+	->Add<UI::Text>("Paused", glm::vec4(0.0f, 0.0f, 0.0f, 1.0f))
+	->SetPosition(160, 100);
+	PauseUI
+	->Add<UI::Text>("Press enter to resume", glm::vec4(0.0f, 0.0f, 0.0f, 1.0f))
 	->SetPosition(120, 150);
 
 	// HomeUI
@@ -115,9 +121,11 @@ void SaveLevel(YAML::Emitter& out, Level& level) {
 	out << YAML::Key << "Level" << YAML::Value << YAML::BeginMap; // Level
 	out << YAML::Key << "Name" << YAML::Value << level.Name;
 
-	out << YAML::Key << "Tilemap" << YAML::Value << YAML::BeginSeq; // Tilemap
-	for(auto row : level.Tilemap)
+	out << YAML::Key << "Tilemap" << YAML::BeginSeq; // Tilemap
+	for(auto row : level.Tilemap) {
+		out << YAML::Flow;
 		out << row;
+	}
 	out << YAML::EndSeq; // Tilemap
 
 	out << YAML::EndMap; // Level

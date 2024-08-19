@@ -6,8 +6,13 @@
 
 namespace Magma::UI {
 
-Text::Text(const std::string& text, const glm::vec4& textColor)
-	: UIElement(UIElement::Type::Text, 0, 0, 0.0f, 0.0f, textColor),
+Ref<UI::Text> UI::Text::Create(const UI::Text::Specification& specs) {
+	return CreateRef<UI::Text>(specs.Text, specs.Color, specs.x, specs.y);
+}
+
+Text::Text(const std::string& text, const glm::vec4& textColor,
+			float x, float y)
+	: UIElement(UIElement::Type::Text, 0, 0, x, y, textColor),
 		m_Text(text) { }
 
 void Text::Draw() {

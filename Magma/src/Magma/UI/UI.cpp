@@ -31,8 +31,8 @@ namespace Magma::UI {
 // }
 
 // Ref<UIElement> UIElement::Create(const UIElement::Specification& specs) {
-// 	return CreateRef<UIElement>(UIElement::Type,
-// 								specs.Width, specs.Height, specs.x, specs.y)
+// 	return CreateRef<UIElement>(specs.Width, specs.Height, specs.x, specs.y,
+// 								specs.Color);
 // }
 
 UIElement::UIElement(UIElement::Type type, uint32_t width, uint32_t height,
@@ -46,7 +46,7 @@ Ref<UIElement> UIElement::Add(Ref<UIElement> element) {
 		auto oldParent = element->m_Parent;
 		element->m_Parent = this;
 
-		if(element->OnAttach()) // If element accepts new parent
+		if(element->OnAttach()) // Whether or not element accepts the new parent
 			m_Children.push_back(element);
 		else
 			element->m_Parent = oldParent;

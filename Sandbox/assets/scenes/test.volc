@@ -28,3 +28,17 @@ Scene:
             Translation: [0, 0, -3]
             Rotation: [0, 0, 0]
             Scale: [1, 1, 1]
+    - Entity:
+        ID: 548
+        Components:
+          MeshComponent:
+            Mesh:
+              Path: Sandbox/assets/models/sphere/wooden_sphere.obj
+          RigidBodyComponent:
+            Body:
+              Type: Static
+              Shape Type: TriangleMesh
+          TrasformComponent:
+            Translation: [0, 0, -3]
+            Rotation: [0, 0, 0]
+            Scale: [1, 1, 1]

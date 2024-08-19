@@ -32,7 +32,7 @@ public:
 	// 	uint32_t Height = 100;
 	// 	float x = 0;
 	// 	float y = 0;
-	// 	glm::vec4 m_Color = glm::vec4(1.0f);
+	// 	glm::vec4 Color = glm::vec4(1.0f);
 	// };
 
 // public:
@@ -76,18 +76,6 @@ public:
 	Ref<TElement> Add(Args&&... args) {
 		Ref<UIElement> element{ new TElement(std::forward<Args>(args)...) };
 		return std::static_pointer_cast<TElement>(Add(element));
-
-		// if(OnAddElement(element)) {
-		// 	auto oldParent = element->m_Parent;
-		// 	element->m_Parent = this;
-
-		// 	if(element->OnAttach()) // If element accepts new parent
-		// 		m_Children.push_back(element);
-		// 	else
-		// 		element->m_Parent = oldParent;
-		// }
-
-		// return std::static_pointer_cast<TElement>(element);
 	}
 
 	template<typename TUIElement>

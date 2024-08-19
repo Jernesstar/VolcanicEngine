@@ -25,7 +25,7 @@ public:
 			  const Transform& t = { });
 	RigidBody(RigidBody::Type type,
 			  const Transform& t = { });
-	virtual ~RigidBody() = 0;
+	~RigidBody();
 
 	bool operator ==(const RigidBody& other) {
 		return m_Actor == other.m_Actor;
@@ -37,12 +37,12 @@ public:
 	RigidBody::Type GetType() { return m_Type; }
 	Shape::Type GetShapeType() { return m_ShapeType; }
 
+	virtual void SetShape(const Shape& shape) = 0;
+	bool HasShape() { return m_HasShape; }
+
 	void UpdateTransform();
 	void UpdateTransform(const Transform& t);
 	const Transform& GetTransform() const { return m_Transform; }
-
-	void SetShape(const Shape& shape);
-	bool HasShape() { return m_HasShape; }
 
 	template<typename TDerived>
 	requires std::derived_from<TDerived, RigidBody>
@@ -65,6 +65,8 @@ public:
 	StaticBody(const Shape& shape, const Transform& t = { });
 	StaticBody(const Transform& t = { });
 	~StaticBody() = default;
+
+	void SetShape(const Shape& shape) override;
 };
 
 class DynamicBody : public RigidBody {
@@ -74,6 +76,7 @@ public:
 	~DynamicBody() = default;
 
 	// void SetVelocity(const glm::vec3& velocity);
+	void SetShape(const Shape& shape) override;
 
 private:
 	

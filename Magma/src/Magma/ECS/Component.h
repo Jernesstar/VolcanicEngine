@@ -2,11 +2,8 @@
 
 #include <glm/vec3.hpp>
 
-#include <VolcaniCore/Core/Defines.h>
-#include <VolcaniCore/Event/Events.h>
-
 #include <VolcaniCore/Object/Mesh.h>
-#include <VolcaniCore/Object/Texture.h>
+#include <VolcaniCore/Object/Model.h>
 
 #include <Physics/RigidBody.h>
 
@@ -24,6 +21,9 @@ struct MeshComponent : public Component {
 	MeshComponent() = default;
 	MeshComponent(Ref<VolcaniCore::Mesh> mesh)
 		: Mesh(mesh) { }
+	MeshComponent(const std::string& path) {
+		Mesh = Mesh::Create(path);
+	}
 	MeshComponent(MeshPrimitive primitive, const Material& material) {
 		Mesh = Mesh::Create(primitive, material);
 	}

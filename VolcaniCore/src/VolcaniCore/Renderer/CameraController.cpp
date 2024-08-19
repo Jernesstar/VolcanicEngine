@@ -22,46 +22,42 @@ void CameraController::OnUpdate(TimeStep ts)
 		return;
 	}
 
-	glm::vec3 upDir(0.0f, 1.0f, 0.0f);
-	glm::vec3 forwardDir = m_Camera->GetDirection();
-	glm::vec3 rightDir = glm::cross(forwardDir, upDir);
+	glm::vec3 up(0.0f, 1.0f, 0.0f);
+	glm::vec3 forward = m_Camera->GetDirection();
+	glm::vec3 right = glm::cross(forward, up);
+	float speed = TranslationSpeed;
 
 	bool moved = false;
-	glm::vec3 xyz;
-	if(xyz.x = Input::KeyPressed(Controls[Control::Right])
+	glm::ivec3 dir;
+	if(dir.x = Input::KeyPressed(Controls[Control::Right])
 			 - Input::KeyPressed(Controls[Control::Left]))
 	{
-		m_Camera->Position += xyz.x * rightDir * TranslationSpeed * (float)ts;
+		m_Camera->Position += (float)dir.x * right * speed * (float)ts;
 	}
-	if(xyz.y = Input::KeyPressed(Controls[Control::Up])
+	if(dir.y = Input::KeyPressed(Controls[Control::Up])
 			 - Input::KeyPressed(Controls[Control::Down]))
 	{
-		m_Camera->Position += xyz.y * upDir * TranslationSpeed * (float)ts;
+		m_Camera->Position += (float)dir.y * up * speed * (float)ts;
 	}
-	if(xyz.z = Input::KeyPressed(Controls[Control::Forward])
+	if(dir.z = Input::KeyPressed(Controls[Control::Forward])
 			 - Input::KeyPressed(Controls[Control::Backward]))
 	{
-		m_Camera->Position += xyz.z * forwardDir * TranslationSpeed * (float)ts;
+		m_Camera->Position += (float)dir.z * forward * speed * (float)ts;
 	}
-	if(xyz.x || xyz.y || xyz.z)
-		moved = true;
+	moved = dir.x || dir.y || dir.z;
 
-	if(delta.x != 0.0f || delta.y != 0.0f) {
+	if((delta.x != 0.0f || delta.y != 0.0f) & RotationSpeed != 0.0f) {
 		float pitchDelta = delta.y * RotationSpeed;
 		float yawDelta = delta.x * RotationSpeed;
 
-		glm::quat q = glm::cross(glm::angleAxis(-pitchDelta, rightDir),
-								 glm::angleAxis(-yawDelta, upDir));
-		m_Camera->Direction = glm::rotate(glm::normalize(q), forwardDir);
+		glm::quat q = glm::cross(glm::angleAxis(-pitchDelta, right),
+								 glm::angleAxis(-yawDelta, up));
+		m_Camera->Direction = glm::rotate(glm::normalize(q), forward);
 		moved = true;
 	}
 
 	if(moved)
 		m_Camera->CalculateView();
-}
-
-void CameraController::OnResize(uint32_t width, uint32_t height) {
-	m_Camera->Resize(width, height);
 }
 
 }

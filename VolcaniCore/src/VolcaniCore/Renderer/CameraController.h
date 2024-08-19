@@ -50,11 +50,10 @@ public:
 		: m_Camera(camera), Controls(controls) { }
 
 	void OnUpdate(TimeStep ts);
-	void OnResize(uint32_t width, uint32_t height);
 
 private:
 	glm::vec2 m_LastMousePosition = { 0.0f, 0.0f };
-	Ref<Camera> m_Camera;
+	Ref<Camera> m_Camera; // TODO(Use weak_ptr)
 };
 
 }

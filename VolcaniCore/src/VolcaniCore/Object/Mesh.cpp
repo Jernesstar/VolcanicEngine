@@ -2,9 +2,30 @@
 
 #include "Renderer/RendererAPI.h"
 
+#include "Model.h"
+
 #include "OpenGL/Mesh.h"
 
 namespace VolcaniCore {
+
+Mesh::Mesh(const std::string& path)
+	: Path(path)
+{
+	Ref<Mesh> mesh = Model::Create(path)->GetMesh(0);
+	this->m_Vertices = mesh->GetVertices();
+	this->m_Indices  = mesh->GetIndices();
+	this->m_Material = mesh->GetMaterial();
+}
+
+Ref<Mesh> Mesh::Create(const std::string& path) {
+	RendererAPI::Backend backend = RendererAPI::GetBackend();
+
+	switch(backend) {
+		case RendererAPI::Backend::OpenGL:
+			return CreateRef<OpenGL::Mesh>(path);
+			break;
+	}
+}
 
 Ref<Mesh> Mesh::Create(const std::vector<Vertex>& vertices,
 					   const std::vector<uint32_t>& indices,
@@ -62,10 +83,10 @@ Ref<Mesh> Mesh::Create(MeshPrimitive primitive, const Material& material) {
 				2,  1,  0,
 
 				4,  5,  6, // Back
-				6,  7, 4,
+				6,  7,  4,
 
 				11,  8,  9, // Left
-				9, 10, 11,
+				 9, 10, 11,
 
 				12, 13, 14, // Right
 				14, 15, 12,
@@ -151,7 +172,7 @@ Ref<Mesh> Mesh::Create(MeshPrimitive primitive, const glm::vec4& color) {
 				6,  7, 4,
 
 				11,  8,  9, // Left
-				9, 10, 11,
+				 9, 10, 11,
 
 				12, 13, 14, // Right
 				14, 15, 12,
@@ -190,7 +211,5 @@ Ref<Mesh> Mesh::Create(MeshPrimitive primitive, const glm::vec4& color) {
 
 	return Create(vertices, indices);
 }
-
-
 
 }

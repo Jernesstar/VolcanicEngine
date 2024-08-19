@@ -33,12 +33,6 @@ RigidBody::~RigidBody() {
 	m_Actor->release();
 }
 
-void RigidBody::SetShape(const Shape& shape) {
-	m_Actor->attachShape(*shape.m_Shape);
-	m_HasShape = true;
-	m_ShapeType = shape.GetType();
-}
-
 // TODO(Fix): Scaled transforms
 void RigidBody::UpdateTransform() {
 	PxTransform pose = m_Actor->getGlobalPose();
@@ -73,6 +67,12 @@ StaticBody::StaticBody(const Transform& t)
 	UpdateTransform(t);
 }
 
+void StaticBody::SetShape(const Shape& shape) {
+	m_Actor->attachShape(*shape.m_Shape);
+	m_HasShape = true;
+	m_ShapeType = shape.GetType();
+}
+
 DynamicBody::DynamicBody(const Shape& shape, const Transform& t)
 	: RigidBody(RigidBody::Type::Dynamic, shape, t)
 {
@@ -95,6 +95,12 @@ DynamicBody::DynamicBody(const Transform& t)
 	PxRigidBodyExt::updateMassAndInertia(*m_Actor->is<PxRigidDynamic>(), 10.0f);
 
 	UpdateTransform(t);
+}
+
+void DynamicBody::SetShape(const Shape& shape) {
+	// m_Shape =
+	// PhysX::PxRigidActorExt::createExclusiveShape(*m_Actor,
+	// 	shape.m_Shape->getGeometry(), *shape.m_Shape->getMaterials()[0]),
 }
 
 // void DynamicBody::SetVelocity(float velocity) {

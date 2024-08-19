@@ -24,6 +24,11 @@ enum class MeshPrimitive { Point, Line, Quad, Cube, Pyramid };
 
 class Mesh {
 public:
+	const std::string Path;
+
+public:
+	static Ref<Mesh> Create(const std::string& path);
+
 	static Ref<Mesh> Create(const std::vector<Vertex>& vertices,
 							const std::vector<uint32_t>& indices,
 							const Material& material = { });
@@ -35,10 +40,13 @@ public:
 
 public:
 	Mesh() = default;
+	Mesh(const std::string& path);
+
 	Mesh(const std::vector<Vertex>& vertices,
 		 const std::vector<uint32_t>& indices,
 		 const Material& material = { })
-			: m_Vertices(vertices), m_Indices(indices), m_Material(material) { }
+			: m_Vertices(vertices), m_Indices(indices), m_Material(material),
+				Path("") { }
 
 	virtual ~Mesh() = default;
 

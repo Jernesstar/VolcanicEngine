@@ -31,7 +31,6 @@ Game::Game()
 	});
 
 	UI::Init();
-	Asset::Init();
 	GameState::Reset();
 
 	// auto shader = ShaderPipeline::Create({
@@ -109,6 +108,8 @@ void Game::LevelScreen() {
 	if(GameState::SelectedLevel == 0)
 		return;
 
+	Asset::Init(); // Load assets. TODO(Implement): Loading screen
+
 	auto& currLevel = GameState::GetLevel();
 	m_Scene = currLevel.Load();
 
@@ -120,6 +121,7 @@ void Game::LevelScreen() {
 			{ Control::Backward, Key::Invalid },
 		})
 	);
+	m_Controller->RotationSpeed = 0.0f; // No rotation with an isometric view
 	m_Scene->SetCamera(camera);
 
 	Coordinate start = currLevel.GetPlayerStart();

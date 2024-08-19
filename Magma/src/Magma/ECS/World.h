@@ -5,6 +5,7 @@
 #include <flecs.h>
 
 #include <VolcaniCore/Core/Time.h>
+#include <VolcaniCore/Core/UUID.h>
 
 #include "Entity.h"
 
