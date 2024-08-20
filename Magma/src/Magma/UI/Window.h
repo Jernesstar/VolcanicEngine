@@ -1,6 +1,6 @@
 #pragma once
 
-#include "UI.h"
+#include "UIElement.h"
 
 using namespace VolcaniCore;
 
@@ -24,10 +24,11 @@ public:
 	static Ref<UI::Window> Create(const UI::Window::Specification& specs);
 
 public:
-	Window(uint32_t width, uint32_t height, float x, float y,
-			const glm::vec4& bgColor,
-			uint32_t borderWidth, uint32_t borderHeight,
-			const glm::vec4& borderColor);
+	Window(uint32_t width = 100, uint32_t height = 100,
+			float x = 0.0f, float y = 0.0f,
+			const glm::vec4& bgColor = glm::vec4(1.0f),
+			uint32_t borderWidth = 0, uint32_t borderHeight = 0,
+			const glm::vec4& borderColor = glm::vec4(1.0f));
 
 private:
 	void Draw() override;

@@ -26,12 +26,14 @@ Game::Game()
 	[&](const KeyPressedEvent& event) {
 		if(event.Key == Key::Escape)
 			Application::Close();
-		if(event.Key == Key::Return && event.IsRepeat == false)
+		if(event.Key == Key::Return && !event.IsRepeat)
 			m_ReturnPressed = true;
 	});
 
 	UI::Init();
 	GameState::Reset();
+
+	Asset::Init();
 
 	// auto shader = ShaderPipeline::Create({
 	// 	{ "Sandbox/assets/shaders/Lighting.glsl.vert", ShaderType::Vertex },
@@ -41,11 +43,7 @@ Game::Game()
 	m_LightingPass = RenderPass::Create("Lighting", shader);
 
 	PointLight light =
-		PointLight{
-			.Constant  = 0.3f,
-			.Linear    = 0.0f,
-			.Quadratic = 0.032f,
-		};
+		PointLight{ .Constant = 0.3f, .Linear = 0.0f, .Quadratic = 0.032f };
 	light.Position = { 0.0f, 2.0f, 0.0f },
 	light.Ambient  = { 0.2f, 0.2f, 0.2f },
 	light.Diffuse  = { 0.5f, 0.5f, 0.5f },
@@ -107,8 +105,6 @@ void Game::LevelScreen() {
 
 	if(GameState::SelectedLevel == 0)
 		return;
-
-	Asset::Init(); // Load assets. TODO(Implement): Loading screen
 
 	auto& currLevel = GameState::GetLevel();
 	m_Scene = currLevel.Load();

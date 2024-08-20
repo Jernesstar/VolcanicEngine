@@ -24,6 +24,9 @@ public:
 
 public:
 	static Shape Create(Shape::Type type);
+	static Shape CreatePlan(const glm::vec3& transform);
+	static Shape CreateCapsule(float radius, float halfRadius);
+	static Shape CreateTriangleMesh(Ref<Mesh> mesh);
 
 public:
 	Shape(Shape::Type type);

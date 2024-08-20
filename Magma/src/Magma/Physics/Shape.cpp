@@ -39,15 +39,6 @@ Shape::Shape(Shape::Type type)
 		case Shape::Type::Sphere:
 			m_Shape = CreateSphere();
 			break;
-		case Shape::Type::Plane:
-			m_Shape = CreatePlane();
-			break;
-		// case Shape::Type::Capsule:
-		// 	m_Shape = CreateCapsule();
-		// case Shape::Type::TriangleMesh:
-		// 	m_Shape = CreateTriangleMesh();
-		// case Shape::Type::ConvexMesh:
-		// 	m_Shape = CreateConvexMesh();
 	}
 }
 

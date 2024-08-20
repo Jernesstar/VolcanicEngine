@@ -112,20 +112,19 @@ Ref<Scene> SceneSerializer::Deserialize(const std::string& filePath) {
 	auto near	= camera["Near"]		  .as<float>();
 	auto far	= camera["Far"]			  .as<float>();
 
+	Ref<Camera> newCam;
 	if(camera["Type"].as<std::string>() == "Stereographic") {
 		auto fov = camera["VerticalFOV"].as<float>();
-		newScene->SetCamera(
-			CreateRef<StereographicCamera>(fov, width, height, near, far));
+		newCam = CreateRef<StereographicCamera>(fov, width, height, near, far);
 	}
 	else if(camera["Type"].as<std::string>() == "Orthographic") {
 		auto ro = camera["Rotation"].as<float>();
-		newScene->SetCamera(
-			CreateRef<OrthographicCamera>(width, height, near, far, ro));
+		newCam = CreateRef<OrthographicCamera>(width, height, near, far, ro);
 	}
 
-	newScene->GetCamera()
-		->SetPositionDirection(camera["Position"].as<glm::vec3>(),
-							   camera["Direction"].as<glm::vec3>());
+	newCam->SetPositionDirection(camera["Position"].as<glm::vec3>(),
+								 camera["Direction"].as<glm::vec3>());
+	newScene->SetCamera(newCam);
 
 	for(auto node : scene["Entities"])
 		DeserializeEntity(node["Entity"], newScene);
@@ -174,7 +173,7 @@ void SerializeEntity(YAML::Emitter& out, Entity& entity) {
 	}
 
 	if(entity.Has<RigidBodyComponent>()) {
-		auto& body = entity.Get<RigidBodyComponent>().Body;
+		auto body = entity.Get<RigidBodyComponent>().Body;
 
 		out << YAML::Key << "RigidBodyComponent" << YAML::BeginMap; // RigidBodyComponent
 		out << YAML::Key << "Body" << YAML::Value << YAML::BeginMap; // Body

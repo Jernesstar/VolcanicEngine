@@ -90,8 +90,8 @@ Collision::Collision() {
 
 	createWall(world);
 
-	// auto plane = RigidBody::Create(RigidBody::Type::Static, Shape(Shape::Type::Plane));
-	// world.AddActor(plane);
+	auto plane = RigidBody::Create(RigidBody::Type::Static, Shape(Shape::Type::Plane));
+	world.AddActor(plane);
 }
 
 Collision::~Collision() {

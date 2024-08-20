@@ -78,6 +78,7 @@ DynamicBody::DynamicBody(const Shape& shape, const Transform& t)
 {
 	m_Actor = GetPhysicsLib()->createRigidDynamic(PxTransform(PxVec3(0.0f)));
 	m_Actor->userData = static_cast<void*>(this);
+	m_Actor->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
 
 	PxRigidBodyExt::updateMassAndInertia(*m_Actor->is<PxRigidDynamic>(), 10.0f);
 

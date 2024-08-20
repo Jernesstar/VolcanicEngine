@@ -5,7 +5,6 @@
 
 #include "Core/Application.h"
 #include "Core/Input.h"
-#include "Event/Events.h"
 
 namespace VolcaniCore {
 
@@ -22,12 +21,13 @@ void CameraController::OnUpdate(TimeStep ts)
 		return;
 	}
 
+	bool moved = false;
+
 	glm::vec3 up(0.0f, 1.0f, 0.0f);
 	glm::vec3 forward = m_Camera->GetDirection();
 	glm::vec3 right = glm::cross(forward, up);
-	float speed = TranslationSpeed;
 
-	bool moved = false;
+	float speed = TranslationSpeed * 0.001f;
 	glm::ivec3 dir;
 	if(dir.x = Input::KeyPressed(Controls[Control::Right])
 			 - Input::KeyPressed(Controls[Control::Left]))

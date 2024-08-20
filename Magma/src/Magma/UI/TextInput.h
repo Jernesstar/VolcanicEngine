@@ -1,6 +1,6 @@
 #pragma once
 
-#include "UI.h"
+#include "UIElement.h"
 
 namespace Magma::UI {
 
@@ -8,7 +8,7 @@ class TextInput : public UIElement {
 public:
 	const uint32_t MaxCharCount;
 public:
-	TextInput(uint32_t maxChars);
+	TextInput(uint32_t maxChars = 100);
 
 	std::string GetText() { return m_Text; }
 

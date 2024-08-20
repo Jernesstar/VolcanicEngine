@@ -10,9 +10,8 @@ Ref<UI::Text> UI::Text::Create(const UI::Text::Specification& specs) {
 	return CreateRef<UI::Text>(specs.Text, specs.Color, specs.x, specs.y);
 }
 
-Text::Text(const std::string& text, const glm::vec4& textColor,
-			float x, float y)
-	: UIElement(UIElement::Type::Text, 0, 0, x, y, textColor),
+Text::Text(const std::string& text, const glm::vec4& textColor)
+	: UIElement(UIElement::Type::Text, 0, 0, 0.0f, 0.0f, textColor),
 		m_Text(text) { }
 
 void Text::Draw() {
@@ -20,7 +19,7 @@ void Text::Draw() {
 	m_Width = size.x;
 	m_Height = size.y;
 
-	ImVec4 color{m_Color.r, m_Color.g, m_Color.b, m_Color.a };
+	ImVec4 color{ m_Color.r, m_Color.g, m_Color.b, m_Color.a };
 	ImGui::PushStyleColor(ImGuiCol_Text, color);
 	ImGui::SetCursorPos(ImVec2(x, y));
 
@@ -36,8 +35,6 @@ bool Text::OnAttach() {
 	return true;
 }
 
-bool Text::OnAddElement(Ref<UIElement> element) {
-	return false;
-}
+bool Text::OnAddElement(Ref<UIElement> element) { return false; }
 
 }

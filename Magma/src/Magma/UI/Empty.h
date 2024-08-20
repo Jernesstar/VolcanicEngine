@@ -1,6 +1,6 @@
 #pragma once
 
-#include "UI.h"
+#include "UIElement.h"
 
 namespace Magma::UI {
 

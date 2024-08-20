@@ -1,12 +1,12 @@
 #pragma once
 
-#include "UI.h"
+#include "UIElement.h"
 
 namespace Magma::UI {
 
 class Image : public UIElement {
 public:
-	Image(Ref<Texture> image);
+	Image(Ref<Texture> image = nullptr);
 	Image(const std::string& imagePath);
 
 	void Set(Ref<Texture> texture);

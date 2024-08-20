@@ -6,7 +6,7 @@
 
 #include <Core/Log.h>
 
-#include <Magma/UI/UIElements.h>
+#include <Magma/UI/UI.h>
 
 namespace TheMazeIsLava {
 

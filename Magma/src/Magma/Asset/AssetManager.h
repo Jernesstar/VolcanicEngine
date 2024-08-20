@@ -6,8 +6,6 @@
 #include <vector>
 #include <memory>
 
-#define GLM_ENABLE_EXPERIMENTAL
-
 namespace Magma {
 
 class AssetManager {

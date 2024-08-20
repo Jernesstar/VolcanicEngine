@@ -1,6 +1,6 @@
 #pragma once
 
-#include "UI.h"
+#include "UIElement.h"
 
 #include "Image.h"
 #include "Text.h"
@@ -15,10 +15,14 @@ public:
 	std::function<void(void)> OnReleased = [](){};
 
 public:
-	Button(const glm::vec4& color, Ref<Text> uiText);
+	Button(const glm::vec4& color = glm::vec4(1.0f),
+		   const std::string& text,
+		   const glm::vec4& textColor = glm::vec4(1.0f));
+
+	Button(const glm::vec4& color = glm::vec4(1.0f),
+		   Ref<Text> uiText);
+
 	Button(Ref<Image> uiImage);
-	Button(const glm::vec4& color, const std::string& text,
-			const glm::vec4& textColor = glm::vec4(1.0f));
 	Button(const std::string& imagePath);
 
 	Button* SetOnPressed(const std::function<void(void)>& callback) {

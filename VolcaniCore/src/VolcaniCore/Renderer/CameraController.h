@@ -41,7 +41,7 @@ private:
 
 class CameraController {
 public:
-	float TranslationSpeed = 0.005f;
+	float TranslationSpeed = 0.5f;
 	float RotationSpeed = 0.6f;
 	const MovementControls Controls;
 

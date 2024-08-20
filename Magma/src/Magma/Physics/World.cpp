@@ -52,10 +52,11 @@ HitInfo World::Raycast(const glm::vec3& start,
 	PxVec3 st{ start.x, start.y, start.z };
 	PxVec3 dir{ rayDir.x, rayDir.y, rayDir.z };
 
-	bool hit = m_Scene->raycast(st, dir, maxDist, hitInfo, flags);
-	if(hit)
-		return HitInfo((RigidBody*)hitInfo.block.actor->userData,
-					   hitInfo.block.distance);
+	bool hasHit = m_Scene->raycast(st, dir, maxDist, hitInfo, flags);
+	if(hasHit) {
+		auto hit = hitInfo.block;
+		return HitInfo((RigidBody*)hit.actor->userData, hit.distance);
+	}
 	else
 		return HitInfo();
 }
@@ -72,8 +73,8 @@ void World::AddContactCallback(Ref<RigidBody> actor1, Ref<RigidBody> actor2,
 	m_ContactCallback.AddCallback(
 	[callback, actor1, actor2]
 	(Ref<RigidBody> body1, Ref<RigidBody> body2) {
-		if(((*body1 == *actor1) || (*body1 == *actor2)) &&
-		   ((*body2 == *actor1) || (*body2 == *actor2)))
+		if(((*body1 == *actor1) && (*body2 == *actor2))
+		|| ((*body1 == *actor2) && (*body2 == *actor1)))
 		{
 			callback(body1, body2);
 		}

@@ -64,15 +64,15 @@ ECS::ECS() {
 }
 
 void ECS::OnUpdate(TimeStep ts) {
+	scene->OnUpdate(ts);
+
 	Renderer::StartPass(renderPass);
 	{
 		Renderer::Clear();
 
-		scene->OnUpdate(ts);
 		scene->OnRender();
 	}
 	Renderer::EndPass();
-
 }
 
 }

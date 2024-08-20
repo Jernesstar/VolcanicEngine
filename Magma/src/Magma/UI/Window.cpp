@@ -37,12 +37,12 @@ void Window::Draw() {
 
 	ImGuiWindowFlags windowFlags;
 	windowFlags |= ImGuiWindowFlags_NoDocking
-				| ImGuiWindowFlags_NoTitleBar
-				| ImGuiWindowFlags_NoCollapse
-				| ImGuiWindowFlags_NoResize
-				| ImGuiWindowFlags_NoMove
-				| ImGuiWindowFlags_NoBringToFrontOnFocus
-				| ImGuiWindowFlags_NoNavFocus;
+				 | ImGuiWindowFlags_NoTitleBar
+				 | ImGuiWindowFlags_NoCollapse
+				 | ImGuiWindowFlags_NoResize
+				 | ImGuiWindowFlags_NoMove
+				 | ImGuiWindowFlags_NoBringToFrontOnFocus
+				 | ImGuiWindowFlags_NoNavFocus;
 
 	ImGui::Begin("##Window", &m_Open, windowFlags);
 

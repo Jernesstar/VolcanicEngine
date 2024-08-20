@@ -21,6 +21,8 @@ public:
 		return *this;
 	}
 
+	operator Entity() const { return Finalize(); }
+
 	Entity Finalize() const { return Entity{ m_Handle }; }
 
 private:
