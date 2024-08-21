@@ -65,7 +65,7 @@ private:
 	Ref<Mesh> cube;
 
 	Ref<Camera> camera;
-	Ref<CameraController> controller;
+	CameraController controller;
 };
 
 Cube::Cube() {
@@ -94,7 +94,8 @@ Cube::Cube() {
 	// camera = CreateRef<StereographicCamera>(75.0f);
 	// camera = CreateRef<OrthographicCamera>(800, 600, 0.1f, 100.0f);
 	camera = CreateRef<IsometricCamera>();
-	controller = CreateRef<CameraController>(camera,
+	controller =
+	CameraController(
 		MovementControls(
 		ControlMap{
 			{ Control::Up,   Key::W },
@@ -103,7 +104,8 @@ Cube::Cube() {
 			{ Control::Backward, Key::Invalid },
 		})
 	);
-	controller->RotationSpeed = 0.0f;
+	controller.SetCamera(camera);
+	controller.RotationSpeed = 0.0f;
 }
 
 Cube::~Cube() {
@@ -111,7 +113,7 @@ Cube::~Cube() {
 }
 
 void Cube::OnUpdate(TimeStep ts) {
-	controller->OnUpdate(ts);
+	controller.OnUpdate(ts);
 
 	Renderer::Clear();
 
@@ -140,6 +142,7 @@ void Cube::OnUpdate(TimeStep ts) {
 	Renderer::EndPass();
 
 	RendererAPI::Get()->RenderFramebuffer(framebuffer, AttachmentTarget::Color);
+
 	Magma::UI::End();
 }
 

@@ -10,7 +10,7 @@ public:
 
 private:
 	Ref<Camera> camera;
-	Ref<CameraController> controller;
+	CameraController controller;
 
 	Ref<Mesh> cube;
 
@@ -42,11 +42,11 @@ Bloom::Bloom() {
 	// camera = CreateRef<OrthographicCamera>(800, 600, 0.1f, 100.0f);
 	camera->SetPosition({ 2.5f, 2.5f, 2.5f });
 	camera->SetDirection({ -0.5f, -0.5f, -0.5f });
-	controller = CreateRef<CameraController>(camera);
+	controller = CameraController{ camera };
 }
 
 void Bloom::OnUpdate(TimeStep ts) {
-	controller->OnUpdate(ts);
+	controller.OnUpdate(ts);
 
 	Renderer::StartPass(bloomPass);
 	{

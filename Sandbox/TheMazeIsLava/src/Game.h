@@ -33,7 +33,7 @@ private:
 	std::function<void(void)> m_CurrentScreen;
 
 	Ref<Scene> m_Scene;
-	Ref<CameraController> m_Controller;
+	CameraController m_Controller;
 
 	inline static Ref<RenderPass> m_LightingPass;
 	inline static Ref<RenderPass> m_ShadowPass;

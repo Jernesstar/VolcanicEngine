@@ -31,11 +31,11 @@ public:
 	void OnUpdate(TimeStep ts);
 
 private:
+	Ref<Camera> camera;
+	CameraController controller;
+
 	Ref<ShaderPipeline> shader;
 	Ref<RenderPass> drawPass;
-
-	Ref<Camera> camera;
-	Ref<CameraController> controller;
 
 	Ref<Mesh> cube;
 	Ref<Model> torch;
@@ -95,7 +95,7 @@ Lighting::Lighting() {
 	// camera = CreateRef<OrthographicCamera>(800, 600, 0.1f, 100.0f);
 	camera->SetPosition({ 2.5f, 2.5f, 2.5f });
 	camera->SetDirection({ -0.5f, -0.5f, -0.5f });
-	controller = CreateRef<CameraController>(camera);
+	controller = CameraController{ camera };
 }
 
 void Lighting::OnUpdate(TimeStep ts) {

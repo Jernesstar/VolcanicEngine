@@ -56,11 +56,11 @@ public:
 	void OnUpdate(TimeStep ts);
 
 private:
+	Ref<Camera> camera;
+	CameraController controller;
+
 	Ref<ShaderPipeline> shader;
 	Ref<Mesh> cube;
-
-	Ref<Camera> camera;
-	Ref<CameraController> controller;
 
 	Physics::World world;
 };
@@ -86,7 +86,7 @@ Collision::Collision() {
 
 	camera = CreateRef<StereographicCamera>(75.0f);
 	camera->SetPosition({ 0.0f, 0.5f, 3.0f });
-	controller = CreateRef<CameraController>(camera);
+	controller = CameraController{ camera };
 
 	createWall(world);
 
@@ -99,9 +99,9 @@ Collision::~Collision() {
 }
 
 void Collision::OnUpdate(TimeStep ts) {
+	controller.OnUpdate(ts);
 	world.OnUpdate(ts);
 
-	controller->OnUpdate(ts);
 	shader->SetMat4("u_ViewProj", camera->GetViewProjection());
 
 	Renderer::Clear();

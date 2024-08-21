@@ -21,11 +21,11 @@ public:
 	void OnUpdate(TimeStep ts);
 
 private:
+	Ref<Camera> camera;
+	CameraController controller;
+
 	Ref<ShaderPipeline> shader;
 	Ref<Mesh> cube;
-
-	Ref<Camera> camera;
-	Ref<CameraController> controller;
 
 	Physics::World world;
 };
@@ -85,7 +85,7 @@ Raycast::Raycast() {
 
 	camera = CreateRef<StereographicCamera>(75.0f);
 	camera->SetPosition({ 0.0f, 0.0f, 3.0f });
-	controller = CreateRef<CameraController>(camera);
+	controller = CameraController{ camera };
 
 	createActors(world);
 
@@ -99,8 +99,8 @@ Raycast::~Raycast() {
 }
 
 void Raycast::OnUpdate(TimeStep ts) {
+	controller.OnUpdate(ts);
 	world.OnUpdate(ts);
-	controller->OnUpdate(ts);
 
 	shader->SetMat4("u_ViewProj", camera->GetViewProjection());
 

@@ -8,8 +8,10 @@
 
 namespace VolcaniCore {
 
-void CameraController::OnUpdate(TimeStep ts)
-{
+void CameraController::OnUpdate(TimeStep ts) {
+	if(!m_Camera)
+		return;
+
 	glm::vec2 mousePosition = Input::GetMousePosition();
 	glm::vec2 delta = (mousePosition - m_LastMousePosition) * 0.001f;
 	m_LastMousePosition = mousePosition;

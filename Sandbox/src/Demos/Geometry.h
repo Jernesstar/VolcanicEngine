@@ -13,9 +13,6 @@ private:
 	Ref<ShaderPipeline> shader;
 	Ref<Mesh> cube;
 
-	Ref<Camera> camera;
-	Ref<CameraController> controller;
-
 	Physics::World world;
 };
 

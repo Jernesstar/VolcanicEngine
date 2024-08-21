@@ -110,7 +110,8 @@ void Game::LevelScreen() {
 	m_Scene = currLevel.Load();
 
 	auto camera = CreateRef<IsometricCamera>();
-	m_Controller = CreateRef<CameraController>(camera,
+	m_Controller =
+	CameraController(
 		MovementControls(
 		ControlMap{
 			{ Control::Up,   Key::W },
@@ -119,7 +120,8 @@ void Game::LevelScreen() {
 			{ Control::Backward, Key::Invalid },
 		})
 	);
-	m_Controller->RotationSpeed = 0.0f; // No rotation with an isometric view
+	m_Controller.SetCamera(camera);
+	m_Controller.RotationSpeed = 0.0f;
 	m_Scene->SetCamera(camera);
 
 	Coordinate start = currLevel.GetPlayerStart();
@@ -138,7 +140,7 @@ void Game::LevelScreen() {
 void Game::PlayScreen() {
 	// Gameplay
 	GameState::GetLevel().OnUpdate(m_TimeStep);
-	m_Controller->OnUpdate(m_TimeStep);
+	m_Controller.OnUpdate(m_TimeStep);
 	m_Scene->OnUpdate(m_TimeStep);
 
 	Renderer::StartPass(m_LightingPass);

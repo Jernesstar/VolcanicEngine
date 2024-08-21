@@ -34,6 +34,7 @@ Renderer::Renderer()
 	});
 }
 
+// TODO(Implement): Instancing
 static const uint32_t MaxInstances = 1000;
 
 struct RendererData {

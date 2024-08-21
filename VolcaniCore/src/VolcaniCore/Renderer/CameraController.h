@@ -46,14 +46,20 @@ public:
 	const MovementControls Controls;
 
 public:
+	CameraController(const MovementControls& controls = { })
+		: Controls(controls) { }
 	CameraController(Ref<Camera> camera, const MovementControls& controls = { })
 		: m_Camera(camera), Controls(controls) { }
+
+	void SetCamera(Ref<Camera> camera) {
+		m_Camera = camera;
+	}
 
 	void OnUpdate(TimeStep ts);
 
 private:
 	glm::vec2 m_LastMousePosition = { 0.0f, 0.0f };
-	Ref<Camera> m_Camera; // TODO(Use weak_ptr)
+	Ref<Camera> m_Camera;
 };
 
 }

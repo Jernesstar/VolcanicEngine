@@ -79,7 +79,5 @@
 		"typeinfo": "cpp",
 		"valarray": "cpp",
 		"variant": "cpp",
-		"zutil.h": "c",
-		"*.hpp11": "cpp"
 	}
 }
