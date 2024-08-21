@@ -16,13 +16,9 @@ public:
 
 public:
 	Button(const glm::vec4& color = glm::vec4(1.0f),
-		   const std::string& text,
+		   const std::string& text = "",
 		   const glm::vec4& textColor = glm::vec4(1.0f));
 
-	Button(const glm::vec4& color = glm::vec4(1.0f),
-		   Ref<Text> uiText);
-
-	Button(Ref<Image> uiImage);
 	Button(const std::string& imagePath);
 
 	Button* SetOnPressed(const std::function<void(void)>& callback) {

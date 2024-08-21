@@ -19,20 +19,22 @@ Image::Image(Ref<Texture> image)
 Image::Image(const std::string& imagePath)
 	: UIElement(UIElement::Type::Image)
 {
-	Set(imagePath);
+	SetImage(imagePath);
 }
 
-void Image::Set(Ref<Texture> image) {
+void Image::SetImage(Ref<Texture> image) {
 	if(!image)
 		return;
+
 	m_Image = image;
 	m_Width = m_Image->GetWidth();
 	m_Height = m_Image->GetHeight();
 }
 
-void Image::Set(const std::string& imagePath) {
+void Image::SetImage(const std::string& imagePath) {
 	if(imagePath == "")
 		return;
+
 	m_Image = Texture::Create(imagePath);
 	m_Width = m_Image->GetWidth();
 	m_Height = m_Image->GetHeight();

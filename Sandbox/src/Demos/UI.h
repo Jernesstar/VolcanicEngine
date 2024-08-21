@@ -9,7 +9,7 @@ public:
 	void OnUpdate(TimeStep ts);
 
 private:
-	Ref<Magma::UI::UIElement> Root;
+	// Ref<Magma::UI::UIElement> Root;
 };
 
 UI::UI() {
@@ -20,6 +20,7 @@ UI::UI() {
 	});
 
 	// Root = Magma::UI::UIElement::Create();
+	VOLCANICORE_LOG_INFO("UI project is now running");
 }
 
 void UI::OnUpdate(TimeStep ts) {

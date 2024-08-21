@@ -113,6 +113,8 @@ void Game::LevelScreen() {
 	m_Controller = CreateRef<CameraController>(camera,
 		MovementControls(
 		ControlMap{
+			{ Control::Up,   Key::W },
+			{ Control::Down, Key::S },
 			{ Control::Forward,  Key::Invalid },
 			{ Control::Backward, Key::Invalid },
 		})

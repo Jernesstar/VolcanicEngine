@@ -13,19 +13,6 @@ static bool ButtonImage(Ref<UIElement>, ImVec2);
 
 static bool (*ButtonFunction)(Ref<UIElement>, ImVec2);
 
-Button::Button(const glm::vec4& color, Ref<Text> text)
-	: UIElement(UIElement::Type::Button, text->GetWidth(), text->GetHeight())
-{
-	Add(text);
-	m_Color = color;
-}
-
-Button::Button(Ref<Image> image)
-	: UIElement(UIElement::Type::Button, image->GetWidth(), image->GetHeight())
-{
-	Add(image);
-}
-
 Button::Button(const glm::vec4& color, const std::string& text,
 				const glm::vec4& textColor)
 	: UIElement(UIElement::Type::Button)

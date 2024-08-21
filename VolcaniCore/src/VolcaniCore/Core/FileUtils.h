@@ -11,8 +11,9 @@ public:
 
 	static void CreateFile(const std::string& path);
 
+	static std::vector<std::string> GetFiles(const std::string& dir);
 	static std::vector<std::string> GetFiles(
-		const std::string& dir, const std::vector<std::string>& ext = { });
+		const std::string& dir, const std::vector<std::string>& ext);
 
 	static std::string ReadFile(const std::string& path);
 

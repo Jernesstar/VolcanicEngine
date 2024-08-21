@@ -75,7 +75,7 @@ Cube::Cube() {
 			Application::Close();
 	});
 
-	UI::Init();
+	Magma::UI::Init();
 
 	shader = ShaderPipeline::Create({
 		{ "VolcaniCore/assets/shaders/Mesh.glsl.vert", ShaderType::Vertex },
@@ -97,14 +97,17 @@ Cube::Cube() {
 	controller = CreateRef<CameraController>(camera,
 		MovementControls(
 		ControlMap{
+			{ Control::Up,   Key::W },
+			{ Control::Down, Key::S },
 			{ Control::Forward,  Key::Invalid },
 			{ Control::Backward, Key::Invalid },
 		})
 	);
+	controller->RotationSpeed = 0.0f;
 }
 
 Cube::~Cube() {
-	UI::Close();
+	Magma::UI::Close();
 }
 
 void Cube::OnUpdate(TimeStep ts) {
@@ -112,8 +115,8 @@ void Cube::OnUpdate(TimeStep ts) {
 
 	Renderer::Clear();
 
-	UI::Begin();
-	ImGui::Begin("Light");
+	Magma::UI::Begin();
+	ImGui::Begin("Lights");
 	{
 		float r = camera->As<IsometricCamera>()->R;
 		ImGui::SliderFloat("Light.R", &r, 0.0f, 10.0f);
@@ -121,7 +124,6 @@ void Cube::OnUpdate(TimeStep ts) {
 		camera->As<IsometricCamera>()->SetDistance(r);
 	}
 	ImGui::End();
-	UI::End();
 
 	Renderer::StartPass(renderPass);
 	{
@@ -138,6 +140,7 @@ void Cube::OnUpdate(TimeStep ts) {
 	Renderer::EndPass();
 
 	RendererAPI::Get()->RenderFramebuffer(framebuffer, AttachmentTarget::Color);
+	Magma::UI::End();
 }
 
 }

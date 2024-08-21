@@ -1,5 +1,13 @@
 #include "UI.h"
 
+#include <imgui/imgui.h>
+#include <imgui/backends/imgui_impl_glfw.h>
+#include <imgui/backends/imgui_impl_opengl3.h>
+
+#include <VolcaniCore/Core/Application.h>
+#include <VolcaniCore/Event/Events.h>
+#include <VolcaniCore/Renderer/RendererAPI.h>
+
 namespace Magma::UI {
 
 void Begin() {
@@ -22,7 +30,7 @@ void Init() {
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 
-	Ref<Window> window = Application::GetWindow();
+	Ref<VolcaniCore::Window> window = Application::GetWindow();
 
 	ImGuiIO& io = ImGui::GetIO();
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard

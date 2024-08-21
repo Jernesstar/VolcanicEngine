@@ -1,12 +1,6 @@
 #include "UIElement.h"
 
 #include <imgui/imgui.h>
-#include <imgui/backends/imgui_impl_glfw.h>
-#include <imgui/backends/imgui_impl_opengl3.h>
-
-#include <VolcaniCore/Core/Application.h>
-#include <VolcaniCore/Event/Events.h>
-#include <VolcaniCore/Renderer/RendererAPI.h>
 
 using namespace VolcaniCore;
 

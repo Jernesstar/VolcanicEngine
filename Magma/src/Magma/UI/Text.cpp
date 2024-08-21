@@ -1,13 +1,11 @@
 #include "Text.h"
 
 #include <imgui/imgui.h>
-#include <imgui/backends/imgui_impl_glfw.h>
-#include <imgui/backends/imgui_impl_opengl3.h>
 
 namespace Magma::UI {
 
 Ref<UI::Text> UI::Text::Create(const UI::Text::Specification& specs) {
-	return CreateRef<UI::Text>(specs.Text, specs.Color, specs.x, specs.y);
+	return CreateRef<UI::Text>(specs.Text, specs.Color);
 }
 
 Text::Text(const std::string& text, const glm::vec4& textColor)

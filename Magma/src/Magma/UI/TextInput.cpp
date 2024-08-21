@@ -1,8 +1,6 @@
 #include "TextInput.h"
 
 #include <imgui/imgui.h>
-#include <imgui/backends/imgui_impl_glfw.h>
-#include <imgui/backends/imgui_impl_opengl3.h>
 
 namespace Magma::UI {
 
@@ -11,7 +9,7 @@ TextInput::TextInput(uint32_t maxChars)
 		MaxCharCount(maxChars), m_Text("") { }
 
 void TextInput::Draw() {
-	static char input[MaxCharCount]{""};
+	char input[MaxCharCount]{""};
 
 	ImGui::InputText("##TextInput", input, sizeof(input));
 	m_Text = std::string(input);

@@ -29,7 +29,7 @@ public:
 		return *this;
 	}
 
-	operator Ref<TUIElement> const { return Finalize(); }
+	operator Ref<TUIElement>() const { return Finalize(); }
 
 	Ref<TUIElement> Finalize() const { return m_Element; }
 

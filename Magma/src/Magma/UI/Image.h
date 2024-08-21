@@ -9,8 +9,8 @@ public:
 	Image(Ref<Texture> image = nullptr);
 	Image(const std::string& imagePath);
 
-	void Set(Ref<Texture> texture);
-	void Set(const std::string& imagePath);
+	void SetImage(Ref<Texture> texture);
+	void SetImage(const std::string& imagePath);
 
 	Ref<Texture> GetImage() { return m_Image; }
 
