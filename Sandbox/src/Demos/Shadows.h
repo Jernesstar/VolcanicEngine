@@ -88,14 +88,15 @@ void Shadows::OnUpdate(TimeStep ts) {
 	{
 		Renderer::Clear();
 
-		depthMap->Get(AttachmentTarget::Color).Bind();
-		shadowShader->SetInt("u_ShadowMap", 0);
+		depthMap->Get(AttachmentTarget::Depth).Bind(1);
+		shadowShader->SetInt("u_ShadowMap", 1);
 
 		shadowShader->SetMat4("u_LightSpaceMatrix", lightSpaceMatrix);
 
 		RenderScene();
 	}
 	Renderer::EndPass();
+
 	// RendererAPI::Get()->RenderFramebuffer(depthMap, AttachmentTarget::Depth);
 }
 

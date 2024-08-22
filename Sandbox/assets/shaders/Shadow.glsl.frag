@@ -9,7 +9,7 @@ uniform vec3 u_ViewPos;
 in VS_OUT {
     vec3 FragPos;
     vec3 Normal;
-    vec2 TexCoords;
+    vec4 TexCoords;
     vec4 FragPosLightSpace;
 } fs_in;
 
@@ -35,7 +35,12 @@ float ShadowCalculation(vec4 fragPosLightSpace)
 
 void main()
 {
-    vec3 color = texture(u_Diffuse, fs_in.TexCoords).rgb;
+    vec3 color;
+    if(fs_in.TexCoords.a = 0.0)
+        color = fs_in.TexCoords.xyz;
+    else
+        color = texture(u_Diffuse, fs_in.TexCoords.xy).rgb;
+
     vec3 normal = normalize(fs_in.Normal);
     vec3 lightColor = vec3(1.0);
     // ambient

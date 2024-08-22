@@ -47,6 +47,7 @@ public:
 
 	Ref<ShaderPipeline> GetPipeline() const { return m_Pipeline; }
 	Ref<Framebuffer> GetOutput() const { return m_Output; }
+	Handles& GetHandles const { return m_Handles; }
 
 private:
 	Handles m_Handles;

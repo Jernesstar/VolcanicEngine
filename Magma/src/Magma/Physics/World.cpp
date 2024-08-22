@@ -55,10 +55,11 @@ HitInfo World::Raycast(const glm::vec3& start,
 	bool hasHit = m_Scene->raycast(st, dir, maxDist, hitInfo, flags);
 	if(hasHit) {
 		auto hit = hitInfo.block;
-		return HitInfo((RigidBody*)hit.actor->userData, hit.distance);
+		auto actor = static_cast<RigidBody*>(hit.actor->userData);
+		return HitInfo(Ref<RigidBody>(actor), hit.distance);
 	}
-	else
-		return HitInfo();
+
+	return HitInfo();
 }
 
 void World::AddContactCallback(

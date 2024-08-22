@@ -9,6 +9,7 @@
 #include "Core/Assert.h"
 #include "Event/Events.h"
 
+#include "Renderer/Renderer.h"
 #include "Renderer/ShaderLibrary.h"
 
 #include "Shader.h"
@@ -209,7 +210,9 @@ void Renderer::RenderFramebuffer(Ref<VolcaniCore::Framebuffer> buffer,
 		return;
 	}
 
-	ShaderLibrary::Get("Framebuffer")->Bind();
+	if(!VolcaniCore::Renderer::GetPass())
+		ShaderLibrary::Get("Framebuffer")->Bind();
+
 	buffer->As<OpenGL::Framebuffer>()->Get(target).Bind();
 	s_Data.FramebufferArray->Bind();
 

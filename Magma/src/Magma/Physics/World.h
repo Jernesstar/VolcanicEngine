@@ -39,21 +39,15 @@ private:
 class HitInfo {
 public:
 	const bool HasHit;
+	Ref<RigidBody> Actor;
 	const float Distance;
 
 public:
 	HitInfo()
-		: HasHit(false), Distance(0.0f), m_Actor(nullptr) { }
-	HitInfo(RigidBody* actor, float distance)
-		: HasHit(true), Distance(distance), m_Actor(actor) { }
+		: HasHit(false), Actor(nullptr), Distance(0.0f) { }
+	HitInfo(Ref<RigidBody> actor, float distance)
+		: HasHit(true), Actor(actor), Distance(distance) { }
 
-	// Call only if HasHit is true
-	RigidBody& GetActor() {
-		return *m_Actor;
-	}
-
-private:
-	RigidBody* m_Actor;
 };
 
 class World {

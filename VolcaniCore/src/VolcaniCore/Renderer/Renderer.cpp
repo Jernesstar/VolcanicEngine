@@ -48,6 +48,7 @@ void Renderer::StartPass(Ref<RenderPass> pass) {
 void Renderer::EndPass() {
 	if(!s_CurrentPass)
 		return;
+
 	auto framebuffer = s_CurrentPass->GetOutput();
 
 	if(framebuffer) {
@@ -57,6 +58,7 @@ void Renderer::EndPass() {
 	}
 
 	s_CurrentPass->GetPipeline()->Unbind();
+	s_CurrentPass = nullptr;
 }
 
 Ref<RenderPass> Renderer::GetPass() {

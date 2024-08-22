@@ -13,9 +13,9 @@ Attachment::~Attachment() {
 		glDeleteRenderbuffers(1, &m_RendererID);
 }
 
-void Attachment::Bind() const {
+void Attachment::Bind(uint32_t slot) const {
 	if(this->Type == AttachmentType::Texture)
-		glBindTexture(GL_TEXTURE_2D, m_RendererID);
+		glBindTextureUnit(slot, m_TextureID);
 	else if(this->Type == AttachmentType::RenderBuffer)
 		glBindRenderbuffer(GL_RENDERBUFFER, m_RendererID);
 }

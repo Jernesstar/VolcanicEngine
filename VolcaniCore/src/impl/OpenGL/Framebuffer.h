@@ -21,7 +21,7 @@ public:
 		: Target(target), Type(type) { }
 	~Attachment();
 
-	void Bind() const;
+	void Bind(uint32_t slot = 0) const;
 	uint32_t GetRendererID() const;
 
 private:

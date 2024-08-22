@@ -24,10 +24,18 @@ private:
 	Ref<Camera> camera;
 	CameraController controller;
 
-	Ref<ShaderPipeline> shader;
+	Ref<RenderPass> drawPass;
+	Ref<RenderPass> maskPass;
+	Ref<RenderPass> outlinePass;
+
 	Ref<Mesh> cube;
 
 	Physics::World world;
+
+	Ref<RigidBody> selected;
+
+	glm::vec2 pixelSize{ 1.0f/800.0f, 1.0f/600.0f };
+	glm::vec4 outlineColor{ 0.0f, 0.5f, 1.0f, 1.0f };
 };
 
 Raycast::Raycast() {
@@ -61,31 +69,50 @@ Raycast::Raycast() {
 		float maxDist = 10000.0f;
 
 		auto hitInfo = world.Raycast(worldStart, rayDir, maxDist);
-		if(hitInfo.HasHit) {
-			VOLCANICORE_LOG_INFO("{");
-			VOLCANICORE_LOG_INFO("\tx: %f", hitInfo.GetActor().GetTransform().Translation.x);
-			VOLCANICORE_LOG_INFO("\tDistance: %f", hitInfo.Distance);
-			VOLCANICORE_LOG_INFO("}\n");
-		}
-		else
-			VOLCANICORE_LOG_INFO("No hit");
+		selected = hitInfo.Actor;
 	});
+
+	Ref<ShaderPipeline> drawShader;
+	Ref<ShaderPipeline> maskShader;
+	Ref<ShaderPipeline> outlineShader;
+
+	drawShader = ShaderPipeline::Create({
+		{ "VolcaniCore/assets/shaders/Mesh.glsl.vert", ShaderType::Vertex },
+		{ "VolcaniCore/assets/shaders/Mesh.glsl.frag", ShaderType::Fragment }
+	});
+	maskShader = ShaderPipeline::Create({
+		{ "Sandbox/assets/shaders/Mask.glsl.vert", ShaderType::Vertex },
+		{ "Sandbox/assets/shaders/Mask.glsl.frag", ShaderType::Fragment }
+	});
+	outlineShader = ShaderPipeline::Create({
+		{ "Sandbox/assets/shaders/Outline.glsl.vert", ShaderType::Vertex },
+		{ "Sandbox/assets/shaders/Outline.glsl.frag", ShaderType::Fragment }
+	});
+
+	drawPass = RenderPass::Create("Draw Pass", drawShader);
+	maskPass = RenderPass::Create("Mask Pass", maskShader)
+	outlinePass = RenderPass::Create("Outline Pass", outlineShader);
+
+	// maskPass = RenderPass::Create("Mask Pass", maskShader,
+	// Handles{
+	// 	.Vec4Handles = {
+	// 		[]() {
+	// 			return glm::vec4(1.0f);
+	// 		}
+	// 	}
+	// });
+	mask = CreateRef<OpenGL::Framebuffer>(800, 600);
+	maskPass->SetOutput(mask);
+
+	camera = CreateRef<StereographicCamera>(75.0f);
+	camera->SetPosition({ 0.0f, 0.0f, 3.0f });
+	controller = CameraController{ camera };
 
 	cube = Mesh::Create(MeshPrimitive::Cube,
 	Material{
 		.Diffuse = Texture::Create("Sandbox/assets/images/wood.png")
 		// .Specular = Texture::Create("Sandbox/assets/images/wood_specular.png"),
 	});
-	shader = ShaderPipeline::Create({
-		{ "VolcaniCore/assets/shaders/Mesh.glsl.vert", ShaderType::Vertex },
-		{ "VolcaniCore/assets/shaders/Mesh.glsl.frag", ShaderType::Fragment }
-	});
-	shader->Bind();
-	shader->SetTexture("u_Diffuse", cube->GetMaterial().Diffuse, 0);
-
-	camera = CreateRef<StereographicCamera>(75.0f);
-	camera->SetPosition({ 0.0f, 0.0f, 3.0f });
-	controller = CameraController{ camera };
 
 	createActors(world);
 
@@ -104,13 +131,51 @@ void Raycast::OnUpdate(TimeStep ts) {
 
 	shader->SetMat4("u_ViewProj", camera->GetViewProjection());
 
-	Renderer::Clear();
+	// 1. Draw scene without selected object
+	Renderer::StartPass(drawPass);
+	{
+		Renderer::Clear();
 
-	for(Ref<RigidBody> actor : world) {
-		actor->UpdateTransform();
-		shader->SetMat4("u_Model", actor->GetTransform());
-		Renderer3D::DrawMesh(cube);
+		for(Ref<RigidBody> actor : world) {
+			actor->UpdateTransform();
+
+			if(actor == selected)
+				continue;
+
+			Renderer3D::DrawMesh(cube, actor->GetTransform());
+		}
 	}
+	Renderer::EndPass();
+
+	if(!selected)
+		return;
+
+	// 2. Draw selected object into mask texture with color white
+	Renderer::StartPass(maskPass);
+	{
+		maskPass->GetPipeline()->SetVec4("u_Color", glm::vec4(1.0f));
+		Renderer3D::DrawMesh(cube, selected->GetTransform());
+	}
+	Renderer::EndPass();
+
+	// 4. Full-screen quad applying some image processing function
+	Renderer::StartPass(outlinePass);
+	{
+		auto mask = maskPass->GetOutput();
+
+		outlinePass->GetPipeline()->SetVec2("u_PixelSize", pixelSize);
+		outlinePass->GetPipeline()->SetVec4("u_Color", outlineColor);
+
+		RendererAPI::Get()->RenderFramebuffer(mask, Attachment::Target::Color);
+	}
+	Renderer::EndPass();
+
+	// 6. Draw selected object
+	Renderer::StartPass(drawPass);
+	{
+		Renderer3D::DrawMesh(cube, selected->GetTransform());
+	}
+	Renderer::EndPass();
 
 	// auto scene = world.Get();
 	// const PxRenderBuffer& rb = scene->getRenderBuffer();
