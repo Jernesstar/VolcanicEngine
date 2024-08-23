@@ -99,7 +99,7 @@ Lighting::Lighting() {
 }
 
 void Lighting::OnUpdate(TimeStep ts) {
-	controller->OnUpdate(ts);
+	controller.OnUpdate(ts);
 
 	Renderer::StartPass(drawPass);
 	{

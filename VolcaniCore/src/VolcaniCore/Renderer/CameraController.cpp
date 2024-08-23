@@ -31,18 +31,18 @@ void CameraController::OnUpdate(TimeStep ts) {
 
 	float speed = TranslationSpeed * 0.001f;
 	glm::ivec3 dir;
-	if(dir.x = Input::KeyPressed(Controls[Control::Right])
-			 - Input::KeyPressed(Controls[Control::Left]))
+	if(dir.x = Input::KeyPressed(m_Controls[Control::Right])
+			 - Input::KeyPressed(m_Controls[Control::Left]))
 	{
 		m_Camera->Position += (float)dir.x * right * speed * (float)ts;
 	}
-	if(dir.y = Input::KeyPressed(Controls[Control::Up])
-			 - Input::KeyPressed(Controls[Control::Down]))
+	if(dir.y = Input::KeyPressed(m_Controls[Control::Up])
+			 - Input::KeyPressed(m_Controls[Control::Down]))
 	{
 		m_Camera->Position += (float)dir.y * up * speed * (float)ts;
 	}
-	if(dir.z = Input::KeyPressed(Controls[Control::Forward])
-			 - Input::KeyPressed(Controls[Control::Backward]))
+	if(dir.z = Input::KeyPressed(m_Controls[Control::Forward])
+			 - Input::KeyPressed(m_Controls[Control::Backward]))
 	{
 		m_Camera->Position += (float)dir.z * forward * speed * (float)ts;
 	}

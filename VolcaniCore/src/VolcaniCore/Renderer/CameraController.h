@@ -14,15 +14,16 @@ enum class Control { Up, Down, Left, Right, Forward, Backward };
 
 using ControlMap = std::unordered_map<Control, Key>;
 
-struct MovementControls {
-	const ControlMap Map;
-
+class MovementControls {
+public:
 	MovementControls(const ControlMap& map = { })
-		: Map(GetControls(map)) { }
+		: m_Map(GetControls(map)) { }
 
-	Key operator [](Control control) const { return Map.at(control); }
+	Key operator [](Control control) const { return m_Map.at(control); }
 
 private:
+	ControlMap m_Map;
+
 	ControlMap GetControls(const ControlMap& map) const {
 		ControlMap controls;
 		controls[Control::Up]		= Get(map, Control::Up,		  Key::Q);
@@ -43,13 +44,16 @@ class CameraController {
 public:
 	float TranslationSpeed = 0.5f;
 	float RotationSpeed = 0.6f;
-	const MovementControls Controls;
 
 public:
 	CameraController(const MovementControls& controls = { })
-		: Controls(controls) { }
+		: m_Controls(controls) { }
 	CameraController(Ref<Camera> camera, const MovementControls& controls = { })
-		: m_Camera(camera), Controls(controls) { }
+		: m_Camera(camera), m_Controls(controls) { }
+
+	void SetControls(const MovementControls& controls) {
+		m_Controls = controls;
+	}
 
 	void SetCamera(Ref<Camera> camera) {
 		m_Camera = camera;
@@ -58,8 +62,10 @@ public:
 	void OnUpdate(TimeStep ts);
 
 private:
-	glm::vec2 m_LastMousePosition = { 0.0f, 0.0f };
 	Ref<Camera> m_Camera;
+	MovementControls m_Controls;
+
+	glm::vec2 m_LastMousePosition = { 0.0f, 0.0f };
 };
 
 }

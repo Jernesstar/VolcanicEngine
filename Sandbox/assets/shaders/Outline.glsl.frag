@@ -21,7 +21,7 @@ void main()
     for(int y = -WIDTH; y <= WIDTH; ++y) {
         for(int x = -WIDTH; x <= WIDTH; ++x) {
             vec2 dUV = vec2(float(x) * u_PixelSize.x, float(y) * u_PixelSize.y);
-            float mask = texture2D(u_Texture, texCoord + dUV).r;
+            float mask = texture(u_Texture, v_TexCoords + dUV).r;
             coverage += mask;
 
             if(mask >= 0.5) {
@@ -45,5 +45,5 @@ void main()
         a = 1.0 - min(1.0, max(0.0, dist - solid) / fuzzy);
     }
 
-    FragColor = vec4(color, a);
+    FragColor = vec4(u_Color.xyz, a);
 }

@@ -36,18 +36,17 @@ private:
 	std::vector<std::function<void(Ref<RigidBody>, Ref<RigidBody>)>> m_Callbacks;
 };
 
-class HitInfo {
-public:
+struct HitInfo {
 	const bool HasHit;
-	Ref<RigidBody> Actor;
+	// TODO(Fix): Use smart pointer
+	// const Ref<RigidBody> Actor;
+	RigidBody* Actor;
 	const float Distance;
 
-public:
 	HitInfo()
 		: HasHit(false), Actor(nullptr), Distance(0.0f) { }
-	HitInfo(Ref<RigidBody> actor, float distance)
+	HitInfo(RigidBody* actor, float distance)
 		: HasHit(true), Actor(actor), Distance(distance) { }
-
 };
 
 class World {

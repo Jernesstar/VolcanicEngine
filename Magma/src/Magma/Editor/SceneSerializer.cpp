@@ -101,8 +101,8 @@ Ref<Scene> SceneSerializer::Deserialize(const std::string& filePath) {
 	auto scene = file["Scene"];
 	auto camera = scene["Camera"];
 
-	MAGMA_ASSERT(scene);
-	MAGMA_ASSERT(camera);
+	VOLCANICORE_ASSERT(scene);
+	VOLCANICORE_ASSERT(camera);
 
 	Ref<Scene> newScene = CreateRef<Scene>(scene["Name"].as<std::string>());
 	auto width	= camera["ViewportWidth"] .as<uint32_t>();

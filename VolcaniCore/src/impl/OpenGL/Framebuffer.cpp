@@ -15,7 +15,7 @@ Attachment::~Attachment() {
 
 void Attachment::Bind(uint32_t slot) const {
 	if(this->Type == AttachmentType::Texture)
-		glBindTextureUnit(slot, m_TextureID);
+		glBindTextureUnit(slot, m_RendererID);
 	else if(this->Type == AttachmentType::RenderBuffer)
 		glBindRenderbuffer(GL_RENDERBUFFER, m_RendererID);
 }

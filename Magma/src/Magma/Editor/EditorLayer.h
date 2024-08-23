@@ -2,12 +2,18 @@
 
 #include <filesystem>
 
+#include <VolcaniCore/Core/Defines.h>
+
 #include <VolcaniCore/Core/Time.h>
 #include <VolcaniCore/Object/Texture.h>
 #include <VolcaniCore/Object/Framebuffer.h>
 
-#include "Scene.h"
-#include "SceneHierarchyPanel.h"
+#include <VolcaniCore/Renderer/Camera.h>
+
+// #include "Scene.h"
+// #include "SceneHierarchyPanel.h"
+
+using namespace VolcaniCore;
 
 namespace Magma {
 
@@ -20,8 +26,8 @@ public:
 	void Render();
 
 private:
-	Ref<Scene> m_CurrentScene;
-	Ref<SceneHierarchyPanel> m_SceneHierarchyPanel;
+	// Ref<Scene> m_CurrentScene;
+	// Ref<SceneHierarchyPanel> m_SceneHierarchyPanel;
 	Ref<Framebuffer> m_Framebuffer;
 	Ref<Texture> m_IconPlay, m_IconPause, m_IconStop;
 	

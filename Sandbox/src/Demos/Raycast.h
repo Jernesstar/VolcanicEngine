@@ -32,7 +32,8 @@ private:
 
 	Physics::World world;
 
-	Ref<RigidBody> selected;
+	// Ref<RigidBody> selected{ nullptr };
+	RigidBody* selected = nullptr;
 
 	glm::vec2 pixelSize{ 1.0f/800.0f, 1.0f/600.0f };
 	glm::vec4 outlineColor{ 0.0f, 0.5f, 1.0f, 1.0f };
@@ -90,7 +91,7 @@ Raycast::Raycast() {
 	});
 
 	drawPass = RenderPass::Create("Draw Pass", drawShader);
-	maskPass = RenderPass::Create("Mask Pass", maskShader)
+	maskPass = RenderPass::Create("Mask Pass", maskShader);
 	outlinePass = RenderPass::Create("Outline Pass", outlineShader);
 
 	// maskPass = RenderPass::Create("Mask Pass", maskShader,
@@ -101,7 +102,7 @@ Raycast::Raycast() {
 	// 		}
 	// 	}
 	// });
-	mask = CreateRef<OpenGL::Framebuffer>(800, 600);
+	Ref<OpenGL::Framebuffer> mask = CreateRef<OpenGL::Framebuffer>(800, 600);
 	maskPass->SetOutput(mask);
 
 	camera = CreateRef<StereographicCamera>(75.0f);
@@ -122,28 +123,30 @@ Raycast::Raycast() {
 }
 
 Raycast::~Raycast() {
-	Physics::Close();
+	// Physics::Close();
 }
 
 void Raycast::OnUpdate(TimeStep ts) {
 	controller.OnUpdate(ts);
 	world.OnUpdate(ts);
 
-	shader->SetMat4("u_ViewProj", camera->GetViewProjection());
+	Renderer::Clear();
 
 	// 1. Draw scene without selected object
 	Renderer::StartPass(drawPass);
 	{
-		Renderer::Clear();
+		Renderer3D::Begin(camera);
 
 		for(Ref<RigidBody> actor : world) {
 			actor->UpdateTransform();
 
-			if(actor == selected)
+			if(actor.get() == selected)
 				continue;
 
 			Renderer3D::DrawMesh(cube, actor->GetTransform());
 		}
+
+		Renderer3D::End();
 	}
 	Renderer::EndPass();
 
@@ -153,8 +156,13 @@ void Raycast::OnUpdate(TimeStep ts) {
 	// 2. Draw selected object into mask texture with color white
 	Renderer::StartPass(maskPass);
 	{
+		Renderer::Clear();
+
 		maskPass->GetPipeline()->SetVec4("u_Color", glm::vec4(1.0f));
+
+		Renderer3D::Begin(camera);
 		Renderer3D::DrawMesh(cube, selected->GetTransform());
+		Renderer3D::End();
 	}
 	Renderer::EndPass();
 
@@ -166,14 +174,16 @@ void Raycast::OnUpdate(TimeStep ts) {
 		outlinePass->GetPipeline()->SetVec2("u_PixelSize", pixelSize);
 		outlinePass->GetPipeline()->SetVec4("u_Color", outlineColor);
 
-		RendererAPI::Get()->RenderFramebuffer(mask, Attachment::Target::Color);
+		RendererAPI::Get()->RenderFramebuffer(mask, AttachmentTarget::Color);
 	}
 	Renderer::EndPass();
 
 	// 6. Draw selected object
 	Renderer::StartPass(drawPass);
 	{
+		Renderer3D::Begin(camera);
 		Renderer3D::DrawMesh(cube, selected->GetTransform());
+		Renderer3D::End();
 	}
 	Renderer::EndPass();
 

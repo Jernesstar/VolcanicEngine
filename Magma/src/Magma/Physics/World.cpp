@@ -48,15 +48,16 @@ HitInfo World::Raycast(const glm::vec3& start,
 					//  | PxHitFlag::eNORMAL
 					//  | PxHitFlag::eUV;
 	// PxReal maxDist = 10.0e+5;
-	PxRaycastBuffer hitInfo;
 	PxVec3 st{ start.x, start.y, start.z };
 	PxVec3 dir{ rayDir.x, rayDir.y, rayDir.z };
+	PxRaycastBuffer hitInfo;
 
 	bool hasHit = m_Scene->raycast(st, dir, maxDist, hitInfo, flags);
 	if(hasHit) {
 		auto hit = hitInfo.block;
-		auto actor = static_cast<RigidBody*>(hit.actor->userData);
-		return HitInfo(Ref<RigidBody>(actor), hit.distance);
+		RigidBody* actor = static_cast<RigidBody*>(hit.actor->userData);
+
+		return HitInfo(actor, hit.distance);
 	}
 
 	return HitInfo();

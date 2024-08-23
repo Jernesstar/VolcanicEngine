@@ -5,8 +5,8 @@
 #include <imgui/backends/imgui_impl_opengl3.h>
 
 #include <VolcaniCore/Core/Log.h>
-#include <VolcaniCore/Renderer/RendererAPI.h>
 #include <VolcaniCore/Event/Events.h>
+#include <VolcaniCore/Renderer/RendererAPI.h>
 
 namespace Magma {
 

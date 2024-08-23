@@ -25,7 +25,7 @@ public:
 		: IsTextured(false), m_Color(color),
 			m_Width(width), m_Height(height) { }
 
-	Ref<Texture> GetColor() const { return m_Color; }
+	glm::vec4 GetColor() const { return m_Color; }
 	Ref<Texture> GetTexture() const { return m_Texture; }
 
 	uint32_t GetWidth() const { return m_Width; }

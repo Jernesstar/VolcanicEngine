@@ -34,6 +34,9 @@ void Renderer3D::DrawCubemap(Ref<Cubemap> cubemap) {
 }
 
 void Renderer3D::DrawMesh(Ref<Mesh> mesh, const glm::mat4& transform) {
+	if(!mesh)
+		return;
+
 	auto pass = Renderer::GetPass();
 
 	if(pass) {
@@ -65,7 +68,7 @@ void Renderer3D::DrawQuad(Ref<Quad> quad, const glm::mat4& transform) {
 		);
 	else
 		DrawMesh(
-			Mesh::Create(MeshPrimitive::Quad, quad->GetColor),
+			Mesh::Create(MeshPrimitive::Quad, quad->GetColor()),
 			transform
 		);
 }
@@ -75,7 +78,7 @@ void Renderer3D::DrawQuad(Ref<Texture> texture, const glm::mat4& transform) {
 }
 
 void Renderer3D::DrawQuad(const glm::vec4& color, const glm::mat4& transform) {
-	DrawQuad(Quad::Create(color), transform);
+	DrawQuad(Quad::Create(1, 1, color), transform);
 }
 
 void Renderer3D::DrawLine(const Line& line, const glm::mat4& transform) {
