@@ -1,12 +1,13 @@
 #pragma once
 
+#include <vector>
+
 #include "Point.h"
 
 namespace VolcaniCore {
 
-struct Line {
-	Point P0;
-	Point P1;
+struct Curve {
+	std::vector<Point> Points;
 };
 
 }

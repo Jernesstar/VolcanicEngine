@@ -4,8 +4,6 @@
 
 #include "Physics.h"
 
-using namespace physx;
-
 namespace Magma::Physics {
 
 World::World() {

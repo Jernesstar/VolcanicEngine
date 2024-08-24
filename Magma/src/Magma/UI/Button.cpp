@@ -13,6 +13,20 @@ static bool ButtonImage(Ref<UIElement>, ImVec2);
 
 static bool (*ButtonFunction)(Ref<UIElement>, ImVec2);
 
+Ref<UI::Button> Button::Create(const UI::Button::Specification& specs) {
+	if(specs.Image != "")
+		return CreateRef<UI::Button>(specs.Image);
+
+	auto button =
+		CreateRef<UI::Button>(specs.Color, specs.Text, specs.TextColor);
+	button->SetPositionX(specs.x);
+	button->SetPositionY(specs.y);
+	button->OnPressed = specs.OnPressed;
+	button->OnReleased = specs.OnReleased;
+
+	return button;
+}
+
 Button::Button(const glm::vec4& color, const std::string& text,
 				const glm::vec4& textColor)
 	: UIElement(UIElement::Type::Button)

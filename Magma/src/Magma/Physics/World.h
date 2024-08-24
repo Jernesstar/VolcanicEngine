@@ -25,9 +25,7 @@ private:
 	void onConstraintBreak(PxConstraintInfo* constraints, PxU32 count) { }
 	void onWake(PxActor** actors, PxU32 count) { }
 	void onSleep(PxActor** actors, PxU32 count) { }
-	void onAdvance(const PxRigidBody* const*, const PxTransform*, const PxU32)
-	{
-	}
+	void onAdvance(const PxRigidBody*const*, const PxTransform*, const PxU32) {}
 	void onTrigger(PxTriggerPair* pairs, PxU32 count);
 	void onContact(const PxContactPairHeader& pairHeader,
 				   const PxContactPair* pairs, PxU32 nbPairs);
@@ -63,6 +61,9 @@ public:
 	// RigidBody CreateActor();
 	// RigidBody CreatePlane();
 
+	HitInfo Raycast(const glm::vec3& start,
+					const glm::vec3& direction, float maxDist = 10000.0f);
+
 	void AddContactCallback(
 		const std::function<void(Ref<RigidBody>, Ref<RigidBody>)>& callback);
 
@@ -77,9 +78,6 @@ public:
 	std::vector<Ref<RigidBody>>::const_iterator end() {
 		return m_Actors.end();
 	}
-
-	HitInfo Raycast(const glm::vec3& start,
-					const glm::vec3& direction, float maxDist = 10000.0f);
 
 	PxScene* Get() { return m_Scene; }
 

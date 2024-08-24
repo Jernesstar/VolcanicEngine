@@ -11,6 +11,25 @@ namespace Magma::UI {
 
 class Button : public UIElement {
 public:
+	struct Specification {
+		glm::vec4 Color = glm::vec4(1.0f);
+		std::string Text = "";
+		glm::vec4 TextColor = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+		std::string Image = "";
+
+		uint32_t x = 100;
+		uint32_t y = 100;
+		float Width = 10;
+		float Height = 10;
+
+		std::function<void(void)> OnPressed = [](){};
+		std::function<void(void)> OnReleased = [](){};
+	}
+
+public:
+	static Ref<UI::Button> Create(const UI::Button::Specification& specs);
+
+public:
 	std::function<void(void)> OnPressed = [](){};
 	std::function<void(void)> OnReleased = [](){};
 

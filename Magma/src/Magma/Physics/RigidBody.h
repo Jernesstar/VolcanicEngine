@@ -13,32 +13,41 @@ public:
 	enum class Type { Static, Dynamic };
 
 public:
-	static Ref<RigidBody> Create(RigidBody::Type type,
-								 const Shape& shape,
+	static Ref<RigidBody> Create(RigidBody::Type type, const Shape& shape,
 								 const Transform& t = { });
-	static Ref<RigidBody> Create(RigidBody::Type type,
-								 const Transform& t = { });
+
+	static Ref<RigidBody> Create(RigidBody::Type type, const Transform& t = { });
 
 public:
-	RigidBody(RigidBody::Type type,
-			  const Shape& shape,
+	RigidBody(RigidBody::Type type, const Shape& shape,
 			  const Transform& t = { });
-	RigidBody(RigidBody::Type type,
-			  const Transform& t = { });
+
+	RigidBody(RigidBody::Type type, const Transform& t = { });
 	~RigidBody();
 
-	bool operator ==(const RigidBody& other) {
+	RigidBody& operator =(const RigidBody& other) {
+		this->m_Actor = other.m_Actor;
+		this->m_Actor->acquireReference();
+		this->m_Actor->userData = this;
+
+		this->m_Type = other.m_Type;
+		this->SetShape(other.m_Shape);
+
+		return *this;
+	}
+
+	bool operator ==(const RigidBody& other) const {
 		return m_Actor == other.m_Actor;
 	}
-	bool operator !=(const RigidBody& other) {
+	bool operator !=(const RigidBody& other) const {
 		return m_Actor != other.m_Actor;
 	}
 
-	RigidBody::Type GetType() { return m_Type; }
-	Shape::Type GetShapeType() { return m_ShapeType; }
+	RigidBody::Type GetType() const { return m_Type; }
 
 	virtual void SetShape(const Shape& shape) = 0;
-	bool HasShape() { return m_HasShape; }
+	bool HasShape() const { return m_HasShape; }
+	Shape::Type GetShapeType() const { return m_ShapeType; }
 
 	void UpdateTransform();
 	void UpdateTransform(const Transform& t);
