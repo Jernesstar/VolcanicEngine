@@ -9,8 +9,8 @@ namespace Magma::UI {
 class Text : public UIElement {
 public:
 	struct Specification {
-		glm::vec4 Color = glm::vec4(1.0f);
 		std::string Text = "";
+		glm::vec4 Color = glm::vec4(1.0f);
 
 		float x = 0;
 		float y = 0;

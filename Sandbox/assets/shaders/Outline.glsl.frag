@@ -13,21 +13,12 @@ out vec4 FragColor;
 
 void main()
 {
+    // const int WIDTH = u_Width;
     const int WIDTH = 5;
     bool isInside = false;
     float coverage = 0.0;
     float dist = 1e6;
     int count = 0;
-
-    bool up    = texture(u_Texture, vec2(v_TexCoords.x, v_TexCoords.y + WIDTH * u_PixelSize.y)).r > 0.5;
-    bool down  = texture(u_Texture, vec2(v_TexCoords.x, v_TexCoords.y - WIDTH * u_PixelSize.y)).r > 0.5;
-    bool left  = texture(u_Texture, vec2(v_TexCoords.x - WIDTH * u_PixelSize.x, v_TexCoords.y)).r > 0.5;
-    bool right = texture(u_Texture, vec2(v_TexCoords.x + WIDTH * u_PixelSize.x, v_TexCoords.y)).r > 0.5;
-
-    if(!up && !down && !left && !right) {
-        FragColor = vec4(0.0);
-        return;
-    }
 
     for(int y = -WIDTH; y <= WIDTH; y++)
     {

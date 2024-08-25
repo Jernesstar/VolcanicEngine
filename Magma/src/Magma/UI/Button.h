@@ -24,7 +24,7 @@ public:
 
 		std::function<void(void)> OnPressed = [](){};
 		std::function<void(void)> OnReleased = [](){};
-	}
+	};
 
 public:
 	static Ref<UI::Button> Create(const UI::Button::Specification& specs);

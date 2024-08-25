@@ -19,8 +19,8 @@ Ref<UI::Button> Button::Create(const UI::Button::Specification& specs) {
 
 	auto button =
 		CreateRef<UI::Button>(specs.Color, specs.Text, specs.TextColor);
-	button->SetPositionX(specs.x);
-	button->SetPositionY(specs.y);
+	button->x = specs.x;
+	button->y = specs.y;
 	button->OnPressed = specs.OnPressed;
 	button->OnReleased = specs.OnReleased;
 

@@ -27,11 +27,10 @@ public:
 
 	RigidBody& operator =(const RigidBody& other) {
 		this->m_Actor = other.m_Actor;
-		this->m_Actor->acquireReference();
 		this->m_Actor->userData = this;
 
 		this->m_Type = other.m_Type;
-		this->SetShape(other.m_Shape);
+		// this->SetShape(other.m_Shape);
 
 		return *this;
 	}
@@ -65,6 +64,7 @@ protected:
 
 	Shape::Type m_ShapeType;
 	bool m_HasShape = false;
+	// Ref<Shape> m_Shape;
 
 	friend class World;
 };

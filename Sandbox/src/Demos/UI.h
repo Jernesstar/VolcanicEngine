@@ -9,7 +9,7 @@ public:
 	void OnUpdate(TimeStep ts);
 
 private:
-	Ref<UI::UIElement> Root;
+	Ref<Magma::UI::UIElement> Root;
 };
 
 UI::UI() {
@@ -19,14 +19,16 @@ UI::UI() {
 			Application::Close();
 	});
 
-	Root = UI::UIBuilder<UI::Window>()
-	.Add(UI::Text::Specification{
+	Root = Magma::UI::UIBuilder<Magma::UI::Window>()
+	// .Add<Magma::UI::Button>(glm::vec4{ 0.0f, 1.0f, 1.0f, 1.0f }, "Test Button", glm::vec4(1.0f))
+	.Add<Magma::UI::Text>(
+	{
 		.Text = "Root UI",
-		.TextColor = { 0.0f, 1.0f, 0.0f, 1.0f },
+		.Color = { 0.0f, 1.0f, 0.0f, 1.0f },
 		.x = 20, .y = 200
 	})
-	.Add<UI::Button>({ 0.0f, 1.0f, 1.0f, 1.0f }, "Test Button", glm::vec4(1.0f))
-	.Finalize();
+	// .Finalize();
+	;
 
 	VOLCANICORE_LOG_INFO("UI project is now running");
 }
