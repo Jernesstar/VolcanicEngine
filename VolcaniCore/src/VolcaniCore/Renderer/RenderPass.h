@@ -1,7 +1,7 @@
 #pragma once
 
-#include <unordered_map>
 #include <vector>
+#include <unordered_map>
 
 #include "Object/Shader.h"
 #include "Object/Framebuffer.h"
@@ -9,41 +9,69 @@
 namespace VolcaniCore {
 
 template<typename TOut>
-using HandleMap = std::unordered_map<std::string, std::function<TOut(void)>>;
+using ValueCallback = std::function<TOut(void)>;
 
 template<typename TOut>
-using HandleList = std::vector<HandleMap<TOut>>;
+using HandleMap = std::unordered_map<std::string, ValueCallback<TOut>>;
+
+struct TextureAndSlot {
+	Ref<Texture> Texture;
+	uint32_t Slot;
+}
 
 class Handles {
-	HandleList<uint32_t>	 IntHandles;
-	HandleList<float>		 FloatHandles;
-	HandleList<Ref<Texture>> TextureHandles;
+	HandleMap<uint32_t>		IntHandles;
+	HandleMap<float>		FloatHandles;
+	HandleMap<TextureAndSlot> TextureHandles;
 
-	HandleList<glm::vec2> Vec2Handles;
-	HandleList<glm::vec3> Vec3Handles;
-	HandleList<glm::vec4> Vec4Handles;
+	HandleMap<glm::vec2> Vec2Handles;
+	HandleMap<glm::vec3> Vec3Handles;
+	HandleMap<glm::vec4> Vec4Handles;
 
-	HandleList<glm::mat2> Mat2Handles;
-	HandleList<glm::mat3> Mat3Handles;
-	HandleList<glm::mat4> Mat4Handles;
+	HandleMap<glm::mat2> Mat2Handles;
+	HandleMap<glm::mat3> Mat3Handles;
+	HandleMap<glm::mat4> Mat4Handles;
+
+	template<typename TUniform>
+	void Set(const std::string& uniformName,
+			 const ValueCallback<TUniform>& callback)
+	{
+		GetHandles<TUniform>()[uniformName] = callback;
+	}
+
+	void Set(const std::string& uniformName,
+			 const ValueCallback<TextureAndSlot>&)
+	{
+		TextureHandles[uniformName] = callback;
+	}
+
+	template<typename TUniform>
+	HandleMap<TUniform>& GetHandles();
 };
 
 class RenderPass {
 public:
 	static Ref<RenderPass> Create(const std::string& name,
 								  Ref<ShaderPipeline> pipeline,
-								  const Handles& = { });
+								  const Handles& = { })
+{
+	return CreateRef<RenderPass>(name, pipeline, handles);
+}
 
 public:
 	const std::string Name;
 
 public:
 	RenderPass(const std::string& name, Ref<ShaderPipeline> pipeline,
-			   const Handles& handles = { });
+				const Handles& handles = { })
+		: Name(name), m_Pipeline(pipeline), m_Handles(handles) { }
 	~RenderPass() = default;
 
-	// void AddInput();
-	void SetOutput(Ref<Framebuffer> buffer);
+	void SetOutput(Ref<Framebuffer> output) {
+		m_Output = output;
+	}
+
+	void LinkHandles();
 
 	Ref<ShaderPipeline> GetPipeline() const { return m_Pipeline; }
 	Ref<Framebuffer> GetOutput() const { return m_Output; }

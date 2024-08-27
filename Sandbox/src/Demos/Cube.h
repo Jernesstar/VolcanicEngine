@@ -68,7 +68,9 @@ private:
 	CameraController controller;
 };
 
-Cube::Cube() {
+Cube::Cube()
+	: Application(1920, 1080, "Cube Demo")
+{
 	Events::RegisterListener<KeyPressedEvent>(
 	[](const KeyPressedEvent& event) {
 		if(event.Key == Key::Escape)
@@ -81,7 +83,7 @@ Cube::Cube() {
 		{ "VolcaniCore/assets/shaders/Mesh.glsl.vert", ShaderType::Vertex },
 		{ "VolcaniCore/assets/shaders/Mesh.glsl.frag", ShaderType::Fragment }
 	});
-	framebuffer = CreateRef<OpenGL::Framebuffer>(200, 150);
+	framebuffer = CreateRef<OpenGL::Framebuffer>(480, 270);
 
 	renderPass = RenderPass::Create("Render Pass", shader);
 	renderPass->SetOutput(framebuffer);
@@ -136,7 +138,7 @@ void Cube::OnUpdate(TimeStep ts) {
 		for(int y = -5; y < 5; y++)
 			for(int x = -5; x < 5; x++)
 				Renderer3D::DrawMesh(cube, { .Translation = { x, 0.0f, y } });
-		
+
 		Renderer3D::End();
 	}
 	Renderer::EndPass();

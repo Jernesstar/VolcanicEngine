@@ -1,36 +1,50 @@
 #pragma once
 
-#include "Renderer/RendererAPI.h"
-
-#include <OpenGL/VertexArray.h>
+#include <Renderer/RendererAPI.h>
 
 namespace VolcaniCore::OpenGL {
+
+struct DrawCall {
+
+}
+
+struct DrawCallIndexed : public DrawCall {
+
+};
+
+struct DrawCallInstanced : public DrawCall {
+
+};
+
+struct DrawCallMultiIndirect : public DrawCall {
+
+};
 
 class Renderer : public VolcaniCore::RendererAPI {
 public:
 	Renderer();
 	~Renderer() = default;
 
-	void Clear(const glm::vec4& color = { 0.0f, 0.0f, 0.0f, 0.0f }) override;
+	void StartFrame() override;
+	void EndFrame(FrameData& frame) override;
+
+	void Clear(const glm::vec4& color = glm::vec4(1.0f)) override;
 	void Resize(uint32_t width, uint32_t height) override;
 
-	void DrawPoint(const Point& point, const glm::mat4& transform) override;
+	void RenderCubemap(Ref<VolcaniCore::Cubemap> cubemap) override;
 
-	void DrawLine(const Line& line, const glm::mat4& transform) override;
-
-	void DrawMesh(Ref<VolcaniCore::Mesh> model, const glm::mat4& tr) override;
-
-	void DrawCubemap(Ref<VolcaniCore::Cubemap> cubemap) override;
-
-	void RenderFramebuffer(Ref<VolcaniCore::Framebuffer> buffer,
-						   AttachmentTarget target) override;
+	void RenderFramebuffer(
+			Ref<VolcaniCore::Framebuffer> f, AttachmentTarget t) override;
 
 private:
-	void DrawIndexed(Ref<VertexArray> vertexArray, uint32_t indices = 0);
-	void DrawInstanced(Ref<VertexArray> vertexArray, uint32_t instanceCount);
-
 	void Init() override;
 	void Close() override;
+
+	void Flush(DrawCommand& call);
+
+	void RenderPoints(DrawCommand& call);
+	void RenderLines(DrawCommand& call);
+	void RenderMeshes(DrawCommand& call);
 };
 
 }

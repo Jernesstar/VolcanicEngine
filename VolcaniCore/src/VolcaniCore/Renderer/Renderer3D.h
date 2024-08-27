@@ -1,14 +1,13 @@
 #pragma once
 
-#include "Object/Shader.h"
 #include "Object/Cubemap.h"
-#include "Object/Quad.h"
-#include "Object/Text.h"
-#include "Object/Texture.h"
-#include "Object/Mesh.h"
-#include "Object/Model.h"
 #include "Object/Point.h"
 #include "Object/Line.h"
+#include "Object/Quad.h"
+#include "Object/Mesh.h"
+#include "Object/Model.h"
+#include "Object/Texture.h"
+#include "Object/Text.h"
 
 #include "Renderer/Camera.h"
 #include "Renderer/Transform.h"
@@ -20,7 +19,7 @@ public:
 	static void Begin(Ref<Camera> camera);
 	static void End();
 
-	static void DrawCubemap(Ref<Cubemap> cubemap);
+	static void RenderCubemap(Ref<Cubemap> cubemap);
 
 	static void DrawMesh(Ref<Mesh> mesh, const glm::mat4& tr);
 	static void DrawMesh(Ref<Mesh> mesh, const Transform& t = { }) {
@@ -65,7 +64,6 @@ public:
 private:
 	static void Init();
 	static void Close();
-	static void Flush();
 
 	friend class Renderer;
 };

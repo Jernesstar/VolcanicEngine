@@ -94,14 +94,19 @@ Raycast::Raycast() {
 	maskPass = RenderPass::Create("Mask Pass", maskShader);
 	outlinePass = RenderPass::Create("Outline Pass", outlineShader);
 
-	// maskPass = RenderPass::Create("Mask Pass", maskShader,
-	// Handles{
-	// 	.Vec4Handles = {
-	// 		[]() {
-	// 			return glm::vec4(1.0f);
-	// 		}
-	// 	}
-	// });
+	outlinePass->GetHandles.Set("u_PixelSize",
+		[pixelSize]() {
+			return pixelSize;
+		});
+	outlinePass->GetHandles.Set("u_Color",
+		[outlineColor]() {
+			return outlineColor;
+		});
+	maskPass->GetHandles.Set("u_Color",
+		[]() {
+			return glm::vec4(1.0f);
+		});
+
 	Ref<OpenGL::Framebuffer> mask = CreateRef<OpenGL::Framebuffer>(800, 600);
 	maskPass->SetOutput(mask);
 
@@ -158,21 +163,18 @@ void Raycast::OnUpdate(TimeStep ts) {
 	{
 		Renderer::Clear();
 
-		maskPass->GetPipeline()->SetVec4("u_Color", glm::vec4(1.0f));
-
 		Renderer3D::Begin(camera);
 		Renderer3D::DrawMesh(cube, selected->GetTransform());
 		Renderer3D::End();
 	}
 	Renderer::EndPass();
 
+	Renderer::EndFrame();
+
 	// 4. Full-screen quad applying some image processing function
 	Renderer::StartPass(outlinePass);
 	{
 		auto mask = maskPass->GetOutput();
-
-		outlinePass->GetPipeline()->SetVec2("u_PixelSize", pixelSize);
-		outlinePass->GetPipeline()->SetVec4("u_Color", outlineColor);
 
 		RendererAPI::Get()->RenderFramebuffer(mask, AttachmentTarget::Color);
 	}

@@ -4,25 +4,23 @@
 #include "Core/Assert.h"
 
 #include "Renderer/RendererAPI.h"
-#include "Renderer/Renderer3D.h"
-#include "Renderer/Renderer2D.h"
 
 namespace VolcaniCore {
 
 static Ref<RenderPass> s_CurrentPass;
+static DrawCommand s_CurrentDrawCommand;
+static FrameData s_CurrentFrame;
 
 void Renderer::Init() {
-	Renderer3D::Init();
-	Renderer2D::Init();
+
 }
 
 void Renderer::Close() {
-	Renderer2D::Close();
-	Renderer3D::Close();
+
 }
 
 void Renderer::Clear(const glm::vec4& color) {
-	RendererAPI::Get()->Clear(color);
+	s_CurrentDrawCommand.ShouldClearScreen = true;
 }
 
 void Renderer::Resize(uint32_t width, uint32_t height) {
@@ -30,44 +28,34 @@ void Renderer::Resize(uint32_t width, uint32_t height) {
 }
 
 void Renderer::BeginFrame() {
-	// RendererAPI::Get()->BeginFrame();
+	RendererAPI::Get()->BeginFrame();
 }
 
-void Renderer::StartPass(Ref<RenderPass> pass) {
-	s_CurrentPass = pass;
-	auto framebuffer = pass->GetOutput();
+void Renderer::EndFrame() {
+	RendererAPI::Get()->DrawFrame(s_CurrentFrame);
 
-	if(framebuffer) {
-		Resize(framebuffer->GetWidth(), framebuffer->GetHeight());
-		framebuffer->Bind();
-	}
-
-	pass->GetPipeline()->Bind();
-}
-
-void Renderer::EndPass() {
-	if(!s_CurrentPass)
-		return;
-
-	auto framebuffer = s_CurrentPass->GetOutput();
-
-	if(framebuffer) {
-		framebuffer->Unbind();
-		auto window = Application::GetWindow();
-		Resize(window->GetWidth(), window->GetHeight());
-	}
-
-	s_CurrentPass->GetPipeline()->Unbind();
-	s_CurrentPass = nullptr;
+	s_CurrentFrame.DrawCommands.clear();
 }
 
 Ref<RenderPass> Renderer::GetPass() {
 	return s_CurrentPass;
 }
 
-void Renderer::EndFrame() {
-	// RendererAPI::Get()->EndFrame();
+DrawCommand& Renderer::GetCommand() {
+	return s_CurrentDrawCommand;
 }
 
+void Renderer::StartPass(Ref<RenderPass> pass) {
+	s_CurrentPass = pass;
+	s_CurrentDrawCommand = DrawCommand{ .Pass = pass };
+}
+
+void Renderer::EndPass() {
+	if(!s_CurrentPass)
+		return;
+
+	s_CurrentFrame.AddDrawCommand(s_CurrentDrawCommand);
+	s_CurrentPass = nullptr;
+}
 
 }

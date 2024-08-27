@@ -7,50 +7,53 @@
 
 namespace VolcaniCore {
 
-void Renderer3D::Init() {
-
-}
-
-void Renderer3D::Close() {
-
-}
-
 void Renderer3D::Begin(Ref<Camera> camera) {
-	auto pass = Renderer::GetPass();
-	if(!pass)
-		return;
+	auto& handles = Renderer::GetPass().GetHandles();
 
-	auto pipeline = pass->GetPipeline();
-	pipeline->SetMat4("u_ViewProj", camera->GetViewProjection());
-	pipeline->SetVec3("u_CameraPosition", camera->GetPosition());
+	handles
+	.Set("u_ViewProj",
+		[camera]() -> glm::mat4
+		{
+			return camera->GetViewProjection();
+		});
+	handles
+	.Set("u_CameraPosition"
+		[camera]() -> glm::vec3
+		{
+			return camera->GetPosition();
+		});
 }
 
 void Renderer3D::End() {
 
 }
 
-void Renderer3D::DrawCubemap(Ref<Cubemap> cubemap) {
-	RendererAPI::Get()->DrawCubemap(cubemap);
+void Renderer3D::RenderCubemap(Ref<Cubemap> cubemap) {
+	RendererAPI::Get()->RenderCubemap(cubemap);
 }
 
-void Renderer3D::DrawMesh(Ref<Mesh> mesh, const glm::mat4& transform) {
+void Renderer3D::DrawMesh(Ref<Mesh> mesh, const glm::mat4& tr) {
 	if(!mesh)
 		return;
 
-	auto pass = Renderer::GetPass();
+	auto& command = Renderer::GetDrawCommand();
 
-	if(pass) {
-		auto pipeline = pass->GetPipeline();
-		Material& material = mesh->GetMaterial();
+	// TODO(Is this even going to work for different meshes?)
+	// Right now we have one mesh, so this should be a problem
+	command.Pass->GetHandles()
+	.Set("u_Diffuse",
+		[mesh]() {
+			Material& material = mesh->GetMaterial();
+			return { material.Diffuse, 0 };
+		});
+	command.Pass->GetHandles()
+	.Set("u_Specular"
+		[mesh]() {
+			Material& material = mesh->GetMaterial();
+			return { material.Specular, 1 };
+		});
 
-		pipeline->SetMat4("u_Model", transform);
-		if(material.Diffuse)
-			pipeline->SetTexture("u_Diffuse", material.Diffuse, 0);
-		if(material.Specular)
-			pipeline->SetTexture("u_Specular",  material.Specular, 1);
-	}
-
-	RendererAPI::Get()->DrawMesh(mesh, transform);
+	command.MeshTransforms[mesh].Add(tr);
 }
 
 void Renderer3D::DrawModel(Ref<Model> model, const glm::mat4& transform) {
@@ -59,18 +62,14 @@ void Renderer3D::DrawModel(Ref<Model> model, const glm::mat4& transform) {
 }
 
 void Renderer3D::DrawQuad(Ref<Quad> quad, const glm::mat4& transform) {
+	Ref<Mesh> mesh;
 	if(quad->IsTextured)
-		DrawMesh(
-			Mesh::Create(
-				MeshPrimitive::Quad, Material{ .Diffuse = quad->GetTexture() }
-			),
-			transform
-		);
+		mesh = Mesh::Create(
+				MeshPrimitive::Quad, Material{ .Diffuse = quad->GetTexture() });
 	else
-		DrawMesh(
-			Mesh::Create(MeshPrimitive::Quad, quad->GetColor()),
-			transform
-		);
+		mesh = Mesh::Create(MeshPrimitive::Quad, quad->GetColor());
+
+	DrawMesh(mesh, transform);
 }
 
 void Renderer3D::DrawQuad(Ref<Texture> texture, const glm::mat4& transform) {
@@ -81,11 +80,11 @@ void Renderer3D::DrawQuad(const glm::vec4& color, const glm::mat4& transform) {
 	DrawQuad(Quad::Create(1, 1, color), transform);
 }
 
-void Renderer3D::DrawLine(const Line& line, const glm::mat4& transform) {
+void Renderer3D::DrawPoint(const Point& point, const glm::mat4& transform) {
 	// TODO(Implement)
 }
 
-void Renderer3D::DrawPoint(const Point& point, const glm::mat4& transform) {
+void Renderer3D::DrawLine(const Line& line, const glm::mat4& transform) {
 	// TODO(Implement)
 }
 

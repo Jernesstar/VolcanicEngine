@@ -1,16 +1,14 @@
 #include "Renderer.h"
 
-#include <unordered_map>
-
 #include <glad/glad.h>
 
 #include <glm/gtc/type_ptr.hpp>
 
-#include "Core/Assert.h"
-#include "Event/Events.h"
+#include <Core/Assert.h>
+#include <Event/Events.h>
 
-#include "Renderer/Renderer.h"
-#include "Renderer/ShaderLibrary.h"
+#include <Renderer/Renderer.h>
+#include <Renderer/ShaderLibrary.h>
 
 #include "Shader.h"
 #include "Mesh.h"
@@ -24,6 +22,24 @@ using namespace VolcaniCore;
 
 namespace VolcaniCore::OpenGL {
 
+static void DrawIndexed(Ref<VertexArray> vertexArray, uint32_t indices = 0);
+static void DrawInstanced(Ref<VertexArray> vertexArray, uint32_t instanceCount);
+
+static const uint32_t MaxInstances = 1000;
+
+struct RendererData {
+	Ptr<VertexArray> CubemapArray;
+	Ptr<VertexArray> FramebufferArray;
+
+	Ref<VertexArray> MeshArray;
+	Ref<VertexArray> LineArray;
+	Ref<VertexArray> PointArray;
+
+	Ref<VertexBuffer> Transforms;
+};
+
+static RendererData s_Data;
+
 Renderer::Renderer()
 	: RendererAPI(RendererAPI::Backend::OpenGL)
 {
@@ -34,24 +50,6 @@ Renderer::Renderer()
 		Resize(event.Width, event.Height);
 	});
 }
-
-// TODO(Implement): Instancing
-static const uint32_t MaxInstances = 1000;
-
-struct RendererData {
-	Ptr<VertexArray> CubemapArray;
-	Ptr<VertexArray> FramebufferArray;
-
-	Ref<VertexBuffer> MeshBuffer;
-	Ref<VertexBuffer> LineBuffer;
-	Ref<VertexBuffer> PointBuffer;
-
-	Ptr<VertexArray> MeshArray;
-	Ptr<VertexArray> LineArray;
-	Ptr<VertexArray> PointArray;
-};
-
-static RendererData s_Data;
 
 void Renderer::Init() {
 	glEnable(GL_DEPTH_TEST);				// Depth testing
@@ -133,26 +131,31 @@ void Renderer::Init() {
 
 	Ref<VertexBuffer> buffer = CreateRef<VertexBuffer>(
 		BufferLayout{
-			{ "TexCoord",	BufferDataType::Vec2 },
+			{ "TexCoord", BufferDataType::Vec2 }
 		},
 		framebufferCoords
 	);
 	s_Data.FramebufferArray = CreatePtr<VertexArray>(buffer);
 
-	// s_Data.PointBuffer = CreateRef<VertexBuffer>(
-	// 	BufferLayout{
-	// 		{ "Coordinate", BufferDataType::Vec3 },
-	// 		{ "Color",		BufferDataType::Vec3 },
-	// 	});
-	// s_Data.PointArray = CreatePtr<VertexArray>(buffer);
+	auto pointBuffer = CreateRef<VertexBuffer>(
+		BufferLayout{
+			{ "Coordinate", BufferDataType::Vec3 },
+			{ "Color",		BufferDataType::Vec3 },
+		},
+		MaxInstances
+	);
+	s_Data.PointArray = CreatePtr<VertexArray>(pointBuffer);
 
-	// s_Data.LineBuffer = CreateRef<VertexBuffer>(
-	// 	BufferLayout{
-	// 		{ "Coordinate", BufferDataType::Vec3 },
-	// 		{ "Color",		BufferDataType::Vec3 },
-	// 	});
-	// s_Data.LineArray = CreatePtr<VertexArray>(buffer);
+	auto lineBuffer = CreateRef<VertexBuffer>(
+		BufferLayout{
+			{ "Coordinate", BufferDataType::Vec3 },
+			{ "Color",		BufferDataType::Vec3 },
+		},
+		MaxInstances
+	);
+	s_Data.LineArray = CreatePtr<VertexArray>(lineBuffer);
 
+	// For static geometry
 	// s_Data.MeshBuffer = CreateRef<VertexBuffer>(
 	// 	BufferLayout{
 	// 		{ "Coordinate", BufferDataType::Vec3 },
@@ -161,11 +164,96 @@ void Renderer::Init() {
 	// 	});
 	// s_Data.MeshArray = CreatePtr<VertexArray>(buffer);
 
+	// uint32_t vboID, flags;
+	// glGenBuffers(1, &vboID);
+	// glBindBuffer(GL_ARRAY_BUFFER, vboID);
+	// flags = GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT;
+	// glBufferStorage(GL_ARRAY_BUFFER, MaxInstances * sizeof(glm::mat4), 0, flags);
+
+	// void* myPointer =
+	// 	glMapBufferRange(GL_ARRAY_BUFFER, 0, MaxInstances * sizeof(glm::mat4), flags);
+
+	// TODO(Implement): This should be the implementation of the mapped buffer above
+	s_Data.Transforms = CreateRef<VertexBuffer>(
+		BufferLayout{
+			{ "Transform", BufferDataType::Mat4 }
+		});
+
 	ShaderLibrary::Get("Framebuffer")->Bind();
 	ShaderLibrary::Get("Framebuffer")->SetInt("u_ScreenTexture", 0);
 }
 
 void Renderer::Close() { }
+
+void Renderer::BeginFrame() {
+
+}
+
+void Renderer::EndFrame(FrameData& data) {
+	for(auto& command : data) {
+		Flush(command);
+	}
+}
+
+void Renderer::Flush(DrawCommand& command) {
+	auto framebuffer = command.Pass->GetOutput();
+	if(framebuffer) {
+		Resize(framebuffer->GetWidth(), framebuffer->GetHeight());
+		framebuffer->Bind();
+	}
+
+	if(command.ShouldClearScreen)
+		Clear();
+
+	RenderMeshes(command);
+	RenderLines(command);
+	RenderPoints(command);
+
+	if(framebuffer) {
+		framebuffer->Unbind();
+		auto window = Application::GetWindow();
+		Resize(window->GetWidth(), window->GetHeight());
+	}
+}
+
+void Renderer::RenderPoints(DrawCommand& command) {
+	for(auto& [point, transforms] : command.PointTransforms) {
+
+	}
+}
+
+void Renderer::RenderLines(DrawCommand& command) {
+	for(auto& [line, transforms] : command.LineTransforms) {
+		s_Data.LineArray->Bind();
+		s_Data.LineArray->GetVertexBuffer()->SetData(transforms);
+
+		glDrawArraysInstanced(GL_LINES, 0, 2, transforms.GetCount());
+	}
+}
+
+void Renderer::RenderMeshes(DrawCommand& command) {
+	// Many options here:
+	// 1. Put all meshes into s_Data.MeshBuffer and use MultiDrawIndirect
+	// 2. Individually bind mesh vertex array and link transform buffer to it
+	//		and use DrawInstanced
+
+	// Method 1 currently being used
+
+	for(auto& [mesh, transforms] : command.MeshTransforms) {
+		command.Pass->LinkHandles();
+
+		auto* nativeMesh = mesh->As<OpenGL::Mesh>();
+		auto vao = mesh->GetVertexArray();
+
+		vao->Bind();
+		s_Data.Transforms->Bind();
+		s_Data.Transforms->SetData(transforms);
+
+		DrawInstanced(vao, transforms.GetCount());
+
+		s_Data.Transforms->Unbind();
+	}
+}
 
 void Renderer::Clear(const glm::vec4& color) {
 	glClearColor(color.x, color.y, color.z, color.w);
@@ -176,22 +264,7 @@ void Renderer::Resize(uint32_t width, uint32_t height) {
 	glViewport(0, 0, width, height);
 }
 
-void Renderer::DrawPoint(const VolcaniCore::Point& point, const glm::mat4& tr) {
-
-}
-
-void Renderer::DrawLine(const VolcaniCore::Line& line, const glm::mat4& tr) {
-	// s_Data.LineVAO->Bind();
-	// glDrawArrays(GL_LINES, 0, 2);
-}
-
-void Renderer::DrawMesh(Ref<VolcaniCore::Mesh> mesh, const glm::mat4& tr) {
-	auto nativeMesh = mesh->As<OpenGL::Mesh>();
-
-	DrawIndexed(nativeMesh->GetVertexArray());
-}
-
-void Renderer::DrawCubemap(Ref<VolcaniCore::Cubemap> cubemap) {
+void Renderer::RenderCubemap(Ref<VolcaniCore::Cubemap> cubemap) {
 	glDepthMask(GL_FALSE);
 
 	cubemap->As<OpenGL::Cubemap>()->Bind();
@@ -204,9 +277,6 @@ void Renderer::DrawCubemap(Ref<VolcaniCore::Cubemap> cubemap) {
 void Renderer::RenderFramebuffer(Ref<VolcaniCore::Framebuffer> buffer,
 								 AttachmentTarget target)
 {
-	glDisable(GL_DEPTH_TEST);
-	glCullFace(GL_FRONT);
-
 	if(!buffer->Has(target)) {
 		VOLCANICORE_LOG_WARNING("Framebuffer does not have needed attachment");
 		return;
@@ -218,6 +288,9 @@ void Renderer::RenderFramebuffer(Ref<VolcaniCore::Framebuffer> buffer,
 	buffer->As<OpenGL::Framebuffer>()->Get(target).Bind();
 	s_Data.FramebufferArray->Bind();
 
+	glDisable(GL_DEPTH_TEST);
+	glCullFace(GL_FRONT);
+
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 
 	glCullFace(GL_BACK);
@@ -227,7 +300,7 @@ void Renderer::RenderFramebuffer(Ref<VolcaniCore::Framebuffer> buffer,
 void Renderer::DrawIndexed(Ref<VertexArray> array, uint32_t indices) {
 	if(!array->HasIndexBuffer()) {
 		VOLCANICORE_LOG_WARNING("Attempt to execute indexed draw call \
-								 without index buffer bound has failed");
+								 without index buffer present has failed");
 		return;
 	}
 	uint32_t count = array->GetIndexBuffer()->Count;
@@ -240,7 +313,7 @@ void Renderer::DrawIndexed(Ref<VertexArray> array, uint32_t indices) {
 void Renderer::DrawInstanced(Ref<VertexArray> array, uint32_t instanceCount) {
 	if(!array->HasIndexBuffer()) {
 		VOLCANICORE_LOG_WARNING("Attempt to execute instanced draw call \
-								 without index buffer bound has failed");
+								 without index buffer present has failed");
 		return;
 	}
 	uint32_t count = array->GetIndexBuffer()->Count;
