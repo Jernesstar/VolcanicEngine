@@ -58,19 +58,34 @@ Application* CreateApplication(const CommandLineArgs& args) {
 
 	Physics::Init();
 
+	// Isometric Camera, smooth scroll pixels, instancing
 	if(project == "Cube")	   return new Demo::Cube();
+
+	// PointLights, Spotlights, uniform buffers
 	if(project == "Lighting")  return new Demo::Lighting();
+
+	// Shadows
 	if(project == "Shadows")   return new Demo::Shadows();
+
+	// Bloom
 	if(project == "Bloom")	   return new Demo::Bloom();
 
+	// UI
 	if(project == "UI")		   return new Demo::UI();
+
+	// Entity component system
 	if(project == "ECS")	   return new Demo::ECS();
 
+	// Raycasting, object outlining
 	if(project == "Raycast")   return new Demo::Raycast();
-	if(project == "Collision") return new Demo::Collision();
-	if(project == "Geometry")  return new Demo::Geometry();
 
+	// Collision detection
+	if(project == "Collision") return new Demo::Collision();
+
+	// Magma Editor
 	if(project == "Editor")	   return new Magma::Editor();
+
+	// The Maze is Lava game
 	if(project == "Game")	   return new TheMazeIsLava::Game();
 
 	return new Demo::Template();

@@ -20,7 +20,7 @@ public:
 	uint32_t GetHeight() const { return m_Height; }
 
 	bool HasPath() const { return m_Path != ""; }
-	std::string GetPath() const { return m_Path; }
+	const std::string& GetPath() const { return m_Path; }
 
 	template<typename TDerived>
 	requires std::derived_from<TDerived, Texture>

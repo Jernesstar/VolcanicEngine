@@ -13,17 +13,16 @@ Mesh::Mesh(const std::string& path)
 		{ "TexCoord_Color", BufferDataType::Vec4 }
 	});
 
-	m_VertexBuffer = 
-		CreateRef<VertexBuffer>(layout, m_Vertices.size(), &m_Vertices[0]);
-	m_IndexBuffer = CreateRef<IndexBuffer>(m_Indices.size(), &m_Indices[0]);
+	Ref<VertexBuffer> vBuffer;
+	Ref<IndexBuffer> indexBuffer;
+	vBuffer = CreateRef<VertexBuffer>(layout, m_Vertices.size(), &m_Vertices[0]);
+	indexBuffer = CreateRef<IndexBuffer>(m_Indices.size(), &m_Indices[0]);
 
-	m_VertexArray = CreateRef<VertexArray>(m_VertexBuffer, m_IndexBuffer);
-	m_VertexArray->Unbind();
+	m_VertexArray = CreateRef<VertexArray>(vBuffer, indexBuffer);
 }
 
 Mesh::Mesh(const std::vector<Vertex>& verts,
-		   const std::vector<uint32_t>& indices,
-		   const Material& material)
+			const std::vector<uint32_t>& indices, const Material& material)
 	: VolcaniCore::Mesh(verts, indices, material)
 {
 	BufferLayout layout({
@@ -32,12 +31,12 @@ Mesh::Mesh(const std::vector<Vertex>& verts,
 		{ "TexCoord_Color", BufferDataType::Vec4 }
 	});
 
-	m_VertexBuffer = 
-		CreateRef<VertexBuffer>(layout, m_Vertices.size(), &m_Vertices[0]);
-	m_IndexBuffer = CreateRef<IndexBuffer>(m_Indices.size(), &m_Indices[0]);
+	Ref<VertexBuffer> vBuffer;
+	Ref<IndexBuffer> indexBuffer;
+	vBuffer = CreateRef<VertexBuffer>(layout, m_Vertices.size(), &m_Vertices[0]);
+	indexBuffer = CreateRef<IndexBuffer>(m_Indices.size(), &m_Indices[0]);
 
-	m_VertexArray = CreateRef<VertexArray>(m_VertexBuffer, m_IndexBuffer);
-	m_VertexArray->Unbind();
+	m_VertexArray = CreateRef<VertexArray>(vBuffer, indexBuffer);
 }
 
 }

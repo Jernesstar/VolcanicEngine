@@ -10,8 +10,7 @@
 namespace VolcaniCore::OpenGL {
 
 Texture2D::Texture2D(uint32_t width, uint32_t height)
-	: Texture(width, height),
-		InternalFormat(GL_RGBA8), DataFormat(GL_RGBA)
+	: Texture(width, height), InternalFormat(GL_RGBA8), DataFormat(GL_RGBA)
 {
 	glCreateTextures(GL_TEXTURE_2D, 1, &m_TextureID);
 	glTextureStorage2D(m_TextureID, 1, InternalFormat, m_Width, m_Height);
@@ -24,24 +23,15 @@ Texture2D::Texture2D(uint32_t width, uint32_t height)
 }
 
 Texture2D::Texture2D(const std::string& path)
-	: Texture(path), InternalFormat(GL_RGBA8), DataFormat(GL_RGBA)
+	: Texture(path)
 {
-	unsigned char* pixel_data = FileUtils::ReadImage(path.c_str(),
-													 m_Width, m_Height,
-													 4, false);
-	
-	glCreateTextures(GL_TEXTURE_2D, 1, &m_TextureID);
-	glTextureStorage2D(m_TextureID, 1, InternalFormat, m_Width, m_Height);
+	uint32_t width, height;
+	unsigned char* pixelData =
+		FileUtils::ReadImage(path.c_str(), width, height, 4, false);
 
-	glTextureParameteri(m_TextureID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTextureParameteri(m_TextureID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	glTextureParameteri(m_TextureID, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTextureParameteri(m_TextureID, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-	glTextureSubImage2D(m_TextureID, 0, 0, 0, m_Width, m_Height, DataFormat,
-						GL_UNSIGNED_BYTE, pixel_data);
-	stbi_image_free(pixel_data);
+	Texture2D(width, height);
+	SetData(pixelData);
+	stbi_image_free(pixelData);
 }
 
 Texture2D::~Texture2D() { glDeleteTextures(1, &m_TextureID); }

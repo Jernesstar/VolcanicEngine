@@ -25,8 +25,12 @@ public:
 	void AddVertexBuffer(Ref<VertexBuffer> vertexBuffer);
 	void SetIndexBuffer(Ref<IndexBuffer> index_buffer);
 
-	Ref<IndexBuffer> GetIndexBuffer() const { return m_IndexBuffer; }
 	bool HasIndexBuffer() const { return bool(m_IndexBuffer); }
+	Ref<IndexBuffer> GetIndexBuffer() const { return m_IndexBuffer; }
+
+	Ref<VertexBuffer> GetVertexBuffer(uint32_t index = 0) {
+		return m_VertexBuffer[index];
+	}
 
 private:
 	uint32_t m_VertexArrayID;

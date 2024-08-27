@@ -14,15 +14,12 @@ public:
 	Mesh(const std::string& path);
 
 	Mesh(const std::vector<Vertex>& vertices,
-		 const std::vector<uint32_t>& indices,
-		 const Material& material = { });
+		 const std::vector<uint32_t>& indices, const Material& material = { });
+
+	Ref<VertexArray> GetVertexArray() { return m_VertexArray; }
 
 private:
-	Ref<OpenGL::VertexArray> m_VertexArray;
-	Ref<OpenGL::VertexBuffer> m_VertexBuffer;
-	Ref<OpenGL::IndexBuffer> m_IndexBuffer;
-
-	friend class Renderer;
+	Ref<VertexArray> m_VertexArray;
 };
 
 }
