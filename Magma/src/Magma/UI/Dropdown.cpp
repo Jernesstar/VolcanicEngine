@@ -14,8 +14,9 @@ DropDown::DropDown()
 void DropDown::Draw() {
 	uint32_t n = m_Children.size();
 	const char* items[n];
+	// TODO(Implement): Images
 	for(uint32_t i = 0; i < n; i++)
-		items[i] = m_Children[i]->As<UI::Text>()->Get().c_str(); // TODO(Implement): Images
+		items[i] = m_Children[i]->As<UI::Text>()->Get().c_str();
 
 	if(ImGui::BeginCombo("##Combo", m_CurrentItem))
 	{

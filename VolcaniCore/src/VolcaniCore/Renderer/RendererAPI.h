@@ -2,8 +2,6 @@
 
 #include "Object/Cubemap.h"
 #include "Object/Framebuffer.h"
-#include "Object/Mesh.h"
-#include "Object/Line.h"
 
 #include "Renderer/Transform.h"
 
@@ -37,10 +35,6 @@ public:
 	virtual void RenderCubemap(Ref<Cubemap> cubemap) = 0;
 	virtual void RenderFramebuffer(
 					Ref<Framebuffer> framebuffer, AttachmentTarget target) = 0;
-
-	template<typename TDerived>
-	requires std::derived_from<TDerived, RendererAPI>
-	TDerived* As() const { return (TDerived*)(this); }
 
 protected:
 	const RendererAPI::Backend m_Backend;

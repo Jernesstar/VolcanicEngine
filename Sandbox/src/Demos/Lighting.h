@@ -19,10 +19,12 @@ struct PointLight : public Light {
 	float Quadratic;
 };
 
-// struct SpotLight : public Light, public DirectionalLight {
-// 	float CutoffAngle;
-// 	float OuterCutoffAngle;
-// };
+struct SpotLight : public Light {
+	glm::vec3 Direction;
+
+	float CutoffAngle;
+	float OuterCutoffAngle;
+};
 
 class Lighting : public Application {
 public:
@@ -36,6 +38,8 @@ private:
 
 	Ref<ShaderPipeline> shader;
 	Ref<RenderPass> drawPass;
+
+	Ref<UniformBuffer> buffer;
 
 	Ref<Mesh> cube;
 	Ref<Model> torch;
@@ -52,12 +56,12 @@ Lighting::Lighting() {
 	});
 
 	cube = Mesh::Create(MeshPrimitive::Cube,
-	Material{
-		.Diffuse = Texture::Create("Sandbox/assets/images/wood.png"),
-		.Specular = Texture::Create("Sandbox/assets/images/wood_specular.png"),
-	});
-	torch = ::Model::Create("Sandbox/assets/models/mc-torch/Torch.obj");
-	stairs = ::Model::Create("Sandbox/TheMazeIsLava/assets/models/stairs/stairs.obj");
+		Material{
+			.Diffuse = Texture::Create("Sandbox/assets/images/wood.png"),
+			.Specular = Texture::Create("Sandbox/assets/images/wood_specular.png"),
+		});
+	torch = Model::Create("Sandbox/assets/models/mc-torch/Torch.obj");
+	stairs = Model::Create("Sandbox/TheMazeIsLava/assets/models/stairs/stairs.obj");
 
 	shader = ShaderPipeline::Create({
 		{ "Sandbox/assets/shaders/Lighting.glsl.vert", ShaderType::Vertex },
@@ -87,6 +91,13 @@ Lighting::Lighting() {
 	shader->SetFloat("u_PointLights[0].Linear",    light.Linear);
 	shader->SetFloat("u_PointLights[0].Quadratic", light.Quadratic);
 
+	buffer = UniformBuffer<Spotlight>::Create("Spotlight",
+		BufferLayout{
+			{ "Direction",   BufferDataType::Vec3 },
+			{ "CutoffAngle", BufferDataType::Float },
+			{ "OuterCutoffAngle",  BufferDataType::Float },
+		});
+
 	// shader->SetTexture("u_Material.Diffuse", cube->GetMaterial().Diffuse, 0);
 	// shader->SetTexture("u_Material.Specular", cube->GetMaterial().Specular, 1);
 	// shader->SetFloat("u_Material.Shininess", 32.0f);
@@ -109,7 +120,7 @@ void Lighting::OnUpdate(TimeStep ts) {
 
 		Renderer3D::DrawModel(torch,
 		{
-			.Translation = light.Position - glm::vec3{ 0.0f, .0f, 0.0f }
+			.Translation = light.Position - glm::vec3{ 0.0f, 1.0f, 0.0f }
 		});
 		Renderer3D::DrawMesh(cube, { .Translation = { -2.0f,  0.0f,  0.0f } });
 		Renderer3D::DrawMesh(cube, { .Translation = {  2.0f,  0.0f,  0.0f } });

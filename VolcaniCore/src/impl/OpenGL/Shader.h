@@ -29,8 +29,8 @@ public:
 
 	void SetInt(const std::string& name, int _int) override;
 	void SetFloat(const std::string& name, float _float) override;
-	void SetTexture(const std::string& name,
-					Ref<Texture> texture, uint32_t slot) override;
+	void SetTexture(const std::string& name, Ref<Texture> texture,
+					uint32_t slot) override;
 
 	void SetVec2(const std::string& name, const glm::vec2& vec) override;
 	void SetVec3(const std::string& name, const glm::vec3& vec) override;

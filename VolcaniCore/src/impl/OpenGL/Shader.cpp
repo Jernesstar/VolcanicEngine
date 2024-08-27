@@ -97,19 +97,19 @@ void ShaderProgram::SetVec4(const std::string& name, const glm::vec4& vec) {
 	glUniform4f(location, vec.r, vec.g, vec.b, vec.a);
 }
 
-void ShaderProgram::SetMat2(const std::string& name, const glm::mat2& matrix) {
+void ShaderProgram::SetMat2(const std::string& name, const glm::mat2& mat) {
 	GLint location = glGetUniformLocation(m_ProgramID, name.c_str());
-	glUniformMatrix2fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
+	glUniformMatrix2fv(location, 1, GL_FALSE, glm::value_ptr(mat));
 }
 
-void ShaderProgram::SetMat3(const std::string& name, const glm::mat3& matrix) {
+void ShaderProgram::SetMat3(const std::string& name, const glm::mat3& mat) {
 	GLint location = glGetUniformLocation(m_ProgramID, name.c_str());
-	glUniformMatrix3fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
+	glUniformMatrix3fv(location, 1, GL_FALSE, glm::value_ptr(mat));
 }
 
-void ShaderProgram::SetMat4(const std::string& name, const glm::mat4& matrix) {
+void ShaderProgram::SetMat4(const std::string& name, const glm::mat4& mat) {
 	GLint location = glGetUniformLocation(m_ProgramID, name.c_str());
-	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
+	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(mat));
 }
 
 uint32_t GetShaderType(ShaderType type) {

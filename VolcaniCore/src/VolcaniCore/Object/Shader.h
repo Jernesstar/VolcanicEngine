@@ -49,11 +49,6 @@ public:
 	virtual void SetMat2(const std::string& name, const glm::mat2& mat) = 0;
 	virtual void SetMat3(const std::string& name, const glm::mat3& mat) = 0;
 	virtual void SetMat4(const std::string& name, const glm::mat4& mat) = 0;
-
-	// TODO(Implement):
-	// template<typename T>
-	// virtual void SetUniformBuffer(const std::string& name,
-									//  Ref<UniformBuffer<T>> buffer) = 0;
 };
 
 }

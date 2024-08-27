@@ -164,16 +164,7 @@ void Renderer::Init() {
 	// 	});
 	// s_Data.MeshArray = CreatePtr<VertexArray>(buffer);
 
-	// uint32_t vboID, flags;
-	// glGenBuffers(1, &vboID);
-	// glBindBuffer(GL_ARRAY_BUFFER, vboID);
-	// flags = GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT;
-	// glBufferStorage(GL_ARRAY_BUFFER, MaxInstances * sizeof(glm::mat4), 0, flags);
-
-	// void* myPointer =
-	// 	glMapBufferRange(GL_ARRAY_BUFFER, 0, MaxInstances * sizeof(glm::mat4), flags);
-
-	// TODO(Implement): This should be the implementation of the mapped buffer above
+	// TODO(Implement): Turn into MappedBuffer
 	s_Data.Transforms = CreateRef<VertexBuffer>(
 		BufferLayout{
 			{ "Transform", BufferDataType::Mat4 }

@@ -6,7 +6,7 @@ namespace VolcaniCore {
 class UniformBuffer {
 public:
 	// static Ref<UniformBuffer<THandle>> Create(Ref<THandle> handle);
-	// static UniformBuffer Create();
+	static UniformBuffer Create();
 
 public:
 	UniformBuffer() = default;
@@ -14,7 +14,8 @@ public:
 // 		: m_Handle(handle) { }
 	virtual ~UniformBuffer() = default;
 
-// 	virtual void Update(uint32_t size = 0, uint32_t offset = 0) = 0;
+	template<typename T>
+	virtual void SetData(Buffer<T> buffer) = 0;
 
 // protected:
 // 	Ref<THandle> m_Handle;

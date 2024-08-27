@@ -4,9 +4,10 @@
 #include <string>
 #include <cstdint>
 
+// TODO(Maybe): Move to VolcaniCore
 namespace VolcaniCore::OpenGL {
 
-enum class BufferDataType { Float, Int, Vec2, Vec3, Vec4, Mat2, Mat3, Mat4 };
+enum class BufferDataType { Int, Float, Vec2, Vec3, Vec4, Mat2, Mat3, Mat4 };
 
 struct BufferElement {
 public:
@@ -26,17 +27,16 @@ private:
 	static uint32_t CalcCount(BufferDataType type);
 };
 
-
 class BufferLayout {
 public:
 	const std::vector<BufferElement> Elements;
 	const uint32_t Stride;
-	const bool StructureOfArrays;
 	const bool Dynamic;
+	const bool StructureOfArrays;
 
 public:
 	BufferLayout(const std::initializer_list<BufferElement>& elements,
-				 bool structureOfArrays = false, bool dynamic = true)
+				 bool dynamic = true, bool structureOfArrays = false)
 		: Elements(elements), Stride(CalcStride(elements)),
 			StructureOfArrays(structureOfArrays), Dynamic(dynamic) { }
 
@@ -54,8 +54,6 @@ private:
 			stride += element.Size;
 		return stride;
 	}
-
-	friend class BufferElement;
 };
 
 }

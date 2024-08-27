@@ -56,12 +56,12 @@ void Renderer3D::DrawMesh(Ref<Mesh> mesh, const glm::mat4& tr) {
 	command.MeshTransforms[mesh].Add(tr);
 }
 
-void Renderer3D::DrawModel(Ref<Model> model, const glm::mat4& transform) {
+void Renderer3D::DrawModel(Ref<Model> model, const glm::mat4& tr) {
 	for(auto& mesh : *model)
-		DrawMesh(mesh, transform);
+		DrawMesh(mesh, tr);
 }
 
-void Renderer3D::DrawQuad(Ref<Quad> quad, const glm::mat4& transform) {
+void Renderer3D::DrawQuad(Ref<Quad> quad, const glm::mat4& tr) {
 	Ref<Mesh> mesh;
 	if(quad->IsTextured)
 		mesh = Mesh::Create(
@@ -69,26 +69,26 @@ void Renderer3D::DrawQuad(Ref<Quad> quad, const glm::mat4& transform) {
 	else
 		mesh = Mesh::Create(MeshPrimitive::Quad, quad->GetColor());
 
-	DrawMesh(mesh, transform);
+	DrawMesh(mesh, tr);
 }
 
-void Renderer3D::DrawQuad(Ref<Texture> texture, const glm::mat4& transform) {
-	DrawQuad(Quad::Create(texture), transform);
+void Renderer3D::DrawQuad(Ref<Texture> texture, const glm::mat4& tr) {
+	DrawQuad(Quad::Create(texture), tr);
 }
 
-void Renderer3D::DrawQuad(const glm::vec4& color, const glm::mat4& transform) {
-	DrawQuad(Quad::Create(1, 1, color), transform);
+void Renderer3D::DrawQuad(const glm::vec4& color, const glm::mat4& tr) {
+	DrawQuad(Quad::Create(1, 1, color), tr);
 }
 
-void Renderer3D::DrawPoint(const Point& point, const glm::mat4& transform) {
-	// TODO(Implement)
+void Renderer3D::DrawPoint(const Point& point, const glm::mat4& tr) {
+	command.PointTransforms[point].Add(tr);
 }
 
-void Renderer3D::DrawLine(const Line& line, const glm::mat4& transform) {
-	// TODO(Implement)
+void Renderer3D::DrawLine(const Line& line, const glm::mat4& tr) {
+	command.LineTransforms[line].Add(tr);
 }
 
-void Renderer3D::DrawText(Ref<Text> text, const glm::mat4& transform) {
+void Renderer3D::DrawText(Ref<Text> text, const glm::mat4& tr) {
 	// TODO(Implement)
 }
 

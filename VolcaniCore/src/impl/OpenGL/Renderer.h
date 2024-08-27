@@ -34,7 +34,8 @@ public:
 	void RenderCubemap(Ref<VolcaniCore::Cubemap> cubemap) override;
 
 	void RenderFramebuffer(
-			Ref<VolcaniCore::Framebuffer> f, AttachmentTarget t) override;
+			Ref<VolcaniCore::Framebuffer> framebuffer,
+			AttachmentTarget target) override;
 
 private:
 	void Init() override;
