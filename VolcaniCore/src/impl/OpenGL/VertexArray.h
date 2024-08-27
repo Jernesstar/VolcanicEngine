@@ -22,14 +22,14 @@ public:
 	void Bind() const;
 	void Unbind() const;
 
-	void AddVertexBuffer(Ref<VertexBuffer> vertexBuffer);
-	void SetIndexBuffer(Ref<IndexBuffer> index_buffer);
+	void AddVertexBuffer(Ref<VertexBuffer> buffer);
+	void SetIndexBuffer(Ref<IndexBuffer> buffer);
 
 	bool HasIndexBuffer() const { return bool(m_IndexBuffer); }
 	Ref<IndexBuffer> GetIndexBuffer() const { return m_IndexBuffer; }
 
 	Ref<VertexBuffer> GetVertexBuffer(uint32_t index = 0) {
-		return m_VertexBuffer[index];
+		return m_VertexBuffers[index];
 	}
 
 private:

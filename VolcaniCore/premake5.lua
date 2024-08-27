@@ -14,6 +14,7 @@ project "VolcaniCore"
     }
 
     includedirs {
+        "src/",
         "src/VolcaniCore",
         "src/impl",
 

@@ -48,7 +48,6 @@ using namespace Magma::Physics;
 #include "Demos/ECS.h"
 #include "Demos/Raycast.h"
 #include "Demos/Collision.h"
-#include "Demos/Geometry.h"
 #include "Demos/Template.h"
 
 #include "Sandbox/TheMazeIsLava/src/Game.h"

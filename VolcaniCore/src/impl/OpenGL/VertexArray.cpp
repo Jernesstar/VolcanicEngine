@@ -6,7 +6,6 @@
 #include <glad/glad.h>
 
 #include "Core/Assert.h"
-#include "Core/Log.h"
 
 using namespace VolcaniCore;
 
@@ -53,7 +52,7 @@ void VertexArray::AddVertexBuffer(Ref<VertexBuffer> vertexBuffer) {
 	vertexBuffer->Bind();
 
 	uint64_t offset = 0;
-	const auto& layout = vertexBuffer->Layout;
+	auto& layout = vertexBuffer->Layout;
 	uint32_t stride = layout.Stride;
 
 	if(layout.StructureOfArrays)
@@ -110,6 +109,7 @@ void VertexArray::SetIndexBuffer(Ref<IndexBuffer> indexBuffer) {
 
 	glBindVertexArray(m_VertexArrayID);
 	indexBuffer->Bind();
+
 	m_IndexBuffer = indexBuffer;
 }
 

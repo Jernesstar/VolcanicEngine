@@ -19,19 +19,16 @@ public:
 
 	static void WriteToFile(const std::string& path, const std::string& info);
 
-	static unsigned char* ReadImage(const std::string& path,
-									int& width, int& height,
-									int desiredChannels = 4, bool flip = 0);
+	static unsigned char* ReadImage(
+		const std::string& path, int& width, int& height,
+		int desiredChannels = 4, bool flip = 0);
 
-	static unsigned char* ReadImage(const std::string& path,
-									int& width, int& height,
-									int& bitsPerPixel,
-									int desiredChannels = 4,
-									bool flip = 0);
+	static unsigned char* ReadImage(
+		const std::string& path, int& width, int& height, int& bitsPerPixel,
+		int desiredChannels = 4, bool flip = 0);
 
-	static unsigned char* ReadImage(const std::string& path,
-									int desiredChannels = 4,
-									bool flip = 0);
+	static unsigned char* ReadImage(
+		const std::string& path, int desiredChannels = 4, bool flip = 0);
 };
 
 }

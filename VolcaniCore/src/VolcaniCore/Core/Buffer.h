@@ -34,7 +34,7 @@ public:
 		m_LastElement = 0;
 	}
 
-	Delete() {
+	void Delete() {
 		delete m_Data;
 	}
 

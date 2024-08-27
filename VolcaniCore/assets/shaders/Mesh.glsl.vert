@@ -21,7 +21,7 @@ void main()
     v_TexCoord_Color = a_TexCoord_Color;
 
     v_Textured = 0;
-    if(v_TexCoord_Color.w == 0.0f)
+    if(v_TexCoord_Color.a == 0.0f)
         v_Textured = 1;
 
     gl_Position = u_ViewProj * vec4(v_Position, 1.0);

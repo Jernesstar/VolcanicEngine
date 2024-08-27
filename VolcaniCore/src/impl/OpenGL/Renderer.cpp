@@ -111,30 +111,32 @@ void Renderer::Init() {
 		 1.0f, -1.0f,  1.0f
 	};
 
-	float framebufferVertices[] =
+	float framebufferCoords[] =
 	{
-		// Coords      // TexCoords
-		 1.0f, -1.0f,  1.0f, 0.0f,
-		-1.0f, -1.0f,  0.0f, 0.0f,
-		-1.0f,  1.0f,  0.0f, 1.0f,
+		// TexCoords
+		1.0f, 0.0f,
+		0.0f, 0.0f,
+		0.0f, 1.0f,
 
-		 1.0f,  1.0f,  1.0f, 1.0f,
-		 1.0f, -1.0f,  1.0f, 0.0f,
-		-1.0f,  1.0f,  0.0f, 1.0f
+		1.0f, 1.0f,
+		1.0f, 0.0f,
+		0.0f, 1.0f
 	};
 
 	Ref<VertexBuffer> cubemapBuffer = CreateRef<VertexBuffer>(
 		BufferLayout{
 			{ "Position", BufferDataType::Vec3 }
-		}, cubemapVertices
+		},
+		cubemapVertices
 	);
 	s_Data.CubemapArray = CreatePtr<VertexArray>(cubemapBuffer);
 
 	Ref<VertexBuffer> buffer = CreateRef<VertexBuffer>(
 		BufferLayout{
-			{ "Coordinate", BufferDataType::Vec2 },
 			{ "TexCoord",	BufferDataType::Vec2 },
-		}, framebufferVertices);
+		},
+		framebufferCoords
+	);
 	s_Data.FramebufferArray = CreatePtr<VertexArray>(buffer);
 
 	// s_Data.PointBuffer = CreateRef<VertexBuffer>(
@@ -186,7 +188,7 @@ void Renderer::DrawLine(const VolcaniCore::Line& line, const glm::mat4& tr) {
 void Renderer::DrawMesh(Ref<VolcaniCore::Mesh> mesh, const glm::mat4& tr) {
 	auto nativeMesh = mesh->As<OpenGL::Mesh>();
 
-	DrawIndexed(nativeMesh->m_VertexArray);
+	DrawIndexed(nativeMesh->GetVertexArray());
 }
 
 void Renderer::DrawCubemap(Ref<VolcaniCore::Cubemap> cubemap) {
@@ -225,14 +227,14 @@ void Renderer::RenderFramebuffer(Ref<VolcaniCore::Framebuffer> buffer,
 void Renderer::DrawIndexed(Ref<VertexArray> array, uint32_t indices) {
 	if(!array->HasIndexBuffer()) {
 		VOLCANICORE_LOG_WARNING("Attempt to execute indexed draw call \
-								without index buffer bound has failed");
+								 without index buffer bound has failed");
 		return;
 	}
 	uint32_t count = array->GetIndexBuffer()->Count;
 
 	array->Bind();
 	glDrawElements(GL_TRIANGLES, indices != 0 ? indices : count,
-				   GL_UNSIGNED_INT, 0);
+					GL_UNSIGNED_INT, 0);
 }
 
 void Renderer::DrawInstanced(Ref<VertexArray> array, uint32_t instanceCount) {

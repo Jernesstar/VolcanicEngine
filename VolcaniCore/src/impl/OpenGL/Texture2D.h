@@ -19,7 +19,7 @@ public:
 	~Texture2D();
 
 	void Bind(uint32_t slot = 0);
-	void SetData(uint32_t size, const void* data);
+	void SetData(const void* data);
 	void SetData(const glm::ivec2& pos, const glm::ivec2& size,
 				 const void* data);
 

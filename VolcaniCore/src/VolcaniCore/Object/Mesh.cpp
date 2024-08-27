@@ -28,8 +28,8 @@ Ref<Mesh> Mesh::Create(const std::string& path) {
 }
 
 Ref<Mesh> Mesh::Create(const std::vector<Vertex>& vertices,
-					   const std::vector<uint32_t>& indices,
-					   const Material& material)
+						const std::vector<uint32_t>& indices,
+						const Material& material)
 {
 	RendererAPI::Backend backend = RendererAPI::GetBackend();
 
@@ -76,7 +76,7 @@ Ref<Mesh> Mesh::Create(MeshPrimitive primitive, const Material& material) {
 				{ { -0.5,  0.5,  0.5 }, {  0,  1,  0 }, { 1.0, 1.0, 0.0, 0.0 } },
 				{ {  0.5,  0.5,  0.5 }, {  0,  1,  0 }, { 0.0, 1.0, 0.0, 0.0 } },
 			};
-			// index data
+
 			indices =
 			{
 				0,  3,  2, // Front
@@ -110,6 +110,7 @@ Ref<Mesh> Mesh::Create(MeshPrimitive primitive, const Material& material) {
 				{ { -0.5, -0.5,  0.5 }, { 0, 0, 1 }, { 0.0, 0.0, 0.0, 0.0 } },
 				{ {  0.5, -0.5,  0.5 }, { 0, 0, 1 }, { 1.0, 0.0, 0.0, 0.0 } },
 			};
+
 			indices =
 			{
 				0, 2, 3,
@@ -162,7 +163,7 @@ Ref<Mesh> Mesh::Create(MeshPrimitive primitive, const glm::vec4& color) {
 				{ { -0.5,  0.5,  0.5 }, {  0,  1,  0 }, color },
 				{ {  0.5,  0.5,  0.5 }, {  0,  1,  0 }, color },
 			};
-			// index data
+
 			indices =
 			{
 				0,  3,  2, // Front
@@ -196,6 +197,7 @@ Ref<Mesh> Mesh::Create(MeshPrimitive primitive, const glm::vec4& color) {
 				{ { -0.5, -0.5,  0.5 }, { 0, 0, 1 }, color },
 				{ {  0.5, -0.5,  0.5 }, { 0, 0, 1 }, color },
 			};
+
 			indices =
 			{
 				0, 2, 3,
