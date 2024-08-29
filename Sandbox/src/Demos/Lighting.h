@@ -1,5 +1,7 @@
 #pragma once
 
+#include <OpenGL/UniformBuffer.h>
+
 namespace Demo {
 
 struct Light {
@@ -39,7 +41,7 @@ private:
 	Ref<ShaderPipeline> shader;
 	Ref<RenderPass> drawPass;
 
-	Ref<UniformBuffer> buffer;
+	Ref<OpenGL::UniformBuffer> buffer;
 
 	Ref<Mesh> cube;
 	Ref<Model> torch;
@@ -91,12 +93,12 @@ Lighting::Lighting() {
 	shader->SetFloat("u_PointLights[0].Linear",    light.Linear);
 	shader->SetFloat("u_PointLights[0].Quadratic", light.Quadratic);
 
-	buffer = UniformBuffer<Spotlight>::Create("Spotlight",
-		BufferLayout{
-			{ "Direction",   BufferDataType::Vec3 },
-			{ "CutoffAngle", BufferDataType::Float },
-			{ "OuterCutoffAngle",  BufferDataType::Float },
-		});
+	// buffer = CreateRef<UniformBuffer>("Spotlight",
+	// 	BufferLayout{
+	// 		{ "Direction",   BufferDataType::Vec3 },
+	// 		{ "CutoffAngle", BufferDataType::Float },
+	// 		{ "OuterCutoffAngle",  BufferDataType::Float },
+	// 	});
 
 	// shader->SetTexture("u_Material.Diffuse", cube->GetMaterial().Diffuse, 0);
 	// shader->SetTexture("u_Material.Specular", cube->GetMaterial().Specular, 1);

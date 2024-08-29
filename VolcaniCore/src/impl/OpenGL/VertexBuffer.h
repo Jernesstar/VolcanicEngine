@@ -18,17 +18,17 @@ public:
 public:
 	VertexBuffer(const BufferLayout& layout,
 				 uint32_t count, const void* data = nullptr)
-		: Layout(layout), Count(count)
+		: Layout(layout), Count(count), Size(count * layout.Stride)
 	{
 		glCreateBuffers(1, &m_BufferID);
 		glBindBuffer(GL_ARRAY_BUFFER, m_BufferID);
-		glBufferData(GL_ARRAY_BUFFER, count * Layout.Stride, data,
+		glBufferData(GL_ARRAY_BUFFER, Size, data,
 					 layout.Dynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
 	}
 
 	template<typename T>
 	VertexBuffer(const BufferLayout& layout, Buffer<T> buffer)
-		: Layout(layout)
+		: Layout(layout), Count(buffer.GetCount()), Size(buffer.GetSize())
 	{
 		VOLCANICORE_ASSERT(layout.Stride == sizeof(T));
 
@@ -40,11 +40,11 @@ public:
 
 	template<typename T, std::size_t TCount>
 	VertexBuffer(const BufferLayout& layout, const T (&vertices)[TCount])
-		: Layout(layout)
+		: Layout(layout), Count(TCount), Size(TCount * layout.Stride)
 	{
 		glCreateBuffers(1, &m_BufferID);
 		glBindBuffer(GL_ARRAY_BUFFER, m_BufferID);
-		glBufferData(GL_ARRAY_BUFFER, TCount * Layout.Stride, vertices,
+		glBufferData(GL_ARRAY_BUFFER, Size, vertices,
 					 layout.Dynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
 	}
 
@@ -62,7 +62,7 @@ public:
 	void SetData(const void* data, uint32_t count = 1, uint32_t offset = 0) {
 		glBindBuffer(GL_ARRAY_BUFFER, m_BufferID);
 		glBufferSubData(GL_ARRAY_BUFFER, offset * Layout.Stride,
-						count == 0 : Size ? count * Layout.Stride, data);
+						(count == 0) ? Size : count * Layout.Stride, data);
 	}
 
 	template<typename T>

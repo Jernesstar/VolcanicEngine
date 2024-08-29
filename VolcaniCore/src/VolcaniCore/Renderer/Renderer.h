@@ -1,6 +1,12 @@
 #pragma once
 
+#include <unordered_map>
+
 #include "Core/Buffer.h"
+
+#include "Object/Point.h"
+#include "Object/Line.h"
+#include "Object/Mesh.h"
 
 #include "RenderPass.h"
 
@@ -11,8 +17,10 @@ struct DrawCommand {
 	bool ShouldClearScreen = false;
 
 	std::unordered_map<Ref<Mesh>, Buffer<glm::mat4>> MeshTransforms;
-	std::unordered_map<Point, Buffer<glm::mat4>> PointTransforms;
-	std::unordered_map<Line, Buffer<glm::mat4>> LineTransforms;
+
+	// Turn this into two lists, one a HashSet, one not
+	// std::unordered_map<Point, Buffer<glm::mat4>> PointTransforms;
+	// std::unordered_map<Line, Buffer<glm::mat4>> LineTransforms;
 };
 
 struct FrameData {
@@ -28,7 +36,14 @@ struct FrameData {
 	std::vector<DrawCommand>::const_iterator end() const {
 		return DrawCommands.end();
 	}
-}
+
+	std::vector<DrawCommand>::iterator begin() {
+		return DrawCommands.begin();
+	}
+	std::vector<DrawCommand>::iterator end() {
+		return DrawCommands.end();
+	}
+};
 
 class Renderer {
 public:

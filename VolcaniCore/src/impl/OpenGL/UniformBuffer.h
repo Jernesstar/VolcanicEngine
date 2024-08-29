@@ -3,6 +3,7 @@
 #include <glad/glad.h>
 
 #include <VolcaniCore/Core/Buffer.h>
+#include <VolcaniCore/Core/Assert.h>
 
 #include "Object/UniformBuffer.h"
 
@@ -14,7 +15,7 @@ namespace VolcaniCore::OpenGL {
 
 class UniformBuffer : VolcaniCore::UniformBuffer {
 public:
-	const std::string Name;
+	// const std::string Name;
 	const BufferLayout Layout;
 	const uint32_t Count;
 	const uint32_t Size;
@@ -22,8 +23,9 @@ public:
 
 public:
 	UniformBuffer(const BufferLayout& layout, uint32_t binding,
-				  uint32_t count = 1, const void* data = nullptr)
-		: Binding(binding), Count(count), Size(count * layout.Stride)
+					uint32_t count = 1, const void* data = nullptr)
+		: Layout(layout), Binding(binding),
+			Count(count), Size(count * layout.Stride)
 	{
 		glCreateBuffers(1, &m_BufferID);
 		glNamedBufferData(m_BufferID, Size, data, GL_DYNAMIC_DRAW);
@@ -31,8 +33,10 @@ public:
 	}
 
 	template<typename T>
-	UniformBuffer(const BufferLayout& layout, Buffer<T> buffer)
-		: Binding(binding), Count(buffer.GetCount()), Size(buffer.GetSize())
+	UniformBuffer(const BufferLayout& layout, uint32_t binding,
+					Buffer<T> buffer)
+		: Layout(layout), Binding(binding),
+			Count(buffer.GetCount()), Size(buffer.GetSize())
 	{
 		VOLCANICORE_ASSERT(layout.Stride == sizeof(T));
 

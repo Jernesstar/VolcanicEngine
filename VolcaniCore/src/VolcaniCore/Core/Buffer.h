@@ -1,10 +1,14 @@
 #pragma once
 
+#include <cstdint>
+
 namespace VolcaniCore {
 
 template<typename T>
 class Buffer {
 public:
+	Buffer() = default;
+
 	Buffer(uint32_t count)
 		: m_Count(count)
 	{
@@ -41,7 +45,7 @@ public:
 private:
 	T* m_Data;
 	uint32_t m_Count;
-	uint32_t  m_LastElement;
+	uint32_t m_LastElement;
 
 private:
 	void Reallocate() {

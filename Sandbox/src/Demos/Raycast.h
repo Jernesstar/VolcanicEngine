@@ -94,15 +94,18 @@ Raycast::Raycast() {
 	maskPass = RenderPass::Create("Mask Pass", maskShader);
 	outlinePass = RenderPass::Create("Outline Pass", outlineShader);
 
-	outlinePass->GetHandles.Set("u_PixelSize",
-		[pixelSize]() {
+	outlinePass->GetHandles()
+	.Set<glm::vec2>("u_PixelSize",
+		[this]() {
 			return pixelSize;
 		});
-	outlinePass->GetHandles.Set("u_Color",
-		[outlineColor]() {
+	outlinePass->GetHandles()
+	.Set<glm::vec4>("u_Color",
+		[this]() {
 			return outlineColor;
 		});
-	maskPass->GetHandles.Set("u_Color",
+	maskPass->GetHandles()
+	.Set<glm::vec4>("u_Color",
 		[]() {
 			return glm::vec4(1.0f);
 		});

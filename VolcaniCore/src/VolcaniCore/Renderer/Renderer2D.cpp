@@ -22,11 +22,11 @@ void Renderer2D::DrawQuad(Ref<Quad> quad, const Transform& t) {
 }
 
 void Renderer2D::DrawQuad(const glm::vec4& color, const Transform& t) {
-	DrawQuad(Quad::Create(color), );
+	DrawQuad(Quad::Create(1, 1, color), t);
 }
 
 void Renderer2D::DrawQuad(Ref<Texture> texture, const Transform& t) {
-	DrawQuad(Quad::Create(texture));
+	DrawQuad(Quad::Create(texture), t);
 }
 
 void Renderer2D::DrawText(Ref<Text> text, const Transform& t) {

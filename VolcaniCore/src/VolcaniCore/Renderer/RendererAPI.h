@@ -8,6 +8,7 @@
 namespace VolcaniCore {
 
 struct FrameData;
+struct DrawCommand;
 
 class RendererAPI {
 public:

@@ -4,6 +4,7 @@
 #include <unordered_map>
 
 #include "Object/Shader.h"
+#include "Object/Texture.h"
 #include "Object/Framebuffer.h"
 
 namespace VolcaniCore {
@@ -15,14 +16,23 @@ template<typename TOut>
 using HandleMap = std::unordered_map<std::string, ValueCallback<TOut>>;
 
 struct TextureAndSlot {
-	Ref<Texture> Texture;
+	Ref<Texture> Sampler;
 	uint32_t Slot;
-}
+};
+
+template <typename T>
+struct id {
+	typedef T type;
+};
+
+template<typename T>
+using nondeduced = typename id<T>::type;
 
 class Handles {
+public:
 	HandleMap<uint32_t>		IntHandles;
 	HandleMap<float>		FloatHandles;
-	HandleMap<TextureAndSlot> TextureHandles;
+	// HandleMap<TextureAndSlot> TextureHandles;
 
 	HandleMap<glm::vec2> Vec2Handles;
 	HandleMap<glm::vec3> Vec3Handles;
@@ -33,16 +43,10 @@ class Handles {
 	HandleMap<glm::mat4> Mat4Handles;
 
 	template<typename TUniform>
-	void Set(const std::string& uniformName,
-			 const ValueCallback<TUniform>& callback)
+	void Set(const std::string& uniformName, ValueCallback<TUniform> callback)
+
 	{
 		GetHandles<TUniform>()[uniformName] = callback;
-	}
-
-	void Set(const std::string& uniformName,
-			 const ValueCallback<TextureAndSlot>&)
-	{
-		TextureHandles[uniformName] = callback;
 	}
 
 	template<typename TUniform>
@@ -53,7 +57,7 @@ class RenderPass {
 public:
 	static Ref<RenderPass> Create(const std::string& name,
 								  Ref<ShaderPipeline> pipeline,
-								  const Handles& = { })
+								  const Handles& handles = { })
 {
 	return CreateRef<RenderPass>(name, pipeline, handles);
 }

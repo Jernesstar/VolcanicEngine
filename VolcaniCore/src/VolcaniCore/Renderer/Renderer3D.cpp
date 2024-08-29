@@ -8,20 +8,20 @@
 namespace VolcaniCore {
 
 void Renderer3D::Begin(Ref<Camera> camera) {
-	auto& handles = Renderer::GetPass().GetHandles();
+	auto& handles = Renderer::GetPass()->GetHandles();
 
 	handles
-	.Set("u_ViewProj",
-		[camera]() -> glm::mat4
+	.Set<glm::mat4>("u_ViewProj",
+		[camera]()
 		{
 			return camera->GetViewProjection();
 		});
-	handles
-	.Set("u_CameraPosition"
-		[camera]() -> glm::vec3
-		{
-			return camera->GetPosition();
-		});
+	// handles
+	// .Set("u_CameraPosition",
+	// 	[camera]() -> glm::vec3
+	// 	{
+	// 		return camera->GetPosition();
+	// 	});
 }
 
 void Renderer3D::End() {
@@ -40,18 +40,18 @@ void Renderer3D::DrawMesh(Ref<Mesh> mesh, const glm::mat4& tr) {
 
 	// TODO(Is this even going to work for different meshes?)
 	// Right now we have one mesh, so this should be a problem
-	command.Pass->GetHandles()
-	.Set("u_Diffuse",
-		[mesh]() {
-			Material& material = mesh->GetMaterial();
-			return { material.Diffuse, 0 };
-		});
-	command.Pass->GetHandles()
-	.Set("u_Specular"
-		[mesh]() {
-			Material& material = mesh->GetMaterial();
-			return { material.Specular, 1 };
-		});
+	// command.Pass->GetHandles()
+	// .Set("u_Diffuse",
+	// 	[mesh]() {
+	// 		Material& material = mesh->GetMaterial();
+	// 		return { material.Diffuse, 0 };
+	// 	});
+	// command.Pass->GetHandles()
+	// .Set("u_Specular",
+	// 	[mesh]() {
+	// 		Material& material = mesh->GetMaterial();
+	// 		return { material.Specular, 1 };
+	// 	});
 
 	command.MeshTransforms[mesh].Add(tr);
 }
@@ -81,11 +81,15 @@ void Renderer3D::DrawQuad(const glm::vec4& color, const glm::mat4& tr) {
 }
 
 void Renderer3D::DrawPoint(const Point& point, const glm::mat4& tr) {
-	command.PointTransforms[point].Add(tr);
+	auto& command = Renderer::GetDrawCommand();
+
+	// command.PointTransforms[point].Add(tr);
 }
 
 void Renderer3D::DrawLine(const Line& line, const glm::mat4& tr) {
-	command.LineTransforms[line].Add(tr);
+	auto& command = Renderer::GetDrawCommand();
+
+	// command.LineTransforms[line].Add(tr);
 }
 
 void Renderer3D::DrawText(Ref<Text> text, const glm::mat4& tr) {

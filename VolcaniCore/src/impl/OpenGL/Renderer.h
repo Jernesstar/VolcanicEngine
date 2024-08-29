@@ -6,7 +6,7 @@ namespace VolcaniCore::OpenGL {
 
 struct DrawCall {
 
-}
+};
 
 struct DrawCallIndexed : public DrawCall {
 

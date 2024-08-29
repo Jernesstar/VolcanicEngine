@@ -1,26 +1,26 @@
 #include "RenderPass.h"
 
-#define GET_HANDLES(TUniform) \
+#define GET_HANDLES(T, Uniform) \
 template<> \
-HandleMap<TUniform>& RenderPass::GetHandles<TUniform>() { \
-	return TUniform##Handles; \
+HandleMap<T>& Handles::GetHandles<T>() { \
+	return Uniform##Handles; \
 }
 
 #define SET_UNIFORM(TUniform) \
-for(auto& [uniformName, valueCallback] : m_Handles.##TUniform##Handles) \
-	m_Pipeline->Set##TUniform##(uniformName, valueCallback());
+for(auto& [uniformName, valueCallback] : m_Handles.TUniform##Handles) \
+	m_Pipeline->Set##TUniform(uniformName, valueCallback());
 
 namespace VolcaniCore {
 
-GET_HANDLES(Int)
-GET_HANDLES(Float)
+GET_HANDLES(uint32_t, Int)
+GET_HANDLES(float, Float)
 // GET_HANDLES(Texture)
-GET_HANDLES(Vec2)
-GET_HANDLES(Vec3)
-GET_HANDLES(Vec4)
-GET_HANDLES(Mat2)
-GET_HANDLES(Mat3)
-GET_HANDLES(Mat4)
+GET_HANDLES(glm::vec2, Vec2)
+GET_HANDLES(glm::vec3, Vec3)
+GET_HANDLES(glm::vec4, Vec4)
+GET_HANDLES(glm::mat2, Mat2)
+GET_HANDLES(glm::mat3, Mat3)
+GET_HANDLES(glm::mat4, Mat4)
 
 void RenderPass::LinkHandles() {
 	m_Pipeline->Bind();
@@ -37,10 +37,10 @@ void RenderPass::LinkHandles() {
 	SET_UNIFORM(Mat3);
 	SET_UNIFORM(Mat4);
 
-	for(auto& [uniform, callbackValue] : m_Handles.TextureHandles) {
-		auto& [texture, slot] = callbackValue();
-		m_Pipeline->SetTexture(uniform, texture, slot);
-	}
+	// for(auto& [uniform, callbackValue] : m_Handles.TextureHandles) {
+	// 	auto& [texture, slot] = callbackValue();
+	// 	m_Pipeline->SetTexture(uniform, texture, slot);
+	// }
 }
 
 }

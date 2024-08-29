@@ -4,6 +4,7 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
+#include <Core/Application.h>
 #include <Core/Assert.h>
 #include <Event/Events.h>
 
@@ -168,7 +169,9 @@ void Renderer::Init() {
 	s_Data.Transforms = CreateRef<VertexBuffer>(
 		BufferLayout{
 			{ "Transform", BufferDataType::Mat4 }
-		});
+		},
+		MaxInstances
+	);
 
 	ShaderLibrary::Get("Framebuffer")->Bind();
 	ShaderLibrary::Get("Framebuffer")->SetInt("u_ScreenTexture", 0);
@@ -176,7 +179,7 @@ void Renderer::Init() {
 
 void Renderer::Close() { }
 
-void Renderer::BeginFrame() {
+void Renderer::StartFrame() {
 
 }
 
@@ -208,18 +211,18 @@ void Renderer::Flush(DrawCommand& command) {
 }
 
 void Renderer::RenderPoints(DrawCommand& command) {
-	for(auto& [point, transforms] : command.PointTransforms) {
+	// for(auto& [point, transforms] : command.PointTransforms) {
 
-	}
+	// }
 }
 
 void Renderer::RenderLines(DrawCommand& command) {
-	for(auto& [line, transforms] : command.LineTransforms) {
-		s_Data.LineArray->Bind();
-		s_Data.LineArray->GetVertexBuffer()->SetData(transforms);
+	// for(auto& [line, transforms] : command.LineTransforms) {
+	// 	s_Data.LineArray->Bind();
+	// 	s_Data.LineArray->GetVertexBuffer()->SetData(transforms);
 
-		glDrawArraysInstanced(GL_LINES, 0, 2, transforms.GetCount());
-	}
+	// 	glDrawArraysInstanced(GL_LINES, 0, 2, transforms.GetCount());
+	// }
 }
 
 void Renderer::RenderMeshes(DrawCommand& command) {
@@ -230,20 +233,20 @@ void Renderer::RenderMeshes(DrawCommand& command) {
 
 	// Method 1 currently being used
 
-	for(auto& [mesh, transforms] : command.MeshTransforms) {
-		command.Pass->LinkHandles();
+	// for(auto& [mesh, transforms] : command.MeshTransforms) {
+	// 	command.Pass->LinkHandles();
 
-		auto* nativeMesh = mesh->As<OpenGL::Mesh>();
-		auto vao = mesh->GetVertexArray();
+	// 	auto* nativeMesh = mesh->As<OpenGL::Mesh>();
+	// 	auto vao = nativeMesh->GetVertexArray();
 
-		vao->Bind();
-		s_Data.Transforms->Bind();
-		s_Data.Transforms->SetData(transforms);
+	// 	vao->Bind();
+	// 	s_Data.Transforms->Bind();
+	// 	s_Data.Transforms->SetData(transforms);
 
-		DrawInstanced(vao, transforms.GetCount());
+	// 	DrawInstanced(vao, transforms.GetCount());
 
-		s_Data.Transforms->Unbind();
-	}
+	// 	s_Data.Transforms->Unbind();
+	// }
 }
 
 void Renderer::Clear(const glm::vec4& color) {
@@ -288,7 +291,7 @@ void Renderer::RenderFramebuffer(Ref<VolcaniCore::Framebuffer> buffer,
 	glEnable(GL_DEPTH_TEST);
 }
 
-void Renderer::DrawIndexed(Ref<VertexArray> array, uint32_t indices) {
+void DrawIndexed(Ref<VertexArray> array, uint32_t indices) {
 	if(!array->HasIndexBuffer()) {
 		VOLCANICORE_LOG_WARNING("Attempt to execute indexed draw call \
 								 without index buffer present has failed");
@@ -301,7 +304,7 @@ void Renderer::DrawIndexed(Ref<VertexArray> array, uint32_t indices) {
 					GL_UNSIGNED_INT, 0);
 }
 
-void Renderer::DrawInstanced(Ref<VertexArray> array, uint32_t instanceCount) {
+void DrawInstanced(Ref<VertexArray> array, uint32_t instanceCount) {
 	if(!array->HasIndexBuffer()) {
 		VOLCANICORE_LOG_WARNING("Attempt to execute instanced draw call \
 								 without index buffer present has failed");

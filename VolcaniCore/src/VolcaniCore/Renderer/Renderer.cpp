@@ -1,6 +1,5 @@
 #include "Renderer.h"
 
-#include "Core/Application.h"
 #include "Core/Assert.h"
 
 #include "Renderer/RendererAPI.h"
@@ -28,11 +27,11 @@ void Renderer::Resize(uint32_t width, uint32_t height) {
 }
 
 void Renderer::BeginFrame() {
-	RendererAPI::Get()->BeginFrame();
+	RendererAPI::Get()->StartFrame();
 }
 
 void Renderer::EndFrame() {
-	RendererAPI::Get()->DrawFrame(s_CurrentFrame);
+	RendererAPI::Get()->EndFrame(s_CurrentFrame);
 
 	s_CurrentFrame.DrawCommands.clear();
 }
@@ -41,7 +40,7 @@ Ref<RenderPass> Renderer::GetPass() {
 	return s_CurrentPass;
 }
 
-DrawCommand& Renderer::GetCommand() {
+DrawCommand& Renderer::GetDrawCommand() {
 	return s_CurrentDrawCommand;
 }
 
