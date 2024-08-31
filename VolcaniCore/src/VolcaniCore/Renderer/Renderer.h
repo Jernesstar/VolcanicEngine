@@ -23,26 +23,15 @@ struct DrawCommand {
 	// std::unordered_map<Line, Buffer<glm::mat4>> LineTransforms;
 };
 
+struct FrameDebugInfo {
+	uint32_t DrawCalls;
+	float FPS;
+};
+
 struct FrameData {
 	std::vector<DrawCommand> DrawCommands;
 
-	void AddDrawCommand(const DrawCommand& command) {
-		DrawCommands.push_back(command);
-	}
-
-	std::vector<DrawCommand>::const_iterator begin() const {
-		return DrawCommands.begin();
-	}
-	std::vector<DrawCommand>::const_iterator end() const {
-		return DrawCommands.end();
-	}
-
-	std::vector<DrawCommand>::iterator begin() {
-		return DrawCommands.begin();
-	}
-	std::vector<DrawCommand>::iterator end() {
-		return DrawCommands.end();
-	}
+	FrameDebugInfo Info;
 };
 
 class Renderer {

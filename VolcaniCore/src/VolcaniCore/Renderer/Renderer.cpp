@@ -24,6 +24,7 @@ void Renderer::Clear(const glm::vec4& color) {
 
 void Renderer::Resize(uint32_t width, uint32_t height) {
 	RendererAPI::Get()->Resize(width, height);
+	// s_CurrentDrawCommand.Size = { width, height };
 }
 
 void Renderer::BeginFrame() {
@@ -53,7 +54,7 @@ void Renderer::EndPass() {
 	if(!s_CurrentPass)
 		return;
 
-	s_CurrentFrame.AddDrawCommand(s_CurrentDrawCommand);
+	s_CurrentFrame.DrawCommands.push_back(s_CurrentDrawCommand);
 	s_CurrentPass = nullptr;
 }
 

@@ -50,7 +50,6 @@ void Bloom::OnUpdate(TimeStep ts) {
 
 	Renderer::StartPass(bloomPass);
 	{
-		Renderer::Clear();
 		Renderer3D::Begin(camera);
 
 		Renderer3D::DrawMesh(cube);
