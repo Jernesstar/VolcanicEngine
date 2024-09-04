@@ -12,15 +12,24 @@
 
 namespace VolcaniCore {
 
+template<typename TData>
+using PrimitiveData = std::unordered_map<Ref<TData>, Buffer<glm::mat4>>;
+
+// template<typename TData>
+// struct PrimitiveData;
+
 struct DrawCommand {
 	Ref<RenderPass> Pass;
 	bool ShouldClearScreen = false;
 
-	std::unordered_map<Ref<Mesh>, Buffer<glm::mat4>> MeshTransforms;
+	void AddPoint(Ref<Point> point, const glm::mat4& transform);
+	void AddLine(Ref<Line> line, const glm::mat4& transform);
+	void AddMesh(Ref<Mesh> mesh, const glm::mat4& transform);
 
-	// Turn this into two lists, one a HashSet, one not
-	// std::unordered_map<Point, Buffer<glm::mat4>> PointTransforms;
-	// std::unordered_map<Line, Buffer<glm::mat4>> LineTransforms;
+private:
+	PrimitiveData<Point> m_Points;
+	PrimitiveData<Line> m_Lines;
+	PrimitiveData<Mesh> m_Meshes;
 };
 
 struct FrameDebugInfo {
@@ -29,9 +38,17 @@ struct FrameDebugInfo {
 };
 
 struct FrameData {
+	FrameDebugInfo Info;
 	std::vector<DrawCommand> DrawCommands;
 
-	FrameDebugInfo Info;
+	void AddDrawCommand(DrawCommand& command);
+
+	std::vector<DrawCommand>::iterator begin()  {
+		return DrawCommands.begin();
+	}
+	std::vector<DrawCommand>::iterator end()  {
+		return DrawCommands.end();
+	}
 };
 
 class Renderer {

@@ -1,12 +1,13 @@
 #pragma once
 
+#include <functional>
+
+#include "Core/Defines.h"
+
 namespace VolcaniCore {
 
 template<typename TUniform, typename THandle>
 class UniformBuffer {
-public:
-	static Ref<UniformBuffer<TUniform>> Create(Ref<THandle> handle);
-
 public:
 	std::function<TUniform(Ref<THandle)>> SetData = [](){};
 

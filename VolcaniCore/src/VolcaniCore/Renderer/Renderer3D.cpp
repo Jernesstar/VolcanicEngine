@@ -53,7 +53,7 @@ void Renderer3D::DrawMesh(Ref<Mesh> mesh, const glm::mat4& tr) {
 	// 		return { material.Specular, 1 };
 	// 	});
 
-	command.MeshTransforms[mesh].Add(tr);
+	command.AddMesh(mesh, tr);
 }
 
 void Renderer3D::DrawModel(Ref<Model> model, const glm::mat4& tr) {

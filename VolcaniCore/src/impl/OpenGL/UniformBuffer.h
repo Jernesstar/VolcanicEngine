@@ -5,7 +5,7 @@
 #include <VolcaniCore/Core/Buffer.h>
 #include <VolcaniCore/Core/Assert.h>
 
-#include "Object/UniformBuffer.h"
+// #include "Object/UniformBuffer.h"
 
 #include "BufferLayout.h"
 
@@ -13,7 +13,7 @@ using namespace VolcaniCore;
 
 namespace VolcaniCore::OpenGL {
 
-class UniformBuffer : VolcaniCore::UniformBuffer {
+class UniformBuffer {
 public:
 	// const std::string Name;
 	const BufferLayout Layout;
