@@ -26,9 +26,9 @@ namespace VolcaniCore::OpenGL {
 static void DrawIndexed(Ref<VertexArray> vertexArray, uint32_t indices = 0);
 static void DrawInstanced(Ref<VertexArray> vertexArray, uint32_t instanceCount);
 
-static const uint32_t MaxInstances = 1000;
-
 struct RendererData {
+	static const uint32_t MaxInstances = 1000;
+
 	Ptr<VertexArray> CubemapArray;
 	Ptr<VertexArray> FramebufferArray;
 
@@ -143,7 +143,7 @@ void Renderer::Init() {
 			{ "Coordinate", BufferDataType::Vec3 },
 			{ "Color",		BufferDataType::Vec3 },
 		},
-		MaxInstances
+		RendererData::MaxInstances
 	);
 	s_Data.PointArray = CreatePtr<VertexArray>(pointBuffer);
 
@@ -152,7 +152,7 @@ void Renderer::Init() {
 			{ "Coordinate", BufferDataType::Vec3 },
 			{ "Color",		BufferDataType::Vec3 },
 		},
-		MaxInstances
+		RendererData::MaxInstances
 	);
 	s_Data.LineArray = CreatePtr<VertexArray>(lineBuffer);
 
@@ -170,7 +170,7 @@ void Renderer::Init() {
 		BufferLayout{
 			{ "Transform", BufferDataType::Mat4 }
 		},
-		MaxInstances
+		RendererData::MaxInstances
 	);
 
 	ShaderLibrary::Get("Framebuffer")->Bind();
@@ -183,18 +183,6 @@ void Renderer::StartFrame() {
 
 }
 
-void Renderer::RenderPoints(DrawCommand& command) {
-
-}
-
-void Renderer::RenderLines(DrawCommand& command) {
-
-}
-
-void Renderer::RenderMeshes(DrawCommand& command) {
-
-}
-
 void Renderer::Clear(const glm::vec4& color) {
 	glClearColor(color.x, color.y, color.z, color.w);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -202,6 +190,32 @@ void Renderer::Clear(const glm::vec4& color) {
 
 void Renderer::Resize(uint32_t width, uint32_t height) {
 	glViewport(0, 0, width, height);
+}
+
+static void DrawPoint(DrawCall& call) {
+
+}
+
+static void DrawLine(DrawCall& call) {
+
+}
+
+static void DrawMesh(DrawCall& call) {
+
+}
+
+void Renderer::SubmitDrawCall(DrawCall& call) {
+	switch(call.Primitive) {
+		case DrawPrimitive::Point:
+			DrawPoint(call);
+			break;
+		case DrawPrimitive::Line:
+			DrawLine(call);
+			break;
+		case DrawPrimitive::Mesh:
+			DrawMesh(call);
+			break;
+	}
 }
 
 void Renderer::RenderCubemap(Ref<VolcaniCore::Cubemap> cubemap) {

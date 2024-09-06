@@ -9,6 +9,7 @@ workspace "VolcanicEngine"
     filter "system:windows"
         defines {
             "VOLCANICENGINE_WINDOWS",
+            "_DEBUG"
         }
     filter "configurations:Debug"
         optimize "Debug"

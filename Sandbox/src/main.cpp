@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include <VolcaniCore/Core/Application.h>
 #include <VolcaniCore/Core/Log.h>
 #include <VolcaniCore/Core/CommandLineArgs.h>

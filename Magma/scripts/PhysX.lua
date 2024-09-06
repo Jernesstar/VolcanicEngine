@@ -58,9 +58,9 @@ project "PhysX"
     }
 
     defines {
-        -- "NDEBUG",
-        "PX_PHYSX_STATIC_LIB",
+        "PX_DEBUG",
         "PX_CHECKED",
+        "PX_PHYSX_STATIC_LIB",
         "PX_X64",
         "PX_X86"
     }
@@ -73,6 +73,7 @@ project "PhysX"
 
         "-Wno-unused-macros",
         "-Wno-invalid-offsetof",
+        "-Wno-attributes",
     }
 
     filter "system:linux"
@@ -87,7 +88,6 @@ project "PhysX"
 
         defines {
             "PX_LINUX",
-            "PX_GCC"
         }
 
     filter "system:windows"
@@ -98,4 +98,8 @@ project "PhysX"
         files {
             "%{VendorPaths.PhysX}/physx/source/foundation/windows/*.cpp",
             "%{VendorPaths.PhysX}/physx/source/physx/src/device/windows/*.cpp"
+        }
+
+        defines {
+            "PX_WINDOWS",
         }

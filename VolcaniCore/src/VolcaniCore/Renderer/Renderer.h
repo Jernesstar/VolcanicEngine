@@ -43,6 +43,7 @@ struct DrawCall {
 	DrawType Type;
 	DrawOption Options;
 	DrawPrimitive Primitive;
+
 };
 
 struct FrameDebugInfo {

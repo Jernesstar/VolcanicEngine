@@ -94,7 +94,7 @@ void Renderer::Flush(DrawCommand& command) {
 	if(command.ShouldClearScreen)
 		Clear();
 
-	auto calles = GenerateDrawCalles(command);
+	auto calles = CreateDrawCalles(command);
 	for(auto& call : calles) {
 		RendererAPI::Get()->SubmitDrawCall(call);
 		s_CurrentFrame.Info.DrawCalls++;
