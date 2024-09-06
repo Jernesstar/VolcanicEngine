@@ -35,6 +35,7 @@ project "assimp"
         "%{VendorPaths.assimp}/code/AssetLib/Blender/*.cpp",
         "%{VendorPaths.assimp}/code/AssetLib/Unreal/*.cpp",
         "%{VendorPaths.assimp}/contrib/Open3DGC/**.cpp",
+        "%{VendorPaths.assimp}/contrib/zip/test/*",
     }
 
     includedirs {

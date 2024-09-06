@@ -7,8 +7,7 @@
 
 namespace VolcaniCore {
 
-struct FrameData;
-struct DrawCommand;
+struct DrawCall;
 
 class RendererAPI {
 public:
@@ -28,10 +27,12 @@ public:
 	virtual ~RendererAPI() = default;
 
 	virtual void StartFrame() = 0;
-	virtual void EndFrame(FrameData& frame) = 0;
+	virtual void EndFrame() = 0;
 
 	virtual void Clear(const glm::vec4& color = glm::vec4(0.0f)) = 0;
 	virtual void Resize(uint32_t width, uint32_t height) = 0;
+
+	virtual void SubmitDrawCall(DrawCall& call) = 0;
 
 	virtual void RenderCubemap(Ref<Cubemap> cubemap) = 0;
 	virtual void RenderFramebuffer(

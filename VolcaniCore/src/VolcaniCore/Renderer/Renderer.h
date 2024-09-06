@@ -35,6 +35,16 @@ private:
 	PrimitiveData<Mesh> m_Meshes;
 };
 
+enum class DrawType { Array, Indexed };
+enum class DrawOption { Single, Instanced, Multi };
+enum class DrawPrimitive { Point, Line, Mesh };
+
+struct DrawCall {
+	DrawType Type;
+	DrawOption Options;
+	DrawPrimitive Primitive;
+};
+
 struct FrameDebugInfo {
 	uint32_t DrawCalls;
 	float FPS;
@@ -45,13 +55,6 @@ struct FrameData {
 	FrameDebugInfo Info;
 
 	void AddDrawCommand(DrawCommand& command);
-
-	List<DrawCommand>::iterator begin()  {
-		return DrawCommands.begin();
-	}
-	List<DrawCommand>::iterator end()  {
-		return DrawCommands.end();
-	}
 };
 
 class Renderer {
@@ -64,7 +67,6 @@ public:
 
 	static void BeginFrame();
 	static void EndFrame();
-	List<DrawCall> GenerateDrawCalles();
 
 	static Ref<RenderPass> GetPass();
 	static DrawCommand& GetDrawCommand();
@@ -72,6 +74,9 @@ public:
 private:
 	static void Init();
 	static void Close();
+
+	static void Flush(DrawCommand& command);
+	static List<DrawCall> CreateDrawCalles(DrawCommand& command);
 
 	friend class Application;
 };

@@ -1,5 +1,6 @@
 #include "Renderer.h"
 
+#include "Core/Application.h"
 #include "Core/Assert.h"
 
 #include "Renderer/RendererAPI.h"
@@ -73,8 +74,8 @@ void Renderer::BeginFrame() {
 }
 
 
-void Renderer::EndFrame(FrameData& data) {
-	for(auto& command : data) {
+void Renderer::EndFrame() {
+	for(auto& command : s_CurrentFrame.DrawCommands) {
 		Flush(command);
 	}
 
@@ -93,15 +94,52 @@ void Renderer::Flush(DrawCommand& command) {
 	if(command.ShouldClearScreen)
 		Clear();
 
-	RenderMeshes(command);
-	RenderLines(command);
-	RenderPoints(command);
+	auto calles = GenerateDrawCalles(command);
+	for(auto& call : calles) {
+		RendererAPI::Get()->SubmitDrawCall(call);
+		s_CurrentFrame.Info.DrawCalls++;
+	}
 
 	if(framebuffer) {
 		framebuffer->Unbind();
 		auto window = Application::GetWindow();
 		Resize(window->GetWidth(), window->GetHeight());
 	}
+}
+
+List<DrawCall> Renderer::CreateDrawCalles(DrawCommand& command) {
+	// for(auto& [point, transforms] : command.PointTransforms) {
+
+	// }
+
+	// for(auto& [line, transforms] : command.LineTransforms) {
+	// 	s_Data.LineArray->Bind();
+	// 	s_Data.LineArray->GetVertexBuffer()->SetData(transforms);
+
+	// 	glDrawArraysInstanced(GL_LINES, 0, 2, transforms.GetCount());
+	// }
+
+	// Many options here:
+	// 1. Put all meshes into s_Data.MeshBuffer and use MultiDrawIndirect
+	// 2. Individually bind mesh vertex array and link transform buffer to it
+	//		and use DrawInstanced
+
+	// Method 1 currently being used
+
+	// for(auto& [mesh, transforms] : command.MeshTransforms) {
+	// 	command.Pass->LinkHandles();
+
+	// 	auto* nativeMesh = mesh->As<OpenGL::Mesh>();
+	// 	auto vao = nativeMesh->GetVertexArray();
+
+	// 	vao->Bind();
+	// 	s_Data.Transforms->Bind();
+	// 	s_Data.Transforms->SetData(transforms);
+
+	// 	DrawInstanced(vao, transforms.GetCount());
+
+	// 	s_Data.Transforms->Unbind();
+	// }
 }
 
 Ref<RenderPass> Renderer::GetPass() {
