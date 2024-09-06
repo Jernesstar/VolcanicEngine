@@ -72,10 +72,36 @@ void Renderer::BeginFrame() {
 	RendererAPI::Get()->StartFrame();
 }
 
-void Renderer::EndFrame() {
-	RendererAPI::Get()->EndFrame(s_CurrentFrame);
+
+void Renderer::EndFrame(FrameData& data) {
+	for(auto& command : data) {
+		Flush(command);
+	}
 
 	s_CurrentFrame.DrawCommands.clear();
+
+	RendererAPI::Get()->EndFrame();
+}
+
+void Renderer::Flush(DrawCommand& command) {
+	auto framebuffer = command.Pass->GetOutput();
+	if(framebuffer) {
+		Resize(framebuffer->GetWidth(), framebuffer->GetHeight());
+		framebuffer->Bind();
+	}
+
+	if(command.ShouldClearScreen)
+		Clear();
+
+	RenderMeshes(command);
+	RenderLines(command);
+	RenderPoints(command);
+
+	if(framebuffer) {
+		framebuffer->Unbind();
+		auto window = Application::GetWindow();
+		Resize(window->GetWidth(), window->GetHeight());
+	}
 }
 
 Ref<RenderPass> Renderer::GetPass() {

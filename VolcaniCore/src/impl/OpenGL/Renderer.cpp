@@ -183,33 +183,6 @@ void Renderer::StartFrame() {
 
 }
 
-void Renderer::EndFrame(FrameData& data) {
-	for(auto& command : data) {
-		Flush(command);
-	}
-}
-
-void Renderer::Flush(DrawCommand& command) {
-	auto framebuffer = command.Pass->GetOutput();
-	if(framebuffer) {
-		Resize(framebuffer->GetWidth(), framebuffer->GetHeight());
-		framebuffer->Bind();
-	}
-
-	if(command.ShouldClearScreen)
-		Clear();
-
-	RenderMeshes(command);
-	RenderLines(command);
-	RenderPoints(command);
-
-	if(framebuffer) {
-		framebuffer->Unbind();
-		auto window = Application::GetWindow();
-		Resize(window->GetWidth(), window->GetHeight());
-	}
-}
-
 void Renderer::RenderPoints(DrawCommand& command) {
 	// for(auto& [point, transforms] : command.PointTransforms) {
 

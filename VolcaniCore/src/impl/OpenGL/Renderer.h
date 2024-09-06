@@ -26,7 +26,7 @@ public:
 	~Renderer() = default;
 
 	void StartFrame() override;
-	void EndFrame(FrameData& frame) override;
+	void EndFrame() override;
 
 	void Clear(const glm::vec4& color = glm::vec4(1.0f)) override;
 	void Resize(uint32_t width, uint32_t height) override;

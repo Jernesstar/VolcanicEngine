@@ -13,6 +13,9 @@
 namespace VolcaniCore {
 
 template<typename TData>
+using List = std::vector<TData>;
+
+template<typename TData>
 using PrimitiveData = std::unordered_map<Ref<TData>, Buffer<glm::mat4>>;
 
 // template<typename TData>
@@ -38,15 +41,15 @@ struct FrameDebugInfo {
 };
 
 struct FrameData {
+	List<DrawCommand> DrawCommands;
 	FrameDebugInfo Info;
-	std::vector<DrawCommand> DrawCommands;
 
 	void AddDrawCommand(DrawCommand& command);
 
-	std::vector<DrawCommand>::iterator begin()  {
+	List<DrawCommand>::iterator begin()  {
 		return DrawCommands.begin();
 	}
-	std::vector<DrawCommand>::iterator end()  {
+	List<DrawCommand>::iterator end()  {
 		return DrawCommands.end();
 	}
 };
@@ -61,6 +64,7 @@ public:
 
 	static void BeginFrame();
 	static void EndFrame();
+	List<DrawCall> GenerateDrawCalles();
 
 	static Ref<RenderPass> GetPass();
 	static DrawCommand& GetDrawCommand();
