@@ -19,7 +19,7 @@ public:
 	static void Begin(Ref<Camera> camera);
 	static void End();
 
-	static void RenderCubemap(Ref<Cubemap> cubemap);
+	static void DrawSkybox(Ref<Cubemap> cubemap);
 
 	static void DrawMesh(Ref<Mesh> mesh, const glm::mat4& tr);
 	static void DrawMesh(Ref<Mesh> mesh, const Transform& t = { }) {
@@ -60,12 +60,6 @@ public:
 	static void DrawText(Ref<Text> text, const Transform& t = { }) {
 		DrawText(text, t.GetTransform());
 	}
-
-private:
-	static void Init();
-	static void Close();
-
-	friend class Renderer;
 };
 
 }

@@ -119,9 +119,6 @@ Ref<Mesh> Mesh::Create(MeshPrimitive primitive, const Material& material) {
 
 			break;
 		}
-		
-		case MeshPrimitive::Line:
-			break;
 	}
 
 	return Create(vertices, indices, material);
@@ -206,9 +203,6 @@ Ref<Mesh> Mesh::Create(MeshPrimitive primitive, const glm::vec4& color) {
 
 			break;
 		}
-		
-		case MeshPrimitive::Line:
-			break;
 	}
 
 	return Create(vertices, indices);

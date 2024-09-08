@@ -1,6 +1,5 @@
 #include "Renderer.h"
 
-#include "Core/Application.h"
 #include "Core/Assert.h"
 
 #include "Renderer/RendererAPI.h"
@@ -11,41 +10,16 @@ static Ref<RenderPass> s_CurrentPass;
 static DrawCommand s_CurrentDrawCommand;
 static FrameData s_CurrentFrame;
 
-// template<>
-// struct PrimitiveData<Point> { 
-// 	std::unordered_map<Ref<Point>, Buffer<glm::mat4>> Points;
-
-// 	Buffer<glm::mat4>& operator [](Ref<Point> points) {
-// 		return Points[points];
-// 	}
-// };
-// template<>
-// struct PrimitiveData<Line> { 
-// 	std::unordered_map<Ref<Line>, Buffer<glm::mat4>> Lines;
-
-// 	Buffer<glm::mat4>& operator [](Ref<Line> line) {
-// 		return Lines[line];
-// 	}
-// };
-// template<>
-// struct PrimitiveData<Mesh> { 
-// 	std::unordered_map<Ref<Mesh>, Buffer<glm::mat4>> Meshes;
-
-// 	Buffer<glm::mat4>& operator [](Ref<Mesh> mesh) {
-// 		return Meshes[mesh];
-// 	}
-// };
-
-void DrawCommand::AddPoint(Ref<Point> point, const glm::mat4& transform) {
-	m_Points[point].Add(transform);
+void DrawCommand::AddPoint(const Point& point, const glm::mat4& transform) {
+	Points[point].Add(transform);
 }
 
-void DrawCommand::AddLine(Ref<Line> line, const glm::mat4& transform) {
-	m_Lines[line].Add(transform);
+void DrawCommand::AddLine(const Line& line, const glm::mat4& transform) {
+	Lines[line].Add(transform);
 }
 
 void DrawCommand::AddMesh(Ref<Mesh> mesh, const glm::mat4& transform) {
-	m_Meshes[mesh].Add(transform);
+	Meshes[mesh].Add(transform);
 }
 
 void FrameData::AddDrawCommand(DrawCommand& command) {
@@ -53,26 +27,78 @@ void FrameData::AddDrawCommand(DrawCommand& command) {
 }
 
 void Renderer::Init() {
-
+	s_CurrentFrame = { };
 }
 
 void Renderer::Close() {
 
 }
 
+Ref<RenderPass> Renderer::GetPass() {
+	return s_CurrentPass;
+}
+DrawCommand& Renderer::GetDrawCommand() {
+	return s_CurrentDrawCommand;
+}
+FrameDebugInfo& Renderer::GetDebugInfo() {
+	return s_CurrentFrame.Info;
+}
+
+void Renderer::StartPass(Ref<RenderPass> pass, const DrawOptionsMap& map) {
+	s_CurrentPass = pass;
+
+	// TODO(Implement): GetValueOrDefault(DrawOptionsMap), similar to the one used in CameraController
+	if(map == { }) {
+		map =
+		{
+			{
+				DrawPrimitive::Point,
+				DrawOptions{
+					.Type = DrawType::Array,
+					.Partition = DrawPartition::Single
+				}
+			},
+			{
+				DrawPrimitive::Line,
+				DrawOptions{
+					.Type = DrawType::Array,
+					.Partition = DrawPartition::Single
+				}
+			}
+			{
+				DrawPrimitive::Mesh,
+				DrawOptions{
+					.Type = DrawType::Indexed,
+					.Partition = DrawPartition::Instanced
+				}
+			}
+		}
+	}
+	s_CurrentDrawCommand = DrawCommand{
+		.Pass = pass,
+		.Map = map
+	};
+}
+
+void Renderer::EndPass() {
+	if(!s_CurrentPass)
+		return;
+
+	s_CurrentFrame.AddDrawCommand(s_CurrentDrawCommand);
+	s_CurrentPass = nullptr;
+}
+
 void Renderer::Clear(const glm::vec4& color) {
-	s_CurrentDrawCommand.ShouldClearScreen = true;
+	s_CurrentDrawCommand.Clear = true;
 }
 
 void Renderer::Resize(uint32_t width, uint32_t height) {
-	RendererAPI::Get()->Resize(width, height);
-	// s_CurrentDrawCommand.Size = { width, height };
+	s_CurrentDrawCommand.Size = { width, height };
 }
 
 void Renderer::BeginFrame() {
 	RendererAPI::Get()->StartFrame();
 }
-
 
 void Renderer::EndFrame() {
 	for(auto& command : s_CurrentFrame.DrawCommands) {
@@ -91,11 +117,15 @@ void Renderer::Flush(DrawCommand& command) {
 		framebuffer->Bind();
 	}
 
-	if(command.ShouldClearScreen)
+	if(command.Clear)
 		Clear();
+	if(command.Size != { 0, 0 })
+		Resize(command.Size.x, command.Size.y);
 
-	auto calles = CreateDrawCalles(command);
-	for(auto& call : calles) {
+	command.Pass->SetUniforms();
+
+	auto calls = CreateDrawCalls(command);
+	for(auto& call : calls) {
 		RendererAPI::Get()->SubmitDrawCall(call);
 		s_CurrentFrame.Info.DrawCalls++;
 	}
@@ -107,61 +137,70 @@ void Renderer::Flush(DrawCommand& command) {
 	}
 }
 
-List<DrawCall> Renderer::CreateDrawCalles(DrawCommand& command) {
-	// for(auto& [point, transforms] : command.PointTransforms) {
+List<DrawCall> Renderer::CreateDrawCalls(DrawCommand& command) {
+	auto& options = command.OptionsMap;
+	List<DrawCall> calls;
 
-	// }
+	// TODO(Implement):
+	DrawCall pointCall{
+		.Type	   = options[DrawPrimitive::Point].Type,
+		.Partition	   = options[DrawPrimitive::Point].Partition,
+		.Primitive = DrawPrimitive::Point
+	};
+	for(auto& [point, transforms] : command.Points) {
+		Vertex p0;
 
-	// for(auto& [line, transforms] : command.LineTransforms) {
-	// 	s_Data.LineArray->Bind();
-	// 	s_Data.LineArray->GetVertexBuffer()->SetData(transforms);
+		p0.Position = point.Position * transforms[0];
+		p0.Normal = glm::vec3(0.0f);
+		p0.TexCoord_Color = point.Color;
 
-	// 	glDrawArraysInstanced(GL_LINES, 0, 2, transforms.GetCount());
-	// }
+		pointCall.GeometryBuffer->Add(p0);
+	}
 
-	// Many options here:
-	// 1. Put all meshes into s_Data.MeshBuffer and use MultiDrawIndirect
-	// 2. Individually bind mesh vertex array and link transform buffer to it
-	//		and use DrawInstanced
+	// TODO(Implement):
+	DrawCall lineCall{
+		.Type	   = options[DrawPrimitive::Line].Type,
+		.Partition = options[DrawPrimitive::Line].Partition,
+		.Primitive = DrawPrimitive::Line
+	};
+	for(auto& [line, _] : command.Lines) {
+		Vertex p0, p1;
 
-	// Method 1 currently being used
+		p0.Position		  = line.P0.Position;
+		p0.Normal		  = glm::vec3(0.0f);
+		p0.TexCoord_Color = line.P0.Color;
 
-	// for(auto& [mesh, transforms] : command.MeshTransforms) {
-	// 	command.Pass->LinkHandles();
+		p1.Position		  = line.P1.Position;
+		p1.Normal		  = glm::vec3(0.0f);
+		p1.TexCoord_Color = line.P1.Color;
 
-	// 	auto* nativeMesh = mesh->As<OpenGL::Mesh>();
-	// 	auto vao = nativeMesh->GetVertexArray();
+		lineCall.GeometryBuffer->Add(p0);
+		lineCall.GeometryBuffer->Add(p1);
+	}
 
-	// 	vao->Bind();
-	// 	s_Data.Transforms->Bind();
-	// 	s_Data.Transforms->SetData(transforms);
+	if(options[DrawPrimitive::Mesh].Partition == DrawPartition::Multi) {
+		// TODO(Implement):
+		return calls;
+	}
 
-	// 	DrawInstanced(vao, transforms.GetCount());
+	for(auto& [mesh, transforms] : command.Meshes) {
+		DrawCall meshCall{
+			.Type = DrawType::Indexed,
+			.Partition = options[DrawPrimitive::Mesh].Partition,
+			.Primitive = DrawPrimitive::Mesh
+		};
 
-	// 	s_Data.Transforms->Unbind();
-	// }
-}
+		meshCall.GeometryBuffer->Add(mesh.GetVertices());
+		meshCall.IndexBuffer->Add(mesh.GetIndices());
 
-Ref<RenderPass> Renderer::GetPass() {
-	return s_CurrentPass;
-}
+		if(meshCall.Partition == DrawPartition::Instanced) {
+			meshCall.TransformBuffer->Add(transforms);
+		}
 
-DrawCommand& Renderer::GetDrawCommand() {
-	return s_CurrentDrawCommand;
-}
+		calls.push_back(meshCall);
+	}
 
-void Renderer::StartPass(Ref<RenderPass> pass) {
-	s_CurrentPass = pass;
-	s_CurrentDrawCommand = DrawCommand();
-	s_CurrentDrawCommand.Pass = s_CurrentPass;
-}
-
-void Renderer::EndPass() {
-	if(!s_CurrentPass)
-		return;
-
-	s_CurrentFrame.AddDrawCommand(s_CurrentDrawCommand);
-	s_CurrentPass = nullptr;
+	return calls;
 }
 
 }

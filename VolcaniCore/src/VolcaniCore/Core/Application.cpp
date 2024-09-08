@@ -50,9 +50,11 @@ void Application::Run() {
 		Renderer::BeginFrame();
 		{
 			s_Instance->OnUpdate(ts);
-			// s_Instance->OnRender();
 		}
 		Renderer::EndFrame();
+
+		float fps = (1.0f / (float)ts) * 1000.0f;
+		Renderer::GetFrame().Info.FPS = fps;
 
 		s_Window->Update();
 	}

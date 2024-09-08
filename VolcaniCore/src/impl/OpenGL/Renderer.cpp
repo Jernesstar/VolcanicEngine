@@ -23,20 +23,16 @@ using namespace VolcaniCore;
 
 namespace VolcaniCore::OpenGL {
 
-static void DrawIndexed(Ref<VertexArray> vertexArray, uint32_t indices = 0);
-static void DrawInstanced(Ref<VertexArray> vertexArray, uint32_t instanceCount);
-
 struct RendererData {
 	static const uint32_t MaxInstances = 1000;
 
 	Ptr<VertexArray> CubemapArray;
 	Ptr<VertexArray> FramebufferArray;
 
-	Ref<VertexArray> MeshArray;
-	Ref<VertexArray> LineArray;
-	Ref<VertexArray> PointArray;
-
-	Ref<VertexBuffer> Transforms;
+	Ref<VertexArray> Array;
+	Ref<VertexBuffer> GeometryBuffer;
+	Ref<VertexBuffer> IndexBuffer;
+	Ref<VertexBuffer> TransformBuffer;
 };
 
 static RendererData s_Data;
@@ -138,40 +134,27 @@ void Renderer::Init() {
 	);
 	s_Data.FramebufferArray = CreatePtr<VertexArray>(buffer);
 
-	auto pointBuffer = CreateRef<VertexBuffer>(
+	s_Data.GeometryBuffer = CreateRef<VertexBuffer>(
 		BufferLayout{
 			{ "Coordinate", BufferDataType::Vec3 },
-			{ "Color",		BufferDataType::Vec3 },
+			{ "Normal",		BufferDataType::Vec3 },
+			{ "TexCoord_Color", BufferDataType::Vec4 },
 		},
 		RendererData::MaxInstances
 	);
-	s_Data.PointArray = CreatePtr<VertexArray>(pointBuffer);
-
-	auto lineBuffer = CreateRef<VertexBuffer>(
-		BufferLayout{
-			{ "Coordinate", BufferDataType::Vec3 },
-			{ "Color",		BufferDataType::Vec3 },
-		},
-		RendererData::MaxInstances
-	);
-	s_Data.LineArray = CreatePtr<VertexArray>(lineBuffer);
-
-	// For static geometry
-	// s_Data.MeshBuffer = CreateRef<VertexBuffer>(
-	// 	BufferLayout{
-	// 		{ "Coordinate", BufferDataType::Vec3 },
-	// 		{ "Normal",		BufferDataType::Vec3 },
-	// 		{ "TexCoord_Color", BufferDataType::Vec4 },
-	// 	});
-	// s_Data.MeshArray = CreatePtr<VertexArray>(buffer);
-
-	// TODO(Implement): Turn into MappedBuffer
-	s_Data.Transforms = CreateRef<VertexBuffer>(
+	// TODO(Change): Turn into MappedBuffer
+	s_Data.TransformBuffer = CreateRef<VertexBuffer>(
 		BufferLayout{
 			{ "Transform", BufferDataType::Mat4 }
 		},
 		RendererData::MaxInstances
 	);
+	s_Data.IndexBuffer = CreateRef<IndexBuffer>();
+
+	s_Data.Array = CreatePtr<VertexArray>();
+	s_Data.Array->AddVertexBuffer(s_Data.GeometryBuffer);
+	s_Data.Array->AddVertexBuffer(s_Data.TransformBuffer);
+	s_Data.Array->SetIndexBuffer(s_Data.IndexBuffer);
 
 	ShaderLibrary::Get("Framebuffer")->Bind();
 	ShaderLibrary::Get("Framebuffer")->SetInt("u_ScreenTexture", 0);
@@ -180,6 +163,9 @@ void Renderer::Init() {
 void Renderer::Close() { }
 
 void Renderer::StartFrame() {
+
+}
+void Renderer::EndFrame() {
 
 }
 
@@ -192,16 +178,73 @@ void Renderer::Resize(uint32_t width, uint32_t height) {
 	glViewport(0, 0, width, height);
 }
 
+// TODO(Implement):
 static void DrawPoint(DrawCall& call) {
+	auto& geometry = call.GeometryBuffer;
+	auto& transforms = call.TransformBuffer;
+	uint32_t instanceCount = transforms->GetCount();
 
+	s_Data.Array->Bind();
+	s_Data.GeometryBuffer->SetData(geometry);
+	s_Data.TransformBuffer->SetData(transforms);
+
+	glDrawArrays(GL_POINTS, 0, instanceCount);
 }
 
+// TODO(Implement):
 static void DrawLine(DrawCall& call) {
+	auto& geometry = call.GeometryBuffer;
+	auto& transforms = call.TransformBuffer;
+	uint32_t instanceCount = transforms->GetCount();
 
+	s_Data.Array->Bind();
+	s_Data.GeometryBuffer->SetData(geometry);
+	s_Data.TransformBuffer->SetData(transforms);
+
+	glDrawArrays(GL_LINES, 0, 2);
 }
 
 static void DrawMesh(DrawCall& call) {
+	if(call.Options.Partition == DrawPartition::Multi) {
+		// TODO(Implement): Pack meshes together and issue a single draw call
+		return;
+	}
 
+	auto& geometry	 = call.GeometryBuffer;
+	auto& indices	 = call.IndexBuffer;
+	auto& transforms = call.TransformBuffer;
+	uint32_t count = indices->GetCount();
+	uint32_t instanceCount = transforms->GetCount();
+
+	s_Data.Array->Bind();
+	s_Data.GeometryBuffer->SetData(geometry);
+	s_Data.IndexBuffer->SetData(indices);
+	s_Data.TransformBuffer->SetData(transforms);
+
+	switch(call.Partition) {
+		case DrawPartition::Single:
+		{
+			if(call.Type == Array)
+				glDrawArrays(GL_TRIANGLES, 0, count);
+			else
+				glDrawElements(GL_TRIANGLES, 0, count);
+
+			break;
+		}
+		case DrawPartition::Instanced:
+		{
+			s_Data.TransformBuffer->SetData(trs);
+
+			if(call.Type == Array)
+				glDrawArraysInstanced(GL_TRIANGLES, count,
+									  GL_UNSIGNED_INT, 0, instanceCount);
+			else
+				glDrawElementsInstanced(GL_TRIANGLES, count,
+										GL_UNSIGNED_INT, 0, instanceCount);
+
+			break;
+		}
+	}
 }
 
 void Renderer::SubmitDrawCall(DrawCall& call) {
@@ -249,32 +292,6 @@ void Renderer::RenderFramebuffer(Ref<VolcaniCore::Framebuffer> buffer,
 
 	glCullFace(GL_BACK);
 	glEnable(GL_DEPTH_TEST);
-}
-
-void DrawIndexed(Ref<VertexArray> array, uint32_t indices) {
-	if(!array->HasIndexBuffer()) {
-		VOLCANICORE_LOG_WARNING("Attempt to execute indexed draw call \
-								 without index buffer present has failed");
-		return;
-	}
-	uint32_t count = array->GetIndexBuffer()->Count;
-
-	array->Bind();
-	glDrawElements(GL_TRIANGLES, indices != 0 ? indices : count,
-					GL_UNSIGNED_INT, 0);
-}
-
-void DrawInstanced(Ref<VertexArray> array, uint32_t instanceCount) {
-	if(!array->HasIndexBuffer()) {
-		VOLCANICORE_LOG_WARNING("Attempt to execute instanced draw call \
-								 without index buffer present has failed");
-		return;
-	}
-	uint32_t count = array->GetIndexBuffer()->Count;
-
-	array->Bind();
-	glDrawElementsInstanced(GL_TRIANGLES, count,
-							GL_UNSIGNED_INT, 0, instanceCount);
 }
 
 }

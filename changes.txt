@@ -1,0 +1,24 @@
+Adding this file, to track changes as a go between writing the code and testing the code.
+
+So far:
+
+change:
+	Removed Point, Line, and Mesh buffers in OpenGL::Renderer::RendererData in favor of a single Geometry buffer
+	Renamed VolcaniCore::Renderer::RenderCubemap -> DrawSkybox
+	Renamed LinkHandles -> SetUniforms, class Handles -> Uniforms, HandleMap -> UniformMap
+
+feat_begin:
+	Created Vertex.h
+	Created structs DrawType, DrawPartition, DrawPrimitive, DrawCall
+	Implementing DrawLine, DrawPoint, DrawMesh in OpenGL::Renderer,
+	Removed DrawInstanced and DrawIndexed in OpenGL::Renderer;
+	Implementing VolcaniCore::Renderer::CreateDrawCalls
+	Defines.h now includes the usings 'List = std::vector', 'Map = std::unordered_map', and 'Func = std::function'
+	Work in Buffer.h, implementing Add(Buffer), Add(List)
+
+feat_end:
+	Application calculates the FPS
+	struct TextureSlot
+
+todo:
+	Change all instances of vector, unordered_map and function to their corresponding using definitions

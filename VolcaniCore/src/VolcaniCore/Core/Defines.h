@@ -2,9 +2,10 @@
 
 #include <cstdint>
 #include <string>
-#include <string_view>
-#include <vector>
 #include <memory>
+#include <vector>
+#include <unordered_map>
+#include <functional>
 
 #define GLM_ENABLE_EXPERIMENTAL
 
@@ -25,5 +26,14 @@ template<typename T, typename ...Args>
 constexpr Ref<T> CreateRef(Args&&... args) {
 	return std::make_shared<T>(std::forward<Args>(args)...);
 }
+
+template<typename TValue>
+using List = std::vector<TValue>;
+
+template<typename TKey, typename TValue>
+using Map = std::unordered_map<TKey, TValue>;
+
+template<typename TReturn, typename ...Args>
+using Func = std::function<TReturn(Args)>;
 
 }

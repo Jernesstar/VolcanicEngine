@@ -8,27 +8,27 @@
 namespace VolcaniCore {
 
 void Renderer3D::Begin(Ref<Camera> camera) {
-	auto& handles = Renderer::GetPass()->GetHandles();
+	auto& uniforms = Renderer::GetPass()->GetUniforms();
 
-	handles
+	uniforms
 	.Set<glm::mat4>("u_ViewProj",
 		[camera]()
 		{
 			return camera->GetViewProjection();
 		});
-	// handles
-	// .Set("u_CameraPosition",
-	// 	[camera]() -> glm::vec3
-	// 	{
-	// 		return camera->GetPosition();
-	// 	});
+	uniforms
+	.Set<glm::vec3>("u_CameraPosition",
+		[camera]()
+		{
+			return camera->GetPosition();
+		});
 }
 
 void Renderer3D::End() {
 
 }
 
-void Renderer3D::RenderCubemap(Ref<Cubemap> cubemap) {
+void Renderer3D::DrawSkybox(Ref<Cubemap> cubemap) {
 	RendererAPI::Get()->RenderCubemap(cubemap);
 }
 
@@ -37,21 +37,20 @@ void Renderer3D::DrawMesh(Ref<Mesh> mesh, const glm::mat4& tr) {
 		return;
 
 	auto& command = Renderer::GetDrawCommand();
+	auto& uniforms = Renderer::GetPass()->GetUniforms();
 
-	// TODO(Is this even going to work for different meshes?)
-	// Right now we have one mesh, so this should be a problem
-	// command.Pass->GetHandles()
-	// .Set("u_Diffuse",
-	// 	[mesh]() {
-	// 		Material& material = mesh->GetMaterial();
-	// 		return { material.Diffuse, 0 };
-	// 	});
-	// command.Pass->GetHandles()
-	// .Set("u_Specular",
-	// 	[mesh]() {
-	// 		Material& material = mesh->GetMaterial();
-	// 		return { material.Specular, 1 };
-	// 	});
+	uniforms
+	.Set<TextureSlot>("u_Diffuse",
+		[mesh]() {
+			Material& material = mesh->GetMaterial();
+			return { material.Diffuse, 0 };
+		});
+	uniforms
+	.Set<TextureSlot>("u_Specular",
+		[mesh]() {
+			Material& material = mesh->GetMaterial();
+			return { material.Specular, 1 };
+		});
 
 	command.AddMesh(mesh, tr);
 }

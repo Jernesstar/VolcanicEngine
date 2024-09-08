@@ -6,20 +6,16 @@
 #include <glm/vec4.hpp>
 
 #include "Object/Texture.h"
+#include "Object/Vertex.h"
 
 namespace VolcaniCore {
-
-struct Vertex {
-	glm::vec3 Position;
-	glm::vec3 Normal;
-	glm::vec4 TexCoord_Color; // if the alpha channel is 0, used as tex coord
-};
 
 struct Material {
 	Ref<Texture> Diffuse = nullptr;
 	Ref<Texture> Specular = nullptr;
 };
 
+// TODO(Change): Make Point and Line and kind of Mesh
 enum class MeshPrimitive { Point, Line, Quad, Cube, Pyramid };
 
 class Mesh {
