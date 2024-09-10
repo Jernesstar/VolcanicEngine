@@ -19,10 +19,11 @@ enum class DrawPrimitive { Point, Line, Mesh };
 struct DrawOptions {
 	DrawType Type;
 	DrawPartition Partition;
-}
+};
 
 struct DrawCall {
-	DrawOptions Options;
+	DrawType Type;
+	DrawPartition Partition;
 	DrawPrimitive Primitive;
 
 	Buffer<Vertex> GeometryBuffer;
@@ -37,7 +38,7 @@ struct DrawCommand {
 	DrawOptionsMap OptionsMap;
 
 	bool Clear = false;
-	glm::ivec3 Size;
+	glm::ivec2 Size;
 
 	void AddPoint(Ref<Point> point, const glm::mat4& transform);
 	void AddLine(Ref<Line> line,	const glm::mat4& transform);
@@ -57,7 +58,7 @@ struct FrameData {
 	List<DrawCommand> DrawCommands;
 	FrameDebugInfo Info;
 
-	void AddDrawCommand(DrawCommand& command);
+	void AddDrawCommand(DrawCommand command);
 };
 
 class Renderer {

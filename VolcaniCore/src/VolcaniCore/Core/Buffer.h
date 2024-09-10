@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstring>
+
 #include "Core/Defines.h"
 
 namespace VolcaniCore {
@@ -35,7 +37,7 @@ public:
 	~Buffer() = default;
 	Buffer& operator =(const Buffer&) = default;
 
-	T* Get() { return m_Data; }
+	T* Get() const { return m_Data; }
 
 	uint32_t GetCount()	   const { return m_Index; }
 	uint32_t GetMaxCount() const { return m_MaxCount; }
@@ -79,6 +81,13 @@ public:
 		delete m_Data;
 		m_Data = newData;
 	}
+
+	// List<T>::iterator() begin() const {
+
+	// }
+	// List<T>::iterator() end() const {
+
+	// }
 
 private:
 	T* m_Data;

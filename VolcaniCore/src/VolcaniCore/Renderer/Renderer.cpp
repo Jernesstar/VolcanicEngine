@@ -1,6 +1,8 @@
 #include "Renderer.h"
 
+#include "Core/Application.h"
 #include "Core/Assert.h"
+#include "Core/Defines.h"
 
 #include "Renderer/RendererAPI.h"
 
@@ -10,11 +12,11 @@ static Ref<RenderPass> s_CurrentPass;
 static DrawCommand s_CurrentDrawCommand;
 static FrameData s_CurrentFrame;
 
-void DrawCommand::AddPoint(const Point& point, const glm::mat4& transform) {
+void DrawCommand::AddPoint(Ref<Point> point, const glm::mat4& transform) {
 	Points[point].Add(transform);
 }
 
-void DrawCommand::AddLine(const Line& line, const glm::mat4& transform) {
+void DrawCommand::AddLine(Ref<Line> line, const glm::mat4& transform) {
 	Lines[line].Add(transform);
 }
 
@@ -22,7 +24,7 @@ void DrawCommand::AddMesh(Ref<Mesh> mesh, const glm::mat4& transform) {
 	Meshes[mesh].Add(transform);
 }
 
-void FrameData::AddDrawCommand(DrawCommand& command) {
+void FrameData::AddDrawCommand(DrawCommand command) {
 	DrawCommands.push_back(command);
 }
 
@@ -44,39 +46,19 @@ FrameDebugInfo& Renderer::GetDebugInfo() {
 	return s_CurrentFrame.Info;
 }
 
+FrameData& Renderer::GetFrame() {
+	return s_CurrentFrame;
+}
+
+static DrawOptionsMap GetOrReturnDefaults(const DrawOptionsMap& map);
+
 void Renderer::StartPass(Ref<RenderPass> pass, const DrawOptionsMap& map) {
 	s_CurrentPass = pass;
 
-	// TODO(Implement): GetValueOrDefault(DrawOptionsMap), similar to the one used in CameraController
-	if(map == { }) {
-		map =
-		{
-			{
-				DrawPrimitive::Point,
-				DrawOptions{
-					.Type = DrawType::Array,
-					.Partition = DrawPartition::Single
-				}
-			},
-			{
-				DrawPrimitive::Line,
-				DrawOptions{
-					.Type = DrawType::Array,
-					.Partition = DrawPartition::Single
-				}
-			}
-			{
-				DrawPrimitive::Mesh,
-				DrawOptions{
-					.Type = DrawType::Indexed,
-					.Partition = DrawPartition::Instanced
-				}
-			}
-		}
-	}
+	DrawOptionsMap newMap = GetOrReturnDefaults(map);
 	s_CurrentDrawCommand = DrawCommand{
 		.Pass = pass,
-		.Map = map
+		.OptionsMap = newMap
 	};
 }
 
@@ -101,6 +83,7 @@ void Renderer::BeginFrame() {
 }
 
 void Renderer::EndFrame() {
+	s_CurrentFrame.Info.DrawCalls = 0;
 	for(auto& command : s_CurrentFrame.DrawCommands) {
 		Flush(command);
 	}
@@ -119,7 +102,7 @@ void Renderer::Flush(DrawCommand& command) {
 
 	if(command.Clear)
 		Clear();
-	if(command.Size != { 0, 0 })
+	if(command.Size != glm::ivec2{ 0, 0 })
 		Resize(command.Size.x, command.Size.y);
 
 	command.Pass->SetUniforms();
@@ -137,46 +120,47 @@ void Renderer::Flush(DrawCommand& command) {
 	}
 }
 
+// TODO(Fix): Reuse draw calls, or have great buffer and partition it.
 List<DrawCall> Renderer::CreateDrawCalls(DrawCommand& command) {
 	auto& options = command.OptionsMap;
 	List<DrawCall> calls;
 
-	// TODO(Implement):
-	DrawCall pointCall{
-		.Type	   = options[DrawPrimitive::Point].Type,
-		.Partition	   = options[DrawPrimitive::Point].Partition,
-		.Primitive = DrawPrimitive::Point
-	};
-	for(auto& [point, transforms] : command.Points) {
-		Vertex p0;
+	// // TODO(Implement):
+	// DrawCall pointCall{
+	// 	.Type	   = options[DrawPrimitive::Point].Type,
+	// 	.Partition = options[DrawPrimitive::Point].Partition,
+	// 	.Primitive = DrawPrimitive::Point
+	// };
+	// for(auto& [point, transform] : command.Points) {
+	// 	Vertex p0;
 
-		p0.Position = point.Position * transforms[0];
-		p0.Normal = glm::vec3(0.0f);
-		p0.TexCoord_Color = point.Color;
+	// 	p0.Position = point->Position * transform[0];
+	// 	p0.Normal = glm::vec3(0.0f);
+	// 	p0.TexCoord_Color = point->Color;
 
-		pointCall.GeometryBuffer->Add(p0);
-	}
+	// 	pointCall.GeometryBuffer->Add(p0);
+	// }
 
-	// TODO(Implement):
-	DrawCall lineCall{
-		.Type	   = options[DrawPrimitive::Line].Type,
-		.Partition = options[DrawPrimitive::Line].Partition,
-		.Primitive = DrawPrimitive::Line
-	};
-	for(auto& [line, _] : command.Lines) {
-		Vertex p0, p1;
+	// // TODO(Implement):
+	// DrawCall lineCall{
+	// 	.Type	   = options[DrawPrimitive::Line].Type,
+	// 	.Partition = options[DrawPrimitive::Line].Partition,
+	// 	.Primitive = DrawPrimitive::Line
+	// };
+	// for(auto& [line, transform] : command.Lines) {
+	// 	Vertex p0, p1;
 
-		p0.Position		  = line.P0.Position;
-		p0.Normal		  = glm::vec3(0.0f);
-		p0.TexCoord_Color = line.P0.Color;
+	// 	p0.Position		  = line.P0.Position* transform[0];
+	// 	p0.Normal		  = glm::vec3(0.0f);
+	// 	p0.TexCoord_Color = line.P0.Color;
 
-		p1.Position		  = line.P1.Position;
-		p1.Normal		  = glm::vec3(0.0f);
-		p1.TexCoord_Color = line.P1.Color;
+	// 	p1.Position		  = line.P1.Position* transform[0];
+	// 	p1.Normal		  = glm::vec3(0.0f);
+	// 	p1.TexCoord_Color = line.P1.Color;
 
-		lineCall.GeometryBuffer->Add(p0);
-		lineCall.GeometryBuffer->Add(p1);
-	}
+	// 	lineCall.GeometryBuffer->Add(p0);
+	// 	lineCall.GeometryBuffer->Add(p1);
+	// }
 
 	if(options[DrawPrimitive::Mesh].Partition == DrawPartition::Multi) {
 		// TODO(Implement):
@@ -189,18 +173,49 @@ List<DrawCall> Renderer::CreateDrawCalls(DrawCommand& command) {
 			.Partition = options[DrawPrimitive::Mesh].Partition,
 			.Primitive = DrawPrimitive::Mesh
 		};
-
-		meshCall.GeometryBuffer->Add(mesh.GetVertices());
-		meshCall.IndexBuffer->Add(mesh.GetIndices());
+		meshCall.GeometryBuffer = Buffer<Vertex>(mesh->GetVertices());
+		meshCall.IndexBuffer = Buffer<uint32_t>(mesh->GetIndices());
 
 		if(meshCall.Partition == DrawPartition::Instanced) {
-			meshCall.TransformBuffer->Add(transforms);
+			meshCall.TransformBuffer = Buffer<glm::mat4>(transforms);
+			calls.push_back(meshCall);
 		}
-
-		calls.push_back(meshCall);
+		else {
+			// for(auto& tr : transforms)
+			// 	calls.push_back(meshCall);
+		}
 	}
 
 	return calls;
+}
+
+static DrawOptionsMap GetOrReturnDefaults(const DrawOptionsMap& map) {
+	DrawOptionsMap newMap =
+	{
+		{
+			DrawPrimitive::Point,
+			DrawOptions{
+				.Type = DrawType::Array,
+				.Partition = DrawPartition::Single
+			}
+		},
+		{
+			DrawPrimitive::Line,
+			DrawOptions{
+				.Type = DrawType::Array,
+				.Partition = DrawPartition::Single
+			}
+		},
+		{
+			DrawPrimitive::Mesh,
+			DrawOptions{
+				.Type = DrawType::Indexed,
+				.Partition = DrawPartition::Instanced
+			}
+		}
+	};
+
+	return newMap;
 }
 
 }

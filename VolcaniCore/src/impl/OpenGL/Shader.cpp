@@ -74,7 +74,7 @@ void ShaderProgram::SetFloat(const std::string& name, float _float) {
 }
 
 void ShaderProgram::SetTexture(const std::string& name,
-							   Ref<Texture> texture, uint32_t slot)
+								Ref<Texture> texture, uint32_t slot)
 {
 	VOLCANICORE_ASSERT(slot >= 0);
 

@@ -69,7 +69,8 @@ private:
 };
 
 Cube::Cube()
-	: Application(1920, 1080, "Cube Demo")
+	: Application(800, 600, "Cube Demo")
+	// : Application(1920, 1080, "Cube Demo")
 {
 	Events::RegisterListener<KeyPressedEvent>(
 	[](const KeyPressedEvent& event) {
@@ -77,16 +78,16 @@ Cube::Cube()
 			Application::Close();
 	});
 
-	Magma::UI::Init();
+	// Magma::UI::Init();
 
 	shader = ShaderPipeline::Create({
 		{ "VolcaniCore/assets/shaders/Mesh.glsl.vert", ShaderType::Vertex },
 		{ "VolcaniCore/assets/shaders/Mesh.glsl.frag", ShaderType::Fragment }
 	});
-	framebuffer = CreateRef<OpenGL::Framebuffer>(480, 270);
+	// framebuffer = CreateRef<OpenGL::Framebuffer>(480, 270);
 
 	renderPass = RenderPass::Create("Render Pass", shader);
-	renderPass->SetOutput(framebuffer);
+	// renderPass->SetOutput(framebuffer);
 
 	cube = Mesh::Create(MeshPrimitive::Cube,
 		Material{
@@ -111,23 +112,21 @@ Cube::Cube()
 }
 
 Cube::~Cube() {
-	Magma::UI::Close();
+	// Magma::UI::Close();
 }
 
 void Cube::OnUpdate(TimeStep ts) {
 	controller.OnUpdate(ts);
 
-	Renderer::Clear();
+	// Magma::UI::Begin();
+	// ImGui::Begin("Lights");
+	// {
+	// 	float r = camera->As<IsometricCamera>()->R;
+	// 	ImGui::SliderFloat("Light.R", &r, 0.0f, 10.0f);
 
-	Magma::UI::Begin();
-	ImGui::Begin("Lights");
-	{
-		float r = camera->As<IsometricCamera>()->R;
-		ImGui::SliderFloat("Light.R", &r, 0.0f, 10.0f);
-
-		camera->As<IsometricCamera>()->SetDistance(r);
-	}
-	ImGui::End();
+	// 	camera->As<IsometricCamera>()->SetDistance(r);
+	// }
+	// ImGui::End();
 
 	Renderer::StartPass(renderPass);
 	{
@@ -143,9 +142,12 @@ void Cube::OnUpdate(TimeStep ts) {
 	}
 	Renderer::EndPass();
 
-	RendererAPI::Get()->RenderFramebuffer(framebuffer, AttachmentTarget::Color);
+	VOLCANICORE_LOG_INFO("Draw Calls: %i", Renderer::GetDebugInfo().DrawCalls);
+	// VOLCANICORE_LOG_INFO("%f", Renderer::GetDebugInfo().FPS);
 
-	Magma::UI::End();
+	// RendererAPI::Get()->RenderFramebuffer(framebuffer, AttachmentTarget::Color);
+
+	// Magma::UI::End();
 }
 
 }

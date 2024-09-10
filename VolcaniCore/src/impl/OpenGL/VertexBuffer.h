@@ -2,8 +2,8 @@
 
 #include <glad/glad.h>
 
-#include <VolcaniCore/Core/Assert.h>
-#include <VolcaniCore/Core/Buffer.h>
+#include "Core/Assert.h"
+#include "Core/Buffer.h"
 
 #include "BufferLayout.h"
 
@@ -59,7 +59,7 @@ public:
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
 
-	void SetData(const void* data, uint32_t count = 1, uint32_t offset = 0) {
+	void SetData(const void* data, uint32_t count = 0, uint32_t offset = 0) {
 		glBindBuffer(GL_ARRAY_BUFFER, m_BufferID);
 		glBufferSubData(GL_ARRAY_BUFFER, offset * Layout.Stride,
 						(count == 0) ? Size : count * Layout.Stride, data);

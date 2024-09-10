@@ -9,10 +9,10 @@
 namespace VolcaniCore {
 
 template<typename TOut>
-using ValueCallback = Func<TOut(void)>;
+using ValueCallback = std::function<TOut(void)>;
 
 template<typename TOut>
-using UniformMap = Map<std::string, ValueCallback<TOut>>;
+using HandleMap = Map<std::string, ValueCallback<TOut>>;
 
 struct TextureSlot {
 	Ref<Texture> Sampler;
@@ -21,32 +21,32 @@ struct TextureSlot {
 
 class Uniforms {
 public:
-	UniformMap<uint32_t>	IntHandles;
-	UniformMap<float>		FloatHandles;
-	UniformMap<TextureSlot> TextureHandles;
+	HandleMap<uint32_t>	IntHandles;
+	HandleMap<float>	FloatHandles;
+	HandleMap<TextureSlot> TextureHandles;
 
-	UniformMap<glm::vec2> Vec2Handles;
-	UniformMap<glm::vec3> Vec3Handles;
-	UniformMap<glm::vec4> Vec4Handles;
+	HandleMap<glm::vec2> Vec2Handles;
+	HandleMap<glm::vec3> Vec3Handles;
+	HandleMap<glm::vec4> Vec4Handles;
 
-	UniformMap<glm::mat2> Mat2Handles;
-	UniformMap<glm::mat3> Mat3Handles;
-	UniformMap<glm::mat4> Mat4Handles;
+	HandleMap<glm::mat2> Mat2Handles;
+	HandleMap<glm::mat3> Mat3Handles;
+	HandleMap<glm::mat4> Mat4Handles;
 
 	template<typename TUniform>
 	void Set(const std::string& uniformName, ValueCallback<TUniform> callback)
 	{
-		GetUniforms<TUniform>()[uniformName] = callback;
+		GetHandles<TUniform>()[uniformName] = callback;
 	}
 
 	template<typename TUniform>
-	UniformMap<TUniform>& GetUniforms();
+	HandleMap<TUniform>& GetHandles();
 };
 
 class RenderPass {
 public:
 	static Ref<RenderPass> Create(const std::string& name,
-		Ref<ShaderPipeline> pipeline, const Handles& handles = { })
+		Ref<ShaderPipeline> pipeline, const Uniforms& handles = { })
 	{
 		return CreateRef<RenderPass>(name, pipeline, handles);
 	}

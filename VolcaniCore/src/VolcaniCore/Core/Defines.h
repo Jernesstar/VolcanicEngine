@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <string>
+// #include <string_view>
 #include <memory>
 #include <vector>
 #include <unordered_map>
@@ -33,7 +34,7 @@ using List = std::vector<TValue>;
 template<typename TKey, typename TValue>
 using Map = std::unordered_map<TKey, TValue>;
 
-template<typename TReturn, typename ...Args>
-using Func = std::function<TReturn(Args)>;
+// template<typename TReturn, class Input>
+// using Func = std::function<TReturn(Input)>;
 
 }
