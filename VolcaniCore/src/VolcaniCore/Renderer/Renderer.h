@@ -35,18 +35,21 @@ using DrawOptionsMap = Map<DrawPrimitive, DrawOptions>;
 
 struct DrawCommand {
 	Ref<RenderPass> Pass;
+	Uniforms PerUniforms;
 	DrawOptionsMap OptionsMap;
 
 	bool Clear = false;
 	glm::ivec2 Size;
 
+	Map<Ref<Point>, Buffer<glm::mat4>> Points;
+	Map<Ref<Line>,  Buffer<glm::mat4>> Lines;
+	Map<Ref<Mesh>,  Buffer<glm::mat4>> Meshes;
+
 	void AddPoint(Ref<Point> point, const glm::mat4& transform);
 	void AddLine(Ref<Line> line,	const glm::mat4& transform);
 	void AddMesh(Ref<Mesh> mesh,	const glm::mat4& transform);
 
-	Map<Ref<Point>, Buffer<glm::mat4>> Points;
-	Map<Ref<Line>,  Buffer<glm::mat4>> Lines;
-	Map<Ref<Mesh>,  Buffer<glm::mat4>> Meshes;
+	Uniforms& GetUniforms() { return PerUniforms; }
 };
 
 struct FrameDebugInfo {
@@ -63,11 +66,13 @@ struct FrameData {
 
 class Renderer {
 public:
-	static void StartPass(Ref<RenderPass> pass, const DrawOptionsMap& map = { });
+	static void StartPass(Ref<RenderPass> pass);
 	static void EndPass();
 
 	static void Clear(const glm::vec4& color = glm::vec4(0.0f));
 	static void Resize(uint32_t width, uint32_t height);
+
+	static void NewDrawCommand(const DrawOptionsMap& = { });
 
 	static void BeginFrame();
 	static void EndFrame();

@@ -50,23 +50,12 @@ FrameData& Renderer::GetFrame() {
 	return s_CurrentFrame;
 }
 
-static DrawOptionsMap GetOrReturnDefaults(const DrawOptionsMap& map);
 
-void Renderer::StartPass(Ref<RenderPass> pass, const DrawOptionsMap& map) {
+void Renderer::StartPass(Ref<RenderPass> pass) {
 	s_CurrentPass = pass;
-
-	DrawOptionsMap newMap = GetOrReturnDefaults(map);
-	s_CurrentDrawCommand = DrawCommand{
-		.Pass = pass,
-		.OptionsMap = newMap
-	};
 }
 
 void Renderer::EndPass() {
-	if(!s_CurrentPass)
-		return;
-
-	s_CurrentFrame.AddDrawCommand(s_CurrentDrawCommand);
 	s_CurrentPass = nullptr;
 }
 
@@ -76,6 +65,20 @@ void Renderer::Clear(const glm::vec4& color) {
 
 void Renderer::Resize(uint32_t width, uint32_t height) {
 	s_CurrentDrawCommand.Size = { width, height };
+}
+
+static DrawOptionsMap GetOrReturnDefaults(const DrawOptionsMap& map);
+
+void Renderer::NewDrawCommand(const DrawOptionsMap& map) {
+	DrawOptionsMap newMap = GetOrReturnDefaults(map);
+
+	auto newCommand = DrawCommand{
+		.Pass = s_CurrentPass,
+		.OptionsMap = newMap
+	};
+	s_CurrentFrame.AddDrawCommand(newCommand);
+	std::size_t lastIndex = s_CurrentFrame.DrawCommands.size();
+	s_CurrentDrawCommand = s_CurrentFrame.DrawCommands.at(lastIndex);
 }
 
 void Renderer::BeginFrame() {
@@ -99,6 +102,8 @@ void Renderer::Flush(DrawCommand& command) {
 		Resize(framebuffer->GetWidth(), framebuffer->GetHeight());
 		framebuffer->Bind();
 	}
+
+	command.Pass->GetPipeline()->Bind();
 
 	if(command.Clear)
 		Clear();

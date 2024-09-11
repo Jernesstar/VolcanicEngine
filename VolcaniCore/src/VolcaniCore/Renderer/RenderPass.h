@@ -57,21 +57,22 @@ public:
 public:
 	RenderPass(const std::string& name, Ref<ShaderPipeline> pipeline,
 				const Uniforms& uniforms = { })
-		: Name(name), m_Pipeline(pipeline), m_Uniforms(uniforms) { }
+		: Name(name), m_Pipeline(pipeline), m_GlobalUniforms(uniforms) { }
 	~RenderPass() = default;
 
 	void SetOutput(Ref<Framebuffer> output) {
 		m_Output = output;
 	}
 
+	void SetUniforms(const Uniforms& uniforms);
 	void SetUniforms();
 
 	Ref<ShaderPipeline> GetPipeline() const { return m_Pipeline; }
 	Ref<Framebuffer> GetOutput() const { return m_Output; }
-	Uniforms& GetUniforms() { return m_Uniforms; }
+	Uniforms& GetUniforms() { return m_GlobalUniforms; }
 
 private:
-	Uniforms m_Uniforms;
+	Uniforms m_GlobalUniforms;
 	Ref<Framebuffer> m_Output;
 	Ref<ShaderPipeline> m_Pipeline;
 };

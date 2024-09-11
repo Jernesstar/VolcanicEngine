@@ -2,14 +2,14 @@
 
 #include "Core/Assert.h"
 
-#define GET_HANDLES(T, Uniform) \
+#define GET_HANDLES(TUniform, Uniform) \
 template<> \
-HandleMap<T>& Uniforms::GetHandles<T>() { \
+HandleMap<TUniform>& Uniforms::GetHandles<TUniform>() { \
 	return Uniform##Handles; \
 }
 
 #define SET_UNIFORM(TUniform) \
-for(auto& [uniformName, valueCallback] : m_Uniforms.TUniform##Handles) \
+for(auto& [uniformName, valueCallback] : uniforms.TUniform##Handles) \
 	m_Pipeline->Set##TUniform(uniformName, valueCallback());
 
 namespace VolcaniCore {
@@ -24,12 +24,12 @@ GET_HANDLES(glm::mat2, Mat2)
 GET_HANDLES(glm::mat3, Mat3)
 GET_HANDLES(glm::mat4, Mat4)
 
-void RenderPass::SetUniforms() {
+void RenderPass::SetUniforms(const Uniforms& uniforms) {
 	m_Pipeline->Bind();
 
 	SET_UNIFORM(Int);
 	SET_UNIFORM(Float);
-	for(auto& [uniformName, callbackValue] : m_Uniforms.TextureHandles) {
+	for(auto& [uniformName, callbackValue] : uniforms.TextureHandles) {
 		auto slot = callbackValue();
 		if(slot.Sampler)
 			m_Pipeline->SetTexture(uniformName, slot.Sampler, slot.Index);
@@ -42,6 +42,10 @@ void RenderPass::SetUniforms() {
 	SET_UNIFORM(Mat2);
 	SET_UNIFORM(Mat3);
 	SET_UNIFORM(Mat4);
+}
+
+void RenderPass::SetUniforms() {
+	SetUniforms(m_GlobalUniforms);
 }
 
 }

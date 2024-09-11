@@ -1,7 +1,7 @@
 project "PhysX"
     kind "StaticLib"
     language "C++"
-    cppdialect "C++11"
+    -- cppdialect "C++11"
 
     objdir ("%{RootPath}/build/Magma/obj")
     targetdir ("%{RootPath}/build/Magma/lib")
@@ -55,10 +55,11 @@ project "PhysX"
         "%{VendorPaths.PhysX}/physx/source/scenequery/include",
         "%{VendorPaths.PhysX}/physx/source/simulationcontroller/src",
         "%{VendorPaths.PhysX}/physx/source/simulationcontroller/include",
+        "%{VendorPaths.PhysX}/physx/source/physx/src/device"
     }
 
     defines {
-        "PX_DEBUG",
+        -- "PX_DEBUG",
         "PX_CHECKED",
         "PX_PHYSX_STATIC_LIB",
         "PX_X64",
@@ -69,7 +70,6 @@ project "PhysX"
         "-O3",
         "-g3",
         "-gdwarf-2",
-        "-std=c++0x",
 
         "-Wno-unused-macros",
         "-Wno-invalid-offsetof",
@@ -78,28 +78,34 @@ project "PhysX"
 
     filter "system:linux"
         includedirs {
-            "%{VendorPaths.PhysX}/physx/source/physx/src/device"
+            "%{VendorPaths.PhysX}/physx/source/physx/src/device/linux/*.cpp"
         }
 
         files {
             "%{VendorPaths.PhysX}/physx/source/foundation/unix/*.cpp",
-            "%{VendorPaths.PhysX}/physx/source/physx/src/device/linux/*.cpp"
         }
 
         defines {
-            "PX_LINUX",
+            -- "PX_LINUX",
+        }
+
+        buildoptions {
+            "-std=c++0x",
         }
 
     filter "system:windows"
         includedirs {
-            "%{VendorPaths.PhysX}/physx/source/physx/src/device"
+            "%{VendorPaths.PhysX}/physx/source/physx/src/device/windows/*.cpp"
         }
 
         files {
             "%{VendorPaths.PhysX}/physx/source/foundation/windows/*.cpp",
-            "%{VendorPaths.PhysX}/physx/source/physx/src/device/windows/*.cpp"
         }
 
         defines {
-            "PX_WINDOWS",
+            -- "PX_WINDOWS",
+        }
+
+        buildoptions {
+            "-std=c++11",
         }
