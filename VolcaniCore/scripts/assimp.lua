@@ -2,6 +2,7 @@ project "assimp"
     kind "StaticLib"
     language "C++"
     cppdialect "C++latest"
+    staticruntime "On"
 
     objdir ("%{RootPath}/build/VolcaniCore/obj")
     targetdir ("%{RootPath}/build/VolcaniCore/lib")
@@ -17,7 +18,7 @@ project "assimp"
         -- "%{VendorPaths.assimp}/code/AssetLib/FBX/*.cpp",
         "%{VendorPaths.assimp}/contrib/clipper/**.cpp",
         "%{VendorPaths.assimp}/contrib/gtest/**.cpp",
-        "%{VendorPaths.assimp}/contrib/openddlparser/**.cpp",
+        -- "%{VendorPaths.assimp}/contrib/openddlparser/**.cpp",
         "%{VendorPaths.assimp}/contrib/poly2tri/**.cpp",
         "%{VendorPaths.assimp}/contrib/pugixml/**.cpp",
         "%{VendorPaths.assimp}/contrib/unzip/**.c",
@@ -54,16 +55,6 @@ project "assimp"
         "%{VendorPaths.assimp}/contrib/openddlparser/include",
     }
 
-    buildoptions {
-        "-w",
-        "-long-long",
-        "-O3",
-    }
-
-    links {
-        "zlib",
-    }
-
     defines {
         "ASSIMP_NO_EXPORT",
         "ASSIMP_BUILD_RELEASE",
@@ -94,8 +85,8 @@ project "assimp"
         "ASSIMP_BUILD_NO_GLTF_IMPORTER",
         "ASSIMP_BUILD_NO_HMP_IMPORTER",
         "ASSIMP_BUILD_NO_IFC_IMPORTER",
-        "ASSIMP_BUILD_NO_IQM_IMPORTER",
-        "ASSIMP_BUILD_NO_IRR_IMPORTER",
+        "ASSIMP_BUILD_NO_RR_IMPORTER",
+        "ASSIMP_BUILD_NO_IIQM_IMPORTER",
         "ASSIMP_BUILD_NO_IRRMESH_IMPORTER",
         "ASSIMP_BUILD_NO_LWO_IMPORTER",
         "ASSIMP_BUILD_NO_LWS_IMPORTER",
@@ -141,7 +132,13 @@ project "assimp"
         systemversion "latest"
 
     filter "toolset:gcc or toolset:clang"
+        links {
+            "zlib",
+        }
+
         buildoptions {
+            "-w",
+            "-long-long",
+            "-O3",
             "-W",
-            "-Wno-format-security"
         }

@@ -1,7 +1,8 @@
 project "PhysX"
     kind "StaticLib"
     language "C++"
-    -- cppdialect "C++11"
+    cppdialect "C++11"
+    staticruntime "On"
 
     objdir ("%{RootPath}/build/Magma/obj")
     targetdir ("%{RootPath}/build/Magma/lib")
@@ -58,16 +59,10 @@ project "PhysX"
     }
 
     defines {
-        "PX_CHECKED",
         "PX_PHYSX_STATIC_LIB",
+        "PX_CHECKED",
         "PX_X64",
         "PX_X86"
-    }
-
-    buildoptions {
-        "-O3",
-        "-g3",
-        "-gdwarf-2",
     }
 
     filter "system:linux"
@@ -93,11 +88,14 @@ project "PhysX"
         }
 
         buildoptions {
-            "-std=c++14",
+            -- "-std=c++14",
         }
 
     filter "toolset:gcc or toolset:clang"
         buildoptions {
+            "-O3",
+            "-g3",
+            "-gdwarf-2",
             "-Wno-invalid-offsetof",
             "-Wno-unused-macros"
         }

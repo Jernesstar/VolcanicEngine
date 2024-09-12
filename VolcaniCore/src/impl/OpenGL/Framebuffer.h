@@ -10,6 +10,8 @@ namespace VolcaniCore::OpenGL {
 
 enum class AttachmentType { Texture, RenderBuffer, None };
 
+class Framebuffer;
+
 class Attachment {
 public:
 	VolcaniCore::AttachmentTarget Target;

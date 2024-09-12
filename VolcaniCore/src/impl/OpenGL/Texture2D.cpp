@@ -25,7 +25,6 @@ Texture2D::Texture2D(uint32_t width, uint32_t height)
 Texture2D::Texture2D(const std::string& path)
 	: Texture(path), InternalFormat(GL_RGBA8), DataFormat(GL_RGBA)
 {
-	int width, height;
 	unsigned char* pixelData =
 		FileUtils::ReadImage(path.c_str(), m_Width, m_Height, 4, false);
 

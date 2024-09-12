@@ -2,6 +2,7 @@ project "VolcaniCore"
     kind "StaticLib"
     language "C++"
     cppdialect "C++latest"
+    staticruntime "On"
 
     objdir ("%{RootPath}/build/VolcaniCore/obj")
     targetdir ("%{RootPath}/build/VolcaniCore/lib")
@@ -25,6 +26,17 @@ project "VolcaniCore"
         "%{Includes.freetype}",
         "%{Includes.assimp}",
         "%{Includes.stb_image}"
+    }
+
+    links {
+        -- "bgfx",
+        -- "bimg",
+        -- "bx",
+        "glfw",
+        "glad",
+        "assimp",
+        "freetype",
+        "stb_image"
     }
 
     filter "toolset:gcc or toolset:clang"

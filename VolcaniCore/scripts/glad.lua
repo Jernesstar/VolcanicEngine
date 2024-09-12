@@ -1,6 +1,7 @@
 project "glad"
     kind "StaticLib"
     language "C"
+    staticruntime "On"
 
     objdir ("%{RootPath}/build/VolcaniCore/obj")
     targetdir ("%{RootPath}/build/VolcaniCore/lib")

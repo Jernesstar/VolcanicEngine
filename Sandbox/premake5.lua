@@ -4,6 +4,7 @@ project "Sandbox"
     cppdialect "C++latest"
     exceptionhandling "Off"
     rtti "Off"
+    staticruntime "On"
 
     objdir ("%{RootPath}/build/Sanbox/obj")
     targetdir ("%{RootPath}/build/Sanbox/bin")
@@ -42,20 +43,7 @@ project "Sandbox"
         "Magma",
         "VolcaniCore",
 
-        "imgui",
-        "yaml-cpp",
-        "ImGuiFileDialog",
         "flecs",
-        "PhysX",
-
-        -- "bgfx",
-        -- "bimg",
-        -- "bx",
-        "glfw",
-        "glad",
-        "assimp",
-        "freetype",
-        "stb_image"
     }
 
     filter "system:linux"
@@ -63,7 +51,7 @@ project "Sandbox"
             "pthread",
             "dl",
             "GL",
-            "X11"
+            "X11",
         }
 
     filter "system:windows"
@@ -72,10 +60,7 @@ project "Sandbox"
             "gdi32",
             "kernel32",
             "psapi",
-            "Ws2_32"
-        }
-        buildoptions {
-            "-fexceptions"
+            "Ws2_32",
         }
     filter "system:macosx"
         links {
@@ -88,5 +73,6 @@ project "Sandbox"
 
     filter "toolset:gcc or toolset:clang"
         buildoptions {
+            "-fexceptions",
             "-Wno-format-security"
         }
