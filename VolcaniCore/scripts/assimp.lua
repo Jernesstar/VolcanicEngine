@@ -46,7 +46,7 @@ project "assimp"
         "%{VendorPaths.assimp}/contrib/unzip",
         "%{VendorPaths.assimp}/contrib/zip/src",
         "%{VendorPaths.assimp}/contrib/zlib",
-        "%{VendorPaths.assimp}/contrib/zlib/src
+        "%{VendorPaths.assimp}/contrib/zlib/src",
         "%{VendorPaths.assimp}/contrib/pugixml/src",
         "%{VendorPaths.assimp}/contrib/utf8cpp/source",
         "%{VendorPaths.assimp}/contrib/rapidjson/include",

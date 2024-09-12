@@ -25,8 +25,6 @@ GET_HANDLES(glm::mat3, Mat3)
 GET_HANDLES(glm::mat4, Mat4)
 
 void RenderPass::SetUniforms(const Uniforms& uniforms) {
-	m_Pipeline->Bind();
-
 	SET_UNIFORM(Int);
 	SET_UNIFORM(Float);
 	for(auto& [uniformName, callbackValue] : uniforms.TextureHandles) {
@@ -45,6 +43,8 @@ void RenderPass::SetUniforms(const Uniforms& uniforms) {
 }
 
 void RenderPass::SetUniforms() {
+	m_Pipeline->Bind();
+
 	SetUniforms(m_GlobalUniforms);
 }
 

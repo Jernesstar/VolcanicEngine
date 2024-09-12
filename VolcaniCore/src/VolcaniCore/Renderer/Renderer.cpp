@@ -103,14 +103,15 @@ void Renderer::Flush(DrawCommand& command) {
 		framebuffer->Bind();
 	}
 
-	command.Pass->GetPipeline()->Bind();
+	if(s_CurrentDrawCommand.Pass != command.Pass)
+		command.Pass->SetUniforms();
+
+	command.Pass->SetUniforms(command.GetUniforms());
 
 	if(command.Clear)
 		Clear();
 	if(command.Size != glm::ivec2{ 0, 0 })
 		Resize(command.Size.x, command.Size.y);
-
-	command.Pass->SetUniforms();
 
 	auto calls = CreateDrawCalls(command);
 	for(auto& call : calls) {
@@ -123,6 +124,8 @@ void Renderer::Flush(DrawCommand& command) {
 		auto window = Application::GetWindow();
 		Resize(window->GetWidth(), window->GetHeight());
 	}
+
+	s_CurrentDrawCommand = command;
 }
 
 // TODO(Fix): Reuse draw calls, or have great buffer and partition it.
@@ -183,12 +186,9 @@ List<DrawCall> Renderer::CreateDrawCalls(DrawCommand& command) {
 
 		if(meshCall.Partition == DrawPartition::Instanced) {
 			meshCall.TransformBuffer = Buffer<glm::mat4>(transforms);
-			calls.push_back(meshCall);
 		}
-		else {
-			// for(auto& tr : transforms)
-			// 	calls.push_back(meshCall);
-		}
+
+		calls.push_back(meshCall);
 	}
 
 	return calls;

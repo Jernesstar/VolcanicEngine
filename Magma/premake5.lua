@@ -29,8 +29,10 @@ project "Magma"
         "%{Includes.imgui}",
     }
 
+
     filter "toolset:gcc or toolset:clang"
         buildoptions {
+            "-fexceptions",
             "-Wno-format-security"
         }
 

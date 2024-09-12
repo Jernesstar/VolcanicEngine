@@ -6,6 +6,11 @@ workspace "VolcanicEngine"
     filter "system:linux"
         defines "VOLCANICENGINE_LINUX"
 
+        buildoptions {
+            "-fexceptions",
+        }
+
+
     filter "system:windows"
         defines {
             "VOLCANICENGINE_WINDOWS",
