@@ -14,7 +14,7 @@ static PxShape* CreateTriangleMesh(Ref<Mesh> mesh);
 // static PxShape* CreateConvexMesh(Buffer<Vertex> data);
 
 Shape Shape::Create(Shape::Type type) {
-	
+	return Shape(type);
 }
 
 Shape::Shape(Ref<Mesh> mesh)
@@ -82,6 +82,7 @@ PxShape* CreatePlane() {
 PxShape* CreatCapsule() {
 	// auto material = GetPhysicsLib()->createMaterial(0.5f, 0.5f, 0.6f);
 	// return GetPhysicsLib()->createShape(PxCapsuleGeometry(), *material);
+	return nullptr;
 }
 
 // PxShape* CreateConvexMesh(Buffer<Vertex> data) {

@@ -29,9 +29,10 @@ project "Magma"
         "%{Includes.imgui}",
     }
 
-    buildoptions {
-        "-Wno-format-security"
-    }
+    filter "toolset:gcc or toolset:clang"
+        buildoptions {
+            "-Wno-format-security"
+        }
 
     filter "system:windows"
         systemversion "latest"

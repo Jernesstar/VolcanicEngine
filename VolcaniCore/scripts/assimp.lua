@@ -45,7 +45,8 @@ project "assimp"
         "%{VendorPaths.assimp}/contrib",
         "%{VendorPaths.assimp}/contrib/unzip",
         "%{VendorPaths.assimp}/contrib/zip/src",
-        "%{VendorPaths.assimp}/contrib/zlib/src",
+        "%{VendorPaths.assimp}/contrib/zlib",
+        "%{VendorPaths.assimp}/contrib/zlib/src
         "%{VendorPaths.assimp}/contrib/pugixml/src",
         "%{VendorPaths.assimp}/contrib/utf8cpp/source",
         "%{VendorPaths.assimp}/contrib/rapidjson/include",
@@ -55,7 +56,6 @@ project "assimp"
 
     buildoptions {
         "-w",
-        "-W",
         "-long-long",
         "-O3",
     }
@@ -139,3 +139,9 @@ project "assimp"
 
     filter "system:windows"
         systemversion "latest"
+
+    filter "toolset:gcc or toolset:clang"
+        buildoptions {
+            "-W",
+            "-Wno-format-security"
+        }

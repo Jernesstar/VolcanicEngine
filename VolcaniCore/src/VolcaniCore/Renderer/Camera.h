@@ -89,8 +89,8 @@ public:
 	const glm::mat4& GetProjection()     const { return Projection; }
 	const glm::mat4& GetViewProjection() const { return ViewProjection; }
 
-	float GetViewportWidth() const { return ViewportWidth; }
-	float GetViewportHeight() const { return ViewportHeight; }
+	uint32_t GetViewportWidth() const { return ViewportWidth; }
+	uint32_t GetViewportHeight() const { return ViewportHeight; }
 	float GetNear() const { return Near; }
 	float GetFar()	const { return Far; }
 

@@ -20,7 +20,7 @@ OrthographicCamera::OrthographicCamera(float rotation)
 	CalculateView();
 }
 
-OrthographicCamera::OrthographicCamera(float width, float height,
+OrthographicCamera::OrthographicCamera(uint32_t width, uint32_t height,
 									   float near, float far, float rotation)
 	: Camera(Camera::Type::Ortho, width, height, near, far),
 		m_Rotation(rotation)

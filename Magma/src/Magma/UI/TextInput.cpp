@@ -9,7 +9,8 @@ TextInput::TextInput(uint32_t maxChars)
 		MaxCharCount(maxChars), m_Text("") { }
 
 void TextInput::Draw() {
-	char input[MaxCharCount]{""};
+	//char input[MaxCharCount]{""};
+	char input[255]{ "" };
 
 	ImGui::InputText("##TextInput", input, sizeof(input));
 	m_Text = std::string(input);

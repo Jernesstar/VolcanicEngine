@@ -23,8 +23,12 @@ project "yaml-cpp"
     buildoptions {
         "-w",
         "-Wall",
-        "-Wextra",
-        "-Wshadow",
         "-Weffc++",
         "-Wno-long-long"
     }
+
+    filter "toolset:gcc or toolset:clang"
+        buildoptions {
+            "-Wshadow",
+            "-Wextra"
+        }

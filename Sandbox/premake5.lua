@@ -58,9 +58,13 @@ project "Sandbox"
         "stb_image"
     }
 
-    buildoptions {
-        "-Wno-format-security"
-    }
+    filter "system:linux"
+        links {
+            "pthread",
+            "dl",
+            "GL",
+            "X11"
+        }
 
     filter "system:windows"
         systemversion "latest"
@@ -70,14 +74,6 @@ project "Sandbox"
             "psapi",
             "Ws2_32"
         }
-    filter "system:linux"
-        links {
-            "pthread",
-            "dl",
-            "GL",
-            "X11"
-        }
-
         buildoptions {
             "-fexceptions"
         }
@@ -88,4 +84,9 @@ project "Sandbox"
             "Cocoa.framework",
             "IOKit.framework",
             "CoreVideo.framework"
+        }
+
+    filter "toolset:gcc or toolset:clang"
+        buildoptions {
+            "-Wno-format-security"
         }

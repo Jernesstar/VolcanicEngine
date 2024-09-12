@@ -7,7 +7,6 @@ project "PhysX"
     targetdir ("%{RootPath}/build/Magma/lib")
 
     files {
-        -- "%{VendorPaths.PhysX}/physx/**.h",
         "%{VendorPaths.PhysX}/physx/source/physx/src/*.cpp",
         "%{VendorPaths.PhysX}/physx/source/physx/src/gpu/*.cpp",
         "%{VendorPaths.PhysX}/physx/source/common/src/*.cpp",
@@ -59,7 +58,6 @@ project "PhysX"
     }
 
     defines {
-        -- "PX_DEBUG",
         "PX_CHECKED",
         "PX_PHYSX_STATIC_LIB",
         "PX_X64",
@@ -70,17 +68,9 @@ project "PhysX"
         "-O3",
         "-g3",
         "-gdwarf-2",
-
-        "-Wno-unused-macros",
-        "-Wno-invalid-offsetof",
-        "-Wno-attributes",
     }
 
     filter "system:linux"
-        includedirs {
-            "%{VendorPaths.PhysX}/physx/source/physx/src/device/linux/*.cpp"
-        }
-
         files {
             "%{VendorPaths.PhysX}/physx/source/foundation/unix/*.cpp",
         }
@@ -94,10 +84,6 @@ project "PhysX"
         }
 
     filter "system:windows"
-        includedirs {
-            "%{VendorPaths.PhysX}/physx/source/physx/src/device/windows/*.cpp"
-        }
-
         files {
             "%{VendorPaths.PhysX}/physx/source/foundation/windows/*.cpp",
         }
@@ -107,5 +93,11 @@ project "PhysX"
         }
 
         buildoptions {
-            "-std=c++11",
+            "-std=c++14",
+        }
+
+    filter "toolset:gcc or toolset:clang"
+        buildoptions {
+            "-Wno-invalid-offsetof",
+            "-Wno-unused-macros"
         }

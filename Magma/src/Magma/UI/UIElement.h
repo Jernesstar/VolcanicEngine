@@ -63,7 +63,7 @@ public:
 	float GetPositionX() const { return x; }
 	float GetPositionY() const { return y; }
 
-	UIElement* SetSize(float width, float height) {
+	UIElement* SetSize(uint32_t width, uint32_t height) {
 		this->m_Width = width;
 		this->m_Height = height;
 		return this;

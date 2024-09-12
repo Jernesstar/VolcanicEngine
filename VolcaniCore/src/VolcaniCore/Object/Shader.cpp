@@ -91,6 +91,8 @@ std::vector<ShaderFile> GetShaders(const std::string& shaderFolder,
 	{
 		shaders.push_back(TryGetShader(path));
 	}
+
+	return shaders;
 }
 
 ShaderFile TryGetShader(const std::string& path) {

@@ -8,7 +8,7 @@ class OrthographicCamera : public Camera {
 public:
 	OrthographicCamera();
 	OrthographicCamera(float rotation);
-	OrthographicCamera(float width, float height, float near, float far,
+	OrthographicCamera(uint32_t width, uint32_t height, float near, float far,
 						float rotation = 0.0f);
 	~OrthographicCamera() = default;
 
