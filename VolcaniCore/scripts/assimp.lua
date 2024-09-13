@@ -2,7 +2,7 @@ project "assimp"
     kind "StaticLib"
     language "C++"
     cppdialect "C++latest"
-    staticruntime "On"
+    staticruntime "Off"
 
     objdir ("%{RootPath}/build/VolcaniCore/obj")
     targetdir ("%{RootPath}/build/VolcaniCore/lib")
@@ -85,8 +85,8 @@ project "assimp"
         "ASSIMP_BUILD_NO_GLTF_IMPORTER",
         "ASSIMP_BUILD_NO_HMP_IMPORTER",
         "ASSIMP_BUILD_NO_IFC_IMPORTER",
-        "ASSIMP_BUILD_NO_RR_IMPORTER",
-        "ASSIMP_BUILD_NO_IIQM_IMPORTER",
+        "ASSIMP_BUILD_NO_IRR_IMPORTER",
+        "ASSIMP_BUILD_NO_IQM_IMPORTER",
         "ASSIMP_BUILD_NO_IRRMESH_IMPORTER",
         "ASSIMP_BUILD_NO_LWO_IMPORTER",
         "ASSIMP_BUILD_NO_LWS_IMPORTER",

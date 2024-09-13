@@ -2,7 +2,7 @@ project "PhysX"
     kind "StaticLib"
     language "C++"
     cppdialect "C++11"
-    staticruntime "On"
+    staticruntime "Off"
 
     objdir ("%{RootPath}/build/Magma/obj")
     targetdir ("%{RootPath}/build/Magma/lib")

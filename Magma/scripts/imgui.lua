@@ -1,8 +1,8 @@
 project "imgui"
     kind "StaticLib"
     language "C++"
-    cppdialect "C++20"
-    staticruntime "On"
+    cppdialect "C++latest"
+    staticruntime "Off"
 
     objdir ("%{RootPath}/build/Magma/obj")
     targetdir ("%{RootPath}/build/Magma/lib")

@@ -2,7 +2,7 @@ project "Magma"
     kind "StaticLib"
     language "C++"
     cppdialect "C++latest"
-    staticruntime "On"
+    staticruntime "Off"
 
     objdir ("%{RootPath}/build/Magma/obj")
     targetdir ("%{RootPath}/build/Magma/lib")

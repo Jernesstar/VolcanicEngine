@@ -1,5 +1,7 @@
 #pragma once
 
+#define PX_PHYSX_STATIC_LIB
+
 #include <PxPhysics.h>
 #include <PxPhysicsAPI.h>
 

@@ -1,5 +1,6 @@
 #pragma once
 
+#define flecs_STATIC
 #include <flecs.h>
 
 #include "Component.h"

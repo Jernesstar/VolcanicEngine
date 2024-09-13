@@ -2,7 +2,7 @@ project "yaml-cpp"
     kind "StaticLib"
     language "C++"
     cppdialect "C++latest"
-    staticruntime "On"
+    staticruntime "Off"
 
     objdir ("%{RootPath}/build/Magma/obj")
     targetdir ("%{RootPath}/build/Magma/lib")
@@ -29,8 +29,8 @@ project "yaml-cpp"
 
     filter "toolset:gcc or toolset:clang"
         buildoptions {
-            "-Wno-long-long",
-            "-Weffc++",
+            "-Wextra",
             "-Wshadow",
-            "-Wextra"
+            "-Weffc++",
+            "-Wno-long-long",
         }

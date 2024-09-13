@@ -1,7 +1,8 @@
 project "flecs"
     kind "StaticLib"
     language "C"
-    staticruntime "On"
+--    staticruntime "On"
+    staticruntime "Off"
 
     objdir ("%{RootPath}/build/Magma/obj")
     targetdir ("%{RootPath}/build/Magma/lib")
@@ -16,7 +17,7 @@ project "flecs"
     }
 
     defines {
-        -- ~"flecs_STATIC",
+        "flecs_STATIC",
         "FLECS_DEBUG",
         -- "FLECS_CUSTOM_BUILD",
         -- "FLECS_CPP",

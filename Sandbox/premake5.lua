@@ -2,9 +2,9 @@ project "Sandbox"
     kind "ConsoleApp"
     language "C++"
     cppdialect "C++latest"
-    exceptionhandling "Off"
-    rtti "Off"
-    staticruntime "On"
+    -- exceptionhandling "On"
+    -- rtti "On"
+    staticruntime "Off"
 
     objdir ("%{RootPath}/build/Sanbox/obj")
     targetdir ("%{RootPath}/build/Sanbox/bin")
@@ -42,8 +42,6 @@ project "Sandbox"
     links {
         "Magma",
         "VolcaniCore",
-
-        "flecs",
     }
 
     filter "system:linux"
@@ -71,8 +69,17 @@ project "Sandbox"
             "CoreVideo.framework"
         }
 
+	filter "configurations:Debug"
+		runtime "Debug"
+		symbols "on"
+
     filter "toolset:gcc or toolset:clang"
         buildoptions {
             "-fexceptions",
             "-Wno-format-security"
+        }
+
+    filter "toolset:msc"
+        buildoptions {
+            "/NODEFAULTLIB:library"
         }
