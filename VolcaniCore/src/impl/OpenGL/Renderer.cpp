@@ -148,7 +148,9 @@ void Renderer::Init() {
 	// TODO(Change): Turn into MappedBuffer
 	s_Data.TransformBuffer = CreateRef<VertexBuffer>(
 		BufferLayout{
-			{ "Transform", BufferDataType::Mat4 }
+			{ "Transform", BufferDataType::Mat4 },
+			false, // Dynamic
+			true, // Structure of arrays
 		},
 		RendererData::MaxInstances
 	);

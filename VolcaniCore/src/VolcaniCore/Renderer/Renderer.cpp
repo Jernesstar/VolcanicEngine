@@ -162,11 +162,11 @@ List<DrawCall> CreateDrawCalls(DrawCommand& command) {
 	// for(auto& [line, transform] : command.Lines) {
 	// 	Vertex p0, p1;
 
-	// 	p0.Position		  = line.P0.Position* transform[0];
+	// 	p0.Position		  = line.P0.Position * transform[0];
 	// 	p0.Normal		  = glm::vec3(0.0f);
 	// 	p0.TexCoord_Color = line.P0.Color;
 
-	// 	p1.Position		  = line.P1.Position* transform[0];
+	// 	p1.Position		  = line.P1.Position * transform[0];
 	// 	p1.Normal		  = glm::vec3(0.0f);
 	// 	p1.TexCoord_Color = line.P1.Color;
 
@@ -192,6 +192,7 @@ List<DrawCall> CreateDrawCalls(DrawCommand& command) {
 
 		if(meshCall.Type == DrawType::Indexed)
 			meshCall.IndexBuffer = Buffer<uint32_t>(mesh->GetIndices());
+
 		if(meshCall.Partition == DrawPartition::Instanced)
 			meshCall.TransformBuffer = Buffer<glm::mat4>(transforms);
 
