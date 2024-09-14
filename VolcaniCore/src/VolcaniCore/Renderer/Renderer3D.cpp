@@ -51,6 +51,8 @@ void Renderer3D::DrawMesh(Ref<Mesh> mesh, const glm::mat4& tr) {
 			Material material = mesh->GetMaterial();
 			return TextureSlot{ material.Specular, 1 };
 		});
+	// uniforms
+	// .Set<TextureSlot>("u_Model")
 
 	command.AddMesh(mesh, tr);
 }

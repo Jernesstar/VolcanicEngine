@@ -42,7 +42,7 @@ void RenderPass::SetUniforms(const Uniforms& uniforms) {
 	SET_UNIFORM(Mat4);
 }
 
-void RenderPass::SetUniforms() {
+void RenderPass::SetGlobalUniforms() {
 	m_Pipeline->Bind();
 
 	SetUniforms(m_GlobalUniforms);

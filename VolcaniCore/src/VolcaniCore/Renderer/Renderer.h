@@ -69,25 +69,22 @@ public:
 	static void StartPass(Ref<RenderPass> pass);
 	static void EndPass();
 
+	static void NewDrawCommand(const DrawOptionsMap& = { });
+
 	static void Clear(const glm::vec4& color = glm::vec4(0.0f));
 	static void Resize(uint32_t width, uint32_t height);
-
-	static void NewDrawCommand(const DrawOptionsMap& = { });
 
 	static void BeginFrame();
 	static void EndFrame();
 
 	static Ref<RenderPass> GetPass();
 	static DrawCommand& GetDrawCommand();
-	static FrameDebugInfo& GetDebugInfo();
+	static FrameDebugInfo GetDebugInfo();
 
 private:
 	static void Init();
 	static void Close();
 	static FrameData& GetFrame();
-
-	static void Flush(DrawCommand& command);
-	static List<DrawCall> CreateDrawCalls(DrawCommand& command);
 
 	friend class Application;
 };

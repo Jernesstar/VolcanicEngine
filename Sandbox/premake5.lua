@@ -42,6 +42,18 @@ project "Sandbox"
     links {
         "Magma",
         "VolcaniCore",
+
+        "glfw",
+        "glad",
+        "assimp",
+        "freetype",
+        "stb_image",
+
+        "imgui",
+        "yaml-cpp",
+        "ImGuiFileDialog",
+        "flecs",
+        "PhysX",
     }
 
     filter "system:linux"

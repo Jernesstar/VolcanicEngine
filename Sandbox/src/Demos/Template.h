@@ -35,7 +35,7 @@ Template::Template() {
 
 	VOLCANICORE_LOG_INFO("Template Project Started");
 
-	buffer = Buffer<glm::mat4>(6);
+	buffer = Buffer<glm::mat4>(5);
 
 	while(buffer.GetCount() < 5) {
 		buffer.Add(glm::mat4(1.0f));

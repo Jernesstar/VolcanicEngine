@@ -64,8 +64,8 @@ public:
 		m_Output = output;
 	}
 
+	void SetGlobalUniforms();
 	void SetUniforms(const Uniforms& uniforms);
-	void SetUniforms();
 
 	Ref<ShaderPipeline> GetPipeline() const { return m_Pipeline; }
 	Ref<Framebuffer> GetOutput() const { return m_Output; }

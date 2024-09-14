@@ -8,9 +8,9 @@
 
 namespace VolcaniCore {
 
-static Ref<RenderPass> s_CurrentPass;
-static DrawCommand s_CurrentDrawCommand;
-static FrameData s_CurrentFrame;
+static Ref<RenderPass> s_RenderPass;
+static DrawCommand* s_DrawCommand;
+static FrameData s_Frame;
 
 void DrawCommand::AddPoint(Ref<Point> point, const glm::mat4& transform) {
 	Points[point].Add(transform);
@@ -29,7 +29,7 @@ void FrameData::AddDrawCommand(DrawCommand command) {
 }
 
 void Renderer::Init() {
-	s_CurrentFrame = { };
+	s_Frame = { };
 }
 
 void Renderer::Close() {
@@ -37,48 +37,52 @@ void Renderer::Close() {
 }
 
 Ref<RenderPass> Renderer::GetPass() {
-	return s_CurrentPass;
+	return s_RenderPass;
 }
 DrawCommand& Renderer::GetDrawCommand() {
-	return s_CurrentDrawCommand;
+	return *s_DrawCommand;
 }
-FrameDebugInfo& Renderer::GetDebugInfo() {
-	return s_CurrentFrame.Info;
+FrameDebugInfo Renderer::GetDebugInfo() {
+	return s_Frame.Info;
 }
 
 FrameData& Renderer::GetFrame() {
-	return s_CurrentFrame;
+	return s_Frame;
 }
 
+static void Flush(DrawCommand& command);
+static List<DrawCall> CreateDrawCalls(DrawCommand& command);
+static DrawOptionsMap GetOrReturnDefaults(const DrawOptionsMap& map);
 
 void Renderer::StartPass(Ref<RenderPass> pass) {
-	s_CurrentPass = pass;
+	s_RenderPass = pass;
+
+	NewDrawCommand();
 }
 
 void Renderer::EndPass() {
-	s_CurrentPass = nullptr;
+	s_RenderPass = nullptr;
+	s_DrawCommand = nullptr;
 }
-
-void Renderer::Clear(const glm::vec4& color) {
-	s_CurrentDrawCommand.Clear = true;
-}
-
-void Renderer::Resize(uint32_t width, uint32_t height) {
-	s_CurrentDrawCommand.Size = { width, height };
-}
-
-static DrawOptionsMap GetOrReturnDefaults(const DrawOptionsMap& map);
 
 void Renderer::NewDrawCommand(const DrawOptionsMap& map) {
 	DrawOptionsMap newMap = GetOrReturnDefaults(map);
 
 	auto newCommand = DrawCommand{
-		.Pass = s_CurrentPass,
-		.OptionsMap = newMap
+		.Pass = s_RenderPass,
+		.OptionsMap = newMap,
 	};
-	s_CurrentFrame.AddDrawCommand(newCommand);
-	std::size_t lastIndex = s_CurrentFrame.DrawCommands.size();
-	s_CurrentDrawCommand = s_CurrentFrame.DrawCommands.at(lastIndex);
+	s_Frame.AddDrawCommand(newCommand);
+	std::size_t lastIndex = s_Frame.DrawCommands.size() - 1;
+	s_DrawCommand = &s_Frame.DrawCommands[lastIndex];
+}
+
+void Renderer::Clear(const glm::vec4& color) {
+	s_DrawCommand->Clear = true;
+}
+
+void Renderer::Resize(uint32_t width, uint32_t height) {
+	s_DrawCommand->Size = { width, height };
 }
 
 void Renderer::BeginFrame() {
@@ -86,50 +90,50 @@ void Renderer::BeginFrame() {
 }
 
 void Renderer::EndFrame() {
-	s_CurrentFrame.Info.DrawCalls = 0;
-	for(auto& command : s_CurrentFrame.DrawCommands) {
+	s_Frame.Info.DrawCalls = 0;
+	for(auto& command : s_Frame.DrawCommands) {
 		Flush(command);
 	}
 
-	s_CurrentFrame.DrawCommands.clear();
+	s_Frame.DrawCommands.clear();
 
 	RendererAPI::Get()->EndFrame();
 }
 
-void Renderer::Flush(DrawCommand& command) {
+void Flush(DrawCommand& command) {
 	auto framebuffer = command.Pass->GetOutput();
 	if(framebuffer) {
-		Resize(framebuffer->GetWidth(), framebuffer->GetHeight());
+		RendererAPI::Get()
+			->Resize(framebuffer->GetWidth(),framebuffer->GetHeight());
 		framebuffer->Bind();
 	}
 
-	if(s_CurrentDrawCommand.Pass != command.Pass)
-		command.Pass->SetUniforms();
+	// if(s_DrawCommand->Pass != command.Pass)
+		// command.Pass->SetUniforms();
 
+	command.Pass->SetGlobalUniforms();
 	command.Pass->SetUniforms(command.GetUniforms());
 
 	if(command.Clear)
-		Clear();
+		RendererAPI::Get()->Clear({ 0.0f, 1.0f, 1.0f, 1.0f });
 	if(command.Size != glm::ivec2{ 0, 0 })
-		Resize(command.Size.x, command.Size.y);
+		RendererAPI::Get()->Resize(command.Size.x, command.Size.y);
 
-	auto calls = CreateDrawCalls(command);
-	for(auto& call : calls) {
+	for(auto call : CreateDrawCalls(command)) {
 		RendererAPI::Get()->SubmitDrawCall(call);
-		s_CurrentFrame.Info.DrawCalls++;
+		s_Frame.Info.DrawCalls++;
 	}
 
 	if(framebuffer) {
 		framebuffer->Unbind();
 		auto window = Application::GetWindow();
-		Resize(window->GetWidth(), window->GetHeight());
+		RendererAPI::Get()->Resize(window->GetWidth(), window->GetHeight());
 	}
 
-	s_CurrentDrawCommand = command;
+	// s_DrawCommand = &command;
 }
 
-// TODO(Fix): Reuse draw calls, or have great buffer and partition it.
-List<DrawCall> Renderer::CreateDrawCalls(DrawCommand& command) {
+List<DrawCall> CreateDrawCalls(DrawCommand& command) {
 	auto& options = command.OptionsMap;
 	List<DrawCall> calls;
 
@@ -172,21 +176,24 @@ List<DrawCall> Renderer::CreateDrawCalls(DrawCommand& command) {
 
 	if(options[DrawPrimitive::Mesh].Partition == DrawPartition::Multi) {
 		// TODO(Implement):
+
 		return calls;
 	}
 
-	for(auto& [mesh, transforms] : command.Meshes) {
+	for(auto [mesh, transforms] : command.Meshes) {
 		DrawCall meshCall{
-			.Type = DrawType::Indexed,
+			.Type	   = options[DrawPrimitive::Mesh].Type,
 			.Partition = options[DrawPrimitive::Mesh].Partition,
 			.Primitive = DrawPrimitive::Mesh
 		};
-		meshCall.GeometryBuffer = Buffer<Vertex>(mesh->GetVertices());
-		meshCall.IndexBuffer = Buffer<uint32_t>(mesh->GetIndices());
 
-		if(meshCall.Partition == DrawPartition::Instanced) {
+		// TODO(Fix): Have a big buffer and partition it
+		meshCall.GeometryBuffer = Buffer<Vertex>(mesh->GetVertices());
+
+		if(meshCall.Type == DrawType::Indexed)
+			meshCall.IndexBuffer = Buffer<uint32_t>(mesh->GetIndices());
+		if(meshCall.Partition == DrawPartition::Instanced)
 			meshCall.TransformBuffer = Buffer<glm::mat4>(transforms);
-		}
 
 		calls.push_back(meshCall);
 	}
@@ -194,7 +201,7 @@ List<DrawCall> Renderer::CreateDrawCalls(DrawCommand& command) {
 	return calls;
 }
 
-static DrawOptionsMap GetOrReturnDefaults(const DrawOptionsMap& map) {
+DrawOptionsMap GetOrReturnDefaults(const DrawOptionsMap& map) {
 	DrawOptionsMap newMap =
 	{
 		{
