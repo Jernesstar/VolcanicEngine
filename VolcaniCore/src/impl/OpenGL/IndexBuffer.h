@@ -2,6 +2,8 @@
 
 #include <glad/glad.h>
 
+#include "Core/Buffer.h"
+
 namespace VolcaniCore::OpenGL {
 
 class IndexBuffer {
@@ -9,25 +11,35 @@ public:
 	const uint32_t Count;
 	const uint32_t Size;
 
-	template<std::size_t TCount>
-	IndexBuffer(const uint32_t (&indices)[TCount])
-		: Count(Count), Size(TCount * sizeof(uint32_t))
-	{
-		glCreateBuffers(1, &m_BufferID);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_BufferID);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, Count * sizeof(uint32_t), indices,
-					 GL_STATIC_DRAW);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	}
-
+public:
 	IndexBuffer(uint32_t count, const uint32_t* indices = nullptr,
 				bool dynamic = false)
 		: Count(count), Size(count * sizeof(uint32_t))
 	{
 		glCreateBuffers(1, &m_BufferID);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_BufferID);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, Count * sizeof(uint32_t), indices,
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, Size, indices,
 					 dynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	}
+
+	IndexBuffer(Buffer<uint32_t> buffer, bool dynamic = false)
+		: Count(buffer.GetCount()), Size(buffer.GetSize())
+	{
+		glCreateBuffers(1, &m_BufferID);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_BufferID);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, Size, buffer.Get(),
+					 dynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	}
+
+	template<std::size_t TCount>
+	IndexBuffer(const uint32_t (&indices)[TCount])
+		: Count(TCount), Size(TCount * sizeof(uint32_t))
+	{
+		glCreateBuffers(1, &m_BufferID);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_BufferID);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, Size, indices, GL_STATIC_DRAW);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
 
@@ -50,6 +62,11 @@ public:
 
 	void SetData(Buffer<uint32_t> buffer, uint32_t offset = 0) {
 		SetData(buffer.Get(), buffer.GetCount(), offset);
+	}
+
+	template<std::size_t TCount>
+	void SetData(const uint32_t (&vertices)[TCount]) {
+		SetData(vertices, TCount);
 	}
 
 private:

@@ -45,6 +45,16 @@ void VertexArray::Unbind() const {
 	glBindVertexArray(0);
 }
 
+void VertexArray::SetIndexBuffer(Ref<IndexBuffer> indexBuffer) {
+	if(!indexBuffer)
+		return;
+
+	glBindVertexArray(m_VertexArrayID);
+	indexBuffer->Bind();
+
+	m_IndexBuffer = indexBuffer;
+}
+
 void VertexArray::AddVertexBuffer(Ref<VertexBuffer> vertexBuffer) {
 	VOLCANICORE_ASSERT(vertexBuffer, "Vertex buffer was null");
 
@@ -60,6 +70,14 @@ void VertexArray::AddVertexBuffer(Ref<VertexBuffer> vertexBuffer) {
 
 	for(auto& element : layout) {
 		switch(element.Type) {
+			case BufferDataType::Int:
+			{
+				glEnableVertexAttribArray(m_BufferIndex);
+				glVertexAttribIPointer(m_BufferIndex++, element.Count, GL_INT,
+										stride, (void*)offset);
+
+				break;
+			}
 			case BufferDataType::Float:
 			case BufferDataType::Vec2:
 			case BufferDataType::Vec3:
@@ -71,16 +89,6 @@ void VertexArray::AddVertexBuffer(Ref<VertexBuffer> vertexBuffer) {
 									  stride, (void*)offset);
 				break;
 			}
-
-			case BufferDataType::Int:
-			{
-				glEnableVertexAttribArray(m_BufferIndex);
-				glVertexAttribIPointer(m_BufferIndex++, element.Count, GL_INT,
-									   stride, (void*)offset);
-
-				break;
-			}
-
 			case BufferDataType::Mat2:
 			case BufferDataType::Mat3:
 			case BufferDataType::Mat4:
@@ -90,7 +98,8 @@ void VertexArray::AddVertexBuffer(Ref<VertexBuffer> vertexBuffer) {
 					glVertexAttribPointer(m_BufferIndex, element.Count,
 						GL_FLOAT, element.Normalized ? GL_FALSE : GL_TRUE,
 						stride,
-						(void*)(offset + (sizeof(float) * element.Count * i)));
+						(void*)(offset + (sizeof(float) * element.Count * i))
+					);
 
 					glVertexAttribDivisor(m_BufferIndex++, 1);
 				}
@@ -101,16 +110,6 @@ void VertexArray::AddVertexBuffer(Ref<VertexBuffer> vertexBuffer) {
 	}
 
 	m_VertexBuffers.push_back(vertexBuffer);
-}
-
-void VertexArray::SetIndexBuffer(Ref<IndexBuffer> indexBuffer) {
-	if(!indexBuffer)
-		return;
-
-	glBindVertexArray(m_VertexArrayID);
-	indexBuffer->Bind();
-
-	m_IndexBuffer = indexBuffer;
 }
 
 }

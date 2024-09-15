@@ -19,8 +19,8 @@ public:
 
 	BufferElement(const std::string& name, BufferDataType type,
 				  bool normalized = true)
-		: Name(name), Type(type), Normalized(normalized), Size(CalcSize(type)),
-			Count(CalcCount(type)) { }
+		: Name(name), Type(type), Normalized(normalized),
+			Size(CalcSize(type)), Count(CalcCount(type)) { }
 
 private:
 	static uint32_t CalcSize(BufferDataType type);
@@ -38,7 +38,7 @@ public:
 	BufferLayout(const std::initializer_list<BufferElement>& elements,
 				 bool dynamic = true, bool structureOfArrays = false)
 		: Elements(elements), Stride(CalcStride(elements)),
-			StructureOfArrays(structureOfArrays), Dynamic(dynamic) { }
+			Dynamic(dynamic), StructureOfArrays(structureOfArrays) { }
 
 	std::vector<BufferElement>::const_iterator begin() const {
 		return Elements.begin();

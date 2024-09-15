@@ -24,6 +24,7 @@ public:
 		glBindBuffer(GL_ARRAY_BUFFER, m_BufferID);
 		glBufferData(GL_ARRAY_BUFFER, Size, data,
 					 layout.Dynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
 
 	template<typename T>
@@ -34,8 +35,9 @@ public:
 
 		glCreateBuffers(1, &m_BufferID);
 		glBindBuffer(GL_ARRAY_BUFFER, m_BufferID);
-		glBufferData(GL_ARRAY_BUFFER, buffer.GetSize(), buffer.Get(),
+		glBufferData(GL_ARRAY_BUFFER, Size, buffer.Get(),
 					 layout.Dynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
 
 	template<typename T, std::size_t TCount>
@@ -46,6 +48,7 @@ public:
 		glBindBuffer(GL_ARRAY_BUFFER, m_BufferID);
 		glBufferData(GL_ARRAY_BUFFER, Size, vertices,
 					 layout.Dynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
 
 	~VertexBuffer() {
@@ -72,8 +75,7 @@ public:
 
 	template<typename T, std::size_t TCount>
 	void SetData(const T (&vertices)[TCount]) {
-		glBindBuffer(GL_ARRAY_BUFFER, m_BufferID);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, TCount * Layout.Stride, vertices);
+		SetData(vertices, TCount);
 	}
 
 private:

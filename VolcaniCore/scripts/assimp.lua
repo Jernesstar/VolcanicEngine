@@ -1,7 +1,7 @@
 project "assimp"
     kind "StaticLib"
     language "C++"
-    cppdialect "C++latest"
+    cppdialect "C++11"
     staticruntime "Off"
 
     objdir ("%{RootPath}/build/VolcaniCore/obj")

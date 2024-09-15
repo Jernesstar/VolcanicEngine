@@ -115,9 +115,9 @@ void Flush(DrawCommand& command) {
 	command.Pass->SetUniforms(command.GetUniforms());
 
 	if(command.Clear)
-		RendererAPI::Get()->Clear({ 0.0f, 1.0f, 1.0f, 1.0f });
-	if(command.Size != glm::ivec2{ 0, 0 })
-		RendererAPI::Get()->Resize(command.Size.x, command.Size.y);
+		RendererAPI::Get()->Clear();
+	// if(command.Size != glm::ivec2{ 0, 0 })
+	// 	RendererAPI::Get()->Resize(command.Size.x, command.Size.y);
 
 	for(auto call : CreateDrawCalls(command)) {
 		RendererAPI::Get()->SubmitDrawCall(call);
@@ -223,7 +223,7 @@ DrawOptionsMap GetOrReturnDefaults(const DrawOptionsMap& map) {
 			DrawPrimitive::Mesh,
 			DrawOptions{
 				.Type = DrawType::Indexed,
-				.Partition = DrawPartition::Instanced
+				.Partition = DrawPartition::Single
 			}
 		}
 	};

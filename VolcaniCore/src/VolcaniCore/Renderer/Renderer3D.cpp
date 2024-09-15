@@ -36,6 +36,12 @@ void Renderer3D::DrawMesh(Ref<Mesh> mesh, const glm::mat4& tr) {
 	if(!mesh)
 		return;
 
+	// if(Renderer::GetDrawCommand()
+	// 	.OptionsMap[DrawPrimitive::Mesh].Partition == DrawPartition::Single
+	// )
+	// {
+	// 	Renderer::NewDrawCommand();
+	// }
 	auto& command = Renderer::GetDrawCommand();
 	auto& uniforms = command.GetUniforms();
 
@@ -50,6 +56,11 @@ void Renderer3D::DrawMesh(Ref<Mesh> mesh, const glm::mat4& tr) {
 		[mesh]() {
 			Material material = mesh->GetMaterial();
 			return TextureSlot{ material.Specular, 1 };
+		});
+	uniforms
+	.Set<glm::mat4>("u_Model",
+		[tr]() {
+			return tr;
 		});
 
 	command.AddMesh(mesh, tr);

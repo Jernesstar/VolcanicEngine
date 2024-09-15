@@ -13,7 +13,7 @@
 	},
 
 	"features": {
-		"ghcr.io/devcontainers/features/desktop-lite:1.2.0": {}
+		"ghcr.io/devcontainers/features/desktop-lite:1.2.5": {}
 	},
 
 	"build": {
@@ -28,5 +28,6 @@
 		}
 	},
 
-	"remoteUser": "root"
+	"remoteUser": "root",
+	"containerUser": "root"
 }

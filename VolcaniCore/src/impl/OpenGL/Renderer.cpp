@@ -24,10 +24,10 @@ using namespace VolcaniCore;
 namespace VolcaniCore::OpenGL {
 
 struct RendererData {
-	static const uint32_t MaxInstances = 100'000;
-	static const uint32_t MaxTriangles = 1'000'000'000;
-	static const uint32_t MaxVertices = MaxTriangles * 3;
-	static const uint32_t MaxIndices = MaxVertices * 2/* (3.0f / 2.0f) */;
+	static const uint32_t MaxInstances = 100;
+	static const uint32_t MaxTriangles = 1'000'000;
+	static const uint32_t MaxVertices  = MaxTriangles * 3;
+	static const uint32_t MaxIndices   = MaxVertices  * 2/* (3.0f / 2.0f) */;
 
 	Ptr<VertexArray> CubemapArray;
 	Ptr<VertexArray> FramebufferArray;
@@ -139,27 +139,31 @@ void Renderer::Init() {
 
 	s_Data.GeometryBuffer = CreateRef<VertexBuffer>(
 		BufferLayout{
-			{ "Coordinate", BufferDataType::Vec3 },
-			{ "Normal",		BufferDataType::Vec3 },
-			{ "TexCoord_Color", BufferDataType::Vec4 },
+			{
+				{ "Coordinate", BufferDataType::Vec3 },
+				{ "Normal",		BufferDataType::Vec3 },
+				{ "TexCoord_Color", BufferDataType::Vec4 },
+			},
+			true, // Dynamic
+			false // Structure of arrays
 		},
 		RendererData::MaxVertices
 	);
 	// TODO(Change): Turn into MappedBuffer
 	s_Data.TransformBuffer = CreateRef<VertexBuffer>(
 		BufferLayout{
-			{ "Transform", BufferDataType::Mat4 },
-			false, // Dynamic
+			{ { "Transform", BufferDataType::Mat4 } },
+			true, // Dynamic
 			true, // Structure of arrays
 		},
 		RendererData::MaxInstances
 	);
-	s_Data.Indices = CreateRef<IndexBuffer>(RendererData::MaxIndices);
+	s_Data.Indices = CreateRef<IndexBuffer>(RendererData::MaxIndices, true);
 
 	s_Data.Array = CreatePtr<VertexArray>();
-	s_Data.Array->AddVertexBuffer(s_Data.GeometryBuffer);
-	s_Data.Array->AddVertexBuffer(s_Data.TransformBuffer);
 	s_Data.Array->SetIndexBuffer(s_Data.Indices);
+	s_Data.Array->AddVertexBuffer(s_Data.GeometryBuffer);
+	// s_Data.Array->AddVertexBuffer(s_Data.TransformBuffer);
 
 	ShaderLibrary::Get("Framebuffer")->Bind();
 	ShaderLibrary::Get("Framebuffer")->SetInt("u_ScreenTexture", 0);
@@ -223,30 +227,27 @@ static void DrawMesh(DrawCall& call) {
 
 	s_Data.Array->Bind();
 	s_Data.GeometryBuffer->SetData(geometry);
-	s_Data.Indices->SetData(indices);
+	
+	if(call.Type == DrawType::Indexed)
+		s_Data.Indices->SetData(indices);
 
-	switch(call.Partition) {
-		case DrawPartition::Single:
-		{
-			if(call.Type == DrawType::Array)
-				glDrawArrays(GL_TRIANGLES, 0, count);
-			else
-				glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, 0);
+	if(call.Partition == DrawPartition::Single)
+	{
+		VOLCANICORE_LOG_INFO("Here");
+		if(call.Type == DrawType::Array)
+			glDrawArrays(GL_TRIANGLES, 0, count);
+		else
+			glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, 0);
+	}
+	if(call.Partition == DrawPartition::Instanced)
+	{
+		s_Data.TransformBuffer->SetData(transforms);
 
-			break;
-		}
-		case DrawPartition::Instanced:
-		{
-			s_Data.TransformBuffer->SetData(transforms);
-
-			if(call.Type == DrawType::Array)
-				glDrawArraysInstanced(GL_TRIANGLES, 0, 6, instanceCount);
-			else
-				glDrawElementsInstanced(GL_TRIANGLES, count,
-										GL_UNSIGNED_INT, 0, instanceCount);
-
-			break;
-		}
+		if(call.Type == DrawType::Array)
+			glDrawArraysInstanced(GL_TRIANGLES, 0, 6, instanceCount);
+		else
+			glDrawElementsInstanced(GL_TRIANGLES, count,
+									GL_UNSIGNED_INT, 0, instanceCount);
 	}
 }
 

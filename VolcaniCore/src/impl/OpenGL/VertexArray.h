@@ -22,8 +22,8 @@ public:
 	void Bind() const;
 	void Unbind() const;
 
-	void AddVertexBuffer(Ref<VertexBuffer> buffer);
 	void SetIndexBuffer(Ref<IndexBuffer> buffer);
+	void AddVertexBuffer(Ref<VertexBuffer> buffer);
 
 	bool HasIndexBuffer() const { return bool(m_IndexBuffer); }
 	Ref<IndexBuffer> GetIndexBuffer() const { return m_IndexBuffer; }
