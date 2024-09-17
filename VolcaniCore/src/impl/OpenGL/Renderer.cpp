@@ -24,10 +24,10 @@ using namespace VolcaniCore;
 namespace VolcaniCore::OpenGL {
 
 struct RendererData {
-	static const uint32_t MaxInstances = 100;
-	static const uint32_t MaxTriangles = 1'000'000;
-	static const uint32_t MaxVertices  = MaxTriangles * 3;
-	static const uint32_t MaxIndices   = MaxVertices  * 2/* (3.0f / 2.0f) */;
+	inline static const uint32_t MaxInstances = 100;
+	inline static const uint32_t MaxTriangles = 1'000'000;
+	inline static const uint32_t MaxVertices  = MaxTriangles * 3;
+	inline static const uint32_t MaxIndices   = MaxVertices  * 2/* (3.0f / 2.0f) */;
 
 	Ptr<VertexArray> CubemapArray;
 	Ptr<VertexArray> FramebufferArray;
@@ -163,7 +163,7 @@ void Renderer::Init() {
 	s_Data.Array = CreatePtr<VertexArray>();
 	s_Data.Array->SetIndexBuffer(s_Data.Indices);
 	s_Data.Array->AddVertexBuffer(s_Data.GeometryBuffer);
-	// s_Data.Array->AddVertexBuffer(s_Data.TransformBuffer);
+	s_Data.Array->AddVertexBuffer(s_Data.TransformBuffer);
 
 	ShaderLibrary::Get("Framebuffer")->Bind();
 	ShaderLibrary::Get("Framebuffer")->SetInt("u_ScreenTexture", 0);
@@ -222,32 +222,30 @@ static void DrawMesh(DrawCall& call) {
 	auto& geometry	 = call.GeometryBuffer;
 	auto& indices	 = call.IndexBuffer;
 	auto& transforms = call.TransformBuffer;
-	uint32_t count = indices.GetCount();
+	uint32_t indexCount = indices.GetCount();
 	uint32_t instanceCount = transforms.GetCount();
 
 	s_Data.Array->Bind();
 	s_Data.GeometryBuffer->SetData(geometry);
-	
+
 	if(call.Type == DrawType::Indexed)
 		s_Data.Indices->SetData(indices);
 
 	if(call.Partition == DrawPartition::Single)
 	{
-		VOLCANICORE_LOG_INFO("Here");
 		if(call.Type == DrawType::Array)
-			glDrawArrays(GL_TRIANGLES, 0, count);
+			glDrawArrays(GL_TRIANGLES, 0, indexCount);
 		else
-			glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, 0);
+			glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
 	}
 	if(call.Partition == DrawPartition::Instanced)
 	{
 		s_Data.TransformBuffer->SetData(transforms);
 
 		if(call.Type == DrawType::Array)
-			glDrawArraysInstanced(GL_TRIANGLES, 0, 6, instanceCount);
+			glDrawArraysInstanced(GL_TRIANGLES, 0, indexCount, instanceCount);
 		else
-			glDrawElementsInstanced(GL_TRIANGLES, count,
-									GL_UNSIGNED_INT, 0, instanceCount);
+			glDrawElementsInstanced(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0, instanceCount);
 	}
 }
 

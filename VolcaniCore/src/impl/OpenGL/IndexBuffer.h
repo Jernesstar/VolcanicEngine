@@ -12,8 +12,8 @@ public:
 	const uint32_t Size;
 
 public:
-	IndexBuffer(uint32_t count, const uint32_t* indices = nullptr,
-				bool dynamic = false)
+	IndexBuffer(uint32_t count, bool dynamic = false,
+				const uint32_t* indices = nullptr)
 		: Count(count), Size(count * sizeof(uint32_t))
 	{
 		glCreateBuffers(1, &m_BufferID);
@@ -58,6 +58,7 @@ public:
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_BufferID);
 		glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, offset * sizeof(uint32_t),
 						(count == 0) ? Size : count * sizeof(uint32_t), data);
+		
 	}
 
 	void SetData(Buffer<uint32_t> buffer, uint32_t offset = 0) {
@@ -65,8 +66,8 @@ public:
 	}
 
 	template<std::size_t TCount>
-	void SetData(const uint32_t (&vertices)[TCount]) {
-		SetData(vertices, TCount);
+	void SetData(const uint32_t (&indices)[TCount]) {
+		SetData(indices, TCount);
 	}
 
 private:

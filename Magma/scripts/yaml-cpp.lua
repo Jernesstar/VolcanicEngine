@@ -21,16 +21,16 @@ project "yaml-cpp"
         "YAML_CPP_NO_CONTRIB"
     }
 
-    buildoptions {
-        "-w",
-        -- "-Wall",
-        "-W4",
-    }
-
     filter "toolset:gcc or toolset:clang"
         buildoptions {
+            "-w",
             "-Wextra",
             "-Wshadow",
             "-Weffc++",
             "-Wno-long-long",
+        }
+
+    filter "toolset:msc"
+        buildoptions {
+            "-W4"
         }

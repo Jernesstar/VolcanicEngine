@@ -11,10 +11,9 @@ layout(location = 0) out vec4 FragColor;
 
 void main()
 {
-    // if(v_Textured == 1)
-    //     FragColor = vec4(vec3(texture(u_Diffuse, v_TexCoord_Color.xy)), 1.0);
-    // else
-    //     FragColor = v_TexCoord_Color;
-    // FragColor = vec4(FragColor, 1.0);
-    FragColor = vec4(v_Position, 1.0);
+    if(v_Textured == 1)
+        FragColor = vec4(vec3(texture(u_Diffuse, v_TexCoord_Color.xy)), 1.0);
+    else
+        FragColor = v_TexCoord_Color;
+    FragColor.a = 1.0;
 }

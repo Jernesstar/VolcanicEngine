@@ -52,7 +52,7 @@ public:
 
 	void Add(const T& element) {
 		if(m_Index >= m_MaxCount)
-			Reallocate(50);
+			Reallocate(100);
 
 		m_Data[m_Index++] = element;
 	}

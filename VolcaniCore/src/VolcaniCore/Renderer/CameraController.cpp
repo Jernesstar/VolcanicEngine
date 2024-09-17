@@ -48,7 +48,7 @@ void CameraController::OnUpdate(TimeStep ts) {
 	}
 	moved = dir.x || dir.y || dir.z;
 
-	if((delta.x != 0.0f || delta.y != 0.0f) & RotationSpeed != 0.0f) {
+	if((delta.x != 0.0f || delta.y != 0.0f) && RotationSpeed != 0.0f) {
 		float pitchDelta = delta.y * RotationSpeed;
 		float yawDelta = delta.x * RotationSpeed;
 

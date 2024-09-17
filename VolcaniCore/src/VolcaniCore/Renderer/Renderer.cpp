@@ -194,7 +194,7 @@ List<DrawCall> CreateDrawCalls(DrawCommand& command) {
 			meshCall.IndexBuffer = Buffer<uint32_t>(mesh->GetIndices());
 
 		if(meshCall.Partition == DrawPartition::Instanced)
-			meshCall.TransformBuffer = Buffer<glm::mat4>(transforms);
+			meshCall.TransformBuffer = transforms;
 
 		calls.push_back(meshCall);
 	}
@@ -223,7 +223,7 @@ DrawOptionsMap GetOrReturnDefaults(const DrawOptionsMap& map) {
 			DrawPrimitive::Mesh,
 			DrawOptions{
 				.Type = DrawType::Indexed,
-				.Partition = DrawPartition::Single
+				.Partition = DrawPartition::Instanced
 			}
 		}
 	};

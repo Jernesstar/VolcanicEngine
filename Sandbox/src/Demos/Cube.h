@@ -134,15 +134,15 @@ void Cube::OnUpdate(TimeStep ts) {
 
 		Renderer3D::Begin(camera);
 
-		for(int y = -5; y < 5; y++)
-			for(int x = -5; x < 5; x++)
+		for(int y = 0; y < 4; y++)
+			for(int x = 0; x < 1; x++)
 				Renderer3D::DrawMesh(cube, { .Translation = { x, 0.0f, y } });
 
 		Renderer3D::End();
 	}
 	Renderer::EndPass();
 
-	VOLCANICORE_LOG_INFO("Draw Calls: %i", Renderer::GetDebugInfo().DrawCalls);
+	// VOLCANICORE_LOG_INFO("Draw Calls: %i", Renderer::GetDebugInfo().DrawCalls);
 	// VOLCANICORE_LOG_INFO("%f", Renderer::GetDebugInfo().FPS);
 
 	// RendererAPI::Get()->RenderFramebuffer(framebuffer, AttachmentTarget::Color);
