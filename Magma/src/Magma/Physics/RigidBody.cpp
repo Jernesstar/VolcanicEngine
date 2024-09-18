@@ -4,8 +4,7 @@
 
 namespace Magma::Physics {
 
-Ref<RigidBody> RigidBody::Create(RigidBody::Type type,
-								 const Shape& shape,
+Ref<RigidBody> RigidBody::Create(RigidBody::Type type, Ref<Shape> shape,
 								 const Transform& t)
 {
 	if(type == RigidBody::Type::Static)
@@ -21,10 +20,10 @@ Ref<RigidBody> RigidBody::Create(RigidBody::Type type,
 	return CreateRef<DynamicBody>(t);
 }
 
-RigidBody::RigidBody(RigidBody::Type type, const Shape& shape,
+RigidBody::RigidBody(RigidBody::Type type, Ref<Shape> shape,
 					 const Transform& t)
 	: m_Type(type), m_Transform(t), m_HasShape(true),
-		m_ShapeType(shape.GetType()) { }
+		m_ShapeType(shape->GetType()) { }
 
 RigidBody::RigidBody(RigidBody::Type type, const Transform& t)
 	: m_Type(type), m_Transform(t), m_HasShape(false) { }
@@ -48,7 +47,7 @@ void RigidBody::UpdateTransform(const Transform& t) {
 	m_Actor->setGlobalPose(pose);
 }
 
-StaticBody::StaticBody(const Shape& shape, const Transform& t)
+StaticBody::StaticBody(Ref<Shape> shape, const Transform& t)
 	: RigidBody(RigidBody::Type::Static, shape, t)
 {
 	m_Actor = GetPhysicsLib()->createRigidStatic(PxTransform(PxVec3(0.0f)));
@@ -67,13 +66,13 @@ StaticBody::StaticBody(const Transform& t)
 	UpdateTransform(t);
 }
 
-void StaticBody::SetShape(const Shape& shape) {
-	m_Actor->attachShape(*shape.m_Shape);
+void StaticBody::SetShape(Ref<Shape> shape) {
+	m_Actor->attachShape(*shape->m_Shape);
 	m_HasShape = true;
-	m_ShapeType = shape.GetType();
+	m_ShapeType = shape->GetType();
 }
 
-DynamicBody::DynamicBody(const Shape& shape, const Transform& t)
+DynamicBody::DynamicBody(Ref<Shape> shape, const Transform& t)
 	: RigidBody(RigidBody::Type::Dynamic, shape, t)
 {
 	m_Actor = GetPhysicsLib()->createRigidDynamic(PxTransform(PxVec3(0.0f)));
@@ -99,10 +98,10 @@ DynamicBody::DynamicBody(const Transform& t)
 	UpdateTransform(t);
 }
 
-void DynamicBody::SetShape(const Shape& shape) {
+void DynamicBody::SetShape(Ref<Shape> shape) {
 	// m_Shape =
 	// PhysX::PxRigidActorExt::createExclusiveShape(*m_Actor,
-	// 	shape.m_Shape->getGeometry(), *shape.m_Shape->getMaterials()[0]),
+	// 	shape->m_Shape->getGeometry(), *shape->m_Shape->getMaterials()[0]),
 }
 
 // void DynamicBody::SetVelocity(float velocity) {

@@ -25,29 +25,26 @@ public:
 	};
 
 public:
-	static Shape Create(Shape::Type type);
-	// static Shape CreatePlane(const glm::vec3& transform);
-	// static Shape CreateCapsule(float radius, float halfRadius);
-	// static Shape CreateTriangleMesh(Ref<Mesh> mesh);
+	static Ref<Shape> Create(Shape::Type type);
+	static Ref<Shape> CreateBox(float radius);
+	static Ref<Shape> CreatePlane(const Transform& tr);
+	static Ref<Shape> CreateCapsule(float radius, float halfRadius);
+	static Ref<Shape> CreateMesh(Ref<Mesh> mesh);
 
 public:
 	Shape(Shape::Type type);
-	Shape(Ref<Mesh> mesh);
-	// Shape(Buffer<Vertex> data);
 	Shape(const Shape& other);
 	Shape& operator =(const Shape& other);
 	~Shape();
 
 	Shape::Type GetType() const { return m_Type; }
 
-private:
+protected:
 	Type m_Type;
 
 	PxShape* m_Shape;
 
 	friend class RigidBody;
-	friend class StaticBody;
-	friend class DynamicBody;
 };
 
 }

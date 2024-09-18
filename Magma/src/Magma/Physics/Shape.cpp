@@ -6,41 +6,76 @@
 
 namespace Magma::Physics {
 
-static PxShape* CreateBox();
-static PxShape* CreateSphere();
-static PxShape* CreatePlane();
-// static PxShape* CreateCapsule();
-static PxShape* CreateTriangleMesh(Ref<Mesh> mesh);
-// static PxShape* CreateConvexMesh(Buffer<Vertex> data);
+static PxShape* CookMesh(Ref<Mesh> mesh);
 
-Shape Shape::Create(Shape::Type type) {
-	return Shape(type);
-}
-
-Shape::Shape(Ref<Mesh> mesh)
-	: m_Type(Shape::Type::TriangleMesh)
-{
-	m_Shape = CreateTriangleMesh(mesh);
-}
-
-// Shape::Shape(Buffer<Vertex> data)
-// 	: Type(Shape::Type::ConvexShape)
-// {
-// 	m_Shape = CreateConvexShape(mesh);
-// }
-
-Shape::Shape(Shape::Type type)
-	: m_Type(type)
-{
+Ref<Shape> Shape::Create(Shape::Type type) {
+	Ref<Shape> shape;
 	switch(type) {
 		case Shape::Type::Box:
-			m_Shape = CreateBox();
+			shape = CreateBox(0.5f);
 			break;
 		case Shape::Type::Sphere:
-			m_Shape = CreateSphere();
+			shape = CreateBox(0.5f);
+			break;
+		case Shape::Type::Plane:
+			shape = CreatePlane(Transform{ });
+			break;
+		case Shape::Type::Capsule:
+			shape = CreateCapsule(0.5f, 0.5f);
+			break;
+		case Shape::Type::Mesh:
 			break;
 	}
+
+	return shape;
 }
+
+Ref<Shape> CreateBox(float radius) {
+	auto* mat = GetPhysicsLib()->createMaterial(0.5f, 0.5f, 0.6f);
+	Ref<Shape> shape = CreateRef<Shape>(Shape::Type::Box);
+	shape->m_Shape =
+		GetPhysicsLib()->createShape(PxBoxGeometry(0.5f, 0.5f, 0.5f), *mat);
+	
+	return shape;
+}
+
+Ref<Shape> CreateSphere(float radius) {
+	auto* material = GetPhysicsLib()->createMaterial(0.5f, 0.5f, 0.6f);
+	Ref<Shape> shape = CreateRef<Shape>(Shape::Type::Box);
+	shape->m_Shape =
+		GetPhysicsLib()->createShape(PxSphereGeometry(0.5f), *material);
+
+	return shape;
+}
+
+Ref<Shape> CreatePlane(const Transform& tr) {
+	auto* mat = GetPhysicsLib()->createMaterial(0.5f, 0.5f, 0.6f);
+	Ref<Shape> shape = CreateRef<Shape>(Shape::Type::Plane);
+	// shape->m_Shape =
+	// 	GetPhysicsLib()->createShape(PxPlaneGeometry(), *mat);
+
+	return shape;
+}
+
+Ref<Shape> CreateCapsule(float radius, float halfRadius) {
+	auto* mat = GetPhysicsLib()->createMaterial(0.5f, 0.5f, 0.6f);
+	Ref<Shape> shape = CreateRef<Shape>(Shape::Type::Capsule);
+	// shape->m_Shape =
+	// 	GetPhysicsLib()->createShape(PxCapsuleGeometry(0.5f, 0.5f, 0.5f), *mat);
+
+	return shape;
+}
+
+Ref<Shape> CreateMesh(Ref<Mesh> mesh) {
+	auto* mat = GetPhysicsLib()->createMaterial(0.5f, 0.5f, 0.6f);
+	Ref<Shape> shape = CreateRef<Shape>(Shape::Type::Mesh);
+	shape->m_Shape = CookMesh(mesh);
+
+	return shape;
+}
+
+Shape::Shape(Shape::Type type)
+	: m_Type(type) { }
 
 Shape::Shape(const Shape& other)
 	: m_Type(other.m_Type)
@@ -58,31 +93,6 @@ Shape& Shape::operator =(const Shape& other) {
 
 Shape::~Shape() {
 	m_Shape->release();
-}
-
-PxShape* CreateBox() {
-	auto* material = GetPhysicsLib()->createMaterial(0.5f, 0.5f, 0.6f);
-	return GetPhysicsLib()
-			->createShape(PxBoxGeometry(0.5f, 0.5f, 0.5f), *material);
-}
-
-PxShape* CreateSphere() {
-	auto* material = GetPhysicsLib()->createMaterial(0.5f, 0.5f, 0.6f);
-	return GetPhysicsLib()
-			->createShape(PxSphereGeometry(0.5f), *material);
-}
-
-PxShape* CreatePlane() {
-	// PxRigidStatic* groundPlane = PxCreatePlane(*gPhysics, PxPlane(0,1,0,0), *gMaterial);
-	auto* material = GetPhysicsLib()->createMaterial(0.5f, 0.5f, 0.6f);
-	return GetPhysicsLib()
-			->createShape(PxPlaneGeometry(), *material);
-}
-
-PxShape* CreatCapsule() {
-	// auto material = GetPhysicsLib()->createMaterial(0.5f, 0.5f, 0.6f);
-	// return GetPhysicsLib()->createShape(PxCapsuleGeometry(), *material);
-	return nullptr;
 }
 
 // PxShape* CreateConvexMesh(Buffer<Vertex> data) {
@@ -106,7 +116,7 @@ PxShape* CreatCapsule() {
 	// return GetPhysicsLib()->createShape(PxConvexMeshGeometry(mesh), material);
 // }
 
-PxShape* CreateTriangleMesh(Ref<Mesh> mesh) {
+PxShape* CookMesh(Ref<Mesh> mesh) {
 	auto material = GetPhysicsLib()->createMaterial(0.5f, 0.5f, 0.6f);
 
 	PxTriangleMeshDesc desc;

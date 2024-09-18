@@ -21,7 +21,7 @@ struct TextureSlot {
 
 class Uniforms {
 public:
-	HandleMap<uint32_t>	IntHandles;
+	HandleMap<uint32_t> IntHandles;
 	HandleMap<float>	FloatHandles;
 	HandleMap<TextureSlot> TextureHandles;
 
