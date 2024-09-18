@@ -2,6 +2,17 @@ Adding this file, to track changes as a go between writing the code and testing 
 
 So far:
 
+Demo Status:
+Bloom x
+Collision x
+Cube x
+ECS y
+Lighting x
+Raycast x
+Shadows x
+Template y
+UI x
+
 change:
 	Removed Point, Line, and Mesh buffers in OpenGL::Renderer::RendererData in favor of a single Geometry buffer
 	Renamed VolcaniCore::Renderer::RenderCubemap -> DrawSkybox

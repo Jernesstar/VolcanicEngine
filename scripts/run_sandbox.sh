@@ -1,3 +1,3 @@
 #!/bin/bash
 
-build/Sanbox/bin/Sandbox "$@"
+build/Sandbox/bin/Sandbox "$@"

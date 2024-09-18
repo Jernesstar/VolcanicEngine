@@ -6,8 +6,8 @@ project "Sandbox"
     rtti "On"
     staticruntime "Off"
 
-    objdir ("%{RootPath}/build/Sanbox/obj")
-    targetdir ("%{RootPath}/build/Sanbox/bin")
+    objdir ("%{RootPath}/build/Sandbox/obj")
+    targetdir ("%{RootPath}/build/Sandbox/bin")
 
     files {
         "src/**.h",
@@ -39,8 +39,8 @@ project "Sandbox"
     }
 
     links {
-        "VolcaniCore",
         "Magma",
+        "VolcaniCore",
 
         "glfw",
         "glad",

@@ -34,8 +34,7 @@ public:
 	HandleMap<glm::mat4> Mat4Handles;
 
 	template<typename TUniform>
-	void Set(const std::string& uniformName, ValueCallback<TUniform> callback)
-	{
+	void Set(const std::string& uniformName, ValueCallback<TUniform> callback) {
 		GetHandles<TUniform>()[uniformName] = callback;
 	}
 

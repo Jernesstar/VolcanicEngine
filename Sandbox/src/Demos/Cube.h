@@ -78,7 +78,7 @@ Cube::Cube()
 			Application::Close();
 	});
 
-	// Magma::UI::Init();
+	Magma::UI::Init();
 
 	shader = ShaderPipeline::Create({
 		{ "VolcaniCore/assets/shaders/Mesh.glsl.vert", ShaderType::Vertex },
@@ -98,35 +98,43 @@ Cube::Cube()
 	// camera = CreateRef<OrthographicCamera>(800, 600, 0.1f, 100.0f);
 	camera = CreateRef<IsometricCamera>();
 	controller =
-	CameraController(
-		MovementControls(
-		ControlMap{
-			{ Control::Up,   Key::W },
-			{ Control::Down, Key::S },
-			{ Control::Forward,  Key::Invalid },
-			{ Control::Backward, Key::Invalid },
-		})
-	);
+		CameraController(
+			MovementControls(
+				ControlMap{
+					{ Control::Up,   Key::W },
+					{ Control::Down, Key::S },
+					{ Control::Forward,  Key::Invalid },
+					{ Control::Backward, Key::Invalid },
+				}
+			)
+		);
 	controller.SetCamera(camera);
 	controller.RotationSpeed = 0.0f;
 }
 
 Cube::~Cube() {
-	// Magma::UI::Close();
+	Magma::UI::Close();
 }
 
 void Cube::OnUpdate(TimeStep ts) {
+	Magma::UI::Begin();
+
 	controller.OnUpdate(ts);
 
-	// Magma::UI::Begin();
-	// ImGui::Begin("Lights");
-	// {
-	// 	float r = camera->As<IsometricCamera>()->R;
-	// 	ImGui::SliderFloat("Light.R", &r, 0.0f, 10.0f);
+	ImGui::Begin("Lights");
+	{
+		float r = camera->As<IsometricCamera>()->R;
+		ImGui::SliderFloat("Light.R", &r, 0.0f, 10.0f);
 
-	// 	camera->As<IsometricCamera>()->SetDistance(r);
-	// }
-	// ImGui::End();
+		camera->As<IsometricCamera>()->SetDistance(r);
+	}
+	ImGui::End();
+
+	ImGui::Begin("Debug");
+	{
+
+	}
+	ImGui::End();
 
 	Renderer::StartPass(renderPass);
 	{
@@ -134,20 +142,19 @@ void Cube::OnUpdate(TimeStep ts) {
 
 		Renderer3D::Begin(camera);
 
-		for(int y = 0; y < 4; y++)
-			for(int x = 0; x < 1; x++)
-				Renderer3D::DrawMesh(cube, { .Translation = { x, 0.0f, y } });
+		// for(int y = 0; y < 1; y++)
+		// 	for(int x = 0; x < 2; x++)
+				// Renderer3D::DrawMesh(cube, { .Translation = { x, 0.0f, y } });
+		Renderer3D::DrawMesh(cube);
+		Renderer3D::DrawMesh(cube, { .Translation = { 2.0f, 0.0f, 0.0f } });
 
 		Renderer3D::End();
 	}
 	Renderer::EndPass();
 
-	// VOLCANICORE_LOG_INFO("Draw Calls: %i", Renderer::GetDebugInfo().DrawCalls);
-	// VOLCANICORE_LOG_INFO("%f", Renderer::GetDebugInfo().FPS);
-
 	// RendererAPI::Get()->RenderFramebuffer(framebuffer, AttachmentTarget::Color);
 
-	// Magma::UI::End();
+	Magma::UI::End();
 }
 
 }
