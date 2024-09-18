@@ -2,11 +2,12 @@
 
 #define PX_PHYSX_STATIC_LIB
 
-#include <PxPhysics.h>
-#include <PxPhysicsAPI.h>
+// #include <PxPhysics.h>
+// #include <PxPhysicsAPI.h>
 
-using namespace physx;
+// using namespace physx;
 
+#include <VolcaniCore/Renderer/Transform.h>
 #include <VolcaniCore/Object/Mesh.h>
 
 using namespace VolcaniCore;
@@ -20,16 +21,16 @@ public:
 		Sphere,
 		Plane,
 		Capsule,
-		ConvexMesh,
-		TriangleMesh
+		Mesh
 	};
 
 public:
 	static Ref<Shape> Create(Shape::Type type);
+	static Ref<Shape> Create(Ref<Mesh> mesh);
 	static Ref<Shape> CreateBox(float radius);
+	static Ref<Shape> CreateSphere(float radius);
 	static Ref<Shape> CreatePlane(const Transform& tr);
 	static Ref<Shape> CreateCapsule(float radius, float halfRadius);
-	static Ref<Shape> CreateMesh(Ref<Mesh> mesh);
 
 public:
 	Shape(Shape::Type type);
@@ -42,7 +43,7 @@ public:
 protected:
 	Type m_Type;
 
-	PxShape* m_Shape;
+	// PxShape* m_Shape;
 
 	friend class RigidBody;
 };

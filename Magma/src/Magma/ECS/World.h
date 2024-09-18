@@ -2,7 +2,6 @@
 
 #include <string>
 
-#define flecs_STATIC
 #include <flecs.h>
 
 #include <VolcaniCore/Core/Time.h>

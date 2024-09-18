@@ -37,7 +37,7 @@ project "Magma"
         "yaml-cpp",
         "ImGuiFileDialog",
         "flecs",
-        "PhysX",
+        -- "PhysX",
     }
 
     filter "toolset:gcc or toolset:clang"
@@ -54,4 +54,4 @@ include "Magma/scripts/imgui"
 include "Magma/scripts/yaml-cpp"
 include "Magma/scripts/ImGuiFileDialog"
 include "Magma/scripts/flecs"
-include "Magma/scripts/PhysX"
+-- include "Magma/scripts/PhysX"

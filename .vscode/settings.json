@@ -4,9 +4,13 @@
 	"files.associations": {
 		"*.vert": "hlsl",
 		"*.frag": "hlsl",
+		"*.geom": "hlsl",
+		"*.compute": "hlsl",
 		"*.vs": "hlsl",
 		"*.fs": "hlsl",
 		"*.gs": "hlsl",
+		"*.comp": "hlsl",
+		"*.make": "makefile",
 		"any": "cpp",
 		"array": "cpp",
 		"atomic": "cpp",
@@ -79,6 +83,7 @@
 		"typeinfo": "cpp",
 		"valarray": "cpp",
 		"variant": "cpp",
+		"assert.h": "c"
 	},
 	"C_Cpp.errorSquiggles": "enabled",
 	"cmake.sourceDirectory": "/workspaces/VolcanicEngine/Magma/vendor/ImGuiFileDialog"

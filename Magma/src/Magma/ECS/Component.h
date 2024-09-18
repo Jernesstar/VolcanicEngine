@@ -44,8 +44,7 @@ struct RigidBodyComponent : public Component {
 	RigidBodyComponent(Physics::RigidBody::Type type) {
 		Body = Physics::RigidBody::Create(type);
 	}
-	RigidBodyComponent(Physics::RigidBody::Type type,
-					   const Physics::Shape& shape)
+	RigidBodyComponent(Physics::RigidBody::Type type, Ref<Physics::Shape> shape)
 	{
 		Body = Physics::RigidBody::Create(type, shape);
 	}

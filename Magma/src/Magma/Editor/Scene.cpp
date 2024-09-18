@@ -100,7 +100,7 @@ void Scene::RegisterObservers() {
 		// inherit the shape of the current mesh component
 		if(entity.Has<MeshComponent>() && !r.Body->HasShape()) {
 			auto mesh = entity.Get<MeshComponent>().Mesh;
-			Shape shape(mesh);
+			Ref<Shape> shape = Shape::Create(mesh);
 			r.Body->SetShape(shape);
 		}
 		if(entity.Has<TransformComponent>()) {

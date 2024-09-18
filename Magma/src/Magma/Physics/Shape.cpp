@@ -6,7 +6,7 @@
 
 namespace Magma::Physics {
 
-static PxShape* CookMesh(Ref<Mesh> mesh);
+// static PxShape* CookMesh(Ref<Mesh> mesh);
 
 Ref<Shape> Shape::Create(Shape::Type type) {
 	Ref<Shape> shape;
@@ -30,46 +30,46 @@ Ref<Shape> Shape::Create(Shape::Type type) {
 	return shape;
 }
 
-Ref<Shape> CreateBox(float radius) {
-	auto* mat = GetPhysicsLib()->createMaterial(0.5f, 0.5f, 0.6f);
+Ref<Shape> Shape::Create(Ref<Mesh> mesh) {
+	Ref<Shape> shape = CreateRef<Shape>(Shape::Type::Mesh);
+	// auto* mat = GetPhysicsLib()->createMaterial(0.5f, 0.5f, 0.6f);
+	// shape->m_Shape = CookMesh(mesh);
+
+	return shape;
+}
+
+Ref<Shape> Shape::CreateBox(float radius) {
 	Ref<Shape> shape = CreateRef<Shape>(Shape::Type::Box);
-	shape->m_Shape =
-		GetPhysicsLib()->createShape(PxBoxGeometry(0.5f, 0.5f, 0.5f), *mat);
+	// auto* mat = GetPhysicsLib()->createMaterial(0.5f, 0.5f, 0.6f);
+	// shape->m_Shape =
+	// 	GetPhysicsLib()->createShape(PxBoxGeometry(0.5f, 0.5f, 0.5f), *mat);
 	
 	return shape;
 }
 
-Ref<Shape> CreateSphere(float radius) {
-	auto* material = GetPhysicsLib()->createMaterial(0.5f, 0.5f, 0.6f);
+Ref<Shape> Shape::CreateSphere(float radius) {
 	Ref<Shape> shape = CreateRef<Shape>(Shape::Type::Box);
-	shape->m_Shape =
-		GetPhysicsLib()->createShape(PxSphereGeometry(0.5f), *material);
+	// auto* material = GetPhysicsLib()->createMaterial(0.5f, 0.5f, 0.6f);
+	// shape->m_Shape =
+	// 	GetPhysicsLib()->createShape(PxSphereGeometry(0.5f), *material);
 
 	return shape;
 }
 
-Ref<Shape> CreatePlane(const Transform& tr) {
-	auto* mat = GetPhysicsLib()->createMaterial(0.5f, 0.5f, 0.6f);
+Ref<Shape> Shape::CreatePlane(const Transform& tr) {
 	Ref<Shape> shape = CreateRef<Shape>(Shape::Type::Plane);
+	// auto* mat = GetPhysicsLib()->createMaterial(0.5f, 0.5f, 0.6f);
 	// shape->m_Shape =
 	// 	GetPhysicsLib()->createShape(PxPlaneGeometry(), *mat);
 
 	return shape;
 }
 
-Ref<Shape> CreateCapsule(float radius, float halfRadius) {
-	auto* mat = GetPhysicsLib()->createMaterial(0.5f, 0.5f, 0.6f);
+Ref<Shape> Shape::CreateCapsule(float radius, float halfRadius) {
 	Ref<Shape> shape = CreateRef<Shape>(Shape::Type::Capsule);
+	// auto* mat = GetPhysicsLib()->createMaterial(0.5f, 0.5f, 0.6f);
 	// shape->m_Shape =
 	// 	GetPhysicsLib()->createShape(PxCapsuleGeometry(0.5f, 0.5f, 0.5f), *mat);
-
-	return shape;
-}
-
-Ref<Shape> CreateMesh(Ref<Mesh> mesh) {
-	auto* mat = GetPhysicsLib()->createMaterial(0.5f, 0.5f, 0.6f);
-	Ref<Shape> shape = CreateRef<Shape>(Shape::Type::Mesh);
-	shape->m_Shape = CookMesh(mesh);
 
 	return shape;
 }
@@ -80,66 +80,66 @@ Shape::Shape(Shape::Type type)
 Shape::Shape(const Shape& other)
 	: m_Type(other.m_Type)
 {
-	m_Shape = other.m_Shape;
-	m_Shape->acquireReference();
+	// m_Shape = other.m_Shape;
+	// m_Shape->acquireReference();
 }
 
 Shape& Shape::operator =(const Shape& other) {
 	m_Type = other.m_Type;
-	m_Shape = other.m_Shape;
-	m_Shape->acquireReference();
+	// m_Shape = other.m_Shape;
+	// m_Shape->acquireReference();
 	return *this;
 }
 
 Shape::~Shape() {
-	m_Shape->release();
+	// m_Shape->release();
 }
 
-// PxShape* CreateConvexMesh(Buffer<Vertex> data) {
-	// PxConvexMeshDesc desc;
-	// desc.points.count  = 5;
-	// desc.points.stride = sizeof(PxVec3);
-	// desc.points.data   = verts;
-	// desc.flags		   = PxConvexFlag::eCOMPUTE_CONVEX;
+// // PxShape* CookConvex(Buffer<Vertex> data) {
+// 	// PxConvexMeshDesc desc;
+// 	// desc.points.count  = 5;
+// 	// desc.points.stride = sizeof(PxVec3);
+// 	// desc.points.data   = verts;
+// 	// desc.flags		   = PxConvexFlag::eCOMPUTE_CONVEX;
 
-	// PxTolerancesScale scale;
-	// PxCookingParams params(scale);
-	// PxDefaultMemoryOutputStream buf;
-	// PxConvexMeshCookingResult::Enum result;
+// 	// PxTolerancesScale scale;
+// 	// PxCookingParams params(scale);
+// 	// PxDefaultMemoryOutputStream buf;
+// 	// PxConvexMeshCookingResult::Enum result;
 
-	// bool success = PxCookConvexMesh(params, desc, buf, &result);
-	// if(!success)
-	// 	VOLCANICORE_LOG_ERROR("Failed to create convex mesh");
+// 	// bool success = PxCookConvexMesh(params, desc, buf, &result);
+// 	// if(!success)
+// 	// 	VOLCANICORE_LOG_ERROR("Failed to create convex mesh");
 
-	// PxDefaultMemoryInputData input(buf.getData(), buf.getSize());
-	// PxConvexMesh* mesh = GetPhysicsLib()->createConvexMesh(input);
-	// return GetPhysicsLib()->createShape(PxConvexMeshGeometry(mesh), material);
+// 	// PxDefaultMemoryInputData input(buf.getData(), buf.getSize());
+// 	// PxConvexMesh* mesh = GetPhysicsLib()->createConvexMesh(input);
+// 	// return GetPhysicsLib()->createShape(PxConvexMeshGeometry(mesh), material);
+// // }
+
+// PxShape* CookMesh(Ref<Mesh> mesh) {
+// 	auto material = GetPhysicsLib()->createMaterial(0.5f, 0.5f, 0.6f);
+
+// 	PxTriangleMeshDesc desc;
+// 	desc.points.count  = mesh->GetVertices().size();
+// 	desc.points.stride = sizeof(Vertex);
+// 	desc.points.data   = &mesh->GetVertices()[0];
+
+// 	desc.triangles.count  = mesh->GetIndices().size();
+// 	desc.triangles.stride = 3 * sizeof(uint32_t);
+// 	desc.triangles.data   = &mesh->GetIndices()[0];
+
+// 	PxTolerancesScale scale;
+// 	PxCookingParams params(scale);
+// 	PxDefaultMemoryOutputStream buf;
+// 	PxTriangleMeshCookingResult::Enum result;
+
+// 	bool success = PxCookTriangleMesh(params, desc, buf, &result);
+// 	if(!success)
+// 		VOLCANICORE_LOG_ERROR("Failed to create triangle mesh");
+
+// 	PxDefaultMemoryInputData input(buf.getData(), buf.getSize());
+// 	PxTriangleMesh* m = GetPhysicsLib()->createTriangleMesh(input);
+// 	return GetPhysicsLib()->createShape(PxTriangleMeshGeometry(m), *material);
 // }
-
-PxShape* CookMesh(Ref<Mesh> mesh) {
-	auto material = GetPhysicsLib()->createMaterial(0.5f, 0.5f, 0.6f);
-
-	PxTriangleMeshDesc desc;
-	desc.points.count  = mesh->GetVertices().size();
-	desc.points.stride = sizeof(Vertex);
-	desc.points.data   = &mesh->GetVertices()[0];
-
-	desc.triangles.count  = mesh->GetIndices().size();
-	desc.triangles.stride = 3 * sizeof(uint32_t);
-	desc.triangles.data   = &mesh->GetIndices()[0];
-
-	PxTolerancesScale scale;
-	PxCookingParams params(scale);
-	PxDefaultMemoryOutputStream buf;
-	PxTriangleMeshCookingResult::Enum result;
-
-	bool success = PxCookTriangleMesh(params, desc, buf, &result);
-	if(!success)
-		VOLCANICORE_LOG_ERROR("Failed to create triangle mesh");
-
-	PxDefaultMemoryInputData input(buf.getData(), buf.getSize());
-	PxTriangleMesh* m = GetPhysicsLib()->createTriangleMesh(input);
-	return GetPhysicsLib()->createShape(PxTriangleMeshGeometry(m), *material);
-}
 
 }

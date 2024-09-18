@@ -38,7 +38,7 @@ void Model::Load(const std::string& path) {
 	m_Meshes.reserve(scene->mNumMeshes);
 
 	for(uint32_t i = 0; i < scene->mNumMeshes; i++)
-		m_Meshes.push_back(std::move(LoadMesh(path, scene, i)));
+		m_Meshes.push_back(LoadMesh(path, scene, i));
 }
 
 // void Model::Unload() {

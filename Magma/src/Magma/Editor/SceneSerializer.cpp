@@ -110,19 +110,25 @@ Ref<Scene> SceneSerializer::Deserialize(const std::string& filePath) {
 	auto height = camera["ViewportHeight"].as<uint32_t>();
 	auto near	= camera["Near"]		  .as<float>();
 	auto far	= camera["Far"]			  .as<float>();
+	auto position  = camera["Position"].as<glm::vec3>();
+	auto direction = camera["Direction"].as<glm::vec3>();
+	float fovOrRotation;
+	Camera::Type type;
 
-	Ref<Camera> newCam;
 	if(camera["Type"].as<std::string>() == "Stereographic") {
-		auto fov = camera["VerticalFOV"].as<float>();
-		newCam = CreateRef<StereographicCamera>(fov, width, height, near, far);
+		fovOrRotation = camera["VerticalFOV"].as<float>();
+		type = Camera::Type::Stereo;
 	}
 	else if(camera["Type"].as<std::string>() == "Orthographic") {
-		auto ro = camera["Rotation"].as<float>();
-		newCam = CreateRef<OrthographicCamera>(width, height, near, far, ro);
+		fovOrRotation = camera["Rotation"].as<float>();
+		type = Camera::Type::Ortho;
 	}
 
-	newCam->SetPositionDirection(camera["Position"].as<glm::vec3>(),
-								 camera["Direction"].as<glm::vec3>());
+	Ref<Camera> newCam = Camera::Create(type, fovOrRotation);
+	newCam->Resize(width, height);
+	newCam->SetProjection(near, far);
+	newCam->SetPositionDirection(position, direction);
+
 	newScene->SetCamera(newCam);
 
 	for(auto node : scene["Entities"])
@@ -180,7 +186,7 @@ void SerializeEntity(YAML::Emitter& out, Entity& entity) {
 			(body->GetType() == RigidBody::Type::Static ? "Static" : "Dynamic");
 
 		out << YAML::Key << "Shape Type" << YAML::Value;
-		switch(body->GetShapeType()) {
+		switch(body->GetShape()->GetType()) {
 			case Shape::Type::Box:
 				out << "Box";
 				break;
@@ -193,11 +199,8 @@ void SerializeEntity(YAML::Emitter& out, Entity& entity) {
 			case Shape::Type::Capsule:
 				out << "Capsule";
 				break;
-			case Shape::Type::ConvexMesh:
-				out << "ConvexMesh";
-				break;
-			case Shape::Type::TriangleMesh:
-				out << "TriangleMesh";
+			case Shape::Type::Mesh:
+				out << "Mesh";
 				break;
 		}
 		out << YAML::EndMap; // Body
@@ -315,13 +318,10 @@ void DeserializeEntity(YAML::Node entityNode, Ref<Scene> scene) {
 		if(shapeTypeStr == "Sphere")	   shapeType = Shape::Type::Sphere;
 		if(shapeTypeStr == "Plane")		   shapeType = Shape::Type::Plane;
 		if(shapeTypeStr == "Capsule")	   shapeType = Shape::Type::Capsule;
-		if(shapeTypeStr == "ConvexMesh")   shapeType = Shape::Type::ConvexMesh;
-		if(shapeTypeStr == "TriangleMesh") shapeType = Shape::Type::TriangleMesh;
+		if(shapeTypeStr == "Mesh") shapeType = Shape::Type::Mesh;
 
-		if(shapeType != Shape::Type::ConvexMesh
-		&& shapeType != Shape::Type::TriangleMesh)
-		{
-			Shape shape(shapeType);
+		if(shapeType != Shape::Type::Mesh) {
+			Ref<Shape> shape = Shape::Create(shapeType);
 			entity.Add<RigidBodyComponent>(type, shape);
 		}
 		else {

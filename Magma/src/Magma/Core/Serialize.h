@@ -1,5 +1,10 @@
 #pragma once
 
+#include <fstream>
+
+#define YAML_CPP_STATIC_DEFINE
+#include <yaml-cpp/yaml.h>
+
 #include "Core/Defines.h"
 
 namespace VolcaniCore {
@@ -7,7 +12,7 @@ namespace VolcaniCore {
 class Serializer {
 public:
 	template<typename TData>
-	Serialized& Write(const std::string_view& name, const TData& value) {
+	Serializer& Write(const std::string& name, const TData& value) {
 		m_Out << YAML::Key << name << YAML::Value << value;
 		return *this;
 	}

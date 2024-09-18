@@ -1,9 +1,9 @@
 #pragma once
 
-#include <PxPhysics.h>
-#include <PxPhysicsAPI.h>
+// #include <PxPhysics.h>
+// #include <PxPhysicsAPI.h>
 
-using namespace physx;
+// using namespace physx;
 
 #include <VolcaniCore/Core/Time.h>
 
@@ -13,26 +13,26 @@ using namespace VolcaniCore;
 
 namespace Magma::Physics {
 
-class ContactCallback : public PxSimulationEventCallback {
-public:
-	void AddCallback(
-		const std::function<void(Ref<RigidBody>, Ref<RigidBody>)>& callback)
-	{
-		m_Callbacks.push_back(callback);
-	}
+// class ContactCallback : public PxSimulationEventCallback {
+// public:
+// 	void AddCallback(
+// 		const std::function<void(Ref<RigidBody>, Ref<RigidBody>)>& callback)
+// 	{
+// 		m_Callbacks.push_back(callback);
+// 	}
 
-private:
-	void onConstraintBreak(PxConstraintInfo* constraints, PxU32 count) { }
-	void onWake(PxActor** actors, PxU32 count) { }
-	void onSleep(PxActor** actors, PxU32 count) { }
-	void onAdvance(const PxRigidBody*const*, const PxTransform*, const PxU32) {}
-	void onTrigger(PxTriggerPair* pairs, PxU32 count);
-	void onContact(const PxContactPairHeader& pairHeader,
-				   const PxContactPair* pairs, PxU32 nbPairs);
+// private:
+// 	void onConstraintBreak(PxConstraintInfo* constraints, PxU32 count) { }
+// 	void onWake(PxActor** actors, PxU32 count) { }
+// 	void onSleep(PxActor** actors, PxU32 count) { }
+// 	void onAdvance(const PxRigidBody*const*, const PxTransform*, const PxU32) {}
+// 	void onTrigger(PxTriggerPair* pairs, PxU32 count);
+// 	void onContact(const PxContactPairHeader& pairHeader,
+// 				   const PxContactPair* pairs, PxU32 nbPairs);
 
-private:
-	std::vector<std::function<void(Ref<RigidBody>, Ref<RigidBody>)>> m_Callbacks;
-};
+// private:
+// 	std::vector<std::function<void(Ref<RigidBody>, Ref<RigidBody>)>> m_Callbacks;
+// };
 
 struct HitInfo {
 	const bool HasHit;
@@ -79,11 +79,11 @@ public:
 		return m_Actors.end();
 	}
 
-	PxScene* Get() { return m_Scene; }
+	// PxScene* Get() { return m_Scene; }
 
 private:
-	PxScene* m_Scene = nullptr;
-	ContactCallback m_ContactCallback;
+	// PxScene* m_Scene = nullptr;
+	// ContactCallback m_ContactCallback;
 
 	uint64_t m_ActorCount = 0;
 	uint64_t m_MaxActorCount = 0;

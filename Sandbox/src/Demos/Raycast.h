@@ -1,7 +1,8 @@
 #pragma once
 
 static void createActors(Physics::World& world) {
-	Shape box(Shape::Type::Box);
+	Ref<Shape> box = Shape::Create(Shape::Type::Box);
+
 	for(uint32_t x = 0; x < 10; x++) {
 		Ref<RigidBody> body =
 			RigidBody::Create(RigidBody::Type::Static, box,

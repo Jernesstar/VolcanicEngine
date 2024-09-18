@@ -2,8 +2,8 @@ project "Sandbox"
     kind "ConsoleApp"
     language "C++"
     cppdialect "C++latest"
-    -- exceptionhandling "On"
-    -- rtti "On"
+    exceptionhandling "On"
+    rtti "On"
     staticruntime "Off"
 
     objdir ("%{RootPath}/build/Sanbox/obj")
@@ -23,25 +23,24 @@ project "Sandbox"
         "%{RootPath}/Magma/src",
         "%{RootPath}/Magma/src/Magma",
 
-        -- "%{Includes.bgfx}",
+        "%{Includes.imgui}",
+        "%{Includes.imgui}/imgui",
+        "%{Includes.yaml_cpp}",
+        "%{Includes.ImGuiFileDialog}",
+        "%{Includes.flecs}",
+        "%{Includes.PhysX}",
+
         "%{Includes.glfw}",
         "%{Includes.glad}",
         "%{Includes.glm}",
         "%{Includes.freetype}",
         "%{Includes.assimp}",
         "%{Includes.stb_image}",
-
-        "%{Includes.imgui}",
-        "%{Includes.imgui}/imgui",
-        "%{Includes.yaml_cpp}",
-        "%{Includes.ImGuiFileDialog}",
-        "%{Includes.flecs}",
-        "%{Includes.PhysX}"
     }
 
     links {
-        "Magma",
         "VolcaniCore",
+        "Magma",
 
         "glfw",
         "glad",
@@ -53,7 +52,7 @@ project "Sandbox"
         "yaml-cpp",
         "ImGuiFileDialog",
         "flecs",
-        "PhysX",
+        -- "PhysX",
     }
 
     filter "system:linux"
