@@ -61,20 +61,23 @@ void VertexArray::AddVertexBuffer(Ref<VertexBuffer> vertexBuffer) {
 	glBindVertexArray(m_VertexArrayID);
 	vertexBuffer->Bind();
 
-	uint64_t offset = 0;
 	auto& layout = vertexBuffer->Layout;
 	uint32_t stride = layout.Stride;
+	uint64_t offset = 0;
 
-	if(layout.StructureOfArrays)
-		stride = 0;
+	uint32_t count;
+	bool normalized;
 
 	for(auto& element : layout) {
+		count  = element.Count;
+		normalized = element.Normalized ? GL_FALSE : GL_TRUE;
+
 		switch(element.Type) {
 			case BufferDataType::Int:
 			{
 				glEnableVertexAttribArray(m_BufferIndex);
-				glVertexAttribIPointer(m_BufferIndex++, element.Count, GL_INT,
-										stride, (void*)offset);
+				glVertexAttribIPointer(
+					m_BufferIndex++, count, GL_INT, stride, (void*)offset);
 
 				break;
 			}
@@ -84,28 +87,36 @@ void VertexArray::AddVertexBuffer(Ref<VertexBuffer> vertexBuffer) {
 			case BufferDataType::Vec4:
 			{
 				glEnableVertexAttribArray(m_BufferIndex);
-				glVertexAttribPointer(m_BufferIndex++, element.Count, GL_FLOAT,
-									  element.Normalized ? GL_FALSE : GL_TRUE,
-									  stride, (void*)offset);
+				glVertexAttribPointer(
+					m_BufferIndex++, count, GL_FLOAT, normalized, stride,
+					(void*)offset
+				);
 				break;
 			}
 			case BufferDataType::Mat2:
 			case BufferDataType::Mat3:
 			case BufferDataType::Mat4:
 			{
-				for(uint32_t i = 0; i < element.Count; i++) {
+				uint64_t offsetVal = offset;
+				uint32_t perInstance = 0; // How many instances before switching vec?
+				uint32_t vecSize = sizeof(float) * count;
+				if(layout.StructureOfArrays) {
+					offsetVal = 0;
+					perInstance = 1;
+				}
+				for(uint32_t i = 0; i < count; i++) {
 					glEnableVertexAttribArray(m_BufferIndex);
-					glVertexAttribPointer(m_BufferIndex, element.Count,
-						GL_FLOAT, element.Normalized ? GL_FALSE : GL_TRUE,
-						stride,
-						(void*)(offset + (sizeof(float) * element.Count * i))
+					glVertexAttribPointer(
+						m_BufferIndex, count, GL_FLOAT, normalized, stride,
+						(void*)(offsetVal + (vecSize * i))
 					);
 
-					glVertexAttribDivisor(m_BufferIndex++, 1);
+					glVertexAttribDivisor(m_BufferIndex++, perInstance);
 				}
 				break;
 			}
 		}
+
 		offset += element.Size;
 	}
 

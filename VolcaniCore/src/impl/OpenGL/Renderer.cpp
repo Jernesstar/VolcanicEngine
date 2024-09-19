@@ -60,9 +60,9 @@ void Renderer::Init() {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	// glEnable(GL_CULL_FACE);
-	// glFrontFace(GL_CCW);
-	// glCullFace(GL_BACK);
+	glEnable(GL_CULL_FACE);
+	glFrontFace(GL_CCW);
+	glCullFace(GL_BACK);
 
 	float cubemapVertices[] =
 	{
@@ -154,7 +154,7 @@ void Renderer::Init() {
 		BufferLayout{
 			{ { "Transform", BufferDataType::Mat4 } },
 			true, // Dynamic
-			true, // Structure of arrays
+			true // Structure of arrays
 		},
 		RendererData::MaxInstances
 	);
@@ -219,8 +219,8 @@ static void DrawMesh(DrawCall& call) {
 		return;
 	}
 
-	auto& geometry	 = call.GeometryBuffer;
 	auto& indices	 = call.IndexBuffer;
+	auto& geometry	 = call.GeometryBuffer;
 	auto& transforms = call.TransformBuffer;
 	uint32_t indexCount = indices.GetCount();
 	uint32_t instanceCount = transforms.GetCount();
@@ -231,15 +231,13 @@ static void DrawMesh(DrawCall& call) {
 	if(call.Type == DrawType::Indexed)
 		s_Data.Indices->SetData(indices);
 
-	if(call.Partition == DrawPartition::Single)
-	{
+	if(call.Partition == DrawPartition::Single) {
 		if(call.Type == DrawType::Array)
 			glDrawArrays(GL_TRIANGLES, 0, indexCount);
 		else
 			glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
 	}
-	if(call.Partition == DrawPartition::Instanced)
-	{
+	else if(call.Partition == DrawPartition::Instanced) {
 		s_Data.TransformBuffer->SetData(transforms);
 
 		if(call.Type == DrawType::Array)

@@ -110,6 +110,7 @@ Cube::Cube()
 		);
 	controller.SetCamera(camera);
 	controller.RotationSpeed = 0.0f;
+	controller.TranslationSpeed = 1.0f;
 }
 
 Cube::~Cube() {
@@ -132,7 +133,7 @@ void Cube::OnUpdate(TimeStep ts) {
 
 	ImGui::Begin("Debug");
 	{
-
+		ImGui::Text("Test");
 	}
 	ImGui::End();
 
@@ -142,15 +143,15 @@ void Cube::OnUpdate(TimeStep ts) {
 
 		Renderer3D::Begin(camera);
 
-		// for(int y = 0; y < 1; y++)
-		// 	for(int x = 0; x < 2; x++)
-				// Renderer3D::DrawMesh(cube, { .Translation = { x, 0.0f, y } });
-		Renderer3D::DrawMesh(cube);
-		Renderer3D::DrawMesh(cube, { .Translation = { 2.0f, 0.0f, 0.0f } });
+		for(int y = -5; y < 5; y++)
+			for(int x = -5; x < 5; x++)
+				Renderer3D::DrawMesh(cube, { .Translation = { x, 0.0f, y } });
 
 		Renderer3D::End();
 	}
 	Renderer::EndPass();
+
+	// VOLCANICORE_LOG_INFO("FPS: %0.1f", Renderer::GetDebugInfo().FPS);
 
 	// RendererAPI::Get()->RenderFramebuffer(framebuffer, AttachmentTarget::Color);
 

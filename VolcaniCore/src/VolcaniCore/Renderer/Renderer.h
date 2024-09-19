@@ -61,7 +61,7 @@ struct FrameData {
 	List<DrawCommand> DrawCommands;
 	FrameDebugInfo Info;
 
-	void AddDrawCommand(DrawCommand command);
+	void AddDrawCommand(DrawCommand& command);
 };
 
 class Renderer {

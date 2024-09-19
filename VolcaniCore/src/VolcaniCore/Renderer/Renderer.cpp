@@ -24,7 +24,7 @@ void DrawCommand::AddMesh(Ref<Mesh> mesh, const glm::mat4& transform) {
 	Meshes[mesh].Add(transform);
 }
 
-void FrameData::AddDrawCommand(DrawCommand command) {
+void FrameData::AddDrawCommand(DrawCommand& command) {
 	DrawCommands.push_back(command);
 }
 
@@ -36,19 +36,11 @@ void Renderer::Close() {
 
 }
 
-Ref<RenderPass> Renderer::GetPass() {
-	return s_RenderPass;
-}
-DrawCommand& Renderer::GetDrawCommand() {
-	return *s_DrawCommand;
-}
-FrameDebugInfo Renderer::GetDebugInfo() {
-	return s_Frame.Info;
-}
+Ref<RenderPass> Renderer::GetPass() { return s_RenderPass; }
+DrawCommand& Renderer::GetDrawCommand() { return *s_DrawCommand; }
+FrameDebugInfo Renderer::GetDebugInfo() { return s_Frame.Info; }
 
-FrameData& Renderer::GetFrame() {
-	return s_Frame;
-}
+FrameData& Renderer::GetFrame() { return s_Frame; }
 
 static void Flush(DrawCommand& command);
 static List<DrawCall> CreateDrawCalls(DrawCommand& command);
@@ -87,10 +79,11 @@ void Renderer::Resize(uint32_t width, uint32_t height) {
 
 void Renderer::BeginFrame() {
 	RendererAPI::Get()->StartFrame();
+
+	s_Frame.Info.DrawCalls = 0;
 }
 
 void Renderer::EndFrame() {
-	s_Frame.Info.DrawCalls = 0;
 	for(auto& command : s_Frame.DrawCommands) {
 		Flush(command);
 	}

@@ -5,6 +5,7 @@
 
 #include "Core/Application.h"
 #include "Core/Input.h"
+#include "Core/Log.h"
 
 namespace VolcaniCore {
 
@@ -27,26 +28,30 @@ void CameraController::OnUpdate(TimeStep ts) {
 
 	glm::vec3 up(0.0f, 1.0f, 0.0f);
 	glm::vec3 forward = m_Camera->GetDirection();
-	glm::vec3 right = glm::cross(forward, up);
+	glm::vec3 right = glm::normalize(glm::cross(forward, up));
 
 	float speed = TranslationSpeed * 0.001f;
-	glm::ivec3 dir;
+	glm::ivec3 dir(0);
+	glm::vec3 finalDir(0.0f);
 	if(dir.x = Input::KeyPressed(m_Controls[Control::Right])
 			 - Input::KeyPressed(m_Controls[Control::Left]))
 	{
-		m_Camera->Position += (float)dir.x * right * speed * (float)ts;
+		finalDir += (float)dir.x * right;
 	}
 	if(dir.y = Input::KeyPressed(m_Controls[Control::Up])
 			 - Input::KeyPressed(m_Controls[Control::Down]))
 	{
-		m_Camera->Position += (float)dir.y * up * speed * (float)ts;
+		finalDir += (float)dir.y * up;
 	}
 	if(dir.z = Input::KeyPressed(m_Controls[Control::Forward])
 			 - Input::KeyPressed(m_Controls[Control::Backward]))
 	{
-		m_Camera->Position += (float)dir.z * forward * speed * (float)ts;
+		finalDir += (float)dir.z * forward;
 	}
 	moved = dir.x || dir.y || dir.z;
+
+	if(moved)
+		m_Camera->Position += glm::normalize(finalDir) * speed * (float)ts;
 
 	if((delta.x != 0.0f || delta.y != 0.0f) && RotationSpeed != 0.0f) {
 		float pitchDelta = delta.y * RotationSpeed;
