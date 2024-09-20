@@ -38,15 +38,19 @@ void OrthographicCamera::CalculateView() {
 	glm::mat4 transform = glm::translate(glm::mat4(1.0f), Position)
 						* glm::rotate(glm::mat4(1.0f), glm::radians(m_Rotation),
 									  glm::vec3{ 0, 0, 1 });
-	// lightView = glm::lookAt(lightPos, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-
-	View = glm::inverse(transform);
+	// View = glm::inverse(transform);
+	View = glm::lookAt(Position, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	ViewProjection = Projection * View;
 }
 
 void OrthographicCamera::CalculateProjection() {
 	float asp = ViewportWidth/ViewportHeight;
-	Projection = glm::ortho(-asp, asp, -1.0f/asp, 1.0f/asp, Near, Far);
+
+	Projection = glm::ortho(-(float)ViewportWidth  / 2.0f,
+							 (float)ViewportWidth  / 2.0f,
+							-(float)ViewportHeight / 2.0f,
+							 (float)ViewportHeight / 2.0f, Near, Far);
+	// Projection = glm::ortho(-asp, asp, -1.0f/asp, 1.0f/asp, Near, Far);
 	ViewProjection = Projection * View;
 }
 

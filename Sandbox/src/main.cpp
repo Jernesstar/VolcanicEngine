@@ -18,9 +18,9 @@
 #include <VolcaniCore/Object/Model.h>
 #include <VolcaniCore/Object/Texture.h>
 
+#include <Magma/Scene/Scene.h>
+#include <Magma/Scene/SceneSerializer.h>
 #include <Magma/Editor/Editor.h>
-#include <Magma/Editor/Scene.h>
-#include <Magma/Editor/SceneSerializer.h>
 
 #include <Magma/UI/UI.h>
 

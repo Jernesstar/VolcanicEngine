@@ -3,8 +3,8 @@
 uniform sampler2D u_Diffuse;
 uniform sampler2D u_ShadowMap;
 
-uniform vec3 u_LightPos;
-uniform vec3 u_ViewPos;
+uniform vec3 u_LightPosition;
+uniform vec3 u_CameraPosition;
 
 in VS_OUT {
     vec3 FragPos;
@@ -26,7 +26,7 @@ float ShadowCalculation(vec4 fragPosLightSpace)
     // get depth of current fragment from light's perspective
     float currentDepth = projCoords.z;
     // check whether current frag pos is in shadow
-    // vec3 lightDir = normalize(fs_in.FragPos - u_LightPos);
+    // vec3 lightDir = normalize(fs_in.FragPos - u_LightPosition);
     // float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
     float shadow = currentDepth > closestDepth ? 1.0 : 0.0;
 
@@ -46,11 +46,11 @@ void main()
     // ambient
     vec3 ambient = 0.15 * lightColor;
     // diffuse
-    vec3 lightDir = normalize(u_LightPos - fs_in.FragPos);
+    vec3 lightDir = normalize(u_LightPosition - fs_in.FragPos);
     float diff = max(dot(lightDir, normal), 0.0);
     vec3 diffuse = diff * lightColor;
     // specular
-    vec3 viewDir = normalize(u_ViewPos - fs_in.FragPos);
+    vec3 viewDir = normalize(u_CameraPosition - fs_in.FragPos);
     float spec = 0.0;
     vec3 halfwayDir = normalize(lightDir + viewDir);
     spec = pow(max(dot(normal, halfwayDir), 0.0), 64.0);

@@ -8,6 +8,10 @@
 
 namespace VolcaniCore {
 
+static void FlushCommand(DrawCommand& command);
+static List<DrawCall> CreateDrawCalls(DrawCommand& command);
+static DrawOptionsMap GetOrReturnDefaults(const DrawOptionsMap& map);
+
 const uint32_t FrameDebugInfo::MaxInstances = 1000;
 const uint32_t FrameDebugInfo::MaxTriangles = 1'000'000;
 const uint32_t FrameDebugInfo::MaxVertices  = MaxTriangles * 3;
@@ -49,15 +53,7 @@ void Renderer::Close() {
 	IndexBuffer.Delete();
 }
 
-Ref<RenderPass> Renderer::GetPass() { return s_RenderPass; }
-DrawCommand& Renderer::GetDrawCommand() { return *s_DrawCommand; }
-FrameDebugInfo Renderer::GetDebugInfo() { return s_Frame.Info; }
-
 FrameData& Renderer::GetFrame() { return s_Frame; }
-
-static void Flush(DrawCommand& command);
-static List<DrawCall> CreateDrawCalls(DrawCommand& command);
-static DrawOptionsMap GetOrReturnDefaults(const DrawOptionsMap& map);
 
 void Renderer::BeginFrame() {
 	RendererAPI::Get()->StartFrame();
@@ -66,9 +62,7 @@ void Renderer::BeginFrame() {
 }
 
 void Renderer::EndFrame() {
-	for(auto& command : s_Frame.DrawCommands) {
-		Flush(command);
-	}
+	Flush();
 	s_Frame.DrawCommands.clear();
 
 	RendererAPI::Get()->EndFrame();
@@ -97,6 +91,12 @@ void Renderer::NewDrawCommand(const DrawOptionsMap& map) {
 	s_DrawCommand = &s_Frame.DrawCommands[lastIndex];
 }
 
+void Renderer::Flush() {
+	for(auto& command : s_Frame.DrawCommands) {
+		FlushCommand(command);
+	}
+}
+
 void Renderer::Clear(const glm::vec4& color) {
 	s_DrawCommand->Clear = true;
 }
@@ -105,7 +105,19 @@ void Renderer::Resize(uint32_t width, uint32_t height) {
 	s_DrawCommand->Size = { width, height };
 }
 
-void Flush(DrawCommand& command) {
+Ref<RenderPass> Renderer::GetPass() {
+	return s_RenderPass;
+}
+
+DrawCommand& Renderer::GetDrawCommand() {
+	return *s_DrawCommand;
+}
+
+FrameDebugInfo Renderer::GetDebugInfo() {
+	return s_Frame.Info;
+}
+
+void FlushCommand(DrawCommand& command) {
 	auto framebuffer = command.Pass->GetOutput();
 	if(framebuffer) {
 		RendererAPI::Get()

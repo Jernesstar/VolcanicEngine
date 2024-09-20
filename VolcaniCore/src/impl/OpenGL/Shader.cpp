@@ -65,6 +65,9 @@ void ShaderProgram::Compile() {
 
 void ShaderProgram::SetInt(const std::string& name, int _int) {
 	GLint location = glGetUniformLocation(m_ProgramID, name.c_str());
+
+	// if(location = -1)
+	// 	VOLCANICORE_LOG_WARNING("[OpenGL]: Could not find uniform %s in shader program %s", name.c_str(), this->ProgramName.c_str());
 	glUniform1i(location, _int);
 }
 

@@ -89,14 +89,13 @@ Cube::Cube()
 	renderPass = RenderPass::Create("Render Pass", shader);
 	renderPass->SetOutput(framebuffer);
 
-	// cube = Mesh::Create(MeshPrimitive::Cube, { 1.0f, 0.0f, 0.0f, 1.0f });
 	cube = Mesh::Create(MeshPrimitive::Cube,
 		Material{
 			.Diffuse = Texture::Create("Sandbox/assets/images/wood.png")
 		});
 
 	// camera = CreateRef<StereographicCamera>(75.0f);
-	// camera = CreateRef<OrthographicCamera>(800, 600, 0.1f, 100.0f);
+	// camera = CreateRef<OrthographicCamera>(1920, 1080, 0.1f, 100.0f);
 	camera = CreateRef<IsometricCamera>();
 	controller =
 		CameraController(
@@ -109,6 +108,8 @@ Cube::Cube()
 				}
 			)
 		);
+	camera->Resize(480, 270);
+
 	controller.SetCamera(camera);
 	controller.RotationSpeed = 0.0f;
 	controller.TranslationSpeed = 1.0f;
@@ -134,7 +135,7 @@ void Cube::OnUpdate(TimeStep ts) {
 
 	ImGui::Begin("Debug");
 	{
-		ImGui::Text("Test");
+		ImGui::Text("%0.1f", Renderer::GetDebugInfo().FPS);
 	}
 	ImGui::End();
 
@@ -151,8 +152,6 @@ void Cube::OnUpdate(TimeStep ts) {
 		Renderer3D::End();
 	}
 	Renderer::EndPass();
-
-	// VOLCANICORE_LOG_INFO("FPS: %0.1f", Renderer::GetDebugInfo().FPS);
 
 	RendererAPI::Get()->RenderFramebuffer(framebuffer, AttachmentTarget::Color);
 

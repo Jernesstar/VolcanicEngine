@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Magma/UI/UI.h>
-#include <Magma/Editor/Scene.h>
+#include <Magma/Scene/Scene.h>
 
 #include "Level.h"
 

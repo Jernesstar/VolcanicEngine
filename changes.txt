@@ -17,6 +17,7 @@ change:
 	Removed Point, Line, and Mesh buffers in OpenGL::Renderer::RendererData in favor of a single Geometry buffer
 	Renamed VolcaniCore::Renderer::RenderCubemap -> DrawSkybox
 	Renamed LinkHandles -> SetUniforms, class Handles -> Uniforms, HandleMap -> UniformMap
+	Scene, SceneSerializer -> Scene/
 
 feat_begin:
 	Created Vertex.h
@@ -30,6 +31,8 @@ feat_begin:
 feat_end:
 	Application calculates the FPS
 	struct TextureSlot
+	Uniforms::Set now deduces template argument from lambda return type
+	Uncapped FPS by calling glfwSetSwapInterval(0)
 
 todo:
 	Change all instances of vector, unordered_map and function to their corresponding using definitions

@@ -12,10 +12,10 @@ public:
 		m_Element = CreateRef<TUIElement>();
 	}
 
-	template<typename ...Args>
-	UIBuilder(Args&&... args) {
-		m_Element = CreateRef<TUIElement>(std::forward<Args>(args)...);
+	UIBuilder(const TUIElement::Specification& specs) {
+		m_Element = TUIElement::Create(specs);
 	}
+
 	~UIBuilder() = default;
 
 	template<typename TElement>

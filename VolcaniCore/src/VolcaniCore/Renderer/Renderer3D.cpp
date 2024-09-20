@@ -11,17 +11,17 @@ void Renderer3D::Begin(Ref<Camera> camera) {
 	auto& uniforms = Renderer::GetPass()->GetUniforms();
 
 	uniforms
-	.Set<glm::mat4>("u_ViewProj",
-		[camera]()
+	.Set("u_ViewProj",
+		[camera]() -> glm::mat4
 		{
 			return camera->GetViewProjection();
 		});
-	// uniforms
-	// .Set<glm::vec3>("u_CameraPosition",
-	// 	[camera]()
-	// 	{
-	// 		return camera->GetPosition();
-	// 	});
+	uniforms
+	.Set("u_CameraPosition",
+		[camera]() -> glm::vec3
+		{
+			return camera->GetPosition();
+		});
 }
 
 void Renderer3D::End() {
@@ -45,16 +45,18 @@ void Renderer3D::DrawMesh(Ref<Mesh> mesh, const glm::mat4& tr) {
 	auto& uniforms = command.GetUniforms();
 
 	uniforms
-	.Set<TextureSlot>("u_Diffuse",
-		[mesh]() {
+	.Set("u_Diffuse",
+		[mesh]() -> TextureSlot
+		{
 			Material material = mesh->GetMaterial();
-			return TextureSlot{ material.Diffuse, 0 };
+			return { material.Diffuse, 0 };
 		});
 	uniforms
-	.Set<TextureSlot>("u_Specular",
-		[mesh]() {
+	.Set("u_Specular",
+		[mesh]() -> TextureSlot
+		{
 			Material material = mesh->GetMaterial();
-			return TextureSlot{ material.Specular, 1 };
+			return { material.Specular, 1 };
 		});
 
 	command.AddMesh(mesh, tr);

@@ -71,13 +71,11 @@ struct FrameData {
 
 class Renderer {
 public:
-	static void BeginFrame();
-	static void EndFrame();
-
 	static void StartPass(Ref<RenderPass> pass);
 	static void EndPass();
 
 	static void NewDrawCommand(const DrawOptionsMap& = { });
+	static void Flush();
 
 	static void Clear(const glm::vec4& color = glm::vec4(0.0f));
 	static void Resize(uint32_t width, uint32_t height);
@@ -89,6 +87,10 @@ public:
 private:
 	static void Init();
 	static void Close();
+
+	static void BeginFrame();
+	static void EndFrame();
+
 	static FrameData& GetFrame();
 
 	friend class Application;

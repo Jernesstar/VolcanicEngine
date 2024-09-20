@@ -6,7 +6,7 @@
 #include <Renderer/Camera.h>
 #include <Renderer/CameraController.h>
 
-#include <Magma/Editor/Scene.h>
+#include <Magma/Scene/Scene.h>
 #include <Magma/UI/UI.h>
 
 using namespace VolcaniCore;

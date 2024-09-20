@@ -11,8 +11,7 @@ public:
 	void OnUpdate(TimeStep ts);
 
 private:
-	// void RenderScene(Ref<Camera> camera);
-	void RenderScene();
+	void RenderScene(Ref<Camera> camera);
 
 	Ref<ShaderPipeline> depthShader;
 	Ref<ShaderPipeline> shadowShader;
@@ -24,8 +23,9 @@ private:
 
 	Ref<OpenGL::Framebuffer> depthMap;
 
-	// Ref<Camera> depthCamera;
-	// Ref<Camera> sceneCamera;
+	Ref<Camera> depthCamera;
+	Ref<Camera> sceneCamera;
+	CameraController controller;
 };
 
 Shadows::Shadows() {
@@ -60,55 +60,71 @@ Shadows::Shadows() {
 			.Diffuse = Texture::Create("Sandbox/assets/images/wood.png")
 		});
 
-	// depthCamera = CreateRef<OrthographicCamera>(20.0f, 20.0f, 1.0f, 7.5f);
-	// sceneCamera = CreateRef<StereographicCamera>(75.0f);
+	depthCamera = CreateRef<OrthographicCamera>(20.0f, 20.0f, 1.0f, 7.5f);
+	sceneCamera = CreateRef<StereographicCamera>(75.0f);
+
+	depthCamera->SetPosition({ -2.0f, 4.0f, -1.0f });
+
+	controller = CameraController{ sceneCamera };
 }
 
 void Shadows::OnUpdate(TimeStep ts) {
-	glm::mat4 lightProjection, lightView, lightSpaceMatrix;
-	glm::vec3 lightPos = glm::vec3(-2.0f, 4.0f, -1.0f);
-	float near = 1.0f, far = 7.5f;
-
-	lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near, far);
-	lightView = glm::lookAt(lightPos, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-	lightSpaceMatrix = lightProjection * lightView;
+	controller.OnUpdate(ts);
 
 	Renderer::StartPass(depthPass);
 	{
 		Renderer::Clear();
 		
-		Renderer::GetPass()
-		->GetUniforms()
-			.Set<glm::mat4>(
-				"u_LightSpaceMatrix",
-				[lightSpaceMatrix]() {
-					return lightSpaceMatrix;
-				}
-			);
+		Renderer::GetPass()->GetUniforms()
+		.Set("u_LightSpaceMatrix",
+			[&]() -> glm::mat4
+			{
+				return depthCamera->GetViewProjection();
+			});
 
 		// render scene from light's point of view
-		RenderScene();
+		RenderScene(depthCamera);
 	}
 	Renderer::EndPass();
 
 	Renderer::StartPass(shadowPass);
 	{
 		Renderer::Clear();
+		
+		Renderer::GetPass()->GetUniforms()
+		.Set("u_ShadowMap",
+			[&]() -> TextureSlot
+			{
+				depthMap->Get(AttachmentTarget::Depth).Bind(1);
+				shadowShader->SetInt("u_ShadowMap", 1);
 
-		depthMap->Get(AttachmentTarget::Depth).Bind(1);
-		shadowShader->SetInt("u_ShadowMap", 1);
+				return { nullptr, 0 };
+			}
+		);
 
-		shadowShader->SetMat4("u_LightSpaceMatrix", lightSpaceMatrix);
+		Renderer::GetPass()->GetUniforms()
+		.Set("u_LightSpaceMatrix",
+			[&]() -> glm::mat4
+			{
+				return depthCamera->GetViewProjection();
+			});
 
-		RenderScene();
+		Renderer::GetPass()->GetUniforms()
+		.Set("u_LightPosition",
+			[&]() -> glm::vec3
+			{
+				return depthCamera->GetPosition();
+			});
+
+		RenderScene(sceneCamera);
 	}
 	Renderer::EndPass();
 
-	// RendererAPI::Get()->RenderFramebuffer(depthMap, AttachmentTarget::Depth);
+	RendererAPI::Get()->RenderFramebuffer(depthMap, AttachmentTarget::Depth);
 }
 
-void Shadows::RenderScene() {
-	// Renderer3D::Begin(camera);
+void Shadows::RenderScene(Ref<Camera> camera) {
+	Renderer3D::Begin(camera);
 
 	Renderer3D::DrawMesh(cube, { .Translation = { -2.0f,  0.0f,  0.0f } });
 	Renderer3D::DrawMesh(cube, { .Translation = {  2.0f,  0.0f,  0.0f } });
@@ -120,7 +136,7 @@ void Shadows::RenderScene() {
 									.Scale = glm::vec3(20.0f)
 								});
 
-	// Renderer3D::End();
+	Renderer3D::End();
 }
 
 }

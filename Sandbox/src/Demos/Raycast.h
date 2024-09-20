@@ -96,18 +96,21 @@ Raycast::Raycast() {
 	outlinePass = RenderPass::Create("Outline Pass", outlineShader);
 
 	outlinePass->GetUniforms()
-	.Set<glm::vec2>("u_PixelSize",
-		[this]() {
+	.Set("u_PixelSize",
+		[this]() -> glm::vec2
+		{
 			return pixelSize;
 		});
 	outlinePass->GetUniforms()
-	.Set<glm::vec4>("u_Color",
-		[this]() {
+	.Set("u_Color",
+		[this]() -> glm::vec4
+		{
 			return outlineColor;
 		});
 	maskPass->GetUniforms()
-	.Set<glm::vec4>("u_Color",
-		[]() {
+	.Set("u_Color",
+		[]() -> glm::vec4
+		{
 			return glm::vec4(1.0f);
 		});
 
@@ -173,7 +176,7 @@ void Raycast::OnUpdate(TimeStep ts) {
 	}
 	Renderer::EndPass();
 
-	Renderer::EndFrame();
+	Renderer::Flush();
 
 	// 4. Full-screen quad applying some image processing function
 	Renderer::StartPass(outlinePass);

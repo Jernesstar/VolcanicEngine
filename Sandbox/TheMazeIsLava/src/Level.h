@@ -10,7 +10,7 @@
 #include <VolcaniCore/Core/Time.h>
 #include <VolcaniCore/Object/Texture.h>
 
-#include <Magma/Editor/Scene.h>
+#include <Magma/Scene/Scene.h>
 
 using namespace VolcaniCore;
 using namespace Magma;

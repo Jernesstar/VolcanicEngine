@@ -33,8 +33,10 @@ public:
 	HandleMap<glm::mat3> Mat3Handles;
 	HandleMap<glm::mat4> Mat4Handles;
 
-	template<typename TUniform>
-	void Set(const std::string& uniformName, ValueCallback<TUniform> callback) {
+	template<class TPredicate>
+	void Set(const std::string& uniformName, TPredicate&& callback) {
+		using TUniform = std::decay_t<decltype(callback())>;
+
 		GetHandles<TUniform>()[uniformName] = callback;
 	}
 

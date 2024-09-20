@@ -10,11 +10,11 @@ public:
 	void OnUpdate(TimeStep ts);
 
 private:
-	Ref<Magma::UI::UIElement> Root;
+	Ref<UI::UIElement> Root;
 };
 
 UILayer::UILayer() {
-	Magma::UI::Init();
+	UI::Init();
 
 	Events::RegisterListener<KeyPressedEvent>(
 	[](const KeyPressedEvent& event) {
@@ -23,18 +23,18 @@ UILayer::UILayer() {
 	});
 
 	Root =
-	Magma::UI::UIBuilder<Magma::UI::Window>(
-		Magma::UI::Window::Specification
+		UI::UIBuilder<UI::Window>(
+			UI::Window::Specification
+			{
+				.x = 400, .y = 400
+			}
+		)
+		.Add<UI::Button>(
 		{
-			.x = 400, .y = 400
-		}
-	)
-		.Add<Magma::UI::Button>(
-		{
-			.Text = "Test Button",
 			.Color = { 0.0f, 1.0f, 1.0f, 1.0f },
+			.Text = "Test Button",
 		})
-		.Add<Magma::UI::Text>(
+		.Add<UI::Text>(
 		{
 			.Text = "Root UI",
 			.Color = { 0.0f, 1.0f, 0.0f, 1.0f },
@@ -46,15 +46,15 @@ UILayer::UILayer() {
 }
 
 UILayer::~UILayer() {
-	Magma::UI::Close();
+	UI::Close();
 }
 
 void UILayer::OnUpdate(TimeStep ts) {
-	Magma::UI::Begin();
+	UI::Begin();
 
 	Root->Render();
 
-	Magma::UI::End();
+	UI::End();
 }
 
 }

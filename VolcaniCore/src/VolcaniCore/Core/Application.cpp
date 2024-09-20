@@ -45,6 +45,9 @@ void Application::Run() {
 		TimeStep ts = time - s_LastFrame;
 		s_LastFrame = time;
 
+		float fps = (1.0f / (float)ts) * 1000.0f;
+		Renderer::GetFrame().Info.FPS = fps;
+
 		Events::PollEvents();
 
 		Renderer::BeginFrame();
@@ -52,9 +55,6 @@ void Application::Run() {
 			s_Instance->OnUpdate(ts);
 		}
 		Renderer::EndFrame();
-
-		float fps = (1.0f / (float)ts) * 1000.0f;
-		Renderer::GetFrame().Info.FPS = fps;
 
 		s_Window->Update();
 	}

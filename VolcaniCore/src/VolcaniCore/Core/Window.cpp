@@ -14,6 +14,7 @@ Window::Window(uint32_t width, uint32_t height) {
 	VOLCANICORE_ASSERT(m_NativeWindow, "Could not create the window");
 
 	glfwMakeContextCurrent(m_NativeWindow);
+	glfwSwapInterval(0);
 
 	Events::RegisterListener<WindowClosedEvent>(
 	[](const WindowClosedEvent& event) {
