@@ -42,7 +42,7 @@ using namespace Magma::Physics;
 #include "Demos/Lighting.h"
 #include "Demos/Shadows.h"
 #include "Demos/Bloom.h"
-#include "Demos/UI.h"
+#include "Demos/UILayer.h"
 #include "Demos/ECS.h"
 #include "Demos/Raycast.h"
 #include "Demos/Collision.h"
@@ -68,7 +68,7 @@ Application* CreateApplication(const CommandLineArgs& args) {
 	if(project == "Bloom")	   return new Demo::Bloom();
 
 	// UI
-	if(project == "UI")		   return new Demo::UI();
+	if(project == "UI")		   return new Demo::UILayer();
 
 	// Entity component system
 	if(project == "ECS")	   return new Demo::ECS();
