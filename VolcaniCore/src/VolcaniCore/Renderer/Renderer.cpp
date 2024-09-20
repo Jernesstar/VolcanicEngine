@@ -8,9 +8,18 @@
 
 namespace VolcaniCore {
 
+const uint32_t FrameDebugInfo::MaxInstances = 1000;
+const uint32_t FrameDebugInfo::MaxTriangles = 1'000'000;
+const uint32_t FrameDebugInfo::MaxVertices  = MaxTriangles * 3;
+const uint32_t FrameDebugInfo::MaxIndices   = MaxVertices  * 2; /* (3.0f / 2.0f) */
+
 static Ref<RenderPass> s_RenderPass;
 static DrawCommand* s_DrawCommand;
 static FrameData s_Frame;
+
+static Buffer<Vertex> GeometryBuffer;
+static Buffer<uint32_t> IndexBuffer;
+static Buffer<glm::mat4> TransformBuffer;
 
 void DrawCommand::AddPoint(Ref<Point> point, const glm::mat4& transform) {
 	Points[point].Add(transform);
@@ -30,10 +39,14 @@ void FrameData::AddDrawCommand(DrawCommand& command) {
 
 void Renderer::Init() {
 	s_Frame = { };
+	IndexBuffer     = Buffer<uint32_t>(FrameDebugInfo::MaxIndices);
+	GeometryBuffer  = Buffer<Vertex>(FrameDebugInfo::MaxVertices);
+	TransformBuffer = Buffer<glm::mat4>(FrameDebugInfo::MaxInstances);
 }
 
 void Renderer::Close() {
-
+	GeometryBuffer.Delete();
+	IndexBuffer.Delete();
 }
 
 Ref<RenderPass> Renderer::GetPass() { return s_RenderPass; }
@@ -45,6 +58,21 @@ FrameData& Renderer::GetFrame() { return s_Frame; }
 static void Flush(DrawCommand& command);
 static List<DrawCall> CreateDrawCalls(DrawCommand& command);
 static DrawOptionsMap GetOrReturnDefaults(const DrawOptionsMap& map);
+
+void Renderer::BeginFrame() {
+	RendererAPI::Get()->StartFrame();
+
+	s_Frame.Info.DrawCalls = 0;
+}
+
+void Renderer::EndFrame() {
+	for(auto& command : s_Frame.DrawCommands) {
+		Flush(command);
+	}
+	s_Frame.DrawCommands.clear();
+
+	RendererAPI::Get()->EndFrame();
+}
 
 void Renderer::StartPass(Ref<RenderPass> pass) {
 	s_RenderPass = pass;
@@ -77,22 +105,6 @@ void Renderer::Resize(uint32_t width, uint32_t height) {
 	s_DrawCommand->Size = { width, height };
 }
 
-void Renderer::BeginFrame() {
-	RendererAPI::Get()->StartFrame();
-
-	s_Frame.Info.DrawCalls = 0;
-}
-
-void Renderer::EndFrame() {
-	for(auto& command : s_Frame.DrawCommands) {
-		Flush(command);
-	}
-
-	s_Frame.DrawCommands.clear();
-
-	RendererAPI::Get()->EndFrame();
-}
-
 void Flush(DrawCommand& command) {
 	auto framebuffer = command.Pass->GetOutput();
 	if(framebuffer) {
@@ -102,9 +114,8 @@ void Flush(DrawCommand& command) {
 	}
 
 	// if(s_DrawCommand->Pass != command.Pass)
-		// command.Pass->SetUniforms();
+		command.Pass->SetGlobalUniforms();
 
-	command.Pass->SetGlobalUniforms();
 	command.Pass->SetUniforms(command.GetUniforms());
 
 	if(command.Clear)
@@ -123,12 +134,13 @@ void Flush(DrawCommand& command) {
 		RendererAPI::Get()->Resize(window->GetWidth(), window->GetHeight());
 	}
 
-	// s_DrawCommand = &command;
+	s_DrawCommand = &command;
 }
 
 List<DrawCall> CreateDrawCalls(DrawCommand& command) {
 	auto& options = command.OptionsMap;
 	List<DrawCall> calls;
+	uint32_t geomIndex = 0, indicesIndex = 0;
 
 	// // TODO(Implement):
 	// DrawCall pointCall{
@@ -173,18 +185,20 @@ List<DrawCall> CreateDrawCalls(DrawCommand& command) {
 		return calls;
 	}
 
-	for(auto [mesh, transforms] : command.Meshes) {
+	for(auto& [mesh, transforms] : command.Meshes) {
 		DrawCall meshCall{
 			.Type	   = options[DrawPrimitive::Mesh].Type,
 			.Partition = options[DrawPrimitive::Mesh].Partition,
 			.Primitive = DrawPrimitive::Mesh
 		};
 
-		// TODO(Fix): Have a big buffer and partition it
-		meshCall.GeometryBuffer = Buffer<Vertex>(mesh->GetVertices());
+		meshCall.GeometryBuffer = Buffer<Vertex>(GeometryBuffer, geomIndex++);
+		meshCall.GeometryBuffer.Add(mesh->GetVertices());
 
-		if(meshCall.Type == DrawType::Indexed)
-			meshCall.IndexBuffer = Buffer<uint32_t>(mesh->GetIndices());
+		if(meshCall.Type == DrawType::Indexed) {
+			meshCall.IndexBuffer = Buffer<uint32_t>(IndexBuffer, indicesIndex++);
+			meshCall.IndexBuffer.Add(mesh->GetIndices());
+		}
 
 		if(meshCall.Partition == DrawPartition::Instanced)
 			meshCall.TransformBuffer = transforms;

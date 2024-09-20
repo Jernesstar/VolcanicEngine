@@ -22,20 +22,27 @@ public:
 		m_Data = new T[m_MaxCount];
 		memcpy(m_Data, list.data(), GetSize());
 	}
-	Buffer(T* buffer, uint32_t count, uint32_t index = 0)
-		: m_MaxCount(count), m_Index(index)
+	// Buffer(void* buffer, uint32_t count, uint32_t index = 0)
+	// 	: m_MaxCount(count), m_Index(index)
+	// {
+	// 	m_Data = (T*)buffer;
+	// }
+	Buffer(const Buffer<T>& buffer, uint32_t index)
+		: m_MaxCount(buffer.GetMaxCount()), m_Index(0)
 	{
-		m_Data = buffer;
-	}
-	Buffer(void* buffer, uint32_t count, uint32_t index = 0)
-		: m_MaxCount(count), m_Index(index)
-	{
-		m_Data = (T*)buffer;
+		m_Data = buffer.Get() + index;
 	}
 	Buffer(const Buffer&) = default;
 	Buffer(Buffer&&) = default;
 	~Buffer() = default;
 	Buffer& operator =(const Buffer&) = default;
+
+	Buffer<T> Copy() {
+		Buffer<T> newBuffer(this->GetMaxCount());
+		newBuffer.Add(*this);
+
+		return newBuffer;
+	}
 
 	T* Get() const { return m_Data; }
 

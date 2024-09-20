@@ -72,14 +72,21 @@ void Shadows::OnUpdate(TimeStep ts) {
 	lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near, far);
 	lightView = glm::lookAt(lightPos, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	lightSpaceMatrix = lightProjection * lightView;
-	// render scene from light's point of view
 
 	Renderer::StartPass(depthPass);
 	{
 		Renderer::Clear();
+		
+		Renderer::GetPass()
+		->GetUniforms()
+			.Set<glm::mat4>(
+				"u_LightSpaceMatrix",
+				[lightSpaceMatrix]() {
+					return lightSpaceMatrix;
+				}
+			);
 
-		depthShader->SetMat4("u_LightSpaceMatrix", lightSpaceMatrix);
-
+		// render scene from light's point of view
 		RenderScene();
 	}
 	Renderer::EndPass();

@@ -69,8 +69,8 @@ private:
 };
 
 Cube::Cube()
-	: Application(800, 600, "Cube Demo")
-	// : Application(1920, 1080, "Cube Demo")
+	// : Application(800, 600, "Cube Demo")
+	: Application(1920, 1080, "Cube Demo")
 {
 	Events::RegisterListener<KeyPressedEvent>(
 	[](const KeyPressedEvent& event) {
@@ -84,11 +84,12 @@ Cube::Cube()
 		{ "VolcaniCore/assets/shaders/Mesh.glsl.vert", ShaderType::Vertex },
 		{ "VolcaniCore/assets/shaders/Mesh.glsl.frag", ShaderType::Fragment }
 	});
-	// framebuffer = CreateRef<OpenGL::Framebuffer>(480, 270);
+	framebuffer = CreateRef<OpenGL::Framebuffer>(480, 270);
 
 	renderPass = RenderPass::Create("Render Pass", shader);
-	// renderPass->SetOutput(framebuffer);
+	renderPass->SetOutput(framebuffer);
 
+	// cube = Mesh::Create(MeshPrimitive::Cube, { 1.0f, 0.0f, 0.0f, 1.0f });
 	cube = Mesh::Create(MeshPrimitive::Cube,
 		Material{
 			.Diffuse = Texture::Create("Sandbox/assets/images/wood.png")
@@ -153,7 +154,7 @@ void Cube::OnUpdate(TimeStep ts) {
 
 	// VOLCANICORE_LOG_INFO("FPS: %0.1f", Renderer::GetDebugInfo().FPS);
 
-	// RendererAPI::Get()->RenderFramebuffer(framebuffer, AttachmentTarget::Color);
+	RendererAPI::Get()->RenderFramebuffer(framebuffer, AttachmentTarget::Color);
 
 	Magma::UI::End();
 }

@@ -55,6 +55,11 @@ struct DrawCommand {
 struct FrameDebugInfo {
 	uint32_t DrawCalls;
 	float FPS;
+
+	static const uint32_t MaxInstances;
+	static const uint32_t MaxTriangles;
+	static const uint32_t MaxVertices;
+	static const uint32_t MaxIndices;
 };
 
 struct FrameData {
@@ -66,6 +71,9 @@ struct FrameData {
 
 class Renderer {
 public:
+	static void BeginFrame();
+	static void EndFrame();
+
 	static void StartPass(Ref<RenderPass> pass);
 	static void EndPass();
 
@@ -73,9 +81,6 @@ public:
 
 	static void Clear(const glm::vec4& color = glm::vec4(0.0f));
 	static void Resize(uint32_t width, uint32_t height);
-
-	static void BeginFrame();
-	static void EndFrame();
 
 	static Ref<RenderPass> GetPass();
 	static DrawCommand& GetDrawCommand();

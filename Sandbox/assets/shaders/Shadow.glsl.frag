@@ -36,7 +36,7 @@ float ShadowCalculation(vec4 fragPosLightSpace)
 void main()
 {
     vec3 color;
-    if(fs_in.TexCoords.a = 0.0)
+    if(fs_in.TexCoords.a == 0.0)
         color = fs_in.TexCoords.xyz;
     else
         color = texture(u_Diffuse, fs_in.TexCoords.xy).rgb;

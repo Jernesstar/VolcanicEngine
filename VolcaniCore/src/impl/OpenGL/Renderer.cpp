@@ -24,11 +24,6 @@ using namespace VolcaniCore;
 namespace VolcaniCore::OpenGL {
 
 struct RendererData {
-	inline static const uint32_t MaxInstances = 100;
-	inline static const uint32_t MaxTriangles = 1'000'000;
-	inline static const uint32_t MaxVertices  = MaxTriangles * 3;
-	inline static const uint32_t MaxIndices   = MaxVertices  * 2/* (3.0f / 2.0f) */;
-
 	Ptr<VertexArray> CubemapArray;
 	Ptr<VertexArray> FramebufferArray;
 
@@ -147,7 +142,7 @@ void Renderer::Init() {
 			true, // Dynamic
 			false // Structure of arrays
 		},
-		RendererData::MaxVertices
+		FrameDebugInfo::MaxVertices
 	);
 	// TODO(Change): Turn into MappedBuffer
 	s_Data.TransformBuffer = CreateRef<VertexBuffer>(
@@ -156,9 +151,9 @@ void Renderer::Init() {
 			true, // Dynamic
 			true // Structure of arrays
 		},
-		RendererData::MaxInstances
+		FrameDebugInfo::MaxInstances
 	);
-	s_Data.Indices = CreateRef<IndexBuffer>(RendererData::MaxIndices, true);
+	s_Data.Indices = CreateRef<IndexBuffer>(FrameDebugInfo::MaxIndices, true);
 
 	s_Data.Array = CreatePtr<VertexArray>();
 	s_Data.Array->SetIndexBuffer(s_Data.Indices);
