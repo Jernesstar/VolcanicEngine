@@ -53,7 +53,7 @@ std::string FileUtils::ReadFile(const std::string& file_path) {
 	// this operation returns the size of the file
 	size_t size = in.tellg();
 
-	VOLCANICORE_ASSERT_ARGS(size != -1, "Could not read from file: %s",
+	VOLCANICORE_ASSERT_ARGS(size != -1, "Could not read from file '%s'",
 										file_path.c_str());
 
 	std::string str;
@@ -79,7 +79,7 @@ unsigned char* FileUtils::ReadImage(const std::string& path,
 	stbi_set_flip_vertically_on_load((int)flip);
 	unsigned char* pixelData = stbi_load(path.c_str(), &width, &height,
 										 &bitsPerPixel, desiredChannels);
-	VOLCANICORE_ASSERT_ARGS(pixelData, "Could not load image from path %s",
+	VOLCANICORE_ASSERT_ARGS(pixelData, "Could not load image from path '%s'",
 										path.c_str());
 
 	return pixelData;

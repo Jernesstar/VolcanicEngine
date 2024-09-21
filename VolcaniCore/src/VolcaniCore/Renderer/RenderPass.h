@@ -15,8 +15,8 @@ template<typename TOut>
 using HandleMap = Map<std::string, ValueCallback<TOut>>;
 
 struct TextureSlot {
-	Ref<Texture> Sampler;
-	uint32_t Index;
+	Ref<Texture> Sampler = nullptr;
+	uint32_t Index = 0;
 };
 
 class Uniforms {

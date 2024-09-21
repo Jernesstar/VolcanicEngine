@@ -13,6 +13,8 @@ Texture2D::Texture2D(uint32_t width, uint32_t height)
 	: Texture(width, height), InternalFormat(GL_RGBA8), DataFormat(GL_RGBA)
 {
 	glCreateTextures(GL_TEXTURE_2D, 1, &m_TextureID);
+	glBindTexture(GL_TEXTURE_2D, m_TextureID);
+
 	glTextureStorage2D(m_TextureID, 1, InternalFormat, m_Width, m_Height);
 
 	glTextureParameteri(m_TextureID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -29,6 +31,8 @@ Texture2D::Texture2D(const std::string& path)
 		FileUtils::ReadImage(path.c_str(), m_Width, m_Height, 4, false);
 
 	glCreateTextures(GL_TEXTURE_2D, 1, &m_TextureID);
+	glBindTexture(GL_TEXTURE_2D, m_TextureID);
+
 	glTextureStorage2D(m_TextureID, 1, InternalFormat, m_Width, m_Height);
 
 	glTextureParameteri(m_TextureID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -52,6 +56,7 @@ void Texture2D::Bind(uint32_t slot)
 
 void Texture2D::SetData(const void* data)
 {
+	glBindTexture(GL_TEXTURE_2D, m_TextureID);
 	glTextureSubImage2D(m_TextureID, 0, 0, 0, m_Width, m_Height, DataFormat,
 						GL_UNSIGNED_BYTE, data);
 }
@@ -59,6 +64,7 @@ void Texture2D::SetData(const void* data)
 void Texture2D::SetData(const glm::ivec2& pos, const glm::ivec2& size,
 						const void* data)
 {
+	glBindTexture(GL_TEXTURE_2D, m_TextureID);
 	VOLCANICORE_ASSERT(pos.x + size.x <= m_Width && pos.y + size.y <= m_Height,
 						"Coordinates must be within the bounds of the texture.");
 

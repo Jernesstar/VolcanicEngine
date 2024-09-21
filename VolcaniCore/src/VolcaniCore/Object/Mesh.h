@@ -15,7 +15,7 @@ struct Material {
 	Ref<Texture> Specular = nullptr;
 };
 
-// TODO(Change): Make Point and Line and kind of Mesh
+// TODO(Change): Make Point and Line a kind of Mesh
 enum class MeshPrimitive { Point, Line, Quad, Cube, Pyramid };
 
 class Mesh {

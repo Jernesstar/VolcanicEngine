@@ -91,12 +91,14 @@ Cube::Cube()
 
 	cube = Mesh::Create(MeshPrimitive::Cube,
 		Material{
-			.Diffuse = Texture::Create("Sandbox/assets/images/wood.png")
+			.Diffuse = Texture::Create("Sandbox/assets/images/wood.png"),
+			.Specular = Texture::Create("Sandbox/assets/images/wood_specular.png")
 		});
 
 	// camera = CreateRef<StereographicCamera>(75.0f);
 	// camera = CreateRef<OrthographicCamera>(1920, 1080, 0.1f, 100.0f);
 	camera = CreateRef<IsometricCamera>();
+	camera->Resize(480, 270);
 	controller =
 		CameraController(
 			MovementControls(
@@ -108,7 +110,6 @@ Cube::Cube()
 				}
 			)
 		);
-	camera->Resize(480, 270);
 
 	controller.SetCamera(camera);
 	controller.RotationSpeed = 0.0f;
