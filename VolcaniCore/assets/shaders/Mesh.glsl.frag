@@ -8,13 +8,13 @@ layout(location = 1) in vec3 v_Normal;
 layout(location = 2) in vec4 v_TexCoord_Color;
 layout(location = 3) in flat int v_Textured;
 
-layout(location = 0) out vec4 FragColor;
+out vec4 FragColor;
 
 void main()
 {
     vec3 color = v_TexCoord_Color.xyz;
     if(v_Textured == 1)
-        color = texture(u_Specular, v_TexCoord_Color.xy).rgb;
+        color = texture(u_Diffuse, v_TexCoord_Color.xy).rgb;
 
     FragColor = vec4(color, 1.0);
 }

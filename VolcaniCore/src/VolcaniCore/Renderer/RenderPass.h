@@ -21,7 +21,7 @@ struct TextureSlot {
 
 class Uniforms {
 public:
-	HandleMap<uint32_t> IntHandles;
+	HandleMap<int32_t> IntHandles;
 	HandleMap<float>	FloatHandles;
 	HandleMap<TextureSlot> TextureHandles;
 
@@ -68,8 +68,8 @@ public:
 		m_Output = output;
 	}
 
-	void SetGlobalUniforms();
 	void SetUniforms(const Uniforms& uniforms);
+	void SetGlobalUniforms();
 
 	Ref<ShaderPipeline> GetPipeline() const { return m_Pipeline; }
 	Ref<Framebuffer> GetOutput() const { return m_Output; }

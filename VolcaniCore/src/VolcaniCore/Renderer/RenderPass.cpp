@@ -14,7 +14,7 @@ for(auto& [uniformName, valueCallback] : uniforms.TUniform##Handles) \
 
 namespace VolcaniCore {
 
-GET_HANDLES(uint32_t, Int)
+GET_HANDLES(int32_t, Int)
 GET_HANDLES(float, Float)
 GET_HANDLES(TextureSlot, Texture)
 GET_HANDLES(glm::vec2, Vec2)

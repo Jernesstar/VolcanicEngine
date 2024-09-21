@@ -27,7 +27,7 @@ public:
 	void Bind() const override;
 	void Unbind() const override;
 
-	void SetInt(const std::string& name, int _int) override;
+	void SetInt(const std::string& name, int32_t _int) override;
 	void SetFloat(const std::string& name, float _float) override;
 	void SetTexture(const std::string& name, Ref<Texture> texture,
 					uint32_t slot) override;

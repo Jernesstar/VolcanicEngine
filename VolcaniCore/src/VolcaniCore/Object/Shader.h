@@ -37,7 +37,7 @@ public:
 	virtual void Bind() const = 0;
 	virtual void Unbind() const = 0;
 
-	virtual void SetInt(const std::string& name, int _int) = 0;
+	virtual void SetInt(const std::string& name, int32_t _int) = 0;
 	virtual void SetFloat(const std::string& name, float _float) = 0;
 	virtual void SetTexture(const std::string& name, Ref<Texture> texture,
 							uint32_t slot) = 0;

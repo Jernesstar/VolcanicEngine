@@ -202,11 +202,11 @@ List<DrawCall> CreateDrawCalls(DrawCommand& command) {
 			.Primitive = DrawPrimitive::Mesh
 		};
 
-		meshCall.GeometryBuffer = Buffer<Vertex>(GeometryBuffer, geomIndex++);
+		// meshCall.GeometryBuffer = Buffer<Vertex>(GeometryBuffer, geomIndex++);
 		meshCall.GeometryBuffer.Add(mesh->GetVertices());
 
 		if(meshCall.Type == DrawType::Indexed) {
-			meshCall.IndexBuffer = Buffer<uint32_t>(IndexBuffer, indicesIndex++);
+			// meshCall.IndexBuffer = Buffer<uint32_t>(IndexBuffer, indicesIndex++);
 			meshCall.IndexBuffer.Add(mesh->GetIndices());
 		}
 

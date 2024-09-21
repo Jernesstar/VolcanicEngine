@@ -63,11 +63,9 @@ void ShaderProgram::Compile() {
 	}
 }
 
-void ShaderProgram::SetInt(const std::string& name, int _int) {
+void ShaderProgram::SetInt(const std::string& name, int32_t _int) {
 	GLint location = glGetUniformLocation(m_ProgramID, name.c_str());
 
-	// if(location = -1)
-	// 	VOLCANICORE_LOG_WARNING("[OpenGL]: Could not find uniform %s in shader program %s", name.c_str(), this->ProgramName.c_str());
 	glUniform1i(location, _int);
 }
 
@@ -79,10 +77,8 @@ void ShaderProgram::SetFloat(const std::string& name, float _float) {
 void ShaderProgram::SetTexture(const std::string& name,
 								Ref<Texture> texture, uint32_t slot)
 {
-	VOLCANICORE_ASSERT(slot >= 0);
-
 	texture->As<OpenGL::Texture2D>()->Bind(slot);
-	SetInt(name, slot);
+	SetInt(name, (int32_t)slot);
 }
 
 void ShaderProgram::SetVec2(const std::string& name, const glm::vec2& vec) {

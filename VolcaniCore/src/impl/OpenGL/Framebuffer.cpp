@@ -77,8 +77,8 @@ Framebuffer::Framebuffer(uint32_t width, uint32_t height,
 void Framebuffer::CreateColorAttachment(Attachment& attachment) {
 	if(attachment.Type == AttachmentType::Texture) {
 		glGenTextures(1, &attachment.m_RendererID);
-
 		glBindTexture(GL_TEXTURE_2D, attachment.m_RendererID);
+
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_Width, m_Height, 0, GL_RGB,
 					 GL_UNSIGNED_BYTE, NULL);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -88,6 +88,7 @@ void Framebuffer::CreateColorAttachment(Attachment& attachment) {
 
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
 								GL_TEXTURE_2D, attachment.m_RendererID, 0);
+		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 	else if(attachment.Type == AttachmentType::RenderBuffer) {
 		// TODO(Implement):
@@ -109,6 +110,7 @@ void Framebuffer::CreateDepthAttachment(Attachment& attachment) {
 		glBindFramebuffer(GL_FRAMEBUFFER, m_BufferID);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
 							   GL_TEXTURE_2D, attachment.m_RendererID, 0);
+		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 	else if(attachment.Type == AttachmentType::RenderBuffer)
 	{
