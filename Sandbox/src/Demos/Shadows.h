@@ -1,5 +1,6 @@
 #pragma once
 
+#include <OpenGL/Texture2D.h>
 #include <OpenGL/Framebuffer.h>
 
 namespace Demo {
@@ -11,7 +12,7 @@ public:
 	void OnUpdate(TimeStep ts);
 
 private:
-	void RenderScene(Ref<Camera> camera);
+	void RenderScene();
 
 	Ref<ShaderPipeline> depthShader;
 	Ref<ShaderPipeline> shadowShader;
@@ -55,10 +56,12 @@ Shadows::Shadows() {
 
 	shadowPass = RenderPass::Create("Shadow Pass", shadowShader);
 
-	cube = Mesh::Create(MeshPrimitive::Cube,
-		Material{
-			.Diffuse = Texture::Create("Sandbox/assets/images/wood.png")
-		});
+	cube =
+		Mesh::Create(MeshPrimitive::Cube,
+			Material{
+				.Diffuse = Texture::Create("Sandbox/assets/images/stone.png")
+			}
+		);
 
 	depthCamera = CreateRef<OrthographicCamera>(20.0f, 20.0f, 1.0f, 7.5f);
 	sceneCamera = CreateRef<StereographicCamera>(75.0f);
@@ -66,6 +69,7 @@ Shadows::Shadows() {
 	depthCamera->SetPosition({ -2.0f, 4.0f, -1.0f });
 
 	controller = CameraController{ sceneCamera };
+	controller.TranslationSpeed = 5.0f;
 }
 
 void Shadows::OnUpdate(TimeStep ts) {
@@ -74,7 +78,7 @@ void Shadows::OnUpdate(TimeStep ts) {
 	Renderer::StartPass(depthPass);
 	{
 		Renderer::Clear();
-		
+
 		Renderer::GetPass()->GetUniforms()
 		.Set("u_LightSpaceMatrix",
 			[&]() -> glm::mat4
@@ -82,15 +86,34 @@ void Shadows::OnUpdate(TimeStep ts) {
 				return depthCamera->GetViewProjection();
 			});
 
-		// render scene from light's point of view
-		RenderScene(depthCamera);
+		RenderScene();
 	}
 	Renderer::EndPass();
+
+	Renderer::Flush();
 
 	Renderer::StartPass(shadowPass);
 	{
 		Renderer::Clear();
 		
+		Renderer::GetPass()->GetUniforms()
+		.Set("u_ViewProj",
+			[&]() -> glm::mat4
+			{
+				return sceneCamera->GetViewProjection();
+			});
+		Renderer::GetPass()->GetUniforms()
+		.Set("u_LightSpaceMatrix",
+			[&]() -> glm::mat4
+			{
+				return depthCamera->GetViewProjection();
+			});
+		Renderer::GetPass()->GetUniforms()
+		.Set("u_Diffuse",
+			[&]() -> TextureSlot
+			{
+				return { cube->GetMaterial().Diffuse, 0 };
+			});
 		Renderer::GetPass()->GetUniforms()
 		.Set("u_ShadowMap",
 			[&]() -> TextureSlot
@@ -98,33 +121,30 @@ void Shadows::OnUpdate(TimeStep ts) {
 				depthMap->Get(AttachmentTarget::Depth).Bind(1);
 				shadowShader->SetInt("u_ShadowMap", 1);
 
-				return { nullptr, 0 };
-			}
-		);
-
-		Renderer::GetPass()->GetUniforms()
-		.Set("u_LightSpaceMatrix",
-			[&]() -> glm::mat4
-			{
-				return depthCamera->GetViewProjection();
+				return { };
 			});
-
 		Renderer::GetPass()->GetUniforms()
 		.Set("u_LightPosition",
 			[&]() -> glm::vec3
 			{
 				return depthCamera->GetPosition();
 			});
+		Renderer::GetPass()->GetUniforms()
+		.Set("u_CameraPosition",
+			[&]() -> glm::vec3
+			{
+				return sceneCamera->GetPosition();
+			});
 
-		RenderScene(sceneCamera);
+		RenderScene();
 	}
 	Renderer::EndPass();
 
-	RendererAPI::Get()->RenderFramebuffer(depthMap, AttachmentTarget::Depth);
+	// RendererAPI::Get()->RenderFramebuffer(depthMap, AttachmentTarget::Depth);
 }
 
-void Shadows::RenderScene(Ref<Camera> camera) {
-	Renderer3D::Begin(camera);
+void Shadows::RenderScene() {
+	// Renderer3D::Begin(camera);
 
 	Renderer3D::DrawMesh(cube, { .Translation = { -2.0f,  0.0f,  0.0f } });
 	Renderer3D::DrawMesh(cube, { .Translation = {  2.0f,  0.0f,  0.0f } });

@@ -45,15 +45,14 @@ void Renderer::Init() {
 	s_Frame = { };
 	IndexBuffer     = Buffer<uint32_t>(FrameDebugInfo::MaxIndices);
 	GeometryBuffer  = Buffer<Vertex>(FrameDebugInfo::MaxVertices);
-	TransformBuffer = Buffer<glm::mat4>(FrameDebugInfo::MaxInstances);
+	// TransformBuffer = Buffer<glm::mat4>(FrameDebugInfo::MaxInstances);
 }
 
 void Renderer::Close() {
 	GeometryBuffer.Delete();
 	IndexBuffer.Delete();
+	// TransformBuffer.Delete();
 }
-
-FrameData& Renderer::GetFrame() { return s_Frame; }
 
 void Renderer::BeginFrame() {
 	RendererAPI::Get()->StartFrame();
@@ -63,7 +62,6 @@ void Renderer::BeginFrame() {
 
 void Renderer::EndFrame() {
 	Flush();
-	s_Frame.DrawCommands.clear();
 
 	RendererAPI::Get()->EndFrame();
 }
@@ -95,6 +93,8 @@ void Renderer::Flush() {
 	for(auto& command : s_Frame.DrawCommands) {
 		FlushCommand(command);
 	}
+
+	s_Frame.DrawCommands.clear();
 }
 
 void Renderer::Clear(const glm::vec4& color) {
@@ -117,6 +117,8 @@ FrameDebugInfo Renderer::GetDebugInfo() {
 	return s_Frame.Info;
 }
 
+FrameData& Renderer::GetFrame() { return s_Frame; }
+
 void FlushCommand(DrawCommand& command) {
 	auto framebuffer = command.Pass->GetOutput();
 	if(framebuffer) {
@@ -125,15 +127,13 @@ void FlushCommand(DrawCommand& command) {
 		framebuffer->Bind();
 	}
 
-	// if(s_DrawCommand->Pass != command.Pass)
-		command.Pass->SetGlobalUniforms();
-
+	command.Pass->SetGlobalUniforms();
 	command.Pass->SetUniforms(command.GetUniforms());
 
 	if(command.Clear)
 		RendererAPI::Get()->Clear();
-	// if(command.Size != glm::ivec2{ 0, 0 })
-	// 	RendererAPI::Get()->Resize(command.Size.x, command.Size.y);
+	if(command.Size != glm::ivec2{ 0, 0 })
+		RendererAPI::Get()->Resize(command.Size.x, command.Size.y);
 
 	for(auto call : CreateDrawCalls(command)) {
 		RendererAPI::Get()->SubmitDrawCall(call);
@@ -145,8 +145,6 @@ void FlushCommand(DrawCommand& command) {
 		auto window = Application::GetWindow();
 		RendererAPI::Get()->Resize(window->GetWidth(), window->GetHeight());
 	}
-
-	s_DrawCommand = &command;
 }
 
 List<DrawCall> CreateDrawCalls(DrawCommand& command) {
@@ -226,21 +224,24 @@ DrawOptionsMap GetOrReturnDefaults(const DrawOptionsMap& map) {
 	{
 		{
 			DrawPrimitive::Point,
-			DrawOptions{
+			DrawOptions
+			{
 				.Type = DrawType::Array,
 				.Partition = DrawPartition::Single
 			}
 		},
 		{
 			DrawPrimitive::Line,
-			DrawOptions{
+			DrawOptions
+			{
 				.Type = DrawType::Array,
 				.Partition = DrawPartition::Single
 			}
 		},
 		{
 			DrawPrimitive::Mesh,
-			DrawOptions{
+			DrawOptions
+			{
 				.Type = DrawType::Indexed,
 				.Partition = DrawPartition::Instanced
 			}
