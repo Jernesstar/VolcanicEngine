@@ -19,10 +19,9 @@ private:
 	Ref<RenderPass> depthPass;
 	Ref<RenderPass> shadowPass;
 
-	Ref<Mesh> torch;
-	Ref<Mesh> cube;
-
 	Ref<OpenGL::Framebuffer> depthMap;
+
+	Ref<Mesh> cube;
 
 	Ref<Camera> depthCamera;
 	Ref<Camera> sceneCamera;
@@ -50,16 +49,14 @@ Shadows::Shadows() {
 		{ AttachmentTarget::Depth, OpenGL::AttachmentType::Texture }
 	};
 
-	depthPass = RenderPass::Create("Depth Pass", depthShader);
-
 	cube = Mesh::Create(MeshPrimitive::Cube,
 			Material{
 				.Diffuse = Texture::Create("Sandbox/assets/images/wood.png")
 			});
 	depthMap = CreateRef<OpenGL::Framebuffer>(1024, 1024, attachments);
 
+	depthPass = RenderPass::Create("Depth Pass", depthShader);
 	depthPass->SetOutput(depthMap);
-
 	shadowPass = RenderPass::Create("Shadow Pass", shadowShader);
 
 	depthCamera = CreateRef<OrthographicCamera>(20.0f, 20.0f, 1.0f, 7.5f);

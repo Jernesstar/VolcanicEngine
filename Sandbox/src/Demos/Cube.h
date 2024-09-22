@@ -1,7 +1,5 @@
 #pragma once
 
-#include <imgui/imgui.h>
-
 #include <OpenGL/Framebuffer.h>
 
 using namespace VolcaniCore;
@@ -61,7 +59,7 @@ private:
 	Ref<RenderPass> renderPass;
 	Ref<Framebuffer> framebuffer;
 
-	Ref<Mesh> torch;
+	// Ref<Mesh> torch;
 	Ref<Mesh> cube;
 
 	Ref<Camera> camera;
@@ -78,7 +76,7 @@ Cube::Cube()
 			Application::Close();
 	});
 
-	Magma::UI::Init();
+	UI::Init();
 
 	shader = ShaderPipeline::Create({
 		{ "VolcaniCore/assets/shaders/Mesh.glsl.vert", ShaderType::Vertex },
@@ -117,11 +115,11 @@ Cube::Cube()
 }
 
 Cube::~Cube() {
-	Magma::UI::Close();
+	UI::Close();
 }
 
 void Cube::OnUpdate(TimeStep ts) {
-	Magma::UI::Begin();
+	UI::Begin();
 
 	controller.OnUpdate(ts);
 
@@ -156,7 +154,7 @@ void Cube::OnUpdate(TimeStep ts) {
 
 	RendererAPI::Get()->RenderFramebuffer(framebuffer, AttachmentTarget::Color);
 
-	Magma::UI::End();
+	UI::End();
 }
 
 }

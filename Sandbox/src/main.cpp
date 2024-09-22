@@ -22,6 +22,7 @@
 #include <Magma/Scene/SceneSerializer.h>
 #include <Magma/Editor/Editor.h>
 
+#include <imgui/imgui.h>
 #include <Magma/UI/UI.h>
 
 #include <Magma/ECS/World.h>

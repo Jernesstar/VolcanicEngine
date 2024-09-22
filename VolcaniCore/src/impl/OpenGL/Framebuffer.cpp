@@ -77,17 +77,25 @@ Framebuffer::Framebuffer(uint32_t width, uint32_t height,
 void Framebuffer::CreateColorAttachment(Attachment& attachment) {
 	if(attachment.Type == AttachmentType::Texture) {
 		glGenTextures(1, &attachment.m_RendererID);
+		// glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, attachment.m_RendererID);
 		glBindTexture(GL_TEXTURE_2D, attachment.m_RendererID);
 
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_Width, m_Height, 0, GL_RGB,
-					 GL_UNSIGNED_BYTE, NULL);
+		uint32_t internalFormat = GL_RGBA16F;
+		uint32_t colorFormat    = GL_RGBA;
+		glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, m_Width, m_Height, 0,
+					 GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+		// uint32_t samples = 4;
+		// glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, GL_RGB, m_Width, m_Height, GL_TRUE);
+
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-								GL_TEXTURE_2D, attachment.m_RendererID, 0);
+								GL_TEXTURE_2D, attachment.m_RendererID, 0);\
+		// glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, attachment.m_RendererID, 0);
+
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 	else if(attachment.Type == AttachmentType::RenderBuffer) {
@@ -99,7 +107,6 @@ void Framebuffer::CreateDepthAttachment(Attachment& attachment) {
 	if(attachment.Type == AttachmentType::Texture) {
 		glGenTextures(1, &attachment.m_RendererID);
 		glBindTexture(GL_TEXTURE_2D, attachment.m_RendererID);
-
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, m_Width, m_Height, 0,
 					 GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);

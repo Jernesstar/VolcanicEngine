@@ -140,8 +140,9 @@ uint32_t CreateShader(const ShaderFile& shader) {
 		char* message = (char*)alloca(length * sizeof(char));
 		glGetShaderInfoLog(shaderID, length, &length, message);
 
-		VOLCANICORE_ASSERT_ARGS(false, "A compile error was detected for shader \
-								file at %s:\n%s", shader.Path.c_str(), message);
+		VOLCANICORE_ASSERT_ARGS(false,
+			"A compile error was detected for shader file at %s:\n%s",
+			shader.Path.c_str(), message);
 	}
 
 	return shaderID;

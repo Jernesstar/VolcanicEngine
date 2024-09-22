@@ -23,7 +23,7 @@ public:
 
 public:
 	UniformBuffer(const BufferLayout& layout, uint32_t binding,
-					uint32_t count = 1, const void* data = nullptr)
+				  uint32_t count = 1, const void* data = nullptr)
 		: Layout(layout), Binding(binding),
 			Count(count), Size(count * layout.Stride)
 	{
@@ -34,7 +34,7 @@ public:
 
 	template<typename T>
 	UniformBuffer(const BufferLayout& layout, uint32_t binding,
-					Buffer<T> buffer)
+				  Buffer<T> buffer)
 		: Layout(layout), Binding(binding),
 			Count(buffer.GetCount()), Size(buffer.GetSize())
 	{
