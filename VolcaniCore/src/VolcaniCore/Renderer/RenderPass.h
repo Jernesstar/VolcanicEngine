@@ -65,7 +65,7 @@ public:
 	~RenderPass() = default;
 
 	void SetOutput(Ref<Framebuffer> output) {
-		m_Output = output;
+		m_Output.reset(output);
 	}
 
 	void SetUniforms(const Uniforms& uniforms);

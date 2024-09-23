@@ -72,8 +72,8 @@ Bloom::Bloom() {
 	drawPass = RenderPass::Create("Draw Pass", shader);
 
 	std::vector<OpenGL::Attachment> attachments{
-		{ AttachmentTarget::Color, OpenGL::AttachmentType::Texture },
-		{ AttachmentTarget::Depth, OpenGL::AttachmentType::Texture }
+		{ AttachmentTarget::Color, OpenGL::Attachment::Type::Texture },
+		{ AttachmentTarget::Depth, OpenGL::Attachment::Type::Texture }
 	};
 	src = CreateRef<OpenGL::Framebuffer>(800, 600, attachments);
 	drawPass->SetOutput(src);
@@ -189,21 +189,17 @@ void Bloom::InitMips(uint32_t mipChainLength)
 
 		mipChain.emplace_back(mip);
 	}
-	uint32_t FBO;
-	glGenFramebuffers(1, &FBO);
-	glBindFramebuffer(GL_FRAMEBUFFER, FBO);
 
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-							GL_TEXTURE_2D, mipChain[0].texture, 0);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	// mips = Framebuffer::Create(AttachmentTarget::Color, mipChain[0].Sampler);
+	mips = Framebuffer::Create(
+	{
+		{ AttachmentTarget::Color, { mipChain[0].Sampler } }
+	});
 }
 
 void Bloom::Downsample(float filterRadius) {
 	for(const auto& mip : mipChain) {
 		Renderer::Resize(mip.size.x, mip.size.y);
-		// mips->SetColorAttachment(0, mip.Sampler);
+		mips->Set(AttachmentTarget::Color, mip.Sampler);
 
 		RendererAPI::Get()->RenderFramebuffer(mips, AttachmentTarget::Color);
 
@@ -241,7 +237,7 @@ void Bloom::Upsample(float filterRadius) {
 
 		// Set framebuffer render target (we write to this texture)
 		Renderer::Resize(nextMip.size.x, nextMip.size.y);
-		// mips->SetColorAttachment(0, nextMip.Sampler);
+		mips->Set(AttachmentTarget::Color, nextMip.Sampler);
 
 		RendererAPI::Get()->RenderFramebuffer(mips, AttachmentTarget::Color);
 	}

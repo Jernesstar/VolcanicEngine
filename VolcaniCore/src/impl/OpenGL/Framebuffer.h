@@ -1,34 +1,30 @@
 #pragma once
 
-#include <cstdint>
-#include <vector>
-#include <unordered_map>
+#include <Core/Defines.h>
 
-#include <Object/Texture.h>
-
-#include "Object/Framebuffer.h"
+#include <Object/Framebuffer.h>
 
 namespace VolcaniCore::OpenGL {
-
-enum class AttachmentType { Texture, RenderBuffer, None };
 
 class Framebuffer;
 
 class Attachment {
 public:
-	VolcaniCore::AttachmentTarget Target;
-	AttachmentType Type;
+	enum class Type { Texture, RenderBuffer };
 
 public:
 	Attachment() = default;
-	Attachment(AttachmentTarget target, AttachmentType type)
-		: Target(target), Type(type) { }
+	Attachment(Attachment::Type type, uint32_t id = 0)
+		: Type(type), m_RendererID(id) { }
 	~Attachment();
 
 	void Bind(uint32_t slot = 0) const;
 	uint32_t GetRendererID() const;
 
+	Attachment::Type GetType() const { return m_Type; }
+
 private:
+	Attachment::Type m_Type;
 	uint32_t m_RendererID;
 
 	friend class Framebuffer;
@@ -38,32 +34,28 @@ class Framebuffer : public VolcaniCore::Framebuffer {
 public:
 	Framebuffer(uint32_t width, uint32_t height);
 	Framebuffer(uint32_t witdth, uint32_t height,
-				const std::vector<Attachment>& attachments);
-	Framebuffer(AttachmentTarget target, Ref<Texture> texture);
+				const Map<AttachmentTarget, List<Attachment>>& attachmentMap);
 	~Framebuffer();
 
-	// TODO(Implement):
-	void Resize(uint32_t width, uint32_t height) override { }
 	void Bind() const override;
 	void Unbind() const override;
 
 	bool Has(AttachmentTarget target) const override {
-		if(m_Attachments.count(target) == 1)
-			return m_Attachments.at(target).Type != AttachmentType::None;
-
-		return false;
+		return m_AttachmentMap.count(target) == 1;
 	}
+	void Set(AttachmentTarget target,
+			 Ref<Texture> texture, uint32_t index = 0) const override;
 
-	const Attachment& Get(AttachmentTarget target) const {
-		return m_Attachments.at(target);
+	const Attachment& Get(AttachmentTarget target, uint32_t index = 0) const {
+		return m_AttachmentMap.at(target).at(index);
 	}
 
 private:
-	void CreateColorAttachment(Attachment& attachment);
+	void CreateColorAttachment(Attachment& attachment, uint32_t index);
 	void CreateDepthAttachment(Attachment& attachment);
 	void CreateStencilAttachment(Attachment& attachment);
 
-	std::unordered_map<AttachmentTarget, Attachment> m_Attachments;
+	Map<AttachmentTarget, List<Attachment>> m_AttachmentMap;
 	uint32_t m_BufferID;
 };
 

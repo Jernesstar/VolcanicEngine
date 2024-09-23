@@ -10,9 +10,6 @@ namespace VolcaniCore::OpenGL {
 
 class Texture2D : public VolcaniCore::Texture {
 public:
-	const uint32_t InternalFormat, DataFormat;
-
-public:
 	Texture2D(const std::string& path);
 	Texture2D(uint32_t width, uint32_t height);
 	Texture2D(const Texture2D& other) = default;
@@ -31,9 +28,12 @@ public:
 		return this->m_TextureID == other.m_TextureID;
 	}
 
+	static constexpr uint32_t CreateTexture(uint32_t width, uint32_t height,
+		Texture::InternalFormat internal, Texture::ColorFormat color)
+
 private:
 	uint32_t m_TextureID;
-	int m_Width = 0, m_Height = 0;
+	const uint32_t m_InternalFormat, m_DataFormat;
 };
 
 }

@@ -45,8 +45,8 @@ Shadows::Shadows() {
 	});
 
 	std::vector<OpenGL::Attachment> attachments{
-		{ AttachmentTarget::Color, OpenGL::AttachmentType::Texture },
-		{ AttachmentTarget::Depth, OpenGL::AttachmentType::Texture }
+		{ AttachmentTarget::Color, { OpenGL::Attachment::Type::Texture } },
+		{ AttachmentTarget::Depth, { OpenGL::Attachment::Type::Texture } }
 	};
 	depthMap = CreateRef<OpenGL::Framebuffer>(1024, 1024, attachments);
 
