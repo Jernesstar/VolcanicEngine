@@ -12,7 +12,6 @@ class Texture2D : public VolcaniCore::Texture {
 public:
 	Texture2D(const std::string& path);
 	Texture2D(uint32_t width, uint32_t height);
-	Texture2D(const Texture2D& other) = default;
 	~Texture2D();
 
 	void Bind(uint32_t slot = 0);
@@ -28,8 +27,9 @@ public:
 		return this->m_TextureID == other.m_TextureID;
 	}
 
-	static constexpr uint32_t CreateTexture(uint32_t width, uint32_t height,
-		Texture::InternalFormat internal, Texture::ColorFormat color)
+	static uint32_t CreateTexture(uint32_t width, uint32_t height,
+		Texture::InternalFormat internal = Texture::InternalFormat::Normal,
+		Texture::ColorFormat color       = Texture::ColorFormat::RGBA);
 
 private:
 	uint32_t m_TextureID;

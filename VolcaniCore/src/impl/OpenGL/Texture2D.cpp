@@ -10,24 +10,29 @@
 namespace VolcaniCore::OpenGL {
 
 Texture2D::Texture2D(uint32_t width, uint32_t height)
-	: Texture(width, height), m_InternalFormat(RGBA8), m_ColorFormat(RGBA)
+	: Texture(width, height), m_InternalFormat(GL_RGBA8), m_DataFormat(GL_RGBA)
 {
 	m_TextureID = CreateTexture(width, height);
 }
 
 Texture2D::Texture2D(const std::string& path)
-	: Texture(path), m_InternalFormat(RGBA8), m_ColorFormat(RGBA)
+	: Texture(path), m_InternalFormat(GL_RGBA8), m_DataFormat(GL_RGBA)
 {
+	int32_t width, height;
+	unsigned char* pixelData = FileUtils::ReadImage(path, width, height, 4);
+	m_Width = (uint32_t)width;
+	m_Height = (uint32_t)height;
+
 	m_TextureID = CreateTexture(m_Width, m_Height);
 
-	unsigned char* pixelData =
-		FileUtils::ReadImage(path.c_str(), m_Width, m_Height, 4, false);
-
 	SetData(pixelData);
+
 	stbi_image_free(pixelData);
 }
 
-Texture2D::~Texture2D() { glDeleteTextures(1, &m_TextureID); }
+Texture2D::~Texture2D() {
+	glDeleteTextures(1, &m_TextureID);
+}
 
 void Texture2D::Bind(uint32_t slot) {
 	glBindTextureUnit(slot, m_TextureID);
@@ -44,8 +49,8 @@ void Texture2D::SetData(const glm::ivec2& pos, const glm::ivec2& size,
 	VOLCANICORE_ASSERT(pos.x + size.x <= m_Width && pos.y + size.y <= m_Height,
 						"Coordinates must be within the bounds of the texture.");
 
-	glTextureSubImage2D(m_TextureID, 0, pos.x, pos.y, size.x, size.y, DataFormat,
-						GL_UNSIGNED_BYTE, data);
+	glTextureSubImage2D(m_TextureID, 0, pos.x, pos.y, size.x, size.y,
+						m_DataFormat, GL_UNSIGNED_BYTE, data);
 }
 
 constexpr uint32_t GetInternalFormat(Texture::InternalFormat format) {
@@ -68,21 +73,20 @@ constexpr uint32_t GetColorFormat(Texture::ColorFormat format) {
 	}
 }
 
-uint32_t CreateTexture(uint32_t width, uint32_t height,
-			Texture::InternalFormat internal = Texture::InternalFormat::Normal,
-			Texture::ColorFormat color       = Texture::ColorFormat::RGBA)
+uint32_t Texture2D::CreateTexture(uint32_t width, uint32_t height,
+			Texture::InternalFormat internal, Texture::ColorFormat color)
 {
 	uint32_t internalFormat, colorFormat, textureID;
 	internalFormat = GetInternalFormat(internal);
 	colorFormat = GetColorFormat(color);
 
 	glCreateTextures(GL_TEXTURE_2D, 1, &textureID);
-	glTextureStorage2D(textureID, 1, internalFormat, m_Width, m_Height);
+	glTextureStorage2D(textureID, 1, internalFormat, width, height);
 
 	glTextureParameteri(textureID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTextureParameteri(textureID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTextureParameteri(textureID, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTextureParameteri(textureID, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTextureParameteri(textureID, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTextureParameteri(textureID, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
 	return textureID;
 }

@@ -7,7 +7,7 @@ namespace VolcaniCore {
 class Texture {
 public:
 	enum class InternalFormat { Normal, Float };
-enum class ColorFormat { Red, RGB, RGBA };
+	enum class ColorFormat { Red, RGB, RGBA };
 
 public:
 	static Ref<Texture> Create(uint32_t width, uint32_t height);
