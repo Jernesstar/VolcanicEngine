@@ -44,14 +44,10 @@ Shadows::Shadows() {
 		{ "Sandbox/assets/shaders/Shadow.glsl.frag", ShaderType::Fragment }
 	});
 
-	std::vector<OpenGL::Attachment> attachments{
-		{ AttachmentTarget::Color, { OpenGL::Attachment::Type::Texture } },
-		{ AttachmentTarget::Depth, { OpenGL::Attachment::Type::Texture } }
-	};
-	depthMap = CreateRef<OpenGL::Framebuffer>(1024, 1024, attachments);
+	depthMap = CreateRef<OpenGL::Framebuffer>(1024, 1024);
 
 	depthPass = RenderPass::Create("Depth Pass", depthShader);
-	// depthPass->SetOutput(depthMap);
+	depthPass->SetOutput(depthMap);
 	shadowPass = RenderPass::Create("Shadow Pass", shadowShader);
 
 	cube = Mesh::Create(MeshPrimitive::Cube,
@@ -83,7 +79,7 @@ void Shadows::OnUpdate(TimeStep ts) {
 
 	// 	RenderScene();
 	// }
-	Renderer::EndPass();
+	// Renderer::EndPass();
 
 	Renderer::Flush();
 
@@ -103,13 +99,13 @@ void Shadows::OnUpdate(TimeStep ts) {
 			{
 				return depthCamera->GetViewProjection();
 			});
-		// Renderer::GetPass()->GetUniforms()
-		// .Set("u_ShadowMap",
-		// 	[&]() -> int32_t
-		// 	{
-		// 		depthMap->Get(AttachmentTarget::Depth).Bind(1);
-		// 		return 1;
-		// 	});
+		Renderer::GetPass()->GetUniforms()
+		.Set("u_ShadowMap",
+			[&]() -> int32_t
+			{
+				depthMap->Get(AttachmentTarget::Depth).Bind(1);
+				return 1;
+			});
 		Renderer::GetPass()->GetUniforms()
 		.Set("u_LightPosition",
 			[&]() -> glm::vec3

@@ -6,16 +6,15 @@
 
 namespace VolcaniCore::OpenGL {
 
-class Framebuffer;
-
 class Attachment {
 public:
 	enum class Type { Texture, RenderBuffer };
 
 public:
 	Attachment() = default;
-	Attachment(Attachment::Type type, uint32_t id = 0)
-		: Type(type), m_RendererID(id) { }
+	Attachment(Attachment::Type type, uint32_t id = 0,
+				uint32_t width = 0, uint32_t height = 0)
+		: m_Type(type), m_RendererID(id), m_Width(width), m_Height(height) { }
 	~Attachment();
 
 	void Bind(uint32_t slot = 0) const;
@@ -24,8 +23,9 @@ public:
 	Attachment::Type GetType() const { return m_Type; }
 
 private:
-	Attachment::Type m_Type;
 	uint32_t m_RendererID;
+	Attachment::Type m_Type;
+	uint32_t m_Width, m_Height;
 
 	friend class Framebuffer;
 };
@@ -33,8 +33,7 @@ private:
 class Framebuffer : public VolcaniCore::Framebuffer {
 public:
 	Framebuffer(uint32_t width, uint32_t height);
-	Framebuffer(uint32_t witdth, uint32_t height,
-				const Map<AttachmentTarget, List<Attachment>>& attachmentMap);
+	Framebuffer(const Map<AttachmentTarget, List<Attachment>>& attachmentMap);
 	~Framebuffer();
 
 	void Bind() const override;
@@ -51,12 +50,13 @@ public:
 	}
 
 private:
-	void CreateColorAttachment(Attachment& attachment, uint32_t index);
+	void CreateColorAttachment(Attachment& attachment, uint32_t index = 0);
 	void CreateDepthAttachment(Attachment& attachment);
 	void CreateStencilAttachment(Attachment& attachment);
 
 	Map<AttachmentTarget, List<Attachment>> m_AttachmentMap;
 	uint32_t m_BufferID;
+	uint32_t m_Width, m_Height;
 };
 
 }

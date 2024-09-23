@@ -1,22 +1,26 @@
 #include "Framebuffer.h"
 
+#include <algorithm>
+
 #include <glad/glad.h>
 
 #include "Core/Assert.h"
 
+#include "Texture2D.h"
+
 namespace VolcaniCore::OpenGL {
 
 Attachment::~Attachment() {
-	if(this->Type == Attachment::Type::Texture)
+	if(this->GetType() == Attachment::Type::Texture)
 		glDeleteTextures(1, &m_RendererID);
-	else if(this->Type == Attachment::Type::RenderBuffer)
+	else if(this->GetType() == Attachment::Type::RenderBuffer)
 		glDeleteRenderbuffers(1, &m_RendererID);
 }
 
 void Attachment::Bind(uint32_t slot) const {
-	if(this->Type == Attachment::Type::Texture)
+	if(this->GetType() == Attachment::Type::Texture)
 		glBindTextureUnit(slot, m_RendererID);
-	else if(this->Type == Attachment::Type::RenderBuffer)
+	else if(this->GetType() == Attachment::Type::RenderBuffer)
 		glBindRenderbuffer(GL_RENDERBUFFER, m_RendererID);
 }
 
@@ -25,32 +29,32 @@ uint32_t Attachment::GetRendererID() const {
 }
 
 Framebuffer::Framebuffer(uint32_t width, uint32_t height)
-	: VolcaniCore::Framebuffer(width, height)
+	: m_Width(width), m_Height(height)
 {
 	glGenFramebuffers(1, &m_BufferID);
 	glBindFramebuffer(GL_FRAMEBUFFER, m_BufferID);
 
 	// TODO(Change): Render buffer
-	m_Attachments.insert(
+	m_AttachmentMap.insert(
 	{
 		AttachmentTarget::Color, { { Attachment::Type::Texture } }
 	});
-	m_Attachments.insert(
+	m_AttachmentMap.insert(
 	{
 		AttachmentTarget::Depth, { { Attachment::Type::Texture } }
 	});
 
-	CreateColorAttachment(m_Attachments[AttachmentTarget::Color][0]);
-	CreateDepthAttachment(m_Attachments[AttachmentTarget::Depth][0]);
+	CreateColorAttachment(m_AttachmentMap[AttachmentTarget::Color][0]);
+	CreateDepthAttachment(m_AttachmentMap[AttachmentTarget::Depth][0]);
 
 	VOLCANICORE_ASSERT(
 		glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-Framebuffer::Framebuffer(uint32_t width, uint32_t height,
-	const Map<AttachmentTarget, List<Attachment>>& attachmentMap)
-	: VolcaniCore::Framebuffer(width, height), m_AttachmentMap(attachmentMap)
+Framebuffer::Framebuffer(
+				const Map<AttachmentTarget, List<Attachment>>& attachmentMap)
+	: m_AttachmentMap(attachmentMap)
 {
 	glGenFramebuffers(1, &m_BufferID);
 	glBindFramebuffer(GL_FRAMEBUFFER, m_BufferID);
@@ -70,6 +74,13 @@ Framebuffer::Framebuffer(uint32_t width, uint32_t height,
 	VOLCANICORE_ASSERT(
 		glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	for(const auto& [_, attachments] : m_AttachmentMap) {
+		for(const auto& att : attachments) {
+			m_Width = std::max(m_Width, att.m_Width);
+			m_Height = std::max(m_Height, att.m_Height);
+		}
+	}
 }
 
 void Framebuffer::Set(AttachmentTarget target, Ref<Texture> texture,
@@ -81,10 +92,10 @@ void Framebuffer::Set(AttachmentTarget target, Ref<Texture> texture,
 
 void Framebuffer::CreateColorAttachment(Attachment& attachment, uint32_t index)
 {
-	if(attachment.m_RendererID != 0) {
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index,
-								GL_TEXTURE_2D, attachment.m_RendererID, 0);
-	}
+	// if(attachment.m_RendererID != 0) {
+	// 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index,
+	// 							GL_TEXTURE_2D, attachment.m_RendererID, 0);
+	// }
 
 	if(attachment.GetType() == Attachment::Type::Texture) {
 		glGenTextures(1, &attachment.m_RendererID);
@@ -110,10 +121,8 @@ void Framebuffer::CreateColorAttachment(Attachment& attachment, uint32_t index)
 		// glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, GL_RGB, m_Width, m_Height, GL_TRUE);
 		// glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, GL_TEXTURE_2D_MULTISAMPLE, attachment.m_RendererID, 0);
 
-		// glBindTexture(GL_TEXTURE2D, attachment.m_RendererID)
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index,
 								GL_TEXTURE_2D, attachment.m_RendererID, 0);
-
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 	else if(attachment.GetType() == Attachment::Type::RenderBuffer) {
@@ -133,9 +142,9 @@ void Framebuffer::CreateDepthAttachment(Attachment& attachment)
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
+		glBindTexture(GL_TEXTURE_2D, 0);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
 								GL_TEXTURE_2D, attachment.m_RendererID, 0);
-		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 	else if(attachment.GetType() == Attachment::Type::RenderBuffer)
 	{

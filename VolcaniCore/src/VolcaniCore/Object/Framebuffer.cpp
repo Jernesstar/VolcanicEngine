@@ -1,8 +1,9 @@
 #include "Framebuffer.h"
 
-#include "OpenGL/Framebuffer.h"
-
 #include "Renderer/RendererAPI.h"
+
+#include "OpenGL/Framebuffer.h"
+#include "OpenGL/Texture2D.h"
 
 namespace VolcaniCore {
 
@@ -31,7 +32,8 @@ Ref<Framebuffer> Framebuffer::Create(
 					attachments[target].push_back(
 					{
 						OpenGL::Attachment::Type::Texture,
-						texture->As<OpenGL::Texture2D>()->GetID()
+						texture->As<OpenGL::Texture2D>()->GetID(),
+						texture->GetWidth(), texture->GetHeight()
 					});
 				}
 			}

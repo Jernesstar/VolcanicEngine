@@ -3,9 +3,9 @@
 namespace Demo {
 
 struct BloomMip {
-	glm::vec2 size;
-	glm::ivec2 intSize;
-	uint32_t texture; // TODO: Replace with Ref<Texture>
+	glm::vec2 Size;
+	glm::ivec2 IntSize;
+	Ref<Texture> Sampler;
 };
 
 class Bloom : public Application {
@@ -71,11 +71,7 @@ Bloom::Bloom() {
 	});
 	drawPass = RenderPass::Create("Draw Pass", shader);
 
-	std::vector<OpenGL::Attachment> attachments{
-		{ AttachmentTarget::Color, OpenGL::Attachment::Type::Texture },
-		{ AttachmentTarget::Depth, OpenGL::Attachment::Type::Texture }
-	};
-	src = CreateRef<OpenGL::Framebuffer>(800, 600, attachments);
+	src = CreateRef<OpenGL::Framebuffer>(800, 600);
 	drawPass->SetOutput(src);
 
 	uint32_t mipChainLength = 5;
@@ -171,34 +167,34 @@ void Bloom::InitMips(uint32_t mipChainLength)
 
 		mipSize *= 0.5f;
 		mipIntSize /= 2;
-		mip.size = mipSize;
-		mip.intSize = mipIntSize;
+		mip.Size = mipSize;
+		mip.IntSize = mipIntSize;
 
-		glGenTextures(1, &mip.texture);
-		glBindTexture(GL_TEXTURE_2D, mip.texture);
-		// we are downscaling an HDR color buffer, so we need a float texture format
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_R11F_G11F_B10F,
-		             (int)mipSize.x, (int)mipSize.y,
-		             0, GL_RGB, GL_FLOAT, nullptr);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		// glGenTextures(1, &mip.texture);
+		// glBindTexture(GL_TEXTURE_2D, mip.texture);
+		// // we are downscaling an HDR color buffer, so we need a float texture format
+		// glTexImage2D(GL_TEXTURE_2D, 0, GL_R11F_G11F_B10F,
+		//              (int)mipSize.x, (int)mipSize.y,
+		//              0, GL_RGB, GL_FLOAT, nullptr);
+		// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-		// mip.Sampler = Texture::Create(mipSize.x, mipSize.y);
+		// mip.Sampler = Texture::Create(mipSize.x, mipSize.y, Texture::InternalFormat::Float);
 
 		mipChain.emplace_back(mip);
 	}
 
-	mips = Framebuffer::Create(
-	{
-		{ AttachmentTarget::Color, { mipChain[0].Sampler } }
-	});
+	// mips = Framebuffer::Create(
+	// {
+	// 	{ AttachmentTarget::Color, { mipChain[0].Sampler } }
+	// });
 }
 
 void Bloom::Downsample(float filterRadius) {
 	for(const auto& mip : mipChain) {
-		Renderer::Resize(mip.size.x, mip.size.y);
+		Renderer::Resize(mip.IntSize.x, mip.IntSize.y);
 		mips->Set(AttachmentTarget::Color, mip.Sampler);
 
 		RendererAPI::Get()->RenderFramebuffer(mips, AttachmentTarget::Color);
@@ -210,15 +206,15 @@ void Bloom::Downsample(float filterRadius) {
 		.Set("u_SrcResolution",
 		[&]() -> glm::vec2
 		{
-			return mip.size;
+			return mip.Size;
 		});
 		// Set current mip as texture input for next iteration
-		// Renderer::GetDrawCommand().GetUniforms()
-		// .Set("u_SrcTexture",
-		// [&]() -> TextureSlot
-		// {
-		// 	return { mip.Sampler, 0 };
-		// });
+		Renderer::GetDrawCommand().GetUniforms()
+		.Set("u_SrcTexture",
+		[&]() -> TextureSlot
+		{
+			return { mip.Sampler, 0 };
+		});
 	}
 }
 
@@ -228,15 +224,15 @@ void Bloom::Upsample(float filterRadius) {
 		const BloomMip& nextMip = mipChain[i-1];
 
 		// Bind viewport and texture from where to read
-		// Renderer::GetDrawCommand().GetUniforms()
-		// .Set("u_SrcTexture",
-		// [&]() -> TextureSlot
-		// {
-		// 	return { mip.Sampler, 0 };
-		// });
+		Renderer::GetDrawCommand().GetUniforms()
+		.Set("u_SrcTexture",
+		[&]() -> TextureSlot
+		{
+			return { mip.Sampler, 0 };
+		});
 
 		// Set framebuffer render target (we write to this texture)
-		Renderer::Resize(nextMip.size.x, nextMip.size.y);
+		Renderer::Resize(nextMip.IntSize.x, nextMip.IntSize.y);
 		mips->Set(AttachmentTarget::Color, nextMip.Sampler);
 
 		RendererAPI::Get()->RenderFramebuffer(mips, AttachmentTarget::Color);
