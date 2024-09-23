@@ -78,10 +78,8 @@ Cube::Cube()
 
 	UI::Init();
 
-	shader = ShaderPipeline::Create({
-		{ "VolcaniCore/assets/shaders/Mesh.glsl.vert", ShaderType::Vertex },
-		{ "VolcaniCore/assets/shaders/Mesh.glsl.frag", ShaderType::Fragment }
-	});
+	shader = ShaderPipeline::Create("VolcaniCore/assets/shaders", "Mesh");
+
 	framebuffer = CreateRef<OpenGL::Framebuffer>(480, 270);
 
 	renderPass = RenderPass::Create("Render Pass", shader);

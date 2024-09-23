@@ -83,7 +83,7 @@ void Framebuffer::CreateColorAttachment(Attachment& attachment) {
 		uint32_t internalFormat = GL_RGBA16F;
 		uint32_t colorFormat    = GL_RGBA;
 		glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, m_Width, m_Height, 0,
-					 GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+					 colorFormat, GL_UNSIGNED_BYTE, NULL);
 		// uint32_t samples = 4;
 		// glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, GL_RGB, m_Width, m_Height, GL_TRUE);
 
@@ -91,12 +91,11 @@ void Framebuffer::CreateColorAttachment(Attachment& attachment) {
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glBindTexture(GL_TEXTURE_2D, 0);
 
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
 								GL_TEXTURE_2D, attachment.m_RendererID, 0);\
 		// glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, attachment.m_RendererID, 0);
-
-		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 	else if(attachment.Type == AttachmentType::RenderBuffer) {
 		// TODO(Implement):

@@ -48,20 +48,19 @@ Shadows::Shadows() {
 		{ AttachmentTarget::Color, OpenGL::AttachmentType::Texture },
 		{ AttachmentTarget::Depth, OpenGL::AttachmentType::Texture }
 	};
+	depthMap = CreateRef<OpenGL::Framebuffer>(1024, 1024, attachments);
+
+	depthPass = RenderPass::Create("Depth Pass", depthShader);
+	// depthPass->SetOutput(depthMap);
+	shadowPass = RenderPass::Create("Shadow Pass", shadowShader);
 
 	cube = Mesh::Create(MeshPrimitive::Cube,
 			Material{
 				.Diffuse = Texture::Create("Sandbox/assets/images/wood.png")
 			});
-	depthMap = CreateRef<OpenGL::Framebuffer>(1024, 1024, attachments);
-
-	depthPass = RenderPass::Create("Depth Pass", depthShader);
-	depthPass->SetOutput(depthMap);
-	shadowPass = RenderPass::Create("Shadow Pass", shadowShader);
 
 	depthCamera = CreateRef<OrthographicCamera>(20.0f, 20.0f, 1.0f, 7.5f);
 	sceneCamera = CreateRef<StereographicCamera>(75.0f);
-
 	depthCamera->SetPosition({ -2.0f, 4.0f, -1.0f });
 
 	controller = CameraController{ sceneCamera };
@@ -71,19 +70,19 @@ Shadows::Shadows() {
 void Shadows::OnUpdate(TimeStep ts) {
 	controller.OnUpdate(ts);
 
-	Renderer::StartPass(depthPass);
-	{
-		Renderer::Clear();
+	// Renderer::StartPass(depthPass);
+	// {
+	// 	Renderer::Clear();
 
-		Renderer::GetPass()->GetUniforms()
-		.Set("u_LightSpaceMatrix",
-			[&]() -> glm::mat4
-			{
-				return depthCamera->GetViewProjection();
-			});
+	// 	Renderer::GetPass()->GetUniforms()
+	// 	.Set("u_LightSpaceMatrix",
+	// 		[&]() -> glm::mat4
+	// 		{
+	// 			return depthCamera->GetViewProjection();
+	// 		});
 
-		RenderScene();
-	}
+	// 	RenderScene();
+	// }
 	Renderer::EndPass();
 
 	Renderer::Flush();
@@ -104,13 +103,13 @@ void Shadows::OnUpdate(TimeStep ts) {
 			{
 				return depthCamera->GetViewProjection();
 			});
-		Renderer::GetPass()->GetUniforms()
-		.Set("u_ShadowMap",
-			[&]() -> int32_t
-			{
-				depthMap->Get(AttachmentTarget::Depth).Bind(1);
-				return 1;
-			});
+		// Renderer::GetPass()->GetUniforms()
+		// .Set("u_ShadowMap",
+		// 	[&]() -> int32_t
+		// 	{
+		// 		depthMap->Get(AttachmentTarget::Depth).Bind(1);
+		// 		return 1;
+		// 	});
 		Renderer::GetPass()->GetUniforms()
 		.Set("u_LightPosition",
 			[&]() -> glm::vec3

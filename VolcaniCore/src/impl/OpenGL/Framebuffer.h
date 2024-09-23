@@ -4,6 +4,8 @@
 #include <vector>
 #include <unordered_map>
 
+#include <Object/Texture.h>
+
 #include "Object/Framebuffer.h"
 
 namespace VolcaniCore::OpenGL {
@@ -37,6 +39,7 @@ public:
 	Framebuffer(uint32_t width, uint32_t height);
 	Framebuffer(uint32_t witdth, uint32_t height,
 				const std::vector<Attachment>& attachments);
+	Framebuffer(AttachmentTarget target, Ref<Texture> texture);
 	~Framebuffer();
 
 	// TODO(Implement):

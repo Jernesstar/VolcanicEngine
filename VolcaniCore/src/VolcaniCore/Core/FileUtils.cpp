@@ -32,19 +32,18 @@ std::vector<std::string> FileUtils::GetFiles(
 {
 	std::vector<std::string> files;
 	for(auto p : std::filesystem::directory_iterator(dir.c_str())) {
-		for(auto ext : extensions)
-			if(p.path().extension() == ext)
+		for(auto& ext : extensions)
+			if(p.path().extension().string() == ext)
 				files.push_back(p.path().string());
 	}
-
 	return files;
 }
 
-std::string FileUtils::ReadFile(const std::string& file_path) {
-	std::ifstream in(file_path, std::ios::in | std::ios::binary);
+std::string FileUtils::ReadFile(const std::string& filePath) {
+	std::ifstream in(filePath, std::ios::in | std::ios::binary);
 
 	VOLCANICORE_ASSERT_ARGS(in, "Could not open file: %s",
-								file_path.c_str())
+								filePath.c_str())
 
 	// Sets the read position at the end of the file;
 	in.seekg(0, std::ios::end);
@@ -54,7 +53,7 @@ std::string FileUtils::ReadFile(const std::string& file_path) {
 	size_t size = in.tellg();
 
 	VOLCANICORE_ASSERT_ARGS(size != -1, "Could not read from file '%s'",
-										file_path.c_str());
+										filePath.c_str());
 
 	std::string str;
 	str.resize(size); // Resize the resulting string

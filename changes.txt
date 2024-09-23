@@ -5,13 +5,13 @@ So far:
 Demo Status:
 Bloom x
 Collision x
-Cube x
+Cube y
 ECS y
-Lighting x
+Lighting y
 Raycast x
-Shadows x
+Shadows y
 Template y
-UI x
+UILayer y
 
 change:
 	Removed Point, Line, and Mesh buffers in OpenGL::Renderer::RendererData in favor of a single Geometry buffer
@@ -36,3 +36,4 @@ feat_end:
 
 todo:
 	Change all instances of vector, unordered_map and function to their corresponding using definitions
+	Work on Editor, start small

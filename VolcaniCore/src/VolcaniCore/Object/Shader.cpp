@@ -77,32 +77,26 @@ bool StringContains(const std::string& str, const std::string& subStr) {
 }
 
 std::vector<ShaderFile> GetShaders(const std::string& shaderFolder,
-								   const std::string& name)
+									const std::string& name)
 {
-	// TODO(Fix): This is causing a crash
-	std::vector<ShaderFile> shaders;
-
-	for(auto path :
-		FileUtils::GetFiles(shaderFolder, { name + ".glsl.vert",
-											name + ".glsl.frag",
-											name + ".glsl.geom",
-											name + ".glsl.comp",
-										  }))
+	// TODO(Fix): Find by name, then by extensions
+	std::vector<std::string> paths;
+	for(auto path : FileUtils::GetFiles(shaderFolder,
+					{ ".vert", ".frag", ".geom", ".comp" }))
 	{
-		shaders.push_back(TryGetShader(path));
+		if(StringContains(path, name))
+			paths.push_back(path);
 	}
-
-	return shaders;
+	
+	return GetShaders(paths);
 }
 
 ShaderFile TryGetShader(const std::string& path) {
 	std::size_t dot = path.find_first_of('.');
 	if(dot == std::string::npos)
-		VOLCANICORE_ASSERT_ARGS(false, "%s is an incorrectly formatted \
-										file name. Accepted formats: \
-										example.glsl.vert, \
-										example.vert.glsl, \
-										example.vert", path.c_str());
+		VOLCANICORE_ASSERT_ARGS(false,
+			"%s is an incorrectly formatted file name. Accepted formats: \
+			example.glsl.vert, example.vert.glsl, example.vert", path.c_str());
 
 	std::string str = path.substr(dot);
 	if(StringContains(str, "vert") || StringContains(str, "vs"))

@@ -159,9 +159,6 @@ void Renderer::Init() {
 	s_Data.Array->SetIndexBuffer(s_Data.Indices);
 	s_Data.Array->AddVertexBuffer(s_Data.GeometryBuffer);
 	s_Data.Array->AddVertexBuffer(s_Data.TransformBuffer);
-
-	ShaderLibrary::Get("Framebuffer")->Bind();
-	ShaderLibrary::Get("Framebuffer")->SetInt("u_ScreenTexture", 0);
 }
 
 void Renderer::Close() { }
@@ -277,7 +274,7 @@ void Renderer::RenderFramebuffer(Ref<VolcaniCore::Framebuffer> buffer,
 	if(!VolcaniCore::Renderer::GetPass())
 		ShaderLibrary::Get("Framebuffer")->Bind();
 
-	buffer->As<OpenGL::Framebuffer>()->Get(target).Bind();
+	buffer->As<OpenGL::Framebuffer>()->Get(target).Bind(0);
 	s_Data.FramebufferArray->Bind();
 
 	glDisable(GL_DEPTH_TEST);
