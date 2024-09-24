@@ -10,7 +10,8 @@ public:
 	enum class ColorFormat { Red, RGB, RGBA };
 
 public:
-	static Ref<Texture> Create(uint32_t width, uint32_t height);
+	static Ref<Texture> Create(uint32_t width, uint32_t height,
+								InternalFormat format = InternalFormat::Normal);
 	static Ref<Texture> Create(const std::string& path);
 
 public:

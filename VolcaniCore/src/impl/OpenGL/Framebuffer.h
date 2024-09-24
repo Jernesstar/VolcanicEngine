@@ -45,14 +45,17 @@ public:
 	void Set(AttachmentTarget target,
 			 Ref<Texture> texture, uint32_t index = 0) const override;
 
+	void Bind(AttachmentTarget target, uint32_t slot,
+			  uint32_t index = 0) const override;
+
 	const Attachment& Get(AttachmentTarget target, uint32_t index = 0) const {
 		return m_AttachmentMap.at(target).at(index);
 	}
 
 private:
-	void CreateColorAttachment(Attachment& attachment, uint32_t index = 0);
-	void CreateDepthAttachment(Attachment& attachment);
-	void CreateStencilAttachment(Attachment& attachment);
+	void CreateColorAttachment(uint32_t index = 0);
+	void CreateDepthAttachment();
+	void CreateStencilAttachment();
 
 	Map<AttachmentTarget, List<Attachment>> m_AttachmentMap;
 	uint32_t m_BufferID;

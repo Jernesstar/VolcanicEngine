@@ -274,7 +274,7 @@ void Renderer::RenderFramebuffer(Ref<VolcaniCore::Framebuffer> buffer,
 	if(!VolcaniCore::Renderer::GetPass())
 		ShaderLibrary::Get("Framebuffer")->Bind();
 
-	buffer->As<OpenGL::Framebuffer>()->Get(target).Bind(0);
+	buffer->Bind(target, 0);
 	s_Data.FramebufferArray->Bind();
 
 	glDisable(GL_DEPTH_TEST);

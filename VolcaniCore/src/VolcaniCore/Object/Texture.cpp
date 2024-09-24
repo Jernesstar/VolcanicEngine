@@ -6,12 +6,14 @@
 
 namespace VolcaniCore {
 
-Ref<Texture> Texture::Create(uint32_t width, uint32_t height) {
+Ref<Texture> Texture::Create(uint32_t width, uint32_t height,
+							 InternalFormat format)
+{
 	RendererAPI::Backend backend = RendererAPI::GetBackend();
 
 	switch(backend) {
 		case RendererAPI::Backend::OpenGL:
-			return CreateRef<OpenGL::Texture2D>(width, height);
+			return CreateRef<OpenGL::Texture2D>(width, height, format);
 			break;
 	}
 }

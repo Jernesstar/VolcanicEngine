@@ -9,10 +9,12 @@
 
 namespace VolcaniCore::OpenGL {
 
-Texture2D::Texture2D(uint32_t width, uint32_t height)
-	: Texture(width, height), m_InternalFormat(GL_RGBA8), m_DataFormat(GL_RGBA)
+Texture2D::Texture2D(uint32_t width, uint32_t height,
+					 Texture::InternalFormat format)
+	: Texture(width, height), m_InternalFormat(GL_RGBA8),
+		m_DataFormat(GL_RGBA)
 {
-	m_TextureID = CreateTexture(width, height);
+	m_TextureID = CreateTexture(width, height, format);
 }
 
 Texture2D::Texture2D(const std::string& path)

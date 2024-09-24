@@ -44,8 +44,8 @@ Framebuffer::Framebuffer(uint32_t width, uint32_t height)
 		AttachmentTarget::Depth, { { Attachment::Type::Texture } }
 	});
 
-	CreateColorAttachment(m_AttachmentMap[AttachmentTarget::Color][0]);
-	CreateDepthAttachment(m_AttachmentMap[AttachmentTarget::Depth][0]);
+	CreateColorAttachment();
+	CreateDepthAttachment();
 
 	VOLCANICORE_ASSERT(
 		glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
@@ -56,25 +56,6 @@ Framebuffer::Framebuffer(
 				const Map<AttachmentTarget, List<Attachment>>& attachmentMap)
 	: m_AttachmentMap(attachmentMap)
 {
-	glGenFramebuffers(1, &m_BufferID);
-	glBindFramebuffer(GL_FRAMEBUFFER, m_BufferID);
-
-	uint32_t index = 0;
-	for(auto& att : m_AttachmentMap[AttachmentTarget::Color])
-		CreateColorAttachment(att, index++);
-
-	CreateDepthAttachment(m_AttachmentMap[AttachmentTarget::Depth][0]);
-	CreateStencilAttachment(m_AttachmentMap[AttachmentTarget::Stencil][0]);
-
-	if(!Has(AttachmentTarget::Color)) {
-		glDrawBuffer(GL_NONE);
-		glReadBuffer(GL_NONE);
-	}
-
-	VOLCANICORE_ASSERT(
-		glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
 	m_Width = 0;
 	m_Height = 0;
 	for(const auto& [_, attachments] : m_AttachmentMap) {
@@ -83,6 +64,34 @@ Framebuffer::Framebuffer(
 			m_Height = std::max(m_Height, att.m_Height);
 		}
 	}
+
+	glGenFramebuffers(1, &m_BufferID);
+	glBindFramebuffer(GL_FRAMEBUFFER, m_BufferID);
+
+	if(!Has(AttachmentTarget::Color)) {
+		glDrawBuffer(GL_NONE);
+		glReadBuffer(GL_NONE);
+	}
+	if(!Has(AttachmentTarget::Depth)) {
+		m_AttachmentMap.insert(
+		{
+			// TODO(Change): Replace with RenderBuffer
+			AttachmentTarget::Depth, { { Attachment::Type::Texture } }
+		});
+	}
+
+	uint32_t index = 0;
+	for(auto& _ : m_AttachmentMap[AttachmentTarget::Color])
+		CreateColorAttachment(index++);
+	
+	CreateDepthAttachment();
+
+	if(Has(AttachmentTarget::Stencil))
+		CreateStencilAttachment();
+
+	VOLCANICORE_ASSERT(
+		glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void Framebuffer::Set(AttachmentTarget target, Ref<Texture> texture,
@@ -92,12 +101,20 @@ void Framebuffer::Set(AttachmentTarget target, Ref<Texture> texture,
 		GL_TEXTURE_2D, texture->As<OpenGL::Texture2D>()->GetID(), 0);
 }
 
-void Framebuffer::CreateColorAttachment(Attachment& attachment, uint32_t index)
+void Framebuffer::Bind(AttachmentTarget target, uint32_t slot,
+						uint32_t index) const
 {
-	if(attachment.m_RendererID != 0) {
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index,
-								GL_TEXTURE_2D, attachment.m_RendererID, 0);
-	}
+	Get(target, index).Bind(slot);
+}
+
+void Framebuffer::CreateColorAttachment(uint32_t index)
+{
+	auto& attachment = m_AttachmentMap[AttachmentTarget::Color][0];
+
+	// if(attachment.m_RendererID != 0) {
+	// 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index,
+	// 							GL_TEXTURE_2D, attachment.m_RendererID, 0);
+	// }
 
 	if(attachment.GetType() == Attachment::Type::Texture) {
 		glGenTextures(1, &attachment.m_RendererID);
@@ -125,17 +142,22 @@ void Framebuffer::CreateColorAttachment(Attachment& attachment, uint32_t index)
 		// glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, GL_RGB, m_Width, m_Height, GL_TRUE);
 		// glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, GL_TEXTURE_2D_MULTISAMPLE, attachment.m_RendererID, 0);
 
+		glBindTexture(GL_TEXTURE_2D, 0);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index,
 								GL_TEXTURE_2D, attachment.m_RendererID, 0);
-		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 	else if(attachment.GetType() == Attachment::Type::RenderBuffer) {
 		// TODO(Implement):
 	}
 }
 
-void Framebuffer::CreateDepthAttachment(Attachment& attachment)
-{
+void Framebuffer::CreateDepthAttachment() {
+	auto& attachment = m_AttachmentMap[AttachmentTarget::Depth][0];
+	// if(attachment.m_RendererID != 0) {
+	// 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
+	// 							GL_TEXTURE_2D, attachment.m_RendererID, 0);
+	// }
+
 	if(attachment.GetType() == Attachment::Type::Texture) {
 		glGenTextures(1, &attachment.m_RendererID);
 		glBindTexture(GL_TEXTURE_2D, attachment.m_RendererID);
@@ -146,9 +168,9 @@ void Framebuffer::CreateDepthAttachment(Attachment& attachment)
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
+		glBindTexture(GL_TEXTURE_2D, 0);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
 								GL_TEXTURE_2D, attachment.m_RendererID, 0);
-		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 	else if(attachment.GetType() == Attachment::Type::RenderBuffer)
 	{
@@ -173,7 +195,7 @@ void Framebuffer::CreateDepthAttachment(Attachment& attachment)
 	}
 }
 
-void Framebuffer::CreateStencilAttachment(Attachment& attachment) {
+void Framebuffer::CreateStencilAttachment() {
 	// TODO(Implement):
 }
 

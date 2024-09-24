@@ -11,7 +11,7 @@ namespace VolcaniCore::OpenGL {
 class Texture2D : public VolcaniCore::Texture {
 public:
 	Texture2D(const std::string& path);
-	Texture2D(uint32_t width, uint32_t height);
+	Texture2D(uint32_t width, uint32_t height, Texture::InternalFormat format);
 	~Texture2D();
 
 	void Bind(uint32_t slot = 0);

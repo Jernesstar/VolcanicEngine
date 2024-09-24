@@ -66,20 +66,20 @@ Shadows::Shadows() {
 void Shadows::OnUpdate(TimeStep ts) {
 	controller.OnUpdate(ts);
 
-	// Renderer::StartPass(depthPass);
-	// {
-	// 	Renderer::Clear();
+	Renderer::StartPass(depthPass);
+	{
+		Renderer::Clear();
 
-	// 	Renderer::GetPass()->GetUniforms()
-	// 	.Set("u_LightSpaceMatrix",
-	// 		[&]() -> glm::mat4
-	// 		{
-	// 			return depthCamera->GetViewProjection();
-	// 		});
+		Renderer::GetPass()->GetUniforms()
+		.Set("u_LightSpaceMatrix",
+			[&]() -> glm::mat4
+			{
+				return depthCamera->GetViewProjection();
+			});
 
-	// 	RenderScene();
-	// }
-	// Renderer::EndPass();
+		RenderScene();
+	}
+	Renderer::EndPass();
 
 	Renderer::Flush();
 
