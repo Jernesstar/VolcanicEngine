@@ -52,26 +52,20 @@ Framebuffer::Framebuffer(uint32_t width, uint32_t height)
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-Framebuffer::Framebuffer(
-				const Map<AttachmentTarget, List<Attachment>>& attachmentMap)
-	: m_AttachmentMap(attachmentMap)
+Framebuffer::Framebuffer(const Map<AttachmentTarget, List<Attachment>>& map,
+						 uint32_t width, uint32_t height)
+	: VolcaniCore::Framebuffer(width, height), m_AttachmentMap(map)
 {
-	m_Width = 0;
-	m_Height = 0;
-	for(const auto& [_, attachments] : m_AttachmentMap) {
-		for(const auto& att : attachments) {
-			m_Width = std::max(m_Width, att.m_Width);
-			m_Height = std::max(m_Height, att.m_Height);
-		}
-	}
+	if(m_Width == 0 || m_Height == 0)
+		for(const auto& [_, attachments] : m_AttachmentMap)
+			for(const auto& att : attachments) {
+				m_Width  = std::max(m_Width, att.m_Width);
+				m_Height = std::max(m_Height, att.m_Height);
+			}
 
 	glGenFramebuffers(1, &m_BufferID);
 	glBindFramebuffer(GL_FRAMEBUFFER, m_BufferID);
 
-	if(!Has(AttachmentTarget::Color)) {
-		glDrawBuffer(GL_NONE);
-		glReadBuffer(GL_NONE);
-	}
 	if(!Has(AttachmentTarget::Depth)) {
 		m_AttachmentMap.insert(
 		{
@@ -89,13 +83,25 @@ Framebuffer::Framebuffer(
 	if(Has(AttachmentTarget::Stencil))
 		CreateStencilAttachment();
 
+	if(!Has(AttachmentTarget::Color)) {
+		glDrawBuffer(GL_NONE);
+		glReadBuffer(GL_NONE);
+	}
+
+	uint32_t* atts = new uint32_t[index];
+	for(uint32_t i = 0; i < index; i++)
+		atts[i] = GL_COLOR_ATTACHMENT0 + i;
+
+	glDrawBuffers(index, atts);
+	delete atts;
+
 	VOLCANICORE_ASSERT(
 		glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void Framebuffer::Set(AttachmentTarget target, Ref<Texture> texture,
-					  uint32_t index) const
+						uint32_t index) const
 {
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index,
 		GL_TEXTURE_2D, texture->As<OpenGL::Texture2D>()->GetID(), 0);
@@ -107,9 +113,8 @@ void Framebuffer::Bind(AttachmentTarget target, uint32_t slot,
 	Get(target, index).Bind(slot);
 }
 
-void Framebuffer::CreateColorAttachment(uint32_t index)
-{
-	auto& attachment = m_AttachmentMap[AttachmentTarget::Color][0];
+void Framebuffer::CreateColorAttachment(uint32_t index) {
+	auto& attachment = m_AttachmentMap[AttachmentTarget::Color][index];
 
 	// if(attachment.m_RendererID != 0) {
 	// 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index,
@@ -135,8 +140,7 @@ void Framebuffer::CreateColorAttachment(uint32_t index)
 		// Texture::InternalFormat internalFormat = Texture::InternalFormat::Float;
 		// Texture::ColorFormat colorFormat = Texture::ColorFormat::RGBA;
 		// attachment.m_RendererID =
-		// 	OpenGL::Texture::CreateTexture(m_Width, m_Height,
-		// 									internalFormat, colorFormat);
+		// 	OpenGL::Texture::CreateTexture(m_Width, m_Height, internalFormat);
 
 		// uint32_t samples = 4;
 		// glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, GL_RGB, m_Width, m_Height, GL_TRUE);
@@ -153,10 +157,11 @@ void Framebuffer::CreateColorAttachment(uint32_t index)
 
 void Framebuffer::CreateDepthAttachment() {
 	auto& attachment = m_AttachmentMap[AttachmentTarget::Depth][0];
-	// if(attachment.m_RendererID != 0) {
-	// 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
-	// 							GL_TEXTURE_2D, attachment.m_RendererID, 0);
-	// }
+
+	if(attachment.m_RendererID != 0) {
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
+								GL_TEXTURE_2D, attachment.m_RendererID, 0);
+	}
 
 	if(attachment.GetType() == Attachment::Type::Texture) {
 		glGenTextures(1, &attachment.m_RendererID);
@@ -172,31 +177,37 @@ void Framebuffer::CreateDepthAttachment() {
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
 								GL_TEXTURE_2D, attachment.m_RendererID, 0);
 	}
-	else if(attachment.GetType() == Attachment::Type::RenderBuffer)
-	{
+	else if(attachment.GetType() == Attachment::Type::RenderBuffer) {
 		if(this->Has(AttachmentTarget::Stencil)) {
-			auto& stencilAttachment = this->Get(AttachmentTarget::Stencil);
+			const auto& stencilAttachment = this->Get(AttachmentTarget::Stencil);
 
 			if(stencilAttachment.GetType() == Attachment::Type::RenderBuffer) {
-				glGenRenderbuffers(1, &attachment.m_RendererID);
-				glBindRenderbuffer(GL_RENDERBUFFER, attachment.m_RendererID);
-
-				glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8,
-									  m_Width, m_Height);
-				glFramebufferRenderbuffer(GL_FRAMEBUFFER,
-										  GL_DEPTH_STENCIL_ATTACHMENT,
-										  GL_RENDERBUFFER,
-										  attachment.m_RendererID);
+				CreateDepthStencilAttachment();
+				return;
 			}
 		}
-		else {
-			// TODO(Implement):
-		}
+
+		// TODO(Implement):
 	}
 }
 
 void Framebuffer::CreateStencilAttachment() {
 	// TODO(Implement):
+}
+
+void Framebuffer::CreateDepthStencilAttachment() {
+	auto& depthAttachment = m_AttachmentMap[AttachmentTarget::Depth][0];
+	auto& stencilAttachment = m_AttachmentMap[AttachmentTarget::Stencil][0];
+
+	glGenRenderbuffers(1, &depthAttachment.m_RendererID);
+	glBindRenderbuffer(GL_RENDERBUFFER, depthAttachment.m_RendererID);
+
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8,
+							m_Width, m_Height);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER,
+								GL_DEPTH_STENCIL_ATTACHMENT,
+								GL_RENDERBUFFER,
+								depthAttachment.m_RendererID);
 }
 
 Framebuffer::~Framebuffer() {

@@ -15,9 +15,9 @@ public:
 	void OnUpdate(TimeStep ts);
 
 private:
-	void InitMips(uint32_t mipChainLength);
-	void Downsample(float filterRadius);
-	void Upsample(float filterRadius);
+	void InitMips();
+	void Downsample();
+	void Upsample();
 
 	Ref<Camera> camera;
 	CameraController controller;
@@ -32,6 +32,7 @@ private:
 	Ref<Framebuffer> src;
 	Ref<Framebuffer> mips;
 	List<BloomMip> mipChain;
+	uint32_t mipChainLength = 5;
 };
 
 Bloom::Bloom() {
@@ -67,12 +68,16 @@ Bloom::Bloom() {
 	drawPass = RenderPass::Create("Draw Pass", shader);
 
 	src = Framebuffer::Create(800, 600);
+	// Ref<Texture> test = Texture::Create(800, 600, Texture::InternalFormat::Float);
+	// src = Framebuffer::Create({
+	// 		{ AttachmentTarget::Color, { { test } } }
+	// 	});
+
 	drawPass->SetOutput(src);
 
-	uint32_t mipChainLength = 5;
-	InitMips(mipChainLength);
+	InitMips();
 
-	cube = Mesh::Create(MeshPrimitive::Cube, { 1.0f, 0.0f, 0.0f, 1.0f });
+	cube = Mesh::Create(MeshPrimitive::Cube, { 0.98f, 0.92f, 0.0f, 1.0f });
 
 	camera = CreateRef<StereographicCamera>(75.0f);
 	camera->SetPosition({ 2.5f, 2.5f, 2.5f });
@@ -100,32 +105,32 @@ void Bloom::OnUpdate(TimeStep ts) {
 
 	Renderer::Flush();
 
-	// RendererAPI::Get()->RenderFramebuffer(src, AttachmentTarget::Color);
+	RendererAPI::Get()->RenderFramebuffer(src, AttachmentTarget::Color);
 
-	Renderer::StartPass(downsamplePass);
-	{
-		Renderer::GetDrawCommand().GetUniforms()
-		.Set("u_SrcResolution",
-		[&]() -> glm::vec2
-		{
-			auto window = Application::GetWindow();
-			return { window->GetWidth(), window->GetHeight() };
-		});
-		Renderer::GetDrawCommand().GetUniforms()
-		.Set("u_SrcTexture",
-		[&]() -> int32_t
-		{
-			src->Bind(AttachmentTarget::Color, 0);
-			return 0;
-		});
+	// Renderer::StartPass(downsamplePass);
+	// {
+	// 	Renderer::GetDrawCommand().GetUniforms()
+	// 	.Set("u_SrcResolution",
+	// 	[&]() -> glm::vec2
+	// 	{
+	// 		auto window = Application::GetWindow();
+	// 		return { window->GetWidth(), window->GetHeight() };
+	// 	});
+	// 	Renderer::GetDrawCommand().GetUniforms()
+	// 	.Set("u_SrcTexture",
+	// 	[&]() -> TextureSlot
+	// 	{
+	// 		src->Bind(AttachmentTarget::Color, 0);
+	// 		return { };
+	// 	});
 
-		Downsample(filterRadius);
-	}
-	Renderer::EndPass();
+	// 	Downsample();
+	// }
+	// Renderer::EndPass();
 
-	Renderer::Flush();
+	// Renderer::Flush();
 
-	RendererAPI::Get()->RenderFramebuffer(mips, AttachmentTarget::Color);
+	// RendererAPI::Get()->RenderFramebuffer(mips, AttachmentTarget::Color);
 
 	// Renderer::StartPass(upsamplePass);
 	// {
@@ -141,7 +146,7 @@ void Bloom::OnUpdate(TimeStep ts) {
 	// 	glBlendFunc(GL_ONE, GL_ONE);
 	// 	glBlendEquation(GL_FUNC_ADD);
 
-	// 	Upsample(filterRadius);
+	// 	Upsample();
 
 	// 	// Disable additive blending
 	// 	glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA); // Restore if this was default
@@ -151,17 +156,25 @@ void Bloom::OnUpdate(TimeStep ts) {
 
 	// Renderer::StartPass(bloomPass);
 	// {
+	// 	Renderer::GetPass()->GetUniforms()
+	// 	.Set("u_SceneTexture",
+	// 	[&]() -> TextureSlot
+	// 	{
+	// 		src->Bind(AttachmentTarget::Color, 1);
+	// 		return { };
+	// 	});
+
 	// 	RendererAPI::Get()->RenderFramebuffer(mips, AttachmentTarget::Color);
 	// }
 	// Renderer::EndPass();
 }
 
-void Bloom::InitMips(uint32_t mipChainLength) {
+void Bloom::InitMips() {
 	uint32_t windowWidth = Application::GetWindow()->GetWidth();
 	uint32_t windowHeight = Application::GetWindow()->GetHeight();
 
 	glm::vec2 mipSize((float)windowWidth, (float)windowHeight);
-	glm::ivec2 mipIntSize((int)windowWidth, (int)windowHeight);
+	glm::ivec2 mipIntSize((uint32_t)windowWidth, (uint32_t)windowHeight);
 
 	for(uint32_t i = 0; i < mipChainLength; i++) {
 		BloomMip mip;
@@ -171,21 +184,21 @@ void Bloom::InitMips(uint32_t mipChainLength) {
 		mip.Size = mipSize;
 		mip.IntSize = mipIntSize;
 
-		mip.Sampler = Texture::Create(mipSize.x, mipSize.y,
-									  Texture::InternalFormat::Float);
+		mip.Sampler = Texture::Create(mipIntSize.x, mipIntSize.y,
+										Texture::InternalFormat::Float);
 
 		mipChain.push_back(mip);
 	}
 
-	mips = Framebuffer::Create(
-	{
-		{ AttachmentTarget::Color, { mipChain[0].Sampler } }
-	});
+	mips = Framebuffer::Create({
+			{ AttachmentTarget::Color, { mipChain[0].Sampler } }
+		});
 }
 
-void Bloom::Downsample(float filterRadius) {
+void Bloom::Downsample() {
 	for(const auto& mip : mipChain) {
 		Renderer::Resize(mip.IntSize.x, mip.IntSize.y);
+		Renderer::Clear();
 
 		Renderer::GetDrawCommand().GetUniforms()
 		.Set("Sampler",
@@ -217,7 +230,7 @@ void Bloom::Downsample(float filterRadius) {
 	}
 }
 
-void Bloom::Upsample(float filterRadius) {
+void Bloom::Upsample() {
 	for(int i = mipChain.size() - 1; i > 0; i--) {
 		const BloomMip& mip = mipChain[i];
 		const BloomMip& nextMip = mipChain[i-1];

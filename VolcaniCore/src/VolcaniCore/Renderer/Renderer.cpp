@@ -120,6 +120,10 @@ FrameDebugInfo Renderer::GetDebugInfo() {
 FrameData& Renderer::GetFrame() { return s_Frame; }
 
 void FlushCommand(DrawCommand& command) {
+	if(command.Points.size() == 0
+	&& command.Lines.size()  == 0
+	&& command.Meshes.size() == 0) return;
+
 	auto framebuffer = command.Pass->GetOutput();
 	if(framebuffer) {
 		RendererAPI::Get()

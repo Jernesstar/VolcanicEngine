@@ -124,7 +124,7 @@ void Cube::OnUpdate(TimeStep ts) {
 	ImGui::Begin("Lights");
 	{
 		float r = camera->As<IsometricCamera>()->R;
-		ImGui::SliderFloat("Light.R", &r, 0.0f, 10.0f);
+		ImGui::SliderFloat("Light.R", &r, 0.0f, 100.0f);
 
 		camera->As<IsometricCamera>()->SetDistance(r);
 	}
@@ -132,7 +132,7 @@ void Cube::OnUpdate(TimeStep ts) {
 
 	ImGui::Begin("Debug");
 	{
-		ImGui::Text("%0.1f", Renderer::GetDebugInfo().FPS);
+		ImGui::Text("FPS: %0.1f", Renderer::GetDebugInfo().FPS);
 	}
 	ImGui::End();
 

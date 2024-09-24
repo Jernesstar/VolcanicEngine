@@ -235,7 +235,8 @@ static void DrawMesh(DrawCall& call) {
 		if(call.Type == DrawType::Array)
 			glDrawArraysInstanced(GL_TRIANGLES, 0, indexCount, instanceCount);
 		else
-			glDrawElementsInstanced(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0, instanceCount);
+			glDrawElementsInstanced(GL_TRIANGLES, indexCount,
+									GL_UNSIGNED_INT, 0, instanceCount);
 	}
 }
 

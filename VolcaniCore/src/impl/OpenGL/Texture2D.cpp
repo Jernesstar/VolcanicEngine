@@ -76,11 +76,10 @@ constexpr uint32_t GetColorFormat(Texture::ColorFormat format) {
 }
 
 uint32_t Texture2D::CreateTexture(uint32_t width, uint32_t height,
-			Texture::InternalFormat internal, Texture::ColorFormat color)
+			Texture::InternalFormat internal)
 {
 	uint32_t internalFormat, colorFormat, textureID;
 	internalFormat = GetInternalFormat(internal);
-	colorFormat = GetColorFormat(color);
 
 	glCreateTextures(GL_TEXTURE_2D, 1, &textureID);
 	glTextureStorage2D(textureID, 1, internalFormat, width, height);

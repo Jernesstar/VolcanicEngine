@@ -28,8 +28,7 @@ public:
 	}
 
 	static uint32_t CreateTexture(uint32_t width, uint32_t height,
-		Texture::InternalFormat internal = Texture::InternalFormat::Normal,
-		Texture::ColorFormat color       = Texture::ColorFormat::RGBA);
+		Texture::InternalFormat internal = Texture::InternalFormat::Normal);
 
 private:
 	uint32_t m_TextureID;
