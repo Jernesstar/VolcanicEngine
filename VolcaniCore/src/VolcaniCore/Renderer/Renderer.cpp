@@ -12,7 +12,7 @@ static void FlushCommand(DrawCommand& command);
 static List<DrawCall> CreateDrawCalls(DrawCommand& command);
 static DrawOptionsMap GetOrReturnDefaults(const DrawOptionsMap& map);
 
-const uint32_t FrameDebugInfo::MaxInstances = 1000;
+const uint32_t FrameDebugInfo::MaxInstances = 10'000;
 const uint32_t FrameDebugInfo::MaxTriangles = 1'000'000;
 const uint32_t FrameDebugInfo::MaxVertices  = MaxTriangles * 3;
 const uint32_t FrameDebugInfo::MaxIndices   = MaxVertices  * 2; /* (3.0f / 2.0f) */

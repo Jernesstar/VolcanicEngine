@@ -142,8 +142,8 @@ void Cube::OnUpdate(TimeStep ts) {
 
 		Renderer3D::Begin(camera);
 
-		for(int y = -5; y < 5; y++)
-			for(int x = -5; x < 5; x++)
+		for(int y = -50; y < 50; y++)
+			for(int x = -50; x < 50; x++)
 				Renderer3D::DrawMesh(cube, { .Translation = { x, 0.0f, y } });
 
 		Renderer3D::End();

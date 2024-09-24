@@ -56,7 +56,6 @@ private:
 
 	Map<AttachmentTarget, List<Attachment>> m_AttachmentMap;
 	uint32_t m_BufferID;
-	uint32_t m_Width, m_Height;
 };
 
 }
