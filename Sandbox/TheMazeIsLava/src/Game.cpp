@@ -77,8 +77,6 @@ Game::~Game() {
 void Game::OnUpdate(TimeStep ts) {
 	m_TimeStep = ts;
 
-	Renderer::Clear();
-
 	m_CurrentScreen();
 
 	UI::Begin();

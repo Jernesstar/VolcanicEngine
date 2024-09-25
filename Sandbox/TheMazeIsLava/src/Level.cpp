@@ -43,14 +43,14 @@ Ref<Scene> Level::Load() {
 			ECS::Entity wall = ECS::EntityBuilder(world)
 			.Add<TransformComponent>(Transform{ .Translation = { x, 1.0f, y } })
 			.Add<MeshComponent>(Asset::Wall)
-			.Add<RigidBodyComponent>(RigidBody::Type::Static)
+			// .Add<RigidBodyComponent>(RigidBody::Type::Static)
 			.Finalize();
 		}
 		if(IsPath(x, y)) {
 			ECS::Entity path = ECS::EntityBuilder(world)
 			.Add<TransformComponent>(Transform{ .Translation = { x, 0.0f, y } })
 			.Add<MeshComponent>(Asset::Wall)
-			.Add<RigidBodyComponent>(RigidBody::Type::Static)
+			// .Add<RigidBodyComponent>(RigidBody::Type::Static)
 			// .Add<MeshComponent>(PickPathMesh(x, y))
 			.Finalize();
 		}
@@ -58,7 +58,7 @@ Ref<Scene> Level::Load() {
 			ECS::Entity lava = ECS::EntityBuilder(world)
 			.Add<TransformComponent>(Transform{ .Translation = { x, 1.0f, y } })
 			.Add<MeshComponent>(Asset::Lava)
-			.Add<RigidBodyComponent>(RigidBody::Type::Static)
+			// .Add<RigidBodyComponent>(RigidBody::Type::Static)
 			.Finalize();
 		}
 		if(IsGoal(x, y)) {
@@ -69,7 +69,7 @@ Ref<Scene> Level::Load() {
 				.Scale = glm::vec3(0.5)
 			})
 			.Add<MeshComponent>(Asset::Stairs)
-			.Add<RigidBodyComponent>(RigidBody::Type::Static)
+			// .Add<RigidBodyComponent>(RigidBody::Type::Static)
 			.Finalize();
 		}
 	});
