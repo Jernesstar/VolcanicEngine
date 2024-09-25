@@ -197,7 +197,6 @@ void Bloom::InitMips() {
 void Bloom::Downsample() {
 	for(const auto& mip : mipChain) {
 		Renderer::Resize(mip.IntSize.x, mip.IntSize.y);
-		Renderer::Clear();
 
 		Renderer::GetDrawCommand().GetUniforms()
 		.Set("Sampler",

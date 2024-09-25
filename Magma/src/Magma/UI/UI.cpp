@@ -39,7 +39,7 @@ void Init() {
 					| ImGuiConfigFlags_ViewportsEnable;
 	io.DisplaySize = ImVec2(window->GetWidth(), window->GetHeight());
 
-	if(RendererAPI::GetBackend() == RendererAPI::Backend::OpenGL) {
+	if(RendererAPI::Get()->GetBackend() == RendererAPI::Backend::OpenGL) {
 		ImGui_ImplGlfw_InitForOpenGL(window->GetNativeWindow(), true);
 		ImGui_ImplOpenGL3_Init("#version 450");
 	}

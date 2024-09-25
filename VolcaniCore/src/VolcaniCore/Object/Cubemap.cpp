@@ -7,7 +7,7 @@
 namespace VolcaniCore {
 
 Ref<Cubemap> Cubemap::Create(const std::string& cubemap_folder) {
-	RendererAPI::Backend backend = RendererAPI::GetBackend();
+	RendererAPI::Backend backend = RendererAPI::Get()->GetBackend();
 
 	switch(backend) {
 		case RendererAPI::Backend::OpenGL:
@@ -17,7 +17,7 @@ Ref<Cubemap> Cubemap::Create(const std::string& cubemap_folder) {
 }
 
 Ref<Cubemap> Cubemap::Create(const std::vector<std::string>& faces) {
-	RendererAPI::Backend backend = RendererAPI::GetBackend();
+	RendererAPI::Backend backend = RendererAPI::Get()->GetBackend();
 
 	switch(backend) {
 		case RendererAPI::Backend::OpenGL:

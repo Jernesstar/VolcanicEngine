@@ -9,6 +9,8 @@ public:
 	Renderer();
 	~Renderer() = default;
 
+	void SetOptions(const RendererAPI::Options& options) override;
+
 	void StartFrame() override;
 	void EndFrame() override;
 
@@ -17,10 +19,9 @@ public:
 
 	void SubmitDrawCall(DrawCall& call) override;
 
-	void RenderCubemap(Ref<VolcaniCore::Cubemap> cubemap) override;
-	void RenderFramebuffer(
-			Ref<VolcaniCore::Framebuffer> framebuffer,
-			AttachmentTarget target) override;
+	void RenderCubemap(Ref<Cubemap> cubemap) override;
+	void RenderFramebuffer(Ref<Framebuffer> framebuffer,
+							AttachmentTarget target) override;
 
 private:
 	void Init() override;
