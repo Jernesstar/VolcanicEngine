@@ -26,6 +26,9 @@ public:
 	bool operator ==(const Texture2D& other) const {
 		return this->m_TextureID == other.m_TextureID;
 	}
+	bool operator !=(const Texture2D& other) const {
+		return this->m_TextureID != other.m_TextureID;
+	}
 
 	static uint32_t CreateTexture(uint32_t width, uint32_t height,
 		Texture::InternalFormat internal = Texture::InternalFormat::Normal);

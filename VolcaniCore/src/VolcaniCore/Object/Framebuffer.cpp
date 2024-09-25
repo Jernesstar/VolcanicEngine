@@ -36,17 +36,21 @@ Ref<Framebuffer> Framebuffer::Create(
 			// 			texture->GetWidth(), texture->GetHeight()
 			// 		});
 
-			// 		if(target != AttachmentTarget::Color) // Only need one depth or stencil attachment
+					// // Only need one depth or stencil attachment
+			// 		if(target != AttachmentTarget::Color)
 			// 			break;
 			// 	}
 
-			auto id = textureAttachments.at(AttachmentTarget::Color).at(0)
-						->As<OpenGL::Texture2D>()->GetID();
+			auto& texture = textureAttachments.at(AttachmentTarget::Color).at(0);
 			attachments.insert(
 			{
 				AttachmentTarget::Color,
 				{
-					{ { OpenGL::Attachment::Type::Texture, 0, 800, 600 } }
+					{
+						OpenGL::Attachment::Type::Texture,
+						texture->As<OpenGL::Texture2D>()->GetID(),
+						texture->GetWidth(), texture->GetHeight()
+					}
 				}
 			});
 

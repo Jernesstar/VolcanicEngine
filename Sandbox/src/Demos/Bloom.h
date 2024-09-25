@@ -33,6 +33,7 @@ private:
 	Ref<Framebuffer> mips;
 	List<BloomMip> mipChain;
 	uint32_t mipChainLength = 5;
+	Ref<Texture> test;
 };
 
 Bloom::Bloom() {
@@ -67,15 +68,11 @@ Bloom::Bloom() {
 	});
 	drawPass = RenderPass::Create("Draw Pass", shader);
 
-	src = Framebuffer::Create(800, 600);
-	// Ref<Texture> test = Texture::Create(800, 600, Texture::InternalFormat::Float);
-	// src = Framebuffer::Create({
-	// 		{ AttachmentTarget::Color, { { test } } }
-	// 	});
-
-	drawPass->SetOutput(src);
+	auto window = Application::GetWindow();
+	src = Framebuffer::Create(window->GetWidth(), window->GetHeight());
 
 	InitMips();
+	drawPass->SetOutput(mips);
 
 	cube = Mesh::Create(MeshPrimitive::Cube, { 0.98f, 0.92f, 0.0f, 1.0f });
 
@@ -92,6 +89,8 @@ void Bloom::OnUpdate(TimeStep ts) {
 
 	float filterRadius = 0.005f;
 
+	mips->Set(AttachmentTarget::Color, mipChain[4].Sampler);
+
 	Renderer::StartPass(drawPass);
 	{
 		Renderer::Clear();
@@ -105,7 +104,7 @@ void Bloom::OnUpdate(TimeStep ts) {
 
 	Renderer::Flush();
 
-	RendererAPI::Get()->RenderFramebuffer(src, AttachmentTarget::Color);
+	RendererAPI::Get()->RenderFramebuffer(mips, AttachmentTarget::Color);
 
 	// Renderer::StartPass(downsamplePass);
 	// {
@@ -205,7 +204,7 @@ void Bloom::Downsample() {
 		[mip, &mips = mips]() -> TextureSlot
 		{
 			mips->Set(AttachmentTarget::Color, mip.Sampler);
-			return { nullptr, 0 };
+			return { };
 		});
 		RendererAPI::Get()->RenderFramebuffer(mips, AttachmentTarget::Color);
 

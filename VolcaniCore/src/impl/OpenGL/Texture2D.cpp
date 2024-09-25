@@ -76,9 +76,10 @@ constexpr uint32_t GetColorFormat(Texture::ColorFormat format) {
 }
 
 uint32_t Texture2D::CreateTexture(uint32_t width, uint32_t height,
-			Texture::InternalFormat internal)
+									Texture::InternalFormat internal)
 {
-	uint32_t internalFormat, colorFormat, textureID;
+	uint32_t internalFormat;
+	uint32_t textureID;
 	internalFormat = GetInternalFormat(internal);
 
 	glCreateTextures(GL_TEXTURE_2D, 1, &textureID);
@@ -86,8 +87,8 @@ uint32_t Texture2D::CreateTexture(uint32_t width, uint32_t height,
 
 	glTextureParameteri(textureID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTextureParameteri(textureID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTextureParameteri(textureID, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTextureParameteri(textureID, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTextureParameteri(textureID, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTextureParameteri(textureID, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
 	return textureID;
 }
