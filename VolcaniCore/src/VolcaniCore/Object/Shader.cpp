@@ -25,7 +25,7 @@ static std::vector<ShaderFile> GetShaders(const std::string& shaderFolder,
 Ref<ShaderPipeline> ShaderPipeline::Create(
 						const std::vector<ShaderFile>& shaders)
 {
-	RendererAPI::Backend backend = RendererAPI::GetBackend();
+	RendererAPI::Backend backend = RendererAPI::Get()->GetBackend();
 
 	switch(backend) {
 		case RendererAPI::Backend::OpenGL:
@@ -37,7 +37,7 @@ Ref<ShaderPipeline> ShaderPipeline::Create(
 Ref<ShaderPipeline> ShaderPipeline::Create(
 						const std::vector<std::string>& paths)
 {
-	RendererAPI::Backend backend = RendererAPI::GetBackend();
+	RendererAPI::Backend backend = RendererAPI::Get()->GetBackend();
 
 	auto shaders = GetShaders(paths);
 
@@ -51,7 +51,7 @@ Ref<ShaderPipeline> ShaderPipeline::Create(
 Ref<ShaderPipeline> ShaderPipeline::Create(const std::string& folderPath,
 										   const std::string& name)
 {
-	RendererAPI::Backend backend = RendererAPI::GetBackend();
+	RendererAPI::Backend backend = RendererAPI::Get()->GetBackend();
 
 	auto shaders = GetShaders(folderPath, name);
 

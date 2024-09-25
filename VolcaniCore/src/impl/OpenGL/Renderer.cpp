@@ -47,13 +47,15 @@ Renderer::Renderer()
 }
 
 void Renderer::Init() {
-	glEnable(GL_DEPTH_TEST);				// Depth testing
+	SetOptions(
+		{
+			RendererAPI::Options::BlendingMode::Off,
+			RendererAPI::Options::DepthTesting::On,
+		});
+
 	glEnable(GL_MULTISAMPLE);				// Smooth edges
 	glEnable(GL_FRAMEBUFFER_SRGB);			// Gamma correction
-	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS); // ???
-
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS); // Smooth cubemap edges
 
 	glEnable(GL_CULL_FACE);
 	glFrontFace(GL_CCW);
@@ -106,7 +108,6 @@ void Renderer::Init() {
 
 	float framebufferCoords[] =
 	{
-		// TexCoords
 		1.0f, 0.0f,
 		0.0f, 0.0f,
 		0.0f, 1.0f,
@@ -142,7 +143,7 @@ void Renderer::Init() {
 			true, // Dynamic
 			false // Structure of arrays
 		},
-		FrameDebugInfo::MaxVertices
+		VolcaniCore::Renderer::MaxVertices
 	);
 	// TODO(Change): Turn into MappedBuffer
 	s_Data.TransformBuffer = CreateRef<VertexBuffer>(
@@ -151,9 +152,10 @@ void Renderer::Init() {
 			true, // Dynamic
 			true // Structure of arrays
 		},
-		FrameDebugInfo::MaxInstances
+		VolcaniCore::Renderer::MaxInstances
 	);
-	s_Data.Indices = CreateRef<IndexBuffer>(FrameDebugInfo::MaxIndices, true);
+	s_Data.Indices =
+		CreateRef<IndexBuffer>(VolcaniCore::Renderer::MaxIndices, true);
 
 	s_Data.Array = CreatePtr<VertexArray>();
 	s_Data.Array->SetIndexBuffer(s_Data.Indices);
@@ -162,6 +164,23 @@ void Renderer::Init() {
 }
 
 void Renderer::Close() { }
+
+void Renderer::SetOptions(const RendererAPI::Options& options) {
+	glDisable(GL_DEPTH_TEST);
+	if(options.DepthTest == RendererAPI::Options::DepthTesting::On)
+		glEnable(GL_DEPTH_TEST);
+
+	glDisable(GL_BLEND);
+	if(options.Blending != RendererAPI::Options::BlendingMode::Off)
+		glEnable(GL_BLEND);
+	if(options.Blending == RendererAPI::Options::BlendingMode::Closest) {
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	}
+	if(options.Blending == RendererAPI::Options::BlendingMode::Additive) {
+		glBlendFunc(GL_ONE, GL_ONE);
+		glBlendEquation(GL_FUNC_ADD);
+	}
+}
 
 void Renderer::StartFrame() {
 

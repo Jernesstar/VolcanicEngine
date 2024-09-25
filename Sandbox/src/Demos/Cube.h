@@ -133,6 +133,10 @@ void Cube::OnUpdate(TimeStep ts) {
 	ImGui::Begin("Debug");
 	{
 		ImGui::Text("FPS: %0.1f", Renderer::GetDebugInfo().FPS);
+		ImGui::Text("Draw Calls: %i", Renderer::GetDebugInfo().DrawCalls);
+		ImGui::Text("Indices: %i", Renderer::GetDebugInfo().Indices);
+		ImGui::Text("Vertices: %i", Renderer::GetDebugInfo().Vertices);
+		ImGui::Text("Instances: %i", Renderer::GetDebugInfo().Instances);
 	}
 	ImGui::End();
 

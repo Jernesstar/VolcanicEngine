@@ -16,8 +16,9 @@ UILayer y
 change:
 	Removed Point, Line, and Mesh buffers in OpenGL::Renderer::RendererData in favor of a single Geometry buffer
 	Renamed VolcaniCore::Renderer::RenderCubemap -> DrawSkybox
-	Renamed LinkHandles -> SetUniforms, class Handles -> Uniforms, HandleMap -> UniformMap
-	Scene, SceneSerializer -> Scene/
+	Renamed LinkHandles -> SetUniforms, class Handles -> Uniforms
+	Moved files Scene, SceneSerializer -> Scene/
+	Moved defines FrameDebugInfo::Max_ -> Renderer::Max_
 
 feat_begin:
 	Created Vertex.h
@@ -33,7 +34,11 @@ feat_end:
 	struct TextureSlot
 	Uniforms::Set now deduces template argument from lambda return type
 	Uncapped FPS by calling glfwSetSwapInterval(0)
+	RendererAPI can now set options: DepthTesting and BlendingMode
+	In VolcaniCore::Renderer, Transforms now go into TransformBuffer
 
 todo:
 	Change all instances of vector, unordered_map and function to their corresponding using definitions
 	Work on Editor, start small
+	Work on Scene
+	Work on Game

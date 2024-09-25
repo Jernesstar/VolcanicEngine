@@ -37,6 +37,7 @@ struct DrawCommand {
 	Ref<RenderPass> Pass;
 	Uniforms PerUniforms;
 	DrawOptionsMap OptionsMap;
+	RendererAPI::Options RendererOptions;
 
 	bool Clear = false;
 	glm::ivec2 Size;
@@ -53,13 +54,12 @@ struct DrawCommand {
 };
 
 struct FrameDebugInfo {
-	uint32_t DrawCalls;
 	float FPS;
 
-	static const uint32_t MaxInstances;
-	static const uint32_t MaxTriangles;
-	static const uint32_t MaxVertices;
-	static const uint32_t MaxIndices;
+	uint32_t DrawCalls = 0;
+	uint32_t Indices   = 0;
+	uint32_t Vertices  = 0;
+	uint32_t Instances = 0;
 };
 
 struct FrameData {
@@ -71,6 +71,12 @@ struct FrameData {
 
 class Renderer {
 public:
+	static const uint32_t MaxTriangles;
+	static const uint32_t MaxIndices;
+	static const uint32_t MaxVertices;
+	static const uint32_t MaxInstances;
+
+public:
 	static void StartPass(Ref<RenderPass> pass);
 	static void EndPass();
 
@@ -79,6 +85,7 @@ public:
 
 	static void Clear(const glm::vec4& color = glm::vec4(0.0f));
 	static void Resize(uint32_t width, uint32_t height);
+	static void PushOptions(const RendererAPI::Options& options);
 
 	static Ref<RenderPass> GetPass();
 	static DrawCommand& GetDrawCommand();
