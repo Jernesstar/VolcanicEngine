@@ -42,12 +42,12 @@ Game::Game()
 	auto shader = ShaderLibrary::Get("Mesh");
 	m_LightingPass = RenderPass::Create("Lighting", shader);
 
-	PointLight light =
-		PointLight{ .Constant = 0.3f, .Linear = 0.0f, .Quadratic = 0.032f };
-	light.Position = { 0.0f, 2.0f, 0.0f },
-	light.Ambient  = { 0.2f, 0.2f, 0.2f },
-	light.Diffuse  = { 0.5f, 0.5f, 0.5f },
-	light.Specular = { 1.0f, 1.0f, 1.0f },
+	// PointLight light =
+	// 	PointLight{ .Constant = 0.3f, .Linear = 0.0f, .Quadratic = 0.032f };
+	// light.Position = { 0.0f, 2.0f, 0.0f };
+	// light.Ambient  = { 0.2f, 0.2f, 0.2f };
+	// light.Diffuse  = { 0.5f, 0.5f, 0.5f };
+	// light.Specular = { 1.0f, 1.0f, 1.0f };
 
 	// shader->Bind();
 
@@ -139,7 +139,6 @@ void Game::PlayScreen() {
 	// Gameplay
 	GameState::GetLevel().OnUpdate(m_TimeStep);
 	m_Controller.OnUpdate(m_TimeStep);
-	m_Scene->OnUpdate(m_TimeStep);
 
 	Renderer::StartPass(m_LightingPass);
 	{
