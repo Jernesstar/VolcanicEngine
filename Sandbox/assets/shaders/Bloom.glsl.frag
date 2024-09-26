@@ -5,8 +5,8 @@ layout(location = 0) in vec2 TexCoords;
 layout(binding = 0) uniform sampler2D u_BloomTexture;
 layout(binding = 1) uniform sampler2D u_SceneTexture;
 
-uniform float exposure;
-uniform float bloomStrength = 0.04f;
+uniform float exposure = 1.0;
+uniform float bloomStrength = 0.04;
 
 vec3 bloom()
 {

@@ -11,7 +11,7 @@ class Buffer {
 public:
 	Buffer() = default;
 
-	Buffer(uint32_t count)
+	Buffer(uint64_t count)
 		: m_MaxCount(count), m_Index(0)
 	{
 		m_Data = new T[m_MaxCount];
@@ -22,12 +22,12 @@ public:
 		m_Data = new T[m_MaxCount];
 		memcpy(m_Data, list.data(), GetSize());
 	}
-	// Buffer(void* buffer, uint32_t count, uint32_t index = 0)
+	// Buffer(void* buffer, uint64_t count, uint64_t index = 0)
 	// 	: m_MaxCount(count), m_Index(index)
 	// {
 	// 	m_Data = (T*)buffer;
 	// }
-	Buffer(const Buffer<T>& buffer, uint32_t index)
+	Buffer(const Buffer<T>& buffer, uint64_t index)
 		: m_MaxCount(buffer.GetMaxCount()), m_Index(0)
 	{
 		m_Data = buffer.Get() + index;
@@ -50,12 +50,12 @@ public:
 		return List<T>(m_Data, m_Data + m_Index);
 	}
 
-	T& operator [](uint32_t index) const { return m_Data[index]; }
+	T& operator [](uint64_t index) const { return m_Data[index]; }
 
-	uint32_t GetCount()	   const { return m_Index; }
-	uint32_t GetMaxCount() const { return m_MaxCount; }
-	std::size_t GetSize()	 const { return m_Index	   * sizeof(T); }
-	std::size_t GetMaxSize() const { return m_MaxCount * sizeof(T); }
+	uint64_t GetCount()	   const { return m_Index; }
+	uint64_t GetMaxCount() const { return m_MaxCount; }
+	uint64_t GetSize()	   const { return m_Index	 * sizeof(T); }
+	uint64_t GetMaxSize()  const { return m_MaxCount * sizeof(T); }
 
 	void Add(const T& element) {
 		if(m_Index >= m_MaxCount)
@@ -86,7 +86,7 @@ public:
 		delete m_Data;
 	}
 
-	void Reallocate(uint32_t surplus) {
+	void Reallocate(uint64_t surplus) {
 		m_MaxCount += surplus;
 
 		T* newData = new T[m_MaxCount];
@@ -106,8 +106,8 @@ public:
 
 private:
 	T* m_Data = nullptr;
-	uint32_t m_MaxCount = 0;
-	uint32_t m_Index = 0;
+	uint64_t m_MaxCount = 0;
+	uint64_t m_Index = 0;
 };
 
 }

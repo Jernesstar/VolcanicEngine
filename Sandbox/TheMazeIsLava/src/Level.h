@@ -38,7 +38,7 @@ public:
 	void OnRender();
 
 	void Load();
-	Ref<Scene> GetScene() { return m_Scene; }
+	Ref<Scene>& GetScene() { return m_Scene; }
 
 	void TraverseTilemap(const std::function<void(const Tile& tile)>& func);
 

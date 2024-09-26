@@ -7,8 +7,8 @@
 // Remember to use a floating-point texture format (for HDR)!
 // Remember to use edge clamping for this texture!
 
-layout(binding = 0) uniform sampler2D u_SrcTexture;
 uniform float u_FilterRadius;
+layout(binding = 0) uniform sampler2D u_SrcTexture;
 
 layout(location = 0) in vec2 v_TexCoords;
 
@@ -44,9 +44,9 @@ void main()
     // 16   | 1 2 1 |
 
     vec3 upsample;
-    upsample = e*4.0;
-    upsample += (b+d+f+h)*2.0;
-    upsample += (a+c+g+i);
+    upsample = e * 4.0;
+    upsample += (b + d + f + h) * 2.0;
+    upsample += (a + c + g + i);
     upsample *= 1.0 / 16.0;
 
     FragColor = vec4(upsample, 1.0);

@@ -12,10 +12,10 @@ static void FlushCommand(DrawCommand& command);
 static List<DrawCall> CreateDrawCalls(DrawCommand& command);
 static DrawOptionsMap GetOrReturnDefaults(const DrawOptionsMap& map);
 
-const uint32_t Renderer::MaxTriangles = 1'000'000;
-const uint32_t Renderer::MaxIndices   = MaxVertices  * 3; /* (3.0f / 2.0f) */
-const uint32_t Renderer::MaxVertices  = MaxTriangles * 3;
-const uint32_t Renderer::MaxInstances = 10'000;
+const uint64_t Renderer::MaxTriangles = 1'000'000;
+const uint64_t Renderer::MaxIndices   = MaxVertices  * 3; /* (3.0f / 2.0f) */
+const uint64_t Renderer::MaxVertices  = MaxTriangles * 3;
+const uint64_t Renderer::MaxInstances = 200'000;
 
 static Ref<RenderPass> s_RenderPass;
 static DrawCommand* s_DrawCommand;
@@ -175,36 +175,32 @@ FrameDebugInfo Renderer::GetDebugInfo() {
 FrameData& Renderer::GetFrame() { return s_Frame; }
 
 void FlushCommand(DrawCommand& command) {
-	if(command.Points.size() == 0
-	&& command.Lines.size()  == 0
-	&& command.Meshes.size() == 0) return;
-
 	auto framebuffer = command.Pass->GetOutput();
+	if(!s_DrawCommand || s_DrawCommand->Pass != command.Pass)
+		command.Pass->SetGlobalUniforms();
+
 	if(framebuffer) {
 		RendererAPI::Get()
 			->Resize(framebuffer->GetWidth(), framebuffer->GetHeight());
 		framebuffer->Bind();
 	}
 
-	auto oldOptions = RendererAPI::Get()->GetOptions();
-	RendererAPI::Get()->SetOptions(command.RendererOptions);
-
-	if(!s_DrawCommand || s_DrawCommand->Pass != command.Pass)
-		command.Pass->SetGlobalUniforms();
+	// auto oldOptions = RendererAPI::Get()->GetOptions();
+	// RendererAPI::Get()->SetOptions(command.RendererOptions);
 
 	command.Pass->SetUniforms(command.GetUniforms());
 
-	if(command.Clear)
-		RendererAPI::Get()->Clear();
 	if(command.Size != glm::ivec2{ 0, 0 })
 		RendererAPI::Get()->Resize(command.Size.x, command.Size.y);
+	if(command.Clear)
+		RendererAPI::Get()->Clear();
 
 	// TODO(Fix): ProcessDrawCalls: Flush draw calls if data becomes to big
 	for(auto& call : CreateDrawCalls(command)) {
 		RendererAPI::Get()->SubmitDrawCall(call);
 	}
 
-	RendererAPI::Get()->SetOptions(oldOptions);
+	// RendererAPI::Get()->SetOptions(oldOptions);
 
 	if(framebuffer) {
 		framebuffer->Unbind();
@@ -216,9 +212,12 @@ void FlushCommand(DrawCommand& command) {
 }
 
 List<DrawCall> CreateDrawCalls(DrawCommand& command) {
-	auto& options = command.OptionsMap;
 	List<DrawCall> calls;
+	if(command.Points.size() == 0
+	&& command.Lines.size()  == 0
+	&& command.Meshes.size() == 0) return calls;
 
+	auto& options = command.OptionsMap;
 	// // TODO(Implement):
 	// DrawCall pointCall{
 	// 	.Type	   = options[DrawPrimitive::Point].Type,

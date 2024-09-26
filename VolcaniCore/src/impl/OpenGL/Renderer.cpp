@@ -286,17 +286,28 @@ void Renderer::RenderFramebuffer(Ref<VolcaniCore::Framebuffer> buffer,
 		return;
 	}
 
-	if(!VolcaniCore::Renderer::GetPass())
+	auto pass = VolcaniCore::Renderer::GetPass();
+	if(pass) {
+		pass->GetPipeline()->Bind();
+
+		if(pass->GetOutput())
+			pass->GetOutput()->Bind();
+	}
+	else {
 		ShaderLibrary::Get("Framebuffer")->Bind();
+		buffer->Bind(target, 0);
+	}
 
-	buffer->Bind(target, 0);
 	s_Data.FramebufferArray->Bind();
-
 	glDisable(GL_DEPTH_TEST);
 
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 
 	glEnable(GL_DEPTH_TEST);
+	s_Data.FramebufferArray->Unbind();
+
+	if(pass && pass->GetOutput())
+		pass->GetOutput()->Unbind();
 }
 
 }

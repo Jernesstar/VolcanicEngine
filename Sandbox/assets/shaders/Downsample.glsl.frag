@@ -9,8 +9,8 @@
 // Remember to use a floating-point texture format (for HDR)!
 // Remember to use edge clamping for this texture!
 
-layout(binding = 0) uniform sampler2D u_SrcTexture;
 uniform vec2 u_SrcResolution;
+layout(binding = 0) uniform sampler2D u_SrcTexture;
 
 layout(location = 0) in vec2 v_TexCoords;
 
@@ -60,10 +60,10 @@ void main()
     // to effectively yield this sum. We get:
     // 0.125*5 + 0.03125*4 + 0.0625*4 = 1
     vec3 downsample;
-    downsample = e*0.125;
-    downsample += (a+c+g+i)*0.03125;
-    downsample += (b+d+f+h)*0.0625;
-    downsample += (j+k+l+m)*0.125;
+    downsample = e * 0.125;
+    downsample += (a + c + g + i) * 0.03125;
+    downsample += (b + d + f + h) * 0.0625;
+    downsample += (j + k + l + m) * 0.125;
 
     FragColor = vec4(downsample, 1.0);
 }

@@ -72,10 +72,10 @@ struct FrameData {
 
 class Renderer {
 public:
-	static const uint32_t MaxTriangles;
-	static const uint32_t MaxIndices;
-	static const uint32_t MaxVertices;
-	static const uint32_t MaxInstances;
+	static const uint64_t MaxTriangles;
+	static const uint64_t MaxIndices;
+	static const uint64_t MaxVertices;
+	static const uint64_t MaxInstances;
 
 public:
 	static void StartPass(Ref<RenderPass> pass);

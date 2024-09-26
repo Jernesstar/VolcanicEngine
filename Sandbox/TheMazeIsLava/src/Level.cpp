@@ -24,8 +24,9 @@ Level::Level(const std::string& name, const Tilemap& map)
 }
 
 void Level::OnUpdate(TimeStep ts) {
-	if(m_Scene)
-		m_Scene->OnUpdate(ts);
+	VOLCANICORE_LOG_INFO("Count %i", m_Scene.use_count());
+	// if(m_Scene)
+	// 	m_Scene->OnUpdate(ts);
 }
 
 void Level::OnRender() {
@@ -40,54 +41,54 @@ void Level::PropagateLava(TimeStep ts) {
 }
 
 void Level::Load() {
-	m_Scene = CreateRef<Scene>();
+	m_Scene = CreateRef<Scene>(Name);
 	auto& world = m_Scene->GetEntityWorld();
 
-	// TraverseTilemap(
-	// 	[&](const Tile& tile)
-	// 	{
-	// 		auto [x, y] = tile;
+	TraverseTilemap(
+		[&](const Tile& tile)
+		{
+			auto [x, y] = tile;
 
-	// 		if(IsWall(tile)) {
-	// 			ECS::Entity wall = ECS::EntityBuilder(world)
-	// 			.Add<TransformComponent>(
-	// 				Transform{ .Translation = { x, 1.0f, y } }
-	// 			)
-	// 			.Add<MeshComponent>(Asset::Wall)
-	// 			// .Add<RigidBodyComponent>(RigidBody::Type::Static)
-	// 			.Finalize();
-	// 		}
-	// 		if(IsPath(tile)) {
-	// 			ECS::Entity path = ECS::EntityBuilder(world)
-	// 			.Add<TransformComponent>(
-	// 				Transform{ .Translation = { x, 0.0f, y } }
-	// 			)
-	// 			.Add<MeshComponent>(Asset::Wall)
-	// 			.Add<RigidBodyComponent>(RigidBody::Type::Static)
-	// 			// .Add<MeshComponent>(PickPathMesh(tile))
-	// 			.Finalize();
-	// 		}
-	// 		if(IsLava(tile)) {
-	// 			ECS::Entity lava = ECS::EntityBuilder(world)
-	// 			.Add<TransformComponent>(
-	// 				Transform{ .Translation = { x, 1.0f, y } }
-	// 			)
-	// 			.Add<MeshComponent>(Asset::Lava)
-	// 			// .Add<RigidBodyComponent>(RigidBody::Type::Static)
-	// 			.Finalize();
-	// 		}
-	// 		if(IsGoal(tile)) {
-	// 			ECS::Entity stairs = ECS::EntityBuilder(world, "Goal")
-	// 			.Add<TransformComponent>(
-	// 				Transform{
-	// 					.Translation = { x, 1.0f, y },
-	// 					.Scale = glm::vec3(0.5)
-	// 				})
-	// 			.Add<MeshComponent>(Asset::Stairs)
-	// 			// .Add<RigidBodyComponent>(RigidBody::Type::Static)
-	// 			.Finalize();
-	// 		}
-	// 	});
+			if(IsWall(tile)) {
+				ECS::Entity wall = ECS::EntityBuilder(world)
+				.Add<TransformComponent>(
+					Transform{ .Translation = { x, 1.0f, y } }
+				)
+				.Add<MeshComponent>(Asset::Wall)
+				// .Add<RigidBodyComponent>(RigidBody::Type::Static)
+				.Finalize();
+			}
+			if(IsPath(tile)) {
+				ECS::Entity path = ECS::EntityBuilder(world)
+				.Add<TransformComponent>(
+					Transform{ .Translation = { x, 0.0f, y } }
+				)
+				.Add<MeshComponent>(Asset::Wall)
+				.Add<RigidBodyComponent>(RigidBody::Type::Static)
+				// .Add<MeshComponent>(PickPathMesh(tile))
+				.Finalize();
+			}
+			if(IsLava(tile)) {
+				ECS::Entity lava = ECS::EntityBuilder(world)
+				.Add<TransformComponent>(
+					Transform{ .Translation = { x, 1.0f, y } }
+				)
+				.Add<MeshComponent>(Asset::Lava)
+				// .Add<RigidBodyComponent>(RigidBody::Type::Static)
+				.Finalize();
+			}
+			if(IsGoal(tile)) {
+				ECS::Entity stairs = ECS::EntityBuilder(world, "Goal")
+				.Add<TransformComponent>(
+					Transform{
+						.Translation = { x, 1.0f, y },
+						.Scale = glm::vec3(0.5)
+					})
+				.Add<MeshComponent>(Asset::Stairs)
+				// .Add<RigidBodyComponent>(RigidBody::Type::Static)
+				.Finalize();
+			}
+		});
 }
 
 void Level::TraverseTilemap(const std::function<void(const Tile& tile)>& func) {

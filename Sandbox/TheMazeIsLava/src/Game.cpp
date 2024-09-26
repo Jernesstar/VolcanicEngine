@@ -120,8 +120,7 @@ void Game::LevelScreen() {
 
 	auto& currLevel = GameState::GetLevel();
 	currLevel.Load();
-	currLevel.OnUpdate(m_TimeStep);
-	auto scene = currLevel.GetScene();
+	auto& scene = currLevel.GetScene();
 	scene->SetCamera(camera);
 
 	Tile start = currLevel.PlayerStart;
