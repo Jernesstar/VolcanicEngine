@@ -102,7 +102,7 @@ protected:
 	glm::vec3 Position	= { 0.0f, 0.0f, 0.0f };
 	glm::vec3 Direction = { 0.0f, 0.0f, -1.0f };
 
-	float Near = 0.1f;
+	float Near = 0.001f;
 	float Far  = 1000.0f;
 	uint32_t ViewportWidth  = 800;
 	uint32_t ViewportHeight = 600;

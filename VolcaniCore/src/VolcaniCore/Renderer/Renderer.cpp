@@ -8,46 +8,6 @@
 
 namespace VolcaniCore {
 
-void DrawCommand::AddPoint(Ref<Point> point, const glm::mat4& transform) {
-	if(OptionsMap[DrawPrimitive::Point].Partition != DrawPartition::Instanced) {
-		Points[point] = Buffer<glm::mat4>();
-		return;
-	}
-
-	if(Points.count(point) == 0)
-		Points[point] = Buffer<glm::mat4>(TransformBuffer, TransformIndex);
-
-	Points[point].Add(transform);
-}
-
-void DrawCommand::AddLine(Ref<Line> line, const glm::mat4& transform) {
-	if(OptionsMap[DrawPrimitive::Line].Partition != DrawPartition::Instanced) {
-		Lines[line] = Buffer<glm::mat4>();
-		return;
-	}
-
-	if(Lines.count(line) == 0)
-		Lines[line] = Buffer<glm::mat4>(TransformBuffer, TransformIndex);
-
-	Lines[line].Add(transform);
-}
-
-void DrawCommand::AddMesh(Ref<Mesh> mesh, const glm::mat4& transform) {
-	if(OptionsMap[DrawPrimitive::Mesh].Partition != DrawPartition::Instanced) {
-		Meshes[point] = Buffer<glm::mat4>();
-		return;
-	}
-
-	if(Meshes.count(line) == 0)
-		Meshes[line] = Buffer<glm::mat4>(TransformBuffer, TransformIndex);
-
-	Meshes[line].Add(transform);
-}
-
-void FrameData::AddDrawCommand(DrawCommand& command) {
-	DrawCommands.push_back(command);
-}
-
 static void FlushCommand(DrawCommand& command);
 static List<DrawCall> CreateDrawCalls(DrawCommand& command);
 static DrawOptionsMap GetOrReturnDefaults(const DrawOptionsMap& map);
@@ -61,10 +21,55 @@ static Ref<RenderPass> s_RenderPass;
 static DrawCommand* s_DrawCommand;
 static FrameData s_Frame;
 
-static Buffer<Vertex> GeometryBuffer;
 static Buffer<uint32_t> IndexBuffer;
+static Buffer<Vertex> GeometryBuffer;
 static Buffer<glm::mat4> TransformBuffer;
-static uint32_t TransformIndex;
+
+static uint32_t DrawCallCount;
+static uint32_t IndexCount;
+static uint32_t GeometryCount;
+static uint32_t TransformCount;
+
+void DrawCommand::AddPoint(Ref<Point> point, const glm::mat4& transform) {
+	if(OptionsMap[DrawPrimitive::Point].Partition != DrawPartition::Instanced) {
+		Points[point] = Buffer<glm::mat4>();
+		return;
+	}
+
+	if(Points.count(point) == 0)
+		Points[point] = Buffer<glm::mat4>(TransformBuffer, TransformCount);
+
+	Points[point].Add(transform);
+}
+
+void DrawCommand::AddLine(Ref<Line> line, const glm::mat4& transform) {
+	if(OptionsMap[DrawPrimitive::Line].Partition != DrawPartition::Instanced) {
+		Lines[line] = Buffer<glm::mat4>();
+		return;
+	}
+
+	if(Lines.count(line) == 0)
+		Lines[line] = Buffer<glm::mat4>(TransformBuffer, TransformCount);
+
+	Lines[line].Add(transform);
+}
+
+void DrawCommand::AddMesh(Ref<Mesh> mesh, const glm::mat4& transform) {
+	if(OptionsMap[DrawPrimitive::Mesh].Partition != DrawPartition::Instanced) {
+		Meshes[mesh] = Buffer<glm::mat4>();
+		return;
+	}
+
+	// TODO(Fix): Support multiple meshes
+	if(Meshes.count(mesh) == 0)
+		Meshes[mesh] = Buffer<glm::mat4>(TransformBuffer, TransformCount);
+
+	Meshes[mesh].Add(transform);
+}
+
+void FrameData::AddDrawCommand(DrawCommand& command) {
+	DrawCommands.push_back(command);
+}
 
 void Renderer::Init() {
 	s_Frame = { };
@@ -74,24 +79,32 @@ void Renderer::Init() {
 }
 
 void Renderer::Close() {
-	GeometryBuffer.Delete();
 	IndexBuffer.Delete();
+	GeometryBuffer.Delete();
 	TransformBuffer.Delete();
 }
 
 void Renderer::BeginFrame() {
 	RendererAPI::Get()->StartFrame();
 
-	s_Frame.Info.DrawCalls = 0;
+	DrawCallCount  = 0;
+	IndexCount     = 0;
+	GeometryCount  = 0;
+	TransformCount = 0;
 }
 
 void Renderer::EndFrame() {
 	Flush();
 
-	GeometryBuffer.Clear();
+	s_Frame.Info.DrawCalls = DrawCallCount;
+	s_Frame.Info.Indices   = IndexCount;
+	s_Frame.Info.Vertices  = GeometryCount;
+	s_Frame.Info.Instances = TransformCount;
+
 	IndexBuffer.Clear();
+	GeometryBuffer.Clear();
 	TransformBuffer.Clear();
-	TransformIndex = 0;
+	TransformCount = 0;
 
 	RendererAPI::Get()->EndFrame();
 }
@@ -137,7 +150,7 @@ void Renderer::Resize(uint32_t width, uint32_t height) {
 }
 
 void Renderer::PushOptions(const RendererAPI::Options& options) {
-	s_DrawCommand->Options = options;
+	s_DrawCommand->RendererOptions = options;
 }
 
 Ref<RenderPass> Renderer::GetPass() {
@@ -159,9 +172,6 @@ void FlushCommand(DrawCommand& command) {
 	&& command.Lines.size()  == 0
 	&& command.Meshes.size() == 0) return;
 
-	auto oldOptions = RendererAPI::Get()->GetOptions();
-	RendererAPI::Get()->SetOptions(command.RendererOptions);
-
 	auto framebuffer = command.Pass->GetOutput();
 	if(framebuffer) {
 		RendererAPI::Get()
@@ -169,9 +179,11 @@ void FlushCommand(DrawCommand& command) {
 		framebuffer->Bind();
 	}
 
-	if(s_DrawCommand)
-		if(s_DrawCommand->Pass != command.Pass)
-			command.Pass->SetGlobalUniforms();
+	auto oldOptions = RendererAPI::Get()->GetOptions();
+	RendererAPI::Get()->SetOptions(command.RendererOptions);
+
+	if(!s_DrawCommand || s_DrawCommand->Pass != command.Pass)
+		command.Pass->SetGlobalUniforms();
 
 	command.Pass->SetUniforms(command.GetUniforms());
 
@@ -185,13 +197,14 @@ void FlushCommand(DrawCommand& command) {
 		RendererAPI::Get()->SubmitDrawCall(call);
 	}
 
+	RendererAPI::Get()->SetOptions(oldOptions);
+
 	if(framebuffer) {
 		framebuffer->Unbind();
 		auto window = Application::GetWindow();
 		RendererAPI::Get()->Resize(window->GetWidth(), window->GetHeight());
 	}
 
-	RendererAPI::Get()->SetOptions(oldOptions);
 	s_DrawCommand = &command;
 }
 
@@ -257,18 +270,20 @@ List<DrawCall> CreateDrawCalls(DrawCommand& command) {
 			meshCall.IndexBuffer = Buffer<uint32_t>(IndexBuffer, indicesIndex);
 			meshCall.IndexBuffer.Add(mesh->GetIndices());
 		}
-		if(meshCall.Partition == DrawPartition::Instanced) {
+		if(meshCall.Partition == DrawPartition::Instanced)
 			meshCall.TransformBuffer = transforms;
-		}
 
 		calls.push_back(meshCall);
 		geomIndex += meshCall.GeometryBuffer.GetCount();
 		indicesIndex += meshCall.IndexBuffer.GetCount();
 
-		s_Frame.Info.DrawCalls++;
-		s_Frame.Info.Indices   += meshCall.IndexBuffer.GetCount();
-		s_Frame.Info.Vertices  += meshCall.VertexBuffer.GetCount();
-		s_Frame.Info.Instances += meshCall.Instances.GetCount();
+		uint32_t multiple = meshCall.TransformBuffer.GetCount();
+		multiple = multiple != 0 ? multiple : 1;
+
+		DrawCallCount++;
+		IndexCount     += meshCall.IndexBuffer.GetCount() * multiple;
+		GeometryCount  += meshCall.GeometryBuffer.GetCount() * multiple;
+		TransformCount += multiple;
 	}
 
 	return calls;

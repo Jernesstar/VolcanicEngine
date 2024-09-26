@@ -8,6 +8,7 @@
 #include "Object/Line.h"
 #include "Object/Mesh.h"
 
+#include "RendererAPI.h"
 #include "RenderPass.h"
 
 namespace VolcaniCore {

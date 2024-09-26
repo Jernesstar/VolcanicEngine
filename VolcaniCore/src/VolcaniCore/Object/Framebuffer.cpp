@@ -27,32 +27,19 @@ Ref<Framebuffer> Framebuffer::Create(
 			Map<AttachmentTarget, List<OpenGL::Attachment>> attachments;
 			attachments.reserve(textureAttachments.size());
 
-			// for(const auto& [target, textures] : textureAttachments)
-			// 	for(const auto& texture : textures) {
-			// 		attachments[target].push_back(
-			// 		{
-			// 			OpenGL::Attachment::Type::Texture,
-			// 			texture->As<OpenGL::Texture2D>()->GetID(),
-			// 			texture->GetWidth(), texture->GetHeight()
-			// 		});
-
-					// // Only need one depth or stencil attachment
-			// 		if(target != AttachmentTarget::Color)
-			// 			break;
-			// 	}
-
-			auto& texture = textureAttachments.at(AttachmentTarget::Color).at(0);
-			attachments.insert(
-			{
-				AttachmentTarget::Color,
-				{
+			for(const auto& [target, textures] : textureAttachments)
+				for(const auto& texture : textures) {
+					attachments[target].push_back(
 					{
 						OpenGL::Attachment::Type::Texture,
-						texture->As<OpenGL::Texture2D>()->GetID(),
-						texture->GetWidth(), texture->GetHeight()
-					}
+						texture->GetWidth(), texture->GetHeight(),
+						texture->As<OpenGL::Texture2D>()->GetID()
+					});
+
+					// Only need one depth or stencil attachment
+					if(target != AttachmentTarget::Color)
+						break;
 				}
-			});
 
 			return CreateRef<OpenGL::Framebuffer>(attachments);
 		}

@@ -19,8 +19,8 @@ public:
 		enum class BlendingMode { Off, Greatest, Additive };
 
 	public:
-		const Option::DepthTesting DepthTest;
-		const Option::BlendingMode Blending;
+		DepthTesting DepthTest = DepthTesting::On;
+		BlendingMode Blending = BlendingMode::Greatest;
 	};
 
 public:

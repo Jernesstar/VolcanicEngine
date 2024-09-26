@@ -1,7 +1,5 @@
 #pragma once
 
-#include <OpenGL/Framebuffer.h>
-
 using namespace VolcaniCore;
 
 namespace Demo {
@@ -57,6 +55,9 @@ public:
 private:
 	Ref<ShaderPipeline> shader;
 	Ref<RenderPass> renderPass;
+
+	Ref<Texture> color;
+	Ref<Texture> depth;
 	Ref<Framebuffer> framebuffer;
 
 	// Ref<Mesh> torch;
@@ -80,7 +81,13 @@ Cube::Cube()
 
 	shader = ShaderPipeline::Create("VolcaniCore/assets/shaders", "Mesh");
 
-	framebuffer = CreateRef<OpenGL::Framebuffer>(480, 270);
+	color = Texture::Create(480, 270);
+	depth = Texture::Create(1920, 1080);
+	framebuffer = Framebuffer::Create(
+		{
+			{ AttachmentTarget::Color, { { color } } },
+			{ AttachmentTarget::Depth, { { depth } } },
+		});
 
 	renderPass = RenderPass::Create("Render Pass", shader);
 	renderPass->SetOutput(framebuffer);
@@ -91,25 +98,25 @@ Cube::Cube()
 			.Specular = Texture::Create("Sandbox/assets/images/wood_specular.png")
 		});
 
-	// camera = CreateRef<StereographicCamera>(75.0f);
+	camera = CreateRef<StereographicCamera>(75.0f);
 	// camera = CreateRef<OrthographicCamera>(1920, 1080, 0.1f, 100.0f);
-	camera = CreateRef<IsometricCamera>();
-	camera->Resize(480, 270);
+	// camera = CreateRef<IsometricCamera>();
+	camera->Resize(1920, 1080);
 	controller =
 		CameraController(
 			MovementControls(
 				ControlMap{
-					{ Control::Up,   Key::W },
-					{ Control::Down, Key::S },
-					{ Control::Forward,  Key::Invalid },
-					{ Control::Backward, Key::Invalid },
+					// { Control::Up,   Key::W },
+					// { Control::Down, Key::S },
+					// { Control::Forward,  Key::Invalid },
+					// { Control::Backward, Key::Invalid },
 				}
 			)
 		);
 
 	controller.SetCamera(camera);
-	controller.RotationSpeed = 0.0f;
-	controller.TranslationSpeed = 1.0f;
+	// controller.RotationSpeed = 0.0f;
+	controller.TranslationSpeed = 5.0f;
 }
 
 Cube::~Cube() {
@@ -154,6 +161,7 @@ void Cube::OnUpdate(TimeStep ts) {
 	}
 	Renderer::EndPass();
 
+	Renderer::Flush();
 	RendererAPI::Get()->RenderFramebuffer(framebuffer, AttachmentTarget::Color);
 
 	UI::End();

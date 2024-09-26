@@ -47,16 +47,11 @@ Renderer::Renderer()
 }
 
 void Renderer::Init() {
-	SetOptions(
-		{
-			RendererAPI::Options::BlendingMode::Off,
-			RendererAPI::Options::DepthTesting::On,
-		});
+	SetOptions(m_Options);
 
 	glEnable(GL_MULTISAMPLE);				// Smooth edges
 	glEnable(GL_FRAMEBUFFER_SRGB);			// Gamma correction
 	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS); // Smooth cubemap edges
-
 	glEnable(GL_CULL_FACE);
 	glFrontFace(GL_CCW);
 	glCullFace(GL_BACK);
@@ -108,12 +103,12 @@ void Renderer::Init() {
 
 	float framebufferCoords[] =
 	{
-		1.0f, 0.0f,
-		0.0f, 0.0f,
 		0.0f, 1.0f,
-
-		1.0f, 1.0f,
+		0.0f, 0.0f,
 		1.0f, 0.0f,
+
+		1.0f, 0.0f,
+		1.0f, 1.0f,
 		0.0f, 1.0f
 	};
 
@@ -173,9 +168,9 @@ void Renderer::SetOptions(const RendererAPI::Options& options) {
 	glDisable(GL_BLEND);
 	if(options.Blending != RendererAPI::Options::BlendingMode::Off)
 		glEnable(GL_BLEND);
-	if(options.Blending == RendererAPI::Options::BlendingMode::Closest) {
+
+	if(options.Blending == RendererAPI::Options::BlendingMode::Greatest)
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	}
 	if(options.Blending == RendererAPI::Options::BlendingMode::Additive) {
 		glBlendFunc(GL_ONE, GL_ONE);
 		glBlendEquation(GL_FUNC_ADD);
@@ -298,11 +293,9 @@ void Renderer::RenderFramebuffer(Ref<VolcaniCore::Framebuffer> buffer,
 	s_Data.FramebufferArray->Bind();
 
 	glDisable(GL_DEPTH_TEST);
-	glCullFace(GL_FRONT);
 
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 
-	glCullFace(GL_BACK);
 	glEnable(GL_DEPTH_TEST);
 }
 

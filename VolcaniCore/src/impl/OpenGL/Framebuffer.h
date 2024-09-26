@@ -11,9 +11,9 @@ public:
 	enum class Type { Texture, RenderBuffer };
 
 public:
-	Attachment(Attachment::Type type, uint32_t id = 0,
-				uint32_t width = 0, uint32_t height = 0)
-		: m_Type(type), m_RendererID(id), m_Width(width), m_Height(height) { }
+	Attachment(Attachment::Type type, uint32_t width = 0, uint32_t height = 0,
+				uint32_t id = 0)
+		: m_Type(type), m_Width(width), m_Height(height), m_RendererID(id) { }
 
 	void Bind(uint32_t slot = 0) const;
 
@@ -25,8 +25,8 @@ private:
 	void Delete() const;
 
 	Attachment::Type m_Type;
-	uint32_t m_RendererID = 0;
 	uint32_t m_Width, m_Height;
+	uint32_t m_RendererID;
 
 	friend class Framebuffer;
 };

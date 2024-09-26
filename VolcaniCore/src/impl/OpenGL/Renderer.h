@@ -19,8 +19,8 @@ public:
 
 	void SubmitDrawCall(DrawCall& call) override;
 
-	void RenderCubemap(Ref<Cubemap> cubemap) override;
-	void RenderFramebuffer(Ref<Framebuffer> framebuffer,
+	void RenderCubemap(Ref<VolcaniCore::Cubemap> cubemap) override;
+	void RenderFramebuffer(Ref<VolcaniCore::Framebuffer> framebuffer,
 							AttachmentTarget target) override;
 
 private:

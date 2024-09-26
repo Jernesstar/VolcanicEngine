@@ -52,12 +52,19 @@ Framebuffer::Framebuffer(const Map<AttachmentTarget, List<Attachment>>& map,
 						 uint32_t width, uint32_t height)
 	: VolcaniCore::Framebuffer(width, height), m_AttachmentMap(map)
 {
-	if(m_Width == 0 || m_Height == 0)
-		for(const auto& [_, attachments] : m_AttachmentMap)
-			for(const auto& att : attachments) {
-				m_Width  = std::max(m_Width, att.m_Width);
-				m_Height = std::max(m_Height, att.m_Height);
-			}
+	if(m_Width == 0 || m_Height == 0) {
+		if(Has(AttachmentTarget::Color)) {
+			auto& att = m_AttachmentMap[AttachmentTarget::Color][0];
+			m_Width  = att.m_Width;
+			m_Height = att.m_Height;
+		}
+		else
+			for(const auto& [_, attachments] : m_AttachmentMap)
+				for(const auto& att : attachments) {
+					m_Width  = std::max(m_Width, att.m_Width);
+					m_Height = std::max(m_Height, att.m_Height);
+				}
+	}
 
 	glGenFramebuffers(1, &m_BufferID);
 	glBindFramebuffer(GL_FRAMEBUFFER, m_BufferID);
@@ -149,11 +156,15 @@ void Framebuffer::Bind(AttachmentTarget target, uint32_t slot,
 
 void Framebuffer::CreateColorAttachment(uint32_t index) {
 	auto& attachment = m_AttachmentMap[AttachmentTarget::Color][index];
+	uint32_t width  = attachment.m_Width;
+	uint32_t height = attachment.m_Height;
+	width  = width  ? width  : m_Width;
+	height = height ? height : m_Height;
 
 	if(attachment.GetType() == Attachment::Type::Texture) {
 		if(attachment.m_RendererID == 0) {
 			Texture::InternalFormat format = Texture::InternalFormat::Float;
-			uint32_t id = Texture2D::CreateTexture(m_Width, m_Height, format);
+			uint32_t id = Texture2D::CreateTexture(width, height, format);
 			attachment.m_RendererID = id;
 		}
 
@@ -171,13 +182,17 @@ void Framebuffer::CreateColorAttachment(uint32_t index) {
 
 void Framebuffer::CreateDepthAttachment() {
 	auto& attachment = m_AttachmentMap[AttachmentTarget::Depth][0];
+	uint32_t width  = attachment.m_Width;
+	uint32_t height = attachment.m_Height;
+	width  = width  ? width  : m_Width;
+	height = height ? height : m_Height;
 
 	if(attachment.GetType() == Attachment::Type::Texture) {
 		if(attachment.m_RendererID != 0) {
 			// TODO(Implement): CreateTexture(Type::Depth);
 			glGenTextures(1, &attachment.m_RendererID);
 			glBindTexture(GL_TEXTURE_2D, attachment.m_RendererID);
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, m_Width, m_Height,
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height,
 						 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
