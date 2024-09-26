@@ -17,42 +17,42 @@ using namespace Magma;
 
 namespace TheMazeIsLava {
 
+struct Tile { uint32_t x, y };
 using Coordinate = glm::vec2;
+using TileMap	 = List<List<uint32_t>>;
 
 class Level {
 public:
 	const std::string Name;
-	const std::vector<std::vector<uint32_t>> Tilemap;
 	const uint32_t Width, Height;
 
+	TileMap Map;
+	Coordinate Goal;
+	Coordinate PlayerStart;
+	List<Tile> LavaPoints;
+
 public:
-	Level(const std::string& name, std::vector<std::vector<uint32_t>> map);
+	Level(const std::string& name, const TileMap& map);
 	~Level() = default;
 
 	void OnUpdate(TimeStep ts);
 
-	Ref<Scene> Load();
+	void Load();
+	Ref<Scene> GetScene() { return m_Scene; }
 
-	Coordinate GetPlayerStart() const { return m_PlayerStart; }
-	Coordinate GetGoal() const { return m_Goal; }
+	void TraverseTilemap(const std::function<void(const Tile& tile)>& func);
 
-	void TraverseTilemap(
-			const std::function<void(uint32_t x, uint32_t y)>& func);
-
-	bool IsInbounds(uint32_t col, uint32_t row) const;
-
-	bool IsWall(uint32_t col, uint32_t row) const;
-	bool IsPath(uint32_t col, uint32_t row) const;
-	bool IsLava(uint32_t col, uint32_t row) const;
-	bool IsGoal(uint32_t col, uint32_t row) const;
-	bool IsCheckpoint(uint32_t col, uint32_t row) const;
+	bool IsWall(const Tile& tile) const;
+	bool IsPath(const Tile& tile) const;
+	bool IsLava(const Tile& tile) const;
+	bool IsGoal(const Tile& tile) const;
+	bool IsStart(const Tile& tile) const;
+	bool IsCheckpoint(const Tile& tile) const;
+	bool IsInbounds(const Tile& tile) const;
 
 private:
-	Coordinate m_Goal;
-	Coordinate m_PlayerStart;
-	std::vector<Coordinate> m_LavaPoints;
+	Ref<Scene> m_Scene;
 
-private:
 	void PropagateLava(TimeStep ts);
 };
 

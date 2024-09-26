@@ -67,8 +67,7 @@ struct TransformComponent : public Component {
 	glm::vec3 Scale		  = { 1.0f, 1.0f, 1.0f };
 
 	TransformComponent() = default;
-	TransformComponent(const glm::vec3& t,
-					   const glm::vec3& r,
+	TransformComponent(const glm::vec3& t, const glm::vec3& r,
 					   const glm::vec3& s)
 		: Translation(t), Rotation(r), Scale(s) { }
 	TransformComponent(const Transform& t)
@@ -85,7 +84,7 @@ struct ScriptComponent : public Component {
 	ScriptComponent(const std::string& path)
 		// : Path(path)
 	{
-		// ScriptLibrary::LoadScript(path);
+		// ScriptEngine::LoadScript(path);
 	}
 	ScriptComponent(const ScriptComponent& other) = default;
 };
