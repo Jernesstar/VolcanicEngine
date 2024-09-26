@@ -32,11 +32,10 @@ private:
 	Ref<UI::UIElement> m_CurrentUI;
 	std::function<void(void)> m_CurrentScreen;
 
-	Ref<Scene> m_Scene;
 	CameraController m_Controller;
 
 	inline static Ref<RenderPass> m_LightingPass;
-	inline static Ref<RenderPass> m_ShadowPass;
+	// inline static Ref<RenderPass> m_ShadowPass;
 
 	bool m_Paused = false;
 	bool m_GameOver = false;

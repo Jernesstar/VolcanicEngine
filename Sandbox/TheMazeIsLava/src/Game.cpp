@@ -104,26 +104,28 @@ void Game::LevelScreen() {
 	if(GameState::SelectedLevel == 0)
 		return;
 
-	auto& currLevel = GameState::GetLevel();
-	m_Scene = currLevel.Load();
-
 	auto camera = CreateRef<IsometricCamera>();
 	m_Controller =
-	CameraController(
-		MovementControls(
-		ControlMap{
-			{ Control::Up,   Key::W },
-			{ Control::Down, Key::S },
-			{ Control::Forward,  Key::Invalid },
-			{ Control::Backward, Key::Invalid },
-		})
-	);
+		CameraController(
+			MovementControls(
+				ControlMap{
+					{ Control::Up,   Key::W },
+					{ Control::Down, Key::S },
+					{ Control::Forward,  Key::Invalid },
+					{ Control::Backward, Key::Invalid },
+				})
+		);
 	m_Controller.SetCamera(camera);
 	m_Controller.RotationSpeed = 0.0f;
-	m_Scene->SetCamera(camera);
 
-	Coordinate start = currLevel.GetPlayerStart();
-	Player player(m_Scene->GetEntityWorld());
+	auto& currLevel = GameState::GetLevel();
+	currLevel.Load();
+	currLevel.OnUpdate(m_TimeStep);
+	auto scene = currLevel.GetScene();
+	scene->SetCamera(camera);
+
+	Tile start = currLevel.PlayerStart;
+	Player player(scene->GetEntityWorld());
 	player
 	.Get<TransformComponent>().Translation = { start.x, 0.0f, start.y };
 
@@ -137,16 +139,16 @@ void Game::LevelScreen() {
 
 void Game::PlayScreen() {
 	// Gameplay
-	GameState::GetLevel().OnUpdate(m_TimeStep);
 	m_Controller.OnUpdate(m_TimeStep);
+	// GameState::GetLevel().OnUpdate(m_TimeStep);
 
-	Renderer::StartPass(m_LightingPass);
-	{
-		Renderer::Clear();
+	// Renderer::StartPass(m_LightingPass);
+	// {
+	// 	Renderer::Clear();
 
-		m_Scene->OnRender();
-	}
-	Renderer::EndPass();
+	// 	GameState::GetLevel().OnRender();
+	// }
+	// Renderer::EndPass();
 
 	if(m_GameOver) {
 		m_CurrentUI = GameState::GameOverUI;

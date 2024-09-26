@@ -12,8 +12,12 @@ namespace Magma {
 Scene::Scene(const std::string& name)
 	: Name(name)
 {
-	RegisterSystems();
-	RegisterObservers();
+	// RegisterSystems();
+	// RegisterObservers();
+}
+
+Scene::~Scene() {
+	VOLCANICORE_LOG_INFO("Why?");
 }
 
 void Scene::OnUpdate(TimeStep ts) {

@@ -89,7 +89,7 @@ void Bloom::OnUpdate(TimeStep ts) {
 
 	float filterRadius = 0.005f;
 
-	// mips->Set(AttachmentTarget::Color, mipChain[4].Sampler);
+	mips->Set(AttachmentTarget::Color, mipChain[4].Sampler);
 
 	Renderer::StartPass(drawPass);
 	{

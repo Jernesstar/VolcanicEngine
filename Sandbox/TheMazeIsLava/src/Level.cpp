@@ -9,24 +9,28 @@ using namespace Magma::Physics;
 
 namespace TheMazeIsLava {
 
-Level::Level(const std::string& name, std::vector<std::vector<uint32_t>> map)
+Level::Level(const std::string& name, const Tilemap& map)
 	: Name(name), Width(map[0].size()), Height(map.size()), Map(map)
 {
 	TraverseTilemap(
-	[&](const Tile& tile)
-	{
-		auto [x, y] = tile;
+		[&](const Tile& tile)
+		{
+			auto [x, y] = tile;
 
-		if(IsLava(tile))  LavaPoints.push_back({ x, y });
-		if(IsGoal(tile))  Goal = { x, y };
-		if(IsStart(tile)) PlayerStart = { x, y };
-	});
+			if(IsLava(tile))  LavaPoints.push_back({ x, y });
+			if(IsGoal(tile))  Goal = { x, y };
+			if(IsStart(tile)) PlayerStart = { x, y };
+		});
 }
 
 void Level::OnUpdate(TimeStep ts) {
-	PropagateLava(ts);
+	if(m_Scene)
+		m_Scene->OnUpdate(ts);
+}
 
-	m_Scene->OnUpdate(ts);
+void Level::OnRender() {
+	if(m_Scene)
+		m_Scene->OnRender();
 }
 
 void Level::PropagateLava(TimeStep ts) {
@@ -36,57 +40,54 @@ void Level::PropagateLava(TimeStep ts) {
 }
 
 void Level::Load() {
-	if(m_Scene)
-		return;
-
 	m_Scene = CreateRef<Scene>();
-	auto& world = scene->GetEntityWorld();
+	auto& world = m_Scene->GetEntityWorld();
 
-	TraverseTilemap(
-		[&](const Tile& tile)
-		{
-			auto [x, y] = tile;
+	// TraverseTilemap(
+	// 	[&](const Tile& tile)
+	// 	{
+	// 		auto [x, y] = tile;
 
-			if(IsWall(tile)) {
-				ECS::Entity wall = ECS::EntityBuilder(world)
-				.Add<TransformComponent>(
-					Transform{ .Translation = { x, 1.0f, y } }
-				)
-				.Add<MeshComponent>(Asset::Wall)
-				// .Add<RigidBodyComponent>(RigidBody::Type::Static)
-				.Finalize();
-			}
-			if(IsPath(tile)) {
-				ECS::Entity path = ECS::EntityBuilder(world)
-				.Add<TransformComponent>(
-					Transform{ .Translation = { x, 0.0f, y } }
-				)
-				.Add<MeshComponent>(Asset::Wall)
-				.Add<RigidBodyComponent>(RigidBody::Type::Static)
-				// .Add<MeshComponent>(PickPathMesh(tile))
-				.Finalize();
-			}
-			if(IsLava(tile)) {
-				ECS::Entity lava = ECS::EntityBuilder(world)
-				.Add<TransformComponent>(
-					Transform{ .Translation = { x, 1.0f, y } }
-				)
-				.Add<MeshComponent>(Asset::Lava)
-				// .Add<RigidBodyComponent>(RigidBody::Type::Static)
-				.Finalize();
-			}
-			if(IsGoal(tile)) {
-				ECS::Entity stairs = ECS::EntityBuilder(world, "Goal")
-				.Add<TransformComponent>(
-					Transform{
-						.Translation = { x, 1.0f, y },
-						.Scale = glm::vec3(0.5)
-					})
-				.Add<MeshComponent>(Asset::Stairs)
-				// .Add<RigidBodyComponent>(RigidBody::Type::Static)
-				.Finalize();
-			}
-		});
+	// 		if(IsWall(tile)) {
+	// 			ECS::Entity wall = ECS::EntityBuilder(world)
+	// 			.Add<TransformComponent>(
+	// 				Transform{ .Translation = { x, 1.0f, y } }
+	// 			)
+	// 			.Add<MeshComponent>(Asset::Wall)
+	// 			// .Add<RigidBodyComponent>(RigidBody::Type::Static)
+	// 			.Finalize();
+	// 		}
+	// 		if(IsPath(tile)) {
+	// 			ECS::Entity path = ECS::EntityBuilder(world)
+	// 			.Add<TransformComponent>(
+	// 				Transform{ .Translation = { x, 0.0f, y } }
+	// 			)
+	// 			.Add<MeshComponent>(Asset::Wall)
+	// 			.Add<RigidBodyComponent>(RigidBody::Type::Static)
+	// 			// .Add<MeshComponent>(PickPathMesh(tile))
+	// 			.Finalize();
+	// 		}
+	// 		if(IsLava(tile)) {
+	// 			ECS::Entity lava = ECS::EntityBuilder(world)
+	// 			.Add<TransformComponent>(
+	// 				Transform{ .Translation = { x, 1.0f, y } }
+	// 			)
+	// 			.Add<MeshComponent>(Asset::Lava)
+	// 			// .Add<RigidBodyComponent>(RigidBody::Type::Static)
+	// 			.Finalize();
+	// 		}
+	// 		if(IsGoal(tile)) {
+	// 			ECS::Entity stairs = ECS::EntityBuilder(world, "Goal")
+	// 			.Add<TransformComponent>(
+	// 				Transform{
+	// 					.Translation = { x, 1.0f, y },
+	// 					.Scale = glm::vec3(0.5)
+	// 				})
+	// 			.Add<MeshComponent>(Asset::Stairs)
+	// 			// .Add<RigidBodyComponent>(RigidBody::Type::Static)
+	// 			.Finalize();
+	// 		}
+	// 	});
 }
 
 void Level::TraverseTilemap(const std::function<void(const Tile& tile)>& func) {
@@ -104,27 +105,27 @@ void Level::TraverseTilemap(const std::function<void(const Tile& tile)>& func) {
 
 bool Level::IsWall(const Tile& tile) const {
 	auto [col, row] = tile;
-	return Tilemap[row][col] == 0;
+	return Map[row][col] == 0;
 }
 bool Level::IsPath(const Tile& tile) const {
 	auto [col, row] = tile;
-	return Tilemap[row][col] == 1;
+	return Map[row][col] == 1;
 }
 bool Level::IsLava(const Tile& tile) const {
 	auto [col, row] = tile;
-	return Tilemap[row][col] == 2;
+	return Map[row][col] == 2;
 }
 bool Level::IsGoal(const Tile& tile) const {
 	auto [col, row] = tile;
-	return Tilemap[row][col] == 3;
+	return Map[row][col] == 3;
 }
 bool Level::IsStart(const Tile& tile) const {
 	auto [col, row] = tile;
-	return Tilemap[row][col] == 4;
+	return Map[row][col] == 4;
 }
 bool Level::IsCheckpoint(const Tile& tile) const {
 	auto [col, row] = tile;
-	return Tilemap[row][col] == 5;
+	return Map[row][col] == 5;
 }
 bool Level::IsInbounds(const Tile& tile) const {
 	auto [col, row] = tile;

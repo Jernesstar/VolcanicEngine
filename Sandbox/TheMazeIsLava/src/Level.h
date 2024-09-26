@@ -17,25 +17,25 @@ using namespace Magma;
 
 namespace TheMazeIsLava {
 
-struct Tile { uint32_t x, y };
-using Coordinate = glm::vec2;
-using TileMap	 = List<List<uint32_t>>;
+struct Tile { uint32_t x, y; };
+using Tilemap = List<List<uint32_t>>;
 
 class Level {
 public:
 	const std::string Name;
 	const uint32_t Width, Height;
 
-	TileMap Map;
-	Coordinate Goal;
-	Coordinate PlayerStart;
+	Tilemap Map;
+	Tile Goal;
+	Tile PlayerStart;
 	List<Tile> LavaPoints;
 
 public:
-	Level(const std::string& name, const TileMap& map);
+	Level(const std::string& name, const Tilemap& map);
 	~Level() = default;
 
 	void OnUpdate(TimeStep ts);
+	void OnRender();
 
 	void Load();
 	Ref<Scene> GetScene() { return m_Scene; }
@@ -51,7 +51,7 @@ public:
 	bool IsInbounds(const Tile& tile) const;
 
 private:
-	Ref<Scene> m_Scene;
+	Ref<Scene> m_Scene = nullptr;
 
 	void PropagateLava(TimeStep ts);
 };

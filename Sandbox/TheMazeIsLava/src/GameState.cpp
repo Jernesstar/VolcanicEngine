@@ -93,9 +93,9 @@ void GameState::ResetUI() {
 }
 
 Level LoadLevel(YAML::Node levelNode) {
-	std::vector<std::vector<uint32_t>> tilemap;
+	List<List<uint32_t>> tilemap;
 	for(auto rowNode : levelNode["Tilemap"])
-		tilemap.push_back(rowNode.as<std::vector<uint32_t>>());
+		tilemap.push_back(rowNode.as<List<uint32_t>>());
 
 	return Level{ levelNode["Name"].as<std::string>(), tilemap };
 }
@@ -123,7 +123,7 @@ void SaveLevel(YAML::Emitter& out, Level& level) {
 	out << YAML::Key << "Name" << YAML::Value << level.Name;
 
 	out << YAML::Key << "Tilemap" << YAML::BeginSeq; // Tilemap
-	for(auto row : level.Tilemap) {
+	for(auto row : level.Map) {
 		out << YAML::Flow;
 		out << row;
 	}
