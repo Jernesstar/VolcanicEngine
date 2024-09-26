@@ -60,7 +60,7 @@ private:
 	Ref<Texture> depth;
 	Ref<Framebuffer> framebuffer;
 
-	// Ref<Mesh> torch;
+	Ref<Mesh> torch;
 	Ref<Mesh> cube;
 
 	Ref<Camera> camera;
@@ -81,21 +81,21 @@ Cube::Cube()
 
 	shader = ShaderPipeline::Create("VolcaniCore/assets/shaders", "Mesh");
 
-	color = Texture::Create(480, 270);
-	depth = Texture::Create(1920, 1080);
-	framebuffer = Framebuffer::Create(
-		{
-			{ AttachmentTarget::Color, { { color } } },
-			{ AttachmentTarget::Depth, { { depth } } },
-		});
+	// color = Texture::Create(480, 270);
+	// depth = Texture::Create(1920, 1080);
+	// framebuffer = Framebuffer::Create(
+	// 	{
+	// 		{ AttachmentTarget::Color, { { color } } },
+	// 		{ AttachmentTarget::Depth, { { depth } } },
+	// 	});
 
 	renderPass = RenderPass::Create("Render Pass", shader);
-	renderPass->SetOutput(framebuffer);
+	// renderPass->SetOutput(framebuffer);
 
+	torch = Mesh::Create("Sandbox/assets/models/mc-torch/Torch.obj");
 	cube = Mesh::Create(MeshPrimitive::Cube,
 		Material{
 			.Diffuse = Texture::Create("Sandbox/assets/images/wood.png"),
-			.Specular = Texture::Create("Sandbox/assets/images/wood_specular.png")
 		});
 
 	camera = CreateRef<StereographicCamera>(75.0f);
@@ -153,16 +153,22 @@ void Cube::OnUpdate(TimeStep ts) {
 
 		Renderer3D::Begin(camera);
 
-		for(int y = -50; y < 50; y++)
-			for(int x = -50; x < 50; x++)
+		for(int y = 0; y < 50; y++)
+			for(int x = 0; x < 50; x++)
 				Renderer3D::DrawMesh(cube, { .Translation = { x, 0.0f, y } });
+
+		Renderer::NewDrawCommand();
+
+		for(int y = 0; y < 50; y++)
+			for(int x = 0; x < 50; x++)
+				Renderer3D::DrawMesh(torch, { .Translation = { x, 1.0f, y } });
 
 		Renderer3D::End();
 	}
 	Renderer::EndPass();
 
 	Renderer::Flush();
-	RendererAPI::Get()->RenderFramebuffer(framebuffer, AttachmentTarget::Color);
+	// RendererAPI::Get()->RenderFramebuffer(framebuffer, AttachmentTarget::Color);
 
 	UI::End();
 }
