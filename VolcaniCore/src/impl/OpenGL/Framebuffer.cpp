@@ -146,6 +146,8 @@ void Framebuffer::Set(AttachmentTarget target, Ref<Texture> texture,
 	att.m_RendererID = id;
 	att.m_Width = texture->GetWidth();
 	att.m_Height = texture->GetHeight();
+	m_Width = att.m_Width;
+	m_Height = att.m_Height;
 }
 
 void Framebuffer::Bind(AttachmentTarget target, uint32_t slot,

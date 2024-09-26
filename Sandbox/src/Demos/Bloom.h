@@ -70,9 +70,9 @@ Bloom::Bloom() {
 
 	auto window = Application::GetWindow();
 	src = Framebuffer::Create(window->GetWidth(), window->GetHeight());
+	drawPass->SetOutput(src);
 
 	InitMips();
-	drawPass->SetOutput(mips);
 
 	cube = Mesh::Create(MeshPrimitive::Cube, { 0.98f, 0.92f, 0.0f, 1.0f });
 
@@ -89,8 +89,6 @@ void Bloom::OnUpdate(TimeStep ts) {
 
 	float filterRadius = 0.005f;
 
-	mips->Set(AttachmentTarget::Color, mipChain[4].Sampler);
-
 	Renderer::StartPass(drawPass);
 	{
 		Renderer::Clear();
@@ -104,41 +102,41 @@ void Bloom::OnUpdate(TimeStep ts) {
 
 	Renderer::Flush();
 
-	RendererAPI::Get()->RenderFramebuffer(mips, AttachmentTarget::Color);
+	// RendererAPI::Get()->RenderFramebuffer(src, AttachmentTarget::Color);
 
-	// Renderer::StartPass(downsamplePass);
-	// {
-	// 	Renderer::GetDrawCommand().GetUniforms()
-	// 	.Set("u_SrcResolution",
-	// 	[&]() -> glm::vec2
-	// 	{
-	// 		auto window = Application::GetWindow();
-	// 		return { window->GetWidth(), window->GetHeight() };
-	// 	});
-	// 	Renderer::GetDrawCommand().GetUniforms()
-	// 	.Set("u_SrcTexture",
-	// 	[&]() -> TextureSlot
-	// 	{
-	// 		src->Bind(AttachmentTarget::Color, 0);
-	// 		return { };
-	// 	});
+	Renderer::StartPass(downsamplePass);
+	{
+		Renderer::GetDrawCommand().GetUniforms()
+		.Set("u_SrcResolution",
+			[&]() -> glm::vec2
+			{
+				auto window = Application::GetWindow();
+				return { window->GetWidth(), window->GetHeight() };
+			});
+		Renderer::GetDrawCommand().GetUniforms()
+		.Set("u_SrcTexture",
+			[&]() -> TextureSlot
+			{
+				src->Bind(AttachmentTarget::Color, 0);
+				return { };
+			});
 
-	// 	Downsample();
-	// }
-	// Renderer::EndPass();
+		Downsample();
+	}
+	Renderer::EndPass();
 
 	// Renderer::Flush();
 
-	// RendererAPI::Get()->RenderFramebuffer(mips, AttachmentTarget::Color);
+	RendererAPI::Get()->RenderFramebuffer(mips, AttachmentTarget::Color);
 
 	// Renderer::StartPass(upsamplePass);
 	// {
 	// 	Renderer::GetPass()->GetUniforms()
 	// 	.Set("u_FilterRadius",
-	// 	[&]() -> float
-	// 	{
-	// 		return filterRadius;
-	// 	});
+	// 		[&]() -> float
+	// 		{
+	// 			return filterRadius;
+	// 		});
 
 	// 	// Enable additive blending
 	// 	glEnable(GL_BLEND);
@@ -157,11 +155,11 @@ void Bloom::OnUpdate(TimeStep ts) {
 	// {
 	// 	Renderer::GetPass()->GetUniforms()
 	// 	.Set("u_SceneTexture",
-	// 	[&]() -> TextureSlot
-	// 	{
-	// 		src->Bind(AttachmentTarget::Color, 1);
-	// 		return { };
-	// 	});
+	// 		[&]() -> TextureSlot
+	// 		{
+	// 			src->Bind(AttachmentTarget::Color, 1);
+	// 			return { };
+	// 		});
 
 	// 	RendererAPI::Get()->RenderFramebuffer(mips, AttachmentTarget::Color);
 	// }
@@ -197,6 +195,7 @@ void Bloom::InitMips() {
 void Bloom::Downsample() {
 	for(const auto& mip : mipChain) {
 		Renderer::Resize(mip.IntSize.x, mip.IntSize.y);
+		// Renderer::Clear();
 
 		Renderer::GetDrawCommand().GetUniforms()
 		.Set("Sampler",
@@ -208,6 +207,9 @@ void Bloom::Downsample() {
 		RendererAPI::Get()->RenderFramebuffer(mips, AttachmentTarget::Color);
 
 		Renderer::Flush();
+
+		if(mip.IntSize == mipChain[mipChainLength - 1].IntSize)
+			return;
 
 		Renderer::NewDrawCommand();
 
