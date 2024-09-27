@@ -74,12 +74,12 @@ Bloom::Bloom() {
 	});
 	drawPass = RenderPass::Create("Draw Pass", shader);
 
-	auto window = Application::GetWindow();
 	src = Framebuffer::Create(window->GetWidth(), window->GetHeight());
 	InitMips();
 
 	drawPass->SetOutput(src);
 	downsamplePass->SetOutput(mips);
+	upsamplePass->SetOutput(mips);
 
 	cube = Mesh::Create(MeshPrimitive::Cube, { 0.98f, 0.92f, 0.0f, 1.0f });
 
@@ -110,6 +110,7 @@ void Bloom::OnUpdate(TimeStep ts) {
 
 	Renderer::StartPass(downsamplePass);
 	{
+		Renderer::GetPass()->SetGlobalUniforms();
 		Renderer::GetDrawCommand().GetUniforms()
 		.Set("u_SrcResolution",
 			[&]() -> glm::vec2
@@ -139,6 +140,7 @@ void Bloom::OnUpdate(TimeStep ts) {
 			{
 				return filterRadius;
 			});
+		Renderer::GetPass()->SetGlobalUniforms();
 
 		// Enable additive blending
 		glBlendFunc(GL_ONE, GL_ONE);
@@ -152,31 +154,34 @@ void Bloom::OnUpdate(TimeStep ts) {
 	Renderer::EndPass();
 	Renderer::Flush();
 
-	RendererAPI::Get()->Resize(window->GetWidth(), window->GetHeight());
-	RendererAPI::Get()->RenderFramebuffer(mips, AttachmentTarget::Color);
+	// RendererAPI::Get()->Resize(window->GetWidth(), window->GetHeight());
+	// RendererAPI::Get()->RenderFramebuffer(mips, AttachmentTarget::Color);
 
-	// Renderer::StartPass(bloomPass);
-	// {
-	// 	Renderer::GetDrawCommand().GetUniforms()
-	// 	.Set("u_BloomTexture",
-	// 		[&]() -> TextureSlot
-	// 		{
-	// 			mips->Bind(AttachmentTarget::Color, 0);
-	// 			return { };
-	// 		});
-	// 	Renderer::GetDrawCommand().GetUniforms()
-	// 	.Set("u_SceneTexture",
-	// 		[&]() -> TextureSlot
-	// 		{
-	// 			src->Bind(AttachmentTarget::Color, 1);
-	// 			return { };
-	// 		});
+	Renderer::StartPass(bloomPass);
+	{
+		Renderer::GetDrawCommand().GetUniforms()
+		.Set("u_BloomTexture",
+			[&]() -> TextureSlot
+			{
+				mips->Bind(AttachmentTarget::Color, 0);
+				return { };
+			});
+		Renderer::GetDrawCommand().GetUniforms()
+		.Set("u_SceneTexture",
+			[&]() -> TextureSlot
+			{
+				src->Bind(AttachmentTarget::Color, 1);
+				return { };
+			});
 
-	// 	RendererAPI::Get()->Resize(window->GetWidth(), window->GetHeight());
-	// 	RendererAPI::Get()->RenderFramebuffer(mips, AttachmentTarget::Color);
-	// }
-	// Renderer::EndPass();
-	// Renderer::Flush();
+		Renderer::GetPass()
+			->SetUniforms(Renderer::GetDrawCommand().GetUniforms());
+
+		RendererAPI::Get()->Resize(window->GetWidth(), window->GetHeight());
+		RendererAPI::Get()->RenderFramebuffer(mips, AttachmentTarget::Color);
+	}
+	Renderer::EndPass();
+	Renderer::Flush();
 }
 
 void Bloom::InitMips() {
