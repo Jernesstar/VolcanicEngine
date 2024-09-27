@@ -28,14 +28,19 @@ public:
 	Physics::World& GetPhysicsWorld() { return m_PhysicsWorld; }
 
 private:
-	void RegisterSystems();
-	void RegisterObservers();
-
-	Ref<Camera> m_Camera;
-
-	flecs::system m_RenderSys;
 	ECS::World m_EntityWorld;
 	Physics::World m_PhysicsWorld;
+
+	Ref<Camera> m_Camera;
+	CameraController m_Controller;
+	List<Ref<Light>> m_Lights;
+
+	Ref<RenderPass> m_RenderPass;
+	flecs::system m_RenderSystem;
+
+private:
+	void RegisterSystems();
+	void RegisterObservers();
 
 	friend class Editor;
 };

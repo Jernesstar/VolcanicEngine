@@ -4,13 +4,6 @@
 #include <VolcaniCore/Core/Assert.h>
 #include <VolcaniCore/Event/Events.h>
 
-#include <VolcaniCore/Renderer/Renderer.h>
-#include <VolcaniCore/Renderer/Renderer3D.h>
-#include <VolcaniCore/Renderer/StereographicCamera.h>
-#include <VolcaniCore/Renderer/ShaderLibrary.h>
-
-#include <Magma/ECS/Systems.h>
-
 #include "Asset.h"
 #include "GameState.h"
 #include "Player.h"
@@ -26,8 +19,6 @@ Game::Game()
 	[&](const KeyPressedEvent& event) {
 		if(event.Key == Key::Escape)
 			Application::Close();
-		if(event.Key == Key::Return && !event.IsRepeat)
-			m_ReturnPressed = true;
 	});
 
 	UI::Init();
@@ -35,38 +26,8 @@ Game::Game()
 
 	Asset::Init();
 
-	// auto shader = ShaderPipeline::Create({
-	// 	{ "Sandbox/assets/shaders/Lighting.glsl.vert", ShaderType::Vertex },
-	// 	{ "Sandbox/assets/shaders/Lighting.glsl.frag", ShaderType::Fragment }
-	// });
-	auto shader = ShaderLibrary::Get("Mesh");
-	m_LightingPass = RenderPass::Create("Lighting", shader);
-
-	// PointLight light =
-	// 	PointLight{ .Constant = 0.3f, .Linear = 0.0f, .Quadratic = 0.032f };
-	// light.Position = { 0.0f, 2.0f, 0.0f };
-	// light.Ambient  = { 0.2f, 0.2f, 0.2f };
-	// light.Diffuse  = { 0.5f, 0.5f, 0.5f };
-	// light.Specular = { 1.0f, 1.0f, 1.0f };
-
-	// shader->Bind();
-
-	// shader->SetInt("u_PointLightCount", 1);
-	// shader->SetVec3("u_PointLights[0].Position", light.Position);
-	// shader->SetVec3("u_PointLights[0].Ambient",  light.Ambient);
-	// shader->SetVec3("u_PointLights[0].Diffuse",  light.Diffuse);
-	// shader->SetVec3("u_PointLights[0].Specular", light.Specular);
-
-	// shader->SetFloat("u_PointLights[0].Constant",  light.Constant);
-	// shader->SetFloat("u_PointLights[0].Linear",    light.Linear);
-	// shader->SetFloat("u_PointLights[0].Quadratic", light.Quadratic);
-
-	// shader->SetTexture("u_Material.Diffuse", cube->GetMaterial().Diffuse, 0);
-	// shader->SetTexture("u_Material.Specular", cube->GetMaterial().Specular, 1);
-	// shader->SetFloat("u_Material.Shininess", 32.0f);
-
-	m_CurrentUI = GameState::HomeUI;
-	m_CurrentScreen = std::bind(&Game::HomeScreen, this);
+	m_CurrentScreen = &HomeScreen;
+	m_CurrentScreen->OnLoad();
 }
 
 Game::~Game() {
@@ -75,106 +36,174 @@ Game::~Game() {
 }
 
 void Game::OnUpdate(TimeStep ts) {
-	m_TimeStep = ts;
-
-	m_CurrentScreen();
-
-	UI::Begin();
-	m_CurrentUI->Render();
-	UI::End();
+	m_CurrentScreen->OnUpdate(ts);
+	m_CurrentScreen->OnRender();
 }
 
-void Game::HomeScreen() {
-	// // Front picture, level load, settings
+void Game::LoadScreens() {
+	Ref<UI::UIElement> home, level, pause, over; 
 
-	if(m_ReturnPressed) {
-		m_ReturnPressed = false;
-		m_CurrentUI = GameState::LevelSelectUI;
-		m_CurrentScreen = std::bind(&Game::LevelScreen, this);
-		return;
-	}
-}
+	UI::Window::Specification specs{
+		.Width = 600,
+		.Height = 400,
+		.x = 100.0f,
+		.y = 100.0f,
+		.Color = glm::vec4{ 0.859375f, 0.76171875f, 0.5859375f, 1.0f },
+		.BorderWidth = 10,
+		.BorderHeight = 20,
+		.BorderColor = glm::vec4{ 0.3125f, 0.234375f, 0.078125f, 1.0f }
+	};
+	home  = UI::Window::Create(specs);
+	level = UI::Window::Create(specs);
+	pause = UI::Window::Create(specs);
+	over  = UI::Window::Create(specs);
 
-void Game::LevelScreen() {
-	// Staircase like level selection
+	home
+	->Add<UI::Text>("The Maze is Lava", glm::vec4(0.0f, 0.0f, 0.0f, 1.0f))
+	->SetPosition(160, 100);
+	home
+	->Add<UI::Text>("Press start to play", glm::vec4(0.0f, 0.0f, 0.0f, 1.0f))
+	->SetPosition(120, 150);
+	// home
+	// ->Add<UI::Image>("Sandbox/assets/images/background.png")
+	// ->SetPosition(100, 100);
 
-	// TODO(Implement):
-	// DrawLevelVisualizer();
+	pause
+	->Add<UI::Text>("Paused", glm::vec4(0.0f, 0.0f, 0.0f, 1.0f))
+	->SetPosition(160, 100);
+	pause
+	->Add<UI::Text>("Press enter to resume", glm::vec4(0.0f, 0.0f, 0.0f, 1.0f))
+	->SetPosition(120, 150);
 
-	if(GameState::SelectedLevel == 0)
-		return;
+	EmptyScreen = Screen{ };
+	HomeScreen	= Screen{ home };
+	LevelScreen = Screen{ level };
+	PauseScreen = Screen{ pause };
+	OverScreen	= Screen{ over };
 
-	auto camera = CreateRef<IsometricCamera>();
-	m_Controller =
-		CameraController(
-			MovementControls(
-				ControlMap{
-					{ Control::Up,   Key::W },
-					{ Control::Down, Key::S },
-					{ Control::Forward,  Key::Invalid },
-					{ Control::Backward, Key::Invalid },
-				})
-		);
-	m_Controller.SetCamera(camera);
-	m_Controller.RotationSpeed = 0.0f;
+	HomeScreen.OnLoad =
+		[&]()
+		{
+			auto camera = CreateRef<IsometricCamera>();
+			m_Controller =
+				CameraController(
+					MovementControls(
+						ControlMap{
+							{ Control::Up,   Key::W },
+							{ Control::Down, Key::S },
+							{ Control::Forward,  Key::Invalid },
+							{ Control::Backward, Key::Invalid },
+						})
+				);
+			m_Controller.SetCamera(camera);
+			m_Controller.RotationSpeed = 0.0f;
 
-	auto& currLevel = GameState::GetLevel();
-	currLevel.Load();
-	auto& scene = currLevel.GetScene();
-	scene->SetCamera(camera);
+			auto& currLevel = GameState::GetLevel();
+			currLevel.Load();
+			auto scene = currLevel.GetScene();
+			scene->SetCamera(camera);
 
-	Tile start = currLevel.PlayerStart;
-	Player player(scene->GetEntityWorld());
-	player
-	.Get<TransformComponent>().Translation = { start.x, 0.0f, start.y };
+			Tile start = currLevel.PlayerStart;
+			Player player(scene->GetEntityWorld());
+			player
+			.Get<TransformComponent>().Translation = { start.x, 0.0f, start.y };
 
-	// TODO(Implement): Collision with group
-	// PhysicsSystem::RegisterForCollisionDetection(player, m_LavaGroup);
-
-	GameState::SelectedLevel = 0;
-	m_CurrentUI = GameState::EmptyUI;
-	m_CurrentScreen = std::bind(&Game::PlayScreen, this);
-}
-
-void Game::PlayScreen() {
-	// Gameplay
-	m_Controller.OnUpdate(m_TimeStep);
-	// GameState::GetLevel().OnUpdate(m_TimeStep);
-
-	// Renderer::StartPass(m_LightingPass);
-	// {
-	// 	Renderer::Clear();
-
-	// 	GameState::GetLevel().OnRender();
-	// }
-	// Renderer::EndPass();
-
-	if(m_GameOver) {
-		m_CurrentUI = GameState::GameOverUI;
-		m_CurrentScreen = std::bind(&Game::OverScreen, this);
-		return;
-	}
-	if(m_LevelPassed) {
-		m_LevelPassed = false;
-		if(GameState::SelectedLevel == GameState::MaxLevel) {
-			GameState::MaxLevel++;
-			GameState::ResetUI();
+			// TODO(Implement): Collision with group
+			// PhysicsSystem::RegisterForCollisionDetection(player, m_LavaGroup);
 		}
-	}
-	if(m_ReturnPressed) {
-		m_ReturnPressed = false;
-		m_Paused = !m_Paused;
-		m_CurrentUI = m_Paused ? GameState::PauseUI : GameState::EmptyUI;
-	}
-}
 
-void Game::OverScreen() {
-	if(m_ReturnPressed) {
-		m_ReturnPressed = false;
-		m_CurrentUI = GameState::EmptyUI;
-		m_CurrentScreen = std::bind(&Game::PlayScreen, this);
-		return;
-	}
+	HomeScreen.OnUpdate =
+		[&](TimeStep ts)
+		{
+			m_Controller.OnUpdate(ts);
+			GameState::GetLevel().OnUpdate(ts);
+			GameState::GetLevel().OnRender();
+
+			auto& state = HomeScreen.GetState();
+			if(state.ReturnPressed) {
+				state.ReturnPressed = false;
+				m_CurrentScreen = &LevelScreen;
+				m_CurrentScreen->OnLoad();
+			}
+		}
+
+	LevelScreen.OnLoad =
+		[&]()
+		{
+			auto ui = LevelScreen.GetUI();
+			ui->Clear();
+
+			float offset = 0.0f;
+			for(uint32_t i = 1; i <= GameState::Levels.size(); i++) {
+				glm::vec4 color = { 0.3125f, 0.234375f, 0.078125f, 1.0f };
+				if(i > GameState::MaxLevel)
+					color.a = 0.7f; // Buttons for locked levels are darker
+
+				ui
+				->Add<UI::Button>(color, std::to_string(i))
+				->SetOnPressed(
+				[i]() {
+					if(i <= GameState::MaxLevel)
+						SelectedLevel = i;
+				})
+				->SetSize(70, 50)
+				->SetPosition(i * 70 + (offset += 40.0f), 100.0f);
+			}
+		}
+
+	LevelScreen.OnUpdate =
+		[&](TimeStep _)
+		{
+			// TODO(Implement): Staircase like level selection
+			// DrawLevelVisualizer();
+
+			if(GameState::SelectedLevel == 0)
+				return;
+
+			m_CurrentScreen = &PlayScreen;
+			m_CurrentScreen->OnLoad();
+		}
+
+	PlayScreen.OnUpdate =
+		[&](TimeStep _)
+		{
+			auto& level = GameState::GetLevel();
+			auto& state = HomeScreen.GetState();
+
+			level.OnUpdate(ts);
+			level.OnRender();
+
+			if(level.GameOver) {
+				m_CurrentScreen = &OverScreen;
+			}
+			else if(level.Complete) {
+				m_CurrentScreen = &LevelScreen;
+
+				if(GameState::SelectedLevel == GameState::MaxLevel) {
+					GameState::MaxLevel++;
+
+					m_CurrentScreen->OnLoad();
+				}
+			}
+			else if(state.ReturnPressed) {
+				state.ReturnPressed = false;
+				level.Paused = !level.Paused;
+				if(level.Paused)
+					m_CurrentScreen = &PauseScreen;
+			}
+		}
+
+	OverScreen.OnUpdate =
+		[](TimeStep _)
+		{
+			auto& state = HomeScreen.GetState();
+
+			if(state.ReturnPressed) {
+				state.ReturnPressed = false;
+				m_CurrentScreen = &PlayScreen;
+				m_CurrentScreen->OnLoad();
+			}
+		}
 }
 
 }

@@ -12,27 +12,63 @@ namespace Magma {
 Scene::Scene(const std::string& name)
 	: Name(name)
 {
-	// RegisterSystems();
-	// RegisterObservers();
+	RegisterSystems();
+	RegisterObservers();
+
+	Ref<ShaderPipeline> shader;
+	shader = ShaderPipeline::Create({
+		{ "VolcaniCore/assets/shaders/Scene.glsl.vert", ShaderType::Vertex },
+		{ "VolcaniCore/assets/shaders/Scene.glsl.frag", ShaderType::Fragment }
+	});
+	m_DrawPass = RenderPass::Create("Draw", shader);
+
+	// PointLight light =
+	// 	PointLight{ .Constant = 0.3f, .Linear = 0.0f, .Quadratic = 0.032f };
+	// light.Position = { 0.0f, 2.0f, 0.0f };
+	// light.Ambient  = { 0.2f, 0.2f, 0.2f };
+	// light.Diffuse  = { 0.5f, 0.5f, 0.5f };
+	// light.Specular = { 1.0f, 1.0f, 1.0f };
+
+	// shader->Bind();
+
+	// shader->SetInt("u_PointLightCount", 1);
+	// shader->SetVec3("u_PointLights[0].Position", light.Position);
+	// shader->SetVec3("u_PointLights[0].Ambient",  light.Ambient);
+	// shader->SetVec3("u_PointLights[0].Diffuse",  light.Diffuse);
+	// shader->SetVec3("u_PointLights[0].Specular", light.Specular);
+
+	// shader->SetFloat("u_PointLights[0].Constant",  light.Constant);
+	// shader->SetFloat("u_PointLights[0].Linear",    light.Linear);
+	// shader->SetFloat("u_PointLights[0].Quadratic", light.Quadratic);
+
+	// shader->SetTexture("u_Material.Diffuse", cube->GetMaterial().Diffuse, 0);
+	// shader->SetTexture("u_Material.Specular", cube->GetMaterial().Specular, 1);
+	// shader->SetFloat("u_Material.Shininess", 32.0f);
 }
 
 Scene::~Scene() {
-	VOLCANICORE_LOG_INFO("Why?");
+
 }
 
 void Scene::OnUpdate(TimeStep ts) {
+	CameraController.OnUpdate(ts);
 	m_EntityWorld.OnUpdate(ts);
 }
 
 void Scene::OnRender() {
-	if(!m_Camera)
-		return;
+	Renderer::StartPass(m_DrawPass);
+	{
+		Renderer3D::Begin(m_Camera);
 
-	Renderer3D::Begin(m_Camera);
+		m_RenderSys.run();
 
-	m_RenderSys.run();
+		Renderer3D::End();
+	}
+	Renderer::EndPass();
+	
+	// if(m_Options.Bloom)
+	// 	BloomPass();
 
-	Renderer3D::End();
 }
 
 void Scene::RegisterSystems() {
@@ -45,21 +81,21 @@ void Scene::RegisterSystems() {
 	[](const ScriptComponent& s, TransformComponent& t) {
 		s.OnInput(t);
 	});
-	world
-	.system<const TransformComponent, RigidBodyComponent>("RigidBodyUpdate")
-	.kind(flecs::PreUpdate)
-	.each(
-	[](const TransformComponent& t, RigidBodyComponent& r) {
-		r.Body->UpdateTransform({ t.Translation, t.Rotation, t.Scale });
-	});
+	// world
+	// .system<const TransformComponent, RigidBodyComponent>("RigidBodyUpdate")
+	// .kind(flecs::PreUpdate)
+	// .each(
+	// [](const TransformComponent& t, RigidBodyComponent& r) {
+	// 	r.Body->UpdateTransform({ t.Translation, t.Rotation, t.Scale });
+	// });
 
-	world
-	.system("PhysicsUpdate")
-	.kind(flecs::OnUpdate)
-	.run(
-	[&](flecs::iter& it) {
-		m_PhysicsWorld.OnUpdate(it.delta_time());
-	});
+	// world
+	// .system("PhysicsUpdate")
+	// .kind(flecs::OnUpdate)
+	// .run(
+	// [&](flecs::iter& it) {
+	// 	m_PhysicsWorld.OnUpdate(it.delta_time());
+	// });
 
 	world
 	.system<const RigidBodyComponent, TransformComponent>("TransformUpdate")
@@ -93,33 +129,33 @@ void Scene::RegisterObservers() {
 	// Creating RigidBodyComponent then MeshComponent ==> bounding volume
 	// Creating MeshComponent then RigidBodyComponent ==> tightly-fitting volume
 
-	world
-	.observer<RigidBodyComponent>("OnSetRigidBody")
-	.event(flecs::OnSet)
-	.each(
-	[&](flecs::entity e, RigidBodyComponent& r) {
-		Entity entity{ e };
+	// world
+	// .observer<RigidBodyComponent>("OnSetRigidBody")
+	// .event(flecs::OnSet)
+	// .each(
+	// [&](flecs::entity e, RigidBodyComponent& r) {
+	// 	Entity entity{ e };
 
-		// If the RigidBody was created without a shape,
-		// inherit the shape of the current mesh component
-		if(entity.Has<MeshComponent>() && !r.Body->HasShape()) {
-			auto mesh = entity.Get<MeshComponent>().Mesh;
-			Ref<Shape> shape = Shape::Create(mesh);
-			r.Body->SetShape(shape);
-		}
-		if(entity.Has<TransformComponent>()) {
-			auto& t = entity.Get<TransformComponent>();
+	// 	// If the RigidBody was created without a shape,
+	// 	// inherit the shape of the current mesh component
+	// 	if(entity.Has<MeshComponent>() && !r.Body->HasShape()) {
+	// 		auto mesh = entity.Get<MeshComponent>().Mesh;
+	// 		Ref<Shape> shape = Shape::Create(mesh);
+	// 		r.Body->SetShape(shape);
+	// 	}
+	// 	if(entity.Has<TransformComponent>()) {
+	// 		auto& t = entity.Get<TransformComponent>();
 
-			Transform tr{
-				.Translation = t.Translation,
-				.Rotation	 = t.Rotation,
-				.Scale		 = t.Scale
-			};
-			r.Body->UpdateTransform(tr);
-		}
+	// 		Transform tr{
+	// 			.Translation = t.Translation,
+	// 			.Rotation	 = t.Rotation,
+	// 			.Scale		 = t.Scale
+	// 		};
+	// 		r.Body->UpdateTransform(tr);
+	// 	}
 
-		PhysicsSystem::Register(m_PhysicsWorld, entity);
-	});
+	// 	PhysicsSystem::Register(m_PhysicsWorld, entity);
+	// });
 }
 
 }

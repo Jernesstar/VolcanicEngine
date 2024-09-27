@@ -24,9 +24,8 @@ Level::Level(const std::string& name, const Tilemap& map)
 }
 
 void Level::OnUpdate(TimeStep ts) {
-	VOLCANICORE_LOG_INFO("Count %i", m_Scene.use_count());
-	// if(m_Scene)
-	// 	m_Scene->OnUpdate(ts);
+	if(m_Scene)
+		m_Scene->OnUpdate(ts);
 }
 
 void Level::OnRender() {
@@ -64,7 +63,7 @@ void Level::Load() {
 					Transform{ .Translation = { x, 0.0f, y } }
 				)
 				.Add<MeshComponent>(Asset::Wall)
-				.Add<RigidBodyComponent>(RigidBody::Type::Static)
+				// .Add<RigidBodyComponent>(RigidBody::Type::S tatic)
 				// .Add<MeshComponent>(PickPathMesh(tile))
 				.Finalize();
 			}

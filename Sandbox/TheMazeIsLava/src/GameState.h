@@ -10,14 +10,11 @@ using namespace Magma;
 
 namespace TheMazeIsLava {
 
-// Global state
 class GameState {
 public:
 	static void Load();
 	static void Reset();
 	static void Save();
-
-	static void ResetUI();
 
 	static Level& GetLevel(uint32_t level = 0);
 
@@ -26,16 +23,9 @@ public:
 	inline static uint32_t SelectedLevel = 0; // The one being played right now
 	inline static std::vector<Level> Levels;
 
-	inline static Ref<UI::UIElement> EmptyUI;
-	inline static Ref<UI::UIElement> HomeUI;
-	inline static Ref<UI::UIElement> LevelSelectUI;
-	inline static Ref<UI::UIElement> PauseUI;
-	inline static Ref<UI::UIElement> GameOverUI;
-
 private:
 	static void LoadState(bool newState = false);
 	static void SaveState();
-	static void InitUI();
 };
 
 }

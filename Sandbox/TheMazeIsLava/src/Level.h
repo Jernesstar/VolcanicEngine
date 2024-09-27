@@ -1,11 +1,8 @@
-
 #pragma once
 
-#include <cstdint>
-#include <vector>
-#include <functional>
-
 #include <glm/vec2.hpp>
+
+#include <VolcaniCore/Core/Defines.h>
 
 #include <VolcaniCore/Core/Time.h>
 #include <VolcaniCore/Object/Texture.h>
@@ -30,6 +27,10 @@ public:
 	Tile PlayerStart;
 	List<Tile> LavaPoints;
 
+	bool Paused = false;
+	bool GameOver = false;
+	bool Complete = false;
+
 public:
 	Level(const std::string& name, const Tilemap& map);
 	~Level() = default;
@@ -38,7 +39,7 @@ public:
 	void OnRender();
 
 	void Load();
-	Ref<Scene>& GetScene() { return m_Scene; }
+	Ref<Scene> GetScene() const { return m_Scene; }
 
 	void TraverseTilemap(const std::function<void(const Tile& tile)>& func);
 
@@ -51,9 +52,10 @@ public:
 	bool IsInbounds(const Tile& tile) const;
 
 private:
-	Ref<Scene> m_Scene = nullptr;
-
 	void PropagateLava(TimeStep ts);
+
+private:
+	Ref<Scene> m_Scene = nullptr;
 };
 
 }

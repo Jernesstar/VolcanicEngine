@@ -1,5 +1,7 @@
 #pragma once
 
+#include <glm/vec3.hpp>
+
 namespace TheMazeIsLava {
 
 struct Light {
@@ -19,9 +21,9 @@ struct PointLight : public Light {
 	float Quadratic;
 };
 
-// struct SpotLight : public Light, public DirectionalLight {
-// 	float CutoffAngle;
-// 	float OuterCutoffAngle;
-// };
+struct SpotLight : public Light {
+	float CutoffAngle;
+	float OuterCutoffAngle;
+};
 
 }
