@@ -34,10 +34,12 @@ private:
 	Ref<Framebuffer> mips;
 	List<BloomMip> mipChain;
 
-	uint32_t mipChainLength = 5;
-	float filterRadius	= 0.02f;
+	uint32_t mipChainLength = 6;
+	float filterRadius	= 0.005f;
 	float exposure		= 1.0f;
 	float bloomStrength = 0.04f;
+
+	float rotation = 0.0f;
 
 	Ref<Window> window;
 };
@@ -123,7 +125,10 @@ void Bloom::OnUpdate(TimeStep ts) {
 		Renderer::Clear();
 		Renderer3D::Begin(camera);
 
-		Renderer3D::DrawMesh(cube);
+		Renderer3D::DrawMesh(cube,
+			{
+				.Rotation = { (rotation += (float)ts) * 0.003f, 0.0f, 0.0f }
+			});
 
 		Renderer3D::End();
 	}
@@ -134,7 +139,6 @@ void Bloom::OnUpdate(TimeStep ts) {
 
 	Renderer::StartPass(downsamplePass);
 	{
-		Renderer::GetPass()->SetGlobalUniforms();
 		Renderer::GetDrawCommand().GetUniforms()
 		.Set("u_SrcResolution",
 			[&]() -> glm::vec2
@@ -148,6 +152,7 @@ void Bloom::OnUpdate(TimeStep ts) {
 				src->Bind(AttachmentTarget::Color, 0);
 				return { };
 			});
+		Renderer::GetPass()->SetGlobalUniforms();
 
 		Downsample();
 	}
@@ -263,7 +268,6 @@ void Bloom::Downsample() {
 		Renderer::GetPass()
 			->SetUniforms(Renderer::GetDrawCommand().GetUniforms());
 
-		RendererAPI::Get()->Resize(mip.IntSize.x, mip.IntSize.y);
 		RendererAPI::Get()->RenderFramebuffer(mips, AttachmentTarget::Color);
 
 		Renderer::Flush();
@@ -306,7 +310,6 @@ void Bloom::Upsample() {
 		Renderer::GetPass()
 			->SetUniforms(Renderer::GetDrawCommand().GetUniforms());
 
-		RendererAPI::Get()->Resize(nextMip.IntSize.x, nextMip.IntSize.y);
 		RendererAPI::Get()->RenderFramebuffer(mips, AttachmentTarget::Color);
 
 		Renderer::Flush();

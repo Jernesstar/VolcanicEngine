@@ -286,17 +286,24 @@ void Renderer::RenderFramebuffer(Ref<VolcaniCore::Framebuffer> buffer,
 		return;
 	}
 
+	// TODO(Change): Move to VolcaniCore::Renderer2D::DrawFullScreenQuad
 	auto pass = VolcaniCore::Renderer::GetPass();
+	Ref<ShaderPipeline> pipeline;
+	Ref<VolcaniCore::Framebuffer> output;
 	if(pass) {
-		pass->GetPipeline()->Bind();
+		pipeline = pass->GetPipeline();
+		output = pass->GetOutput();
+	}
 
-		if(pass->GetOutput())
-			pass->GetOutput()->Bind();
-	}
-	else {
+	if(!pipeline)
 		ShaderLibrary::Get("Framebuffer")->Bind();
-		buffer->Bind(target, 0);
+
+	if(output) {
+		output->Bind();
+		Resize(output->GetWidth(), output->GetHeight());
 	}
+	else
+		buffer->Bind(target, 0);
 
 	s_Data.FramebufferArray->Bind();
 	glDisable(GL_DEPTH_TEST);
@@ -306,8 +313,8 @@ void Renderer::RenderFramebuffer(Ref<VolcaniCore::Framebuffer> buffer,
 	glEnable(GL_DEPTH_TEST);
 	s_Data.FramebufferArray->Unbind();
 
-	if(pass && pass->GetOutput())
-		pass->GetOutput()->Unbind();
+	if(output)
+		output->Unbind();
 }
 
 }
