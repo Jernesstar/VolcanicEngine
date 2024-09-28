@@ -26,7 +26,8 @@ public:
 	void OnUpdate(TimeStep ts);
 	void OnRender();
 
-	void SetCamera(Ref<Camera> camera) { m_Camera = camera; }
+	void SetCamera(Ref<Camera> camera);
+	void SetController(const CameraController& controller);
 	Ref<Camera> GetCamera() const { return m_Camera; }
 
 	ECS::World& GetEntityWorld() { return m_EntityWorld; }

@@ -17,8 +17,8 @@ Scene::Scene(const std::string& name)
 
 	Ref<ShaderPipeline> shader;
 	shader = ShaderPipeline::Create({
-		{ "VolcaniCore/assets/shaders/Scene.glsl.vert", ShaderType::Vertex },
-		{ "VolcaniCore/assets/shaders/Scene.glsl.frag", ShaderType::Fragment }
+		{ "VolcaniCore/assets/shaders/Mesh.glsl.vert", ShaderType::Vertex },
+		{ "VolcaniCore/assets/shaders/Mesh.glsl.frag", ShaderType::Fragment }
 	});
 	m_DrawPass = RenderPass::Create("Draw", shader);
 
@@ -71,6 +71,16 @@ void Scene::OnRender() {
 
 }
 
+void Scene::SetCamera(Ref<Camera> camera) {
+	m_Camera = camera;
+	m_Controller = CameraController{ camera };
+}
+
+void Scene::SetController(const CameraController& controller) {
+	m_Controller = controller;
+	m_Controller.SetCamera(m_Camera);
+}
+
 void Scene::RegisterSystems() {
 	auto& world = m_EntityWorld.Get();
 
@@ -101,26 +111,28 @@ void Scene::RegisterSystems() {
 	.system<const RigidBodyComponent, TransformComponent>("TransformUpdate")
 	.kind(flecs::PostUpdate)
 	.each(
-	[](const RigidBodyComponent& r, TransformComponent& t) {
-		Transform tr = r.Body->GetTransform();
-		t.Translation = tr.Translation;
-		t.Rotation	  = tr.Rotation;
-		t.Scale		  = tr.Scale;
-	});
+		[](const RigidBodyComponent& r, TransformComponent& t)
+		{
+			Transform tr = r.Body->GetTransform();
+			t.Translation = tr.Translation;
+			t.Rotation	  = tr.Rotation;
+			t.Scale		  = tr.Scale;
+		});
 
 	m_RenderSystem = world
 	.system<const TransformComponent, const MeshComponent>("RenderSystem")
 	.kind(0)
 	.each(
-	[](const TransformComponent& t, const MeshComponent& m) {
-		Transform tr{
-			.Translation = t.Translation,
-			.Rotation	 = t.Rotation,
-			.Scale		 = t.Scale
-		};
+		[](const TransformComponent& t, const MeshComponent& m)
+		{
+			Transform tr{
+				.Translation = t.Translation,
+				.Rotation	 = t.Rotation,
+				.Scale		 = t.Scale
+			};
 
-		Renderer3D::DrawMesh(m.Mesh, tr);
-	});
+			Renderer3D::DrawMesh(m.Mesh, tr);
+		});
 }
 
 void Scene::RegisterObservers() {

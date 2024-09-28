@@ -39,6 +39,7 @@ Game::~Game() {
 }
 
 void Game::OnUpdate(TimeStep ts) {
+	RendererAPI::Get()->Clear();
 	m_CurrentScreen->OnUpdate(ts);
 	m_CurrentScreen->OnRender();
 }
@@ -148,19 +149,17 @@ void Game::LoadScreens() {
 							{ Control::Backward, Key::Invalid },
 						})
 				);
-			controller.SetCamera(camera);
 			controller.RotationSpeed = 0.0f;
 
 			auto& currLevel = GameState::GetLevel();
 			currLevel.Load();
 			auto scene = currLevel.GetScene();
 			scene->SetCamera(camera);
-			// scene->SetController(controller);
+			scene->SetController(controller);
 
-			Tile start = currLevel.PlayerStart;
+			auto [x, y] = currLevel.PlayerStart;
 			Player player(scene->GetEntityWorld());
-			player
-			.Get<TransformComponent>().Translation = { start.x, 0.0f, start.y };
+			player.Get<TransformComponent>().Translation = { x, 0.0f, y };
 
 			// TODO(Implement): Collision with group
 			// PhysicsSystem::RegisterForCollisionDetection(player, m_LavaGroup);
