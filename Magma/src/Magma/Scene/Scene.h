@@ -1,10 +1,15 @@
 #pragma once
 
 #include <VolcaniCore/Core/Time.h>
+#include <VolcaniCore/Renderer/Renderer.h>
+#include <VolcaniCore/Renderer/RenderPass.h>
 #include <VolcaniCore/Renderer/Camera.h>
+#include <VolcaniCore/Renderer/CameraController.h>
 
 #include "ECS/World.h"
 #include "Physics/World.h"
+
+#include "Light.h"
 
 using namespace VolcaniCore;
 
@@ -31,11 +36,12 @@ private:
 	ECS::World m_EntityWorld;
 	Physics::World m_PhysicsWorld;
 
+	// TODO(Maybe): Turn Camera and CameraController into Entitys
 	Ref<Camera> m_Camera;
 	CameraController m_Controller;
 	List<Ref<Light>> m_Lights;
 
-	Ref<RenderPass> m_RenderPass;
+	Ref<RenderPass> m_DrawPass;
 	flecs::system m_RenderSystem;
 
 private:

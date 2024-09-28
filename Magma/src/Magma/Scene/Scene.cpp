@@ -51,7 +51,7 @@ Scene::~Scene() {
 }
 
 void Scene::OnUpdate(TimeStep ts) {
-	CameraController.OnUpdate(ts);
+	m_Controller.OnUpdate(ts);
 	m_EntityWorld.OnUpdate(ts);
 }
 
@@ -60,7 +60,7 @@ void Scene::OnRender() {
 	{
 		Renderer3D::Begin(m_Camera);
 
-		m_RenderSys.run();
+		m_RenderSystem.run();
 
 		Renderer3D::End();
 	}
@@ -108,7 +108,7 @@ void Scene::RegisterSystems() {
 		t.Scale		  = tr.Scale;
 	});
 
-	m_RenderSys = world
+	m_RenderSystem = world
 	.system<const TransformComponent, const MeshComponent>("RenderSystem")
 	.kind(0)
 	.each(

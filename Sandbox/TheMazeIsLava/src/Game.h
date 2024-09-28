@@ -28,6 +28,7 @@ private:
 	Screen EmptyScreen;
 	Screen HomeScreen;
 	Screen LevelScreen;
+	Screen PlayScreen;
 	Screen PauseScreen;
 	Screen OverScreen;
 };

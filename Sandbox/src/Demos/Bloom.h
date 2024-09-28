@@ -11,6 +11,7 @@ struct BloomMip {
 class Bloom : public Application {
 public:
 	Bloom();
+	~Bloom();
 
 	void OnUpdate(TimeStep ts);
 
@@ -34,12 +35,16 @@ private:
 	List<BloomMip> mipChain;
 
 	uint32_t mipChainLength = 5;
-	float filterRadius = 0.005f;
+	float filterRadius	= 0.02f;
+	float exposure		= 1.0f;
+	float bloomStrength = 0.04f;
 
 	Ref<Window> window;
 };
 
-Bloom::Bloom() {
+Bloom::Bloom()
+	: Application(1920, 1080)
+{
 	Events::RegisterListener<KeyPressedEvent>(
 		[](const KeyPressedEvent& event)
 		{
@@ -74,7 +79,9 @@ Bloom::Bloom() {
 	});
 	drawPass = RenderPass::Create("Draw Pass", shader);
 
-	src = Framebuffer::Create(window->GetWidth(), window->GetHeight());
+	auto width = window->GetWidth();
+	auto height = window->GetHeight();
+	src = Framebuffer::Create(width, height);
 	InitMips();
 
 	drawPass->SetOutput(src);
@@ -86,13 +93,30 @@ Bloom::Bloom() {
 	camera = CreateRef<StereographicCamera>(75.0f);
 	camera->SetPosition({ 2.5f, 2.5f, 2.5f });
 	camera->SetDirection({ -0.5f, -0.5f, -0.5f });
+	camera->Resize(width, height);
 
 	controller = CameraController{ camera };
 	controller.TranslationSpeed = 5.0f;
+
+	UI::Init();
+}
+
+Bloom::~Bloom() {
+	UI::Close();
 }
 
 void Bloom::OnUpdate(TimeStep ts) {
+	UI::Begin();
+
 	controller.OnUpdate(ts);
+
+	ImGui::Begin("Parameters");
+	{
+		ImGui::SliderFloat("Filter radius",  &filterRadius,  0.00001f, 0.1f);
+		ImGui::SliderFloat("Exposure",		 &exposure,		 0.00001f, 10.0f);
+		ImGui::SliderFloat("Bloom Strength", &bloomStrength, 0.00001f, 1.0f);
+	}
+	ImGui::End();
 
 	Renderer::StartPass(drawPass);
 	{
@@ -173,7 +197,20 @@ void Bloom::OnUpdate(TimeStep ts) {
 				src->Bind(AttachmentTarget::Color, 1);
 				return { };
 			});
+		Renderer::GetPass()->GetUniforms()
+		.Set("u_Exposure",
+			[&]() -> float
+			{
+				return exposure;
+			});
+		Renderer::GetPass()->GetUniforms()
+		.Set("u_BloomStrength",
+			[&]() -> float
+			{
+				return bloomStrength;
+			});
 
+		Renderer::GetPass()->SetGlobalUniforms();
 		Renderer::GetPass()
 			->SetUniforms(Renderer::GetDrawCommand().GetUniforms());
 
@@ -182,6 +219,8 @@ void Bloom::OnUpdate(TimeStep ts) {
 	}
 	Renderer::EndPass();
 	Renderer::Flush();
+
+	UI::End();
 }
 
 void Bloom::InitMips() {
@@ -246,7 +285,7 @@ void Bloom::Downsample() {
 }
 
 void Bloom::Upsample() {
-	for(uint32_t i = mipChain.size() - 1; i > 0; i--) {
+	for(uint32_t i = mipChainLength - 1; i > 0; i--) {
 		const BloomMip& mip = mipChain[i];
 		const BloomMip& nextMip = mipChain[i - 1];
 

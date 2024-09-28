@@ -46,20 +46,15 @@ public:
 	float RotationSpeed = 0.6f;
 
 public:
-	CameraController(const MovementControls& controls = { })
-		: m_Controls(controls) { }
-	CameraController(Ref<Camera> camera, const MovementControls& controls = { })
-		: m_Camera(camera), m_Controls(controls) { }
+	CameraController(const MovementControls& controls = { });
+	CameraController(Ref<Camera> camera);
+
+	void OnUpdate(TimeStep ts);
 
 	void SetControls(const MovementControls& controls) {
 		m_Controls = controls;
 	}
-
-	void SetCamera(Ref<Camera> camera) {
-		m_Camera = camera;
-	}
-
-	void OnUpdate(TimeStep ts);
+	void SetCamera(Ref<Camera> camera);
 
 private:
 	Ref<Camera> m_Camera;

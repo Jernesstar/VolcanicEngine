@@ -16,15 +16,18 @@ Game::Game()
 	: Application(800, 600, "The Maze is Lava")
 {
 	Events::RegisterListener<KeyPressedEvent>(
-	[&](const KeyPressedEvent& event) {
-		if(event.Key == Key::Escape)
-			Application::Close();
-	});
+		[&](const KeyPressedEvent& event)
+		{
+			if(event.Key == Key::Escape)
+				Application::Close();
+		});
 
 	UI::Init();
 	GameState::Reset();
 
 	Asset::Init();
+
+	LoadScreens();
 
 	m_CurrentScreen = &HomeScreen;
 	m_CurrentScreen->OnLoad();
@@ -78,54 +81,21 @@ void Game::LoadScreens() {
 	EmptyScreen = Screen{ };
 	HomeScreen	= Screen{ home };
 	LevelScreen = Screen{ level };
+	PlayScreen  = Screen{ };
 	PauseScreen = Screen{ pause };
 	OverScreen	= Screen{ over };
-
-	HomeScreen.OnLoad =
-		[&]()
-		{
-			auto camera = CreateRef<IsometricCamera>();
-			m_Controller =
-				CameraController(
-					MovementControls(
-						ControlMap{
-							{ Control::Up,   Key::W },
-							{ Control::Down, Key::S },
-							{ Control::Forward,  Key::Invalid },
-							{ Control::Backward, Key::Invalid },
-						})
-				);
-			m_Controller.SetCamera(camera);
-			m_Controller.RotationSpeed = 0.0f;
-
-			auto& currLevel = GameState::GetLevel();
-			currLevel.Load();
-			auto scene = currLevel.GetScene();
-			scene->SetCamera(camera);
-
-			Tile start = currLevel.PlayerStart;
-			Player player(scene->GetEntityWorld());
-			player
-			.Get<TransformComponent>().Translation = { start.x, 0.0f, start.y };
-
-			// TODO(Implement): Collision with group
-			// PhysicsSystem::RegisterForCollisionDetection(player, m_LavaGroup);
-		}
 
 	HomeScreen.OnUpdate =
 		[&](TimeStep ts)
 		{
-			m_Controller.OnUpdate(ts);
-			GameState::GetLevel().OnUpdate(ts);
-			GameState::GetLevel().OnRender();
+ 			auto& state = HomeScreen.GetState();
 
-			auto& state = HomeScreen.GetState();
 			if(state.ReturnPressed) {
 				state.ReturnPressed = false;
 				m_CurrentScreen = &LevelScreen;
 				m_CurrentScreen->OnLoad();
 			}
-		}
+		};
 
 	LevelScreen.OnLoad =
 		[&]()
@@ -144,12 +114,12 @@ void Game::LoadScreens() {
 				->SetOnPressed(
 				[i]() {
 					if(i <= GameState::MaxLevel)
-						SelectedLevel = i;
+						GameState::SelectedLevel = i;
 				})
 				->SetSize(70, 50)
 				->SetPosition(i * 70 + (offset += 40.0f), 100.0f);
 			}
-		}
+		};
 
 	LevelScreen.OnUpdate =
 		[&](TimeStep _)
@@ -162,13 +132,45 @@ void Game::LoadScreens() {
 
 			m_CurrentScreen = &PlayScreen;
 			m_CurrentScreen->OnLoad();
-		}
+		};
+
+	PlayScreen.OnLoad =
+		[&]()
+		{
+			auto camera = CreateRef<IsometricCamera>();
+			auto controller =
+				CameraController(
+					MovementControls(
+						ControlMap{
+							{ Control::Up,   Key::W },
+							{ Control::Down, Key::S },
+							{ Control::Forward,  Key::Invalid },
+							{ Control::Backward, Key::Invalid },
+						})
+				);
+			controller.SetCamera(camera);
+			controller.RotationSpeed = 0.0f;
+
+			auto& currLevel = GameState::GetLevel();
+			currLevel.Load();
+			auto scene = currLevel.GetScene();
+			scene->SetCamera(camera);
+			// scene->SetController(controller);
+
+			Tile start = currLevel.PlayerStart;
+			Player player(scene->GetEntityWorld());
+			player
+			.Get<TransformComponent>().Translation = { start.x, 0.0f, start.y };
+
+			// TODO(Implement): Collision with group
+			// PhysicsSystem::RegisterForCollisionDetection(player, m_LavaGroup);
+		};
 
 	PlayScreen.OnUpdate =
-		[&](TimeStep _)
+		[&](TimeStep ts)
 		{
-			auto& level = GameState::GetLevel();
 			auto& state = HomeScreen.GetState();
+			auto& level = GameState::GetLevel();
 
 			level.OnUpdate(ts);
 			level.OnRender();
@@ -187,14 +189,28 @@ void Game::LoadScreens() {
 			}
 			else if(state.ReturnPressed) {
 				state.ReturnPressed = false;
-				level.Paused = !level.Paused;
-				if(level.Paused)
-					m_CurrentScreen = &PauseScreen;
+				level.Paused = true;
+				m_CurrentScreen = &PauseScreen;
 			}
-		}
+		};
+
+	// TODO(Fix): Have Pause UI be part of the PlayScreen
+	PauseScreen.OnUpdate =
+		[&](TimeStep _)
+		{
+			auto& state = HomeScreen.GetState();
+			auto& level = GameState::GetLevel();
+
+			if(state.ReturnPressed) {
+				state.ReturnPressed = false;
+				level.Paused = false;
+				m_CurrentScreen = &PlayScreen;
+				m_CurrentScreen->OnLoad();
+			}
+		};
 
 	OverScreen.OnUpdate =
-		[](TimeStep _)
+		[&](TimeStep _)
 		{
 			auto& state = HomeScreen.GetState();
 
@@ -203,7 +219,7 @@ void Game::LoadScreens() {
 				m_CurrentScreen = &PlayScreen;
 				m_CurrentScreen->OnLoad();
 			}
-		}
+		};
 }
 
 }

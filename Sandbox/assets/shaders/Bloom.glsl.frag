@@ -5,14 +5,14 @@ layout(location = 0) in vec2 TexCoords;
 layout(binding = 0) uniform sampler2D u_BloomTexture;
 layout(binding = 1) uniform sampler2D u_SceneTexture;
 
-uniform float exposure = 1.0;
-uniform float bloomStrength = 0.04;
+uniform float u_Exposure;
+uniform float u_BloomStrength;
 
 vec3 bloom()
 {
     vec3 bloomColor = texture(u_BloomTexture, TexCoords).rgb;
     vec3 hdrColor = texture(u_SceneTexture, TexCoords).rgb;
-    return mix(hdrColor, bloomColor, bloomStrength); // linear interpolation
+    return mix(hdrColor, bloomColor, u_BloomStrength); // linear interpolation
 }
 
 out vec4 FragColor;
@@ -23,7 +23,7 @@ void main()
     result = bloom();
 
     // tone mapping
-    result = vec3(1.0) - exp(-result * exposure);
+    result = vec3(1.0) - exp(-result * u_Exposure);
 
     // also gamma correct while we're at it
     const float gamma = 2.2;
