@@ -49,7 +49,7 @@ using namespace Magma::Physics;
 #include "Demos/Collision.h"
 #include "Demos/Template.h"
 
-#include "Sandbox/TheMazeIsLava/src/Game.h"
+#include "Game.h"
 
 Application* CreateApplication(const CommandLineArgs& args) {
 	std::string project = args[1];

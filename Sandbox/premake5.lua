@@ -3,7 +3,7 @@ project "Sandbox"
     language "C++"
     cppdialect "C++latest"
     exceptionhandling "On"
-    rtti "On"
+    rtti "Off"
     staticruntime "Off"
 
     objdir ("%{RootPath}/build/Sandbox/obj")
@@ -16,7 +16,9 @@ project "Sandbox"
     }
 
     includedirs {
-        "%{RootPath}",
+        "src",
+        "TheMazeIsLava/src",
+
         "%{RootPath}/VolcaniCore/src",
         "%{RootPath}/VolcaniCore/src/VolcaniCore",
         "%{RootPath}/VolcaniCore/src/impl",
