@@ -19,7 +19,6 @@ public:
 	void OnUpdate(TimeStep ts) override;
 
 private:
-	void Play();
 	void LoadScreens();
 
 private:

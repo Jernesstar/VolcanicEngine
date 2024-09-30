@@ -12,6 +12,7 @@ namespace TheMazeIsLava {
 class Screen {
 public:
 	struct State {
+		bool ShowUI = true;
 		bool ReturnPressed = false;
 	};
 

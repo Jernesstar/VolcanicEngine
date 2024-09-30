@@ -27,7 +27,7 @@ public:
 	Tile PlayerStart;
 	List<Tile> LavaPoints;
 
-	bool Paused = false;
+	bool Paused   = false;
 	bool GameOver = false;
 	bool Complete = false;
 
@@ -41,7 +41,7 @@ public:
 	void Load();
 	Ref<Scene> GetScene() const { return m_Scene; }
 
-	void TraverseTilemap(const std::function<void(const Tile& tile)>& func);
+	void TraverseTilemap(const Func<const Tile&, void>& func);
 
 	bool IsWall(const Tile& tile) const;
 	bool IsPath(const Tile& tile) const;

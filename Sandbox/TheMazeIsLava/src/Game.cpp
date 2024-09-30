@@ -3,6 +3,7 @@
 #include <VolcaniCore/Core/Input.h>
 #include <VolcaniCore/Core/Assert.h>
 #include <VolcaniCore/Event/Events.h>
+#include <VolcaniCore/Renderer/RendererAPI.h>
 
 #include "Asset.h"
 #include "GameState.h"

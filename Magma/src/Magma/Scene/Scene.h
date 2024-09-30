@@ -1,8 +1,6 @@
 #pragma once
 
 #include <VolcaniCore/Core/Time.h>
-#include <VolcaniCore/Renderer/Renderer.h>
-#include <VolcaniCore/Renderer/RenderPass.h>
 #include <VolcaniCore/Renderer/Camera.h>
 #include <VolcaniCore/Renderer/CameraController.h>
 
@@ -14,6 +12,8 @@
 using namespace VolcaniCore;
 
 namespace Magma {
+
+class SceneRenderer;
 
 class Scene {
 public:
@@ -29,6 +29,7 @@ public:
 	void SetCamera(Ref<Camera> camera);
 	void SetController(const CameraController& controller);
 	Ref<Camera> GetCamera() const { return m_Camera; }
+	List<Ref<Light>>& GetLights() { return m_Lights; }
 
 	ECS::World& GetEntityWorld() { return m_EntityWorld; }
 	Physics::World& GetPhysicsWorld() { return m_PhysicsWorld; }
@@ -37,13 +38,12 @@ private:
 	ECS::World m_EntityWorld;
 	Physics::World m_PhysicsWorld;
 
-	// TODO(Maybe): Turn Camera and CameraController into Entitys
+	// TODO(Maybe): Turn into Entitys
 	Ref<Camera> m_Camera;
 	CameraController m_Controller;
 	List<Ref<Light>> m_Lights;
 
-	Ref<RenderPass> m_DrawPass;
-	flecs::system m_RenderSystem;
+	Ref<SceneRenderer> m_Renderer;
 
 private:
 	void RegisterSystems();

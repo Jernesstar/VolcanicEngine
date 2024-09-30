@@ -15,11 +15,9 @@ Level::Level(const std::string& name, const Tilemap& map)
 	TraverseTilemap(
 		[&](const Tile& tile)
 		{
-			auto [x, y] = tile;
-
-			if(IsLava(tile))  LavaPoints.push_back({ x, y });
-			if(IsGoal(tile))  Goal = { x, y };
-			if(IsStart(tile)) PlayerStart = { x, y };
+			if(IsLava(tile))  LavaPoints.push_back(tile);
+			if(IsGoal(tile))  Goal = tile;
+			if(IsStart(tile)) PlayerStart = tile;
 		});
 }
 
@@ -90,7 +88,7 @@ void Level::Load() {
 		});
 }
 
-void Level::TraverseTilemap(const std::function<void(const Tile& tile)>& func) {
+void Level::TraverseTilemap(const Func<const Tile&, void>& func) {
 	for(uint32_t i = 0; i < Height; i++)
 		for(uint32_t j = 0; j < Width; j++)
 			func(Tile(j, i));

@@ -24,17 +24,18 @@ public:
 	Entity AddEntity(VolcaniCore::UUID id);
 	Entity AddEntity(const std::string& tag);
 
-	void ForEach(const std::function<void(Entity&)>& func);
+	void ForEach(const Func<Entity&, void>& func);
 
 	template<typename TComponent>
-	void ForEach(const std::function<void(Entity&)>& func) {
+	void ForEach(const Func<Entity&, void>& func) {
 		flecs::query<TComponent>& query = GetQuery<TComponent>();
 
 		query.each(
-		[&func](flecs::entity handle) {
-			Entity entity{ handle };
-			func(entity);
-		});
+			[&func](flecs::entity handle)
+			{
+				Entity entity{ handle };
+				func(entity);
+			});
 	}
 
 	flecs::world& Get() { return m_World; }

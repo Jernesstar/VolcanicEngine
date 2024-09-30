@@ -2,6 +2,8 @@
 
 #include <VolcaniCore/Renderer/Renderer3D.h>
 
+#include "SceneRenderer.h"
+
 #include "ECS/PhysicsSystem.h"
 
 using namespace Magma::ECS;
@@ -15,39 +17,11 @@ Scene::Scene(const std::string& name)
 	RegisterSystems();
 	RegisterObservers();
 
-	Ref<ShaderPipeline> shader;
-	shader = ShaderPipeline::Create({
-		{ "VolcaniCore/assets/shaders/Mesh.glsl.vert", ShaderType::Vertex },
-		{ "VolcaniCore/assets/shaders/Mesh.glsl.frag", ShaderType::Fragment }
-	});
-	m_DrawPass = RenderPass::Create("Draw", shader);
-
-	// PointLight light =
-	// 	PointLight{ .Constant = 0.3f, .Linear = 0.0f, .Quadratic = 0.032f };
-	// light.Position = { 0.0f, 2.0f, 0.0f };
-	// light.Ambient  = { 0.2f, 0.2f, 0.2f };
-	// light.Diffuse  = { 0.5f, 0.5f, 0.5f };
-	// light.Specular = { 1.0f, 1.0f, 1.0f };
-
-	// shader->Bind();
-
-	// shader->SetInt("u_PointLightCount", 1);
-	// shader->SetVec3("u_PointLights[0].Position", light.Position);
-	// shader->SetVec3("u_PointLights[0].Ambient",  light.Ambient);
-	// shader->SetVec3("u_PointLights[0].Diffuse",  light.Diffuse);
-	// shader->SetVec3("u_PointLights[0].Specular", light.Specular);
-
-	// shader->SetFloat("u_PointLights[0].Constant",  light.Constant);
-	// shader->SetFloat("u_PointLights[0].Linear",    light.Linear);
-	// shader->SetFloat("u_PointLights[0].Quadratic", light.Quadratic);
-
-	// shader->SetTexture("u_Material.Diffuse", cube->GetMaterial().Diffuse, 0);
-	// shader->SetTexture("u_Material.Specular", cube->GetMaterial().Specular, 1);
-	// shader->SetFloat("u_Material.Shininess", 32.0f);
+	m_Renderer = CreateRef<SceneRenderer>(this);
 }
 
 Scene::~Scene() {
-
+	m_Renderer->Render();
 }
 
 void Scene::OnUpdate(TimeStep ts) {
@@ -56,19 +30,7 @@ void Scene::OnUpdate(TimeStep ts) {
 }
 
 void Scene::OnRender() {
-	Renderer::StartPass(m_DrawPass);
-	{
-		Renderer3D::Begin(m_Camera);
-
-		m_RenderSystem.run();
-
-		Renderer3D::End();
-	}
-	Renderer::EndPass();
-	
-	// if(m_Options.Bloom)
-	// 	BloomPass();
-
+	m_Renderer->Render();
 }
 
 void Scene::SetCamera(Ref<Camera> camera) {
@@ -111,27 +73,12 @@ void Scene::RegisterSystems() {
 	.system<const RigidBodyComponent, TransformComponent>("TransformUpdate")
 	.kind(flecs::PostUpdate)
 	.each(
-		[](const RigidBodyComponent& r, TransformComponent& t)
+		[](const RigidBodyComponent& rb, TransformComponent& tc)
 		{
-			Transform tr = r.Body->GetTransform();
-			t.Translation = tr.Translation;
-			t.Rotation	  = tr.Rotation;
-			t.Scale		  = tr.Scale;
-		});
-
-	m_RenderSystem = world
-	.system<const TransformComponent, const MeshComponent>("RenderSystem")
-	.kind(0)
-	.each(
-		[](const TransformComponent& t, const MeshComponent& m)
-		{
-			Transform tr{
-				.Translation = t.Translation,
-				.Rotation	 = t.Rotation,
-				.Scale		 = t.Scale
-			};
-
-			Renderer3D::DrawMesh(m.Mesh, tr);
+			Transform tr = rb.Body->GetTransform();
+			tc.Translation = tr.Translation;
+			tc.Rotation	   = tr.Rotation;
+			tc.Scale	   = tr.Scale;
 		});
 }
 

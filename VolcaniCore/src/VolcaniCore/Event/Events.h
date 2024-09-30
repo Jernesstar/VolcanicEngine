@@ -40,10 +40,10 @@ public:
 	template<typename TEvent>
 	requires std::derived_from<TEvent, Event>
 	static EventCallback<TEvent> RegisterListener(
-		const std::function<void(TEvent&)>& callback)
+			const Func<TEvent&, void>& callback)
 	{
 		EventCallback<TEvent> eventCallback(callback);
-		RegisterListener<TEvent>((EventCallback<TEvent>&)eventCallback);
+		RegisterListener<TEvent>(eventCallback);
 		return eventCallback;
 	}
 

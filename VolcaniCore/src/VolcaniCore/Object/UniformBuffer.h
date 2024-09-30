@@ -9,7 +9,7 @@ namespace VolcaniCore {
 template<typename TUniform, typename THandle>
 class UniformBuffer {
 public:
-	std::function<TUniform(Ref<THandle)>> SetData = [](){};
+	Func<Ref<THandle>, TUniform> SetData = [](){};
 
 public:
 	UniformBuffer() = default;

@@ -69,12 +69,13 @@ Entity World::AddEntity(const std::string& tag) {
 	return entity;
 }
 
-void World::ForEach(const std::function<void(Entity& entity)>& func) {
+void World::ForEach(const Func<Entity&, void>& func) {
 	m_AllEntitiesQuery.each(
-	[&func](flecs::entity handle) {
-		Entity entity{ handle };
-		func(entity);
-	});
+		[&func](flecs::entity handle)
+		{
+			Entity entity{ handle };
+			func(entity);
+		});
 }
 
 }
