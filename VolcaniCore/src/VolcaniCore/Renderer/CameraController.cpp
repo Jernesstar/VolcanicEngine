@@ -27,11 +27,8 @@ void CameraController::SetCamera(Ref<Camera> camera) {
 }
 
 void CameraController::OnUpdate(TimeStep ts) {
-	if(!m_Camera)
-		return;
-
 	glm::vec2 mousePosition = Input::GetMousePosition();
-	glm::vec2 delta = (mousePosition - m_LastMousePosition) * 0.001f;
+	glm::vec2 delta = (mousePosition - m_LastMousePosition);
 	m_LastMousePosition = mousePosition;
 
 	if(Input::MouseButtonPressed(Mouse::LeftButton))
@@ -41,39 +38,42 @@ void CameraController::OnUpdate(TimeStep ts) {
 		return;
 	}
 
+	float moveSpeed     = TranslationSpeed * 0.001f;
+	float rotationSpeed = RotationSpeed	   * 0.001f;
+	glm::vec3 finalPos = m_Camera->GetPosition();
+	glm::vec3 finalDir;
+	bool moved = false;
+
 	glm::vec3 up(0.0f, 1.0f, 0.0f);
 	glm::vec3 forward = m_Camera->GetDirection();
 	glm::vec3 right = glm::normalize(glm::cross(forward, up));
 
-	glm::ivec3 dir(0);
-	dir.x = Input::KeyPressed(m_Controls[Control::Right])
-		  - Input::KeyPressed(m_Controls[Control::Left]);
-	dir.y = Input::KeyPressed(m_Controls[Control::Up])
-		  - Input::KeyPressed(m_Controls[Control::Down]);
-	dir.z = Input::KeyPressed(m_Controls[Control::Forward])
-		  - Input::KeyPressed(m_Controls[Control::Backward]);
+	glm::ivec3 inputDir(0.0f);
+	glm::vec3 moveDir(0.0f);
+	inputDir.x = Input::KeyPressed(m_Controls[Control::Right])
+			   - Input::KeyPressed(m_Controls[Control::Left]);
+	inputDir.y = Input::KeyPressed(m_Controls[Control::Up])
+			   - Input::KeyPressed(m_Controls[Control::Down]);
+	inputDir.z = Input::KeyPressed(m_Controls[Control::Forward])
+			   - Input::KeyPressed(m_Controls[Control::Backward]);
+	moveDir += (float)inputDir.x * right;
+	moveDir += (float)inputDir.y * up;
+	moveDir += (float)inputDir.z * forward;
 
-	glm::vec3 finalDir(0.0f);
-	finalDir += (float)dir.x * right;
-	finalDir += (float)dir.y * up;
-	finalDir += (float)dir.z * forward;
-	float speed = TranslationSpeed * 0.001f;
+	if(moved = inputDir.x || inputDir.y || inputDir.z)
+		finalPos += glm::normalize(moveDir) * moveSpeed * (float)ts;
 
-	bool moved = false;
-	if(moved = dir.x || dir.y || dir.z)
-		m_Camera->Position += glm::normalize(finalDir) * speed * (float)ts;
-
-	if(moved |= (delta.x != 0.0f || delta.y != 0.0f) && RotationSpeed != 0.0f) {
+	if(moved |= (delta != glm::vec2(0.0f) && RotationSpeed != 0.0f)) {
 		float pitchDelta = delta.y * RotationSpeed;
 		float yawDelta   = delta.x * RotationSpeed;
 
 		glm::quat q = glm::cross(glm::angleAxis(-pitchDelta, right),
 								 glm::angleAxis(-yawDelta, up));
-		m_Camera->Direction = glm::rotate(glm::normalize(q), forward);
+		finalDir = glm::rotate(glm::normalize(q), forward);
 	}
 
 	if(moved)
-		m_Camera->CalculateView();
+		m_Camera->SetPositionDirection(finalPos, finalDir);
 }
 
 }

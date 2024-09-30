@@ -3,6 +3,7 @@
 #include <VolcaniCore/Renderer/Renderer3D.h>
 
 #include "SceneRenderer.h"
+#include "SceneSerializer.h"
 
 #include "ECS/PhysicsSystem.h"
 
@@ -17,34 +18,33 @@ Scene::Scene(const std::string& name)
 	RegisterSystems();
 	RegisterObservers();
 
-	m_Renderer = CreateRef<SceneRenderer>(this);
+	m_Renderer = SceneRenderer{ this };
+	m_Serializer = SceneSerializer{ this };
 }
 
 Scene::~Scene() {
-	m_Renderer->Render();
+
 }
 
 void Scene::OnUpdate(TimeStep ts) {
-	m_Controller.OnUpdate(ts);
-	m_EntityWorld.OnUpdate(ts);
+	EntityWorld.OnUpdate(ts);
+	m_Renderer.UpdateCamera(ts);
 }
 
 void Scene::OnRender() {
-	m_Renderer->Render();
+	m_Renderer.Render();
 }
 
-void Scene::SetCamera(Ref<Camera> camera) {
-	m_Camera = camera;
-	m_Controller = CameraController{ camera };
+void Scene::Load(const std::string& path) {
+	m_Serializer.Deserialize(path);
 }
 
-void Scene::SetController(const CameraController& controller) {
-	m_Controller = controller;
-	m_Controller.SetCamera(m_Camera);
+void Scene::Save(const std::string& path) {
+	m_Serializer.Serialize(path);
 }
 
 void Scene::RegisterSystems() {
-	auto& world = m_EntityWorld.Get();
+	auto& world = EntityWorld.Get();
 
 	world
 	.system<const ScriptComponent, TransformComponent>("InputUpdate")
@@ -66,7 +66,7 @@ void Scene::RegisterSystems() {
 	// .kind(flecs::OnUpdate)
 	// .run(
 	// [&](flecs::iter& it) {
-	// 	m_PhysicsWorld.OnUpdate(it.delta_time());
+	// 	PhysicsWorld.OnUpdate(it.delta_time());
 	// });
 
 	world
@@ -83,7 +83,7 @@ void Scene::RegisterSystems() {
 }
 
 void Scene::RegisterObservers() {
-	auto world = m_EntityWorld.Get();
+	auto& world = EntityWorld.Get();
 
 	// Creating RigidBodyComponent then MeshComponent ==> bounding volume
 	// Creating MeshComponent then RigidBodyComponent ==> tightly-fitting volume

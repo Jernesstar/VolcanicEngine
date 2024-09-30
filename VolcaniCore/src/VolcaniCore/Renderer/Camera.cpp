@@ -12,11 +12,11 @@ Ref<Camera> Camera::Create(Camera::Type type) {
 	return CreateRef<StereographicCamera>();
 }
 
-Ref<Camera> Camera::Create(Camera::Type type, float fov_rotation) {
+Ref<Camera> Camera::Create(Camera::Type type, float fovOrRotation) {
 	if(type == Camera::Type::Ortho) {
-		return CreateRef<OrthographicCamera>(fov_rotation);
+		return CreateRef<OrthographicCamera>(fovOrRotation);
 	}
-	return CreateRef<StereographicCamera>(fov_rotation);
+	return CreateRef<StereographicCamera>(fovOrRotation);
 }
 
 }

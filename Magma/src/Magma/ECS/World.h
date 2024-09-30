@@ -1,13 +1,14 @@
 #pragma once
 
-#include <string>
-
 #include <flecs.h>
 
 #include <VolcaniCore/Core/Time.h>
+#include <VolcaniCore/Core/Defines.h>
 #include <VolcaniCore/Core/UUID.h>
 
 #include "Entity.h"
+
+using namespace VolcaniCore;
 
 namespace Magma::ECS {
 

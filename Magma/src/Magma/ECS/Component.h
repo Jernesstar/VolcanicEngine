@@ -4,6 +4,7 @@
 
 #include <VolcaniCore/Object/Mesh.h>
 #include <VolcaniCore/Object/Model.h>
+#include <VolcaniCore/Renderer/Camera.h>
 
 #include <Physics/RigidBody.h>
 
@@ -87,6 +88,19 @@ struct ScriptComponent : public Component {
 		// ScriptEngine::LoadScript(path);
 	}
 	ScriptComponent(const ScriptComponent& other) = default;
+};
+
+struct CameraComponent : public Component {
+	Camera::Type CameraType;
+	uint32_t ViewportWidth = 100, ViewportHeight = 100;
+
+	CameraComponent() = default;
+	CameraComponent(const Camera& cam)
+		: CameraType(cam.GetType()),
+			ViewportWidth(cam.GetViewportWidth()),
+			ViewportHeight(cam.GetViewportHeight()) { }
+	// CameraComponent()
+	CameraComponent(const CameraComponent& other) = default;
 };
 
 }

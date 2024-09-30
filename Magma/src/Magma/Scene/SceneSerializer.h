@@ -1,13 +1,22 @@
 #pragma once
 
-#include "Scene.h"
+#include <VolcaniCore/Core/Defines.h>
 
 namespace Magma {
 
+class Scene;
+
 class SceneSerializer {
 public:
-	static void Serialize(Ref<Scene> scene, const std::string& filepath);
-	static Ref<Scene> Deserialize(const std::string& filepath);
+	SceneSerializer() = default;
+	SceneSerializer(Scene* scene);
+	~SceneSerializer() = default;
+
+	void Serialize(const std::string& path);
+	void Deserialize(const std::string& path);
+
+private:
+	Scene* m_Scene;
 };
 
 }

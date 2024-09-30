@@ -1,6 +1,6 @@
 #pragma once
 
-#include <flecs.h>
+#include <flecs/flecs.h>
 
 #include "Component.h"
 
@@ -10,16 +10,14 @@ class Entity {
 public:
 	Entity(flecs::entity handle)
 		: m_Handle(handle) { }
-
 	~Entity() = default;
-
-	bool operator ==(const Entity& other) const {
-		return this->m_Handle == other.m_Handle;
-	}
 
 	flecs::entity GetHandle() const { return m_Handle; }
 
-	void Delete() {
+	bool IsValid() const { return m_Handle != 0; }
+
+	bool IsAlive() const { return m_Handle.is_alive(); }
+	void Kill() {
 		m_Handle.destruct();
 	}
 
@@ -46,6 +44,10 @@ public:
 	requires std::derived_from<TComponent, Component>
 	void Remove() {
 		m_Handle.remove<TComponent>();
+	}
+
+	bool operator ==(const Entity& other) const {
+		return this->m_Handle == other.m_Handle;
 	}
 
 private:

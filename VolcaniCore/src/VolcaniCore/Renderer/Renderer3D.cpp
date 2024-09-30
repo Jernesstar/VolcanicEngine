@@ -44,6 +44,7 @@ void Renderer3D::DrawMesh(Ref<Mesh> mesh, const glm::mat4& tr) {
 	auto& command = Renderer::GetDrawCommand();
 	auto& uniforms = command.GetUniforms();
 
+	// TODO(Change): Configure ahead of time
 	uniforms
 	.Set("u_Diffuse",
 		[mesh]() -> TextureSlot

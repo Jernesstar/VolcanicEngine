@@ -25,7 +25,7 @@ ECS::ECS() {
 	});
 
 	scene = CreateRef<Scene>();
-	scene->SetCamera(CreateRef<StereographicCamera>());
+	// scene->SetCamera(CreateRef<StereographicCamera>());
 	auto& world = scene->GetEntityWorld();
 
 	Magma::ECS::Entity entity = Magma::ECS::EntityBuilder(world)
@@ -43,11 +43,12 @@ ECS::ECS() {
 	.Add<RigidBodyComponent>(RigidBody::Type::Static)
 	.Finalize();
 
-	SceneSerializer::Serialize(scene, "Sandbox/assets/scenes/test.volc");
-	Ref<Scene> test
-		= SceneSerializer::Deserialize("Sandbox/assets/scenes/test.volc");
-	
-	test->GetEntityWorld()
+	scene->Save("Sandbox/assets/scenes/test.volc");
+
+	Ref<Scene> test = CreateRef<Scene>()
+	test->Load("Sandbox/assets/scenes/test.volc");
+
+	test->EntityWorld
 	.ForEach(
 	[](Entity& entity) {
 		VOLCANICORE_LOG_INFO("Path: '%s'", entity.Get<MeshComponent>().Mesh->Path.c_str());

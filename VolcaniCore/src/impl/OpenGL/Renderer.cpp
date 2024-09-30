@@ -41,9 +41,10 @@ Renderer::Renderer()
 	VOLCANICORE_ASSERT(gladLoadGL(), "Glad could not load OpenGL");
 
 	Events::RegisterListener<WindowResizedEvent>(
-	[&](const WindowResizedEvent& event) {
-		Resize(event.Width, event.Height);
-	});
+		[&](const WindowResizedEvent& event)
+		{
+			Resize(event.Width, event.Height);
+		});
 }
 
 void Renderer::Init() {

@@ -39,7 +39,7 @@ void Level::PropagateLava(TimeStep ts) {
 
 void Level::Load() {
 	m_Scene = CreateRef<Scene>(Name);
-	auto& world = m_Scene->GetEntityWorld();
+	auto& world = m_Scene->EntityWorld;
 
 	TraverseTilemap(
 		[&](const Tile& tile)

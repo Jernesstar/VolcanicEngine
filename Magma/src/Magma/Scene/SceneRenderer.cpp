@@ -1,4 +1,5 @@
 #include "SceneRenderer.h"
+#include "Scene.h"
 
 #include <VolcaniCore/Renderer/Renderer.h>
 #include <VolcaniCore/Renderer/Renderer3D.h>
@@ -17,7 +18,7 @@ SceneRenderer::SceneRenderer(Scene* scene)
 	shader = ShaderPipeline::Create("VolcaniCore/assets/shaders", "Lighting");
 	m_LightingPass = RenderPass::Create("Lighting", shader);
 
-	auto& world = m_Scene->GetEntityWorld().Get();
+	auto& world = m_Scene->EntityWorld.Get();
 	m_RenderSystem = world
 	.system<const TransformComponent, const MeshComponent>("RenderSystem")
 	.kind(0)
@@ -34,10 +35,21 @@ SceneRenderer::SceneRenderer(Scene* scene)
 		});
 }
 
+void SceneRenderer::UpdateCamera(TimeStep ts) {
+	// Query the entities with a camera component
+	// auto cam = m_Scene->GetEntity("MainCamera");
+
+	m_Controller.OnUpdate(ts);
+}
+
+void SceneRenderer::UpdatePasses() {
+
+}
+
 void SceneRenderer::Render() {
 	Renderer::StartPass(m_DrawPass);
 	{
-		Renderer3D::Begin(m_Scene->GetCamera());
+		Renderer3D::Begin(m_Camera);
 
 		m_RenderSystem.run();
 
@@ -46,10 +58,10 @@ void SceneRenderer::Render() {
 	Renderer::EndPass();
 	
 	if(m_Options.LightingOptions.Enabled) {
-		auto& lights = m_Scene->GetLights();
+		// auto& lights = m_Scene->GetLights();
 		
-		auto shader = m_LightingPass->GetPipeline();
-		shader->Bind();
+		// auto shader = m_LightingPass->GetPipeline();
+		// shader->Bind();
 		// m_Scene->LightBuffer->SetData();
 		// for(const auto& light : m_Scene->GetPointLights()) {
 		// 	shader->SetVec3("u_PointLights[0].Position", light.Position);

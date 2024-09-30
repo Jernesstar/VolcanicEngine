@@ -109,7 +109,7 @@ void Game::LoadScreens() {
 			for(uint32_t i = 1; i <= GameState::Levels.size(); i++) {
 				glm::vec4 color = { 0.3125f, 0.234375f, 0.078125f, 1.0f };
 				if(i > GameState::MaxLevel)
-					color.a = 0.7f; // Buttons for locked levels are darker
+					color.a = 0.7f;
 
 				ui
 				->Add<UI::Button>(color, std::to_string(i))
@@ -149,17 +149,17 @@ void Game::LoadScreens() {
 							{ Control::Forward,  Key::Invalid },
 							{ Control::Backward, Key::Invalid },
 						})
-				);
+					);
 			controller.RotationSpeed = 0.0f;
 
 			auto& currLevel = GameState::GetLevel();
 			currLevel.Load();
 			auto scene = currLevel.GetScene();
-			scene->SetCamera(camera);
-			scene->SetController(controller);
+			// scene->SetCamera(camera);
+			// scene->SetController(controller);
 
 			auto [x, y] = currLevel.PlayerStart;
-			Player player(scene->GetEntityWorld());
+			Player player(scene->EntityWorld);
 			player.Get<TransformComponent>().Translation = { x, 0.0f, y };
 
 			// TODO(Implement): Collision with group

@@ -14,7 +14,7 @@ public:
 
 public:
 	static Ref<Camera> Create(Camera::Type type);
-	static Ref<Camera> Create(Camera::Type type, float fov_rotation);
+	static Ref<Camera> Create(Camera::Type type, float fovOrRotation);
 
 public:
 	Camera(Camera::Type type)
@@ -31,8 +31,6 @@ public:
 							"Near and far clip must not be non-zero");
 	}
 	virtual ~Camera() = default;
-
-	Camera::Type GetType() { return m_Type; }
 
 	void Resize(uint32_t width, uint32_t height) {
 		if(width == ViewportWidth && height == ViewportHeight) {
@@ -82,7 +80,9 @@ public:
 		CalculateView();
 	}
 
-	const glm::vec3& GetPosition() const { return Position; }
+	Camera::Type GetType() const { return m_Type; }
+
+	const glm::vec3& GetPosition()  const { return Position; }
 	const glm::vec3& GetDirection() const { return Direction; }
 
 	const glm::mat4& GetView()           const { return View; }
@@ -119,8 +119,6 @@ protected:
 
 private:
 	const Camera::Type m_Type;
-
-	friend class CameraController;
 };
 
 }

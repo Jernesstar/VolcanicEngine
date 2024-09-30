@@ -1,31 +1,19 @@
 #include "SceneSerializer.h"
+#include "Scene.h"
 
 #include <fstream>
-
-#define YAML_CPP_STATIC_DEFINE
-#include <yaml-cpp/yaml.h>
 
 #include <VolcaniCore/Core/Assert.h>
 #include <VolcaniCore/Core/UUID.h>
 #include <VolcaniCore/Renderer/StereographicCamera.h>
 #include <VolcaniCore/Renderer/OrthographicCamera.h>
 
+#include "Core/Serialize.h"
+
 using namespace Magma::ECS;
 using namespace Magma::Physics;
 
 namespace YAML {
-
-YAML::Emitter& operator <<(YAML::Emitter& out, const glm::vec3& v) {
-	out << YAML::Flow;
-	out << YAML::BeginSeq << v.x << v.y << v.z << YAML::EndSeq;
-	return out;
-}
-
-YAML::Emitter& operator <<(YAML::Emitter& out, const glm::vec4& v) {
-	out << YAML::Flow;
-	out << YAML::BeginSeq << v.x << v.y << v.z << v.w << YAML::EndSeq;
-	return out;
-}
 
 YAML::Emitter& operator <<(YAML::Emitter& out, const VolcaniCore::Vertex& v) {
 	out << YAML::Flow;
@@ -40,64 +28,69 @@ YAML::Emitter& operator <<(YAML::Emitter& out, const VolcaniCore::Vertex& v) {
 namespace Magma {
 
 static void SerializeEntity(YAML::Emitter& out, Entity& entity);
-static void DeserializeEntity(YAML::Node entityNode, Ref<Scene> scene);
+static void DeserializeEntity(YAML::Node entityNode, Scene* scene);
 
-void SceneSerializer::Serialize(Ref<Scene> scene, const std::string& filePath) {
+SceneSerializer::SceneSerializer(Scene* scene)
+	: m_Scene(scene) { }
+
+void SceneSerializer::Serialize(const std::string& path) {
 	YAML::Emitter out;
 	out << YAML::BeginMap; // File
 
 	out << YAML::Key << "Scene" << YAML::BeginMap; // Scene
-	out << YAML::Key << "Name" << YAML::Value <<  scene->Name;
+	out << YAML::Key << "Name" << YAML::Value << m_Scene->Name;
 
-	auto cam = scene->GetCamera();
-	out << YAML::Key << "Camera" << YAML::BeginMap; // Camera
-	out << YAML::Key << "Type" << YAML::Value
-		<< (cam->GetType() == Camera::Type::Stereo ? "Stereographic"
-												   : "Orthographic");
-	if(cam->GetType() == Camera::Type::Stereo) {
-		auto c = cam->As<StereographicCamera>();
-		out << YAML::Key << "VerticalFOV" << YAML::Value << c->GetVerticalFOV();
-	}
-	if(cam->GetType() == Camera::Type::Ortho) {
-		auto c = cam->As<OrthographicCamera>();
-		out << YAML::Key << "Rotation" << YAML::Value << c->GetRotation();
-	}
-	out << YAML::Key << "Position" << YAML::Value << cam->GetPosition();
-	out << YAML::Key << "Direction" << YAML::Value << cam->GetDirection();
-	out << YAML::Key << "ViewportWidth"
-		<< YAML::Value << cam->GetViewportWidth();
-	out << YAML::Key << "ViewportHeight"
-		<< YAML::Value << cam->GetViewportHeight();
-	out << YAML::Key << "Near"	   << YAML::Value << cam->GetNear();
-	out << YAML::Key << "Far"	   << YAML::Value << cam->GetFar();
-	out << YAML::EndMap; // Camera
+	// TODO(Change): Move to SerializeEntity::if(CameraComponent)
+	// auto cam = m_Scene->GetCamera();
+	// out << YAML::Key << "Camera" << YAML::BeginMap; // Camera
+	// out << YAML::Key << "Type" << YAML::Value
+	// 	<< (cam->GetType() == Camera::Type::Stereo ? "Stereographic"
+	// 											   : "Orthographic");
+	// if(cam->GetType() == Camera::Type::Stereo) {
+	// 	auto c = cam->As<StereographicCamera>();
+	// 	out << YAML::Key << "VerticalFOV" << YAML::Value << c->GetVerticalFOV();
+	// }
+	// if(cam->GetType() == Camera::Type::Ortho) {
+	// 	auto c = cam->As<OrthographicCamera>();
+	// 	out << YAML::Key << "Rotation" << YAML::Value << c->GetRotation();
+	// }
+	// out << YAML::Key << "Position" << YAML::Value << cam->GetPosition();
+	// out << YAML::Key << "Direction" << YAML::Value << cam->GetDirection();
+	// out << YAML::Key << "ViewportWidth"
+	// 	<< YAML::Value << cam->GetViewportWidth();
+	// out << YAML::Key << "ViewportHeight"
+	// 	<< YAML::Value << cam->GetViewportHeight();
+	// out << YAML::Key << "Near"	   << YAML::Value << cam->GetNear();
+	// out << YAML::Key << "Far"	   << YAML::Value << cam->GetFar();
+	// out << YAML::EndMap; // Camera
 
 	out << YAML::Key << "Entities" << YAML::BeginSeq; // Entities
-	scene->GetEntityWorld()
+	m_Scene->EntityWorld
 	.ForEach(
-	[&](Entity& entity) {
-		out << YAML::BeginMap; // Entity
-		SerializeEntity(out, entity);
-		out << YAML::EndMap; // Entity
-	});
+		[&](Entity& entity)
+		{
+			out << YAML::BeginMap; // Entity
+			SerializeEntity(out, entity);
+			out << YAML::EndMap; // Entity
+		});
 	out << YAML::EndSeq; // Entities
 
 	out << YAML::EndMap; // Scene
 
 	out << YAML::EndMap; // File
 
-	std::ofstream fout(filePath);
+	std::ofstream fout(path);
 	fout << out.c_str();
 }
 
-Ref<Scene> SceneSerializer::Deserialize(const std::string& filePath) {
+void SceneSerializer::Deserialize(const std::string& path) {
 	YAML::Node file;
 	try {
-		file = YAML::LoadFile(filePath);
+		file = YAML::LoadFile(path);
 	}
 	catch(YAML::ParserException e) {
 		VOLCANICORE_ASSERT_ARGS(false, "Could not load file {0}: {1}",
-										filePath, e.what());
+										path, e.what());
 	}
 	auto scene = file["Scene"];
 	auto camera = scene["Camera"];
@@ -105,36 +98,35 @@ Ref<Scene> SceneSerializer::Deserialize(const std::string& filePath) {
 	VOLCANICORE_ASSERT(scene);
 	VOLCANICORE_ASSERT(camera);
 
-	Ref<Scene> newScene = CreateRef<Scene>(scene["Name"].as<std::string>());
-	auto width	= camera["ViewportWidth"] .as<uint32_t>();
-	auto height = camera["ViewportHeight"].as<uint32_t>();
-	auto near	= camera["Near"]		  .as<float>();
-	auto far	= camera["Far"]			  .as<float>();
-	auto position  = camera["Position"].as<glm::vec3>();
-	auto direction = camera["Direction"].as<glm::vec3>();
-	float fovOrRotation;
-	Camera::Type type;
+	// TODO(Change): Move to DeserializeEntity::if(CameraComponent)
+	// auto width	= camera["ViewportWidth"] .as<uint32_t>();
+	// auto height = camera["ViewportHeight"].as<uint32_t>();
+	// auto near	= camera["Near"]		  .as<float>();
+	// auto far	= camera["Far"]			  .as<float>();
+	// auto position  = camera["Position"].as<glm::vec3>();
+	// auto direction = camera["Direction"].as<glm::vec3>();
+	// float fovOrRotation;
+	// Camera::Type type;
 
-	if(camera["Type"].as<std::string>() == "Stereographic") {
-		fovOrRotation = camera["VerticalFOV"].as<float>();
-		type = Camera::Type::Stereo;
-	}
-	else if(camera["Type"].as<std::string>() == "Orthographic") {
-		fovOrRotation = camera["Rotation"].as<float>();
-		type = Camera::Type::Ortho;
-	}
+	// if(camera["Type"].as<std::string>() == "Stereographic") {
+	// 	fovOrRotation = camera["VerticalFOV"].as<float>();
+	// 	type = Camera::Type::Stereo;
+	// }
+	// else if(camera["Type"].as<std::string>() == "Orthographic") {
+	// 	fovOrRotation = camera["Rotation"].as<float>();
+	// 	type = Camera::Type::Ortho;
+	// }
 
-	Ref<Camera> newCam = Camera::Create(type, fovOrRotation);
-	newCam->Resize(width, height);
-	newCam->SetProjection(near, far);
-	newCam->SetPositionDirection(position, direction);
+	// Ref<Camera> newCam = Camera::Create(type, fovOrRotation);
+	// newCam->Resize(width, height);
+	// newCam->SetProjection(near, far);
+	// newCam->SetPositionDirection(position, direction);
 
-	newScene->SetCamera(newCam);
+	m_Scene->Name = scene["Name"].as<std::string>();
+	// newScene->SetCamera(newCam);
 
 	for(auto node : scene["Entities"])
-		DeserializeEntity(node["Entity"], newScene);
-
-	return newScene;
+		DeserializeEntity(node["Entity"], m_Scene);
 }
 
 void SerializeEntity(YAML::Emitter& out, Entity& entity) {
@@ -153,7 +145,7 @@ void SerializeEntity(YAML::Emitter& out, Entity& entity) {
 		if(mesh->Path != "") {
 			out << YAML::Key << "Path" << YAML::Value << mesh->Path;
 		}
-		else{
+		else {
 			out << YAML::Key << "Vertices" << YAML::Flow << mesh->GetVertices();
 			out << YAML::Key << "Indices" << YAML::Flow << mesh->GetIndices();
 
@@ -241,9 +233,9 @@ void SerializeEntity(YAML::Emitter& out, Entity& entity) {
 	out << YAML::EndMap; // Entity
 }
 
-void DeserializeEntity(YAML::Node entityNode, Ref<Scene> scene) {
+void DeserializeEntity(YAML::Node entityNode, Scene* scene) {
 	VolcaniCore::UUID id(entityNode["ID"].as<uint64_t>());
-	Entity entity = scene->GetEntityWorld().AddEntity(id);
+	Entity entity = scene->EntityWorld.AddEntity(id);
 
 	auto components = entityNode["Components"];
 	if(!components) return;
@@ -314,11 +306,11 @@ void DeserializeEntity(YAML::Node entityNode, Ref<Scene> scene) {
 		RigidBody::Type type = (typeStr == "Static") ? RigidBody::Type::Static
 							 						 : RigidBody::Type::Dynamic;
 		Shape::Type shapeType;
-		if(shapeTypeStr == "Box")		   shapeType = Shape::Type::Box;
-		if(shapeTypeStr == "Sphere")	   shapeType = Shape::Type::Sphere;
-		if(shapeTypeStr == "Plane")		   shapeType = Shape::Type::Plane;
-		if(shapeTypeStr == "Capsule")	   shapeType = Shape::Type::Capsule;
-		if(shapeTypeStr == "Mesh") shapeType = Shape::Type::Mesh;
+		if(shapeTypeStr == "Box")	  shapeType = Shape::Type::Box;
+		if(shapeTypeStr == "Sphere")  shapeType = Shape::Type::Sphere;
+		if(shapeTypeStr == "Plane")	  shapeType = Shape::Type::Plane;
+		if(shapeTypeStr == "Capsule") shapeType = Shape::Type::Capsule;
+		if(shapeTypeStr == "Mesh")	  shapeType = Shape::Type::Mesh;
 
 		if(shapeType != Shape::Type::Mesh) {
 			Ref<Shape> shape = Shape::Create(shapeType);

@@ -17,12 +17,11 @@ project "flecs"
     }
 
     defines {
-        "flecs_STATIC",
-        "FLECS_DEBUG",
-        -- "FLECS_CUSTOM_BUILD",
-        -- "FLECS_CPP",
-        -- "FLECS_SYSTEM",
-        -- "FLECS_PIPELINE"
+        -- "FLECS_DEBUG",
+        "FLECS_CUSTOM_BUILD",
+        "FLECS_CPP",
+        "FLECS_SYSTEM",
+        "FLECS_PIPELINE"
         -- "FLECS_ALERTS",
         -- "FLECS_LOG",
         -- "FLECS_METRICS",
