@@ -34,7 +34,7 @@ public:
 
 	template<typename T>
 	UniformBuffer(const BufferLayout& layout, uint32_t binding,
-				  Buffer<T> buffer)
+				  const Buffer<T>& buffer)
 		: Layout(layout), Binding(binding),
 			Count(buffer.GetCount()), Size(buffer.GetSize())
 	{
@@ -55,7 +55,7 @@ public:
 	}
 
 	template<typename T>
-	void SetData(Buffer<T> buffer, uint32_t offset = 0) {
+	void SetData(const Buffer<T>& buffer, uint32_t offset = 0) {
 		SetData(buffer.Get(), buffer.GetSize(), offset);
 	}
 

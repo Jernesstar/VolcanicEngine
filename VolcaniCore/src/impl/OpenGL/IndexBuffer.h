@@ -23,7 +23,7 @@ public:
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
 
-	IndexBuffer(Buffer<uint32_t> buffer, bool dynamic = false)
+	IndexBuffer(const Buffer<uint32_t>& buffer, bool dynamic = false)
 		: Count(buffer.GetCount()), Size(buffer.GetSize())
 	{
 		glCreateBuffers(1, &m_BufferID);
@@ -61,7 +61,7 @@ public:
 		
 	}
 
-	void SetData(Buffer<uint32_t> buffer, uint32_t offset = 0) {
+	void SetData(const Buffer<uint32_t>& buffer, uint32_t offset = 0) {
 		SetData(buffer.Get(), buffer.GetCount(), offset);
 	}
 

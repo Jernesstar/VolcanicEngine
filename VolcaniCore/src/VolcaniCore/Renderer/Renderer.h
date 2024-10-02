@@ -47,11 +47,16 @@ struct DrawCommand {
 	Map<Ref<Line>,  Buffer<glm::mat4>> Lines;
 	Map<Ref<Mesh>,  Buffer<glm::mat4>> Meshes;
 
+	Map<Ref<Point>, Uniforms> PointUniforms;
+	Map<Ref<Line>,  Uniforms> LineUniforms;
+	Map<Ref<Mesh>,  Uniforms> MeshUniforms;
+
 	void AddPoint(Ref<Point> point, const glm::mat4& transform);
 	void AddLine(Ref<Line> line,	const glm::mat4& transform);
 	void AddMesh(Ref<Mesh> mesh,	const glm::mat4& transform);
 
 	Uniforms& GetUniforms() { return PerUniforms; }
+	Uniforms& GetUniforms(Ref<Mesh> mesh) { return MeshUniforms[mesh]; }
 };
 
 struct FrameDebugInfo {
@@ -66,8 +71,6 @@ struct FrameDebugInfo {
 struct FrameData {
 	List<DrawCommand> DrawCommands;
 	FrameDebugInfo Info;
-
-	void AddDrawCommand(DrawCommand& command);
 };
 
 class Renderer {

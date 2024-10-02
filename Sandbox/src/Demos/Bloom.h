@@ -125,9 +125,10 @@ void Bloom::OnUpdate(TimeStep ts) {
 		Renderer::Clear();
 		Renderer3D::Begin(camera);
 
+		rotation += (float)ts * 0.001;
 		Renderer3D::DrawMesh(cube,
 			{
-				.Rotation = { (rotation += (float)ts) * 0.003f, 0.0f, 0.0f }
+				.Rotation = rotation * glm::vec3{ 3.0f, 2.0f, 0.1f }
 			});
 
 		Renderer3D::End();

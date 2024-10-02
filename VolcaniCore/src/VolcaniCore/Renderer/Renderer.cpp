@@ -9,7 +9,7 @@
 namespace VolcaniCore {
 
 static void FlushCommand(DrawCommand& command);
-static List<DrawCall> CreateDrawCalls(DrawCommand& command);
+static void FlushDrawCalls(DrawCommand& command);
 static DrawOptionsMap GetOrReturnDefaults(const DrawOptionsMap& map);
 
 const uint64_t Renderer::MaxTriangles = 1'000'000;
@@ -57,7 +57,6 @@ void DrawCommand::AddMesh(Ref<Mesh> mesh, const glm::mat4& transform) {
 	if(OptionsMap[DrawPrimitive::Mesh].Partition != DrawPartition::Instanced)
 		return;
 
-	// TODO(Fix): Crash here
 	// First mesh of its kind in the DrawCommand
 	if(Meshes.count(mesh) == 0)
 		Meshes[mesh] = TransformBuffer.Partition(400);
@@ -67,10 +66,7 @@ void DrawCommand::AddMesh(Ref<Mesh> mesh, const glm::mat4& transform) {
 	}
 
 	Meshes[mesh].Add(transform);
-}
-
-void FrameData::AddDrawCommand(DrawCommand& command) {
-	DrawCommands.push_back(command);
+	TransformCount++;
 }
 
 void Renderer::Init() {
@@ -131,7 +127,7 @@ void Renderer::NewDrawCommand(const DrawOptionsMap& map) {
 		.Pass = s_RenderPass,
 		.OptionsMap = newMap,
 	};
-	s_Frame.AddDrawCommand(newCommand);
+	s_Frame.DrawCommands.push_back(newCommand);
 
 	std::size_t lastIndex = s_Frame.DrawCommands.size() - 1;
 	s_DrawCommand = &s_Frame.DrawCommands[lastIndex];
@@ -192,10 +188,7 @@ void FlushCommand(DrawCommand& command) {
 	if(command.Clear)
 		RendererAPI::Get()->Clear();
 
-	// TODO(Fix): ProcessDrawCalls: Flush draw calls if data becomes to big
-	for(auto& call : CreateDrawCalls(command)) {
-		RendererAPI::Get()->SubmitDrawCall(call);
-	}
+	FlushDrawCalls(command);
 
 	// RendererAPI::Get()->SetOptions(oldOptions);
 
@@ -208,11 +201,10 @@ void FlushCommand(DrawCommand& command) {
 	s_DrawCommand = &command;
 }
 
-List<DrawCall> CreateDrawCalls(DrawCommand& command) {
-	List<DrawCall> calls;
+void FlushDrawCalls(DrawCommand& command) {
 	if(command.Points.size() == 0
 	&& command.Lines.size()  == 0
-	&& command.Meshes.size() == 0) return calls;
+	&& command.Meshes.size() == 0) return;
 
 	auto& options = command.OptionsMap;
 	// // TODO(Implement):
@@ -255,7 +247,7 @@ List<DrawCall> CreateDrawCalls(DrawCommand& command) {
 	if(options[DrawPrimitive::Mesh].Partition == DrawPartition::Multi) {
 		// TODO(Implement):
 
-		return calls;
+		return;
 	}
 
 	for(auto& [mesh, transforms] : command.Meshes) {
@@ -265,30 +257,28 @@ List<DrawCall> CreateDrawCalls(DrawCommand& command) {
 			.Primitive = DrawPrimitive::Mesh
 		};
 
-		// auto& verts = mesh->GetVertices();
-		// meshCall.GeometryBuffer = GeometryBuffer.Partition(verts.size());
-		// meshCall.GeometryBuffer.Add(verts);
+		auto& verts = mesh->GetVertices();
+		meshCall.GeometryBuffer = GeometryBuffer.Partition(verts.size());
+		meshCall.GeometryBuffer.Add(verts);
 
-		// if(meshCall.Type == DrawType::Indexed) {
-		// 	auto& indices = mesh->GetIndices();
-		// 	meshCall.IndexBuffer = IndexBuffer.Partition(indices.size());
-		// 	meshCall.IndexBuffer.Add(indices);
-		// }
-		// if(meshCall.Partition == DrawPartition::Instanced)
-		// 	meshCall.TransformBuffer = transforms.Partition();
+		if(meshCall.Type == DrawType::Indexed) {
+			auto& indices = mesh->GetIndices();
+			meshCall.IndexBuffer = IndexBuffer.Partition(indices.size());
+			meshCall.IndexBuffer.Add(indices);
+		}
+		if(meshCall.Partition == DrawPartition::Instanced)
+			meshCall.TransformBuffer = std::move(transforms);
 
-		// calls.push_back(meshCall);
+		command.Pass->SetUniforms(command.GetUniforms(mesh));
+		RendererAPI::Get()->SubmitDrawCall(meshCall);
 
-		// uint64_t trCount = meshCall.TransformBuffer.GetCount();
-		// trCount = trCount ? trCount : 1;
+		uint64_t trCount = meshCall.TransformBuffer.GetCount();
+		trCount = trCount ? trCount : 1;
 
-		// DrawCallCount++;
-		// IndexCount     += meshCall.IndexBuffer.GetCount()    * trCount;
-		// VertexCount    += meshCall.GeometryBuffer.GetCount() * trCount;
-		// TransformCount += trCount;
+		DrawCallCount++;
+		IndexCount  += meshCall.IndexBuffer.GetCount()    * trCount;
+		VertexCount += meshCall.GeometryBuffer.GetCount() * trCount;
 	}
-
-	return calls;
 }
 
 DrawOptionsMap GetOrReturnDefaults(const DrawOptionsMap& map) {

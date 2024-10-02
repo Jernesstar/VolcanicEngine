@@ -12,9 +12,6 @@ public:
 
 private:
 	Ref<Scene> scene;
-
-	Ref<ShaderPipeline> shader;
-	Ref<RenderPass> renderPass;
 };
 
 ECS::ECS() {
@@ -26,7 +23,6 @@ ECS::ECS() {
 		});
 
 	scene = CreateRef<Scene>();
-	// scene->SetCamera(CreateRef<StereographicCamera>());
 	auto& world = scene->EntityWorld;
 
 	Magma::ECS::Entity entity = Magma::ECS::EntityBuilder(world)
@@ -35,13 +31,13 @@ ECS::ECS() {
 		Material{
 			.Diffuse = Texture::Create("Sandbox/assets/images/wood.png")
 		})
-	.Add<RigidBodyComponent>(RigidBody::Type::Static)
+	// .Add<RigidBodyComponent>(RigidBody::Type::Static)
 	.Finalize();
 
 	Magma::ECS::Entity ball = Magma::ECS::EntityBuilder(world)
 	.Add<TransformComponent>(Transform{ .Translation = { 0.0f, 0.0f, -3.0f } })
 	.Add<MeshComponent>("Sandbox/assets/models/sphere/wooden_sphere.obj")
-	.Add<RigidBodyComponent>(RigidBody::Type::Static)
+	// .Add<RigidBodyComponent>(RigidBody::Type::Static)
 	.Finalize();
 
 	scene->Save("Sandbox/assets/scenes/test.volc");
@@ -51,30 +47,18 @@ ECS::ECS() {
 
 	test->EntityWorld
 	.ForEach(
-	[](Entity& entity) {
-		VOLCANICORE_LOG_INFO("Path: '%s'", entity.Get<MeshComponent>().Mesh->Path.c_str());
-	});
+		[](Entity& entity)
+		{
+			VOLCANICORE_LOG_INFO("Path: '%s'",
+				entity.Get<MeshComponent>().Mesh->Path.c_str());
+		});
 
 	VOLCANICORE_LOG_INFO("Success");
-
-	shader = ShaderPipeline::Create({
-		{ "VolcaniCore/assets/shaders/Mesh.glsl.vert", ShaderType::Vertex },
-		{ "VolcaniCore/assets/shaders/Mesh.glsl.frag", ShaderType::Fragment }
-	});
-
-	renderPass = RenderPass::Create("Render Pass", shader);
 }
 
 void ECS::OnUpdate(TimeStep ts) {
 	scene->OnUpdate(ts);
-
-	Renderer::StartPass(renderPass);
-	{
-		Renderer::Clear();
-
-		scene->OnRender();
-	}
-	Renderer::EndPass();
+	scene->OnRender();
 }
 
 }

@@ -36,7 +36,7 @@ SceneRenderer::SceneRenderer(Scene* scene)
 			Renderer3D::DrawMesh(mc.Mesh, tr);
 		});
 
-	m_Camera = CreateRef<StereographicCamera>();
+	m_Camera = CreateRef<StereographicCamera>(75.0f);
 }
 
 void SceneRenderer::UpdateCamera(TimeStep ts) {
@@ -46,7 +46,8 @@ void SceneRenderer::UpdateCamera(TimeStep ts) {
 	m_Camera->Resize(camera.ViewportWidth, camera.ViewportHeight);
 	m_Camera->SetPositionDirection(camera.Position, camera.Direction);
 
-	CameraController controller;
+	// TODO(CameraController entity)
+	CameraController controller{ m_Camera };
 	Buffer<Light> lights;
 
 	controller.OnUpdate(ts);

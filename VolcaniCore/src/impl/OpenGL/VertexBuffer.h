@@ -69,7 +69,7 @@ public:
 	}
 
 	template<typename T>
-	void SetData(Buffer<T> buffer, uint32_t offset = 0) {
+	void SetData(const Buffer<T>& buffer, uint32_t offset = 0) {
 		SetData(buffer.Get(), buffer.GetCount(), offset);
 	}
 

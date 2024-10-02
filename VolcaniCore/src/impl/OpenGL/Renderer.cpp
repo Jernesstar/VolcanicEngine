@@ -159,7 +159,9 @@ void Renderer::Init() {
 	s_Data.Array->AddVertexBuffer(s_Data.TransformBuffer);
 }
 
-void Renderer::Close() { }
+void Renderer::Close() {
+	s_Data.Array.reset();
+}
 
 void Renderer::SetOptions(const RendererAPI::Options& options) {
 	glDisable(GL_DEPTH_TEST);
@@ -179,10 +181,10 @@ void Renderer::SetOptions(const RendererAPI::Options& options) {
 }
 
 void Renderer::StartFrame() {
-
+	s_Data.Array->Bind();
 }
 void Renderer::EndFrame() {
-
+	s_Data.Array->Unbind();
 }
 
 void Renderer::Clear(const glm::vec4& color) {
@@ -200,7 +202,6 @@ static void DrawPoint(DrawCall& call) {
 	auto& transforms = call.TransformBuffer;
 	uint32_t instanceCount = transforms.GetCount();
 
-	s_Data.Array->Bind();
 	s_Data.GeometryBuffer->SetData(geometry);
 	s_Data.TransformBuffer->SetData(transforms);
 
@@ -213,7 +214,6 @@ static void DrawLine(DrawCall& call) {
 	auto& transforms = call.TransformBuffer;
 	uint32_t instanceCount = transforms.GetCount();
 
-	s_Data.Array->Bind();
 	s_Data.GeometryBuffer->SetData(geometry);
 	s_Data.TransformBuffer->SetData(transforms);
 
@@ -232,7 +232,6 @@ static void DrawMesh(DrawCall& call) {
 	uint32_t indexCount = indices.GetCount();
 	uint32_t instanceCount = transforms.GetCount();
 
-	s_Data.Array->Bind();
 	s_Data.GeometryBuffer->SetData(geometry);
 
 	if(call.Type == DrawType::Indexed)

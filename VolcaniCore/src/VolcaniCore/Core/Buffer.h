@@ -10,10 +10,10 @@ template<typename T>
 class Buffer {
 public:
 	Buffer() = default;
-	Buffer(uint64_t count)
-		: m_MaxCount(count), m_Count(0)
+	Buffer(uint64_t maxCount)
+		: m_MaxCount(maxCount), m_Count(0)
 	{
-		if(count != 0)
+		if(maxCount != 0)
 			m_Data = new T[m_MaxCount];
 	}
 	Buffer(const Buffer& other)
@@ -27,10 +27,10 @@ public:
 	{
 		std::swap(m_Data, other.m_Data);
 	}
-	Buffer(Buffer<T>& buffer, uint64_t count)
-		: m_MaxCount(buffer.GetMaxCount() - count), m_Count(0)
+	Buffer(T* buffer, uint64_t maxCount = 0)
+		: m_MaxCount(maxCount), m_Count(0)
 	{
-		m_Data = buffer.Get() + count;
+		m_Data = (T*)buffer;
 	}
 	Buffer(const List<T>& list)
 		: m_MaxCount(list.size()), m_Count(list.size())
@@ -38,24 +38,13 @@ public:
 		m_Data = new T[m_MaxCount];
 		memcpy(m_Data, list.data(), GetSize());
 	}
-	Buffer(T* buffer, uint64_t count = 0)
-		: m_MaxCount(count), m_Count(count)
-	{
-		m_Data = (T*)buffer;
-	}
 
 	~Buffer() {
-		if(m_MaxCount != 0) // We do infact own this point
+		if(m_MaxCount != 0) // We do in fact own this pointer
 			Delete();
 	}
 
-	Buffer& operator =(const Buffer& other) {
-		memcpy(m_Data, other.m_Data, other.GetSize());
-		m_MaxCount = other.m_MaxCount;
-		m_Count = other.m_Count;
-		return *this;
-	}
-
+	Buffer& operator =(const Buffer& other) = delete;
 	Buffer& operator =(Buffer&& other) {
 		std::swap(m_Data, other.m_Data);
 		m_MaxCount = other.m_MaxCount;
@@ -77,35 +66,31 @@ public:
 	uint64_t GetMaxSize()  const { return m_MaxCount * sizeof(T); }
 
 	Buffer<T> Copy() {
-		Buffer<T> newBuffer(m_MaxCount);
-		newBuffer.Add(*this);
-
-		return newBuffer;
+		return Buffer<T>(*this);
 	}
 
-	Buffer<T>&& Partition(uint32_t count = 0) {
-		Buffer<T> newBuffer;
-		newBuffer.m_Data = this->m_Data + this->m_Count;
-		this->m_Count += count ? count : this->m_MaxCount - this->m_Count;
-
-		return newBuffer;
+	Buffer<T> Partition(uint32_t count = 0) {
+		if(count == 0)
+			count = m_MaxCount;
+		m_Count += count;
+		return Buffer<T>(m_Data + (m_Count - count), 0);
 	}
 
 	void Add(const T& element) {
-		if(m_Count >= m_MaxCount)
+		if(m_MaxCount != 0 && m_Count >= m_MaxCount)
 			Reallocate(100);
 
 		m_Data[m_Count++] = element;
 	}
 	void Add(const Buffer& buffer) {
-		if(m_Count + buffer.GetCount() >= m_MaxCount)
+		if(m_MaxCount != 0 && m_Count + buffer.GetCount() >= m_MaxCount)
 			Reallocate(buffer.GetCount());
 
 		memcpy(m_Data + m_Count, buffer.Get(), buffer.GetSize());
 		m_Count += buffer.GetCount();
 	}
 	void Add(const List<T>& list) {
-		if(m_Count + list.size() >= m_MaxCount)
+		if(m_MaxCount != 0 && m_Count + list.size() >= m_MaxCount)
 			Reallocate(list.size());
 
 		memcpy(m_Data + m_Count, list.data(), list.size() * sizeof(T));
