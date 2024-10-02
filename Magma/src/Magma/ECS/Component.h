@@ -16,6 +16,19 @@ struct Component {
 	virtual ~Component() = default;
 };
 
+struct CameraComponent : public Component {
+	Camera::Type CameraType = Camera::Type::Stereo;
+	uint32_t ViewportWidth = 100;
+	uint32_t ViewportHeight = 100;
+	float Near = 0.01f;
+	float Far  = 1000.0f;
+	glm::vec3 Position = { 0.0f, 0.0f, 0.0f };
+	glm::vec3 Direction = { 0.0f, 0.0f, -1.0f };
+
+	CameraComponent() = default;
+	CameraComponent(const CameraComponent& other) = default;
+};
+
 struct MeshComponent : public Component {
 	Ref<VolcaniCore::Mesh> Mesh;
 
@@ -88,19 +101,6 @@ struct ScriptComponent : public Component {
 		// ScriptEngine::LoadScript(path);
 	}
 	ScriptComponent(const ScriptComponent& other) = default;
-};
-
-struct CameraComponent : public Component {
-	Camera::Type CameraType;
-	uint32_t ViewportWidth = 100, ViewportHeight = 100;
-
-	CameraComponent() = default;
-	CameraComponent(const Camera& cam)
-		: CameraType(cam.GetType()),
-			ViewportWidth(cam.GetViewportWidth()),
-			ViewportHeight(cam.GetViewportHeight()) { }
-	// CameraComponent()
-	CameraComponent(const CameraComponent& other) = default;
 };
 
 }

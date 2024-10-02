@@ -25,51 +25,48 @@ static Buffer<uint32_t> IndexBuffer;
 static Buffer<Vertex> GeometryBuffer;
 static Buffer<glm::mat4> TransformBuffer;
 
-static uint32_t DrawCallCount;
-static uint32_t IndexCount;
-static uint32_t VertexCount;
+static uint64_t GeometryIndex;
+static uint64_t IndicesIndex;
 
-static uint32_t TransformCount;
-
-static uint32_t GeometryIndex;
-static uint32_t IndicesIndex;
+static uint64_t DrawCallCount;
+static uint64_t IndexCount;
+static uint64_t VertexCount;
+static uint64_t TransformCount;
 
 void DrawCommand::AddPoint(Ref<Point> point, const glm::mat4& transform) {
-	if(OptionsMap[DrawPrimitive::Point].Partition != DrawPartition::Instanced) {
-		Points[point] = Buffer<glm::mat4>();
+	if(OptionsMap[DrawPrimitive::Point].Partition != DrawPartition::Instanced)
 		return;
-	}
 
 	if(Points.count(point) == 0)
-		Points[point] = Buffer<glm::mat4>(TransformBuffer, TransformCount);
+		Points[point] = TransformBuffer.Partition(400);
 
 	Points[point].Add(transform);
 }
 
 void DrawCommand::AddLine(Ref<Line> line, const glm::mat4& transform) {
-	if(OptionsMap[DrawPrimitive::Line].Partition != DrawPartition::Instanced) {
-		Lines[line] = Buffer<glm::mat4>();
+	if(OptionsMap[DrawPrimitive::Line].Partition != DrawPartition::Instanced)
 		return;
-	}
 
 	if(Lines.count(line) == 0)
-		Lines[line] = Buffer<glm::mat4>(TransformBuffer, TransformCount);
+		Lines[line] = TransformBuffer.Partition(400);
 
 	Lines[line].Add(transform);
 }
 
 void DrawCommand::AddMesh(Ref<Mesh> mesh, const glm::mat4& transform) {
-	if(OptionsMap[DrawPrimitive::Mesh].Partition != DrawPartition::Instanced) {
-		Meshes[mesh] = Buffer<glm::mat4>();
+	if(OptionsMap[DrawPrimitive::Mesh].Partition != DrawPartition::Instanced)
 		return;
+
+	// TODO(Fix): Crash here
+	// First mesh of its kind in the DrawCommand
+	if(Meshes.count(mesh) == 0)
+		Meshes[mesh] = TransformBuffer.Partition(400);
+
+	if(Meshes[mesh].GetCount() >= 400) {
+		return; // TODO(Implement): What do we do now?
 	}
 
-	// TODO(Fix): Support multiple meshes
-	if(Meshes.count(mesh) == 0)
-		Meshes[mesh] = Buffer<glm::mat4>(TransformBuffer, TransformCount);
-
 	Meshes[mesh].Add(transform);
-	TransformCount++;
 }
 
 void FrameData::AddDrawCommand(DrawCommand& command) {
@@ -268,27 +265,27 @@ List<DrawCall> CreateDrawCalls(DrawCommand& command) {
 			.Primitive = DrawPrimitive::Mesh
 		};
 
-		meshCall.GeometryBuffer = Buffer<Vertex>(GeometryBuffer, GeometryIndex);
-		meshCall.GeometryBuffer.Add(mesh->GetVertices());
+		// auto& verts = mesh->GetVertices();
+		// meshCall.GeometryBuffer = GeometryBuffer.Partition(verts.size());
+		// meshCall.GeometryBuffer.Add(verts);
 
-		if(meshCall.Type == DrawType::Indexed) {
-			meshCall.IndexBuffer = Buffer<uint32_t>(IndexBuffer, IndicesIndex);
-			meshCall.IndexBuffer.Add(mesh->GetIndices());
-		}
-		if(meshCall.Partition == DrawPartition::Instanced)
-			meshCall.TransformBuffer = transforms;
+		// if(meshCall.Type == DrawType::Indexed) {
+		// 	auto& indices = mesh->GetIndices();
+		// 	meshCall.IndexBuffer = IndexBuffer.Partition(indices.size());
+		// 	meshCall.IndexBuffer.Add(indices);
+		// }
+		// if(meshCall.Partition == DrawPartition::Instanced)
+		// 	meshCall.TransformBuffer = transforms.Partition();
 
-		calls.push_back(meshCall);
+		// calls.push_back(meshCall);
 
-		GeometryIndex += meshCall.GeometryBuffer.GetCount();
-		IndicesIndex  += meshCall.IndexBuffer.GetCount();
+		// uint64_t trCount = meshCall.TransformBuffer.GetCount();
+		// trCount = trCount ? trCount : 1;
 
-		uint32_t multiple = meshCall.TransformBuffer.GetCount();
-		multiple = multiple != 0 ? multiple : 1;
-
-		DrawCallCount++;
-		IndexCount  += meshCall.IndexBuffer.GetCount()    * multiple;
-		VertexCount += meshCall.GeometryBuffer.GetCount() * multiple;
+		// DrawCallCount++;
+		// IndexCount     += meshCall.IndexBuffer.GetCount()    * trCount;
+		// VertexCount    += meshCall.GeometryBuffer.GetCount() * trCount;
+		// TransformCount += trCount;
 	}
 
 	return calls;

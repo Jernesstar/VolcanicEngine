@@ -28,7 +28,7 @@ void CameraController::SetCamera(Ref<Camera> camera) {
 
 void CameraController::OnUpdate(TimeStep ts) {
 	glm::vec2 mousePosition = Input::GetMousePosition();
-	glm::vec2 delta = (mousePosition - m_LastMousePosition);
+	glm::vec2 delta = (mousePosition - m_LastMousePosition) * 0.001f;
 	m_LastMousePosition = mousePosition;
 
 	if(Input::MouseButtonPressed(Mouse::LeftButton))
@@ -48,7 +48,7 @@ void CameraController::OnUpdate(TimeStep ts) {
 	glm::vec3 forward = m_Camera->GetDirection();
 	glm::vec3 right = glm::normalize(glm::cross(forward, up));
 
-	glm::ivec3 inputDir(0.0f);
+	glm::ivec3 inputDir(0);
 	glm::vec3 moveDir(0.0f);
 	inputDir.x = Input::KeyPressed(m_Controls[Control::Right])
 			   - Input::KeyPressed(m_Controls[Control::Left]);
@@ -60,7 +60,7 @@ void CameraController::OnUpdate(TimeStep ts) {
 	moveDir += (float)inputDir.y * up;
 	moveDir += (float)inputDir.z * forward;
 
-	if(moved = inputDir.x || inputDir.y || inputDir.z)
+	if(moved = (inputDir.x || inputDir.y || inputDir.z))
 		finalPos += glm::normalize(moveDir) * moveSpeed * (float)ts;
 
 	if(moved |= (delta != glm::vec2(0.0f) && RotationSpeed != 0.0f)) {

@@ -116,7 +116,7 @@ Cube::Cube()
 
 	controller.SetCamera(camera);
 	// controller.RotationSpeed = 0.0f;
-	controller.TranslationSpeed = 5.0f;
+	controller.TranslationSpeed = 20.0f;
 }
 
 Cube::~Cube() {
@@ -153,13 +153,20 @@ void Cube::OnUpdate(TimeStep ts) {
 
 		Renderer3D::Begin(camera);
 
-		for(int y = -100; y < 100; y++)
-			for(int x = -100; x < 100; x++)
-				Renderer3D::DrawMesh(torch, { .Translation = { x, 1.0f, y } });		
+		// for(int y = -100; y < 100; y++)
+		// 	for(int x = -100; x < 100; x++)
+		// 		Renderer3D::DrawMesh(torch, { .Translation = { x, 1.0f, y } });		
+		
+		// Renderer::NewDrawCommand();
+		// for(int y = -100; y < 100; y++)
+		// 	for(int x = -100; x < 100; x++)
+		// 		Renderer3D::DrawMesh(cube, { .Translation = { x, 0.0f, y } });
 
-		for(int y = -100; y < 100; y++)
-			for(int x = -100; x < 100; x++)
+		for(int y = -20; y < 20; y++)
+			for(int x = -20; x < 20; x++) {
+				Renderer3D::DrawMesh(torch, { .Translation = { x, 1.0f, y } });
 				Renderer3D::DrawMesh(cube, { .Translation = { x, 0.0f, y } });
+			}
 
 		Renderer3D::End();
 	}

@@ -3,6 +3,8 @@
 
 #include <VolcaniCore/Renderer/Renderer.h>
 #include <VolcaniCore/Renderer/Renderer3D.h>
+#include <VolcaniCore/Renderer/StereographicCamera.h>
+#include <VolcaniCore/Renderer/OrthographicCamera.h>
 
 using namespace Magma::ECS;
 
@@ -33,13 +35,21 @@ SceneRenderer::SceneRenderer(Scene* scene)
 
 			Renderer3D::DrawMesh(mc.Mesh, tr);
 		});
+
+	m_Camera = CreateRef<StereographicCamera>();
 }
 
 void SceneRenderer::UpdateCamera(TimeStep ts) {
-	// Query the entities with a camera component
-	// auto cam = m_Scene->GetEntity("MainCamera");
+	auto cameraEntity = m_Scene->EntityWorld.GetEntity("MainCamera");
+	auto& camera = cameraEntity.Get<CameraComponent>();
 
-	m_Controller.OnUpdate(ts);
+	m_Camera->Resize(camera.ViewportWidth, camera.ViewportHeight);
+	m_Camera->SetPositionDirection(camera.Position, camera.Direction);
+
+	CameraController controller;
+	Buffer<Light> lights;
+
+	controller.OnUpdate(ts);
 }
 
 void SceneRenderer::UpdatePasses() {

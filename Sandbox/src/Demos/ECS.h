@@ -19,14 +19,15 @@ private:
 
 ECS::ECS() {
 	Events::RegisterListener<KeyPressedEvent>(
-	[](const KeyPressedEvent& event) {
-		if(event.Key == Key::Escape)
-			Application::Close();
-	});
+		[](const KeyPressedEvent& event)
+		{
+			if(event.Key == Key::Escape)
+				Application::Close();
+		});
 
 	scene = CreateRef<Scene>();
 	// scene->SetCamera(CreateRef<StereographicCamera>());
-	auto& world = scene->GetEntityWorld();
+	auto& world = scene->EntityWorld;
 
 	Magma::ECS::Entity entity = Magma::ECS::EntityBuilder(world)
 	.Add<TransformComponent>(Transform{ .Translation = { 0.0f, 0.0f, -3.0f } })
@@ -45,7 +46,7 @@ ECS::ECS() {
 
 	scene->Save("Sandbox/assets/scenes/test.volc");
 
-	Ref<Scene> test = CreateRef<Scene>()
+	Ref<Scene> test = CreateRef<Scene>();
 	test->Load("Sandbox/assets/scenes/test.volc");
 
 	test->EntityWorld

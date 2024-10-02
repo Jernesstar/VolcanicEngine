@@ -51,10 +51,7 @@ private:
 	Ref<RenderPass> m_DrawPass;
 	Ref<RenderPass> m_LightingPass;
 	
-	// TODO(Fix): Turn into Entitys
 	Ref<Camera> m_Camera;
-	CameraController m_Controller;
-	Buffer<Light> m_Lights;
 
 	flecs::system m_RenderSystem;
 };
