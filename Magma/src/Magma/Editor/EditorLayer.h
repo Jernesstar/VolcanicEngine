@@ -10,8 +10,9 @@
 
 #include <VolcaniCore/Renderer/Camera.h>
 
-// #include "Scene.h"
-// #include "SceneHierarchyPanel.h"
+#include "Scene/Scene.h"
+
+#include "SceneHierarchyPanel.h"
 
 using namespace VolcaniCore;
 
@@ -26,9 +27,8 @@ public:
 	void Render();
 
 private:
-	// Ref<Scene> m_CurrentScene;
-	// Ref<SceneHierarchyPanel> m_SceneHierarchyPanel;
-	Ref<Framebuffer> m_Framebuffer;
+	Ref<Scene> m_CurrentScene;
+	Ref<SceneHierarchyPanel> m_SceneHierarchyPanel;
 	Ref<Texture> m_IconPlay, m_IconPause, m_IconStop;
 	
 	enum class SceneState { Edit, Play, Pause };
@@ -46,12 +46,12 @@ private:
 
 	void AddEntity();
 
-	void UI_Toolbar();
-	void OpenProject() { }
-	void SaveSceneAs() { }
-	void OnScenePlay() { }
-	void OnScenePause() { }
-	void OnSceneStop() { }
+	void ToolbarUI();
+	// void OpenProject();
+	// void SaveSceneAs();
+	// void OnScenePlay();
+	// void OnScenePause();
+	// void OnSceneStop();
 };
 
 }

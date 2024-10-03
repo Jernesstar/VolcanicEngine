@@ -17,9 +17,6 @@ SceneRenderer::SceneRenderer(Scene* scene)
 	shader = ShaderPipeline::Create("VolcaniCore/assets/shaders", "Mesh");
 	m_DrawPass = RenderPass::Create("Draw", shader);
 
-	shader = ShaderPipeline::Create("VolcaniCore/assets/shaders", "Lighting");
-	m_LightingPass = RenderPass::Create("Lighting", shader);
-
 	auto& world = m_Scene->EntityWorld.Get();
 	m_RenderSystem = world
 	.system<const TransformComponent, const MeshComponent>("RenderSystem")
@@ -37,10 +34,17 @@ SceneRenderer::SceneRenderer(Scene* scene)
 		});
 
 	m_Camera = CreateRef<StereographicCamera>(75.0f);
+	
+	// auto window = Application::GetWindow();
+	// m_Framebuffer =
+	// 	Framebuffer::Create(window->GetWidth(), window->GetHeight());
 }
 
 void SceneRenderer::UpdateCamera(TimeStep ts) {
 	auto cameraEntity = m_Scene->EntityWorld.GetEntity("MainCamera");
+	if(!cameraEntity.IsValid())
+		return;
+
 	auto& camera = cameraEntity.Get<CameraComponent>();
 
 	m_Camera->Resize(camera.ViewportWidth, camera.ViewportHeight);
@@ -48,7 +52,6 @@ void SceneRenderer::UpdateCamera(TimeStep ts) {
 
 	// TODO(CameraController entity)
 	CameraController controller{ m_Camera };
-	Buffer<Light> lights;
 
 	controller.OnUpdate(ts);
 }
@@ -73,7 +76,7 @@ void SceneRenderer::Render() {
 		
 		// auto shader = m_LightingPass->GetPipeline();
 		// shader->Bind();
-		// m_Scene->LightBuffer->SetData();
+		// LightBuffer->SetData();
 		// for(const auto& light : m_Scene->GetPointLights()) {
 		// 	shader->SetVec3("u_PointLights[0].Position", light.Position);
 		// 	shader->SetVec3("u_PointLights[0].Ambient",  light.Ambient);

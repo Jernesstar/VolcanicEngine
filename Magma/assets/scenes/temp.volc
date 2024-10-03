@@ -1,20 +1,12 @@
 Scene:
   Name: Current Scene
-  Camera:
-    Type: Stereographic
-    Position: [0, 0, 0]
-    Direction: [0, 0, -1]
-    VerticalFOV: 45
-    NearClip: 0.100000001
-    FarClip: 100
-    RotationSpeed: 0.300000012
-    ViewportWidth: 1
-    ViewportHeight: 1
   Entities:
     - Entity:
-        ID: 4234233682
+        ID: 544
         Components:
           TagComponent:
             Tag: Empty Entity
-          TextureComponent:
-            Texture: Sandbox/assets/images/apple.png
+          TrasformComponent:
+            Translation: [0.699999988, 0, 0]
+            Rotation: [0, 0, 0]
+            Scale: [1, 1, 1]

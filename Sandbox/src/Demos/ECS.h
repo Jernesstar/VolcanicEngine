@@ -57,8 +57,8 @@ ECS::ECS() {
 }
 
 void ECS::OnUpdate(TimeStep ts) {
-	scene->OnUpdate(ts);
-	scene->OnRender();
+	// scene->OnUpdate(ts);
+	// scene->OnRender();
 }
 
 }

@@ -90,10 +90,10 @@ void SceneSerializer::Deserialize(const std::string& path) {
 	}
 	catch(YAML::ParserException e) {
 		VOLCANICORE_ASSERT_ARGS(false, "Could not load file {0}: {1}",
-										path, e.what());
+								path, e.what());
 	}
 	auto scene = file["Scene"];
-	auto camera = scene["Camera"];
+	auto camera = scene["MainCamera"];
 
 	VOLCANICORE_ASSERT(scene);
 	VOLCANICORE_ASSERT(camera);

@@ -8,14 +8,12 @@ namespace Magma::ECS {
 
 class Entity {
 public:
+	Entity() = default;
 	Entity(flecs::entity handle)
 		: m_Handle(handle) { }
 	~Entity() = default;
 
-	flecs::entity GetHandle() const { return m_Handle; }
-
 	bool IsValid() const { return m_Handle != 0; }
-
 	bool IsAlive() const { return m_Handle.is_alive(); }
 	void Kill() {
 		m_Handle.destruct();
@@ -46,9 +44,13 @@ public:
 		m_Handle.remove<TComponent>();
 	}
 
+	operator bool() const { return IsValid(); }
+
 	bool operator ==(const Entity& other) const {
 		return this->m_Handle == other.m_Handle;
 	}
+
+	flecs::entity GetHandle() const { return m_Handle; }
 
 private:
 	flecs::entity m_Handle;

@@ -20,10 +20,14 @@ public:
 	void OnUpdate(TimeStep ts);
 
 	Entity GetEntity(const std::string& tag);
+	Entity GetEntity(VolcaniCore::UUID id);
 
 	Entity AddEntity();
 	Entity AddEntity(VolcaniCore::UUID id);
 	Entity AddEntity(const std::string& tag);
+
+	void RemoveEntity(VolcaniCore::UUID id);
+	void RemoveEntity(const std::string& tag);
 
 	void ForEach(const Func<Entity&, void>& func);
 

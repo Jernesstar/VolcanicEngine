@@ -18,85 +18,87 @@ static void DrawVec3Control(const std::string& label, glm::vec3& values,
 							float resetValue = 0.0f,
 							float columnWidth = 190.0f);
 
-SceneHierarchyPanel::SceneHierarchyPanel(const Ref<Scene>& context) {
-	// SetContext(context);
+SceneHierarchyPanel::SceneHierarchyPanel(Ref<Scene> context) {
+	SetContext(context);
 }
 
-void SceneHierarchyPanel::SetContext(const Ref<Scene>& context) {
-	// m_Context = context;
-	// m_SelectionContext = nullptr;
+void SceneHierarchyPanel::SetContext(Ref<Scene> context) {
+	m_Context = context;
+	m_Selected = Entity{ };
 }
 
 void SceneHierarchyPanel::SetSelectedEntity(ECS::Entity& entity) {
-	// m_SelectionContext = &entity;
+	m_Selected = entity;
 }
 
 void SceneHierarchyPanel::Render() {
-	// ImGui::Begin("Scene Hierarchy");
-	// {
-	// 	// m_Context->GetEntityWorld().ForEach(
-	// 	// [&](Entity& entity) {
-	// 	// 	DrawEntityNode(entity);
-	// 	// });
+	ImGui::Begin("Scene Hierarchy");
+	{
+		m_Context->EntityWorld
+		.ForEach(
+			[&](Entity entity)
+			{
+				DrawEntityNode(entity);
+			});
 
-	// 	if(ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
-	// 		m_SelectionContext = nullptr;
+		if(ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
+			m_Selected = Entity{ };
 
-	// 	if(ImGui::BeginPopupContextWindow(0, ImGuiPopupFlags_NoOpenOverItems)) {
-	// 		// if (ImGui::MenuItem("Create Empty Entity"))
-	// 		// 	m_SelectionContext = &m_Context->GetEntityWorld()
-	// 		// 									.AddEntity("Empty Entity");
+		// TODO(Fix): Multiple entities in Hierarchy panel
+		if(ImGui::BeginPopupContextWindow(0, ImGuiPopupFlags_NoOpenOverItems)) {
+			if (ImGui::MenuItem("Create Empty Entity"))
+				m_Selected = m_Context->EntityWorld.AddEntity("Empty Entity");
 
-	// 		ImGui::EndPopup();
-	// 	}
-	// }
-	// ImGui::End();
+			ImGui::EndPopup();
+		}
+	}
+	ImGui::End();
 
-	// if(m_SelectionContext) {
-	// 	ImGui::Begin("Properties");
-	// 	DrawComponents(*m_SelectionContext);
-	// 	ImGui::End();
-	// }
+	if(m_Selected) {
+		ImGui::Begin("Properties");
+		DrawComponents(m_Selected);
+		ImGui::End();
+	}
 }
 
 void SceneHierarchyPanel::DrawComponents(ECS::Entity& entity)
 {
-	// if(entity.Has<TagComponent>()) {
-	// 	auto& tag = entity.Get<TagComponent>().Tag;
+	if(entity.Has<TagComponent>()) {
+		auto& tag = entity.Get<TagComponent>().Tag;
 
-	// 	char buffer[256];
-	// 	memset(buffer, 0, sizeof(buffer));
-	// 	strcpy(buffer, tag.c_str());
-	// 	if(ImGui::InputText("##Tag", buffer, sizeof(buffer))) {
-	// 		tag = std::string(buffer);
-	// 	}
-	// }
+		char buffer[256];
+		memset(buffer, 0, sizeof(buffer));
+		strcpy(buffer, tag.c_str());
+		if(ImGui::InputText("##Tag", buffer, sizeof(buffer))) {
+			tag = std::string(buffer);
+		}
+	}
 
-	// ImGui::SameLine();
-	// ImGui::PushItemWidth(-1);
+	ImGui::SameLine();
+	ImGui::PushItemWidth(-1);
 
-	// if (ImGui::Button("Add Component"))
-	// 	ImGui::OpenPopup("AddComponent");
+	if (ImGui::Button("Add Component"))
+		ImGui::OpenPopup("AddComponent");
 
-	// if(ImGui::BeginPopup("AddComponent")) {
-	// 	DisplayAddComponentEntry<TextureComponent>("Texture Component");
-	// 	DisplayAddComponentEntry<TransformComponent>("Transform Component");
-	// 	ImGui::EndPopup();
-	// }
+	if(ImGui::BeginPopup("AddComponent")) {
+		DisplayAddComponentEntry<TransformComponent>("Transform Component");
+		ImGui::EndPopup();
+	}
 
-	// ImGui::PopItemWidth();
+	ImGui::PopItemWidth();
 
-	// DrawComponent<TransformComponent>("Transform", entity,
-	// [this](auto& component) {
-	// 	DrawVec3Control("Translation", component.Translation);
-	// 	glm::vec3 rotation = glm::degrees(component.Rotation);
-	// 	DrawVec3Control("Rotation", rotation);
-	// 	component.Rotation = glm::radians(rotation);
-	// 	DrawVec3Control("Scale", component.Scale, 1.0f);
-	// });
+	DrawComponent<TransformComponent>("Transform", entity,
+		[&](auto& component)
+		{
+			DrawVec3Control("Translation", component.Translation);
+			glm::vec3 rotation = glm::degrees(component.Rotation);
+			DrawVec3Control("Rotation", rotation);
+			component.Rotation = glm::radians(rotation);
+			DrawVec3Control("Scale", component.Scale, 1.0f);
+		});
 
 	// DrawComponent<TextureComponent>("Texture", entity,
-	// [this](auto& component) {
+	// [&](auto& component) {
 	// 	ImGui::Button("Texture", ImVec2(120.0f, 0.0f));
 	// 	if(ImGui::BeginDragDropTarget()) {
 	// 		if(const ImGuiPayload* payload =
@@ -114,158 +116,159 @@ void SceneHierarchyPanel::DrawComponents(ECS::Entity& entity)
 }
 
 void SceneHierarchyPanel::DrawEntityNode(ECS::Entity& entity) {
-	// auto& tag = entity.Get<TagComponent>().Tag;
+	auto& tag = entity.Get<TagComponent>().Tag;
 	
-	// ImGuiTreeNodeFlags flags;
-	// if(m_SelectionContext)
-	// 	flags = ((*m_SelectionContext == entity) ? ImGuiTreeNodeFlags_Selected : 0)
-	// 											 | ImGuiTreeNodeFlags_OpenOnArrow;
-	// flags |= ImGuiTreeNodeFlags_SpanAvailWidth;
-	// bool opened = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, tag.c_str());
+	ImGuiTreeNodeFlags flags;
+	if(m_Selected)
+		flags = ((m_Selected == entity) ? ImGuiTreeNodeFlags_Selected : 0)
+										| ImGuiTreeNodeFlags_OpenOnArrow;
 
-	// if(ImGui::IsItemClicked()) {
-	// 	m_SelectionContext = &entity;
-	// }
+	flags |= ImGuiTreeNodeFlags_SpanAvailWidth;
+	bool opened = ImGui::TreeNodeEx((void*)(uint64_t)entity, flags, tag.c_str());
 
-	// bool entityDeleted = false;
-	// if(ImGui::BeginPopupContextItem()) {
-	// 	if (ImGui::MenuItem("Delete Entity"))
-	// 		entityDeleted = true;
+	if(ImGui::IsItemClicked())
+		m_Selected = entity;
 
-	// 	ImGui::EndPopup();
-	// }
+	bool entityDeleted = false;
+	if(ImGui::BeginPopupContextItem()) {
+		if (ImGui::MenuItem("Delete Entity"))
+			entityDeleted = true;
 
-	// if(opened)
-	// 	ImGui::TreePop();
+		ImGui::EndPopup();
+	}
 
-	// if(entityDeleted) {
-	// 	m_Context->GetEntityWorld().RemoveEntity(entity);
-	// 	if(m_SelectionContext)
-	// 		if(*m_SelectionContext == entity)
-	// 			m_SelectionContext = nullptr;
-	// }
+	if(opened)
+		ImGui::TreePop();
+
+	if(entityDeleted) {
+		entity.Kill();
+		if(m_Selected && m_Selected == entity)
+			m_Selected = Entity{ };
+	}
 }
 
 template<typename TComponent>
-void SceneHierarchyPanel::DisplayAddComponentEntry(const std::string& entryName) {
-	// if(!m_SelectionContext->Has<TComponent>()) {
-	// 	if(ImGui::MenuItem(entryName.c_str())) {
-	// 		m_SelectionContext->Add<TComponent>();
-	// 		ImGui::CloseCurrentPopup();
-	// 	}
-	// }
+void SceneHierarchyPanel::DisplayAddComponentEntry(const std::string& entryName)
+{
+	if(!m_Selected.Has<TComponent>()) {
+		if(ImGui::MenuItem(entryName.c_str())) {
+			m_Selected.Add<TComponent>();
+			ImGui::CloseCurrentPopup();
+		}
+	}
 }
 
-template<typename TComponent, typename UIFunction>
-void SceneHierarchyPanel::DrawComponent(const std::string& name, ECS::Entity& entity,
-										UIFunction uiFunction)
+template<typename TComponent, typename TUIFunction>
+void SceneHierarchyPanel::DrawComponent(const std::string& name,
+										ECS::Entity& entity,
+										TUIFunction uiFunction)
 {
-	// if (!entity.Has<TComponent>())
-	// 	return;
+	if (!entity.Has<TComponent>())
+		return;
 
-	// const ImGuiTreeNodeFlags treeNodeFlags = ImGuiTreeNodeFlags_DefaultOpen
-	// 									   | ImGuiTreeNodeFlags_Framed
-	// 									   | ImGuiTreeNodeFlags_SpanAvailWidth
-	// 									   | ImGuiTreeNodeFlags_AllowItemOverlap
-	// 									   | ImGuiTreeNodeFlags_FramePadding;
-	// auto& component = entity.Get<TComponent>();
-	// ImVec2 contentRegionAvailable = ImGui::GetContentRegionAvail();
+	const ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen
+								   | ImGuiTreeNodeFlags_Framed
+								   | ImGuiTreeNodeFlags_SpanAvailWidth
+								   | ImGuiTreeNodeFlags_AllowItemOverlap
+								   | ImGuiTreeNodeFlags_FramePadding;
+	auto& component = entity.Get<TComponent>();
+	ImVec2 contentRegionAvailable = ImGui::GetContentRegionAvail();
 
-	// ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{ 4, 4 });
-	// float lineHeight = GImGui->Font->FontSize
-	// 				 + GImGui->Style.FramePadding.y * 2.0f;
-	// ImGui::Separator();
-	// bool open = ImGui::TreeNodeEx((void*)typeid(T).hash_code(),
-	// 							  treeNodeFlags, name.c_str());
-	// ImGui::PopStyleVar();
-	// ImGui::SameLine(contentRegionAvailable.x - lineHeight * 0.5f);
+	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{ 4, 4 });
+	float lineHeight = GImGui->Font->FontSize
+					 + GImGui->Style.FramePadding.y * 2.0f;
+	ImGui::Separator();
+	bool open = ImGui::TreeNodeEx((void*)typeid(T).hash_code(),
+								  flags, name.c_str());
+	ImGui::PopStyleVar();
+	ImGui::SameLine(contentRegionAvailable.x - lineHeight * 0.5f);
 
-	// if(ImGui::Button("+", ImVec2{ lineHeight, lineHeight })) {
-	// 	ImGui::OpenPopup("ComponentSettings");
-	// }
+	if(ImGui::Button("+", ImVec2{ lineHeight, lineHeight })) {
+		ImGui::OpenPopup("ComponentSettings");
+	}
 
-	// bool removeComponent = false;
-	// if(ImGui::BeginPopup("ComponentSettings")) {
-	// 	if (ImGui::MenuItem("Remove component"))
-	// 		removeComponent = true;
+	bool removeComponent = false;
+	if(ImGui::BeginPopup("ComponentSettings")) {
+		if (ImGui::MenuItem("Remove component"))
+			removeComponent = true;
 
-	// 	ImGui::EndPopup();
-	// }
+		ImGui::EndPopup();
+	}
 
-	// if(open) {
-	// 	uiFunction(component);
-	// 	ImGui::TreePop();
-	// }
+	if(open) {
+		uiFunction(component);
+		ImGui::TreePop();
+	}
 
-	// if(removeComponent)
-	// 	entity.Remove<TComponent>();
+	if(removeComponent)
+		entity.Remove<TComponent>();
 }
 
 static void DrawVec3Control(const std::string& label, glm::vec3& values,
 							float resetValue, float columnWidth)
 {
-	// ImGuiIO& io = ImGui::GetIO();
-	// auto boldFont = io.Fonts->Fonts[0];
+	ImGuiIO& io = ImGui::GetIO();
+	auto boldFont = io.Fonts->Fonts[0];
 
-	// ImGui::PushID(label.c_str());
+	ImGui::PushID(label.c_str());
 
-	// ImGui::Columns(2);
-	// ImGui::SetColumnWidth(0, columnWidth);
-	// ImGui::Text(label.c_str());
-	// ImGui::NextColumn();
+	ImGui::Columns(2);
+	ImGui::SetColumnWidth(0, columnWidth);
+	ImGui::Text(label.c_str());
+	ImGui::NextColumn();
 
-	// ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
-	// ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { 0, 0 });
+	ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { 0, 0 });
 
-	// float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
-	// ImVec2 buttonSize = { lineHeight + 3.0f, lineHeight };
+	float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+	ImVec2 buttonSize = { lineHeight + 3.0f, lineHeight };
 
-	// ImGui::PushStyleColor(ImGuiCol_Button, { 0.8f, 0.1f, 0.15f, 1.0f });
-	// ImGui::PushStyleColor(ImGuiCol_ButtonHovered, { 0.9f, 0.2f, 0.2f, 1.0f });
-	// ImGui::PushStyleColor(ImGuiCol_ButtonActive, { 0.8f, 0.1f, 0.15f, 1.0f });
-	// ImGui::PushFont(boldFont);
-	// if(ImGui::Button("X", buttonSize))
-	// 	values.x = resetValue;
-	// ImGui::PopFont();
-	// ImGui::PopStyleColor(3);
+	ImGui::PushStyleColor(ImGuiCol_Button, { 0.8f, 0.1f, 0.15f, 1.0f });
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, { 0.9f, 0.2f, 0.2f, 1.0f });
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, { 0.8f, 0.1f, 0.15f, 1.0f });
+	ImGui::PushFont(boldFont);
+	if(ImGui::Button("X", buttonSize))
+		values.x = resetValue;
+	ImGui::PopFont();
+	ImGui::PopStyleColor(3);
 
-	// ImGui::SameLine();
-	// ImGui::DragFloat("##X", &values.x, 0.1f, 0.0f, 0.0f, "%.2f");
-	// ImGui::PopItemWidth();
-	// ImGui::SameLine();
+	ImGui::SameLine();
+	ImGui::DragFloat("##X", &values.x, 0.1f, 0.0f, 0.0f, "%.2f");
+	ImGui::PopItemWidth();
+	ImGui::SameLine();
 
-	// ImGui::PushStyleColor(ImGuiCol_Button, { 0.2f, 0.7f, 0.2f, 1.0f });
-	// ImGui::PushStyleColor(ImGuiCol_ButtonHovered, { 0.3f, 0.8f, 0.3f, 1.0f });
-	// ImGui::PushStyleColor(ImGuiCol_ButtonActive, { 0.2f, 0.7f, 0.2f, 1.0f });
-	// ImGui::PushFont(boldFont);
-	// if(ImGui::Button("Y", buttonSize))
-	// 	values.y = resetValue;
-	// ImGui::PopFont();
-	// ImGui::PopStyleColor(3);
+	ImGui::PushStyleColor(ImGuiCol_Button, { 0.2f, 0.7f, 0.2f, 1.0f });
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, { 0.3f, 0.8f, 0.3f, 1.0f });
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, { 0.2f, 0.7f, 0.2f, 1.0f });
+	ImGui::PushFont(boldFont);
+	if(ImGui::Button("Y", buttonSize))
+		values.y = resetValue;
+	ImGui::PopFont();
+	ImGui::PopStyleColor(3);
 
-	// ImGui::SameLine();
-	// ImGui::DragFloat("##Y", &values.y, 0.1f, 0.0f, 0.0f, "%.2f");
-	// ImGui::PopItemWidth();
-	// ImGui::SameLine();
+	ImGui::SameLine();
+	ImGui::DragFloat("##Y", &values.y, 0.1f, 0.0f, 0.0f, "%.2f");
+	ImGui::PopItemWidth();
+	ImGui::SameLine();
 
-	// ImGui::PushStyleColor(ImGuiCol_Button, { 0.1f, 0.25f, 0.8f, 1.0f });
-	// ImGui::PushStyleColor(ImGuiCol_ButtonHovered, { 0.2f, 0.35f, 0.9f, 1.0f });
-	// ImGui::PushStyleColor(ImGuiCol_ButtonActive, { 0.1f, 0.25f, 0.8f, 1.0f });
-	// ImGui::PushFont(boldFont);
-	// if(ImGui::Button("Z", buttonSize))
-	// 	values.z = resetValue;
-	// ImGui::PopFont();
-	// ImGui::PopStyleColor(3);
+	ImGui::PushStyleColor(ImGuiCol_Button, { 0.1f, 0.25f, 0.8f, 1.0f });
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, { 0.2f, 0.35f, 0.9f, 1.0f });
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, { 0.1f, 0.25f, 0.8f, 1.0f });
+	ImGui::PushFont(boldFont);
+	if(ImGui::Button("Z", buttonSize))
+		values.z = resetValue;
+	ImGui::PopFont();
+	ImGui::PopStyleColor(3);
 
-	// ImGui::SameLine();
-	// ImGui::DragFloat("##Z", &values.z, 0.1f, 0.0f, 0.0f, "%.2f");
-	// ImGui::PopItemWidth();
+	ImGui::SameLine();
+	ImGui::DragFloat("##Z", &values.z, 0.1f, 0.0f, 0.0f, "%.2f");
+	ImGui::PopItemWidth();
 
-	// ImGui::PopStyleVar();
+	ImGui::PopStyleVar();
 
-	// ImGui::Columns(1);
+	ImGui::Columns(1);
 
-	// ImGui::PopID();
+	ImGui::PopID();
 }
 
 }

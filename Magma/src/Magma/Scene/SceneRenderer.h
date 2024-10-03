@@ -20,17 +20,14 @@ public:
 	struct Options {
 		struct Lighting {
 			bool Enabled = false;
-		};
+		} LightingOptions;
 
 		struct Bloom {
 			bool Enabled	   = false;
 			float Exposure	   = 1.0f;
 			float FilterRadius = 0.005f;
 			float Strength	   = 0.04f;
-		};
-
-		Options::Lighting LightingOptions;
-		Options::Bloom	  BloomOptions;
+		} BloomOptions;
 	};
 
 public:
@@ -42,7 +39,7 @@ public:
 	void UpdateCamera(TimeStep ts);
 	void UpdatePasses();
 
-	const SceneRenderer::Options& GetOptions() { return m_Options; }
+	const SceneRenderer::Options& GetOptions() const { return m_Options; }
 
 private:
 	Scene* m_Scene;

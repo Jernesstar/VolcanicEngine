@@ -51,6 +51,11 @@ Entity World::GetEntity(const std::string& tag) {
 	return Entity{ handle };
 }
 
+Entity World::GetEntity(VolcaniCore::UUID id) {
+	flecs::entity handle = m_World.entity(id);
+	return Entity{ handle };
+}
+
 Entity World::AddEntity() {
 	flecs::entity handle = m_World.entity();
 	return Entity{ handle };
@@ -67,6 +72,14 @@ Entity World::AddEntity(const std::string& tag) {
 	entity.Add<TagComponent>(std::string(tag));
 
 	return entity;
+}
+
+void World::RemoveEntity(VolcaniCore::UUID id) {
+	GetEntity(id).Kill();
+}
+
+void World::RemoveEntity(const std::string& tag) {
+	GetEntity(tag).Kill();
 }
 
 void World::ForEach(const Func<Entity&, void>& func) {
