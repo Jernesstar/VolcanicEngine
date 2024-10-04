@@ -25,7 +25,10 @@ ECS::ECS() {
 	scene = CreateRef<Scene>();
 	auto& world = scene->EntityWorld;
 
-	Magma::ECS::Entity entity = Magma::ECS::EntityBuilder(world)
+	Entity cameraEntity = EntityBuilder(world, "MainCamera");
+	cameraEntity.Add<CameraComponent>();
+
+	Entity entity = EntityBuilder(world)
 	.Add<TransformComponent>(Transform{ .Translation = { 0.0f, 0.0f, -3.0f } })
 	.Add<MeshComponent>(MeshPrimitive::Cube,
 		Material{
@@ -34,7 +37,7 @@ ECS::ECS() {
 	// .Add<RigidBodyComponent>(RigidBody::Type::Static)
 	.Finalize();
 
-	Magma::ECS::Entity ball = Magma::ECS::EntityBuilder(world)
+	Entity ball = EntityBuilder(world)
 	.Add<TransformComponent>(Transform{ .Translation = { 0.0f, 0.0f, -3.0f } })
 	.Add<MeshComponent>("Sandbox/assets/models/sphere/wooden_sphere.obj")
 	// .Add<RigidBodyComponent>(RigidBody::Type::Static)
@@ -46,7 +49,7 @@ ECS::ECS() {
 	test->Load("Sandbox/assets/scenes/test.volc");
 
 	test->EntityWorld
-	.ForEach(
+	.ForEach<MeshComponent>(
 		[](Entity& entity)
 		{
 			VOLCANICORE_LOG_INFO("Path: '%s'",
@@ -57,8 +60,8 @@ ECS::ECS() {
 }
 
 void ECS::OnUpdate(TimeStep ts) {
-	// scene->OnUpdate(ts);
-	// scene->OnRender();
+	scene->OnUpdate(ts);
+	scene->OnRender();
 }
 
 }

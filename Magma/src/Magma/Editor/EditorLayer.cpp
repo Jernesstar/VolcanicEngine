@@ -86,7 +86,6 @@ void EditorLayer::Render() {
 	// any change of dockspace/settings would lead to windows being stuck in limbo and never being visible.
 
 	ImGui::Begin("DockSpace Demo", &dockspaceOpen, windowFlags);
-	// ImGui::PopStyleVar();
 	ImGui::PopStyleVar(2);
 
 	// DockSpace
@@ -271,8 +270,7 @@ void EditorLayer::ToolbarUI()
 	ImVec2 v2 = ImVec2(0, 0);
 	ImVec2 v3 = ImVec2(1, 1);
 
-	bool hasPlayButton = m_SceneState == SceneState::Pause 
-						|| m_SceneState == SceneState::Edit;
+	bool hasPlayButton = m_SceneState != SceneState::Play;
 	bool hasStopButton = true;
 
 	if(hasPlayButton) {

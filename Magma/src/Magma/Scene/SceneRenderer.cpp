@@ -1,6 +1,7 @@
 #include "SceneRenderer.h"
 #include "Scene.h"
 
+#include <VolcaniCore/Core/Application.h>
 #include <VolcaniCore/Renderer/Renderer.h>
 #include <VolcaniCore/Renderer/Renderer3D.h>
 #include <VolcaniCore/Renderer/StereographicCamera.h>
@@ -17,6 +18,23 @@ SceneRenderer::SceneRenderer(Scene* scene)
 	shader = ShaderPipeline::Create("VolcaniCore/assets/shaders", "Mesh");
 	m_DrawPass = RenderPass::Create("Draw", shader);
 
+	m_Camera = CreateRef<StereographicCamera>(75.0f);
+	
+	auto window = Application::GetWindow();
+	auto width = window->GetWidth();
+	auto height = window->GetHeight();
+	m_Output = Framebuffer::Create(width, height);
+
+	auto cameraEntity = m_Scene->EntityWorld.GetEntity("MainCamera");
+	if(!cameraEntity.IsValid())
+		return;
+
+	auto& camera = cameraEntity.Get<CameraComponent>();
+	if(camera.ViewportWidth == 0 || camera.ViewportHeight == 0) {
+		camera.ViewportWidth = width;
+		camera.ViewportHeight = height;
+	}
+
 	auto& world = m_Scene->EntityWorld.Get();
 	m_RenderSystem = world
 	.system<const TransformComponent, const MeshComponent>("RenderSystem")
@@ -32,12 +50,6 @@ SceneRenderer::SceneRenderer(Scene* scene)
 
 			Renderer3D::DrawMesh(mc.Mesh, tr);
 		});
-
-	m_Camera = CreateRef<StereographicCamera>(75.0f);
-	
-	// auto window = Application::GetWindow();
-	// m_Framebuffer =
-	// 	Framebuffer::Create(window->GetWidth(), window->GetHeight());
 }
 
 void SceneRenderer::UpdateCamera(TimeStep ts) {

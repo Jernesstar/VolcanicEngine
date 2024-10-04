@@ -17,6 +17,7 @@ class Scene;
 
 class SceneRenderer {
 public:
+	// TODO(Change): Rename to BloomPass or LightingPass, has its own render function
 	struct Options {
 		struct Lighting {
 			bool Enabled = false;
@@ -47,7 +48,9 @@ private:
 	
 	Ref<RenderPass> m_DrawPass;
 	Ref<RenderPass> m_LightingPass;
-	
+	Ref<Framebuffer> m_Output;
+
+	// TODO(List of Camera's and Framebuffer's for multiple targets, i.e Player pov, bird's eye view pov)
 	Ref<Camera> m_Camera;
 
 	flecs::system m_RenderSystem;

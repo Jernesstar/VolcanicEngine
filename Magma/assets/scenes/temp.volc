@@ -5,8 +5,9 @@ Scene:
         ID: 544
         Components:
           TagComponent:
-            Tag: Empty Entity
-          TrasformComponent:
-            Translation: [0.699999988, 0, 0]
-            Rotation: [0, 0, 0]
-            Scale: [1, 1, 1]
+            Tag: NewEntity
+    - Entity:
+        ID: 545
+        Components:
+          TagComponent:
+            Tag: Name

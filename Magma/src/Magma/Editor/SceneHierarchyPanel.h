@@ -20,8 +20,6 @@ public:
 private:
 	Ref<Scene> m_Context;
 	ECS::Entity m_Selected;
-	std::filesystem::path m_BaseDirectory;
-	std::filesystem::path m_CurrentDirectory;
 
 private:
 	template<typename T>

@@ -50,9 +50,10 @@ void Scene::RegisterSystems() {
 	.system<const ScriptComponent, TransformComponent>("InputUpdate")
 	.kind(flecs::PreUpdate)
 	.each(
-	[](const ScriptComponent& s, TransformComponent& t) {
-		s.OnInput(t);
-	});
+		[](const ScriptComponent& s, TransformComponent& t)
+		{
+			s.OnInput(t);
+		});
 	// world
 	// .system<const TransformComponent, RigidBodyComponent>("RigidBodyUpdate")
 	// .kind(flecs::PreUpdate)
@@ -92,29 +93,30 @@ void Scene::RegisterObservers() {
 	// .observer<RigidBodyComponent>("OnSetRigidBody")
 	// .event(flecs::OnSet)
 	// .each(
-	// [&](flecs::entity e, RigidBodyComponent& r) {
-	// 	Entity entity{ e };
+	// 	[&](flecs::entity e, RigidBodyComponent& r)
+	// 	{
+	// 		Entity entity{ e };
 
-	// 	// If the RigidBody was created without a shape,
-	// 	// inherit the shape of the current mesh component
-	// 	if(entity.Has<MeshComponent>() && !r.Body->HasShape()) {
-	// 		auto mesh = entity.Get<MeshComponent>().Mesh;
-	// 		Ref<Shape> shape = Shape::Create(mesh);
-	// 		r.Body->SetShape(shape);
-	// 	}
-	// 	if(entity.Has<TransformComponent>()) {
-	// 		auto& t = entity.Get<TransformComponent>();
+	// 		// If the RigidBody was created without a shape,
+	// 		// inherit the shape of the current mesh component
+	// 		if(entity.Has<MeshComponent>() && !r.Body->HasShape()) {
+	// 			auto mesh = entity.Get<MeshComponent>().Mesh;
+	// 			Ref<Shape> shape = Shape::Create(mesh);
+	// 			r.Body->SetShape(shape);
+	// 		}
+	// 		if(entity.Has<TransformComponent>()) {
+	// 			auto& t = entity.Get<TransformComponent>();
 
-	// 		Transform tr{
-	// 			.Translation = t.Translation,
-	// 			.Rotation	 = t.Rotation,
-	// 			.Scale		 = t.Scale
-	// 		};
-	// 		r.Body->UpdateTransform(tr);
-	// 	}
+	// 			Transform tr{
+	// 				.Translation = t.Translation,
+	// 				.Rotation	 = t.Rotation,
+	// 				.Scale		 = t.Scale
+	// 			};
+	// 			r.Body->UpdateTransform(tr);
+	// 		}
 
-	// 	PhysicsSystem::Register(m_PhysicsWorld, entity);
-	// });
+	// 		PhysicsSystem::Register(PhysicsWorld, entity);
+	// 	});
 }
 
 }

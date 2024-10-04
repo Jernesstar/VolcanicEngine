@@ -18,18 +18,29 @@ struct Component {
 
 struct CameraComponent : public Component {
 	Camera::Type CameraType = Camera::Type::Stereo;
-	uint32_t ViewportWidth = 100;
-	uint32_t ViewportHeight = 100;
-	float Near = 0.01f;
-	float Far  = 1000.0f;
 	glm::vec3 Position = { 0.0f, 0.0f, 0.0f };
 	glm::vec3 Direction = { 0.0f, 0.0f, -1.0f };
+	uint32_t ViewportWidth = 0;
+	uint32_t ViewportHeight = 0;
+	float Near = 0.01f;
+	float Far  = 1000.0f;
+	union
+	{
+		float VerticalFOV, Rotation;
+	};
 
 	CameraComponent() = default;
+	CameraComponent(Camera::Type type, const glm::vec3& pos,
+					const glm::vec3& dir, uint32_t width, uint32_t height,
+					float near, float far)
+		: CameraType(type), Position(pos), Direction(dir),
+		  ViewportWidth(width), ViewportHeight(height), Near(near), Far(far) { }
+
 	CameraComponent(const CameraComponent& other) = default;
 };
 
 struct MeshComponent : public Component {
+	// TODO(Fix): MeshID
 	Ref<VolcaniCore::Mesh> Mesh;
 
 	MeshComponent() = default;
