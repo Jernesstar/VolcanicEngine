@@ -1,8 +1,5 @@
 #pragma once
 
-#include <OpenGL/Texture2D.h>
-#include <OpenGL/Framebuffer.h>
-
 namespace Demo {
 
 class Shadows : public Application {
@@ -19,7 +16,7 @@ private:
 	Ref<RenderPass> depthPass;
 	Ref<RenderPass> shadowPass;
 
-	Ref<OpenGL::Framebuffer> depthMap;
+	Ref<Framebuffer> depthMap;
 
 	Ref<Mesh> cube;
 
@@ -44,16 +41,16 @@ Shadows::Shadows() {
 		{ "Sandbox/assets/shaders/Shadow.glsl.frag", ShaderType::Fragment }
 	});
 
-	depthMap = CreateRef<OpenGL::Framebuffer>(1024, 1024);
+	depthMap = Framebuffer::Create(1024, 1024);
 
 	depthPass = RenderPass::Create("Depth Pass", depthShader);
 	depthPass->SetOutput(depthMap);
 	shadowPass = RenderPass::Create("Shadow Pass", shadowShader);
 
 	cube = Mesh::Create(MeshPrimitive::Cube,
-			Material{
-				.Diffuse = Texture::Create("Sandbox/assets/images/wood.png")
-			});
+		Material{
+			.Diffuse = Texture::Create("Sandbox/assets/images/wood.png")
+		});
 
 	depthCamera = CreateRef<OrthographicCamera>(20.0f, 20.0f, 1.0f, 7.5f);
 	sceneCamera = CreateRef<StereographicCamera>(75.0f);
@@ -83,47 +80,47 @@ void Shadows::OnUpdate(TimeStep ts) {
 
 	Renderer::Flush();
 
-	Renderer::StartPass(shadowPass);
-	{
-		Renderer::Clear();
+	// Renderer::StartPass(shadowPass);
+	// {
+	// 	Renderer::Clear();
 		
-		Renderer::GetPass()->GetUniforms()
-		.Set("u_ViewProj",
-			[&]() -> glm::mat4
-			{
-				return sceneCamera->GetViewProjection();
-			});
-		Renderer::GetPass()->GetUniforms()
-		.Set("u_LightSpaceMatrix",
-			[&]() -> glm::mat4
-			{
-				return depthCamera->GetViewProjection();
-			});
-		Renderer::GetPass()->GetUniforms()
-		.Set("u_ShadowMap",
-			[&]() -> int32_t
-			{
-				depthMap->Get(AttachmentTarget::Depth).Bind(1);
-				return 1;
-			});
-		Renderer::GetPass()->GetUniforms()
-		.Set("u_LightPosition",
-			[&]() -> glm::vec3
-			{
-				return depthCamera->GetPosition();
-			});
-		Renderer::GetPass()->GetUniforms()
-		.Set("u_CameraPosition",
-			[&]() -> glm::vec3
-			{
-				return sceneCamera->GetPosition();
-			});
+	// 	Renderer::GetPass()->GetUniforms()
+	// 	.Set("u_ViewProj",
+	// 		[&]() -> glm::mat4
+	// 		{
+	// 			return sceneCamera->GetViewProjection();
+	// 		});
+	// 	Renderer::GetPass()->GetUniforms()
+	// 	.Set("u_LightSpaceMatrix",
+	// 		[&]() -> glm::mat4
+	// 		{
+	// 			return depthCamera->GetViewProjection();
+	// 		});
+	// 	Renderer::GetPass()->GetUniforms()
+	// 	.Set("u_LightPosition",
+	// 		[&]() -> glm::vec3
+	// 		{
+	// 			return depthCamera->GetPosition();
+	// 		});
+	// 	Renderer::GetPass()->GetUniforms()
+	// 	.Set("u_CameraPosition",
+	// 		[&]() -> glm::vec3
+	// 		{
+	// 			return sceneCamera->GetPosition();
+	// 		});
+	// 	Renderer::GetPass()->GetUniforms()
+	// 	.Set("u_ShadowMap",
+	// 		[&]() -> TextureSlot
+	// 		{
+	// 			depthMap->Bind(AttachmentTarget::Depth, 1);
+	// 			return { };
+	// 		});
 
-		RenderScene();
-	}
-	Renderer::EndPass();
+	// 	RenderScene();
+	// }
+	// Renderer::EndPass();
 
-	// RendererAPI::Get()->RenderFramebuffer(depthMap, AttachmentTarget::Depth);
+	RendererAPI::Get()->RenderFramebuffer(depthMap, AttachmentTarget::Depth);
 }
 
 void Shadows::RenderScene() {

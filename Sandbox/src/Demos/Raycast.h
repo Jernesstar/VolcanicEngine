@@ -114,7 +114,7 @@ Raycast::Raycast() {
 			return glm::vec4(1.0f);
 		});
 
-	Ref<OpenGL::Framebuffer> mask = CreateRef<OpenGL::Framebuffer>(800, 600);
+	Ref<Framebuffer> mask = Framebuffer::Create(800, 600);
 	maskPass->SetOutput(mask);
 
 	camera = CreateRef<StereographicCamera>(75.0f);

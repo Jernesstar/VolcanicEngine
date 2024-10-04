@@ -3,7 +3,7 @@ Adding this file, to track changes as a go between writing the code and testing 
 So far:
 
 Demo Status:
-Bloom x
+Bloom y
 Collision x
 Cube y
 ECS y
@@ -14,31 +14,9 @@ Template y
 UILayer y
 
 change:
-	Removed Point, Line, and Mesh buffers in OpenGL::Renderer::RendererData in favor of a single Geometry buffer
-	Renamed VolcaniCore::Renderer::RenderCubemap -> DrawSkybox
-	Renamed LinkHandles -> SetUniforms, class Handles -> Uniforms
-	Moved files Scene, SceneSerializer -> Scene/
-	Moved defines FrameDebugInfo::Max_ -> Renderer::Max_
 
 feat_begin:
-	Created Vertex.h
-	Created structs DrawType, DrawPartition, DrawPrimitive, DrawCall
-	Implementing DrawLine, DrawPoint, DrawMesh in OpenGL::Renderer,
-	Removed DrawInstanced and DrawIndexed in OpenGL::Renderer;
-	Implementing VolcaniCore::Renderer::CreateDrawCalls
-	Defines.h now includes the usings 'List = std::vector', 'Map = std::unordered_map', and 'Func = std::function'
-	Work in Buffer.h, implementing Add(Buffer), Add(List)
 
 feat_end:
-	Application calculates the FPS
-	struct TextureSlot
-	Uniforms::Set now deduces template argument from lambda return type
-	Uncapped FPS by calling glfwSetSwapInterval(0)
-	RendererAPI can now set options: DepthTesting and BlendingMode
-	In VolcaniCore::Renderer, Transforms now go into TransformBuffer
 
 todo:
-	Change all instances of vector, unordered_map and function to their corresponding using definitions
-	Work on Editor, start small
-	Work on Scene
-	Work on Game

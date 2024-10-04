@@ -125,11 +125,16 @@ void Bloom::OnUpdate(TimeStep ts) {
 		Renderer::Clear();
 		Renderer3D::Begin(camera);
 
-		rotation += (float)ts * 0.001;
-		Renderer3D::DrawMesh(cube,
-			{
-				.Rotation = rotation * glm::vec3{ 3.0f, 2.0f, 0.1f }
-			});
+		// rotation += (float)ts * 0.001;
+		// Renderer3D::DrawMesh(cube,
+		// 	{
+		// 		.Rotation = rotation * glm::vec3{ 3.0f, 2.0f, 0.1f }
+		// 	});
+
+		Renderer3D::DrawMesh(cube, { .Translation = { -2.0f,  0.0f,  0.0f } });
+		Renderer3D::DrawMesh(cube, { .Translation = {  2.0f,  0.0f,  0.0f } });
+		Renderer3D::DrawMesh(cube, { .Translation = {  0.0f,  0.0f, -2.0f } });
+		Renderer3D::DrawMesh(cube, { .Translation = {  0.0f,  0.0f,  2.0f } });
 
 		Renderer3D::End();
 	}
@@ -184,47 +189,49 @@ void Bloom::OnUpdate(TimeStep ts) {
 	Renderer::EndPass();
 	Renderer::Flush();
 
-	// RendererAPI::Get()->Resize(window->GetWidth(), window->GetHeight());
-	// RendererAPI::Get()->RenderFramebuffer(mips, AttachmentTarget::Color);
+	RendererAPI::Get()->Clear();
 
-	Renderer::StartPass(bloomPass);
-	{
-		Renderer::GetDrawCommand().GetUniforms()
-		.Set("u_BloomTexture",
-			[&]() -> TextureSlot
-			{
-				mips->Bind(AttachmentTarget::Color, 0);
-				return { };
-			});
-		Renderer::GetDrawCommand().GetUniforms()
-		.Set("u_SceneTexture",
-			[&]() -> TextureSlot
-			{
-				src->Bind(AttachmentTarget::Color, 1);
-				return { };
-			});
-		Renderer::GetPass()->GetUniforms()
-		.Set("u_Exposure",
-			[&]() -> float
-			{
-				return exposure;
-			});
-		Renderer::GetPass()->GetUniforms()
-		.Set("u_BloomStrength",
-			[&]() -> float
-			{
-				return bloomStrength;
-			});
+	RendererAPI::Get()->Resize(window->GetWidth(), window->GetHeight());
+	RendererAPI::Get()->RenderFramebuffer(mips, AttachmentTarget::Color);
 
-		Renderer::GetPass()->SetGlobalUniforms();
-		Renderer::GetPass()
-			->SetUniforms(Renderer::GetDrawCommand().GetUniforms());
+	// Renderer::StartPass(bloomPass);
+	// {
+	// 	Renderer::GetDrawCommand().GetUniforms()
+	// 	.Set("u_BloomTexture",
+	// 		[&]() -> TextureSlot
+	// 		{
+	// 			mips->Bind(AttachmentTarget::Color, 0);
+	// 			return { };
+	// 		});
+	// 	Renderer::GetDrawCommand().GetUniforms()
+	// 	.Set("u_SceneTexture",
+	// 		[&]() -> TextureSlot
+	// 		{
+	// 			src->Bind(AttachmentTarget::Color, 1);
+	// 			return { };
+	// 		});
+	// 	Renderer::GetPass()->GetUniforms()
+	// 	.Set("u_Exposure",
+	// 		[&]() -> float
+	// 		{
+	// 			return exposure;
+	// 		});
+	// 	Renderer::GetPass()->GetUniforms()
+	// 	.Set("u_BloomStrength",
+	// 		[&]() -> float
+	// 		{
+	// 			return bloomStrength;
+	// 		});
 
-		RendererAPI::Get()->Resize(window->GetWidth(), window->GetHeight());
-		RendererAPI::Get()->RenderFramebuffer(mips, AttachmentTarget::Color);
-	}
-	Renderer::EndPass();
-	Renderer::Flush();
+	// 	Renderer::GetPass()->SetGlobalUniforms();
+	// 	Renderer::GetPass()
+	// 		->SetUniforms(Renderer::GetDrawCommand().GetUniforms());
+
+	// 	RendererAPI::Get()->Resize(window->GetWidth(), window->GetHeight());
+	// 	RendererAPI::Get()->RenderFramebuffer(mips, AttachmentTarget::Color);
+	// }
+	// Renderer::EndPass();
+	// Renderer::Flush();
 
 	UI::End();
 }
