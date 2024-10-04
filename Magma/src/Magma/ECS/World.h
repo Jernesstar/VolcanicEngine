@@ -36,7 +36,7 @@ public:
 		flecs::query<TComponent>& query = GetQuery<TComponent>();
 
 		query.each(
-			[&func](flecs::entity handle)
+			[func](flecs::entity handle, TComponent& _)
 			{
 				Entity entity{ handle };
 				func(entity);
@@ -50,6 +50,7 @@ private:
 
 	flecs::query<> m_AllEntitiesQuery;
 
+	flecs::query<CameraComponent>	 m_CameraComponentQuery;
 	flecs::query<MeshComponent>		 m_MeshComponentQuery;
 	flecs::query<RigidBodyComponent> m_RigidBodyComponentQuery;
 	flecs::query<TagComponent>		 m_TagComponentQuery;

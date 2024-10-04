@@ -2,7 +2,21 @@ Scene:
   Name: Untitled Scene
   Entities:
     - Entity:
-        ID: 544
+        ID: 550
+        Components:
+          Camera:
+            Type: Stereographic
+            VerticalFOV: 0
+            Position: [0, 0, 0]
+            Direction: [0, 0, -1]
+            ViewportWidth: 800
+            ViewportHeight: 600
+            Near: 0.00999999978
+            Far: 1000
+          TagComponent:
+            Tag: MainCamera
+    - Entity:
+        ID: 551
         Components:
           MeshComponent:
             Mesh:
@@ -16,7 +30,7 @@ Scene:
             Rotation: [0, 0, 0]
             Scale: [1, 1, 1]
     - Entity:
-        ID: 545
+        ID: 552
         Components:
           MeshComponent:
             Mesh:

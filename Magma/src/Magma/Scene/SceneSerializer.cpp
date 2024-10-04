@@ -195,7 +195,7 @@ void SerializeEntity(YAML::Emitter& out, Entity& entity) {
 		auto& r = entity.Get<TransformComponent>().Rotation;
 		auto& s = entity.Get<TransformComponent>().Scale;
 
-		out << YAML::Key << "TrasformComponent" << YAML::BeginMap; // TransformComponent
+		out << YAML::Key << "TransformComponent" << YAML::BeginMap; // TransformComponent
 
 		out << YAML::Key << "Translation" << YAML::Value << t;
 		out << YAML::Key << "Rotation"	  << YAML::Value << r;

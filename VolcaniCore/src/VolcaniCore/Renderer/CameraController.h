@@ -54,6 +54,8 @@ public:
 	void SetControls(const MovementControls& controls) {
 		m_Controls = controls;
 	}
+
+	Ref<Camera> GetCamera() const { return m_Camera; }
 	void SetCamera(Ref<Camera> camera);
 
 private:

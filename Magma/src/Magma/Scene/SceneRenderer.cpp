@@ -1,6 +1,8 @@
 #include "SceneRenderer.h"
 #include "Scene.h"
 
+#include <VolcaniCore/Core/Assert.h>
+
 #include <VolcaniCore/Core/Application.h>
 #include <VolcaniCore/Renderer/Renderer.h>
 #include <VolcaniCore/Renderer/Renderer3D.h>
@@ -19,21 +21,12 @@ SceneRenderer::SceneRenderer(Scene* scene)
 	m_DrawPass = RenderPass::Create("Draw", shader);
 
 	m_Camera = CreateRef<StereographicCamera>(75.0f);
-	
+
 	auto window = Application::GetWindow();
 	auto width = window->GetWidth();
 	auto height = window->GetHeight();
-	m_Output = Framebuffer::Create(width, height);
 
-	auto cameraEntity = m_Scene->EntityWorld.GetEntity("MainCamera");
-	if(!cameraEntity.IsValid())
-		return;
-
-	auto& camera = cameraEntity.Get<CameraComponent>();
-	if(camera.ViewportWidth == 0 || camera.ViewportHeight == 0) {
-		camera.ViewportWidth = width;
-		camera.ViewportHeight = height;
-	}
+	// m_Output = Framebuffer::Create(width, height);
 
 	auto& world = m_Scene->EntityWorld.Get();
 	m_RenderSystem = world
@@ -57,15 +50,13 @@ void SceneRenderer::UpdateCamera(TimeStep ts) {
 	if(!cameraEntity.IsValid())
 		return;
 
-	auto& camera = cameraEntity.Get<CameraComponent>();
-
-	m_Camera->Resize(camera.ViewportWidth, camera.ViewportHeight);
-	m_Camera->SetPositionDirection(camera.Position, camera.Direction);
+	auto& cc = cameraEntity.Get<CameraComponent>();
+	auto camera = m_Controller.GetCamera();
+	// camera->Resize(cc.ViewportWidth, cc.ViewportHeight);
+	// camera->SetPositionDirection(cc.Position, cc.Direction);
 
 	// TODO(CameraController entity)
-	CameraController controller{ m_Camera };
-
-	controller.OnUpdate(ts);
+	m_Controller.OnUpdate(ts);
 }
 
 void SceneRenderer::UpdatePasses() {
@@ -73,9 +64,12 @@ void SceneRenderer::UpdatePasses() {
 }
 
 void SceneRenderer::Render() {
+	auto camera = m_Controller.GetCamera();
+
 	Renderer::StartPass(m_DrawPass);
 	{
-		Renderer3D::Begin(m_Camera);
+		Renderer::Clear();
+		Renderer3D::Begin(camera);
 
 		m_RenderSystem.run();
 
@@ -83,7 +77,7 @@ void SceneRenderer::Render() {
 	}
 	Renderer::EndPass();
 	
-	if(m_Options.LightingOptions.Enabled) {
+	// if(m_Options.LightingOptions.Enabled) {
 		// auto& lights = m_Scene->GetLights();
 		
 		// auto shader = m_LightingPass->GetPipeline();
@@ -104,7 +98,7 @@ void SceneRenderer::Render() {
 		// shader->SetTexture("u_Material.Diffuse", cube->GetMaterial().Diffuse, 0);
 		// shader->SetTexture("u_Material.Specular", cube->GetMaterial().Specular, 1);
 		// shader->SetFloat("u_Material.Shininess", 32.0f);
-	}
+	// }
 }
 
 }

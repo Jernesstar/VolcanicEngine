@@ -25,8 +25,9 @@ ECS::ECS() {
 	scene = CreateRef<Scene>();
 	auto& world = scene->EntityWorld;
 
-	Entity cameraEntity = EntityBuilder(world, "MainCamera");
-	cameraEntity.Add<CameraComponent>();
+	Entity cameraEntity = EntityBuilder(world, "MainCamera")
+	.Add<CameraComponent>()
+	.Finalize();
 
 	Entity entity = EntityBuilder(world)
 	.Add<TransformComponent>(Transform{ .Translation = { 0.0f, 0.0f, -3.0f } })

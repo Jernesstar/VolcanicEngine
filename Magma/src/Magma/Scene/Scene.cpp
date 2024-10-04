@@ -1,11 +1,12 @@
 #include "Scene.h"
 
+#include <VolcaniCore/Core/Assert.h>
 #include <VolcaniCore/Renderer/Renderer3D.h>
+
+#include "ECS/PhysicsSystem.h"
 
 #include "SceneRenderer.h"
 #include "SceneSerializer.h"
-
-#include "ECS/PhysicsSystem.h"
 
 using namespace Magma::ECS;
 using namespace Magma::Physics;
@@ -61,7 +62,6 @@ void Scene::RegisterSystems() {
 	// [](const TransformComponent& t, RigidBodyComponent& r) {
 	// 	r.Body->UpdateTransform({ t.Translation, t.Rotation, t.Scale });
 	// });
-
 	// world
 	// .system("PhysicsUpdate")
 	// .kind(flecs::OnUpdate)
@@ -69,18 +69,17 @@ void Scene::RegisterSystems() {
 	// [&](flecs::iter& it) {
 	// 	PhysicsWorld.OnUpdate(it.delta_time());
 	// });
-
-	world
-	.system<const RigidBodyComponent, TransformComponent>("TransformUpdate")
-	.kind(flecs::PostUpdate)
-	.each(
-		[](const RigidBodyComponent& rb, TransformComponent& tc)
-		{
-			Transform tr = rb.Body->GetTransform();
-			tc.Translation = tr.Translation;
-			tc.Rotation	   = tr.Rotation;
-			tc.Scale	   = tr.Scale;
-		});
+	// world
+	// .system<const RigidBodyComponent, TransformComponent>("TransformUpdate")
+	// .kind(flecs::PostUpdate)
+	// .each(
+	// 	[](const RigidBodyComponent& rb, TransformComponent& tc)
+	// 	{
+	// 		Transform tr = rb.Body->GetTransform();
+	// 		tc.Translation = tr.Translation;
+	// 		tc.Rotation	   = tr.Rotation;
+	// 		tc.Scale	   = tr.Scale;
+	// 	});
 }
 
 void Scene::RegisterObservers() {

@@ -13,11 +13,7 @@ namespace TheMazeIsLava {
 Player::Player(ECS::World& world)
 	: Entity(world.AddEntity("Player").GetHandle())
 {
-	Add<TransformComponent>(
-		Transform{
-			.Translation = { 0.0f, 1.0f, 0.0f },
-			.Scale = glm::vec3(0.2f)
-		});
+	Add<TransformComponent>();
 	Add<MeshComponent>(Asset::Player);
 	Add<RigidBodyComponent>(RigidBody::Type::Static);
 	Add<ScriptComponent>()
@@ -32,8 +28,10 @@ Player::Player(ECS::World& world)
 		int dz = (Input::KeyPressed(Key::Down)	|| Input::KeyPressed(Key::S))
 				-(Input::KeyPressed(Key::Up)	|| Input::KeyPressed(Key::W));
 
-		tr.x += (float)dx * 0.3f;
-		tr.z += (float)dz * 0.3f;
+		glm::vec3 moveDir = { dx, 0.0f, dz };
+		float speed = 0.03f;
+		if(dx || dz)
+			tr += glm::normalize(moveDir) * speed;
 	};
 }
 

@@ -10,6 +10,7 @@ flecs::query<TComponent>& World::GetQuery<TComponent>() { \
 
 namespace Magma::ECS {
 
+GET_QUERY(CameraComponent)
 GET_QUERY(MeshComponent)
 GET_QUERY(RigidBodyComponent)
 GET_QUERY(TagComponent)
@@ -18,6 +19,7 @@ GET_QUERY(ScriptComponent)
 
 World::World() {
 	m_AllEntitiesQuery = m_World.query_builder()
+	.with<CameraComponent>().or_()
 	.with<MeshComponent>().or_()
 	.with<RigidBodyComponent>().or_()
 	.with<TagComponent>().or_()
@@ -25,20 +27,29 @@ World::World() {
 	.with<ScriptComponent>()
 	.build();
 
+	m_CameraComponentQuery = m_World.query_builder<CameraComponent>()
+	.with<CameraComponent>()
+	.cached()
+	.build();
 	m_MeshComponentQuery = m_World.query_builder<MeshComponent>()
 	.with<MeshComponent>()
+	.cached()
 	.build();
 	m_RigidBodyComponentQuery = m_World.query_builder<RigidBodyComponent>()
 	.with<RigidBodyComponent>()
+	.cached()
 	.build();
 	m_TagComponentQuery = m_World.query_builder<TagComponent>()
 	.with<TagComponent>()
+	.cached()
 	.build();
 	m_TransformComponentQuery = m_World.query_builder<TransformComponent>()
 	.with<TransformComponent>()
+	.cached()
 	.build();
 	m_ScriptComponentQuery = m_World.query_builder<ScriptComponent>()
 	.with<ScriptComponent>()
+	.cached()
 	.build();
 }
 

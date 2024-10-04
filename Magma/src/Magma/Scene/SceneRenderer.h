@@ -41,6 +41,7 @@ public:
 	void UpdatePasses();
 
 	const SceneRenderer::Options& GetOptions() const { return m_Options; }
+	CameraController& GetCameraController() { return m_Controller; }
 
 private:
 	Scene* m_Scene;
@@ -50,8 +51,11 @@ private:
 	Ref<RenderPass> m_LightingPass;
 	Ref<Framebuffer> m_Output;
 
-	// TODO(List of Camera's and Framebuffer's for multiple targets, i.e Player pov, bird's eye view pov)
+	// TODO(Implement):
+	// List of Camera's and Framebuffer's for multiple targets, i.e Player pov, bird's eye view pov
 	Ref<Camera> m_Camera;
+	// TODO(Implement): CameraControllerEntity
+	CameraController m_Controller;
 
 	flecs::system m_RenderSystem;
 };

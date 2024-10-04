@@ -5,11 +5,15 @@
 #include <VolcaniCore/Event/Events.h>
 #include <VolcaniCore/Renderer/RendererAPI.h>
 
+#include <Magma/ECS/EntityBuilder.h>
+
 #include "Asset.h"
 #include "GameState.h"
 #include "Player.h"
 #include "IsometricCamera.h"
 #include "Light.h"
+
+using namespace Magma::ECS;
 
 namespace TheMazeIsLava {
 
@@ -139,28 +143,33 @@ void Game::LoadScreens() {
 	PlayScreen.OnLoad =
 		[&]()
 		{
-			auto camera = CreateRef<IsometricCamera>();
-			auto controller =
-				CameraController(
-					MovementControls(
-						ControlMap{
-							{ Control::Up,   Key::W },
-							{ Control::Down, Key::S },
-							{ Control::Forward,  Key::Invalid },
-							{ Control::Backward, Key::Invalid },
-						})
-					);
-			controller.RotationSpeed = 0.0f;
-
 			auto& currLevel = GameState::GetLevel();
 			currLevel.Load();
 			auto scene = currLevel.GetScene();
-			// scene->SetCamera(camera);
-			// scene->SetController(controller);
+
+			auto camera = CreateRef<IsometricCamera>();
+			auto& controller = scene->GetRenderer().GetCameraController();
+			controller.SetControls(
+				MovementControls(
+					ControlMap{
+						{ Control::Up,   Key::W },
+						{ Control::Down, Key::S },
+						{ Control::Forward,  Key::Invalid },
+						{ Control::Backward, Key::Invalid },
+					})
+				);
+			controller.TranslationSpeed = 5.0f;
+			controller.RotationSpeed = 0.0f;
+			controller.SetCamera(camera);
+
+			EntityBuilder(scene->EntityWorld, "MainCamera")
+			.Add<CameraComponent>()
+			.Finalize();
 
 			auto [x, y] = currLevel.PlayerStart;
 			Player player(scene->EntityWorld);
 			player.Get<TransformComponent>().Translation = { x, 0.0f, y };
+			player.Get<TransformComponent>().Scale = glm::vec3(1.0f);
 
 			// TODO(Implement): Collision with group
 			// PhysicsSystem::RegisterForCollisionDetection(player, m_LavaGroup);

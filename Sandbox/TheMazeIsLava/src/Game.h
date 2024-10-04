@@ -2,8 +2,6 @@
 
 #include <Core/Application.h>
 
-#include <Renderer/CameraController.h>
-
 #include "Screen.h"
 
 using namespace VolcaniCore;
