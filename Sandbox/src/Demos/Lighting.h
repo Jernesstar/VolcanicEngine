@@ -47,8 +47,7 @@ private:
 	Ref<OpenGL::UniformBuffer> buffer;
 
 	Ref<Mesh> cube;
-	Ref<Model> torch;
-	// Ref<Model> stairs;
+	Ref<Mesh> torch;
 
 	PointLight light;
 	SpotLight spot;
@@ -99,23 +98,14 @@ Lighting::Lighting() {
 			{ "OuterCutoffAngle",  OpenGL::BufferDataType::Float },
 		}, 0);
 
-	shader->SetInt("u_PointLightCount", 1);
-	shader->SetVec3("u_PointLights[0].Position", light.Position);
-	shader->SetVec3("u_PointLights[0].Ambient",  light.Ambient);
-	shader->SetVec3("u_PointLights[0].Diffuse",  light.Diffuse);
-	shader->SetVec3("u_PointLights[0].Specular", light.Specular);
-
-	shader->SetFloat("u_PointLights[0].Constant",  light.Constant);
-	shader->SetFloat("u_PointLights[0].Linear",    light.Linear);
-	shader->SetFloat("u_PointLights[0].Quadratic", light.Quadratic);
+	shader->SetInt("u_PointLightCount", 400);
 
 	cube = Mesh::Create(MeshPrimitive::Cube,
 		Material{
 			.Diffuse = Texture::Create("Sandbox/assets/images/wood.png"),
 			.Specular = Texture::Create("Sandbox/assets/images/wood_specular.png"),
 		});
-	// torch = Model::Create("Sandbox/assets/models/mc-torch/Torch.obj");
-	// stairs = Model::Create("Sandbox/TheMazeIsLava/assets/models/stairs/stairs.obj");
+	torch = Mesh::Create("Sandbox/assets/models/mc-torch/Torch.obj");
 
 	shader->SetTexture("u_Material.Diffuse",  cube->GetMaterial().Diffuse, 0);
 	shader->SetTexture("u_Material.Specular", cube->GetMaterial().Specular, 1);
@@ -158,19 +148,24 @@ void Lighting::OnUpdate(TimeStep ts) {
 
 		Renderer3D::Begin(camera);
 
-		// Renderer3D::DrawModel(torch,
-		// {
-		// 	.Translation = light.Position - glm::vec3{ 0.0f, 1.0f, 0.0f }
-		// });
-		Renderer3D::DrawMesh(cube, { .Translation = { -2.0f,  0.0f,  0.0f } });
-		Renderer3D::DrawMesh(cube, { .Translation = {  2.0f,  0.0f,  0.0f } });
-		Renderer3D::DrawMesh(cube, { .Translation = {  0.0f,  0.0f, -2.0f } });
-		Renderer3D::DrawMesh(cube, { .Translation = {  0.0f,  0.0f,  2.0f } });
+		for(int y = -10; y < 10; y++)
+			for(int x = -10; x < 10; x++) {
+				Renderer3D::DrawMesh(cube, { .Translation = { x, 0.0f, y } });
 
-		// Renderer3D::DrawModel(stairs,
-		// {
-		// 	.Translation = { 0.0f, -10.0f, 0.0f },
-		// });
+				glm::vec3 lightPos = { x, 1.0f, y };
+				uint32_t i = 10 * (y + 10) + (x + 10);
+				std::string name = "u_PointLights[" + std::to_string(i) + "].";
+
+				shader->SetVec3(name + "Position", lightPos);
+				shader->SetVec3(name + "Ambient",  light.Ambient);
+				shader->SetVec3(name + "Diffuse",  light.Diffuse);
+				shader->SetVec3(name + "Specular", light.Specular);
+
+				shader->SetFloat(name + "Constant",  light.Constant);
+				shader->SetFloat(name + "Linear",    light.Linear);
+				shader->SetFloat(name + "Quadratic", light.Quadratic);
+				Renderer3D::DrawMesh(torch, { .Translation = lightPos });
+			}
 
 		Renderer3D::End();
 	}

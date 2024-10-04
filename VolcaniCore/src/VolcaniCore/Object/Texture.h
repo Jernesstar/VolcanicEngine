@@ -8,10 +8,12 @@ class Texture {
 public:
 	enum class InternalFormat { Normal, Float };
 	enum class ColorFormat { Red, RGB, RGBA };
+	enum class SamplingOption { Nearest, Linear };
 
 public:
 	static Ref<Texture> Create(uint32_t width, uint32_t height,
-								InternalFormat format = InternalFormat::Normal);
+		InternalFormat format = InternalFormat::Normal,
+		SamplingOption sampling = SamplingOption::Linear);
 	static Ref<Texture> Create(const std::string& path);
 
 public:

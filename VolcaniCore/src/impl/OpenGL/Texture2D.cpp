@@ -10,11 +10,11 @@
 namespace VolcaniCore::OpenGL {
 
 Texture2D::Texture2D(uint32_t width, uint32_t height,
-					 Texture::InternalFormat format)
+					 Texture::InternalFormat format, SamplingOption sampling)
 	: Texture(width, height), m_InternalFormat(GL_RGBA8),
 		m_DataFormat(GL_RGBA)
 {
-	m_TextureID = CreateTexture(width, height, format);
+	m_TextureID = CreateTexture(width, height, format, sampling);
 }
 
 Texture2D::Texture2D(const std::string& path)
@@ -76,7 +76,8 @@ constexpr uint32_t GetColorFormat(Texture::ColorFormat format) {
 }
 
 uint32_t Texture2D::CreateTexture(uint32_t width, uint32_t height,
-									Texture::InternalFormat internal)
+									Texture::InternalFormat internal,
+									SamplingOption sampling)
 {
 	uint32_t internalFormat;
 	uint32_t textureID;
@@ -85,8 +86,9 @@ uint32_t Texture2D::CreateTexture(uint32_t width, uint32_t height,
 	glCreateTextures(GL_TEXTURE_2D, 1, &textureID);
 	glTextureStorage2D(textureID, 1, internalFormat, width, height);
 
-	glTextureParameteri(textureID, GL_TEXTURE_MIN_FILTER, GL_LINEAR); // GL_NEAREST
-	glTextureParameteri(textureID, GL_TEXTURE_MAG_FILTER, GL_LINEAR); // GL_NEAREST
+	auto filter = sampling == SamplingOption::Linear ? GL_LINEAR : GL_NEAREST;
+	glTextureParameteri(textureID, GL_TEXTURE_MIN_FILTER, filter);
+	glTextureParameteri(textureID, GL_TEXTURE_MAG_FILTER, filter);
 	glTextureParameteri(textureID, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTextureParameteri(textureID, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 

@@ -11,7 +11,8 @@ namespace VolcaniCore::OpenGL {
 class Texture2D : public VolcaniCore::Texture {
 public:
 	Texture2D(const std::string& path);
-	Texture2D(uint32_t width, uint32_t height, Texture::InternalFormat format);
+	Texture2D(uint32_t width, uint32_t height,
+				Texture::InternalFormat format, SamplingOption sampling);
 	~Texture2D();
 
 	void Bind(uint32_t slot = 0);
@@ -31,7 +32,8 @@ public:
 	}
 
 	static uint32_t CreateTexture(uint32_t width, uint32_t height,
-		Texture::InternalFormat internal = Texture::InternalFormat::Normal);
+		Texture::InternalFormat internal = Texture::InternalFormat::Normal,
+		SamplingOption sampling = SamplingOption::Linear);
 
 private:
 	uint32_t m_TextureID;

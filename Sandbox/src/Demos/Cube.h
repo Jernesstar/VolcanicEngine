@@ -6,13 +6,13 @@ namespace Demo {
 
 class IsometricCamera : public Camera {
 public:
-	float R = 5.0f;
+	float R = 4.0f;
 
 public:
 	IsometricCamera()
 		: Camera(Camera::Type::Ortho)
 	{
-		Near = -R;
+		Near = -4*R*R;
 		Position = R * glm::vec3{
 			glm::sin(glm::radians(45.0f)),
 			glm::sin(glm::radians(35.264f)),
@@ -35,7 +35,6 @@ private:
 	void CalculateProjection() override {
 		float asp = R * (ViewportWidth/ViewportHeight);
 		Projection = glm::ortho(-asp, asp, -R, R, Near, Far);
-
 		ViewProjection = Projection * View;
 	}
 	void CalculateView() override {
@@ -60,7 +59,6 @@ private:
 	Ref<Texture> depth;
 	Ref<Framebuffer> framebuffer;
 
-	Ref<Mesh> torch;
 	Ref<Mesh> cube;
 
 	Ref<Camera> camera;
@@ -81,41 +79,39 @@ Cube::Cube()
 
 	shader = ShaderPipeline::Create("VolcaniCore/assets/shaders", "Mesh");
 
-	// color = Texture::Create(480, 270);
-	// depth = Texture::Create(1920, 1080);
-	// framebuffer = Framebuffer::Create(
-	// 	{
-	// 		{ AttachmentTarget::Color, { { color } } },
-	// 		{ AttachmentTarget::Depth, { { depth } } },
-	// 	});
+	color = Texture::Create(480, 270,
+			Texture::InternalFormat::Normal, Texture::SamplingOption::Nearest);
+	depth = Texture::Create(1920, 1080);
+	framebuffer = Framebuffer::Create(
+		{
+			{ AttachmentTarget::Color, { { color } } },
+			{ AttachmentTarget::Depth, { { depth } } },
+		});
 
 	renderPass = RenderPass::Create("Render Pass", shader);
-	// renderPass->SetOutput(framebuffer);
+	renderPass->SetOutput(framebuffer);
 
-	torch = Mesh::Create("Sandbox/assets/models/mc-torch/Torch.obj");
 	cube = Mesh::Create(MeshPrimitive::Cube,
 		Material{
 			.Diffuse = Texture::Create("Sandbox/assets/images/wood.png"),
 		});
 
-	camera = CreateRef<StereographicCamera>(75.0f);
-	// camera = CreateRef<OrthographicCamera>(1920, 1080, 0.1f, 100.0f);
-	// camera = CreateRef<IsometricCamera>();
+	camera = CreateRef<IsometricCamera>();
 	camera->Resize(1920, 1080);
 	controller =
 		CameraController(
 			MovementControls(
 				ControlMap{
-					// { Control::Up,   Key::W },
-					// { Control::Down, Key::S },
-					// { Control::Forward,  Key::Invalid },
-					// { Control::Backward, Key::Invalid },
+					{ Control::Up,   Key::W },
+					{ Control::Down, Key::S },
+					{ Control::Forward,  Key::Invalid },
+					{ Control::Backward, Key::Invalid },
 				}
 			)
 		);
 
 	controller.SetCamera(camera);
-	// controller.RotationSpeed = 0.0f;
+	controller.RotationSpeed = 0.0f;
 	controller.TranslationSpeed = 20.0f;
 }
 
@@ -154,17 +150,15 @@ void Cube::OnUpdate(TimeStep ts) {
 		Renderer3D::Begin(camera);
 
 		for(int y = -10; y < 10; y++)
-			for(int x = -10; x < 10; x++) {
-				Renderer3D::DrawMesh(torch, { .Translation = { x, 1.0f, y } });
+			for(int x = -10; x < 10; x++)
 				Renderer3D::DrawMesh(cube, { .Translation = { x, 0.0f, y } });
-			}
 
 		Renderer3D::End();
 	}
 	Renderer::EndPass();
 
 	Renderer::Flush();
-	// RendererAPI::Get()->RenderFramebuffer(framebuffer, AttachmentTarget::Color);
+	RendererAPI::Get()->RenderFramebuffer(framebuffer, AttachmentTarget::Color);
 
 	UI::End();
 }

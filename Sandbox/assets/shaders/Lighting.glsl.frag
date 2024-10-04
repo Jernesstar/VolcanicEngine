@@ -38,7 +38,7 @@ struct DirectionalLight {
 //     float OuterCutoffAngle;
 // };
 
-#define MAX_POINT_LIGHTS 16
+#define MAX_POINT_LIGHTS 400
 
 layout(location = 0) in vec3 v_Position;
 layout(location = 1) in vec3 v_Normal;
@@ -73,9 +73,9 @@ void main()
     vec3 viewDir = normalize(u_CameraPosition - v_Position);
 
     vec3 result = vec3(0.0, 0.0, 0.0);
-    // for(int i = 0; i < u_PointLightCount; i++)
-    //     result += CalcPointLight(u_PointLights[i], normal, viewDir);
-    
+    for(int i = 0; i < u_PointLightCount; i++)
+        result += CalcPointLight(u_PointLights[i], normal, viewDir);
+
     // result += CalcDirLight(normal, viewDir);
     result += CalcSpotLight(normal, viewDir);
 

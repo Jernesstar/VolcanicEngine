@@ -7,13 +7,13 @@
 namespace VolcaniCore {
 
 Ref<Texture> Texture::Create(uint32_t width, uint32_t height,
-							 InternalFormat format)
+							 InternalFormat format, SamplingOption sampling)
 {
 	RendererAPI::Backend backend = RendererAPI::Get()->GetBackend();
 
 	switch(backend) {
 		case RendererAPI::Backend::OpenGL:
-			return CreateRef<OpenGL::Texture2D>(width, height, format);
+			return CreateRef<OpenGL::Texture2D>(width, height, format, sampling);
 			break;
 	}
 }
