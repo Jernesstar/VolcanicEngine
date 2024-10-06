@@ -80,10 +80,10 @@ Lighting::Lighting() {
 		.Linear    = 0.0f,
 		.Quadratic = 0.032f,
 	};
-	light.Position = { 0.0f, 1.0f, 0.0f };
-	light.Ambient  = { 0.2f, 0.2f, 0.2f };
-	light.Diffuse  = { 0.5f, 0.5f, 0.5f };
-	light.Specular = { 1.0f, 1.0f, 1.0f };
+	light.Position = { 0.0f, 0.001f, 0.0f };
+	light.Ambient  = { 0.002f, 0.002f, 0.002f };
+	light.Diffuse  = { 0.005f, 0.005f, 0.005f };
+	light.Specular = { 0.001f, 0.001f, 0.001f };
 
 	spot = SpotLight{
 		.Position = { 0.0f, 0.0f, 0.0f },
@@ -147,15 +147,6 @@ void Lighting::OnUpdate(TimeStep ts) {
 
 		Renderer3D::Begin(camera);
 
-		auto& uniforms = Renderer::GetPass()->GetUniforms();
-
-		uniforms
-		.Set("u_PointLightCount",
-			[&]() -> int32_t
-			{
-				return 2 * width * 2 * length;
-			});
-
 		auto cubeUniforms = Uniforms{ }
 		.Set("u_Material.Diffuse",
 			[&]() -> TextureSlot
@@ -193,18 +184,25 @@ void Lighting::OnUpdate(TimeStep ts) {
 		Renderer3D::SetMeshUniforms(cube, cubeUniforms);
 		Renderer3D::SetMeshUniforms(torch, torchUniforms);
 
+		Renderer::GetPass()->GetUniforms()
+		.Set("u_PointLightCount",
+			[&]() -> int32_t
+			{
+				return 2 * width * 2 * length;
+			});
+
 		for(int y = -length; y < length; y++) {
 			for(int x = -width; x < width; x++) {
-				int i = width * (y + length) + (x + width);
+				int i = 2*width * (y + length) + (x + width);
 				std::string name = "u_PointLights[" + std::to_string(i) + "].";
-				// VOLCANICORE_LOG_INFO(name);
+		
+				auto& uniforms = Renderer::GetDrawCommand().GetUniforms();
 
-				glm::vec3 lightPos = { x, 1.5f, y };
 				uniforms
 				.Set(name + "Position",
-					[&]() -> glm::vec3
+					[x=x, y=y]() -> glm::vec3
 					{
-						return lightPos;
+						return { x, 1.5f, y };
 					})
 				.Set(name + "Ambient",
 					[&]() -> glm::vec3
@@ -243,6 +241,7 @@ void Lighting::OnUpdate(TimeStep ts) {
 				Renderer3D::DrawMesh(torch, { .Translation = { x, 1.0f, y } });
 			}
 		}
+		Renderer3D::DrawModel(player);
 
 		Renderer3D::End();
 	}

@@ -194,44 +194,44 @@ void Bloom::OnUpdate(TimeStep ts) {
 	RendererAPI::Get()->Resize(window->GetWidth(), window->GetHeight());
 	RendererAPI::Get()->RenderFramebuffer(mips, AttachmentTarget::Color);
 
-	// Renderer::StartPass(bloomPass);
-	// {
-	// 	Renderer::GetDrawCommand().GetUniforms()
-	// 	.Set("u_BloomTexture",
-	// 		[&]() -> TextureSlot
-	// 		{
-	// 			mips->Bind(AttachmentTarget::Color, 0);
-	// 			return { };
-	// 		});
-	// 	Renderer::GetDrawCommand().GetUniforms()
-	// 	.Set("u_SceneTexture",
-	// 		[&]() -> TextureSlot
-	// 		{
-	// 			src->Bind(AttachmentTarget::Color, 1);
-	// 			return { };
-	// 		});
-	// 	Renderer::GetPass()->GetUniforms()
-	// 	.Set("u_Exposure",
-	// 		[&]() -> float
-	// 		{
-	// 			return exposure;
-	// 		});
-	// 	Renderer::GetPass()->GetUniforms()
-	// 	.Set("u_BloomStrength",
-	// 		[&]() -> float
-	// 		{
-	// 			return bloomStrength;
-	// 		});
+	Renderer::StartPass(bloomPass);
+	{
+		Renderer::GetDrawCommand().GetUniforms()
+		.Set("u_BloomTexture",
+			[&]() -> TextureSlot
+			{
+				mips->Bind(AttachmentTarget::Color, 0);
+				return { };
+			});
+		Renderer::GetDrawCommand().GetUniforms()
+		.Set("u_SceneTexture",
+			[&]() -> TextureSlot
+			{
+				src->Bind(AttachmentTarget::Color, 1);
+				return { };
+			});
+		Renderer::GetPass()->GetUniforms()
+		.Set("u_Exposure",
+			[&]() -> float
+			{
+				return exposure;
+			});
+		Renderer::GetPass()->GetUniforms()
+		.Set("u_BloomStrength",
+			[&]() -> float
+			{
+				return bloomStrength;
+			});
 
-	// 	Renderer::GetPass()->SetGlobalUniforms();
-	// 	Renderer::GetPass()
-	// 		->SetUniforms(Renderer::GetDrawCommand().GetUniforms());
+		Renderer::GetPass()->SetGlobalUniforms();
+		Renderer::GetPass()
+			->SetUniforms(Renderer::GetDrawCommand().GetUniforms());
 
-	// 	RendererAPI::Get()->Resize(window->GetWidth(), window->GetHeight());
-	// 	RendererAPI::Get()->RenderFramebuffer(mips, AttachmentTarget::Color);
-	// }
-	// Renderer::EndPass();
-	// Renderer::Flush();
+		RendererAPI::Get()->Resize(window->GetWidth(), window->GetHeight());
+		RendererAPI::Get()->RenderFramebuffer(mips, AttachmentTarget::Color);
+	}
+	Renderer::EndPass();
+	Renderer::Flush();
 
 	UI::End();
 }

@@ -82,8 +82,7 @@ Cube::Cube()
 	color = Texture::Create(480, 270,
 			Texture::InternalFormat::Normal, Texture::SamplingOption::Nearest);
 	depth = Texture::Create(1920, 1080);
-	framebuffer = Framebuffer::Create(
-		{
+	framebuffer = Framebuffer::Create({
 			{ AttachmentTarget::Color, { { color } } },
 			{ AttachmentTarget::Depth, { { depth } } },
 		});
@@ -158,7 +157,7 @@ void Cube::OnUpdate(TimeStep ts) {
 	Renderer::EndPass();
 
 	Renderer::Flush();
-	RendererAPI::Get()->RenderFramebuffer(framebuffer, AttachmentTarget::Color);
+	RendererAPI::Get()->RenderFramebuffer(framebuffer, AttachmentTarget::Depth);
 
 	UI::End();
 }

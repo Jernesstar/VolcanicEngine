@@ -288,8 +288,8 @@ void Renderer::RenderFramebuffer(Ref<VolcaniCore::Framebuffer> buffer,
 
 	// TODO(Change): Move to VolcaniCore::Renderer2D::DrawFullScreenQuad
 	auto pass = VolcaniCore::Renderer::GetPass();
-	Ref<ShaderPipeline> pipeline;
-	Ref<VolcaniCore::Framebuffer> output;
+	Ref<ShaderPipeline> pipeline = nullptr;
+	Ref<VolcaniCore::Framebuffer> output = nullptr;
 	if(pass) {
 		pipeline = pass->GetPipeline();
 		output = pass->GetOutput();
@@ -313,8 +313,11 @@ void Renderer::RenderFramebuffer(Ref<VolcaniCore::Framebuffer> buffer,
 	glEnable(GL_DEPTH_TEST);
 	s_Data.FramebufferArray->Unbind();
 
-	if(output)
+	if(output) {
+		auto window = Application::GetWindow();
+		Resize(window->GetWidth(), window->GetWidth());
 		output->Unbind();
+	}
 }
 
 }

@@ -31,17 +31,18 @@ Framebuffer::Framebuffer(uint32_t width, uint32_t height)
 	glBindFramebuffer(GL_FRAMEBUFFER, m_BufferID);
 
 	// TODO(Change): Renderbuffer
-	m_AttachmentMap.insert(
-	{
-		AttachmentTarget::Color, { { Attachment::Type::Texture } }
-	});
-	m_AttachmentMap.insert(
-	{
-		AttachmentTarget::Depth, { { Attachment::Type::Texture } }
-	});
+	m_AttachmentMap.insert({
+			AttachmentTarget::Color, { { Attachment::Type::Texture } }
+		});
+	m_AttachmentMap.insert({
+			AttachmentTarget::Depth, { { Attachment::Type::Texture } }
+		});
 
 	CreateColorAttachment();
 	CreateDepthAttachment();
+
+	uint32_t atts[] = { GL_COLOR_ATTACHMENT0 };
+	glDrawBuffers(1, atts);
 
 	VOLCANICORE_ASSERT(
 		glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
@@ -73,13 +74,11 @@ Framebuffer::Framebuffer(const Map<AttachmentTarget, List<Attachment>>& map,
 		glDrawBuffer(GL_NONE);
 		glReadBuffer(GL_NONE);
 	}
-	if(!Has(AttachmentTarget::Depth)) {
-		m_AttachmentMap.insert(
-		{
-			// TODO(Change): Replace with RenderBuffer
+	// TODO(Change): Replace with RenderBuffer
+	if(!Has(AttachmentTarget::Depth))
+		m_AttachmentMap.insert({
 			AttachmentTarget::Depth, { { Attachment::Type::Texture } }
 		});
-	}
 
 	uint32_t index = 0;
 	for(auto& _ : m_AttachmentMap[AttachmentTarget::Color])
@@ -87,16 +86,18 @@ Framebuffer::Framebuffer(const Map<AttachmentTarget, List<Attachment>>& map,
 
 	CreateDepthAttachment();
 
-	// // TODO: Don't create if already have Depth-Stencil buffer
+	// // TODO(Fix): Don't create if already have Depth-Stencil buffer
 	// if(Has(AttachmentTarget::Stencil))
 	// 	CreateStencilAttachment();
 
-	uint32_t* atts = new uint32_t[index];
-	for(uint32_t i = 0; i < index; i++)
-		atts[i] = GL_COLOR_ATTACHMENT0 + i;
+	if(index != 0) {
+		uint32_t* atts = new uint32_t[index];
+		for(uint32_t i = 0; i < index; i++)
+			atts[i] = GL_COLOR_ATTACHMENT0 + i;
 
-	glDrawBuffers(index, atts);
-	delete atts;
+		glDrawBuffers(index, atts);
+		delete atts;
+	}
 
 	VOLCANICORE_ASSERT(
 		glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
@@ -190,7 +191,7 @@ void Framebuffer::CreateDepthAttachment() {
 	height = height ? height : m_Height;
 
 	if(attachment.GetType() == Attachment::Type::Texture) {
-		if(attachment.m_RendererID != 0) {
+		if(attachment.m_RendererID == 0) {
 			// TODO(Implement): CreateTexture(Type::Depth);
 			glGenTextures(1, &attachment.m_RendererID);
 			glBindTexture(GL_TEXTURE_2D, attachment.m_RendererID);

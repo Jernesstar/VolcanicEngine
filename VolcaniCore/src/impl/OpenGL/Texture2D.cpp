@@ -10,7 +10,7 @@
 namespace VolcaniCore::OpenGL {
 
 Texture2D::Texture2D(uint32_t width, uint32_t height,
-					 Texture::InternalFormat format, SamplingOption sampling)
+					 InternalFormat format, SamplingOption sampling)
 	: Texture(width, height), m_InternalFormat(GL_RGBA8),
 		m_DataFormat(GL_RGBA)
 {
@@ -61,6 +61,8 @@ constexpr uint32_t GetInternalFormat(Texture::InternalFormat format) {
 			return GL_RGBA8;
 		case Texture::InternalFormat::Float:
 			return GL_RGBA16F; // GL_R11F_G11F_B10F
+		case Texture::InternalFormat::Depth:
+			return GL_DEPTH_COMPONENT; // GL_R11F_G11F_B10F
 	}
 }
 
@@ -76,7 +78,7 @@ constexpr uint32_t GetColorFormat(Texture::ColorFormat format) {
 }
 
 uint32_t Texture2D::CreateTexture(uint32_t width, uint32_t height,
-									Texture::InternalFormat internal,
+									InternalFormat internal,
 									SamplingOption sampling)
 {
 	uint32_t internalFormat;
