@@ -18,7 +18,7 @@ using namespace Magma::ECS;
 namespace TheMazeIsLava {
 
 Game::Game()
-	: Application(800, 600, "The Maze is Lava")
+	: Application(1920, 1080, "The Maze is Lava")
 {
 	Events::RegisterListener<KeyPressedEvent>(
 		[&](const KeyPressedEvent& event)
@@ -51,12 +51,13 @@ void Game::OnUpdate(TimeStep ts) {
 
 void Game::LoadScreens() {
 	Ref<UI::UIElement> home, level, pause, over; 
+	auto window = Application::GetWindow();
 
 	UI::Window::Specification specs{
 		.Width = 600,
-		.Height = 400,
-		.x = 100.0f,
-		.y = 100.0f,
+		.Height = 300,
+		.x = (float)window->GetWidth()/2.0f - 300,
+		.y = (float)window->GetHeight()/2.0f - 150,
 		.Color = glm::vec4{ 0.859375f, 0.76171875f, 0.5859375f, 1.0f },
 		.BorderWidth = 10,
 		.BorderHeight = 20,
@@ -72,7 +73,7 @@ void Game::LoadScreens() {
 	->SetPosition(160, 100);
 	home
 	->Add<UI::Text>("Press start to play", glm::vec4(0.0f, 0.0f, 0.0f, 1.0f))
-	->SetPosition(120, 150);
+	->SetPosition(145, 150);
 	// home
 	// ->Add<UI::Image>("Sandbox/assets/images/background.png")
 	// ->SetPosition(100, 100);
@@ -169,7 +170,7 @@ void Game::LoadScreens() {
 			auto [x, y] = currLevel.PlayerStart;
 			Player player(scene->EntityWorld);
 			player.Get<TransformComponent>().Translation = { x, 0.0f, y };
-			player.Get<TransformComponent>().Scale = glm::vec3(1.0f);
+			player.Get<TransformComponent>().Scale = glm::vec3(2.2f);
 
 			// TODO(Implement): Collision with group
 			// PhysicsSystem::RegisterForCollisionDetection(player, m_LavaGroup);

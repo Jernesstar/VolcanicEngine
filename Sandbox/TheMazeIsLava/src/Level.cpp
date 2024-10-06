@@ -55,13 +55,13 @@ void Level::Load() {
 				// .Add<RigidBodyComponent>(RigidBody::Type::Static)
 				.Finalize();
 			}
-			if(IsPath(tile)) {
+			if(IsPath(tile) || IsStart(tile)) {
 				ECS::Entity path = ECS::EntityBuilder(world)
 				.Add<TransformComponent>(
 					Transform{ .Translation = { x, 0.0f, y } }
 				)
 				.Add<MeshComponent>(Asset::Wall)
-				// .Add<RigidBodyComponent>(RigidBody::Type::S tatic)
+				// .Add<RigidBodyComponent>(RigidBody::Type::Static)
 				// .Add<MeshComponent>(PickPathMesh(tile))
 				.Finalize();
 			}

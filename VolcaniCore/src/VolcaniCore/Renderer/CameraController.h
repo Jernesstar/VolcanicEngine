@@ -1,7 +1,5 @@
 #pragma once
 
-#include <memory>
-
 #include "Camera.h"
 
 #include "Core/Time.h"
@@ -42,12 +40,13 @@ private:
 
 class CameraController {
 public:
-	float TranslationSpeed = 0.5f;
-	float RotationSpeed = 0.6f;
+	float TranslationSpeed = 2.0f;
+	float RotationSpeed = 1.0f;
 
 public:
 	CameraController(const MovementControls& controls = { });
 	CameraController(Ref<Camera> camera);
+	~CameraController();
 
 	void OnUpdate(TimeStep ts);
 
@@ -63,6 +62,7 @@ private:
 	MovementControls m_Controls;
 
 	glm::vec2 m_LastMousePosition = { 0.0f, 0.0f };
+	UUID m_CallbackID;
 };
 
 }

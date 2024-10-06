@@ -53,7 +53,7 @@ void ShaderProgram::Compile() {
 
 		glDeleteProgram(m_ProgramID);
 
-		VOLCANICORE_ASSERT_ARGS(false, "An linking error has occured: \n%s",
+		VOLCANICORE_ASSERT_ARGS(false, "A linking error has occured: \n%s",
 								message);
 	}
 

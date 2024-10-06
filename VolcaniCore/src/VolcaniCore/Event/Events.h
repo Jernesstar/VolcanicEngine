@@ -1,7 +1,5 @@
 #pragma once
 
-#include <iostream>
-#include <functional>
 #include <map>
 
 #define GLFW_INCLUDE_NONE
@@ -39,20 +37,17 @@ public:
 
 	template<typename TEvent>
 	requires std::derived_from<TEvent, Event>
-	static EventCallback<TEvent> RegisterListener(
-			const Func<TEvent&, void>& callback)
+	static UUID RegisterListener(const Func<TEvent&, void>& callback)
 	{
 		EventCallback<TEvent> eventCallback(callback);
 		RegisterListener<TEvent>(eventCallback);
-		return eventCallback;
+		return eventCallback.GetID();
 	}
 
 	template<typename TEvent>
 	requires std::derived_from<TEvent, Event>
-	static void UnregisterListener(const EventCallback<TEvent>& eventCallback) {
-		Callbacks<TEvent>& callbacks = GetCallbacks<TEvent>();
-		if(callbacks.count(eventCallback.GetID()))
-			callbacks.erase(eventCallback.GetID());
+	static void UnregisterListener(const UUID& callbackID) {
+		GetCallbacks<TEvent>().erase(callbackID);
 	}
 
 private:

@@ -10,6 +10,7 @@
 #include "Object/Text.h"
 
 #include "Renderer/Camera.h"
+#include "Renderer/RenderPass.h"
 #include "Renderer/Transform.h"
 
 namespace VolcaniCore {
@@ -18,6 +19,8 @@ class Renderer3D {
 public:
 	static void Begin(Ref<Camera> camera);
 	static void End();
+
+	static void SetMeshUniforms(Ref<Mesh> mesh, const Uniforms& uniforms);
 
 	static void DrawSkybox(Ref<Cubemap> cubemap);
 

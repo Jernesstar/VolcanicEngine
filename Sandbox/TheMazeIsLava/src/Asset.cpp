@@ -3,15 +3,17 @@
 namespace TheMazeIsLava {
 
 void Asset::Init() {
-	auto tex = Texture::Create("Sandbox/TheMazeIsLava/assets/images/stone.png");
-	auto tex2 = Texture::Create("Sandbox/TheMazeIsLava/assets/images/lava.png");
+	std::string assetPath = "Sandbox/TheMazeIsLava/assets/";
+
+	auto tex = Texture::Create(assetPath + "images/stone.png");
+	auto tex2 = Texture::Create(assetPath + "images/lava.png");
 	Wall = Mesh::Create(MeshPrimitive::Cube, Material{ .Diffuse = tex });
 	Lava = Mesh::Create(MeshPrimitive::Cube, Material{ .Diffuse = tex2 });
 
-	Player = Mesh::Create("Sandbox/assets/models/sphere/wooden_sphere.obj");
-	Torch = Mesh::Create("Sandbox/TheMazeIsLava/assets/models/torch/torch.obj");
-	Stairs =
-		Mesh::Create("Sandbox/TheMazeIsLava/assets/models/stairs/stairs.obj");
+	// TODO(Change): Models in MeshComponent
+	Player = Mesh::Create(assetPath + "models/player/Knight_Golden_Male.obj");
+	Torch  = Mesh::Create(assetPath + "models/torch/torch.obj");
+	Stairs = Mesh::Create(assetPath + "models/stairs/stairs.obj");
 }
 
 }

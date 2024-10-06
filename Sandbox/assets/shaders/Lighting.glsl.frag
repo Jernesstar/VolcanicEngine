@@ -38,7 +38,7 @@ struct DirectionalLight {
 //     float OuterCutoffAngle;
 // };
 
-#define MAX_POINT_LIGHTS 400
+#define MAX_POINT_LIGHTS 100
 
 layout(location = 0) in vec3 v_Position;
 layout(location = 1) in vec3 v_Normal;
@@ -73,11 +73,11 @@ void main()
     vec3 viewDir = normalize(u_CameraPosition - v_Position);
 
     vec3 result = vec3(0.0, 0.0, 0.0);
-    for(int i = 0; i < u_PointLightCount; i++)
-        result += CalcPointLight(u_PointLights[i], normal, viewDir);
+    for(int i = 0; i < 54; i++)
+        result = CalcPointLight(u_PointLights[i], normal, viewDir);
 
     // result += CalcDirLight(normal, viewDir);
-    result += CalcSpotLight(normal, viewDir);
+    // result += CalcSpotLight(normal, viewDir);
 
     FragColor = vec4(result, 1.0);
 }
@@ -99,6 +99,7 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 viewDir)
     vec3 specular = light.Specular * spec * vec3(texture(u_Material.Specular, v_TexCoords.xy));
 
     return (ambient + diffuse + specular) * attenuation;
+    // return vec3(attenuation);
 }
 
 vec3 CalcDirLight(vec3 normal, vec3 viewDir)

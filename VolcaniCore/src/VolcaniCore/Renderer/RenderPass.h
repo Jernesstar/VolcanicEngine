@@ -34,14 +34,21 @@ public:
 	HandleMap<glm::mat4> Mat4Handles;
 
 	template<class TPredicate>
-	void Set(const std::string& uniformName, TPredicate&& callback) {
+	Uniforms& Set(const std::string& uniformName, TPredicate&& callback) {
 		using TUniform = std::decay_t<decltype(callback())>;
-
 		GetHandles<TUniform>()[uniformName] = callback;
+
+		return *this;
 	}
 
 	template<typename TUniform>
 	HandleMap<TUniform>& GetHandles();
+
+	operator bool () {
+		return IntHandles.size() || FloatHandles.size() || TextureHandles.size()
+			|| Vec2Handles.size() || Vec3Handles.size() || Vec4Handles.size()
+			|| Mat2Handles.size() || Mat3Handles.size() || Mat4Handles.size();
+	}
 };
 
 class RenderPass {

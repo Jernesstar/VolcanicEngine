@@ -42,34 +42,38 @@ public:
 	void OnUpdate(TimeStep ts);
 
 private:
-	Ref<ShaderPipeline> shader;
-	Ref<RenderPass> drawPass;
+	Ref<RenderPass> lightingPass;
 	Ref<OpenGL::UniformBuffer> buffer;
 
 	Ref<Mesh> cube;
 	Ref<Mesh> torch;
+	Ref<Model> player;
 
 	PointLight light;
 	SpotLight spot;
 
 	Ref<Camera> camera;
 	CameraController controller;
+
+	int width, length;
 };
 
 Lighting::Lighting() {
 	Events::RegisterListener<KeyPressedEvent>(
-	[](const KeyPressedEvent& event) {
-		if(event.Key == Key::Escape)
-			Application::Close();
-	});
+		[](const KeyPressedEvent& event)
+		{
+			if(event.Key == Key::Escape)
+				Application::Close();
+		});
 
 	UI::Init();
 
+	Ref<ShaderPipeline> shader;
 	shader = ShaderPipeline::Create({
 		{ "Sandbox/assets/shaders/Lighting.glsl.vert", ShaderType::Vertex },
 		{ "Sandbox/assets/shaders/Lighting.glsl.frag", ShaderType::Fragment }
 	});
-	drawPass = RenderPass::Create("Draw Pass", shader);
+	lightingPass = RenderPass::Create("Lighting", shader);
 
 	light = PointLight{
 		.Constant  = 0.3f,
@@ -88,30 +92,22 @@ Lighting::Lighting() {
 		.OuterCutoffAngle = 0.4f
 	};
 
-	shader->Bind();
-
 	buffer = CreateRef<OpenGL::UniformBuffer>(
 		OpenGL::BufferLayout{
 			{ "Position",    OpenGL::BufferDataType::Vec3 },
 			{ "CutoffAngle", OpenGL::BufferDataType::Float },
 			{ "Direction",   OpenGL::BufferDataType::Vec3 },
-			{ "OuterCutoffAngle",  OpenGL::BufferDataType::Float },
+			{ "OuterCutoffAngle", OpenGL::BufferDataType::Float },
 		}, 0);
 
-	shader->SetInt("u_PointLightCount", 400);
-
+	std::string assetPath = "Sandbox/assets/";
 	cube = Mesh::Create(MeshPrimitive::Cube,
 		Material{
-			.Diffuse = Texture::Create("Sandbox/assets/images/wood.png"),
-			.Specular = Texture::Create("Sandbox/assets/images/wood_specular.png"),
+			.Diffuse = Texture::Create(assetPath + "images/wood.png"),
+			.Specular = Texture::Create(assetPath + "images/wood_specular.png"),
 		});
-	torch = Mesh::Create("Sandbox/assets/models/mc-torch/Torch.obj");
-
-	shader->SetTexture("u_Material.Diffuse",  cube->GetMaterial().Diffuse, 0);
-	shader->SetTexture("u_Material.Specular", cube->GetMaterial().Specular, 1);
-	shader->SetFloat("u_Material.Shininess", 32.0f);
-
-	shader->Unbind();
+	torch = Mesh::Create(assetPath + "models/mc-torch/Torch.obj");
+	player = Model::Create("Sandbox/TheMazeIsLava/assets/models/player/Knight_Golden_Male.obj");
 
 	camera = CreateRef<StereographicCamera>(75.0f);
 	camera->SetPosition({ 2.5f, 2.5f, 2.5f });
@@ -119,6 +115,9 @@ Lighting::Lighting() {
 
 	controller = CameraController{ camera };
 	controller.TranslationSpeed = 10.0f;
+
+	width = 5;
+	length = 5;
 }
 
 Lighting::~Lighting() {
@@ -130,42 +129,120 @@ void Lighting::OnUpdate(TimeStep ts) {
 
 	controller.OnUpdate(ts);
 
-	spot.Position = camera->GetPosition();
-	spot.Direction = camera->GetDirection();
+	// spot.Position = camera->GetPosition();
+	// spot.Direction = camera->GetDirection();
 
-	ImGui::Begin("##Spotlight");
-	{
-		ImGui::SliderFloat("Cutoff Angle", &spot.CutoffAngle, 0.0f, 1.0f);
-		ImGui::SliderFloat("Outer Angle", &spot.OuterCutoffAngle, spot.CutoffAngle, 2.0f);
-	}
-	ImGui::End();
+	// ImGui::Begin("Spotlight");
+	// {
+	// 	ImGui::SliderFloat("Cutoff Angle", &spot.CutoffAngle, 0.0f, 1.0f);
+	// 	ImGui::SliderFloat("Outer Angle", &spot.OuterCutoffAngle, spot.CutoffAngle, 2.0f);
+	// }
+	// ImGui::End();
 
-	buffer->SetData(&spot);
+	// buffer->SetData(&spot);
 
-	Renderer::StartPass(drawPass);
+	Renderer::StartPass(lightingPass);
 	{
 		Renderer::Clear();
 
 		Renderer3D::Begin(camera);
 
-		for(int y = -10; y < 10; y++)
-			for(int x = -10; x < 10; x++) {
-				Renderer3D::DrawMesh(cube, { .Translation = { x, 0.0f, y } });
+		auto& uniforms = Renderer::GetPass()->GetUniforms();
 
-				glm::vec3 lightPos = { x, 1.0f, y };
-				uint32_t i = 10 * (y + 10) + (x + 10);
+		uniforms
+		.Set("u_PointLightCount",
+			[&]() -> int32_t
+			{
+				return 2 * width * 2 * length;
+			});
+
+		auto cubeUniforms = Uniforms{ }
+		.Set("u_Material.Diffuse",
+			[&]() -> TextureSlot
+			{
+				return { cube->GetMaterial().Diffuse, 0 };
+			})
+		.Set("u_Material.Specular",
+			[&]() -> TextureSlot
+			{
+				return { cube->GetMaterial().Specular, 1 };
+			})
+		.Set("u_Material.Shininess",
+			[&]() -> float
+			{
+				return 32.0f;
+			});
+
+		auto torchUniforms = Uniforms{ }
+		.Set("u_Material.Diffuse",
+			[&]() -> TextureSlot
+			{
+				return { torch->GetMaterial().Diffuse, 0 };
+			})
+		.Set("u_Material.Specular",
+			[&]() -> TextureSlot
+			{
+				return { torch->GetMaterial().Specular, 1 };
+			})
+		.Set("u_Material.Shininess",
+			[&]() -> float
+			{
+				return 32.0f;
+			});
+
+		Renderer3D::SetMeshUniforms(cube, cubeUniforms);
+		Renderer3D::SetMeshUniforms(torch, torchUniforms);
+
+		for(int y = -length; y < length; y++) {
+			for(int x = -width; x < width; x++) {
+				int i = width * (y + length) + (x + width);
 				std::string name = "u_PointLights[" + std::to_string(i) + "].";
+				// VOLCANICORE_LOG_INFO(name);
 
-				shader->SetVec3(name + "Position", lightPos);
-				shader->SetVec3(name + "Ambient",  light.Ambient);
-				shader->SetVec3(name + "Diffuse",  light.Diffuse);
-				shader->SetVec3(name + "Specular", light.Specular);
+				glm::vec3 lightPos = { x, 1.5f, y };
+				uniforms
+				.Set(name + "Position",
+					[&]() -> glm::vec3
+					{
+						return lightPos;
+					})
+				.Set(name + "Ambient",
+					[&]() -> glm::vec3
+					{
+						return light.Ambient;
+					})
+				.Set(name + "Diffuse",
+					[&]() -> glm::vec3
+					{
+						return light.Diffuse;
+					})
+				.Set(name + "Specular",
+					[&]() -> glm::vec3
+					{
+						return light.Specular;
+					});
 
-				shader->SetFloat(name + "Constant",  light.Constant);
-				shader->SetFloat(name + "Linear",    light.Linear);
-				shader->SetFloat(name + "Quadratic", light.Quadratic);
-				Renderer3D::DrawMesh(torch, { .Translation = lightPos });
+				uniforms
+				.Set(name + "Constant",
+					[&]() -> float
+					{
+						return light.Constant;
+					})
+				.Set(name + "Linear",
+					[&]() -> float
+					{
+						return light.Linear;
+					})
+				.Set(name + "Quadratic",
+					[&]() -> float
+					{
+						return light.Quadratic;
+					});
+
+				Renderer3D::DrawMesh(cube, { .Translation = { x, 0.0f, y } });
+				Renderer3D::DrawMesh(torch, { .Translation = { x, 1.0f, y } });
 			}
+		}
 
 		Renderer3D::End();
 	}

@@ -16,10 +16,15 @@ CameraController::CameraController(Ref<Camera> camera) {
 	SetCamera(camera);
 }
 
+CameraController::~CameraController() {
+	Events::UnregisterListener<WindowResizedEvent>(m_CallbackID);
+}
+
 void CameraController::SetCamera(Ref<Camera> camera) {
 	m_Camera = camera;
 
-	Events::RegisterListener<WindowResizedEvent>(
+	Events::UnregisterListener<WindowResizedEvent>(m_CallbackID);
+	m_CallbackID = Events::RegisterListener<WindowResizedEvent>(
 		[cam = m_Camera](const WindowResizedEvent& event)
 		{
 			cam->Resize(event.Width, event.Height);
