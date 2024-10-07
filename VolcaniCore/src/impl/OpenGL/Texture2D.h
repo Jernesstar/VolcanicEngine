@@ -37,7 +37,7 @@ public:
 
 private:
 	uint32_t m_TextureID;
-	const uint32_t m_InternalFormat, m_DataFormat;
+	uint32_t m_DataFormat;
 };
 
 }

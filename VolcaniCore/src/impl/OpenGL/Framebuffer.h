@@ -18,6 +18,8 @@ public:
 	void Bind(uint32_t slot = 0) const;
 
 	Attachment::Type GetType() const { return m_Type; }
+	uint32_t GetWidth() const { return m_Width; }
+	uint32_t GetHeight() const { return m_Height; }
 
 	uint32_t GetRendererID() const { return m_RendererID; };
 

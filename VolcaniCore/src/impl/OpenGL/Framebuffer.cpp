@@ -123,6 +123,11 @@ void Framebuffer::Unbind() const {
 void Framebuffer::Set(AttachmentTarget target, Ref<Texture> texture,
 						uint32_t index)
 {
+	if(!this->Has(target)) {
+		VOLCANICORE_LOG_WARNING("Need attachemnt not found");
+		return;
+	}
+
 	uint32_t id = texture->As<OpenGL::Texture2D>()->GetID();
 	uint32_t type;
 	switch(target) {
@@ -192,15 +197,9 @@ void Framebuffer::CreateDepthAttachment() {
 
 	if(attachment.GetType() == Attachment::Type::Texture) {
 		if(attachment.m_RendererID == 0) {
-			// TODO(Implement): CreateTexture(Type::Depth);
-			glGenTextures(1, &attachment.m_RendererID);
-			glBindTexture(GL_TEXTURE_2D, attachment.m_RendererID);
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height,
-						 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			Texture::InternalFormat format = Texture::InternalFormat::Depth;
+			uint32_t id = Texture2D::CreateTexture(width, height, format);
+			attachment.m_RendererID = id;
 		}
 
 		glBindTexture(GL_TEXTURE_2D, 0);
@@ -231,13 +230,10 @@ void Framebuffer::CreateDepthStencilAttachment() {
 
 	glGenRenderbuffers(1, &depthAttachment.m_RendererID);
 	glBindRenderbuffer(GL_RENDERBUFFER, depthAttachment.m_RendererID);
-
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8,
-							m_Width, m_Height);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER,
-								GL_DEPTH_STENCIL_ATTACHMENT,
-								GL_RENDERBUFFER,
-								depthAttachment.m_RendererID);
+						  m_Width, m_Height);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT,
+							  GL_RENDERBUFFER, depthAttachment.m_RendererID);
 }
 
 }

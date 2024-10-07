@@ -6,40 +6,40 @@ namespace Demo {
 
 class IsometricCamera : public Camera {
 public:
-	float R = 4.0f;
+	float R = 10.0f;
 
 public:
 	IsometricCamera()
 		: Camera(Camera::Type::Ortho)
 	{
-		Near = -4*R*R;
-		Position = R * glm::vec3{
-			glm::sin(glm::radians(45.0f)),
-			glm::sin(glm::radians(35.264f)),
-			glm::sin(glm::radians(45.0f))
-		};
-
-		Direction = -glm::normalize(Position);
-
-		CalculateProjection();
-		CalculateView();
+		SetDistance(R);
 	}
 	~IsometricCamera() = default;
 
 	void SetDistance(float r) {
 		R = r;
+		Position = R * glm::vec3{
+			glm::sin(glm::radians(45.0f)),
+			glm::sin(glm::radians(35.264f)),
+			glm::sin(glm::radians(45.0f))
+		};
+		Direction = -glm::normalize(Position);
+
+		CalculateView();
 		CalculateProjection();
 	}
 
 private:
 	void CalculateProjection() override {
-		float asp = R * (ViewportWidth/ViewportHeight);
-		Projection = glm::ortho(-asp, asp, -R, R, Near, Far);
+		Projection = glm::ortho(-(float)ViewportWidth  / (R),
+								 (float)ViewportWidth  / (R),
+								-(float)ViewportHeight / (R),
+								 (float)ViewportHeight / (R), Near, Far);
 		ViewProjection = Projection * View;
 	}
 	void CalculateView() override {
 		glm::vec3 up = { 0.0f, 1.0f, 0.0f };
-		View = glm::lookAt(Position, Position + Direction, up);
+		View = glm::lookAt(Position, Position + R*Direction, up);
 		ViewProjection = Projection * View;
 	}
 };
@@ -81,7 +81,7 @@ Cube::Cube()
 
 	color = Texture::Create(480, 270,
 			Texture::InternalFormat::Normal, Texture::SamplingOption::Nearest);
-	depth = Texture::Create(1920, 1080);
+	depth = Texture::Create(1920, 1080, Texture::InternalFormat::Depth);
 	framebuffer = Framebuffer::Create({
 			{ AttachmentTarget::Color, { { color } } },
 			{ AttachmentTarget::Depth, { { depth } } },
@@ -96,7 +96,7 @@ Cube::Cube()
 		});
 
 	camera = CreateRef<IsometricCamera>();
-	camera->Resize(1920, 1080);
+	camera->Resize(480, 270);
 	controller =
 		CameraController(
 			MovementControls(
@@ -126,9 +126,8 @@ void Cube::OnUpdate(TimeStep ts) {
 	ImGui::Begin("Lights");
 	{
 		float r = camera->As<IsometricCamera>()->R;
-		ImGui::SliderFloat("Light.R", &r, 0.0f, 100.0f);
-
-		camera->As<IsometricCamera>()->SetDistance(r);
+		if(ImGui::SliderFloat("Light.R", &r, 10.0f, 100.0f))
+			camera->As<IsometricCamera>()->SetDistance(r);
 	}
 	ImGui::End();
 
@@ -155,9 +154,9 @@ void Cube::OnUpdate(TimeStep ts) {
 		Renderer3D::End();
 	}
 	Renderer::EndPass();
-
 	Renderer::Flush();
-	RendererAPI::Get()->RenderFramebuffer(framebuffer, AttachmentTarget::Depth);
+
+	RendererAPI::Get()->RenderFramebuffer(framebuffer, AttachmentTarget::Color);
 
 	UI::End();
 }

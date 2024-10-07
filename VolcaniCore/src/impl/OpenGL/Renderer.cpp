@@ -315,7 +315,7 @@ void Renderer::RenderFramebuffer(Ref<VolcaniCore::Framebuffer> buffer,
 
 	if(output) {
 		auto window = Application::GetWindow();
-		Resize(window->GetWidth(), window->GetWidth());
+		Resize(window->GetWidth(), window->GetHeight());
 		output->Unbind();
 	}
 }

@@ -6,8 +6,8 @@ namespace VolcaniCore {
 
 class Texture {
 public:
+	// enum class Type { Depth, RGB, RGBA };
 	enum class InternalFormat { Normal, Float, Depth };
-	enum class ColorFormat { Red, RGB, RGBA };
 	enum class SamplingOption { Nearest, Linear };
 
 public:

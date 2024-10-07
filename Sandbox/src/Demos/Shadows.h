@@ -124,6 +124,7 @@ void Shadows::OnUpdate(TimeStep ts) {
 		Renderer3D::DrawMesh(torch,
 			{
 				.Translation = depthCamera->GetPosition()
+							 - glm::vec3{ 0.0f, 1.5f, 0.0f }
 			});
 	}
 	Renderer::EndPass();

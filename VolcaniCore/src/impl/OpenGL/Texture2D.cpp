@@ -11,14 +11,13 @@ namespace VolcaniCore::OpenGL {
 
 Texture2D::Texture2D(uint32_t width, uint32_t height,
 					 InternalFormat format, SamplingOption sampling)
-	: Texture(width, height), m_InternalFormat(GL_RGBA8),
-		m_DataFormat(GL_RGBA)
+	: Texture(width, height), m_DataFormat(GL_RGBA)
 {
 	m_TextureID = CreateTexture(width, height, format, sampling);
 }
 
 Texture2D::Texture2D(const std::string& path)
-	: Texture(path), m_InternalFormat(GL_RGBA8), m_DataFormat(GL_RGBA)
+	: Texture(path), m_DataFormat(GL_RGBA)
 {
 	int32_t width, height;
 	unsigned char* pixelData = FileUtils::ReadImage(path, width, height, 4);
@@ -55,6 +54,17 @@ void Texture2D::SetData(const glm::ivec2& pos, const glm::ivec2& size,
 						m_DataFormat, GL_UNSIGNED_BYTE, data);
 }
 
+// constexpr uint32_t GetType(Texture::Type format) {
+// 	switch(format) {
+// 		case Texture::Type::Depth:
+// 			return GL_DEPTH_COMPONENT;
+// 		case Texture::Type::RGB:
+// 			return GL_RGB;
+// 		case Texture::Type::RGBA:
+// 			return GL_RGBA;
+// 	}
+// }
+
 constexpr uint32_t GetInternalFormat(Texture::InternalFormat format) {
 	switch(format) {
 		case Texture::InternalFormat::Normal:
@@ -62,18 +72,7 @@ constexpr uint32_t GetInternalFormat(Texture::InternalFormat format) {
 		case Texture::InternalFormat::Float:
 			return GL_RGBA16F; // GL_R11F_G11F_B10F
 		case Texture::InternalFormat::Depth:
-			return GL_DEPTH_COMPONENT; // GL_R11F_G11F_B10F
-	}
-}
-
-constexpr uint32_t GetColorFormat(Texture::ColorFormat format) {
-	switch(format) {
-		case Texture::ColorFormat::RGBA:
-			return GL_RGBA;
-		case Texture::ColorFormat::RGB:
-			return GL_RGB;
-		case Texture::ColorFormat::Red:
-			return GL_RED;
+			return GL_DEPTH_COMPONENT32F;
 	}
 }
 
@@ -81,14 +80,12 @@ uint32_t Texture2D::CreateTexture(uint32_t width, uint32_t height,
 									InternalFormat internal,
 									SamplingOption sampling)
 {
-	uint32_t internalFormat;
 	uint32_t textureID;
-	internalFormat = GetInternalFormat(internal);
+	auto internalFormat = GetInternalFormat(internal);
+	auto filter = sampling == SamplingOption::Linear ? GL_LINEAR : GL_NEAREST;
 
 	glCreateTextures(GL_TEXTURE_2D, 1, &textureID);
 	glTextureStorage2D(textureID, 1, internalFormat, width, height);
-
-	auto filter = sampling == SamplingOption::Linear ? GL_LINEAR : GL_NEAREST;
 	glTextureParameteri(textureID, GL_TEXTURE_MIN_FILTER, filter);
 	glTextureParameteri(textureID, GL_TEXTURE_MAG_FILTER, filter);
 	glTextureParameteri(textureID, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
