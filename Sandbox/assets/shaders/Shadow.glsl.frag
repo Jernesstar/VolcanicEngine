@@ -1,7 +1,7 @@
 #version 450 core
 
-uniform vec3 u_LightPosition;
 uniform vec3 u_CameraPosition;
+uniform vec3 u_LightPosition;
 
 layout(binding = 0) uniform sampler2D u_Diffuse;
 layout(binding = 1) uniform sampler2D u_ShadowMap;
@@ -24,9 +24,9 @@ float ShadowCalculation()
     // get depth of current fragment from light's perspective
     float currentDepth = projCoords.z;
     // check whether current frag pos is in shadow
-    // vec3 lightDir = normalize(FragPos - u_LightPosition);
-    // float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
-    float shadow = currentDepth > closestDepth ? 1.0 : 0.0;
+    vec3 lightDir = normalize(FragPos - u_LightPosition);
+    float bias = max(0.05 * (1.0 - dot(Normal, lightDir)), 0.005);
+    float shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;
 
     return shadow;
 }

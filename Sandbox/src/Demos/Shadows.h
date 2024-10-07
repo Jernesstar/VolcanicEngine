@@ -19,6 +19,7 @@ private:
 	Ref<Framebuffer> depthMap;
 
 	Ref<Mesh> cube;
+	Ref<Mesh> torch;
 
 	Ref<Camera> depthCamera;
 	Ref<Camera> sceneCamera;
@@ -53,10 +54,11 @@ Shadows::Shadows() {
 		Material{
 			.Diffuse = Texture::Create("Sandbox/assets/images/wood.png")
 		});
+	torch = Mesh::Create("Sandbox/assets/models/mc-torch/Torch.obj");
 
-	depthCamera = CreateRef<OrthographicCamera>(20.0f, 20.0f, 1.0f, 7.5f);
+	depthCamera = CreateRef<OrthographicCamera>(20.0f, 20.0f, 1.0f, 17.5f);
 	sceneCamera = CreateRef<StereographicCamera>(75.0f);
-	depthCamera->SetPosition({ -2.0f, 4.0f, -1.0f });
+	depthCamera->SetPosition({ -2.0f, 4.0f, -2.0f });
 
 	controller = CameraController{ sceneCamera };
 	controller.TranslationSpeed = 5.0f;
@@ -98,16 +100,16 @@ void Shadows::OnUpdate(TimeStep ts) {
 				return depthCamera->GetViewProjection();
 			});
 		Renderer::GetPass()->GetUniforms()
-		.Set("u_LightPosition",
-			[&]() -> glm::vec3
-			{
-				return depthCamera->GetPosition();
-			});
-		Renderer::GetPass()->GetUniforms()
 		.Set("u_CameraPosition",
 			[&]() -> glm::vec3
 			{
 				return sceneCamera->GetPosition();
+			});
+		Renderer::GetPass()->GetUniforms()
+		.Set("u_LightPosition",
+			[&]() -> glm::vec3
+			{
+				return depthCamera->GetPosition();
 			});
 		Renderer::GetPass()->GetUniforms()
 		.Set("u_ShadowMap",
@@ -118,6 +120,11 @@ void Shadows::OnUpdate(TimeStep ts) {
 			});
 
 		RenderScene();
+
+		Renderer3D::DrawMesh(torch,
+			{
+				.Translation = depthCamera->GetPosition()
+			});
 	}
 	Renderer::EndPass();
 }
@@ -131,7 +138,7 @@ void Shadows::RenderScene() {
 	Renderer3D::DrawMesh(cube, { .Translation = {  0.0f,  0.0f,  2.0f } });
 
 	Renderer3D::DrawMesh(cube,  {
-									.Translation = { 0.0f, -14.0f, 0.0f},
+									.Translation = { 0.0f, -10.5f, 0.0f },
 									.Scale = glm::vec3(20.0f)
 								});
 
