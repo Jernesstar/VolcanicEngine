@@ -21,14 +21,12 @@ public:
 			float near, float far);
 	virtual ~Camera() = default;
 
-	void Resize(uint32_t width, uint32_t height);
+	virtual void Resize(uint32_t width, uint32_t height);
+	virtual void SetProjection(float near, float far);
 
-	void SetProjection(float near, float far);
-
-	void SetPosition(const glm::vec3& position);
-	void SetDirection(const glm::vec3& direction);
-	void SetPositionDirection(const glm::vec3& position,
-							  const glm::vec3& direction);
+	void SetPosition(const glm::vec3& pos);
+	void SetDirection(const glm::vec3& dir);
+	void SetPositionDirection(const glm::vec3& pos, const glm::vec3& dir);
 
 	Camera::Type GetType() const { return m_Type; }
 

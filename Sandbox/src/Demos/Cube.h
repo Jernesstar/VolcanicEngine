@@ -42,6 +42,10 @@ private:
 		View = glm::lookAt(Position, Position + R*Direction, up);
 		ViewProjection = Projection * View;
 	}
+	void Resize(uint32_t width, uint32_t height) override {
+		ViewportWidth = 480;
+		ViewportHeight = 270;
+	}
 };
 
 class Cube : public Application {
@@ -70,12 +74,11 @@ Cube::Cube()
 	: Application(1920, 1080, "Cube Demo")
 {
 	Events::RegisterListener<KeyPressedEvent>(
-	[](const KeyPressedEvent& event) {
-		if(event.Key == Key::Escape)
-			Application::Close();
-	});
-
-	UI::Init();
+		[](const KeyPressedEvent& event)
+		{
+			if(event.Key == Key::Escape)
+				Application::Close();
+		});
 
 	shader = ShaderPipeline::Create("VolcaniCore/assets/shaders", "Mesh");
 
@@ -112,6 +115,8 @@ Cube::Cube()
 	controller.SetCamera(camera);
 	controller.RotationSpeed = 0.0f;
 	controller.TranslationSpeed = 20.0f;
+
+	UI::Init();
 }
 
 Cube::~Cube() {

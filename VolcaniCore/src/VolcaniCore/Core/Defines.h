@@ -2,13 +2,10 @@
 
 #include <cstdint>
 #include <string>
-// #include <string_view>
 #include <memory>
 #include <vector>
 #include <unordered_map>
 #include <functional>
-
-#define GLM_ENABLE_EXPERIMENTAL
 
 namespace VolcaniCore {
 
