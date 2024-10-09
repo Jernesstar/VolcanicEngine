@@ -22,8 +22,13 @@ public:
 	void OnUpdate(TimeStep ts);
 
 private:
-	Ref<Camera> camera;
-	CameraController controller;
+	Ref<Physics::World> world;
+
+	// Ref<RigidBody> selected{ nullptr };
+	RigidBody* selected = nullptr;
+
+	glm::vec2 pixelSize{ 1.0f/800.0f, 1.0f/600.0f };
+	glm::vec4 outlineColor{ 0.0f, 0.5f, 1.0f, 1.0f };
 
 	Ref<RenderPass> drawPass;
 	Ref<RenderPass> maskPass;
@@ -31,69 +36,59 @@ private:
 
 	Ref<Mesh> cube;
 
-	Physics::World world;
-
-	// Ref<RigidBody> selected{ nullptr };
-	RigidBody* selected = nullptr;
-
-	glm::vec2 pixelSize{ 1.0f/800.0f, 1.0f/600.0f };
-	glm::vec4 outlineColor{ 0.0f, 0.5f, 1.0f, 1.0f };
+	Ref<Camera> camera;
+	CameraController controller;
 };
 
 Raycast::Raycast() {
 	Events::RegisterListener<KeyPressedEvent>(
-	[](const KeyPressedEvent& event) {
-		if(event.Key == Key::Escape)
-			Application::Close();
-	});
+		[](const KeyPressedEvent& event)
+		{
+			if(event.Key == Key::Escape)
+				Application::Close();
+		});
 
 	Events::RegisterListener<MouseButtonPressedEvent>(
-	[this](const MouseButtonPressedEvent& event) {
-		auto width = Application::GetWindow()->GetWidth();
-		auto height = Application::GetWindow()->GetHeight();
-		glm::vec4 originNDC{
-			(event.x/width - 0.5f) * 2.0f,
-			(event.y/height - 0.5f) * 2.0f,
-			-1.0f, 1.0f
-		};
-		glm::vec4 endNDC{
-			(event.x/width - 0.5f) * 2.0f,
-			(event.y/height - 0.5f) * 2.0f,
-			1.0f, 1.0f
-		};
+		[this](const MouseButtonPressedEvent& event)
+		{
+			if(event.Button	!= Mouse::RightButton)
+				return;
 
-		glm::mat4 inverseViewProj = glm::inverse(camera->GetViewProjection());
-		glm::vec4 worldStart = inverseViewProj * originNDC;
-		glm::vec4 worldEnd   = inverseViewProj * endNDC;
-		worldStart /= worldStart.w;
-		worldEnd   /= worldEnd.w;
-		glm::vec3 rayDir = glm::vec3(worldEnd - worldStart);
-		float maxDist = 10000.0f;
+			auto width = Application::GetWindow()->GetWidth();
+			auto height = Application::GetWindow()->GetHeight();
+			glm::vec4 originNDC{
+				(event.x/width - 0.5f) * 2.0f,
+				(event.y/height - 0.5f) * 2.0f,
+				-1.0f, 1.0f
+			};
+			glm::vec4 endNDC{
+				(event.x/width - 0.5f) * 2.0f,
+				(event.y/height - 0.5f) * 2.0f,
+				1.0f, 1.0f
+			};
 
-		auto hitInfo = world.Raycast(worldStart, rayDir, maxDist);
-		selected = hitInfo.Actor;
-	});
+			glm::mat4 invViewProj = glm::inverse(camera->GetViewProjection());
+			glm::vec4 worldStart = invViewProj * originNDC;
+			glm::vec4 worldEnd   = invViewProj * endNDC;
+			worldStart /= worldStart.w;
+			worldEnd   /= worldEnd.w;
+			glm::vec3 rayDir = glm::vec3(worldEnd - worldStart);
+			float maxDist = 10000.0f;
+
+			auto hitInfo = world->Raycast(worldStart, rayDir, maxDist);
+			selected = hitInfo.Actor;
+		});
 
 	Ref<ShaderPipeline> drawShader;
 	Ref<ShaderPipeline> maskShader;
 	Ref<ShaderPipeline> outlineShader;
+	drawShader = ShaderPipeline::Create("VolcaniCore/assets/shaders", "Mesh");
+	maskShader = ShaderPipeline::Create("Sandbox/assets/shaders", "Mask");
+	outlineShader = ShaderPipeline::Create("Sandbox/assets/shaders", "Outline");
 
-	drawShader = ShaderPipeline::Create({
-		{ "VolcaniCore/assets/shaders/Mesh.glsl.vert", ShaderType::Vertex },
-		{ "VolcaniCore/assets/shaders/Mesh.glsl.frag", ShaderType::Fragment }
-	});
-	maskShader = ShaderPipeline::Create({
-		{ "Sandbox/assets/shaders/Mask.glsl.vert", ShaderType::Vertex },
-		{ "Sandbox/assets/shaders/Mask.glsl.frag", ShaderType::Fragment }
-	});
-	outlineShader = ShaderPipeline::Create({
-		{ "Sandbox/assets/shaders/Outline.glsl.vert", ShaderType::Vertex },
-		{ "Sandbox/assets/shaders/Outline.glsl.frag", ShaderType::Fragment }
-	});
-
-	drawPass = RenderPass::Create("Draw Pass", drawShader);
-	maskPass = RenderPass::Create("Mask Pass", maskShader);
-	outlinePass = RenderPass::Create("Outline Pass", outlineShader);
+	drawPass = RenderPass::Create("Draw", drawShader);
+	maskPass = RenderPass::Create("Mask", maskShader);
+	outlinePass = RenderPass::Create("Outline", outlineShader);
 
 	outlinePass->GetUniforms()
 	.Set("u_PixelSize",
@@ -122,14 +117,16 @@ Raycast::Raycast() {
 	controller = CameraController{ camera };
 
 	cube = Mesh::Create(MeshPrimitive::Cube,
-	Material{
-		.Diffuse = Texture::Create("Sandbox/assets/images/wood.png")
-		// .Specular = Texture::Create("Sandbox/assets/images/wood_specular.png"),
-	});
+		Material{
+			.Diffuse = Texture::Create("Sandbox/assets/images/wood.png")
+		});
 
-	createActors(world);
+	Physics::Init();
 
-	// auto scene = world.Get();
+	world = CreateRef<Physics::World>();
+	createActors(*world);
+
+	// auto scene = world->Get();
 	// scene->setVisualizationParameter(PxVisualizationParameter::eSCALE, 1.0f);
 	// scene->setVisualizationParameter(PxVisualizationParameter::eACTOR_AXES, 1.0f);
 }
@@ -140,16 +137,15 @@ Raycast::~Raycast() {
 
 void Raycast::OnUpdate(TimeStep ts) {
 	controller.OnUpdate(ts);
-	world.OnUpdate(ts);
-
-	Renderer::Clear();
+	world->OnUpdate(ts);
 
 	// 1. Draw scene without selected object
 	Renderer::StartPass(drawPass);
 	{
+		Renderer::Clear();
 		Renderer3D::Begin(camera);
 
-		for(Ref<RigidBody> actor : world) {
+		for(Ref<RigidBody> actor : *world) {
 			actor->UpdateTransform();
 
 			if(actor.get() == selected)
@@ -175,10 +171,9 @@ void Raycast::OnUpdate(TimeStep ts) {
 		Renderer3D::End();
 	}
 	Renderer::EndPass();
-
 	Renderer::Flush();
 
-	// 4. Full-screen quad applying some image processing function
+	// 4. Render full-screen quad that creates outline
 	Renderer::StartPass(outlinePass);
 	{
 		auto mask = maskPass->GetOutput();

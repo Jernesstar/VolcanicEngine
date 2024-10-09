@@ -142,14 +142,17 @@ void Renderer::Flush() {
 }
 
 void Renderer::Clear(const glm::vec4& color) {
+	VOLCANICORE_ASSERT(s_DrawCommand);
 	s_DrawCommand->Clear = true;
 }
 
 void Renderer::Resize(uint32_t width, uint32_t height) {
+	VOLCANICORE_ASSERT(s_DrawCommand);
 	s_DrawCommand->Size = { width, height };
 }
 
 void Renderer::PushOptions(const RendererAPI::Options& options) {
+	VOLCANICORE_ASSERT(s_DrawCommand);
 	s_DrawCommand->RendererOptions = options;
 }
 

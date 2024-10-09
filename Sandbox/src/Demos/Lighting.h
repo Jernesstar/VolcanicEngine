@@ -66,8 +66,6 @@ Lighting::Lighting() {
 				Application::Close();
 		});
 
-	UI::Init();
-
 	Ref<ShaderPipeline> shader;
 	shader = ShaderPipeline::Create({
 		{ "Sandbox/assets/shaders/Lighting.glsl.vert", ShaderType::Vertex },
@@ -107,7 +105,7 @@ Lighting::Lighting() {
 			.Specular = Texture::Create(assetPath + "images/wood_specular.png"),
 		});
 	torch = Mesh::Create(assetPath + "models/mc-torch/Torch.obj");
-	player = Model::Create("Sandbox/TheMazeIsLava/assets/models/player/Knight_Golden_Male.obj");
+	player = Model::Create(assetPath + "models/player/Knight_Golden_Male.obj");
 
 	camera = CreateRef<StereographicCamera>(75.0f);
 	camera->SetPosition({ 2.5f, 2.5f, 2.5f });
@@ -118,6 +116,8 @@ Lighting::Lighting() {
 
 	width = 5;
 	length = 5;
+
+	UI::Init();
 }
 
 Lighting::~Lighting() {

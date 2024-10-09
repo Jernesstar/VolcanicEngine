@@ -257,8 +257,7 @@ void Bloom::InitMips() {
 		mipChain.push_back(mip);
 	}
 
-	mips = Framebuffer::Create(
-		{
+	mips = Framebuffer::Create({
 			{ AttachmentTarget::Color, { { mipChain[0].Sampler } } }
 		});
 }

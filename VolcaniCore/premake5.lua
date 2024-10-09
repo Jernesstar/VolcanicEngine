@@ -19,7 +19,6 @@ project "VolcaniCore"
         "src/VolcaniCore",
         "src/impl",
 
-        "%{Includes.bgfx}",
         "%{Includes.glfw}",
         "%{Includes.glad}",
         "%{Includes.glm}",
@@ -29,9 +28,6 @@ project "VolcaniCore"
     }
 
     links {
-        -- "bgfx",
-        -- "bimg",
-        -- "bx",
         "glfw",
         "glad",
         "assimp",
@@ -48,9 +44,8 @@ project "VolcaniCore"
         systemversion "latest"
 
 
--- include "VolcaniCore/scripts/bgfx"
-include "VolcaniCore/scripts/glfw"
-include "VolcaniCore/scripts/glad"
-include "VolcaniCore/scripts/assimp"
-include "VolcaniCore/scripts/freetype"
-include "VolcaniCore/scripts/stb_image"
+include "VolcaniCore/.builddeps/glfw"
+include "VolcaniCore/.builddeps/glad"
+include "VolcaniCore/.builddeps/assimp"
+include "VolcaniCore/.builddeps/freetype"
+include "VolcaniCore/.builddeps/stb_image"

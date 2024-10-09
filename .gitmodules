@@ -11,15 +11,6 @@
 [submodule "VolcaniCore/vendor/stb_image"]
 	path = VolcaniCore/vendor/stb_image
 	url = https://github.com/Jernesstar/stb_image
-[submodule "VolcaniCore/vendor/bgfx"]
-	path = VolcaniCore/vendor/bgfx
-	url = https://github.com/bkaradzic/bgfx.git
-[submodule "VolcaniCore/vendor/bimg"]
-	path = VolcaniCore/vendor/bimg
-	url = https://github.com/bkaradzic/bimg.git
-[submodule "VolcaniCore/vendor/bx"]
-	path = VolcaniCore/vendor/bx
-	url = https://github.com/bkaradzic/bx.git
 [submodule "VolcaniCore/vendor/assimp"]
 	path = VolcaniCore/vendor/assimp
 	url = https://github.com/Jernesstar/assimp.git

@@ -49,11 +49,9 @@ private:
 	
 	Ref<RenderPass> m_DrawPass;
 	Ref<RenderPass> m_LightingPass;
+	// TODO(Implement): List of Framebuffer's for multiple targets, i.e Player pov, bird's eye view pov
 	Ref<Framebuffer> m_Output;
 
-	// TODO(Implement):
-	// List of Camera's and Framebuffer's for multiple targets, i.e Player pov, bird's eye view pov
-	Ref<Camera> m_Camera;
 	// TODO(Implement): CameraControllerEntity
 	CameraController m_Controller;
 

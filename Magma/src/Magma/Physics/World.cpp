@@ -38,8 +38,8 @@ void World::AddActor(Ref<RigidBody> body) {
 	m_ActorCount++;
 }
 
-HitInfo World::Raycast(const glm::vec3& start,
-					   const glm::vec3& direction, float maxDist)
+HitInfo World::Raycast(const glm::vec3& start, const glm::vec3& direction,
+						float maxDist)
 {
 	// glm::vec3 rayDir = glm::normalize(direction);
 	// PxHitFlags flags = PxHitFlag::ePOSITION;

@@ -148,7 +148,7 @@ enum Key : KeyCode {
 	Invalid = 0
 };
 
-using MouseCode = uint8_t;
+using MouseCode = unsigned char; // uint8_t
 
 enum Mouse : MouseCode {
 	// From glfw3.h starting line 571
@@ -163,11 +163,11 @@ enum Mouse : MouseCode {
 	Button8 = 7,
 
 	LeftButton   = Button1,
-	MiddleButton = Button2,
-	RightButton  = Button3
+	RightButton  = Button2,
+	MiddleButton = Button3
 };
 
-enum class CursorMode : uint8_t {
+enum class CursorMode : unsigned char {
 	Normal = 0,
 	Hidden = 1,
 	Locked = 2

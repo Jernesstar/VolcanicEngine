@@ -164,12 +164,14 @@ void Renderer::Close() {
 }
 
 void Renderer::SetOptions(const RendererAPI::Options& options) {
-	glDisable(GL_DEPTH_TEST);
 	if(options.DepthTest == RendererAPI::Options::DepthTesting::On)
 		glEnable(GL_DEPTH_TEST);
+	if(options.DepthTest == RendererAPI::Options::DepthTesting::Off)
+		glDisable(GL_DEPTH_TEST);
 
-	glDisable(GL_BLEND);
 	if(options.Blending != RendererAPI::Options::BlendingMode::Off)
+		glDisable(GL_BLEND);
+	else
 		glEnable(GL_BLEND);
 
 	if(options.Blending == RendererAPI::Options::BlendingMode::Greatest)
@@ -178,6 +180,8 @@ void Renderer::SetOptions(const RendererAPI::Options& options) {
 		glBlendFunc(GL_ONE, GL_ONE);
 		glBlendEquation(GL_FUNC_ADD);
 	}
+
+	m_Options = options;
 }
 
 void Renderer::StartFrame() {

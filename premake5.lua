@@ -33,9 +33,6 @@ MagmaVendorDir = "%{RootPath}/Magma/vendor"
 VendorPaths = {}
 Includes = {}
 
-VendorPaths["bgfx"]      = "%{VolcaniCoreVendorDir}/bgfx"
-VendorPaths["bimg"]      = "%{VolcaniCoreVendorDir}/bimg"
-VendorPaths["bx"]        = "%{VolcaniCoreVendorDir}/bx"
 VendorPaths["glm"]       = "%{VolcaniCoreVendorDir}/glm"
 VendorPaths["glad"]      = "%{VolcaniCoreVendorDir}/glad"
 VendorPaths["glfw"]      = "%{VolcaniCoreVendorDir}/glfw"
@@ -49,9 +46,6 @@ VendorPaths["ImGuiFileDialog"] = "%{MagmaVendorDir}/ImGuiFileDialog"
 VendorPaths["flecs"]           = "%{MagmaVendorDir}/flecs"
 VendorPaths["PhysX"]           = "%{MagmaVendorDir}/PhysX"
 
-Includes["bgfx"]      = "%{VendorPaths.bgfx}/include"
-Includes["bimg"]      = "%{VendorPaths.bimg}/include"
-Includes["bx"]        = "%{VendorPaths.bx}/include"
 Includes["glm"]       = "%{VendorPaths.glm}"
 Includes["glad"]      = "%{VendorPaths.glad}/include"
 Includes["glfw"]      = "%{VendorPaths.glfw}/include"

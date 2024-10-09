@@ -50,8 +50,8 @@ project "Magma"
         systemversion "latest"
 
 
-include "Magma/scripts/imgui"
-include "Magma/scripts/yaml-cpp"
-include "Magma/scripts/ImGuiFileDialog"
-include "Magma/scripts/flecs"
--- include "Magma/scripts/PhysX"
+include "Magma/.builddeps/imgui"
+include "Magma/.builddeps/yaml-cpp"
+include "Magma/.builddeps/ImGuiFileDialog"
+include "Magma/.builddeps/flecs"
+-- include "Magma/.builddeps/PhysX"

@@ -56,42 +56,43 @@ public:
 	void OnUpdate(TimeStep ts);
 
 private:
-	Ref<Camera> camera;
-	CameraController controller;
+	Ref<Physics::World> world;
 
-	Ref<ShaderPipeline> shader;
+	Ref<RenderPass> drawPass;
 	Ref<Mesh> cube;
 
-	Physics::World world;
+	Ref<Camera> camera;
+	CameraController controller;
 };
 
 Collision::Collision() {
 	Events::RegisterListener<KeyPressedEvent>(
-	[](const KeyPressedEvent& event) {
-		if(event.Key == Key::Escape)
-			Application::Close();
-	});
+		[](const KeyPressedEvent& event)
+		{
+			if(event.Key == Key::Escape)
+				Application::Close();
+		});
+
+	Ref<ShaderPipeline> shader;
+	shader = ShaderPipeline::Create("VolcaniCore/assets/shaders", "Mesh");
+	drawPass = RenderPass::Create("Draw", shader);
 
 	cube = Mesh::Create(MeshPrimitive::Cube,
-	Material{
-		.Diffuse = Texture::Create("Sandbox/assets/images/wood.png")
-		// .Specular = Texture::Create("Sandbox/assets/images/wood_specular.png"),
-	});
-	shader = ShaderPipeline::Create({
-		{ "VolcaniCore/assets/shaders/Mesh.glsl.vert", ShaderType::Vertex },
-		{ "VolcaniCore/assets/shaders/Mesh.glsl.frag", ShaderType::Fragment }
-	});
-	shader->Bind();
-	shader->SetTexture("u_Diffuse", cube->GetMaterial().Diffuse, 0);
+		Material{
+			.Diffuse = Texture::Create("Sandbox/assets/images/wood.png")
+		});
+
+	Physics::Init();
+
+	world = CreateRef<Physics::World>();
+	createWall(*world);
+
+	// auto plane = RigidBody::Create(RigidBody::Type::Static, Shape(Shape::Type::Plane));
+	// world.AddActor(plane);
 
 	camera = CreateRef<StereographicCamera>(75.0f);
 	camera->SetPosition({ 0.0f, 0.5f, 3.0f });
 	controller = CameraController{ camera };
-
-	createWall(world);
-
-	// auto plane = RigidBody::Create(RigidBody::Type::Static, Shape(Shape::Type::Plane));
-	// world.AddActor(plane);
 }
 
 Collision::~Collision() {
@@ -100,17 +101,20 @@ Collision::~Collision() {
 
 void Collision::OnUpdate(TimeStep ts) {
 	controller.OnUpdate(ts);
-	world.OnUpdate(ts);
+	world->OnUpdate(ts);
 
-	shader->SetMat4("u_ViewProj", camera->GetViewProjection());
+	Renderer::StartPass(drawPass);
+	{
+		Renderer3D::Begin(camera);
 
-	Renderer::Clear();
+		Renderer::Clear();
 
-	for(auto body : world) {
-		body->UpdateTransform();
-		shader->SetMat4("u_Model", body->GetTransform());
-		Renderer3D::DrawMesh(cube);
+		for(auto body : *world) {
+			body->UpdateTransform();
+			Renderer3D::DrawMesh(cube, body->GetTransform());
+		}
 	}
+	Renderer::EndPass();
 }
 
 }

@@ -3,17 +3,23 @@ Adding this file, to track changes as a go between writing the code and testing 
 So far:
 
 Demo Status:
-Bloom y
 Collision x
-Cube y
-ECS y
-Lighting y
 Raycast x
+Bloom y
+Cube y
+Lighting y
 Shadows y
+ECS y
 Template y
 UILayer y
 
+codespace:
+    Removed bgfx
+    Moved TheMazeIsLava game to its own repo
+    Renamed {VolcaniCore, Magma}/scripts/ -> .builddeps/
+
 change:
+
 
 feat_begin:
 

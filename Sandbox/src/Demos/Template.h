@@ -1,12 +1,8 @@
 #pragma once
 
-namespace Demo {
-
-#pragma once
-
-#include <cstring>
-
 #include "Core/Defines.h"
+
+namespace Demo {
 
 class Template : public Application {
 public:
@@ -36,7 +32,6 @@ Template::Template() {
 		});
 
 	camera = CreateRef<StereographicCamera>(75.0f);
-	// camera = CreateRef<OrthographicCamera>(800, 600, 0.1f, 100.0f);
 	camera->SetPosition({ 2.5f, 2.5f, 2.5f });
 	camera->SetDirection({ -0.5f, -0.5f, -0.5f });
 	controller = CameraController{ camera };

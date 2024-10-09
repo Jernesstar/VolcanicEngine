@@ -57,7 +57,7 @@ public:
 
 private:
 	Ref<ShaderPipeline> shader;
-	Ref<RenderPass> renderPass;
+	Ref<RenderPass> drawPass;
 
 	Ref<Texture> color;
 	Ref<Texture> depth;
@@ -90,8 +90,8 @@ Cube::Cube()
 			{ AttachmentTarget::Depth, { { depth } } },
 		});
 
-	renderPass = RenderPass::Create("Render Pass", shader);
-	renderPass->SetOutput(framebuffer);
+	drawPass = RenderPass::Create("Draw", shader);
+	drawPass->SetOutput(framebuffer);
 
 	cube = Mesh::Create(MeshPrimitive::Cube,
 		Material{
@@ -146,7 +146,7 @@ void Cube::OnUpdate(TimeStep ts) {
 	}
 	ImGui::End();
 
-	Renderer::StartPass(renderPass);
+	Renderer::StartPass(drawPass);
 	{
 		Renderer::Clear();
 

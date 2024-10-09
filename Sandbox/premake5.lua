@@ -12,12 +12,10 @@ project "Sandbox"
     files {
         "src/**.h",
         "src/**.cpp",
-        "TheMazeIsLava/src/**.cpp"
     }
 
     includedirs {
         "src",
-        "TheMazeIsLava/src",
 
         "%{RootPath}/VolcaniCore/src",
         "%{RootPath}/VolcaniCore/src/VolcaniCore",

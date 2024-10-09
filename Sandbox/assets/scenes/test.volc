@@ -2,7 +2,7 @@ Scene:
   Name: Untitled Scene
   Entities:
     - Entity:
-        ID: 550
+        ID: 549
         Components:
           Camera:
             Type: Stereographic
@@ -16,7 +16,7 @@ Scene:
           TagComponent:
             Tag: MainCamera
     - Entity:
-        ID: 551
+        ID: 550
         Components:
           MeshComponent:
             Mesh:
@@ -25,17 +25,17 @@ Scene:
               Material:
                 Diffuse:
                   Path: Sandbox/assets/images/wood.png
-          TrasformComponent:
+          TransformComponent:
             Translation: [0, 0, -3]
             Rotation: [0, 0, 0]
             Scale: [1, 1, 1]
     - Entity:
-        ID: 552
+        ID: 551
         Components:
           MeshComponent:
             Mesh:
               Path: Sandbox/assets/models/sphere/wooden_sphere.obj
-          TrasformComponent:
+          TransformComponent:
             Translation: [0, 0, -3]
             Rotation: [0, 0, 0]
             Scale: [1, 1, 1]
