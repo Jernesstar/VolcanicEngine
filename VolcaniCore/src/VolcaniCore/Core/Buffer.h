@@ -78,30 +78,21 @@ public:
 	}
 
 	void Add(const T& element) {
-		if(m_Count >= m_MaxCount)
-			if(m_MaxCount != 0)
-				Reallocate(100);
-			else
-				return;
+		if(m_MaxCount != 0 && m_Count >= m_MaxCount)
+			Reallocate(100);
 
 		m_Data[m_Count++] = element;
 	}
 	void Add(const Buffer& buffer) {
-		if(m_Count + buffer.GetCount() >= m_MaxCount)
-			if(m_MaxCount != 0)
-				Reallocate(buffer.GetCount());
-			else
-				return;
+		if(m_MaxCount != 0 && m_Count + buffer.GetCount() >= m_MaxCount)
+			Reallocate(buffer.GetCount());
 
 		memcpy(m_Data + m_Count, buffer.Get(), buffer.GetSize());
 		m_Count += buffer.GetCount();
 	}
 	void Add(const List<T>& list) {
-		if(m_Count + list.size() >= m_MaxCount)
-			if(m_MaxCount != 0)
-				Reallocate(list.size());
-			else
-				return;
+		if(m_MaxCount != 0 && m_Count + list.size() >= m_MaxCount)
+			Reallocate(list.size());
 
 		memcpy(m_Data + m_Count, list.data(), list.size() * sizeof(T));
 		m_Count += list.size();

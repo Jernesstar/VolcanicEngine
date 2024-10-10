@@ -36,16 +36,13 @@ Shadows::Shadows() {
 
 	Ref<ShaderPipeline> depthShader;
 	Ref<ShaderPipeline> shadowShader;
-	depthShader = ShaderPipeline::Create({
-		{ "Sandbox/assets/shaders/Depth.glsl.vert", ShaderType::Vertex },
-		{ "Sandbox/assets/shaders/Depth.glsl.frag", ShaderType::Fragment }
-	});
-	shadowShader = ShaderPipeline::Create({
-		{ "Sandbox/assets/shaders/Shadow.glsl.vert", ShaderType::Vertex },
-		{ "Sandbox/assets/shaders/Shadow.glsl.frag", ShaderType::Fragment }
-	});
+	depthShader = ShaderPipeline::Create("Sandbox/assets/shaders", "Depth");
+	shadowShader = ShaderPipeline::Create("Sandbox/assets/shaders", "Shadow");
 
-	depthMap = Framebuffer::Create(1024, 1024);
+	depthTexture = Texture::Create(1024, 1024, Texture::InternalFormat::Depth);
+	depthMap = Framebuffer::Create({
+			{ AttachmentTarget::Depth, { { depthTexture } } }
+		});
 	depthPass = RenderPass::Create("Depth Pass", depthShader);
 	depthPass->SetOutput(depthMap);
 	shadowPass = RenderPass::Create("Shadow Pass", shadowShader);
