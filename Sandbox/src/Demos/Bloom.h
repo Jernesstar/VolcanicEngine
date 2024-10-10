@@ -35,7 +35,7 @@ private:
 	List<BloomMip> mipChain;
 
 	uint32_t mipChainLength = 6;
-	float filterRadius	= 0.005f;
+	float filterRadius	= 0.015f;
 	float exposure		= 1.0f;
 	float bloomStrength = 0.04f;
 

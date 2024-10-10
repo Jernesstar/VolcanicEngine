@@ -10,6 +10,7 @@ template<typename T>
 class Buffer {
 public:
 	Buffer() = default;
+
 	Buffer(uint64_t maxCount)
 		: m_MaxCount(maxCount), m_Count(0)
 	{
@@ -45,6 +46,7 @@ public:
 	}
 
 	Buffer& operator =(const Buffer& other) = delete;
+
 	Buffer& operator =(Buffer&& other) {
 		std::swap(m_Data, other.m_Data);
 		m_MaxCount = other.m_MaxCount;
@@ -72,26 +74,34 @@ public:
 	Buffer<T> Partition(uint32_t count = 0) {
 		if(count == 0)
 			count = m_MaxCount;
-		m_Count += count;
-		return Buffer<T>(m_Data + (m_Count - count), 0);
+		return Buffer<T>(m_Data + (m_Count += count), 0);
 	}
 
 	void Add(const T& element) {
-		if(m_MaxCount != 0 && m_Count >= m_MaxCount)
-			Reallocate(100);
+		if(m_Count >= m_MaxCount)
+			if(m_MaxCount != 0)
+				Reallocate(100);
+			else
+				return;
 
 		m_Data[m_Count++] = element;
 	}
 	void Add(const Buffer& buffer) {
-		if(m_MaxCount != 0 && m_Count + buffer.GetCount() >= m_MaxCount)
-			Reallocate(buffer.GetCount());
+		if(m_Count + buffer.GetCount() >= m_MaxCount)
+			if(m_MaxCount != 0)
+				Reallocate(buffer.GetCount());
+			else
+				return;
 
 		memcpy(m_Data + m_Count, buffer.Get(), buffer.GetSize());
 		m_Count += buffer.GetCount();
 	}
 	void Add(const List<T>& list) {
-		if(m_MaxCount != 0 && m_Count + list.size() >= m_MaxCount)
-			Reallocate(list.size());
+		if(m_Count + list.size() >= m_MaxCount)
+			if(m_MaxCount != 0)
+				Reallocate(list.size());
+			else
+				return;
 
 		memcpy(m_Data + m_Count, list.data(), list.size() * sizeof(T));
 		m_Count += list.size();
@@ -129,6 +139,9 @@ private:
 	T* m_Data = nullptr;
 	uint64_t m_MaxCount = 0;
 	uint64_t m_Count = 0;
+
+	// TODO(Implement): Reference counting
+	uint32_t m_RefCount = 0;
 };
 
 }

@@ -301,6 +301,8 @@ void Renderer::RenderFramebuffer(Ref<VolcaniCore::Framebuffer> buffer,
 
 	if(!pipeline)
 		ShaderLibrary::Get("Framebuffer")->Bind();
+	// else
+	// 	pipeline->Bind();
 
 	if(output) {
 		output->Bind();
@@ -322,6 +324,8 @@ void Renderer::RenderFramebuffer(Ref<VolcaniCore::Framebuffer> buffer,
 		Resize(window->GetWidth(), window->GetHeight());
 		output->Unbind();
 	}
+	// if(pipeline)
+	// 	pipeline->Unbind();
 }
 
 }
