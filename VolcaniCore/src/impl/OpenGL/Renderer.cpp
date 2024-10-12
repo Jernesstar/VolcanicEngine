@@ -39,23 +39,14 @@ Renderer::Renderer()
 	: RendererAPI(RendererAPI::Backend::OpenGL)
 {
 	VOLCANICORE_ASSERT(gladLoadGL(), "Glad could not load OpenGL");
-
-	Events::RegisterListener<WindowResizedEvent>(
-		[&](const WindowResizedEvent& event)
-		{
-			Resize(event.Width, event.Height);
-		});
 }
 
 void Renderer::Init() {
-	SetOptions(m_Options);
-
 	glEnable(GL_MULTISAMPLE);				// Smooth edges
 	glEnable(GL_FRAMEBUFFER_SRGB);			// Gamma correction
 	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS); // Smooth cubemap edges
-	glEnable(GL_CULL_FACE);
-	glFrontFace(GL_CCW);
-	glCullFace(GL_BACK);
+
+	SetOptions(m_Options);
 
 	float cubemapVertices[] =
 	{
@@ -164,22 +155,32 @@ void Renderer::Close() {
 }
 
 void Renderer::SetOptions(const RendererAPI::Options& options) {
-	if(options.DepthTest == RendererAPI::Options::DepthTesting::On)
+	if(options.DepthTest == RendererAPI::Options::DepthTestingMode::On)
 		glEnable(GL_DEPTH_TEST);
-	if(options.DepthTest == RendererAPI::Options::DepthTesting::Off)
+	if(options.DepthTest == RendererAPI::Options::DepthTestingMode::Off)
 		glDisable(GL_DEPTH_TEST);
 
-	if(options.Blending != RendererAPI::Options::BlendingMode::Off)
+	if(options.Blending == RendererAPI::Options::BlendingMode::Off)
 		glDisable(GL_BLEND);
 	else
 		glEnable(GL_BLEND);
-
 	if(options.Blending == RendererAPI::Options::BlendingMode::Greatest)
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	if(options.Blending == RendererAPI::Options::BlendingMode::Additive) {
+	else if(options.Blending == RendererAPI::Options::BlendingMode::Additive) {
 		glBlendFunc(GL_ONE, GL_ONE);
 		glBlendEquation(GL_FUNC_ADD);
 	}
+
+	if(options.Cull == RendererAPI::Options::CullingMode::Off)
+		glDisable(GL_CULL_FACE);
+	else {
+		glEnable(GL_CULL_FACE);
+		glFrontFace(GL_CCW);
+	}
+	if(options.Cull == RendererAPI::Options::CullingMode::Front)
+		glCullFace(GL_FRONT);
+	else if(options.Cull == RendererAPI::Options::CullingMode::Back)
+		glCullFace(GL_BACK);
 
 	m_Options = options;
 }

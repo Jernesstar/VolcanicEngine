@@ -15,12 +15,22 @@ public:
 
 	class Options {
 	public:
-		enum class DepthTesting { On, Off };
-		enum class BlendingMode { Off, Greatest, Additive };
+		enum class DepthTestingMode {
+			On,
+			Off
+		} DepthTest = DepthTestingMode::On;
 
-	public:
-		DepthTesting DepthTest = DepthTesting::On;
-		BlendingMode Blending = BlendingMode::Greatest;
+		enum class BlendingMode {
+			Off,
+			Greatest,
+			Additive
+		} Blending = BlendingMode::Greatest;
+
+		enum class CullingMode {
+			Off,
+			Front,
+			Back
+		} Cull = CullingMode::Back;
 	};
 
 public:

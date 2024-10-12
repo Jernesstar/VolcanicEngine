@@ -5,6 +5,8 @@
 #include "Core/Defines.h"
 
 #include "Renderer/RendererAPI.h"
+	#include <glad/glad.h>
+
 
 namespace VolcaniCore {
 
@@ -135,10 +137,15 @@ void Renderer::NewDrawCommand(const DrawOptionsMap& map) {
 
 void Renderer::Flush() {
 	for(auto& command : s_Frame.DrawCommands) {
-		FlushCommand(command);
+		if(command.Points.size()
+		|| command.Lines.size()
+		|| command.Meshes.size()
+		)
+			FlushCommand(command);
 	}
 
 	s_Frame.DrawCommands.clear();
+	s_DrawCommand = nullptr;
 }
 
 void Renderer::Clear(const glm::vec4& color) {
@@ -171,44 +178,41 @@ FrameDebugInfo Renderer::GetDebugInfo() {
 FrameData& Renderer::GetFrame() { return s_Frame; }
 
 void FlushCommand(DrawCommand& command) {
-	auto framebuffer = command.Pass->GetOutput();
 	if(!s_DrawCommand || s_DrawCommand->Pass != command.Pass)
 		command.Pass->SetGlobalUniforms();
-
-	if(framebuffer) {
-		RendererAPI::Get()
-			->Resize(framebuffer->GetWidth(), framebuffer->GetHeight());
-		framebuffer->Bind();
-	}
-
-	// auto oldOptions = RendererAPI::Get()->GetOptions();
-	// RendererAPI::Get()->SetOptions(command.RendererOptions);
-
 	command.Pass->SetUniforms(command.GetUniforms());
+
+	auto framebuffer = command.Pass->GetOutput();
+	if(framebuffer) {
+		framebuffer->Bind();
+		uint32_t width = framebuffer->GetWidth();
+		uint32_t height = framebuffer->GetHeight();
+		RendererAPI::Get()->Resize(width, height);
+	}
 
 	if(command.Size != glm::ivec2{ 0, 0 })
 		RendererAPI::Get()->Resize(command.Size.x, command.Size.y);
 	if(command.Clear)
 		RendererAPI::Get()->Clear();
 
+	auto oldOptions = RendererAPI::Get()->GetOptions();
+	RendererAPI::Get()->SetOptions(command.RendererOptions);
+
 	FlushDrawCalls(command);
 
-	// RendererAPI::Get()->SetOptions(oldOptions);
+	RendererAPI::Get()->SetOptions(oldOptions);
 
 	if(framebuffer) {
+		uint32_t width = Application::GetWindow()->GetWidth();
+		uint32_t height = Application::GetWindow()->GetHeight();
+		RendererAPI::Get()->Resize(width, height);
 		framebuffer->Unbind();
-		auto window = Application::GetWindow();
-		RendererAPI::Get()->Resize(window->GetWidth(), window->GetHeight());
 	}
 
 	s_DrawCommand = &command;
 }
 
 void FlushDrawCalls(DrawCommand& command) {
-	if(command.Points.size() == 0
-	&& command.Lines.size()  == 0
-	&& command.Meshes.size() == 0) return;
-
 	auto& options = command.OptionsMap;
 	// // TODO(Implement):
 	// DrawCall pointCall{

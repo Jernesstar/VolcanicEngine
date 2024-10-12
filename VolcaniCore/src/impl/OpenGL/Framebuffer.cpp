@@ -146,7 +146,7 @@ void Framebuffer::Set(AttachmentTarget target, Ref<Texture> texture,
 
 	glBindFramebuffer(GL_FRAMEBUFFER, m_BufferID);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, type + index, GL_TEXTURE_2D, id, 0);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	// glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	auto& att = m_AttachmentMap[target][index];
 	att.m_RendererID = id;

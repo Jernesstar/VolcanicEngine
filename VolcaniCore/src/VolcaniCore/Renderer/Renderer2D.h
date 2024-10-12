@@ -1,11 +1,12 @@
 #pragma once
 
+#include "Renderer/OrthographicCamera.h"
+#include "Renderer/Transform.h"
+
 #include "Object/Quad.h"
 #include "Object/Text.h"
 #include "Object/Texture.h"
-
-#include "Renderer/OrthographicCamera.h"
-#include "Renderer/Transform.h"
+#include "Object/Framebuffer.h"
 
 namespace VolcaniCore {
 
@@ -19,6 +20,9 @@ public:
 	static void DrawQuad(const glm::vec4& color, const Transform& t = { });
 
 	static void DrawText(Ref<Text> text, const Transform& t = { });
+
+	static void DrawFullScreenQuad(Ref<Framebuffer> framebuffer,
+								   AttachmentTarget target);
 };
 
 }

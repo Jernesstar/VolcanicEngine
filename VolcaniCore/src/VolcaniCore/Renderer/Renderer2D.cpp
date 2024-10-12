@@ -33,4 +33,10 @@ void Renderer2D::DrawText(Ref<Text> text, const Transform& t) {
 
 }
 
+void Renderer2D::DrawFullScreenQuad(Ref<Framebuffer> framebuffer,
+									AttachmentTarget target)
+{
+
+}
+
 }

@@ -61,25 +61,22 @@ Bloom::Bloom()
 		{ "VolcaniCore/assets/shaders/Framebuffer.glsl.vert", ShaderType::Vertex },
 		{ "Sandbox/assets/shaders/Downsample.glsl.frag", ShaderType::Fragment }
 	});
-	downsamplePass = RenderPass::Create("Downsample Pass", shader);
+	downsamplePass = RenderPass::Create("Downsample", shader);
 
 	shader = ShaderPipeline::Create({
 		{ "VolcaniCore/assets/shaders/Framebuffer.glsl.vert", ShaderType::Vertex },
 		{ "Sandbox/assets/shaders/Upsample.glsl.frag", ShaderType::Fragment }
 	});
-	upsamplePass = RenderPass::Create("Upsample Pass", shader);
+	upsamplePass = RenderPass::Create("Upsample", shader);
 
 	shader = ShaderPipeline::Create({
 		{ "VolcaniCore/assets/shaders/Framebuffer.glsl.vert", ShaderType::Vertex },
 		{ "Sandbox/assets/shaders/Bloom.glsl.frag", ShaderType::Fragment }
 	});
-	bloomPass = RenderPass::Create("Bloom Pass", shader);
+	bloomPass = RenderPass::Create("Bloom", shader);
 
-	shader = ShaderPipeline::Create({
-		{ "VolcaniCore/assets/shaders/Mesh.glsl.vert", ShaderType::Vertex },
-		{ "VolcaniCore/assets/shaders/Mesh.glsl.frag", ShaderType::Fragment }
-	});
-	drawPass = RenderPass::Create("Draw Pass", shader);
+	shader = ShaderPipeline::Create("VolcaniCore/assets/shaders", "Mesh");
+	drawPass = RenderPass::Create("Draw", shader);
 
 	auto width = window->GetWidth();
 	auto height = window->GetHeight();
@@ -145,20 +142,20 @@ void Bloom::OnUpdate(TimeStep ts) {
 
 	Renderer::StartPass(downsamplePass);
 	{
+		Renderer::GetPass()->SetGlobalUniforms();
+
 		Renderer::GetDrawCommand().GetUniforms()
 		.Set("u_SrcResolution",
 			[&]() -> glm::vec2
 			{
 				return { window->GetWidth(), window->GetHeight() };
-			});
-		Renderer::GetDrawCommand().GetUniforms()
+			})
 		.Set("u_SrcTexture",
 			[&]() -> TextureSlot
 			{
 				src->Bind(AttachmentTarget::Color, 0);
 				return { };
 			});
-		Renderer::GetPass()->SetGlobalUniforms();
 
 		Downsample();
 	}
@@ -169,63 +166,56 @@ void Bloom::OnUpdate(TimeStep ts) {
 
 	Renderer::StartPass(upsamplePass);
 	{
+		Renderer::GetPass()->SetGlobalUniforms();
+
 		Renderer::GetPass()->GetUniforms()
 		.Set("u_FilterRadius",
 			[&]() -> float
 			{
 				return filterRadius;
 			});
-		Renderer::GetPass()->SetGlobalUniforms();
 
-		// Enable additive blending
 		glBlendFunc(GL_ONE, GL_ONE);
 		glBlendEquation(GL_FUNC_ADD);
-
 		Upsample();
-
-		// Disable additive blending
-		glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	}
 	Renderer::EndPass();
 	Renderer::Flush();
 
-	RendererAPI::Get()->Clear();
-
-	RendererAPI::Get()->Resize(window->GetWidth(), window->GetHeight());
-	RendererAPI::Get()->RenderFramebuffer(mips, AttachmentTarget::Color);
+	// RendererAPI::Get()->RenderFramebuffer(mips, AttachmentTarget::Color);
 
 	Renderer::StartPass(bloomPass);
 	{
-		Renderer::GetDrawCommand().GetUniforms()
-		.Set("u_BloomTexture",
-			[&]() -> TextureSlot
-			{
-				mips->Bind(AttachmentTarget::Color, 0);
-				return { };
-			});
-		Renderer::GetDrawCommand().GetUniforms()
-		.Set("u_SceneTexture",
-			[&]() -> TextureSlot
-			{
-				src->Bind(AttachmentTarget::Color, 1);
-				return { };
-			});
+		Renderer::GetPass()->SetGlobalUniforms();
+
 		Renderer::GetPass()->GetUniforms()
 		.Set("u_Exposure",
 			[&]() -> float
 			{
 				return exposure;
-			});
-		Renderer::GetPass()->GetUniforms()
+			})
 		.Set("u_BloomStrength",
 			[&]() -> float
 			{
 				return bloomStrength;
 			});
 
-		Renderer::GetPass()->SetGlobalUniforms();
-		Renderer::GetPass()
-			->SetUniforms(Renderer::GetDrawCommand().GetUniforms());
+		auto& uniforms = Renderer::GetDrawCommand().GetUniforms()
+		.Set("u_BloomTexture",
+			[&]() -> TextureSlot
+			{
+				mips->Bind(AttachmentTarget::Color, 0);
+				return { };
+			})
+		.Set("u_SceneTexture",
+			[&]() -> TextureSlot
+			{
+				src->Bind(AttachmentTarget::Color, 1);
+				return { };
+			});
+
+		Renderer::GetPass()->SetUniforms(uniforms);
 
 		RendererAPI::Get()->Resize(window->GetWidth(), window->GetHeight());
 		RendererAPI::Get()->RenderFramebuffer(mips, AttachmentTarget::Color);
@@ -252,7 +242,7 @@ void Bloom::InitMips() {
 		mip.IntSize = mipIntSize;
 
 		mip.Sampler = Texture::Create(mipIntSize.x, mipIntSize.y,
-										Texture::InternalFormat::Float);
+									  Texture::InternalFormat::Float);
 
 		mipChain.push_back(mip);
 	}
@@ -264,7 +254,7 @@ void Bloom::InitMips() {
 
 void Bloom::Downsample() {
 	for(const auto& mip : mipChain) {
-		Renderer::GetDrawCommand().GetUniforms()
+		auto& uniforms = Renderer::GetDrawCommand().GetUniforms()
 		.Set("WriteTexture",
 			[mip, &mips = mips]() -> TextureSlot
 			{
@@ -272,8 +262,7 @@ void Bloom::Downsample() {
 				return { };
 			});
 
-		Renderer::GetPass()
-			->SetUniforms(Renderer::GetDrawCommand().GetUniforms());
+		Renderer::GetPass()->SetUniforms(uniforms);
 
 		RendererAPI::Get()->RenderFramebuffer(mips, AttachmentTarget::Color);
 
@@ -285,8 +274,7 @@ void Bloom::Downsample() {
 			[mip]() -> glm::vec2
 			{
 				return mip.Size;
-			});
-		Renderer::GetDrawCommand().GetUniforms()
+			})
 		.Set("u_SrcTexture",
 			[mip]() -> TextureSlot
 			{
@@ -300,22 +288,25 @@ void Bloom::Upsample() {
 		const BloomMip& mip = mipChain[i];
 		const BloomMip& nextMip = mipChain[i - 1];
 
-		Renderer::GetDrawCommand().GetUniforms()
-			.Set("u_SrcTexture",
+		// Renderer::PushOptions({
+		// 		.Blending = RendererAPI::Options::BlendingMode::Additive
+		// 	});
+
+		auto& uniforms = Renderer::GetDrawCommand().GetUniforms()
+		.Set("u_SrcTexture",
 			[mip]() -> TextureSlot
 			{
 				return { mip.Sampler, 0 };
-			});
-		Renderer::GetDrawCommand().GetUniforms()
-			.Set("WriteTexture",
+			})
+		.Set("WriteTexture",
 			[nextMip, &mips = mips]() -> TextureSlot
 			{
+				// Renderer::Resize(nextMip.IntSize.x, nextMip.IntSize.y);
 				mips->Set(AttachmentTarget::Color, nextMip.Sampler);
 				return { };
 			});
 
-		Renderer::GetPass()
-			->SetUniforms(Renderer::GetDrawCommand().GetUniforms());
+		Renderer::GetPass()->SetUniforms(uniforms);
 
 		RendererAPI::Get()->RenderFramebuffer(mips, AttachmentTarget::Color);
 

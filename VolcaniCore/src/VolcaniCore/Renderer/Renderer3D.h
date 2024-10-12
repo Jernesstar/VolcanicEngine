@@ -1,5 +1,9 @@
 #pragma once
 
+#include "Renderer/Camera.h"
+#include "Renderer/RenderPass.h"
+#include "Renderer/Transform.h"
+
 #include "Object/Cubemap.h"
 #include "Object/Point.h"
 #include "Object/Line.h"
@@ -8,10 +12,6 @@
 #include "Object/Model.h"
 #include "Object/Texture.h"
 #include "Object/Text.h"
-
-#include "Renderer/Camera.h"
-#include "Renderer/RenderPass.h"
-#include "Renderer/Transform.h"
 
 namespace VolcaniCore {
 
