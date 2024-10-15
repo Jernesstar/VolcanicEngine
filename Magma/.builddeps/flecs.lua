@@ -8,7 +8,6 @@ project "flecs"
     targetdir ("%{RootPath}/build/Magma/lib")
 
     files {
-        "%{VendorPaths.flecs}/*.h",
         "%{VendorPaths.flecs}/flecs.c",
     }
 
@@ -17,15 +16,15 @@ project "flecs"
     }
 
     defines {
-        -- "FLECS_DEBUG",
-        "FLECS_CUSTOM_BUILD",
-        "FLECS_CPP",
-        "FLECS_SYSTEM",
-        "FLECS_PIPELINE"
-        -- "FLECS_ALERTS",
-        -- "FLECS_LOG",
-        -- "FLECS_METRICS",
-        -- "FLECS_STATS",
+        "FLECS_DEBUG",
+        -- "FLECS_CUSTOM_BUILD",
+        -- "FLECS_CPP",
+        -- "FLECS_SYSTEM",
+        -- "FLECS_PIPELINE"
+        -- -- "FLECS_ALERTS",
+        -- -- "FLECS_LOG",
+        -- -- "FLECS_METRICS",
+        -- -- "FLECS_STATS",
     }
 
     filter "toolset:gcc or toolset:clang"

@@ -42,7 +42,7 @@ Shadows::Shadows()
 	depthShader = ShaderPipeline::Create("Sandbox/assets/shaders", "Depth");
 	shadowShader = ShaderPipeline::Create("Sandbox/assets/shaders", "Shadow");
 
-	depthTexture = Texture::Create(1024, 1024, Texture::InternalFormat::Depth);
+	depthTexture = Texture::Create(2048, 2048, Texture::InternalFormat::Depth);
 	depthMap = Framebuffer::Create({
 			{ AttachmentTarget::Depth, { { depthTexture } } }
 		});
@@ -138,11 +138,15 @@ void Shadows::OnUpdate(TimeStep ts) {
 
 		RenderScene();
 
+		auto pos = depthCamera->GetPosition();
+		Renderer3D::DrawMesh(torch,
+			{
+				.Translation = pos  - glm::vec3{ 0.0f, 0.5f, 0.0f }
+			});
 		Renderer3D::DrawMesh(Mesh::Create(MeshPrimitive::Cube, glm::vec4(1.0f)),
 			{
-				.Translation = depthCamera->GetPosition(),
-							//  - glm::vec3{ 0.0f, 0.5f, 0.0f }
-				.Scale = glm::vec3(0.1f)
+				.Translation = pos,
+				.Scale = glm::vec3(0.5f)
 			});
 	}
 	Renderer::EndPass();
