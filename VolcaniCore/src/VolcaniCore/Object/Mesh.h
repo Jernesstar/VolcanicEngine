@@ -1,9 +1,9 @@
 #pragma once
 
-#include <vector>
-
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
+
+#include "Core/Defines.h"
 
 #include "Object/Texture.h"
 #include "Object/Vertex.h"
@@ -25,8 +25,8 @@ public:
 public:
 	static Ref<Mesh> Create(const std::string& path);
 
-	static Ref<Mesh> Create(const std::vector<Vertex>& vertices,
-							const std::vector<uint32_t>& indices,
+	static Ref<Mesh> Create(const List<Vertex>& vertices,
+							const List<uint32_t>& indices,
 							const Material& material = { });
 
 	static Ref<Mesh> Create(MeshPrimitive primitive,
@@ -38,16 +38,16 @@ public:
 	Mesh() = default;
 	Mesh(const std::string& path);
 
-	Mesh(const std::vector<Vertex>& vertices,
-		 const std::vector<uint32_t>& indices,
+	Mesh(const List<Vertex>& vertices,
+		 const List<uint32_t>& indices,
 		 const Material& material = { })
 			: m_Vertices(vertices), m_Indices(indices), m_Material(material),
 				Path("") { }
 
 	virtual ~Mesh() = default;
 
-	const std::vector<Vertex>& GetVertices() const { return m_Vertices; }
-	const std::vector<uint32_t>& GetIndices() const { return m_Indices; }
+	const List<Vertex>& GetVertices() const { return m_Vertices; }
+	const List<uint32_t>& GetIndices() const { return m_Indices; }
 	Material& GetMaterial() { return m_Material; }
 
 	template<typename TDerived>
@@ -55,8 +55,8 @@ public:
 	TDerived* As() const { return (TDerived*)(this); }
 
 protected:
-	std::vector<Vertex> m_Vertices;
-	std::vector<uint32_t> m_Indices;
+	List<Vertex> m_Vertices;
+	List<uint32_t> m_Indices;
 	Material m_Material;
 };
 

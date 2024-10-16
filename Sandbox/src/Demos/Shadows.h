@@ -57,10 +57,11 @@ Shadows::Shadows()
 	torch = Mesh::Create("Sandbox/assets/models/mc-torch/Torch.obj");
 
 	depthCamera = CreateRef<OrthographicCamera>(20.0f, 20.0f, 1.0f, 17.5f);
-	// depthCamera = CreateRef<StereographicCamera>(75.0f, 20.0f, 20.0f, 1.0f, 17.5f);
 	sceneCamera = CreateRef<StereographicCamera>(75.0f);
 	sceneCamera->Resize(1920, 1080);
-	depthCamera->SetPosition({ -2.0f, 4.0f, -2.0f });
+	depthCamera->SetPosition({ 6.0f, 4.f, 5.0f });
+	depthCamera->SetDirection({ -1.0f, -0.5f, -1.0f });
+	// depthCamera->Resize(1920, 1080);
 
 	controller = CameraController{ sceneCamera };
 	controller.TranslationSpeed = 5.0f;
@@ -103,6 +104,8 @@ void Shadows::OnUpdate(TimeStep ts) {
 	}
 	Renderer::EndPass();
 	Renderer::Flush();
+
+	// RendererAPI::Get()->RenderFramebuffer(depthMap, AttachmentTarget::Depth);
 
 	Renderer::StartPass(shadowPass);
 	{

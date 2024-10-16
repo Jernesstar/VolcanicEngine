@@ -69,7 +69,7 @@ void Camera::SetPosition(const glm::vec3& position) {
 	CalculateView();
 }
 void Camera::SetDirection(const glm::vec3& direction) {
-	Direction = direction;
+	Direction = glm::normalize(direction);
 	CalculateView();
 }
 void Camera::SetPositionDirection(const glm::vec3& position,

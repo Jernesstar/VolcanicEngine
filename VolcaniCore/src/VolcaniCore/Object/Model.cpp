@@ -73,8 +73,8 @@ Ref<Mesh> LoadMesh(const std::string& path,
 									  : aiVector3D(0.0f, 0.0f, 0.0f);
 
 		glm::vec4 uvColor = glm::vec4(texCoord.x, texCoord.y, 0, 0);
-		// if(res == AI_SUCCESS)
-		// 	uvColor = diffuse;
+		if(res == AI_SUCCESS && !mesh->HasTextureCoords(0))
+			uvColor = diffuse;
 
 		Vertex v{
 			.Position		= glm::vec3(pos.x, pos.y, pos.z),
