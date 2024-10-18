@@ -7,7 +7,7 @@
 
 using namespace VolcaniCore;
 
-namespace Demo {
+namespace Ash {
 
 class RaytracingApp : public Application {
 public:
