@@ -1,5 +1,7 @@
 #pragma once
 
+#include <VolcaniCore/Core/Math.h>
+
 using namespace VolcaniCore;
 
 namespace Demo {
@@ -18,7 +20,7 @@ public:
 
 	void SetDistance(float r) {
 		R = r;
-		Position = R * glm::vec3{
+		Position = R * Vec3{
 			glm::sin(glm::radians(45.0f)),
 			glm::sin(glm::radians(35.264f)),
 			glm::sin(glm::radians(45.0f))

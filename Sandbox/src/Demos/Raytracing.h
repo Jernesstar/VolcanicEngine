@@ -1,13 +1,8 @@
 #pragma once
 
-#include <VolcaniCore/Core/Application.h>
-#include <VolcaniCore/Event/Events.h>
+#include <Ash/Ray.h>
 
-#include "Ray.h"
-
-using namespace VolcaniCore;
-
-namespace Ash {
+namespace Demo {
 
 class RaytracingApp : public Application {
 public:

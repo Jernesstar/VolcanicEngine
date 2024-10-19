@@ -47,6 +47,7 @@ using namespace Magma::Physics;
 #include "Demos/ECS.h"
 #include "Demos/Raycast.h"
 #include "Demos/Collision.h"
+#include "Demos/Raytracing.h"
 #include "Demos/Template.h"
 
 Application* CreateApplication(const CommandLineArgs& args) {
@@ -68,6 +69,8 @@ Application* CreateApplication(const CommandLineArgs& args) {
 	if(project == "Raycast")   return new Demo::Raycast();
 	// Collision detection
 	if(project == "Collision") return new Demo::Collision();
+	// PBR
+	if(project == "Raytracing")	return new Demo::Raytracing();
 	// Magma Editor
 	if(project == "Editor")	   return new Magma::Editor();
 
