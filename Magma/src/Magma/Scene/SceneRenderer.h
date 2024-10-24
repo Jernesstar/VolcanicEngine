@@ -41,6 +41,7 @@ public:
 	void UpdatePasses();
 
 	const SceneRenderer::Options& GetOptions() const { return m_Options; }
+	Ref<Framebuffer> GetOutput() { return m_Output; }
 	CameraController& GetCameraController() { return m_Controller; }
 
 private:

@@ -63,6 +63,9 @@ ECS::ECS() {
 void ECS::OnUpdate(TimeStep ts) {
 	scene->OnUpdate(ts);
 	scene->OnRender();
+
+	auto output = scene->GetRenderer().GetOutput();
+	RendererAPI::Get()->RenderFramebuffer(output, AttachmentTarget::Color);
 }
 
 }

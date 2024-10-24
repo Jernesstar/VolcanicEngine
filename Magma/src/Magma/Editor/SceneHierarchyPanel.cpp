@@ -46,7 +46,7 @@ void SceneHierarchyPanel::Render() {
 
 		// TODO(Fix): Multiple entities in Hierarchy panel
 		if(ImGui::BeginPopupContextWindow(0, ImGuiPopupFlags_NoOpenOverItems)) {
-			if (ImGui::MenuItem("Create Empty Entity"))
+			if(ImGui::MenuItem("Create Empty Entity"))
 				m_Selected = m_Context->EntityWorld.AddEntity("Empty Entity");
 
 			ImGui::EndPopup();
@@ -77,7 +77,7 @@ void SceneHierarchyPanel::DrawComponents(ECS::Entity& entity)
 	ImGui::SameLine();
 	ImGui::PushItemWidth(-1);
 
-	if (ImGui::Button("Add Component"))
+	if(ImGui::Button("Add Component"))
 		ImGui::OpenPopup("AddComponent");
 
 	if(ImGui::BeginPopup("AddComponent")) {
@@ -97,7 +97,7 @@ void SceneHierarchyPanel::DrawComponents(ECS::Entity& entity)
 			DrawVec3Control("Scale", component.Scale, 1.0f);
 		});
 
-	// DrawComponent<TextureComponent>("Texture", entity,
+	// DrawComponent<MeshComponent>("Texture", entity,
 	// [&](auto& component) {
 	// 	ImGui::Button("Texture", ImVec2(120.0f, 0.0f));
 	// 	if(ImGui::BeginDragDropTarget()) {

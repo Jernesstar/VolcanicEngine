@@ -20,14 +20,14 @@ SceneRenderer::SceneRenderer(Scene* scene)
 	shader = ShaderPipeline::Create("VolcaniCore/assets/shaders", "Mesh");
 	m_DrawPass = RenderPass::Create("Draw", shader);
 
-	auto camera = CreateRef<StereographicCamera>(75.0f);
-	m_Controller.SetCamera(camera);
-
 	auto window = Application::GetWindow();
 	auto width = window->GetWidth();
 	auto height = window->GetHeight();
+	m_Output = Framebuffer::Create(width, height);
+	m_DrawPass->SetOutput(m_Output);
 
-	// m_Output = Framebuffer::Create(width, height);
+	auto camera = CreateRef<StereographicCamera>(75.0f);
+	m_Controller.SetCamera(camera);
 
 	auto& world = m_Scene->EntityWorld.Get();
 	m_RenderSystem = world
@@ -56,7 +56,6 @@ void SceneRenderer::UpdateCamera(TimeStep ts) {
 	camera->Resize(cc.ViewportWidth, cc.ViewportHeight);
 	camera->SetPositionDirection(cc.Position, cc.Direction);
 
-	// TODO(CameraController entity)
 	m_Controller.OnUpdate(ts);
 }
 
@@ -77,6 +76,7 @@ void SceneRenderer::Render() {
 		Renderer3D::End();
 	}
 	Renderer::EndPass();
+	Renderer::Flush();
 	
 	// if(m_Options.LightingOptions.Enabled) {
 		// auto& lights = m_Scene->GetLights();

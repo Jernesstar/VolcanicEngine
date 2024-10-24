@@ -1,17 +1,15 @@
 #pragma once
 
-#include <cstdint>
-#include <string>
-#include <string_view>
-#include <vector>
-#include <memory>
+#include <VolcaniCore/Core/Defines.h>
+
+using namespace VolcaniCore;
 
 namespace Magma {
 
 class AssetManager {
 public:
 	template<typename T, typename ...Args>
-	static std::shared_ptr<T> CreateOrReturn(Args&&... args);
-}
+	static Ref<T> CreateOrReturn(Args&&... args);
+};
 
 }

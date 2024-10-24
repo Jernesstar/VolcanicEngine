@@ -10,6 +10,7 @@ namespace Magma {
 
 class SceneHierarchyPanel {
 public:
+	SceneHierarchyPanel() = default;
 	SceneHierarchyPanel(Ref<Scene> scene);
 	~SceneHierarchyPanel() = default;
 

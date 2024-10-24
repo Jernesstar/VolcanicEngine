@@ -28,7 +28,7 @@ public:
 
 private:
 	Ref<Scene> m_CurrentScene;
-	Ref<SceneHierarchyPanel> m_SceneHierarchyPanel;
+	SceneHierarchyPanel m_SceneHierarchyPanel;
 	Ref<Texture> m_IconPlay, m_IconPause, m_IconStop;
 	
 	enum class SceneState { Edit, Play, Pause };

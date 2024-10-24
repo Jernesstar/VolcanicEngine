@@ -34,7 +34,7 @@ EditorLayer::EditorLayer() {
 	m_CurrentScene = CreateRef<Scene>();
 	m_CurrentScene->Load("Magma/assets/scenes/temp.volc");
 
-	m_SceneHierarchyPanel = CreateRef<SceneHierarchyPanel>(m_CurrentScene);
+	m_SceneHierarchyPanel = SceneHierarchyPanel(m_CurrentScene);
 
 	m_IconPlay 	= Texture::Create("Magma/assets/icons/PlayButton.png");
 	m_IconPause = Texture::Create("Magma/assets/icons/PauseButton.png");
@@ -58,14 +58,8 @@ void EditorLayer::Render() {
 	// because it would be confusing to have
 	// two docking targets within each others.
 	ImGuiWindowFlags windowFlags = ImGuiWindowFlags_MenuBar
-									| ImGuiWindowFlags_NoDocking;
+								 | ImGuiWindowFlags_NoDocking;
 
-	ImGuiViewport* viewport = ImGui::GetMainViewport();
-	ImGui::SetNextWindowPos(viewport->Pos);
-	ImGui::SetNextWindowSize(viewport->Size);
-	ImGui::SetNextWindowViewport(viewport->ID);
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
 	windowFlags |= ImGuiWindowFlags_NoTitleBar
 				 | ImGuiWindowFlags_NoCollapse
 				 | ImGuiWindowFlags_NoResize
@@ -76,8 +70,15 @@ void EditorLayer::Render() {
 	// When using ImGuiDockNodeFlags_PassthruCentralNode,
 	// DockSpace() will render our background and handle the pass-thru hole,
 	// so we ask Begin() to not render a background.
-	if (dockspaceFlags & ImGuiDockNodeFlags_PassthruCentralNode)
+	if(dockspaceFlags & ImGuiDockNodeFlags_PassthruCentralNode)
 		windowFlags |= ImGuiWindowFlags_NoBackground;
+
+	ImGuiViewport* viewport = ImGui::GetMainViewport();
+	ImGui::SetNextWindowPos(viewport->Pos);
+	ImGui::SetNextWindowSize(viewport->Size);
+	ImGui::SetNextWindowViewport(viewport->ID);
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
 
 	// Important: note that we proceed even if Begin() returns false (aka window is collapsed).
 	// This is because we want to keep our DockSpace() active. If a DockSpace() is inactive,
@@ -91,15 +92,10 @@ void EditorLayer::Render() {
 	// DockSpace
 	ImGuiIO& io = ImGui::GetIO();
 	ImGuiStyle& style = ImGui::GetStyle();
-	float minWinSizeX = style.WindowMinSize.x;
-	style.WindowMinSize.x = 370.0f;
-	if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
-	{
-		ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
-		ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspaceFlags);
+	if(io.ConfigFlags & ImGuiConfigFlags_DockingEnable) {
+		ImGuiID dockspaceID = ImGui::GetID("MyDockSpace");
+		ImGui::DockSpace(dockspaceID, ImVec2(0.0f, 0.0f), dockspaceFlags);
 	}
-
-	style.WindowMinSize.x = minWinSizeX;
 
 	if(ImGui::BeginMainMenuBar()) {
 		if(ImGui::BeginMenu("File")) {
@@ -131,43 +127,33 @@ void EditorLayer::Render() {
 	if(menu.edit.addEntity)
 		AddEntity();
 
-	ImGui::Begin("Scene");
-	{
-		m_SceneHierarchyPanel->Render();
-	}
-	ImGui::End();
+	m_SceneHierarchyPanel.Render();
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0, 0 });
 	ImGui::Begin("Viewport");
 	{
-		auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
-		auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
-		auto viewportOffset = ImGui::GetWindowPos();
-		m_ViewportBounds[0] = { viewportMinRegion.x + viewportOffset.x,
-								viewportMinRegion.y + viewportOffset.y };
-		m_ViewportBounds[1] = { viewportMaxRegion.x + viewportOffset.x,
-								viewportMaxRegion.y + viewportOffset.y };
+		auto minReg = ImGui::GetWindowContentRegionMin();
+		auto maxReg = ImGui::GetWindowContentRegionMax();
+		auto offset = ImGui::GetWindowPos();
+		m_ViewportBounds[0] = { minReg.x + offset.x, minReg.y + offset.y };
+		m_ViewportBounds[1] = { maxReg.x + offset.x, maxReg.y + offset.y };
 
 		m_ViewportFocused = ImGui::IsWindowFocused();
 		m_ViewportHovered = ImGui::IsWindowHovered();
 
-		// TODO(Renderer::ChainPasses)
-		// auto framebuffer = m_CurrentScene->GetRenderer().Output;
-		// auto& colorAttachment =
-		// 	framebuffer->As<OpenGL::Framebuffer>()
-		// 		->Get(AttachmentTarget::Color);
-		// uint64_t textureID = colorAttachment.GetRendererID();
-		// // framebuffer->Bind();
-		// // colorAttachment.Bind();
-		// ImGui::Image(reinterpret_cast<void*>(textureID),
-		// 			 ImVec2{ m_ViewportSize.x, m_ViewportSize.y },
-		// 			 ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
-		// // framebuffer->Unbind();
+		auto framebuffer = m_CurrentScene->GetRenderer().GetOutput();
+		auto& colorAttachment = framebuffer->As<OpenGL::Framebuffer>()
+											->Get(AttachmentTarget::Color);
+		uint64_t textureID = colorAttachment.GetRendererID();
+		framebuffer->Bind();
+		colorAttachment.Bind();
+		ImGui::Image(reinterpret_cast<void*>(textureID),
+					 ImVec2{ m_ViewportSize.x, m_ViewportSize.y });
+		framebuffer->Unbind();
 
 		if(ImGui::BeginDragDropTarget()) {
-			if(const ImGuiPayload* payload =
-						 ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
-			{
+			auto payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM");
+			if(payload) {
 				const wchar_t* path = (const wchar_t*)payload->Data;
 				OpenScene(path);
 			}
@@ -184,7 +170,7 @@ void EditorLayer::Render() {
 
 void EditorLayer::NewScene() {
 	m_CurrentScene = CreateRef<Scene>("Current Scene");
-	m_SceneHierarchyPanel->SetContext(m_CurrentScene);
+	m_SceneHierarchyPanel.SetContext(m_CurrentScene);
 	menu.file.newScene = false;
 }
 
