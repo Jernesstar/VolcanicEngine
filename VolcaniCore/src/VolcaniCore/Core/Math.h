@@ -13,7 +13,7 @@ using Vec2 = Vec2f;
 using Vec3 = Vec3f;
 
 constexpr float PI = 3.14159265358979328462f;
-constexpr float E  = 2.71828182859f;
+// constexpr float E  = 2.71828182859f;
 
 static constexpr float RadToDeg(float radians) {
 	return (180.0f / PI) * radians;

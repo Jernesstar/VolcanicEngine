@@ -4,9 +4,9 @@
 
 namespace Demo {
 
-class RaytracingApp : public Application {
+class Raytracing : public Application {
 public:
-	RaytracingApp();
+	Raytracing();
 
 	void OnUpdate(TimeStep ts);
 
@@ -14,7 +14,7 @@ private:
 
 };
 
-RaytracingApp::RaytracingApp() {
+Raytracing::Raytracing() {
 	Events::RegisterListener<KeyPressedEvent>(
 		[](const KeyPressedEvent& event)
 		{
@@ -26,7 +26,7 @@ RaytracingApp::RaytracingApp() {
 	auto val = r(0.5f);
 }
 
-void RaytracingApp::OnUpdate(TimeStep ts) {
+void Raytracing::OnUpdate(TimeStep ts) {
 
 }
 

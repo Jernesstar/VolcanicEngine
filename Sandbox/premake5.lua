@@ -22,6 +22,8 @@ project "Sandbox"
         "%{RootPath}/VolcaniCore/src/impl",
         "%{RootPath}/Magma/src",
         "%{RootPath}/Magma/src/Magma",
+        "%{RootPath}/Ash/src",
+        "%{RootPath}/Ash/src/Magma",
 
         "%{Includes.imgui}",
         "%{Includes.imgui}/imgui",

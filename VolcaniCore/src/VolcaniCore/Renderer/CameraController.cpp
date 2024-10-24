@@ -56,19 +56,20 @@ void CameraController::OnUpdate(TimeStep ts) {
 	glm::vec3 right = glm::normalize(glm::cross(forward, up));
 
 	glm::ivec3 inputDir(0);
-	glm::vec3 moveDir(0.0f);
 	inputDir.x = Input::KeyPressed(m_Controls[Control::Right])
 			   - Input::KeyPressed(m_Controls[Control::Left]);
 	inputDir.y = Input::KeyPressed(m_Controls[Control::Up])
 			   - Input::KeyPressed(m_Controls[Control::Down]);
 	inputDir.z = Input::KeyPressed(m_Controls[Control::Forward])
 			   - Input::KeyPressed(m_Controls[Control::Backward]);
-	moveDir += (float)inputDir.x * right;
-	moveDir += (float)inputDir.y * up;
-	moveDir += (float)inputDir.z * forward;
 
-	if(moved = (inputDir.x || inputDir.y || inputDir.z))
+	if(moved = (inputDir.x || inputDir.y || inputDir.z)) {
+		glm::vec3 moveDir(0.0f);
+		moveDir += (float)inputDir.x * right;
+		moveDir += (float)inputDir.y * up;
+		moveDir += (float)inputDir.z * forward;
 		finalPos += glm::normalize(moveDir) * moveSpeed * (float)ts;
+	}
 
 	if(moved |= (delta != glm::vec2(0.0f) && RotationSpeed != 0.0f)) {
 		float pitchDelta = delta.y * RotationSpeed;
