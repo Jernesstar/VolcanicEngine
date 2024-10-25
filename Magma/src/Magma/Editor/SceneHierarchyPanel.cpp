@@ -52,27 +52,30 @@ void SceneHierarchyPanel::Render() {
 			ImGui::EndPopup();
 		}
 	}
-	ImGui::End();
 
 	if(m_Selected) {
 		ImGui::Begin("Properties");
 		DrawComponents(m_Selected);
 		ImGui::End();
 	}
+
+	ImGui::End();
 }
 
-void SceneHierarchyPanel::DrawComponents(ECS::Entity& entity)
-{
-	if(entity.Has<TagComponent>()) {
-		auto& tag = entity.Get<TagComponent>().Tag;
+void SceneHierarchyPanel::DrawComponents(ECS::Entity& entity) {
+	if(!entity.IsValid())
+		return;
 
-		char buffer[256];
-		memset(buffer, 0, sizeof(buffer));
-		strcpy(buffer, tag.c_str());
-		if(ImGui::InputText("##Tag", buffer, sizeof(buffer))) {
-			tag = std::string(buffer);
-		}
-	}
+	// if(entity.Has<TagComponent>()) {
+	// 	auto& tag = entity.Get<TagComponent>().Tag;
+
+	// 	char buffer[256];
+	// 	memset(buffer, 0, sizeof(buffer));
+	// 	strcpy(buffer, tag.c_str());
+	// 	if(ImGui::InputText("##Tag", buffer, sizeof(buffer))) {
+	// 		tag = std::string(buffer);
+	// 	}
+	// }
 
 	ImGui::SameLine();
 	ImGui::PushItemWidth(-1);
@@ -131,7 +134,7 @@ void SceneHierarchyPanel::DrawEntityNode(ECS::Entity& entity) {
 
 	bool entityDeleted = false;
 	if(ImGui::BeginPopupContextItem()) {
-		if (ImGui::MenuItem("Delete Entity"))
+		if(ImGui::MenuItem("Delete Entity"))
 			entityDeleted = true;
 
 		ImGui::EndPopup();
@@ -153,8 +156,8 @@ void SceneHierarchyPanel::DisplayAddComponentEntry(const std::string& entryName)
 	if(!m_Selected.Has<TComponent>()) {
 		if(ImGui::MenuItem(entryName.c_str())) {
 			m_Selected.Add<TComponent>();
-			ImGui::CloseCurrentPopup();
 		}
+		ImGui::CloseCurrentPopup();
 	}
 }
 
@@ -163,14 +166,14 @@ void SceneHierarchyPanel::DrawComponent(const std::string& name,
 										ECS::Entity& entity,
 										TUIFunction uiFunction)
 {
-	if (!entity.Has<TComponent>())
+	if(!entity.Has<TComponent>())
 		return;
 
-	const ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen
-								   | ImGuiTreeNodeFlags_Framed
-								   | ImGuiTreeNodeFlags_SpanAvailWidth
-								   | ImGuiTreeNodeFlags_AllowItemOverlap
-								   | ImGuiTreeNodeFlags_FramePadding;
+	ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen
+							 | ImGuiTreeNodeFlags_Framed
+							 | ImGuiTreeNodeFlags_SpanAvailWidth
+							 | ImGuiTreeNodeFlags_AllowItemOverlap
+							 | ImGuiTreeNodeFlags_FramePadding;
 	auto& component = entity.Get<TComponent>();
 	ImVec2 contentRegionAvailable = ImGui::GetContentRegionAvail();
 
@@ -178,8 +181,8 @@ void SceneHierarchyPanel::DrawComponent(const std::string& name,
 	float lineHeight = GImGui->Font->FontSize
 					 + GImGui->Style.FramePadding.y * 2.0f;
 	ImGui::Separator();
-	bool open = ImGui::TreeNodeEx((void*)typeid(T).hash_code(),
-								  flags, name.c_str());
+	bool open =
+		ImGui::TreeNodeEx((void*)typeid(T).hash_code(), flags, name.c_str());
 	ImGui::PopStyleVar();
 	ImGui::SameLine(contentRegionAvailable.x - lineHeight * 0.5f);
 
@@ -189,7 +192,7 @@ void SceneHierarchyPanel::DrawComponent(const std::string& name,
 
 	bool removeComponent = false;
 	if(ImGui::BeginPopup("ComponentSettings")) {
-		if (ImGui::MenuItem("Remove component"))
+		if(ImGui::MenuItem("Remove component"))
 			removeComponent = true;
 
 		ImGui::EndPopup();
