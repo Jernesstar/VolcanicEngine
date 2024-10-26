@@ -29,11 +29,11 @@ namespace Magma::UI {
 // 								specs.Color);
 // }
 
-UIElement::UIElement(UIElement::Type type, uint32_t width, uint32_t height,
-					 float x, float y, const glm::vec4& color,
-					 Ref<UIElement> parent)
-	: m_Type(type), m_Width(width), m_Height(height), x(x), y(y), m_Color(color),
-		m_Parent(parent.get()) { }
+UIElement::UIElement(UIElement::Type type,
+					 uint32_t width, uint32_t height, float x, float y,
+					 const glm::vec4& color, Ref<UIElement> parent)
+	: m_Type(type), m_Width(width), m_Height(height), x(x), y(y),
+		m_Color(color), m_Parent(parent.get()) { }
 
 Ref<UIElement> UIElement::Add(Ref<UIElement> element) {
 	if(OnAddElement(element)) {

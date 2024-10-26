@@ -46,7 +46,7 @@ void Init() {
 
 	ImGui::StyleColorsDark();
 
-	float fontSize = 18.0f * 2.0f;
+	float fontSize = 18.0f;
 	io.Fonts->AddFontFromFileTTF(
 			"VolcaniCore/assets/fonts/JetBrainsMono-Bold.ttf", fontSize);
 	io.FontDefault =

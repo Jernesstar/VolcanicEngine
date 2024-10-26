@@ -6,17 +6,17 @@ namespace Magma::UI {
 
 Ref<Window> Window::Create(const Window::Specification& specs) {
 	return CreateRef<UI::Window>(
-		specs.Width, specs.Height, specs.x, specs.y, specs.Color,
+		specs.Name, specs.Width, specs.Height, specs.x, specs.y, specs.Color,
 		specs.BorderWidth, specs.BorderHeight, specs.BorderColor
 	);
 }
 
-Window::Window(uint32_t width, uint32_t height, float x, float y,
-				const glm::vec4& bgColor,
+Window::Window(std::string name, uint32_t width, uint32_t height,
+				float x, float y, const glm::vec4& bgColor,
 				uint32_t borderWidth, uint32_t borderHeight,
 				const glm::vec4& borderColor)
 	: UIElement(UIElement::Type::Window, width, height, x, y, bgColor),
-		m_BorderWidth(borderWidth), m_BorderHeight(borderHeight),
+		m_Name(name), m_BorderWidth(borderWidth), m_BorderHeight(borderHeight),
 		m_BorderColor(borderColor) { }
 
 void Window::Draw() {
@@ -42,11 +42,10 @@ void Window::Draw() {
 				 | ImGuiWindowFlags_NoBringToFrontOnFocus
 				 | ImGuiWindowFlags_NoNavFocus;
 
-	ImGui::Begin("##Window", &m_Open, windowFlags);
+	ImGui::Begin(m_Name.c_str(), &m_Open, windowFlags);
 
 	ImGui::PopStyleColor();
-	ImGui::PopStyleVar();
-	ImGui::PopStyleVar(2);
+	ImGui::PopStyleVar(3);
 
 	// Not calling ImGUI::End() as the children still need to be rendered
 }

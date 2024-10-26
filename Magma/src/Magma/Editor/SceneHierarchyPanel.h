@@ -1,20 +1,15 @@
 #pragma once
 
-#include <filesystem>
-
-#include <VolcaniCore/Object/Texture.h>
-
+#include "Panel.h"
 #include "Scene/Scene.h"
 
 namespace Magma {
 
-class SceneHierarchyPanel {
+class SceneHierarchyPanel : public Panel {
 public:
-	SceneHierarchyPanel() = default;
+	SceneHierarchyPanel();
 	SceneHierarchyPanel(Ref<Scene> scene);
 	~SceneHierarchyPanel() = default;
-
-	void Render();
 
 	void SetContext(Ref<Scene> scene);
 
@@ -23,16 +18,9 @@ private:
 	ECS::Entity m_Selected;
 
 private:
-	template<typename T>
-	void DisplayAddComponentEntry(const std::string& entryName);
+	void Draw() override;
 
-	template<typename TComponent, typename TUIFunction>
-	void DrawComponent(const std::string& name, ECS::Entity& entity,
-					   TUIFunction uiFunction);
-
-	void SetSelectedEntity(ECS::Entity& entity);
 	void DrawEntityNode(ECS::Entity& entity);
-	void DrawComponents(ECS::Entity& entity);
 };
 
 }

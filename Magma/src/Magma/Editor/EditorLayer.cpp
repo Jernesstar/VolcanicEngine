@@ -7,71 +7,67 @@
 #include <imgui/misc/cpp/imgui_stdlib.h>
 #include <ImGuiFileDialog/ImGuiFileDialog.h>
 
-#include <OpenGL/Texture2D.h>
-#include <OpenGL/Framebuffer.h>
-
-#include <VolcaniCore/Core/Application.h>
 #include <VolcaniCore/Core/Log.h>
 #include <VolcaniCore/Renderer/RendererAPI.h>
 
+#include "SceneTab.h"
+
 using namespace VolcaniCore;
-using namespace Magma::ECS;
 
 namespace Magma {
 
 struct {
 	struct {
-		bool newScene = false;
-		bool openScene = false;
-		bool saveScene = false;
-	} file;
-	struct {
-		bool addEntity = false;
-	} edit;
+		bool newProject = false;
+		bool openProject = false;
+		bool saveProject = false;
+
+		operator bool() const {
+			return newProject || openProject || saveProject;
+		}
+	} project;
+
+	operator bool() const {
+		return project;
+	}
 } menu;
 
 EditorLayer::EditorLayer() {
-	m_CurrentScene = CreateRef<Scene>();
-	m_CurrentScene->Load("Magma/assets/scenes/temp.volc");
+	NewProject();
+	m_Project->Load("Magma/assets/scenes/temp.volc.proj");
 
-	m_SceneHierarchyPanel = SceneHierarchyPanel(m_CurrentScene);
+	auto scene1 = CreateRef<Scene>();
+	scene1->Load("Magma/assets/scenes/temp.magma.scene");
+	auto scene2 = CreateRef<Scene>("Scene2");
 
-	m_IconPlay 	= Texture::Create("Magma/assets/icons/PlayButton.png");
-	m_IconPause = Texture::Create("Magma/assets/icons/PauseButton.png");
-	m_IconStop 	= Texture::Create("Magma/assets/icons/StopButton.png");
+	m_CurrentTab = CreateRef<SceneTab>(scene1);
+	NewTab(m_CurrentTab);
+	NewTab(CreateRef<SceneTab>(scene2));
 }
 
 EditorLayer::~EditorLayer() {
-	m_CurrentScene->Save("Magma/assets/scenes/temp.volc");
+	m_Project->Save("Magma/assets/scenes/temp.volc.proj");
 }
 
 void EditorLayer::Update(TimeStep ts) {
-	RendererAPI::Get()->Clear({ 0.34, 0.2, 0.87, 1.0 });
+	for(auto tab : m_Tabs)
+		tab->Update(ts);
 }
 
 void EditorLayer::Render() {
-	static bool dockspaceOpen = true;
-	static ImGuiDockNodeFlags dockspaceFlags = ImGuiDockNodeFlags_None;
+	bool dockspaceOpen = true;
+	ImGuiDockNodeFlags dockspaceFlags = 0;
+	ImGuiWindowFlags windowFlags = ImGuiWindowFlags_MenuBar;
 
-	// We are using the ImGuiWindowFlags_NoDocking flag
-	// to make the parent window not dockable into,
-	// because it would be confusing to have
-	// two docking targets within each others.
-	ImGuiWindowFlags windowFlags = ImGuiWindowFlags_MenuBar
-								 | ImGuiWindowFlags_NoDocking;
-
-	windowFlags |= ImGuiWindowFlags_NoTitleBar
+	dockspaceFlags |= ImGuiDockNodeFlags_PassthruCentralNode;
+	windowFlags |= ImGuiWindowFlags_NoDocking
 				 | ImGuiWindowFlags_NoCollapse
+				 | ImGuiWindowFlags_NoNavFocus
+				 | ImGuiWindowFlags_NoTitleBar
 				 | ImGuiWindowFlags_NoResize
 				 | ImGuiWindowFlags_NoMove
-				 | ImGuiWindowFlags_NoBringToFrontOnFocus
-				 | ImGuiWindowFlags_NoNavFocus;
-
-	// When using ImGuiDockNodeFlags_PassthruCentralNode,
-	// DockSpace() will render our background and handle the pass-thru hole,
-	// so we ask Begin() to not render a background.
-	if(dockspaceFlags & ImGuiDockNodeFlags_PassthruCentralNode)
-		windowFlags |= ImGuiWindowFlags_NoBackground;
+				 | ImGuiWindowFlags_NoBackground
+				 | ImGuiWindowFlags_NoBringToFrontOnFocus;
 
 	ImGuiViewport* viewport = ImGui::GetMainViewport();
 	ImGui::SetNextWindowPos(viewport->Pos);
@@ -79,221 +75,106 @@ void EditorLayer::Render() {
 	ImGui::SetNextWindowViewport(viewport->ID);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
 
-	// Important: note that we proceed even if Begin() returns false (aka window is collapsed).
-	// This is because we want to keep our DockSpace() active. If a DockSpace() is inactive,
-	// all active windows docked into it will lose their parent and become undocked.
-	// We cannot preserve the docking relationship between an active window and an inactive docking, otherwise 
-	// any change of dockspace/settings would lead to windows being stuck in limbo and never being visible.
-
-	ImGui::Begin("DockSpace Demo", &dockspaceOpen, windowFlags);
-	ImGui::PopStyleVar(2);
-
-	// DockSpace
-	ImGuiIO& io = ImGui::GetIO();
-	ImGuiStyle& style = ImGui::GetStyle();
-	if(io.ConfigFlags & ImGuiConfigFlags_DockingEnable) {
-		ImGuiID dockspaceID = ImGui::GetID("MyDockSpace");
-		ImGui::DockSpace(dockspaceID, ImVec2(0.0f, 0.0f), dockspaceFlags);
-	}
-
-	if(ImGui::BeginMainMenuBar()) {
-		if(ImGui::BeginMenu("File")) {
-			if(ImGui::MenuItem("New", "Ctrl+N"))
-				menu.file.newScene = true;
-			if(ImGui::MenuItem("Open", "Ctrl+O"))
-				menu.file.openScene = true;
-			if(ImGui::MenuItem("Save", "Ctrl+S"))
-				menu.file.saveScene = true;
-
-			ImGui::EndMenu();
-		}
-		if(ImGui::BeginMenu("Edit")) {
-			if(ImGui::MenuItem("Add Entity", "Ctrl+N"))
-				menu.edit.addEntity = true;
-
-			ImGui::EndMenu();
-		}
-
-		ImGui::EndMainMenuBar();
-	}
-
-	if(menu.file.newScene)
-		NewScene();
-	if(menu.file.openScene)
-		OpenScene();
-	if(menu.file.saveScene)
-		SaveScene();
-	if(menu.edit.addEntity)
-		AddEntity();
-
-	m_SceneHierarchyPanel.Render();
-
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0, 0 });
-	ImGui::Begin("Viewport");
+	ImGui::Begin("DockSpaceWindow", &dockspaceOpen, windowFlags);
 	{
-		auto minReg = ImGui::GetWindowContentRegionMin();
-		auto maxReg = ImGui::GetWindowContentRegionMax();
-		auto offset = ImGui::GetWindowPos();
-		m_ViewportBounds[0] = { minReg.x + offset.x, minReg.y + offset.y };
-		m_ViewportBounds[1] = { maxReg.x + offset.x, maxReg.y + offset.y };
+		ImGui::BeginMainMenuBar();
+		{
+			if(ImGui::BeginMenu("Project")) {
+				if(ImGui::MenuItem("New", "Ctrl+N"))
+					menu.project.newProject = true;
+				if(ImGui::MenuItem("Open", "Ctrl+S"))
+					menu.project.openProject = true;
+				if(ImGui::MenuItem("Save", "Ctrl+S"))
+					menu.project.saveProject = true;
 
-		m_ViewportFocused = ImGui::IsWindowFocused();
-		m_ViewportHovered = ImGui::IsWindowHovered();
-
-		auto framebuffer = m_CurrentScene->GetRenderer().GetOutput();
-		auto& colorAttachment = framebuffer->As<OpenGL::Framebuffer>()
-											->Get(AttachmentTarget::Color);
-		uint64_t textureID = colorAttachment.GetRendererID();
-		framebuffer->Bind();
-		colorAttachment.Bind();
-		ImGui::Image(reinterpret_cast<void*>(textureID),
-					 ImVec2{ m_ViewportSize.x, m_ViewportSize.y });
-		framebuffer->Unbind();
-
-		if(ImGui::BeginDragDropTarget()) {
-			auto payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM");
-			if(payload) {
-				const wchar_t* path = (const wchar_t*)payload->Data;
-				OpenScene(path);
+				ImGui::EndMenu();
 			}
-			ImGui::EndDragDropTarget();
+
 		}
+		ImGui::EndMainMenuBar();
+
+		ImGui::BeginTabBar("Tabs", ImGuiTabBarFlags_Reorderable);
+		{
+			if(ImGui::BeginTabItem("+", nullptr, ImGuiTabItemFlags_NoReorder)) {
+				if(ImGui::IsItemActivated())
+					NewTab();
+				ImGui::EndTabItem();
+			}
+
+			for(auto tab : m_Tabs) {
+				if(ImGui::BeginTabItem(tab->GetName().c_str())) {
+					if(ImGui::IsItemActivated())
+						m_CurrentTab = tab;
+					ImGui::EndTabItem();
+				}
+			}
+		}
+		ImGui::EndTabBar();
+
+		ImGui::PopStyleVar(3);
+		ImGuiID dockspaceID = ImGui::GetID("DockSpace");
+		ImGui::DockSpace(dockspaceID, ImVec2(0.0f, 0.0f), dockspaceFlags);
+
+		m_CurrentTab->Render();
 	}
 	ImGui::End();
-	ImGui::PopStyleVar();
 
-	ToolbarUI();
-
-	ImGui::End();
+	if(menu.project.newProject)
+		NewProject();
+	if(menu.project.openProject)
+		OpenProject();
+	if(menu.project.saveProject)
+		SaveProject();
 }
 
-void EditorLayer::NewScene() {
-	m_CurrentScene = CreateRef<Scene>("Current Scene");
-	m_SceneHierarchyPanel.SetContext(m_CurrentScene);
-	menu.file.newScene = false;
+void EditorLayer::NewProject() {
+	m_Project = CreateRef<Project>();
+	menu.project.newProject = false;
 }
 
-void EditorLayer::OpenScene() {
+void EditorLayer::OpenProject() {
 	IGFD::FileDialogConfig config;
 	config.path = ".";
-	ImGuiFileDialog::Instance()
-		->OpenDialog("ChooseFileDlgKey", "Choose File", ".volc", config);
+	auto instance = ImGuiFileDialog::Instance();
+	instance->OpenDialog("ChooseFile", "Choose File", ".volc.proj", config);
 
-	if(ImGuiFileDialog::Instance()->Display("ChooseFileDlgKey")) {
-		if (ImGuiFileDialog::Instance()->IsOk()) {
-			std::string path = ImGuiFileDialog::Instance()->GetFilePathName();
-			m_CurrentScene->Load(path);
+	if(instance->Display("ChooseFile")) {
+		if(instance->IsOk()) {
+			std::string path = instance->GetFilePathName();
+			m_Project->Load(path);
 		}
 
-		ImGuiFileDialog::Instance()->Close();
-		menu.file.openScene = false;
+		instance->Close();
+		menu.project.openProject = false;
 	}
 }
 
-void EditorLayer::OpenScene(const std::filesystem::path& path) {
-	m_CurrentScene->Load(path.string());
-}
-
-void EditorLayer::SaveScene() {
+void EditorLayer::SaveProject() {
 	IGFD::FileDialogConfig config;
 	config.path = ".";
-	ImGuiFileDialog::Instance()
-		->OpenDialog("ChooseFileDlgKey", "Choose File", ".volc", config);
+	auto instance = ImGuiFileDialog::Instance();
+	instance->OpenDialog("ChooseFile", "Choose File", ".volc.proj", config);
 
-	if(ImGuiFileDialog::Instance()->Display("ChooseFileDlgKey")) {
-		if (ImGuiFileDialog::Instance()->IsOk()) {
-			std::string path = ImGuiFileDialog::Instance()->GetFilePathName();
-			m_CurrentScene->Save(path);
+	if(instance->Display("ChooseFile")) {
+		if(instance->IsOk()) {
+			std::string path = instance->GetFilePathName();
+			m_Project->Save(path);
 		}
 
-		ImGuiFileDialog::Instance()->Close();
-		menu.file.saveScene = false;
+		instance->Close();
+		menu.project.openProject = false;
 	}
 }
 
-void EditorLayer::AddEntity() {
-	ImGui::Begin("Add New Entity");
-	{
-		std::string s{ "Name" };
-		ImGui::InputText("##EntityName", &s);
-
-		if(ImGui::Button("Add Entity")) {
-			Entity entity = m_CurrentScene->EntityWorld.AddEntity(s);
-
-			menu.edit.addEntity = false;
-		}
-	}
-	ImGui::End();
+void EditorLayer::NewTab(Ref<Tab> tab) {
+	m_Tabs.push_back(tab);
 }
 
-void EditorLayer::ToolbarUI()
-{
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 2));
-	ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(0, 0));
-	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
-
-	auto& colors = ImGui::GetStyle().Colors;
-	const auto& buttonHovered = colors[ImGuiCol_ButtonHovered];
-	const auto& buttonActive = colors[ImGuiCol_ButtonActive];
-
-	ImGui::PushStyleColor(ImGuiCol_ButtonHovered,
-		ImVec4(buttonHovered.x, buttonHovered.y, buttonHovered.z, 0.5f));
-	ImGui::PushStyleColor(ImGuiCol_ButtonActive,
-		ImVec4(buttonActive.x, buttonActive.y, buttonActive.z, 0.5f));
-
-	ImGui::Begin("##toolbar", nullptr, ImGuiWindowFlags_NoDecoration
-									 | ImGuiWindowFlags_NoScrollbar
-									 | ImGuiWindowFlags_NoScrollWithMouse);
-
-	float size = ImGui::GetWindowHeight() - 4.0f;
-	ImGui::SetCursorPosX(
-		(ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
-
-	ImVec4 tintColor = ImVec4(1, 1, 1, 1);
-	ImVec4 v0  = ImVec4(0.0f, 0.0f, 0.0f, 0.0f);
-	ImVec2 v1 = ImVec2(size, size);
-	ImVec2 v2 = ImVec2(0, 0);
-	ImVec2 v3 = ImVec2(1, 1);
-
-	bool hasPlayButton = m_SceneState != SceneState::Play;
-	bool hasStopButton = true;
-
-	if(hasPlayButton) {
-		auto icon = m_IconPlay->As<OpenGL::Texture2D>();
-		if (ImGui::ImageButton((ImTextureID)(uint64_t)icon->GetID(),
-								v1, v2, v3, 0, v0, tintColor))
-		{
-			m_SceneState = SceneState::Play;
-			// OnScenePlay();
-		}
-	}
-
-	if(!hasPlayButton) {
-		auto icon = m_IconPause->As<OpenGL::Texture2D>();
-		if(ImGui::ImageButton((ImTextureID)(uint64_t)icon->GetID(),
-								v1, v2, v3, 0, v0, tintColor))
-		{
-			m_SceneState = SceneState::Pause;
-			// OnScenePause();
-		}
-	}
-
-	if(hasStopButton) {
-		ImGui::SameLine();
-
-		auto icon = m_IconStop->As<OpenGL::Texture2D>();
-		if(ImGui::ImageButton((ImTextureID)(uint64_t)icon->GetID(),
-								v1, v2, v3, 0, v0, tintColor))
-		{
-			m_SceneState = SceneState::Edit;
-			// OnSceneStop();
-		}
-	}
-
-	ImGui::PopStyleVar(2);
-	ImGui::PopStyleColor(3);
-	ImGui::End();
+void EditorLayer::NewTab() {
+	// TODO(Implement): Dialog box to pick which kind of new tab to create:
+	// Scene, UI, or Level
 }
 
 }

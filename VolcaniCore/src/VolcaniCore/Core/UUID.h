@@ -6,7 +6,7 @@ namespace VolcaniCore {
 
 class UUID {
 public:
-	UUID() : m_ID(Random::RandInt()) { }
+	UUID() : m_ID(Random::RandUInt()) { }
 	UUID(uint64_t uuid) : m_ID(uuid) { }
 
 	operator uint64_t() const { return m_ID; }

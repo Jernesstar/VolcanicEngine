@@ -2,17 +2,10 @@
 
 #include <filesystem>
 
-#include <VolcaniCore/Core/Defines.h>
-
 #include <VolcaniCore/Core/Time.h>
-#include <VolcaniCore/Object/Texture.h>
-#include <VolcaniCore/Object/Framebuffer.h>
 
-#include <VolcaniCore/Renderer/Camera.h>
-
-#include "Scene/Scene.h"
-
-#include "SceneHierarchyPanel.h"
+#include "Project.h"
+#include "Tab.h"
 
 using namespace VolcaniCore;
 
@@ -27,31 +20,16 @@ public:
 	void Render();
 
 private:
-	Ref<Scene> m_CurrentScene;
-	SceneHierarchyPanel m_SceneHierarchyPanel;
-	Ref<Texture> m_IconPlay, m_IconPause, m_IconStop;
-	
-	enum class SceneState { Edit, Play, Pause };
-	SceneState m_SceneState = SceneState::Edit;
+	Ref<Project> m_Project;
+	List<Ref<Tab>> m_Tabs;
+	Ref<Tab> m_CurrentTab;
 
-	bool m_ViewportFocused;
-	bool m_ViewportHovered;
-	glm::vec2 m_ViewportSize = { 0.0f, 0.0f };
-	glm::vec2 m_ViewportBounds[2];
+	void NewProject();
+	void OpenProject();
+	void SaveProject();
 
-	void NewScene();
-	void OpenScene();
-	void OpenScene(const std::filesystem::path& path);
-	void SaveScene();
-
-	void AddEntity();
-
-	void ToolbarUI();
-	// void OpenProject();
-	// void SaveSceneAs();
-	// void OnScenePlay();
-	// void OnScenePause();
-	// void OnSceneStop();
+	void NewTab();
+	void NewTab(Ref<Tab> tab);
 };
 
 }

@@ -1,13 +1,15 @@
 #pragma once
 
-#include <random>
+#include <cstdint>
 
 namespace VolcaniCore {
 
 class Random {
 public:
-	static uint32_t RandInt();
-	static uint32_t RandInt(uint32_t low, uint32_t high);
+	static uint64_t RandUInt();
+	static uint64_t RandUInt(uint64_t low, uint64_t high);
+	static int64_t RandInt();
+	static int64_t RandInt(int64_t low, int64_t high);
 };
 
 }

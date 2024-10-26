@@ -8,7 +8,7 @@
 #include <VolcaniCore/Renderer/StereographicCamera.h>
 #include <VolcaniCore/Renderer/OrthographicCamera.h>
 
-#include "Core/Serialize.h"
+#include "Core/YAMLSerializer.h"
 
 using namespace Magma::ECS;
 using namespace Magma::Physics;

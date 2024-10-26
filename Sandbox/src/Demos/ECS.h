@@ -23,39 +23,42 @@ ECS::ECS() {
 		});
 
 	scene = CreateRef<Scene>();
+	scene->GetRenderer().GetCameraController().TranslationSpeed = 20.0f;
+
 	auto& world = scene->EntityWorld;
 
-	Entity cameraEntity = EntityBuilder(world, "MainCamera")
+	EntityBuilder(world, "MainCamera")
 	.Add<CameraComponent>()
 	.Finalize();
 
-	Entity entity = EntityBuilder(world)
-	.Add<TransformComponent>(Transform{ .Translation = { 0.0f, 0.0f, -3.0f } })
-	.Add<MeshComponent>(MeshPrimitive::Cube,
-		Material{
-			.Diffuse = Texture::Create("Sandbox/assets/images/wood.png")
-		})
-	// .Add<RigidBodyComponent>(RigidBody::Type::Static)
-	.Finalize();
+	for(uint32_t i = 0; i < 10; i++)
+		EntityBuilder(world, "Cube" + std::to_string(i))
+		.Add<TransformComponent>(
+			Transform
+			{
+				.Translation = { (float)Random::RandInt(-10, 10), (float)Random::RandInt(-10, 10), (float)Random::RandInt(-10, 10) }
+			})
+		.Add<MeshComponent>(MeshPrimitive::Cube,
+			Material
+			{
+				.Diffuse = Texture::Create("Sandbox/assets/images/wood.png")
+			})
+		// .Add<RigidBodyComponent>(RigidBody::Type::Static)
+		.Finalize();
 
-	Entity ball = EntityBuilder(world)
-	.Add<TransformComponent>(Transform{ .Translation = { 0.0f, 0.0f, -3.0f } })
-	.Add<MeshComponent>("Sandbox/assets/models/sphere/wooden_sphere.obj")
-	// .Add<RigidBodyComponent>(RigidBody::Type::Static)
-	.Finalize();
+	for(uint32_t i = 0; i < 10; i++)
+		EntityBuilder(world, "Ball" + std::to_string(i))
+		.Add<TransformComponent>(
+			Transform
+			{
+				.Translation = { (float)Random::RandInt(-10, 10), (float)Random::RandInt(-10, 10), (float)Random::RandInt(-10, 10) },
+				.Scale = glm::vec3(0.3f)
+			})
+		.Add<MeshComponent>("Sandbox/assets/models/sphere/wooden_sphere.obj")
+		// .Add<RigidBodyComponent>(RigidBody::Type::Static)
+		.Finalize();
 
-	scene->Save("Sandbox/assets/scenes/test.volc");
-
-	Ref<Scene> test = CreateRef<Scene>();
-	test->Load("Sandbox/assets/scenes/test.volc");
-
-	test->EntityWorld
-	.ForEach<MeshComponent>(
-		[](Entity& entity)
-		{
-			VOLCANICORE_LOG_INFO("Path: '%s'",
-				entity.Get<MeshComponent>().Mesh->Path.c_str());
-		});
+	scene->Save("Magma/assets/scenes/temp.volc");
 
 	VOLCANICORE_LOG_INFO("Success");
 }
@@ -63,6 +66,7 @@ ECS::ECS() {
 void ECS::OnUpdate(TimeStep ts) {
 	scene->OnUpdate(ts);
 	scene->OnRender();
+	// VOLCANICORE_LOG_INFO("%i, %i", Random::RandInt(-2, 2), Random::RandInt(-2, 2));
 
 	auto output = scene->GetRenderer().GetOutput();
 	RendererAPI::Get()->RenderFramebuffer(output, AttachmentTarget::Color);

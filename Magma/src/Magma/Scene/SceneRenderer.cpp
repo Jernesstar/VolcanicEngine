@@ -57,6 +57,9 @@ void SceneRenderer::UpdateCamera(TimeStep ts) {
 	camera->SetPositionDirection(cc.Position, cc.Direction);
 
 	m_Controller.OnUpdate(ts);
+
+	cc.Position = camera->GetPosition();
+	cc.Direction = camera->GetDirection();
 }
 
 void SceneRenderer::UpdatePasses() {
