@@ -29,16 +29,34 @@ void SceneHierarchyPanel::SetContext(Ref<Scene> context) {
 }
 
 void SceneHierarchyPanel::Draw() {
-	ImGui::Begin("Scene Hierarchy");
+	if(ImGui::Begin("Scene Hierarchy"))
 	{
 		m_Context->EntityWorld
 		.ForEach(
-			[&](Entity entity)
+			[&](Entity& entity)
 			{
-				// DrawEntityNode(entity);
+				DrawEntityNode(entity);
 			});
+
+		if(ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
+			m_Selected = Entity{ };
+
+		ImGui::End();
 	}
-	ImGui::End();
+}
+
+void SceneHierarchyPanel::DrawEntityNode(Entity& entity) {
+	auto tag = entity.Get<TagComponent>().Tag.c_str();
+	auto id = (void*)(uint64_t)(uint32_t)entity.GetHandle();
+
+	ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_SpanAvailWidth
+							 | ImGuiTreeNodeFlags_OpenOnArrow;
+	if(m_Selected && entity == m_Selected)
+		flags |= ImGuiTreeNodeFlags_Selected;
+	bool opened = ImGui::TreeNodeEx(id, flags, tag);
+
+	if(opened)
+		ImGui::TreePop();
 }
 
 }

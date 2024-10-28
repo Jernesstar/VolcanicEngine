@@ -32,7 +32,7 @@ ECS::ECS() {
 	.Finalize();
 
 	for(uint32_t i = 0; i < 10; i++)
-		EntityBuilder(world, "Cube" + std::to_string(i))
+		EntityBuilder(world, "Cube" + std::to_string(i + 1))
 		.Add<TransformComponent>(
 			Transform
 			{
@@ -47,7 +47,7 @@ ECS::ECS() {
 		.Finalize();
 
 	for(uint32_t i = 0; i < 10; i++)
-		EntityBuilder(world, "Ball" + std::to_string(i))
+		EntityBuilder(world, "Ball" + std::to_string(i + 1))
 		.Add<TransformComponent>(
 			Transform
 			{
@@ -58,7 +58,7 @@ ECS::ECS() {
 		// .Add<RigidBodyComponent>(RigidBody::Type::Static)
 		.Finalize();
 
-	scene->Save("Magma/assets/scenes/temp.volc");
+	scene->Save("Magma/assets/scenes/temp.magma.scene");
 
 	VOLCANICORE_LOG_INFO("Success");
 }

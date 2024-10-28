@@ -84,14 +84,13 @@ void EditorLayer::Render() {
 			if(ImGui::BeginMenu("Project")) {
 				if(ImGui::MenuItem("New", "Ctrl+N"))
 					menu.project.newProject = true;
-				if(ImGui::MenuItem("Open", "Ctrl+S"))
+				if(ImGui::MenuItem("Open", "Ctrl+O"))
 					menu.project.openProject = true;
 				if(ImGui::MenuItem("Save", "Ctrl+S"))
 					menu.project.saveProject = true;
 
 				ImGui::EndMenu();
 			}
-
 		}
 		ImGui::EndMainMenuBar();
 
@@ -99,16 +98,45 @@ void EditorLayer::Render() {
 		{
 			if(ImGui::BeginTabItem("+", nullptr, ImGuiTabItemFlags_NoReorder)) {
 				if(ImGui::IsItemActivated())
-					NewTab();
+					NewTab(CreateRef<SceneTab>(CreateRef<Scene>("Scene3")));
 				ImGui::EndTabItem();
 			}
-
+			
+			Ref<Tab> tabToDelete = nullptr;
 			for(auto tab : m_Tabs) {
-				if(ImGui::BeginTabItem(tab->GetName().c_str())) {
-					if(ImGui::IsItemActivated())
+				auto name = tab->GetName().c_str();
+				auto size = ImGui::CalcTextSize(name);
+				float padding{4.0f};
+				ImGui::SetNextItemWidth(size.x + 6.0f*padding);
+				bool tabItem = ImGui::BeginTabItem(name);
+
+				float tabHeight{6.5f};
+				float radius{ tabHeight * 0.5f - padding };
+				ImVec2 pos(ImGui::GetItemRectMin());
+				pos.x = ImGui::GetItemRectMax().x;
+				pos.x -= radius + 5.0f*padding;
+				pos.y += radius + padding;
+
+				if(tabItem) {
+					if(ImGui::IsItemActivated() && tab != m_CurrentTab)
+					{
+						m_CurrentTab->GetPanel("SceneHierarchy")->Close();
 						m_CurrentTab = tab;
+						VOLCANICORE_LOG_INFO("Click!");
+					}
 					ImGui::EndTabItem();
 				}
+				
+				auto closeButtonID = ImGui::GetID("CloseButton" + *name);
+				if(ImGui::CloseButton(closeButtonID, pos))
+					tabToDelete = tab;
+					// AddToClosedTabs(tab)
+			}
+
+			if(tabToDelete != nullptr) {
+				VOLCANICORE_LOG_INFO("Definitely here");
+				auto pos = std::find(m_Tabs.begin(), m_Tabs.end(), tabToDelete);
+				m_Tabs.erase(pos);
 			}
 		}
 		ImGui::EndTabBar();
@@ -164,7 +192,7 @@ void EditorLayer::SaveProject() {
 		}
 
 		instance->Close();
-		menu.project.openProject = false;
+		menu.project.saveProject = false;
 	}
 }
 

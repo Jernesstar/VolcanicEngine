@@ -84,10 +84,18 @@ void SerializeEntity(YAML::Emitter& out, Entity& entity) {
 
 	out << YAML::Key << "Components" << YAML::BeginMap; // Components
 
+	if(entity.Has<TagComponent>()) {
+		auto& tag = entity.Get<TagComponent>().Tag;
+
+		out << YAML::Key << "TagComponent" << YAML::BeginMap; // TagComponent
+		out << YAML::Key << "Tag" << YAML::Value << tag;
+		out << YAML::EndMap; // TagComponent
+	}
+
 	if(entity.Has<CameraComponent>()) {
 		auto& camera = entity.Get<CameraComponent>();
 
-		out << YAML::Key << "Camera" << YAML::BeginMap; // Camera
+		out << YAML::Key << "CameraComponent" << YAML::BeginMap; // Camera
 		out << YAML::Key << "Type" << YAML::Value
 			<< (camera.CameraType == Camera::Type::Stereo ? "Stereographic"
 														  : "Orthographic");
@@ -180,14 +188,6 @@ void SerializeEntity(YAML::Emitter& out, Entity& entity) {
 		out << YAML::Key << "ScriptComponent" << YAML::BeginMap; // ScriptComponent
 		// out << YAML::Key << "Path" << YAML::Value << path;
 		out << YAML::EndMap; // ScriptComponent
-	}
-
-	if(entity.Has<TagComponent>()) {
-		auto& tag = entity.Get<TagComponent>().Tag;
-
-		out << YAML::Key << "TagComponent" << YAML::BeginMap; // TagComponent
-		out << YAML::Key << "Tag" << YAML::Value << tag;
-		out << YAML::EndMap; // TagComponent
 	}
 
 	if(entity.Has<TransformComponent>()) {
@@ -308,8 +308,8 @@ void DeserializeEntity(YAML::Node entityNode, Scene* scene) {
 	auto rigidBodyComponentNode = components["RigidBodyComponent"];
 	if(rigidBodyComponentNode) {
 		auto rigidBodyNode = rigidBodyComponentNode["Body"];
-		auto typeStr   = rigidBodyNode["Type"].as<std::string>();
-		auto shapeTypeStr = rigidBodyNode["Shape Type"].as<std::string>();
+		auto typeStr	   = rigidBodyNode["Type"].as<std::string>();
+		auto shapeTypeStr  = rigidBodyNode["Shape Type"].as<std::string>();
 
 		RigidBody::Type type = (typeStr == "Static") ? RigidBody::Type::Static
 							 						 : RigidBody::Type::Dynamic;

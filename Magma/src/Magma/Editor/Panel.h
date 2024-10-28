@@ -23,7 +23,7 @@ public:
 	requires std::derived_from<TPanel, Panel>
 	TPanel* As() const { return (TPanel*)(this); }
 
-private:
+protected:
 	bool m_Open = true;
 
 	Ref<UI::Window> m_Window;

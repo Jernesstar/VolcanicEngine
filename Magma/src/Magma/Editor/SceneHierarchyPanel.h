@@ -13,13 +13,13 @@ public:
 
 	void SetContext(Ref<Scene> scene);
 
+	void Draw() override;
+
 private:
 	Ref<Scene> m_Context;
 	ECS::Entity m_Selected;
 
 private:
-	void Draw() override;
-
 	void DrawEntityNode(ECS::Entity& entity);
 };
 
