@@ -31,12 +31,14 @@ Framebuffer::Framebuffer(uint32_t width, uint32_t height)
 	glBindFramebuffer(GL_FRAMEBUFFER, m_BufferID);
 
 	// TODO(Change): Renderbuffer
-	m_AttachmentMap.insert({
-			AttachmentTarget::Color, { { Attachment::Type::Texture } }
-		});
-	m_AttachmentMap.insert({
-			AttachmentTarget::Depth, { { Attachment::Type::Texture } }
-		});
+	m_AttachmentMap.insert(
+	{
+		AttachmentTarget::Color, { { Attachment::Type::Texture } }
+	});
+	m_AttachmentMap.insert(
+	{
+		AttachmentTarget::Depth, { { Attachment::Type::Texture } }
+	});
 
 	CreateColorAttachment();
 	CreateDepthAttachment();
@@ -76,7 +78,8 @@ Framebuffer::Framebuffer(const Map<AttachmentTarget, List<Attachment>>& map,
 	}
 	// TODO(Change): Replace with RenderBuffer
 	if(!Has(AttachmentTarget::Depth))
-		m_AttachmentMap.insert({
+		m_AttachmentMap.insert(
+		{
 			AttachmentTarget::Depth, { { Attachment::Type::Texture } }
 		});
 

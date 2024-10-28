@@ -29,7 +29,7 @@ void SceneHierarchyPanel::SetContext(Ref<Scene> context) {
 }
 
 void SceneHierarchyPanel::Draw() {
-	if(ImGui::Begin("Scene Hierarchy"))
+	ImGui::Begin("Scene Hierarchy");
 	{
 		m_Context->EntityWorld
 		.ForEach(
@@ -40,9 +40,8 @@ void SceneHierarchyPanel::Draw() {
 
 		if(ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
 			m_Selected = Entity{ };
-
-		ImGui::End();
 	}
+	ImGui::End();
 }
 
 void SceneHierarchyPanel::DrawEntityNode(Entity& entity) {

@@ -6,6 +6,8 @@
 
 #include "Project.h"
 #include "Tab.h"
+#include "SceneTab.h"
+// #include "UITab.h"
 
 using namespace VolcaniCore;
 
@@ -30,6 +32,7 @@ private:
 
 	void NewTab();
 	void NewTab(Ref<Tab> tab);
+	void NewTab(Ref<Scene> scene);
 };
 
 }

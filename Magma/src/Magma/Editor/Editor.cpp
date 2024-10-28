@@ -8,7 +8,9 @@
 
 namespace Magma {
 
-Editor::Editor() {
+Editor::Editor()
+	: Application(1920, 1080, "Magma Editor")
+{
 	Events::RegisterListener<KeyPressedEvent>(
 		[](const KeyPressedEvent& event)
 		{
@@ -17,7 +19,7 @@ Editor::Editor() {
 		});
 
 	UI::Init();
-	m_EditorLayer = CreateRef<EditorLayer>();
+	m_EditorLayer = EditorLayer();
 }
 
 Editor::~Editor() {
@@ -28,8 +30,8 @@ void Editor::OnUpdate(TimeStep ts) {
 	RendererAPI::Get()->Clear();
 
 	UI::Begin();
-	m_EditorLayer->Update(ts);
-	m_EditorLayer->Render();
+	m_EditorLayer.Update(ts);
+	m_EditorLayer.Render();
 	UI::End();
 }
 

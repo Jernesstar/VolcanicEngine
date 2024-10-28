@@ -1,5 +1,5 @@
 Scene:
-  Name: Titled Scene
+  Name: Untitled Scene
   Entities:
     - Entity:
         ID: 549
@@ -8,7 +8,7 @@ Scene:
             Tag: MainCamera
           CameraComponent:
             Type: Stereographic
-            VerticalFOV: 0
+            VerticalFOV: 3.40515527e-43
             Position: [0, 0, 0]
             Direction: [0, 0, -1]
             ViewportWidth: 800
@@ -28,7 +28,7 @@ Scene:
                 Diffuse:
                   Path: Sandbox/assets/images/wood.png
           TransformComponent:
-            Translation: [1, 3, -9]
+            Translation: [8, -3, 8]
             Rotation: [0, 0, 0]
             Scale: [1, 1, 1]
     - Entity:
@@ -44,7 +44,7 @@ Scene:
                 Diffuse:
                   Path: Sandbox/assets/images/wood.png
           TransformComponent:
-            Translation: [-2, -5, -4]
+            Translation: [-9, 4, 3]
             Rotation: [0, 0, 0]
             Scale: [1, 1, 1]
     - Entity:
@@ -60,7 +60,7 @@ Scene:
                 Diffuse:
                   Path: Sandbox/assets/images/wood.png
           TransformComponent:
-            Translation: [-6, -4, -8]
+            Translation: [9, 6, -2]
             Rotation: [0, 0, 0]
             Scale: [1, 1, 1]
     - Entity:
@@ -76,7 +76,7 @@ Scene:
                 Diffuse:
                   Path: Sandbox/assets/images/wood.png
           TransformComponent:
-            Translation: [1, 2, -10]
+            Translation: [-5, 8, 6]
             Rotation: [0, 0, 0]
             Scale: [1, 1, 1]
     - Entity:
@@ -92,7 +92,7 @@ Scene:
                 Diffuse:
                   Path: Sandbox/assets/images/wood.png
           TransformComponent:
-            Translation: [-2, -6, 0]
+            Translation: [9, 4, -8]
             Rotation: [0, 0, 0]
             Scale: [1, 1, 1]
     - Entity:
@@ -108,7 +108,7 @@ Scene:
                 Diffuse:
                   Path: Sandbox/assets/images/wood.png
           TransformComponent:
-            Translation: [1, -8, 3]
+            Translation: [1, -3, -9]
             Rotation: [0, 0, 0]
             Scale: [1, 1, 1]
     - Entity:
@@ -124,7 +124,7 @@ Scene:
                 Diffuse:
                   Path: Sandbox/assets/images/wood.png
           TransformComponent:
-            Translation: [6, 2, 9]
+            Translation: [-8, -9, 3]
             Rotation: [0, 0, 0]
             Scale: [1, 1, 1]
     - Entity:
@@ -140,7 +140,7 @@ Scene:
                 Diffuse:
                   Path: Sandbox/assets/images/wood.png
           TransformComponent:
-            Translation: [-6, 3, -10]
+            Translation: [4, -8, 7]
             Rotation: [0, 0, 0]
             Scale: [1, 1, 1]
     - Entity:
@@ -156,7 +156,7 @@ Scene:
                 Diffuse:
                   Path: Sandbox/assets/images/wood.png
           TransformComponent:
-            Translation: [10, 3, 5]
+            Translation: [-3, 8, 4]
             Rotation: [0, 0, 0]
             Scale: [1, 1, 1]
     - Entity:
@@ -172,7 +172,7 @@ Scene:
                 Diffuse:
                   Path: Sandbox/assets/images/wood.png
           TransformComponent:
-            Translation: [4, -3, 8]
+            Translation: [-3, 1, -2]
             Rotation: [0, 0, 0]
             Scale: [1, 1, 1]
     - Entity:
@@ -184,7 +184,7 @@ Scene:
             Mesh:
               Path: Sandbox/assets/models/sphere/wooden_sphere.obj
           TransformComponent:
-            Translation: [0, -2, 7]
+            Translation: [-9, -8, 3]
             Rotation: [0, 0, 0]
             Scale: [0.300000012, 0.300000012, 0.300000012]
     - Entity:
@@ -196,7 +196,7 @@ Scene:
             Mesh:
               Path: Sandbox/assets/models/sphere/wooden_sphere.obj
           TransformComponent:
-            Translation: [-6, -2, -3]
+            Translation: [3, 6, -6]
             Rotation: [0, 0, 0]
             Scale: [0.300000012, 0.300000012, 0.300000012]
     - Entity:
@@ -208,7 +208,7 @@ Scene:
             Mesh:
               Path: Sandbox/assets/models/sphere/wooden_sphere.obj
           TransformComponent:
-            Translation: [-8, 9, 6]
+            Translation: [-10, -8, -5]
             Rotation: [0, 0, 0]
             Scale: [0.300000012, 0.300000012, 0.300000012]
     - Entity:
@@ -220,7 +220,7 @@ Scene:
             Mesh:
               Path: Sandbox/assets/models/sphere/wooden_sphere.obj
           TransformComponent:
-            Translation: [-2, 10, -5]
+            Translation: [-3, 0, -1]
             Rotation: [0, 0, 0]
             Scale: [0.300000012, 0.300000012, 0.300000012]
     - Entity:
@@ -232,7 +232,7 @@ Scene:
             Mesh:
               Path: Sandbox/assets/models/sphere/wooden_sphere.obj
           TransformComponent:
-            Translation: [4, 10, 0]
+            Translation: [6, 6, -9]
             Rotation: [0, 0, 0]
             Scale: [0.300000012, 0.300000012, 0.300000012]
     - Entity:
@@ -244,7 +244,7 @@ Scene:
             Mesh:
               Path: Sandbox/assets/models/sphere/wooden_sphere.obj
           TransformComponent:
-            Translation: [-7, 9, -9]
+            Translation: [-4, 0, -4]
             Rotation: [0, 0, 0]
             Scale: [0.300000012, 0.300000012, 0.300000012]
     - Entity:
@@ -256,7 +256,7 @@ Scene:
             Mesh:
               Path: Sandbox/assets/models/sphere/wooden_sphere.obj
           TransformComponent:
-            Translation: [-4, 7, -3]
+            Translation: [-6, 1, 3]
             Rotation: [0, 0, 0]
             Scale: [0.300000012, 0.300000012, 0.300000012]
     - Entity:
@@ -268,7 +268,7 @@ Scene:
             Mesh:
               Path: Sandbox/assets/models/sphere/wooden_sphere.obj
           TransformComponent:
-            Translation: [6, 2, -9]
+            Translation: [-1, -4, -9]
             Rotation: [0, 0, 0]
             Scale: [0.300000012, 0.300000012, 0.300000012]
     - Entity:
@@ -280,7 +280,7 @@ Scene:
             Mesh:
               Path: Sandbox/assets/models/sphere/wooden_sphere.obj
           TransformComponent:
-            Translation: [4, 10, -3]
+            Translation: [5, -5, -1]
             Rotation: [0, 0, 0]
             Scale: [0.300000012, 0.300000012, 0.300000012]
     - Entity:
@@ -292,6 +292,6 @@ Scene:
             Mesh:
               Path: Sandbox/assets/models/sphere/wooden_sphere.obj
           TransformComponent:
-            Translation: [8, -7, -7]
+            Translation: [3, -5, -8]
             Rotation: [0, 0, 0]
             Scale: [0.300000012, 0.300000012, 0.300000012]

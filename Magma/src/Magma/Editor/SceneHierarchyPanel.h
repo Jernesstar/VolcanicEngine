@@ -15,6 +15,11 @@ public:
 
 	void Draw() override;
 
+	void Select(ECS::Entity entity) {
+		m_Selected = entity;
+	}
+	ECS::Entity GetSelected() { return m_Selected; }
+
 private:
 	Ref<Scene> m_Context;
 	ECS::Entity m_Selected;

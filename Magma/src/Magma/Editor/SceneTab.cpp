@@ -6,7 +6,8 @@
 #include <ImGuiFileDialog/ImGuiFileDialog.h>
 
 #include "SceneHierarchyPanel.h"
-// #include "PropertiesPanel.h"
+#include "SceneVisualizerPanel.h"
+// #include "ComponentPanel.h"
 
 namespace Magma {
 
@@ -23,12 +24,15 @@ struct {
 
 SceneTab::SceneTab(Ref<Scene> scene) {
 	m_Scene = scene;
-	m_Name = "Scene: " + m_Scene->Name;
 
-	auto panel = CreateRef<SceneHierarchyPanel>(m_Scene);
-	panel->Close();
-	m_Panels.push_back(panel);
-	// TODO(Implement): SceneVisualizerPanel, ComponentPropertiesPanel
+	auto panel1 = CreateRef<SceneHierarchyPanel>(m_Scene);
+	panel1->Close();
+	auto panel2 = CreateRef<SceneVisualizerPanel>(m_Scene);
+	panel2->Close();
+
+	m_Panels.push_back(panel1);
+	m_Panels.push_back(panel2);
+	// TODO(Implement): ComponentPanel
 
 	// m_IconPlay 	= Texture::Create("Magma/assets/icons/PlayButton.png");
 	// m_IconPause = Texture::Create("Magma/assets/icons/PauseButton.png");
@@ -40,6 +44,8 @@ SceneTab::~SceneTab() {
 }
 
 void SceneTab::Update(TimeStep ts) {
+	m_Name = "Scene: " + m_Scene->Name;
+
 	if(m_SceneState == SceneState::Play)
 		m_Scene->OnUpdate(ts);
 }

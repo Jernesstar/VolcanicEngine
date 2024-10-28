@@ -10,8 +10,6 @@
 #include <VolcaniCore/Core/Log.h>
 #include <VolcaniCore/Renderer/RendererAPI.h>
 
-#include "SceneTab.h"
-
 using namespace VolcaniCore;
 
 namespace Magma {
@@ -56,10 +54,9 @@ void EditorLayer::Update(TimeStep ts) {
 
 void EditorLayer::Render() {
 	bool dockspaceOpen = true;
-	ImGuiDockNodeFlags dockspaceFlags = 0;
+	ImGuiDockNodeFlags dockspaceFlags = ImGuiDockNodeFlags_PassthruCentralNode;
 	ImGuiWindowFlags windowFlags = ImGuiWindowFlags_MenuBar;
 
-	dockspaceFlags |= ImGuiDockNodeFlags_PassthruCentralNode;
 	windowFlags |= ImGuiWindowFlags_NoDocking
 				 | ImGuiWindowFlags_NoCollapse
 				 | ImGuiWindowFlags_NoNavFocus
@@ -79,6 +76,8 @@ void EditorLayer::Render() {
 
 	ImGui::Begin("DockSpaceWindow", &dockspaceOpen, windowFlags);
 	{
+		ImGui::PopStyleVar(3);
+
 		ImGui::BeginMainMenuBar();
 		{
 			if(ImGui::BeginMenu("Project")) {
@@ -97,18 +96,21 @@ void EditorLayer::Render() {
 		ImGui::BeginTabBar("Tabs", ImGuiTabBarFlags_Reorderable);
 		{
 			if(ImGui::BeginTabItem("+", nullptr, ImGuiTabItemFlags_NoReorder)) {
-				if(ImGui::IsItemActivated())
-					NewTab(CreateRef<SceneTab>(CreateRef<Scene>("Scene3")));
+				if(ImGui::IsItemActivated()) {
+					NewTab(CreateRef<Scene>("New Scene"));
+				}
 				ImGui::EndTabItem();
 			}
 			
 			Ref<Tab> tabToDelete = nullptr;
+			uint32_t i = 0;
 			for(auto tab : m_Tabs) {
-				auto name = tab->GetName().c_str();
-				auto size = ImGui::CalcTextSize(name);
+				auto name = tab->GetName();
+				auto size = ImGui::CalcTextSize(name.c_str());
 				float padding{4.0f};
 				ImGui::SetNextItemWidth(size.x + 6.0f*padding);
-				bool tabItem = ImGui::BeginTabItem(name);
+				auto strID = name + "##" + std::to_string(i++);
+				bool tabItem = ImGui::BeginTabItem(strID.c_str());
 
 				float tabHeight{6.5f};
 				float radius{ tabHeight * 0.5f - padding };
@@ -119,33 +121,35 @@ void EditorLayer::Render() {
 
 				if(tabItem) {
 					if(ImGui::IsItemActivated() && tab != m_CurrentTab)
-					{
-						m_CurrentTab->GetPanel("SceneHierarchy")->Close();
 						m_CurrentTab = tab;
-						VOLCANICORE_LOG_INFO("Click!");
-					}
+
 					ImGui::EndTabItem();
 				}
 				
-				auto closeButtonID = ImGui::GetID("CloseButton" + *name);
-				if(ImGui::CloseButton(closeButtonID, pos))
+				auto closeButtonID = ImGui::GetID(("Close##" + strID).c_str());
+				if(ImGui::CloseButton(closeButtonID, pos)) {
+					tab->GetPanel("SceneHierarchy")->Close();
 					tabToDelete = tab;
-					// AddToClosedTabs(tab)
+				}
 			}
 
 			if(tabToDelete != nullptr) {
-				VOLCANICORE_LOG_INFO("Definitely here");
-				auto pos = std::find(m_Tabs.begin(), m_Tabs.end(), tabToDelete);
-				m_Tabs.erase(pos);
+				// AddToClosedTabs(tab)
+				auto it = std::find(m_Tabs.begin(), m_Tabs.end(), tabToDelete);
+				m_Tabs.erase(it);
+				uint32_t index = std::distance(m_Tabs.begin(), it);
+				if(tabToDelete == m_CurrentTab)
+					m_CurrentTab = (index > 0) ? m_Tabs[index - 1] : nullptr;
 			}
 		}
 		ImGui::EndTabBar();
+		// ImGui::Dummy(ImVec2(0.0f, 0.0f));
 
-		ImGui::PopStyleVar(3);
 		ImGuiID dockspaceID = ImGui::GetID("DockSpace");
 		ImGui::DockSpace(dockspaceID, ImVec2(0.0f, 0.0f), dockspaceFlags);
 
-		m_CurrentTab->Render();
+		if(m_CurrentTab)
+			m_CurrentTab->Render();
 	}
 	ImGui::End();
 
@@ -198,6 +202,13 @@ void EditorLayer::SaveProject() {
 
 void EditorLayer::NewTab(Ref<Tab> tab) {
 	m_Tabs.push_back(tab);
+	m_CurrentTab = tab;
+}
+
+void EditorLayer::NewTab(Ref<Scene> scene) {
+	Ref<Tab> newTab = CreateRef<SceneTab>(scene);
+	m_Tabs.push_back(newTab);
+	m_CurrentTab = newTab;
 }
 
 void EditorLayer::NewTab() {

@@ -16,7 +16,7 @@ public:
 	void OnUpdate(TimeStep ts);
 
 private:
-	Ref<EditorLayer> m_EditorLayer;
+	EditorLayer m_EditorLayer;
 };
 
 }

@@ -32,11 +32,18 @@ Texture2D::Texture2D(const std::string& path)
 }
 
 Texture2D::~Texture2D() {
-	glDeleteTextures(1, &m_TextureID);
+	if(m_TextureID != 0)
+		glDeleteTextures(1, &m_TextureID);
 }
 
 void Texture2D::Bind(uint32_t slot) {
 	glBindTextureUnit(slot, m_TextureID);
+}
+
+void Texture2D::SetID(uint32_t id) {
+	if(id != 0)
+		glDeleteTextures(1, &m_TextureID);
+	m_TextureID = id;
 }
 
 void Texture2D::SetData(const void* data) {
