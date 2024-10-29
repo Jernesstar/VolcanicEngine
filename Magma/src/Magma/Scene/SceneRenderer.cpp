@@ -23,7 +23,7 @@ SceneRenderer::SceneRenderer(Scene* scene)
 	auto window = Application::GetWindow();
 	auto width = window->GetWidth();
 	auto height = window->GetHeight();
-	m_Output = Framebuffer::Create(800, 600);
+	m_Output = Framebuffer::Create(width, height);
 	m_DrawPass->SetOutput(m_Output);
 
 	auto camera = CreateRef<StereographicCamera>(75.0f);
@@ -36,7 +36,8 @@ SceneRenderer::SceneRenderer(Scene* scene)
 	.each(
 		[](const TransformComponent& tc, const MeshComponent& mc)
 		{
-			Transform tr{
+			Transform tr
+			{
 				.Translation = tc.Translation,
 				.Rotation	 = tc.Rotation,
 				.Scale		 = tc.Scale

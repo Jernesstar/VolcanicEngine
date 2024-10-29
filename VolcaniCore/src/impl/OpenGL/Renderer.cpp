@@ -283,6 +283,7 @@ void Renderer::RenderCubemap(Ref<VolcaniCore::Cubemap> cubemap) {
 	glDepthMask(GL_TRUE);
 }
 
+// TODO(Change): Move to VolcaniCore::Renderer2D::DrawFullScreenQuad
 void Renderer::RenderFramebuffer(Ref<VolcaniCore::Framebuffer> buffer,
 								 AttachmentTarget target)
 {
@@ -291,7 +292,6 @@ void Renderer::RenderFramebuffer(Ref<VolcaniCore::Framebuffer> buffer,
 		return;
 	}
 
-	// TODO(Change): Move to VolcaniCore::Renderer2D::DrawFullScreenQuad
 	auto pass = VolcaniCore::Renderer::GetPass();
 	Ref<ShaderPipeline> pipeline = nullptr;
 	Ref<VolcaniCore::Framebuffer> output = nullptr;

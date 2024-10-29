@@ -29,7 +29,7 @@ void SceneHierarchyPanel::SetContext(Ref<Scene> context) {
 }
 
 void SceneHierarchyPanel::Draw() {
-	ImGui::Begin("Scene Hierarchy");
+	ImGui::Begin("Scene Hierarchy", &m_Open);
 	{
 		m_Context->EntityWorld
 		.ForEach(

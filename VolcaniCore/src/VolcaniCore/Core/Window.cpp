@@ -21,13 +21,15 @@ Window::Window(uint32_t width, uint32_t height) {
 	glfwSwapInterval(0);
 
 	Events::RegisterListener<WindowClosedEvent>(
-	[](const WindowClosedEvent& event) {
-		Application::Close();
-	});
+		[](const WindowClosedEvent& event)
+		{
+			Application::Close();
+		});
 	Events::RegisterListener<WindowResizedEvent>(
-	[&](const WindowResizedEvent& event) {
-		this->Resize(event.Width, event.Height);
-	});
+		[&](const WindowResizedEvent& event)
+		{
+			this->Resize(event.Width, event.Height);
+		});
 }
 
 Window::~Window() {
@@ -37,6 +39,9 @@ Window::~Window() {
 }
 
 void Window::Resize(uint32_t width, uint32_t height) {
+	if(!(width && height) || (width == m_Width && height == m_Height))
+		return;
+
 	m_Width = width;
 	m_Height = height;
 	glfwSetWindowSize(m_NativeWindow, width, height);

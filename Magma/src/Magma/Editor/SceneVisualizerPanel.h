@@ -21,6 +21,7 @@ public:
 
 	void SetContext(Ref<Scene> scene);
 
+	// void Update(TimeStep ts);
 	void Draw() override;
 
 	void Select(ECS::Entity entity) {

@@ -33,36 +33,37 @@ ECS::ECS() {
 	.Add<CameraComponent>()
 	.Finalize();
 
-	for(uint32_t i = 0; i < 10; i++)
+	auto cube = Mesh::Create(MeshPrimitive::Cube,
+		Material
+		{
+			.Diffuse = Texture::Create("Sandbox/assets/images/wood.png")
+		});
+	for(uint32_t i = 0; i < 12; i++)
 		EntityBuilder(world, "Cube" + std::to_string(i + 1))
 		.Add<TransformComponent>(
 			Transform
 			{
-				.Translation = { (float)Random::RandInt(-10, 10), (float)Random::RandInt(-10, 10), (float)Random::RandInt(-10, 10) }
+				.Translation = { (float)Random::RandInt(-5, 5), (float)Random::RandInt(-5, 5), (float)Random::RandInt(-5, 5) }
 			})
-		.Add<MeshComponent>(MeshPrimitive::Cube,
-			Material
-			{
-				.Diffuse = Texture::Create("Sandbox/assets/images/wood.png")
-			})
+		.Add<MeshComponent>(cube)
 		// .Add<RigidBodyComponent>(RigidBody::Type::Static)
 		.Finalize();
 
-	for(uint32_t i = 0; i < 10; i++)
+	auto ball = Mesh::Create("Sandbox/assets/models/sphere/wooden_sphere.obj");
+	for(uint32_t i = 0; i < 12; i++)
 		EntityBuilder(world, "Ball" + std::to_string(i + 1))
 		.Add<TransformComponent>(
 			Transform
 			{
-				.Translation = { (float)Random::RandInt(-10, 10), (float)Random::RandInt(-10, 10), (float)Random::RandInt(-10, 10) },
-				.Scale = glm::vec3(0.3f)
+				.Translation = { (float)Random::RandInt(-5, 5), (float)Random::RandInt(-5, 5), (float)Random::RandInt(-5, 5) },
+				.Scale = glm::vec3(0.1f)
 			})
-		.Add<MeshComponent>("Sandbox/assets/models/sphere/wooden_sphere.obj")
+		.Add<MeshComponent>(ball)
 		// .Add<RigidBodyComponent>(RigidBody::Type::Static)
 		.Finalize();
 
-	scene->Save("Magma/assets/scenes/temp.magma.scene");
+	// scene->Save("Magma/assets/scenes/temp.magma.scene");
 
-	VOLCANICORE_LOG_INFO("Success");
 	UI::Init();
 
 	image = UI::Image::Create(
@@ -72,8 +73,9 @@ ECS::ECS() {
 		.Height = 100
 	});
 
-	// auto output = scene->GetRenderer().GetOutput();
-	// image->SetImage(output, AttachmentTarget::Color);
+	auto output = scene->GetRenderer().GetOutput();
+	image->SetImage(output, AttachmentTarget::Color);
+	VOLCANICORE_LOG_INFO("Success");
 }
 
 ECS::~ECS() {
@@ -90,6 +92,7 @@ void ECS::OnUpdate(TimeStep ts) {
 	auto output = scene->GetRenderer().GetOutput();
 	// RendererAPI::Get()->RenderFramebuffer(output, AttachmentTarget::Color);
 
+	image->SetSize(400, 400);
 	image->Render();
 
 	UI::End();

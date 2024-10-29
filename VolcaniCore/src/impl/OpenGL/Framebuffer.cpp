@@ -167,8 +167,8 @@ void Framebuffer::Bind(AttachmentTarget target, uint32_t slot,
 
 void Framebuffer::CreateColorAttachment(uint32_t index) {
 	auto& attachment = m_AttachmentMap[AttachmentTarget::Color][index];
-	uint32_t width  = attachment.m_Width;
-	uint32_t height = attachment.m_Height;
+	uint32_t& width  = attachment.m_Width;
+	uint32_t& height = attachment.m_Height;
 	width  = width  ? width  : m_Width;
 	height = height ? height : m_Height;
 
@@ -193,8 +193,8 @@ void Framebuffer::CreateColorAttachment(uint32_t index) {
 
 void Framebuffer::CreateDepthAttachment() {
 	auto& attachment = m_AttachmentMap[AttachmentTarget::Depth][0];
-	uint32_t width  = attachment.m_Width;
-	uint32_t height = attachment.m_Height;
+	uint32_t& width  = attachment.m_Width;
+	uint32_t& height = attachment.m_Height;
 	width  = width  ? width  : m_Width;
 	height = height ? height : m_Height;
 

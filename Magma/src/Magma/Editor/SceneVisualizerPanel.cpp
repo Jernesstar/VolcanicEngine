@@ -42,23 +42,24 @@ void SceneVisualizerPanel::Draw() {
 	m_Context->OnRender();
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0, 0 });
-	ImGui::Begin("Scene Visualizer");
+	ImGui::Begin("Scene Visualizer", &m_Open);
 	{
-		auto minReg = ImGui::GetWindowContentRegionMin();
+		auto size = ImGui::GetWindowContentRegionMin();
 		auto offset = ImGui::GetWindowPos();
-		auto width = minReg.x;
-		auto height = minReg.y;
+		auto width = size.x;
+		auto height = size.y;
 
-		auto framebuffer = m_Context->GetRenderer().GetOutput();
-		framebuffer->Bind();
-		// m_Image->SetSize(width, height);
 		m_Image->Render();
-		framebuffer->Unbind();
 
-		if(ImGui::IsMouseDown(0) && ImGui::IsWindowHovered()) {
+		auto& renderer = m_Context->GetRenderer();
+		auto& cameraController = renderer.GetCameraController();
+
+		if(ImGui::IsMouseDown(0))
+			cameraController.OnUpdate(0.001f);
+
+		if(ImGui::IsMouseClicked(0) && ImGui::IsWindowHovered()) {
 			auto& world = m_Context->PhysicsWorld;
-			auto& renderer = m_Context->GetRenderer();
-			auto camera = renderer.GetCameraController().GetCamera();
+			auto camera = cameraController.GetCamera();
 
 			glm::vec2 pos = { ImGui::GetMousePos().x, ImGui::GetMousePos().y };
 			glm::vec4 originNDC{

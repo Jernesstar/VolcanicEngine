@@ -4,6 +4,8 @@
 #include <imgui/backends/imgui_impl_glfw.h>
 #include <imgui/backends/imgui_impl_opengl3.h>
 
+#include "VolcaniCore/Core/Log.h"
+
 #include <OpenGL/Framebuffer.h>
 #include <OpenGL/Texture2D.h>
 
@@ -54,13 +56,9 @@ void Image::SetImage(const std::string& imagePath) {
 void Image::SetImage(Ref<Framebuffer> framebuffer, AttachmentTarget target) {
 	auto& attachment = framebuffer->As<OpenGL::Framebuffer>()->Get(target);
 
-	framebuffer->Bind();
-	attachment.Bind();
 	m_Image->As<OpenGL::Texture2D>()->SetID(attachment.GetRendererID());
 	m_Width = attachment.GetWidth();
 	m_Height = attachment.GetHeight();
-
-	framebuffer->Unbind();
 }
 
 void Image::Draw() {

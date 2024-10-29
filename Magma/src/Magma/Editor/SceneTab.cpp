@@ -69,15 +69,13 @@ void SceneTab::Render() {
 
 			ImGui::EndMenu();
 		}
-		if(ImGui::BeginMenu("View")) {
-			for(auto panel : m_Panels) {
-				if(!panel->IsOpen()) {
-					if(ImGui::MenuItem(panel->Name.c_str()))
-						panel->Open();
-				}
-			}
+		for(auto panel : m_Panels) {
+			if(ImGui::BeginMenu("View")) {
+				if(panel->IsClosed() && ImGui::MenuItem(panel->Name.c_str()))
+					panel->Open();
 
-			ImGui::EndMenu();
+				ImGui::EndMenu();
+			}
 		}
 
 	}
