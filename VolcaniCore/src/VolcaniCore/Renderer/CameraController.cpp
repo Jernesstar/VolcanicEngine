@@ -38,12 +38,12 @@ void CameraController::OnUpdate(TimeStep ts) {
 	glm::vec2 delta = (mousePosition - m_LastMousePosition) * 0.001f;
 	m_LastMousePosition = mousePosition;
 
-	if(Input::MouseButtonPressed(Mouse::LeftButton))
-		Input::SetCursorMode(CursorMode::Locked);
-	else {
+	if(!Input::MouseButtonPressed(Mouse::LeftButton)) {
 		Input::SetCursorMode(CursorMode::Normal);
 		return;
 	}
+
+	Input::SetCursorMode(CursorMode::Locked);
 
 	float moveSpeed     = TranslationSpeed * 0.001f;
 	float rotationSpeed = RotationSpeed	   * 0.001f;

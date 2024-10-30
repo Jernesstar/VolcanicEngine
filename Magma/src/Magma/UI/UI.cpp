@@ -53,6 +53,11 @@ void Init() {
 		io.Fonts->AddFontFromFileTTF(
 			"VolcaniCore/assets/fonts/JetBrainsMono-Regular.ttf", fontSize);
 
+	// Events::RegisterListener<KeyPressedEvent>(
+	// 	[&io](KeyPressedEvent& event)
+	// 	{
+	// 		event.Handled = io.WantCaptureKeyboard;
+	// 	});
 	Events::RegisterListener<MouseButtonPressedEvent>(
 		[&io](MouseButtonPressedEvent& event)
 		{

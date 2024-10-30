@@ -28,6 +28,7 @@ SceneRenderer::SceneRenderer(Scene* scene)
 
 	auto camera = CreateRef<StereographicCamera>(75.0f);
 	m_Controller.SetCamera(camera);
+	m_Controller.TranslationSpeed = 10.0f;
 
 	auto& world = m_Scene->EntityWorld.Get();
 	m_RenderSystem = world

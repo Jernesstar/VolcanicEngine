@@ -1,6 +1,9 @@
 #pragma once
 
-#include "UI/Window.h"
+#include <VolcaniCore/Core/Defines.h>
+#include <VolcaniCore/Core/Time.h>
+
+using namespace VolcaniCore;
 
 namespace Magma {
 
@@ -12,7 +15,8 @@ public:
 	Panel(const std::string& name);
 	~Panel();
 
-	virtual void Draw() { };
+	virtual void Update(TimeStep ts) { }
+	virtual void Draw() { }
 
 	bool IsOpen() { return m_Open; }
 	bool IsClosed() { return !m_Open; }
@@ -25,8 +29,7 @@ public:
 
 protected:
 	bool m_Open = true;
-
-	Ref<UI::Window> m_Window;
+	// Ref<UI::Window> m_Window;
 };
 
 }

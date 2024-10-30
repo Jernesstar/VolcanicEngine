@@ -8,6 +8,7 @@
 #include <VolcaniCore/Renderer/StereographicCamera.h>
 #include <VolcaniCore/Renderer/OrthographicCamera.h>
 
+#include "Core/AssetManager.cpp"
 #include "Core/YAMLSerializer.h"
 
 using namespace Magma::ECS;
@@ -260,8 +261,8 @@ void DeserializeEntity(YAML::Node entityNode, Scene* scene) {
 		auto meshNode = meshComponentNode["Mesh"];
 
 		if(meshNode["Path"]) {
-			// TODO(Fix): MeshID/AssetID
-			entity.Add<MeshComponent>(meshNode["Path"].as<std::string>());
+			auto path = meshNode["Path"].as<std::string>();
+			entity.Add<MeshComponent>(AssetManager::CreateOrReturn<Mesh>(path));
 		}
 		else {
 			auto v = meshNode["Vertices"].as<std::vector<VolcaniCore::Vertex>>();
@@ -280,7 +281,6 @@ void DeserializeEntity(YAML::Node entityNode, Scene* scene) {
 			}
 			entity.Add<MeshComponent>(v, i, mat);
 		}
-
 	}
 
 	auto scriptComponentNode = components["ScriptComponent"];

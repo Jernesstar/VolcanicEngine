@@ -32,14 +32,21 @@ void SceneVisualizerPanel::SetContext(Ref<Scene> context) {
 	m_Context = context;
 	auto framebuffer = m_Context->GetRenderer().GetOutput();
 	m_Image->SetImage(framebuffer, AttachmentTarget::Color);
-	// m_Image->SetImage("Sandbox/assets/images/stone.png");
 
 	m_Selected.Handle = Entity{ };
 	// m_Selected.Collider = CreateRef<Physics::RigidBody>();
 }
 
+void SceneVisualizerPanel::Update(TimeStep ts) {
+	auto& renderer = m_Context->GetRenderer();
+	auto& cameraController = renderer.GetCameraController();
+	cameraController.OnUpdate(ts);
+}
+
 void SceneVisualizerPanel::Draw() {
 	m_Context->OnRender();
+	auto& renderer = m_Context->GetRenderer();
+	auto& cameraController = renderer.GetCameraController();
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0, 0 });
 	ImGui::Begin("Scene Visualizer", &m_Open);
@@ -50,12 +57,6 @@ void SceneVisualizerPanel::Draw() {
 		auto height = size.y;
 
 		m_Image->Render();
-
-		auto& renderer = m_Context->GetRenderer();
-		auto& cameraController = renderer.GetCameraController();
-
-		if(ImGui::IsMouseDown(0))
-			cameraController.OnUpdate(0.001f);
 
 		if(ImGui::IsMouseClicked(0) && ImGui::IsWindowHovered()) {
 			auto& world = m_Context->PhysicsWorld;

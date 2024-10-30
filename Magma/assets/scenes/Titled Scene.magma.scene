@@ -8,7 +8,7 @@ Scene:
             Tag: MainCamera
           CameraComponent:
             Type: Stereographic
-            VerticalFOV: 2.84463588e-43
+            VerticalFOV: 2.32615545e-43
             Position: [0, 0, 0]
             Direction: [0, 0, -1]
             ViewportWidth: 800

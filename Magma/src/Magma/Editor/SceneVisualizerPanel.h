@@ -10,7 +10,7 @@ namespace Magma {
 
 struct EditorEntity {
 	ECS::Entity Handle;
-	Ref<Physics::RigidBody> Collider; // Used to press on Entity
+	Ref<Physics::RigidBody> Collider; // Used to press on Entity objects
 };
 
 class SceneVisualizerPanel : public Panel {
@@ -21,7 +21,7 @@ public:
 
 	void SetContext(Ref<Scene> scene);
 
-	// void Update(TimeStep ts);
+	void Update(TimeStep ts) override;
 	void Draw() override;
 
 	void Select(ECS::Entity entity) {

@@ -28,6 +28,10 @@ void SceneHierarchyPanel::SetContext(Ref<Scene> context) {
 	m_Selected = Entity{ };
 }
 
+void SceneHierarchyPanel::Update(TimeStep ts) {
+
+}
+
 void SceneHierarchyPanel::Draw() {
 	ImGui::Begin("Scene Hierarchy", &m_Open);
 	{
@@ -45,13 +49,14 @@ void SceneHierarchyPanel::Draw() {
 }
 
 void SceneHierarchyPanel::DrawEntityNode(Entity& entity) {
+	ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_SpanAvailWidth
+							 | ImGuiTreeNodeFlags_OpenOnArrow; // Expands only when pressing the arrow
+	if(m_Selected && entity == m_Selected)
+		flags |= ImGuiTreeNodeFlags_Selected;
+
 	auto tag = entity.Get<TagComponent>().Tag.c_str();
 	auto id = (void*)(uint64_t)(uint32_t)entity.GetHandle();
 
-	ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_SpanAvailWidth
-							 | ImGuiTreeNodeFlags_OpenOnArrow;
-	if(m_Selected && entity == m_Selected)
-		flags |= ImGuiTreeNodeFlags_Selected;
 	bool opened = ImGui::TreeNodeEx(id, flags, tag);
 
 	if(opened)

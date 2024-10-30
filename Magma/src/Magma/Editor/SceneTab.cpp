@@ -48,6 +48,16 @@ void SceneTab::Update(TimeStep ts) {
 
 	if(m_SceneState == SceneState::Play)
 		m_Scene->OnUpdate(ts);
+
+	auto hierarchy = GetPanel("SceneHierarchy")->As<SceneHierarchyPanel>();
+	auto visual = GetPanel("SceneVisualizer")->As<SceneVisualizerPanel>();
+
+	visual->Select(hierarchy->GetSelected());
+
+	for(auto panel : m_Panels)
+		panel->Update(ts);
+
+	hierarchy->Select(visual->GetSelected());
 }
 
 void SceneTab::Render() {
@@ -70,8 +80,11 @@ void SceneTab::Render() {
 			ImGui::EndMenu();
 		}
 		for(auto panel : m_Panels) {
+			if(panel->IsOpen())
+				continue;
+
 			if(ImGui::BeginMenu("View")) {
-				if(panel->IsClosed() && ImGui::MenuItem(panel->Name.c_str()))
+				if(ImGui::MenuItem(panel->Name.c_str()))
 					panel->Open();
 
 				ImGui::EndMenu();
@@ -90,16 +103,15 @@ void SceneTab::Render() {
 	if(menu.edit.addEntity)
 		AddEntity();
 
-	// ImGui::Begin("Panels", nullptr, ImGuiWindowFlags_NoTitleBar);
 	for(auto panel : m_Panels)
 		if(panel->IsOpen())
 			panel->Draw();
-	// ImGui::End();
 }
 
 void SceneTab::NewScene() {
 	m_Scene = CreateRef<Scene>("New Scene");
 	GetPanel("SceneHierarchy")->As<SceneHierarchyPanel>()->SetContext(m_Scene);
+	GetPanel("SceneVisualizer")->As<SceneVisualizerPanel>()->SetContext(m_Scene);
 	menu.file.newScene = false;
 }
 

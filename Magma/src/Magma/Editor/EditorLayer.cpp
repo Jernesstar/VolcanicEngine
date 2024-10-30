@@ -36,11 +36,9 @@ EditorLayer::EditorLayer() {
 
 	auto scene1 = CreateRef<Scene>();
 	scene1->Load("Magma/assets/scenes/temp.magma.scene");
-	auto scene2 = CreateRef<Scene>("Scene2");
 
 	m_CurrentTab = CreateRef<SceneTab>(scene1);
 	NewTab(m_CurrentTab);
-	NewTab(CreateRef<SceneTab>(scene2));
 }
 
 EditorLayer::~EditorLayer() {
@@ -109,6 +107,7 @@ void EditorLayer::Render() {
 				auto size = ImGui::CalcTextSize(name.c_str());
 				float padding{4.0f};
 				ImGui::SetNextItemWidth(size.x + 6.0f*padding);
+
 				auto strID = name + "##" + std::to_string(i++);
 				bool tabItem = ImGui::BeginTabItem(strID.c_str());
 
@@ -120,7 +119,7 @@ void EditorLayer::Render() {
 				pos.y += radius + padding;
 
 				if(tabItem) {
-					if(ImGui::IsItemActivated() && tab != m_CurrentTab)
+					if(ImGui::IsMouseClicked(0) && ImGui::IsItemHovered())
 						m_CurrentTab = tab;
 
 					ImGui::EndTabItem();
