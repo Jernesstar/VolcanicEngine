@@ -10,7 +10,10 @@ namespace VolcaniCore {
 
 class JSONSerializer : public Serializer {
 public:
-	Serializer& Write(int32_t value) override;
+	JSONSerializer() = default;
+	~JSONSerializer() = default;
+
+	JSONSerializer& Write(int32_t value) override;
 
 	void Finalize(const std::string& path) override;
 

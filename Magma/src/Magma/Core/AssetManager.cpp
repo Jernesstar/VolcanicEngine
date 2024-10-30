@@ -1,6 +1,5 @@
 #include "AssetManager.h"
 
-#include "Object/Mesh.h"
 
 namespace Magma {
 
