@@ -33,6 +33,11 @@ bool Input::MouseButtonPressed(Mouse mouse_button) {
 	return state == GLFW_PRESS;
 }
 
+void Input::SetMousePosition(float x, float y) {
+	auto window = Application::GetWindow()->GetNativeWindow();
+	glfwSetCursorPos(window, x, y);
+}
+
 glm::vec2 Input::GetMousePosition() {
 	auto window = Application::GetWindow()->GetNativeWindow();
 	double x, y;

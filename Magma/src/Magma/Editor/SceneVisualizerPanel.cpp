@@ -1,12 +1,11 @@
 #include "SceneVisualizerPanel.h"
 
-#include <cstring>
-
 #include <imgui/imgui.h>
 #include <imgui/imgui_internal.h>
 #include <imgui/misc/cpp/imgui_stdlib.h>
 
-#include <glm/gtc/type_ptr.hpp>
+#include <VolcaniCore/Core/Application.h>
+#include <VolcaniCore/Core/Input.h>
 
 #include "ECS/Component.h"
 
@@ -17,13 +16,17 @@ namespace Magma {
 SceneVisualizerPanel::SceneVisualizerPanel()
 	: Panel("SceneVisualizer")
 {
-	m_Image = CreateRef<UI::Image>(Texture::Create(1920, 1080));
+	auto width = Application::GetWindow()->GetWidth();
+	auto height = Application::GetWindow()->GetHeight();
+	m_Image = CreateRef<UI::Image>(Texture::Create(width, height));
 }
 
 SceneVisualizerPanel::SceneVisualizerPanel(Ref<Scene> context)
 	: Panel("SceneVisualizer")
 {
-	m_Image = CreateRef<UI::Image>(Texture::Create(1920, 1080));
+	auto width = Application::GetWindow()->GetWidth();
+	auto height = Application::GetWindow()->GetHeight();
+	m_Image = CreateRef<UI::Image>(Texture::Create(width, height));
 
 	SetContext(context);
 }
@@ -40,6 +43,7 @@ void SceneVisualizerPanel::SetContext(Ref<Scene> context) {
 void SceneVisualizerPanel::Update(TimeStep ts) {
 	auto& renderer = m_Context->GetRenderer();
 	auto& cameraController = renderer.GetCameraController();
+
 	cameraController.OnUpdate(ts);
 }
 
@@ -48,9 +52,13 @@ void SceneVisualizerPanel::Draw() {
 	auto& renderer = m_Context->GetRenderer();
 	auto& cameraController = renderer.GetCameraController();
 
+	auto flags = ImGuiWindowFlags_NoScrollbar
+			   | ImGuiWindowFlags_NoScrollWithMouse;
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0, 0 });
-	ImGui::Begin("Scene Visualizer", &m_Open);
+	ImGui::Begin("Scene Visualizer", &m_Open, flags);
 	{
+		ImGui::PopStyleVar();
+
 		auto size = ImGui::GetWindowContentRegionMin();
 		auto offset = ImGui::GetWindowPos();
 		auto width = size.x;
@@ -63,12 +71,14 @@ void SceneVisualizerPanel::Draw() {
 			auto camera = cameraController.GetCamera();
 
 			glm::vec2 pos = { ImGui::GetMousePos().x, ImGui::GetMousePos().y };
-			glm::vec4 originNDC{
+			glm::vec4 originNDC
+			{
 				(pos.x/width - 0.5f) * 2.0f,
 				(pos.y/height - 0.5f) * 2.0f,
 				-1.0f, 1.0f
 			};
-			glm::vec4 endNDC{
+			glm::vec4 endNDC
+			{
 				(pos.x/width - 0.5f) * 2.0f,
 				(pos.y/height - 0.5f) * 2.0f,
 				1.0f, 1.0f
@@ -86,7 +96,6 @@ void SceneVisualizerPanel::Draw() {
 			// m_Selected.Collider = hitInfo.Actor;
 		}
 	}
-	ImGui::PopStyleVar();
 	ImGui::End();
 }
 

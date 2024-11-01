@@ -19,7 +19,6 @@ Editor::Editor()
 		});
 
 	UI::Init();
-	m_EditorLayer = EditorLayer();
 }
 
 Editor::~Editor() {

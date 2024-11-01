@@ -38,24 +38,24 @@ ECS::ECS() {
 		{
 			.Diffuse = Texture::Create("Sandbox/assets/images/wood.png")
 		});
-	for(uint32_t i = 0; i < 12; i++)
+	for(uint32_t i = 0; i < 20; i++)
 		EntityBuilder(world, "Cube" + std::to_string(i + 1))
 		.Add<TransformComponent>(
 			Transform
 			{
-				.Translation = { (float)Random::RandInt(-5, 5), (float)Random::RandInt(-5, 5), (float)Random::RandInt(-5, 5) }
+				.Translation = { (float)Random::RandInt(-10, 10), (float)Random::RandInt(-10, 10), (float)Random::RandInt(-10, 10) }
 			})
 		.Add<MeshComponent>(cube)
 		// .Add<RigidBodyComponent>(RigidBody::Type::Static)
 		.Finalize();
 
 	auto ball = Mesh::Create("Sandbox/assets/models/sphere/wooden_sphere.obj");
-	for(uint32_t i = 0; i < 12; i++)
+	for(uint32_t i = 0; i < 20; i++)
 		EntityBuilder(world, "Ball" + std::to_string(i + 1))
 		.Add<TransformComponent>(
 			Transform
 			{
-				.Translation = { (float)Random::RandInt(-5, 5), (float)Random::RandInt(-5, 5), (float)Random::RandInt(-5, 5) },
+				.Translation = { (float)Random::RandInt(-10, 10), (float)Random::RandInt(-10, 10), (float)Random::RandInt(-10, 10) },
 				.Scale = glm::vec3(0.1f)
 			})
 		.Add<MeshComponent>(ball)

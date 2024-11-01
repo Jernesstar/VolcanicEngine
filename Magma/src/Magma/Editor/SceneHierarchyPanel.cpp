@@ -49,18 +49,29 @@ void SceneHierarchyPanel::Draw() {
 }
 
 void SceneHierarchyPanel::DrawEntityNode(Entity& entity) {
-	ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_SpanAvailWidth
-							 | ImGuiTreeNodeFlags_OpenOnArrow; // Expands only when pressing the arrow
+	auto flags = ImGuiTreeNodeFlags_SpanAvailWidth
+			   | ImGuiTreeNodeFlags_OpenOnArrow; // Expands only when pressing the arrow
 	if(m_Selected && entity == m_Selected)
 		flags |= ImGuiTreeNodeFlags_Selected;
 
 	auto tag = entity.Get<TagComponent>().Tag.c_str();
 	auto id = (void*)(uint64_t)(uint32_t)entity.GetHandle();
 
-	bool opened = ImGui::TreeNodeEx(id, flags, tag);
+	if(ImGui::TreeNodeEx(id, flags, tag)) {
+		if(ImGui::IsMouseClicked(0) && ImGui::IsItemActivated())
+			m_Selected = entity;
+		if(ImGui::IsMouseClicked(1) && ImGui::IsItemActivated())
+			ImGui::OpenPopup("Properties");
 
-	if(opened)
+		if(ImGui::BeginPopup("Properties")) {
+			ImGui::Text("Test");
+			ImGui::EndPopup();
+		}
+
+
 		ImGui::TreePop();
+	}
+
 }
 
 }

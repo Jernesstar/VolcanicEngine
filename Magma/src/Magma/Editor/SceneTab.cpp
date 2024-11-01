@@ -34,9 +34,24 @@ SceneTab::SceneTab(Ref<Scene> scene) {
 	m_Panels.push_back(panel2);
 	// TODO(Implement): ComponentPanel
 
-	// m_IconPlay 	= Texture::Create("Magma/assets/icons/PlayButton.png");
-	// m_IconPause = Texture::Create("Magma/assets/icons/PauseButton.png");
-	// m_IconStop 	= Texture::Create("Magma/assets/icons/StopButton.png");
+	m_PlayButton = UI::Button::Create(
+		{
+			.Image = "Magma/assets/icons/PlayButton.png",
+			.Width = 20, .Height = 20,
+			.OnPressed = [this]() { OnScenePlay(); }
+		});
+	m_PauseButton = UI::Button::Create(
+		{
+			.Image = "Magma/assets/icons/PauseButton.png",
+			.Width = 20, .Height = 20,
+			.OnPressed = [this]() { OnScenePause(); }
+		});
+	m_StopButton = UI::Button::Create(
+		{
+			.Image = "Magma/assets/icons/StopButton.png",
+			.Width = 20, .Height = 20,
+			.OnPressed = [this]() { OnSceneStop(); }
+		});
 }
 
 SceneTab::~SceneTab() {
@@ -90,7 +105,6 @@ void SceneTab::Render() {
 				ImGui::EndMenu();
 			}
 		}
-
 	}
 	ImGui::EndMainMenuBar();
 
@@ -162,6 +176,38 @@ void SceneTab::OnScenePause() {
 }
 
 void SceneTab::OnSceneStop() {
+
+}
+
+void SceneTab::ToolbarUI() {
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 2));
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(0, 0));
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+
+	auto& colors = ImGui::GetStyle().Colors;
+	const auto& buttonHovered = colors[ImGuiCol_ButtonHovered];
+	const auto& buttonActive = colors[ImGuiCol_ButtonActive];
+
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered,
+		ImVec4(buttonHovered.x, buttonHovered.y, buttonHovered.z, 0.5f));
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive,
+		ImVec4(buttonActive.x, buttonActive.y, buttonActive.z, 0.5f));
+
+	auto flags = ImGuiWindowFlags_NoDecoration
+			   | ImGuiWindowFlags_NoScrollbar
+			   | ImGuiWindowFlags_NoScrollWithMouse;
+	ImGui::Begin("##toolbar", nullptr, flags);
+	{
+		bool hasPlayButton = m_SceneState != SceneState::Play;
+
+		if(hasPlayButton)
+			m_PlayButton->Render();
+		else
+			m_PauseButton->Render();
+
+		m_StopButton->Render();
+	}
+	ImGui::End();
 
 }
 

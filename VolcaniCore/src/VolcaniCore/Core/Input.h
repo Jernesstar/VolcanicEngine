@@ -16,6 +16,8 @@ public:
 	static void SetCursorMode(CursorMode mode);
 	static bool MouseButtonPressed(Mouse mouse_button);
 
+	static void SetMousePosition(float x, float y);
+
 	static glm::vec2 GetMousePosition();
 	static float GetMouseX();
 	static float GetMouseY();

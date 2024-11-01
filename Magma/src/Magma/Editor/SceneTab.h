@@ -4,6 +4,8 @@
 
 #include "Scene/Scene.h"
 
+#include "UI/Button.h"
+
 using namespace VolcaniCore;
 
 namespace Magma {
@@ -18,7 +20,7 @@ public:
 
 private:
 	Ref<Scene> m_Scene;
-	Ref<Texture> m_IconPlay, m_IconPause, m_IconStop;
+	Ref<UI::Button> m_PlayButton, m_PauseButton, m_StopButton;
 	
 	enum class SceneState { Edit, Play, Pause };
 	SceneState m_SceneState = SceneState::Edit;

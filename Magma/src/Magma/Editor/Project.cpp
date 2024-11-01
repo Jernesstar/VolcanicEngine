@@ -2,6 +2,8 @@
 
 #include <cstdlib>
 
+#include <VolcaniCore/Core/Log.h>
+
 namespace Magma {
 
 Project::Project(const std::filesystem::path& path) {
@@ -18,14 +20,16 @@ void Project::Load(const std::filesystem::path& path) {
 
 	// Configure .lua file
 	// Find dependencies
+	// system("cd Magma/projects/Project;"
+	// 	   "/../../../vendor/premake/bin/Windows/premake5.exe gmake2");
 }
 
 void Project::Save() {
-	// system("mingw32-make.exe -f Makefile");
+	// system("mingw32-make.exe -f build/projects/Makefile");
 }
 
 void Project::Run() {
-	// system("build/Project/bin/Project.exe");
+	// system("build/projects/Project/build/bin/Project.exe");
 }
 
 }

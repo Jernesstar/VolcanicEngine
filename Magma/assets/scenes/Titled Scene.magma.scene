@@ -9,7 +9,8 @@ Scene:
           CameraComponent:
             Type: Stereographic
             VerticalFOV: 0
-            Position: Direction
+            Position: [0, 0, 0]
+            Direction: [0, 0, -1]
             ViewportWidth: 800
             ViewportHeight: 600
             Near: 0.00999999978
@@ -27,8 +28,9 @@ Scene:
                 Diffuse:
                   Path: Sandbox/assets/images/wood.png
           TransformComponent:
-            Translation: Rotation
-            Scale
+            Translation: [-10, -2, 1]
+            Rotation: [0, 0, 0]
+            Scale: [1, 1, 1]
     - Entity:
         ID: 551
         Components:
@@ -42,8 +44,9 @@ Scene:
                 Diffuse:
                   Path: Sandbox/assets/images/wood.png
           TransformComponent:
-            Translation: Rotation
-            Scale
+            Translation: [-5, 10, 4]
+            Rotation: [0, 0, 0]
+            Scale: [1, 1, 1]
     - Entity:
         ID: 552
         Components:
@@ -57,8 +60,9 @@ Scene:
                 Diffuse:
                   Path: Sandbox/assets/images/wood.png
           TransformComponent:
-            Translation: Rotation
-            Scale
+            Translation: [5, -9, 2]
+            Rotation: [0, 0, 0]
+            Scale: [1, 1, 1]
     - Entity:
         ID: 553
         Components:
@@ -72,8 +76,9 @@ Scene:
                 Diffuse:
                   Path: Sandbox/assets/images/wood.png
           TransformComponent:
-            Translation: Rotation
-            Scale
+            Translation: [7, -8, -4]
+            Rotation: [0, 0, 0]
+            Scale: [1, 1, 1]
     - Entity:
         ID: 554
         Components:
@@ -87,8 +92,9 @@ Scene:
                 Diffuse:
                   Path: Sandbox/assets/images/wood.png
           TransformComponent:
-            Translation: Rotation
-            Scale
+            Translation: [9, -5, -6]
+            Rotation: [0, 0, 0]
+            Scale: [1, 1, 1]
     - Entity:
         ID: 555
         Components:
@@ -102,8 +108,9 @@ Scene:
                 Diffuse:
                   Path: Sandbox/assets/images/wood.png
           TransformComponent:
-            Translation: Rotation
-            Scale
+            Translation: [-4, -4, -6]
+            Rotation: [0, 0, 0]
+            Scale: [1, 1, 1]
     - Entity:
         ID: 556
         Components:
@@ -117,8 +124,9 @@ Scene:
                 Diffuse:
                   Path: Sandbox/assets/images/wood.png
           TransformComponent:
-            Translation: Rotation
-            Scale
+            Translation: [4, -3, 10]
+            Rotation: [0, 0, 0]
+            Scale: [1, 1, 1]
     - Entity:
         ID: 557
         Components:
@@ -132,8 +140,9 @@ Scene:
                 Diffuse:
                   Path: Sandbox/assets/images/wood.png
           TransformComponent:
-            Translation: Rotation
-            Scale
+            Translation: [4, 6, -9]
+            Rotation: [0, 0, 0]
+            Scale: [1, 1, 1]
     - Entity:
         ID: 558
         Components:
@@ -147,8 +156,9 @@ Scene:
                 Diffuse:
                   Path: Sandbox/assets/images/wood.png
           TransformComponent:
-            Translation: Rotation
-            Scale
+            Translation: [-3, 7, 6]
+            Rotation: [0, 0, 0]
+            Scale: [1, 1, 1]
     - Entity:
         ID: 559
         Components:
@@ -162,8 +172,9 @@ Scene:
                 Diffuse:
                   Path: Sandbox/assets/images/wood.png
           TransformComponent:
-            Translation: Rotation
-            Scale
+            Translation: [7, -6, 6]
+            Rotation: [0, 0, 0]
+            Scale: [1, 1, 1]
     - Entity:
         ID: 560
         Components:
@@ -177,8 +188,9 @@ Scene:
                 Diffuse:
                   Path: Sandbox/assets/images/wood.png
           TransformComponent:
-            Translation: Rotation
-            Scale
+            Translation: [-9, -10, -10]
+            Rotation: [0, 0, 0]
+            Scale: [1, 1, 1]
     - Entity:
         ID: 561
         Components:
@@ -192,10 +204,139 @@ Scene:
                 Diffuse:
                   Path: Sandbox/assets/images/wood.png
           TransformComponent:
-            Translation: Rotation
-            Scale
+            Translation: [6, 10, -2]
+            Rotation: [0, 0, 0]
+            Scale: [1, 1, 1]
     - Entity:
         ID: 562
+        Components:
+          TagComponent:
+            Tag: Cube13
+          MeshComponent:
+            Mesh:
+              Vertices: [[[-0.5, -0.5, -0.5], [0, 0, -1], [0, 0, 0, 0]], [[0.5, -0.5, -0.5], [0, 0, -1], [1, 0, 0, 0]], [[0.5, 0.5, -0.5], [0, 0, -1], [1, 1, 0, 0]], [[-0.5, 0.5, -0.5], [0, 0, -1], [0, 1, 0, 0]], [[-0.5, -0.5, 0.5], [0, 0, 1], [0, 0, 0, 0]], [[0.5, -0.5, 0.5], [0, 0, 1], [1, 0, 0, 0]], [[0.5, 0.5, 0.5], [0, 0, 1], [1, 1, 0, 0]], [[-0.5, 0.5, 0.5], [0, 0, 1], [0, 1, 0, 0]], [[-0.5, 0.5, -0.5], [-1, 0, 0], [0, 0, 0, 0]], [[-0.5, -0.5, -0.5], [-1, 0, 0], [1, 0, 0, 0]], [[-0.5, -0.5, 0.5], [-1, 0, 0], [1, 1, 0, 0]], [[-0.5, 0.5, 0.5], [-1, 0, 0], [0, 1, 0, 0]], [[0.5, -0.5, -0.5], [1, 0, 0], [0, 0, 0, 0]], [[0.5, 0.5, -0.5], [1, 0, 0], [1, 0, 0, 0]], [[0.5, 0.5, 0.5], [1, 0, 0], [1, 1, 0, 0]], [[0.5, -0.5, 0.5], [1, 0, 0], [0, 1, 0, 0]], [[-0.5, -0.5, -0.5], [0, -1, 0], [0, 0, 0, 0]], [[0.5, -0.5, -0.5], [0, -1, 0], [1, 0, 0, 0]], [[0.5, -0.5, 0.5], [0, -1, 0], [1, 1, 0, 0]], [[-0.5, -0.5, 0.5], [0, -1, 0], [0, 1, 0, 0]], [[0.5, 0.5, -0.5], [0, 1, 0], [0, 0, 0, 0]], [[-0.5, 0.5, -0.5], [0, 1, 0], [1, 0, 0, 0]], [[-0.5, 0.5, 0.5], [0, 1, 0], [1, 1, 0, 0]], [[0.5, 0.5, 0.5], [0, 1, 0], [0, 1, 0, 0]]]
+              Indices: [0, 3, 2, 2, 1, 0, 4, 5, 6, 6, 7, 4, 11, 8, 9, 9, 10, 11, 12, 13, 14, 14, 15, 12, 16, 17, 18, 18, 19, 16, 20, 21, 22, 22, 23, 20]
+              Material:
+                Diffuse:
+                  Path: Sandbox/assets/images/wood.png
+          TransformComponent:
+            Translation: [-4, 4, 1]
+            Rotation: [0, 0, 0]
+            Scale: [1, 1, 1]
+    - Entity:
+        ID: 563
+        Components:
+          TagComponent:
+            Tag: Cube14
+          MeshComponent:
+            Mesh:
+              Vertices: [[[-0.5, -0.5, -0.5], [0, 0, -1], [0, 0, 0, 0]], [[0.5, -0.5, -0.5], [0, 0, -1], [1, 0, 0, 0]], [[0.5, 0.5, -0.5], [0, 0, -1], [1, 1, 0, 0]], [[-0.5, 0.5, -0.5], [0, 0, -1], [0, 1, 0, 0]], [[-0.5, -0.5, 0.5], [0, 0, 1], [0, 0, 0, 0]], [[0.5, -0.5, 0.5], [0, 0, 1], [1, 0, 0, 0]], [[0.5, 0.5, 0.5], [0, 0, 1], [1, 1, 0, 0]], [[-0.5, 0.5, 0.5], [0, 0, 1], [0, 1, 0, 0]], [[-0.5, 0.5, -0.5], [-1, 0, 0], [0, 0, 0, 0]], [[-0.5, -0.5, -0.5], [-1, 0, 0], [1, 0, 0, 0]], [[-0.5, -0.5, 0.5], [-1, 0, 0], [1, 1, 0, 0]], [[-0.5, 0.5, 0.5], [-1, 0, 0], [0, 1, 0, 0]], [[0.5, -0.5, -0.5], [1, 0, 0], [0, 0, 0, 0]], [[0.5, 0.5, -0.5], [1, 0, 0], [1, 0, 0, 0]], [[0.5, 0.5, 0.5], [1, 0, 0], [1, 1, 0, 0]], [[0.5, -0.5, 0.5], [1, 0, 0], [0, 1, 0, 0]], [[-0.5, -0.5, -0.5], [0, -1, 0], [0, 0, 0, 0]], [[0.5, -0.5, -0.5], [0, -1, 0], [1, 0, 0, 0]], [[0.5, -0.5, 0.5], [0, -1, 0], [1, 1, 0, 0]], [[-0.5, -0.5, 0.5], [0, -1, 0], [0, 1, 0, 0]], [[0.5, 0.5, -0.5], [0, 1, 0], [0, 0, 0, 0]], [[-0.5, 0.5, -0.5], [0, 1, 0], [1, 0, 0, 0]], [[-0.5, 0.5, 0.5], [0, 1, 0], [1, 1, 0, 0]], [[0.5, 0.5, 0.5], [0, 1, 0], [0, 1, 0, 0]]]
+              Indices: [0, 3, 2, 2, 1, 0, 4, 5, 6, 6, 7, 4, 11, 8, 9, 9, 10, 11, 12, 13, 14, 14, 15, 12, 16, 17, 18, 18, 19, 16, 20, 21, 22, 22, 23, 20]
+              Material:
+                Diffuse:
+                  Path: Sandbox/assets/images/wood.png
+          TransformComponent:
+            Translation: [9, -1, 5]
+            Rotation: [0, 0, 0]
+            Scale: [1, 1, 1]
+    - Entity:
+        ID: 564
+        Components:
+          TagComponent:
+            Tag: Cube15
+          MeshComponent:
+            Mesh:
+              Vertices: [[[-0.5, -0.5, -0.5], [0, 0, -1], [0, 0, 0, 0]], [[0.5, -0.5, -0.5], [0, 0, -1], [1, 0, 0, 0]], [[0.5, 0.5, -0.5], [0, 0, -1], [1, 1, 0, 0]], [[-0.5, 0.5, -0.5], [0, 0, -1], [0, 1, 0, 0]], [[-0.5, -0.5, 0.5], [0, 0, 1], [0, 0, 0, 0]], [[0.5, -0.5, 0.5], [0, 0, 1], [1, 0, 0, 0]], [[0.5, 0.5, 0.5], [0, 0, 1], [1, 1, 0, 0]], [[-0.5, 0.5, 0.5], [0, 0, 1], [0, 1, 0, 0]], [[-0.5, 0.5, -0.5], [-1, 0, 0], [0, 0, 0, 0]], [[-0.5, -0.5, -0.5], [-1, 0, 0], [1, 0, 0, 0]], [[-0.5, -0.5, 0.5], [-1, 0, 0], [1, 1, 0, 0]], [[-0.5, 0.5, 0.5], [-1, 0, 0], [0, 1, 0, 0]], [[0.5, -0.5, -0.5], [1, 0, 0], [0, 0, 0, 0]], [[0.5, 0.5, -0.5], [1, 0, 0], [1, 0, 0, 0]], [[0.5, 0.5, 0.5], [1, 0, 0], [1, 1, 0, 0]], [[0.5, -0.5, 0.5], [1, 0, 0], [0, 1, 0, 0]], [[-0.5, -0.5, -0.5], [0, -1, 0], [0, 0, 0, 0]], [[0.5, -0.5, -0.5], [0, -1, 0], [1, 0, 0, 0]], [[0.5, -0.5, 0.5], [0, -1, 0], [1, 1, 0, 0]], [[-0.5, -0.5, 0.5], [0, -1, 0], [0, 1, 0, 0]], [[0.5, 0.5, -0.5], [0, 1, 0], [0, 0, 0, 0]], [[-0.5, 0.5, -0.5], [0, 1, 0], [1, 0, 0, 0]], [[-0.5, 0.5, 0.5], [0, 1, 0], [1, 1, 0, 0]], [[0.5, 0.5, 0.5], [0, 1, 0], [0, 1, 0, 0]]]
+              Indices: [0, 3, 2, 2, 1, 0, 4, 5, 6, 6, 7, 4, 11, 8, 9, 9, 10, 11, 12, 13, 14, 14, 15, 12, 16, 17, 18, 18, 19, 16, 20, 21, 22, 22, 23, 20]
+              Material:
+                Diffuse:
+                  Path: Sandbox/assets/images/wood.png
+          TransformComponent:
+            Translation: [-5, 3, -9]
+            Rotation: [0, 0, 0]
+            Scale: [1, 1, 1]
+    - Entity:
+        ID: 565
+        Components:
+          TagComponent:
+            Tag: Cube16
+          MeshComponent:
+            Mesh:
+              Vertices: [[[-0.5, -0.5, -0.5], [0, 0, -1], [0, 0, 0, 0]], [[0.5, -0.5, -0.5], [0, 0, -1], [1, 0, 0, 0]], [[0.5, 0.5, -0.5], [0, 0, -1], [1, 1, 0, 0]], [[-0.5, 0.5, -0.5], [0, 0, -1], [0, 1, 0, 0]], [[-0.5, -0.5, 0.5], [0, 0, 1], [0, 0, 0, 0]], [[0.5, -0.5, 0.5], [0, 0, 1], [1, 0, 0, 0]], [[0.5, 0.5, 0.5], [0, 0, 1], [1, 1, 0, 0]], [[-0.5, 0.5, 0.5], [0, 0, 1], [0, 1, 0, 0]], [[-0.5, 0.5, -0.5], [-1, 0, 0], [0, 0, 0, 0]], [[-0.5, -0.5, -0.5], [-1, 0, 0], [1, 0, 0, 0]], [[-0.5, -0.5, 0.5], [-1, 0, 0], [1, 1, 0, 0]], [[-0.5, 0.5, 0.5], [-1, 0, 0], [0, 1, 0, 0]], [[0.5, -0.5, -0.5], [1, 0, 0], [0, 0, 0, 0]], [[0.5, 0.5, -0.5], [1, 0, 0], [1, 0, 0, 0]], [[0.5, 0.5, 0.5], [1, 0, 0], [1, 1, 0, 0]], [[0.5, -0.5, 0.5], [1, 0, 0], [0, 1, 0, 0]], [[-0.5, -0.5, -0.5], [0, -1, 0], [0, 0, 0, 0]], [[0.5, -0.5, -0.5], [0, -1, 0], [1, 0, 0, 0]], [[0.5, -0.5, 0.5], [0, -1, 0], [1, 1, 0, 0]], [[-0.5, -0.5, 0.5], [0, -1, 0], [0, 1, 0, 0]], [[0.5, 0.5, -0.5], [0, 1, 0], [0, 0, 0, 0]], [[-0.5, 0.5, -0.5], [0, 1, 0], [1, 0, 0, 0]], [[-0.5, 0.5, 0.5], [0, 1, 0], [1, 1, 0, 0]], [[0.5, 0.5, 0.5], [0, 1, 0], [0, 1, 0, 0]]]
+              Indices: [0, 3, 2, 2, 1, 0, 4, 5, 6, 6, 7, 4, 11, 8, 9, 9, 10, 11, 12, 13, 14, 14, 15, 12, 16, 17, 18, 18, 19, 16, 20, 21, 22, 22, 23, 20]
+              Material:
+                Diffuse:
+                  Path: Sandbox/assets/images/wood.png
+          TransformComponent:
+            Translation: [4, -2, 5]
+            Rotation: [0, 0, 0]
+            Scale: [1, 1, 1]
+    - Entity:
+        ID: 566
+        Components:
+          TagComponent:
+            Tag: Cube17
+          MeshComponent:
+            Mesh:
+              Vertices: [[[-0.5, -0.5, -0.5], [0, 0, -1], [0, 0, 0, 0]], [[0.5, -0.5, -0.5], [0, 0, -1], [1, 0, 0, 0]], [[0.5, 0.5, -0.5], [0, 0, -1], [1, 1, 0, 0]], [[-0.5, 0.5, -0.5], [0, 0, -1], [0, 1, 0, 0]], [[-0.5, -0.5, 0.5], [0, 0, 1], [0, 0, 0, 0]], [[0.5, -0.5, 0.5], [0, 0, 1], [1, 0, 0, 0]], [[0.5, 0.5, 0.5], [0, 0, 1], [1, 1, 0, 0]], [[-0.5, 0.5, 0.5], [0, 0, 1], [0, 1, 0, 0]], [[-0.5, 0.5, -0.5], [-1, 0, 0], [0, 0, 0, 0]], [[-0.5, -0.5, -0.5], [-1, 0, 0], [1, 0, 0, 0]], [[-0.5, -0.5, 0.5], [-1, 0, 0], [1, 1, 0, 0]], [[-0.5, 0.5, 0.5], [-1, 0, 0], [0, 1, 0, 0]], [[0.5, -0.5, -0.5], [1, 0, 0], [0, 0, 0, 0]], [[0.5, 0.5, -0.5], [1, 0, 0], [1, 0, 0, 0]], [[0.5, 0.5, 0.5], [1, 0, 0], [1, 1, 0, 0]], [[0.5, -0.5, 0.5], [1, 0, 0], [0, 1, 0, 0]], [[-0.5, -0.5, -0.5], [0, -1, 0], [0, 0, 0, 0]], [[0.5, -0.5, -0.5], [0, -1, 0], [1, 0, 0, 0]], [[0.5, -0.5, 0.5], [0, -1, 0], [1, 1, 0, 0]], [[-0.5, -0.5, 0.5], [0, -1, 0], [0, 1, 0, 0]], [[0.5, 0.5, -0.5], [0, 1, 0], [0, 0, 0, 0]], [[-0.5, 0.5, -0.5], [0, 1, 0], [1, 0, 0, 0]], [[-0.5, 0.5, 0.5], [0, 1, 0], [1, 1, 0, 0]], [[0.5, 0.5, 0.5], [0, 1, 0], [0, 1, 0, 0]]]
+              Indices: [0, 3, 2, 2, 1, 0, 4, 5, 6, 6, 7, 4, 11, 8, 9, 9, 10, 11, 12, 13, 14, 14, 15, 12, 16, 17, 18, 18, 19, 16, 20, 21, 22, 22, 23, 20]
+              Material:
+                Diffuse:
+                  Path: Sandbox/assets/images/wood.png
+          TransformComponent:
+            Translation: [-9, -1, 2]
+            Rotation: [0, 0, 0]
+            Scale: [1, 1, 1]
+    - Entity:
+        ID: 567
+        Components:
+          TagComponent:
+            Tag: Cube18
+          MeshComponent:
+            Mesh:
+              Vertices: [[[-0.5, -0.5, -0.5], [0, 0, -1], [0, 0, 0, 0]], [[0.5, -0.5, -0.5], [0, 0, -1], [1, 0, 0, 0]], [[0.5, 0.5, -0.5], [0, 0, -1], [1, 1, 0, 0]], [[-0.5, 0.5, -0.5], [0, 0, -1], [0, 1, 0, 0]], [[-0.5, -0.5, 0.5], [0, 0, 1], [0, 0, 0, 0]], [[0.5, -0.5, 0.5], [0, 0, 1], [1, 0, 0, 0]], [[0.5, 0.5, 0.5], [0, 0, 1], [1, 1, 0, 0]], [[-0.5, 0.5, 0.5], [0, 0, 1], [0, 1, 0, 0]], [[-0.5, 0.5, -0.5], [-1, 0, 0], [0, 0, 0, 0]], [[-0.5, -0.5, -0.5], [-1, 0, 0], [1, 0, 0, 0]], [[-0.5, -0.5, 0.5], [-1, 0, 0], [1, 1, 0, 0]], [[-0.5, 0.5, 0.5], [-1, 0, 0], [0, 1, 0, 0]], [[0.5, -0.5, -0.5], [1, 0, 0], [0, 0, 0, 0]], [[0.5, 0.5, -0.5], [1, 0, 0], [1, 0, 0, 0]], [[0.5, 0.5, 0.5], [1, 0, 0], [1, 1, 0, 0]], [[0.5, -0.5, 0.5], [1, 0, 0], [0, 1, 0, 0]], [[-0.5, -0.5, -0.5], [0, -1, 0], [0, 0, 0, 0]], [[0.5, -0.5, -0.5], [0, -1, 0], [1, 0, 0, 0]], [[0.5, -0.5, 0.5], [0, -1, 0], [1, 1, 0, 0]], [[-0.5, -0.5, 0.5], [0, -1, 0], [0, 1, 0, 0]], [[0.5, 0.5, -0.5], [0, 1, 0], [0, 0, 0, 0]], [[-0.5, 0.5, -0.5], [0, 1, 0], [1, 0, 0, 0]], [[-0.5, 0.5, 0.5], [0, 1, 0], [1, 1, 0, 0]], [[0.5, 0.5, 0.5], [0, 1, 0], [0, 1, 0, 0]]]
+              Indices: [0, 3, 2, 2, 1, 0, 4, 5, 6, 6, 7, 4, 11, 8, 9, 9, 10, 11, 12, 13, 14, 14, 15, 12, 16, 17, 18, 18, 19, 16, 20, 21, 22, 22, 23, 20]
+              Material:
+                Diffuse:
+                  Path: Sandbox/assets/images/wood.png
+          TransformComponent:
+            Translation: [10, 6, 2]
+            Rotation: [0, 0, 0]
+            Scale: [1, 1, 1]
+    - Entity:
+        ID: 568
+        Components:
+          TagComponent:
+            Tag: Cube19
+          MeshComponent:
+            Mesh:
+              Vertices: [[[-0.5, -0.5, -0.5], [0, 0, -1], [0, 0, 0, 0]], [[0.5, -0.5, -0.5], [0, 0, -1], [1, 0, 0, 0]], [[0.5, 0.5, -0.5], [0, 0, -1], [1, 1, 0, 0]], [[-0.5, 0.5, -0.5], [0, 0, -1], [0, 1, 0, 0]], [[-0.5, -0.5, 0.5], [0, 0, 1], [0, 0, 0, 0]], [[0.5, -0.5, 0.5], [0, 0, 1], [1, 0, 0, 0]], [[0.5, 0.5, 0.5], [0, 0, 1], [1, 1, 0, 0]], [[-0.5, 0.5, 0.5], [0, 0, 1], [0, 1, 0, 0]], [[-0.5, 0.5, -0.5], [-1, 0, 0], [0, 0, 0, 0]], [[-0.5, -0.5, -0.5], [-1, 0, 0], [1, 0, 0, 0]], [[-0.5, -0.5, 0.5], [-1, 0, 0], [1, 1, 0, 0]], [[-0.5, 0.5, 0.5], [-1, 0, 0], [0, 1, 0, 0]], [[0.5, -0.5, -0.5], [1, 0, 0], [0, 0, 0, 0]], [[0.5, 0.5, -0.5], [1, 0, 0], [1, 0, 0, 0]], [[0.5, 0.5, 0.5], [1, 0, 0], [1, 1, 0, 0]], [[0.5, -0.5, 0.5], [1, 0, 0], [0, 1, 0, 0]], [[-0.5, -0.5, -0.5], [0, -1, 0], [0, 0, 0, 0]], [[0.5, -0.5, -0.5], [0, -1, 0], [1, 0, 0, 0]], [[0.5, -0.5, 0.5], [0, -1, 0], [1, 1, 0, 0]], [[-0.5, -0.5, 0.5], [0, -1, 0], [0, 1, 0, 0]], [[0.5, 0.5, -0.5], [0, 1, 0], [0, 0, 0, 0]], [[-0.5, 0.5, -0.5], [0, 1, 0], [1, 0, 0, 0]], [[-0.5, 0.5, 0.5], [0, 1, 0], [1, 1, 0, 0]], [[0.5, 0.5, 0.5], [0, 1, 0], [0, 1, 0, 0]]]
+              Indices: [0, 3, 2, 2, 1, 0, 4, 5, 6, 6, 7, 4, 11, 8, 9, 9, 10, 11, 12, 13, 14, 14, 15, 12, 16, 17, 18, 18, 19, 16, 20, 21, 22, 22, 23, 20]
+              Material:
+                Diffuse:
+                  Path: Sandbox/assets/images/wood.png
+          TransformComponent:
+            Translation: [9, -1, 10]
+            Rotation: [0, 0, 0]
+            Scale: [1, 1, 1]
+    - Entity:
+        ID: 569
+        Components:
+          TagComponent:
+            Tag: Cube20
+          MeshComponent:
+            Mesh:
+              Vertices: [[[-0.5, -0.5, -0.5], [0, 0, -1], [0, 0, 0, 0]], [[0.5, -0.5, -0.5], [0, 0, -1], [1, 0, 0, 0]], [[0.5, 0.5, -0.5], [0, 0, -1], [1, 1, 0, 0]], [[-0.5, 0.5, -0.5], [0, 0, -1], [0, 1, 0, 0]], [[-0.5, -0.5, 0.5], [0, 0, 1], [0, 0, 0, 0]], [[0.5, -0.5, 0.5], [0, 0, 1], [1, 0, 0, 0]], [[0.5, 0.5, 0.5], [0, 0, 1], [1, 1, 0, 0]], [[-0.5, 0.5, 0.5], [0, 0, 1], [0, 1, 0, 0]], [[-0.5, 0.5, -0.5], [-1, 0, 0], [0, 0, 0, 0]], [[-0.5, -0.5, -0.5], [-1, 0, 0], [1, 0, 0, 0]], [[-0.5, -0.5, 0.5], [-1, 0, 0], [1, 1, 0, 0]], [[-0.5, 0.5, 0.5], [-1, 0, 0], [0, 1, 0, 0]], [[0.5, -0.5, -0.5], [1, 0, 0], [0, 0, 0, 0]], [[0.5, 0.5, -0.5], [1, 0, 0], [1, 0, 0, 0]], [[0.5, 0.5, 0.5], [1, 0, 0], [1, 1, 0, 0]], [[0.5, -0.5, 0.5], [1, 0, 0], [0, 1, 0, 0]], [[-0.5, -0.5, -0.5], [0, -1, 0], [0, 0, 0, 0]], [[0.5, -0.5, -0.5], [0, -1, 0], [1, 0, 0, 0]], [[0.5, -0.5, 0.5], [0, -1, 0], [1, 1, 0, 0]], [[-0.5, -0.5, 0.5], [0, -1, 0], [0, 1, 0, 0]], [[0.5, 0.5, -0.5], [0, 1, 0], [0, 0, 0, 0]], [[-0.5, 0.5, -0.5], [0, 1, 0], [1, 0, 0, 0]], [[-0.5, 0.5, 0.5], [0, 1, 0], [1, 1, 0, 0]], [[0.5, 0.5, 0.5], [0, 1, 0], [0, 1, 0, 0]]]
+              Indices: [0, 3, 2, 2, 1, 0, 4, 5, 6, 6, 7, 4, 11, 8, 9, 9, 10, 11, 12, 13, 14, 14, 15, 12, 16, 17, 18, 18, 19, 16, 20, 21, 22, 22, 23, 20]
+              Material:
+                Diffuse:
+                  Path: Sandbox/assets/images/wood.png
+          TransformComponent:
+            Translation: [9, 3, 5]
+            Rotation: [0, 0, 0]
+            Scale: [1, 1, 1]
+    - Entity:
+        ID: 570
         Components:
           TagComponent:
             Tag: Ball1
@@ -203,10 +344,11 @@ Scene:
             Mesh:
               Path: Sandbox/assets/models/sphere/wooden_sphere.obj
           TransformComponent:
-            Translation: Rotation
-            Scale
+            Translation: [-5, -7, 2]
+            Rotation: [0, 0, 0]
+            Scale: [0.100000001, 0.100000001, 0.100000001]
     - Entity:
-        ID: 563
+        ID: 571
         Components:
           TagComponent:
             Tag: Ball2
@@ -214,10 +356,11 @@ Scene:
             Mesh:
               Path: Sandbox/assets/models/sphere/wooden_sphere.obj
           TransformComponent:
-            Translation: Rotation
-            Scale
+            Translation: [9, -2, -1]
+            Rotation: [0, 0, 0]
+            Scale: [0.100000001, 0.100000001, 0.100000001]
     - Entity:
-        ID: 564
+        ID: 572
         Components:
           TagComponent:
             Tag: Ball3
@@ -225,10 +368,11 @@ Scene:
             Mesh:
               Path: Sandbox/assets/models/sphere/wooden_sphere.obj
           TransformComponent:
-            Translation: Rotation
-            Scale
+            Translation: [7, 10, -6]
+            Rotation: [0, 0, 0]
+            Scale: [0.100000001, 0.100000001, 0.100000001]
     - Entity:
-        ID: 565
+        ID: 573
         Components:
           TagComponent:
             Tag: Ball4
@@ -236,10 +380,11 @@ Scene:
             Mesh:
               Path: Sandbox/assets/models/sphere/wooden_sphere.obj
           TransformComponent:
-            Translation: Rotation
-            Scale
+            Translation: [1, -8, 9]
+            Rotation: [0, 0, 0]
+            Scale: [0.100000001, 0.100000001, 0.100000001]
     - Entity:
-        ID: 566
+        ID: 574
         Components:
           TagComponent:
             Tag: Ball5
@@ -247,10 +392,11 @@ Scene:
             Mesh:
               Path: Sandbox/assets/models/sphere/wooden_sphere.obj
           TransformComponent:
-            Translation: Rotation
-            Scale
+            Translation: [7, 3, -3]
+            Rotation: [0, 0, 0]
+            Scale: [0.100000001, 0.100000001, 0.100000001]
     - Entity:
-        ID: 567
+        ID: 575
         Components:
           TagComponent:
             Tag: Ball6
@@ -258,10 +404,11 @@ Scene:
             Mesh:
               Path: Sandbox/assets/models/sphere/wooden_sphere.obj
           TransformComponent:
-            Translation: Rotation
-            Scale
+            Translation: [-3, -1, 7]
+            Rotation: [0, 0, 0]
+            Scale: [0.100000001, 0.100000001, 0.100000001]
     - Entity:
-        ID: 568
+        ID: 576
         Components:
           TagComponent:
             Tag: Ball7
@@ -269,10 +416,11 @@ Scene:
             Mesh:
               Path: Sandbox/assets/models/sphere/wooden_sphere.obj
           TransformComponent:
-            Translation: Rotation
-            Scale
+            Translation: [-6, 0, -9]
+            Rotation: [0, 0, 0]
+            Scale: [0.100000001, 0.100000001, 0.100000001]
     - Entity:
-        ID: 569
+        ID: 577
         Components:
           TagComponent:
             Tag: Ball8
@@ -280,10 +428,11 @@ Scene:
             Mesh:
               Path: Sandbox/assets/models/sphere/wooden_sphere.obj
           TransformComponent:
-            Translation: Rotation
-            Scale
+            Translation: [-5, -1, -5]
+            Rotation: [0, 0, 0]
+            Scale: [0.100000001, 0.100000001, 0.100000001]
     - Entity:
-        ID: 570
+        ID: 578
         Components:
           TagComponent:
             Tag: Ball9
@@ -291,10 +440,11 @@ Scene:
             Mesh:
               Path: Sandbox/assets/models/sphere/wooden_sphere.obj
           TransformComponent:
-            Translation: Rotation
-            Scale
+            Translation: [-10, 1, -4]
+            Rotation: [0, 0, 0]
+            Scale: [0.100000001, 0.100000001, 0.100000001]
     - Entity:
-        ID: 571
+        ID: 579
         Components:
           TagComponent:
             Tag: Ball10
@@ -302,10 +452,11 @@ Scene:
             Mesh:
               Path: Sandbox/assets/models/sphere/wooden_sphere.obj
           TransformComponent:
-            Translation: Rotation
-            Scale
+            Translation: [-2, 2, -1]
+            Rotation: [0, 0, 0]
+            Scale: [0.100000001, 0.100000001, 0.100000001]
     - Entity:
-        ID: 572
+        ID: 580
         Components:
           TagComponent:
             Tag: Ball11
@@ -313,10 +464,11 @@ Scene:
             Mesh:
               Path: Sandbox/assets/models/sphere/wooden_sphere.obj
           TransformComponent:
-            Translation: Rotation
-            Scale
+            Translation: [-8, -7, 9]
+            Rotation: [0, 0, 0]
+            Scale: [0.100000001, 0.100000001, 0.100000001]
     - Entity:
-        ID: 573
+        ID: 581
         Components:
           TagComponent:
             Tag: Ball12
@@ -324,5 +476,102 @@ Scene:
             Mesh:
               Path: Sandbox/assets/models/sphere/wooden_sphere.obj
           TransformComponent:
-            Translation: Rotation
-            Scale
+            Translation: [7, -8, -3]
+            Rotation: [0, 0, 0]
+            Scale: [0.100000001, 0.100000001, 0.100000001]
+    - Entity:
+        ID: 582
+        Components:
+          TagComponent:
+            Tag: Ball13
+          MeshComponent:
+            Mesh:
+              Path: Sandbox/assets/models/sphere/wooden_sphere.obj
+          TransformComponent:
+            Translation: [-6, -2, 5]
+            Rotation: [0, 0, 0]
+            Scale: [0.100000001, 0.100000001, 0.100000001]
+    - Entity:
+        ID: 583
+        Components:
+          TagComponent:
+            Tag: Ball14
+          MeshComponent:
+            Mesh:
+              Path: Sandbox/assets/models/sphere/wooden_sphere.obj
+          TransformComponent:
+            Translation: [7, -10, -9]
+            Rotation: [0, 0, 0]
+            Scale: [0.100000001, 0.100000001, 0.100000001]
+    - Entity:
+        ID: 584
+        Components:
+          TagComponent:
+            Tag: Ball15
+          MeshComponent:
+            Mesh:
+              Path: Sandbox/assets/models/sphere/wooden_sphere.obj
+          TransformComponent:
+            Translation: [10, 10, -3]
+            Rotation: [0, 0, 0]
+            Scale: [0.100000001, 0.100000001, 0.100000001]
+    - Entity:
+        ID: 585
+        Components:
+          TagComponent:
+            Tag: Ball16
+          MeshComponent:
+            Mesh:
+              Path: Sandbox/assets/models/sphere/wooden_sphere.obj
+          TransformComponent:
+            Translation: [-9, -3, 6]
+            Rotation: [0, 0, 0]
+            Scale: [0.100000001, 0.100000001, 0.100000001]
+    - Entity:
+        ID: 586
+        Components:
+          TagComponent:
+            Tag: Ball17
+          MeshComponent:
+            Mesh:
+              Path: Sandbox/assets/models/sphere/wooden_sphere.obj
+          TransformComponent:
+            Translation: [9, 5, -10]
+            Rotation: [0, 0, 0]
+            Scale: [0.100000001, 0.100000001, 0.100000001]
+    - Entity:
+        ID: 587
+        Components:
+          TagComponent:
+            Tag: Ball18
+          MeshComponent:
+            Mesh:
+              Path: Sandbox/assets/models/sphere/wooden_sphere.obj
+          TransformComponent:
+            Translation: [3, 9, 5]
+            Rotation: [0, 0, 0]
+            Scale: [0.100000001, 0.100000001, 0.100000001]
+    - Entity:
+        ID: 588
+        Components:
+          TagComponent:
+            Tag: Ball19
+          MeshComponent:
+            Mesh:
+              Path: Sandbox/assets/models/sphere/wooden_sphere.obj
+          TransformComponent:
+            Translation: [-10, -2, 1]
+            Rotation: [0, 0, 0]
+            Scale: [0.100000001, 0.100000001, 0.100000001]
+    - Entity:
+        ID: 589
+        Components:
+          TagComponent:
+            Tag: Ball20
+          MeshComponent:
+            Mesh:
+              Path: Sandbox/assets/models/sphere/wooden_sphere.obj
+          TransformComponent:
+            Translation: [8, 8, -6]
+            Rotation: [0, 0, 0]
+            Scale: [0.100000001, 0.100000001, 0.100000001]

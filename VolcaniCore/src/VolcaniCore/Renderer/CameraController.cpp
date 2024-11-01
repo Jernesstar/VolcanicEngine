@@ -45,8 +45,6 @@ void CameraController::OnUpdate(TimeStep ts) {
 
 	Input::SetCursorMode(CursorMode::Locked);
 
-	float moveSpeed     = TranslationSpeed * 0.001f;
-	float rotationSpeed = RotationSpeed	   * 0.001f;
 	glm::vec3 finalPos = m_Camera->GetPosition();
 	glm::vec3 finalDir;
 	bool moved = false;
@@ -68,6 +66,7 @@ void CameraController::OnUpdate(TimeStep ts) {
 		moveDir += (float)inputDir.x * right;
 		moveDir += (float)inputDir.y * up;
 		moveDir += (float)inputDir.z * forward;
+		float moveSpeed = TranslationSpeed * 0.001f;
 		finalPos += glm::normalize(moveDir) * moveSpeed * (float)ts;
 	}
 
