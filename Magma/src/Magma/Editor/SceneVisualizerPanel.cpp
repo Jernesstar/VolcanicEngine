@@ -13,14 +13,6 @@ using namespace Magma::ECS;
 
 namespace Magma {
 
-SceneVisualizerPanel::SceneVisualizerPanel()
-	: Panel("SceneVisualizer")
-{
-	auto width = Application::GetWindow()->GetWidth();
-	auto height = Application::GetWindow()->GetHeight();
-	m_Image = CreateRef<UI::Image>(Texture::Create(width, height));
-}
-
 SceneVisualizerPanel::SceneVisualizerPanel(Ref<Scene> context)
 	: Panel("SceneVisualizer")
 {

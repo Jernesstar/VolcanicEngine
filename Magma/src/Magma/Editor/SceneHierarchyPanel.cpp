@@ -8,14 +8,13 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
+#include <VolcaniCore/Core/Log.h>
+
 #include "ECS/Component.h"
 
 using namespace Magma::ECS;
 
 namespace Magma {
-
-SceneHierarchyPanel::SceneHierarchyPanel()
-	: Panel("SceneHierarchy") { }
 
 SceneHierarchyPanel::SceneHierarchyPanel(Ref<Scene> context)
 	: Panel("SceneHierarchy")
@@ -42,7 +41,7 @@ void SceneHierarchyPanel::Draw() {
 				DrawEntityNode(entity);
 			});
 
-		if(ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
+		if(ImGui::IsMouseDown(1) && ImGui::IsWindowHovered())
 			m_Selected = Entity{ };
 	}
 	ImGui::End();
@@ -60,13 +59,15 @@ void SceneHierarchyPanel::DrawEntityNode(Entity& entity) {
 	if(ImGui::TreeNodeEx(id, flags, tag)) {
 		if(ImGui::IsMouseClicked(0) && ImGui::IsItemActivated())
 			m_Selected = entity;
+		// if(ImGui::IsMouseClicked(1) && ImGui::IsItemActivated())
+		// 	ImGui::OpenPopup("Properties");
 		if(ImGui::IsMouseClicked(1) && ImGui::IsItemActivated())
-			ImGui::OpenPopup("Properties");
+			VOLCANICORE_LOG_INFO("Here");
 
-		if(ImGui::BeginPopup("Properties")) {
-			ImGui::Text("Test");
-			ImGui::EndPopup();
-		}
+		// if(ImGui::BeginPopupModal("Properties")) {
+		// 	ImGui::Text("Test");
+		// 	ImGui::EndPopup();
+		// }
 
 
 		ImGui::TreePop();

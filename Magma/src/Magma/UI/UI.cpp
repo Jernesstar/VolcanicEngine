@@ -30,14 +30,57 @@ void Init() {
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 
-	Ref<VolcaniCore::Window> window = Application::GetWindow();
+	auto window = Application::GetWindow();
 
 	ImGuiIO& io = ImGui::GetIO();
-	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard
-					| ImGuiConfigFlags_NavEnableSetMousePos
-					| ImGuiConfigFlags_DockingEnable
-					| ImGuiConfigFlags_ViewportsEnable;
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable
+					| ImGuiConfigFlags_ViewportsEnable
+					| ImGuiConfigFlags_NavEnableKeyboard
+					| ImGuiConfigFlags_NavEnableSetMousePos;
 	io.DisplaySize = ImVec2(window->GetWidth(), window->GetHeight());
+
+	Events::RegisterListener<KeyPressedEvent>(
+		[](KeyPressedEvent& event)
+		{
+			ImGuiIO& io = ImGui::GetIO();
+			event.Handled = io.WantCaptureKeyboard;
+		});
+	Events::RegisterListener<KeyReleasedEvent>(
+		[](KeyReleasedEvent& event)
+		{
+			ImGuiIO& io = ImGui::GetIO();
+			event.Handled = io.WantCaptureKeyboard;
+		});
+	Events::RegisterListener<MouseButtonPressedEvent>(
+		[](MouseButtonPressedEvent& event)
+		{
+			ImGuiIO& io = ImGui::GetIO();
+			event.Handled = io.WantCaptureMouse;
+		});
+	Events::RegisterListener<MouseButtonReleasedEvent>(
+		[](MouseButtonReleasedEvent& event)
+		{
+			ImGuiIO& io = ImGui::GetIO();
+			event.Handled = io.WantCaptureMouse;
+		});
+	Events::RegisterListener<MouseScrolledEvent>(
+		[](MouseScrolledEvent& event)
+		{
+			ImGuiIO& io = ImGui::GetIO();
+			event.Handled = io.WantCaptureMouse;
+		});
+	Events::RegisterListener<MouseMovedEvent>(
+		[](MouseMovedEvent& event)
+		{
+			ImGuiIO& io = ImGui::GetIO();
+			event.Handled = io.WantCaptureMouse;
+		});
+	Events::RegisterListener<WindowResizedEvent>(
+		[](const WindowResizedEvent& event)
+		{
+			ImGuiIO& io = ImGui::GetIO();
+			io.DisplaySize = ImVec2(event.Width, event.Height);
+		});
 
 	if(RendererAPI::Get()->GetBackend() == RendererAPI::Backend::OpenGL) {
 		ImGui_ImplGlfw_InitForOpenGL(window->GetNativeWindow(), true);
@@ -45,44 +88,12 @@ void Init() {
 	}
 
 	ImGui::StyleColorsDark();
-
 	float fontSize = 18.0f;
 	io.Fonts->AddFontFromFileTTF(
-			"VolcaniCore/assets/fonts/JetBrainsMono-Bold.ttf", fontSize);
+		"VolcaniCore/assets/fonts/JetBrainsMono-Bold.ttf", fontSize);
 	io.FontDefault =
 		io.Fonts->AddFontFromFileTTF(
 			"VolcaniCore/assets/fonts/JetBrainsMono-Regular.ttf", fontSize);
-
-	// Events::RegisterListener<KeyPressedEvent>(
-	// 	[&io](KeyPressedEvent& event)
-	// 	{
-	// 		event.Handled = io.WantCaptureKeyboard;
-	// 	});
-	Events::RegisterListener<MouseButtonPressedEvent>(
-		[&io](MouseButtonPressedEvent& event)
-		{
-			event.Handled = io.WantCaptureMouse;
-		});
-	Events::RegisterListener<MouseButtonReleasedEvent>(
-		[&io](MouseButtonReleasedEvent& event)
-		{
-			event.Handled = io.WantCaptureMouse;
-		});
-	Events::RegisterListener<MouseScrolledEvent>(
-		[&io](MouseScrolledEvent& event)
-		{
-			event.Handled = io.WantCaptureMouse;
-		});
-	Events::RegisterListener<MouseMovedEvent>(
-		[&io](MouseMovedEvent& event)
-		{
-			event.Handled = io.WantCaptureMouse;
-		});
-	Events::RegisterListener<WindowResizedEvent>(
-		[&io](const WindowResizedEvent& event)
-		{
-			io.DisplaySize = ImVec2(event.Width, event.Height);
-		});
 }
 
 void Close() {

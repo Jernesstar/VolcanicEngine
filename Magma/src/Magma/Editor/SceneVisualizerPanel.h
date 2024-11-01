@@ -5,6 +5,7 @@
 #include "Scene/Scene.h"
 
 #include "UI/Image.h"
+#include "UI/Button.h"
 
 namespace Magma {
 
@@ -15,7 +16,6 @@ struct EditorEntity {
 
 class SceneVisualizerPanel : public Panel {
 public:
-	SceneVisualizerPanel();
 	SceneVisualizerPanel(Ref<Scene> scene);
 	~SceneVisualizerPanel() = default;
 
@@ -31,8 +31,9 @@ public:
 
 private:
 	Ref<Scene> m_Context;
-	Ref<UI::Image> m_Image;
 	EditorEntity m_Selected;
+
+	Ref<UI::Image> m_Image;
 };
 
 }

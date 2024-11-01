@@ -61,9 +61,6 @@ SceneTab::~SceneTab() {
 void SceneTab::Update(TimeStep ts) {
 	m_Name = "Scene: " + m_Scene->Name;
 
-	if(m_SceneState == SceneState::Play)
-		m_Scene->OnUpdate(ts);
-
 	auto hierarchy = GetPanel("SceneHierarchy")->As<SceneHierarchyPanel>();
 	auto visual = GetPanel("SceneVisualizer")->As<SceneVisualizerPanel>();
 
@@ -116,6 +113,8 @@ void SceneTab::Render() {
 		SaveScene();
 	if(menu.edit.addEntity)
 		AddEntity();
+
+	ToolbarUI();
 
 	for(auto panel : m_Panels)
 		if(panel->IsOpen())
@@ -198,9 +197,7 @@ void SceneTab::ToolbarUI() {
 			   | ImGuiWindowFlags_NoScrollWithMouse;
 	ImGui::Begin("##toolbar", nullptr, flags);
 	{
-		bool hasPlayButton = m_SceneState != SceneState::Play;
-
-		if(hasPlayButton)
+		if(m_SceneState == SceneState::Play)
 			m_PlayButton->Render();
 		else
 			m_PauseButton->Render();
@@ -209,6 +206,8 @@ void SceneTab::ToolbarUI() {
 	}
 	ImGui::End();
 
+	ImGui::PopStyleColor(3);
+	ImGui::PopStyleVar(2);
 }
 
 }
