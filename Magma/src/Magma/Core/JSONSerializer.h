@@ -10,19 +10,21 @@
 
 using namespace rapidjson;
 
-namespace VolcaniCore {
+namespace Magma {
 
 class JSONSerializer : public Serializer {
 public:
 	JSONSerializer();
 	~JSONSerializer() = default;
 
+	Serializer& SetOptions(Serializer::Options options) override;
+
 	JSONSerializer& BeginSequence() override;
 	JSONSerializer& EndSequence() override;
 	JSONSerializer& BeginMapping() override;
 	JSONSerializer& EndMapping() override;
 
-	JSONSerializer& WriteKey(const std::string& name) override;
+	Serializer& WriteKey(const std::string& name) override;
 
 	JSONSerializer& Write(uint32_t value) override;
 	JSONSerializer& Write(int32_t value) override;
@@ -35,7 +37,7 @@ public:
 	JSONSerializer& Write(const glm::vec3& value) override;
 	JSONSerializer& Write(const glm::vec4& value) override;
 
-	JSONSerializer& Write(const std::string& value) override;
+	JSONSerializer& Write(const char* value) override;
 
 	void Finalize(const std::string& path) override;
 

@@ -5,12 +5,14 @@
 #define YAML_CPP_STATIC_DEFINE
 #include <yaml-cpp/yaml.h>
 
-namespace VolcaniCore {
+namespace Magma {
 
 class YAMLSerializer : public Serializer {
 public:
 	YAMLSerializer() = default;
 	~YAMLSerializer() = default;
+
+	Serializer& SetOptions(Serializer::Options options) override;
 
 	YAMLSerializer& BeginSequence() override;
 	YAMLSerializer& EndSequence() override;
@@ -30,7 +32,7 @@ public:
 	YAMLSerializer& Write(const glm::vec3& value) override;
 	YAMLSerializer& Write(const glm::vec4& value) override;
 
-	YAMLSerializer& Write(const std::string& value) override;
+	YAMLSerializer& Write(const char* value) override;
 
 	void Finalize(const std::string& path) override;
 

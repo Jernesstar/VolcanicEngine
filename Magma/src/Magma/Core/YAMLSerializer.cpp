@@ -24,7 +24,14 @@ YAML::Emitter& operator <<(YAML::Emitter& out, const glm::vec4& v) {
 
 }
 
-namespace VolcaniCore {
+namespace Magma {
+
+Serializer& YAMLSerializer::SetOptions(Serializer::Options options) {
+	if(options == Serializer::Options::ArrayOneLine)
+		m_Out << YAML::Flow;
+	return *this;
+}
+
 
 YAMLSerializer& YAMLSerializer::BeginSequence() {
 	m_Out << YAML::BeginSeq;
@@ -91,7 +98,7 @@ YAMLSerializer& YAMLSerializer::Write(const glm::vec4& value) {
 	return *this;
 }
 
-YAMLSerializer& YAMLSerializer::Write(const std::string& value) {
+YAMLSerializer& YAMLSerializer::Write(const char* value) {
 	m_Out << YAML::Value << value;
 	return *this;
 }

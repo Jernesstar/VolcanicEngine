@@ -6,11 +6,14 @@
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 
-namespace VolcaniCore {
+using namespace VolcaniCore;
+
+namespace Magma {
 
 class Serializer {
 public:
 	enum class Format { YAML, JSON };
+	enum class Options { ArrayOneLine };
 
 public:
 	Ref<Serializer> Create(Serializer::Format format);
@@ -18,6 +21,8 @@ public:
 public:
 	Serializer() = default;
 	virtual ~Serializer() = default;
+
+	virtual Serializer& SetOptions(Serializer::Options options) = 0;
 
 	virtual Serializer& BeginSequence() = 0;
 	virtual Serializer& EndSequence() = 0;
@@ -37,16 +42,21 @@ public:
 	virtual Serializer& Write(const glm::vec3& value) = 0;
 	virtual Serializer& Write(const glm::vec4& value) = 0;
 
-	virtual Serializer& Write(const std::string& value) = 0;
+	virtual Serializer& Write(const char* value) = 0;
+
+	template<typename TData>
+	Serializer& Write(const TData& value);
 
 	template<typename TData>
 	Serializer& Write(const List<TData>& values) {
+		BeginSequence();
+
 		for(const auto& val : values)
 			Write(val);
-	}
 
-	template<typename TData>
-	Serializer& WriteObject(const TData& value);
+		EndSequence();
+		return *this;
+	}
 
 	// template<typename TData>
 	// Serializer& Read(const std::string& name, TData& value);

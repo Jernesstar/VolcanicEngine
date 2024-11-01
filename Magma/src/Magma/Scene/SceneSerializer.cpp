@@ -6,7 +6,7 @@
 #include <VolcaniCore/Renderer/StereographicCamera.h>
 #include <VolcaniCore/Renderer/OrthographicCamera.h>
 
-#include "Core/AssetManager.cpp"
+#include "Core/AssetManager.h"
 #include "Core/YAMLSerializer.h"
 
 using namespace Magma::ECS;
@@ -17,10 +17,16 @@ namespace Magma {
 static void SerializeEntity(YAMLSerializer& out, Entity& entity);
 static void DeserializeEntity(YAML::Node entityNode, Scene* scene);
 
-// template<>
-// Serializer& Serializer::WriteObject(const VolcaniCore::Vertex& value) {
-	
-// }
+template<>
+Serializer& Serializer::Write(const VolcaniCore::Vertex& value) {
+	SetOptions(Serializer::Options::ArrayOneLine);
+	BeginSequence();
+	Write(value.Position);
+	Write(value.Normal);
+	Write(value.TexCoord_Color);
+	EndSequence();
+	return *this;
+}
 
 SceneSerializer::SceneSerializer(Scene* scene)
 	: m_Scene(scene) { }
@@ -72,6 +78,7 @@ void SceneSerializer::Deserialize(const std::string& path) {
 
 void SerializeEntity(YAMLSerializer& serializer, Entity& entity) {
 	serializer.WriteKey("Entity").BeginMapping(); // Entity
+
 	serializer.WriteKey("ID").Write((uint64_t)entity.GetHandle());
 
 	serializer.WriteKey("Components")
@@ -122,8 +129,13 @@ void SerializeEntity(YAMLSerializer& serializer, Entity& entity) {
 		if(mesh->Path != "")
 			serializer.WriteKey("Path").Write(mesh->Path);
 		else {
-			// serializer.WriteKey("Vertices").Write(mesh->GetVertices());
-			serializer.WriteKey("Indices").Write(mesh->GetIndices());
+			serializer.WriteKey("Vertices")
+			.SetOptions(Serializer::Options::ArrayOneLine)
+			.Write(mesh->GetVertices());
+
+			serializer.WriteKey("Indices")
+			.SetOptions(Serializer::Options::ArrayOneLine)
+			.Write(mesh->GetIndices());
 
 			serializer.WriteKey("Material")
 			.BeginMapping();
@@ -207,9 +219,9 @@ void SerializeEntity(YAMLSerializer& serializer, Entity& entity) {
 			.WriteKey("Scale")		.Write(s)
 		.EndMapping(); // TransformComponent
 	}
-	serializer
-	.EndMapping() // Components
- 	.EndMapping(); // Entity
+	serializer.EndMapping(); // Components
+
+	serializer.EndMapping(); // Entity
 }
 
 void DeserializeEntity(YAML::Node entityNode, Scene* scene) {
