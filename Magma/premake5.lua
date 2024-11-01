@@ -22,6 +22,7 @@ project "Magma"
         "%{Includes.yaml_cpp}",
         "%{Includes.ImGuiFileDialog}",
         "%{Includes.flecs}",
+        "%{Includes.rapidjson}",
         "%{Includes.PhysX}",
 
         "%{Includes.glm}",
@@ -37,6 +38,7 @@ project "Magma"
         "yaml-cpp",
         "ImGuiFileDialog",
         "flecs",
+        "rapidjson",
         -- "PhysX",
     }
 
@@ -54,4 +56,5 @@ include "Magma/.builddeps/imgui"
 include "Magma/.builddeps/yaml-cpp"
 include "Magma/.builddeps/ImGuiFileDialog"
 include "Magma/.builddeps/flecs"
+include "Magma/.builddeps/rapidjson"
 -- include "Magma/.builddeps/PhysX"

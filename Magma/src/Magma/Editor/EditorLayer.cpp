@@ -16,12 +16,13 @@ namespace Magma {
 
 struct {
 	struct {
-		bool newProject = false;
+		bool newProject  = false;
 		bool openProject = false;
 		bool saveProject = false;
+		bool runProject  = false;
 
 		operator bool() const {
-			return newProject || openProject || saveProject;
+			return newProject || openProject || saveProject || runProject;
 		}
 	} project;
 
@@ -42,7 +43,7 @@ EditorLayer::EditorLayer() {
 }
 
 EditorLayer::~EditorLayer() {
-	m_Project->Save("Magma/assets/scenes/temp.volc.proj");
+	m_Project->Save();
 }
 
 void EditorLayer::Update(TimeStep ts) {
@@ -85,6 +86,8 @@ void EditorLayer::Render() {
 					menu.project.openProject = true;
 				if(ImGui::MenuItem("Save", "Ctrl+S"))
 					menu.project.saveProject = true;
+				if(ImGui::MenuItem("Run", "Ctrl+R"))
+					menu.project.runProject = true;
 
 				ImGui::EndMenu();
 			}
@@ -158,6 +161,24 @@ void EditorLayer::Render() {
 		OpenProject();
 	if(menu.project.saveProject)
 		SaveProject();
+	if(menu.project.runProject)
+		RunProject();
+}
+
+void EditorLayer::NewTab(Ref<Tab> tab) {
+	m_Tabs.push_back(tab);
+	m_CurrentTab = tab;
+}
+
+void EditorLayer::NewTab(Ref<Scene> scene) {
+	Ref<Tab> newTab = CreateRef<SceneTab>(scene);
+	m_Tabs.push_back(newTab);
+	m_CurrentTab = newTab;
+}
+
+void EditorLayer::NewTab() {
+	// TODO(Implement): Dialog box to pick which kind of new tab to create:
+	// Scene, UI, or Level
 }
 
 void EditorLayer::NewProject() {
@@ -183,36 +204,13 @@ void EditorLayer::OpenProject() {
 }
 
 void EditorLayer::SaveProject() {
-	IGFD::FileDialogConfig config;
-	config.path = ".";
-	auto instance = ImGuiFileDialog::Instance();
-	instance->OpenDialog("ChooseFile", "Choose File", ".volc.proj", config);
-
-	if(instance->Display("ChooseFile")) {
-		if(instance->IsOk()) {
-			std::string path = instance->GetFilePathName();
-			m_Project->Save(path);
-		}
-
-		instance->Close();
-		menu.project.saveProject = false;
-	}
+	m_Project->Save();
+	menu.project.saveProject = false;
 }
 
-void EditorLayer::NewTab(Ref<Tab> tab) {
-	m_Tabs.push_back(tab);
-	m_CurrentTab = tab;
-}
-
-void EditorLayer::NewTab(Ref<Scene> scene) {
-	Ref<Tab> newTab = CreateRef<SceneTab>(scene);
-	m_Tabs.push_back(newTab);
-	m_CurrentTab = newTab;
-}
-
-void EditorLayer::NewTab() {
-	// TODO(Implement): Dialog box to pick which kind of new tab to create:
-	// Scene, UI, or Level
+void EditorLayer::RunProject() {
+	m_Project->Run();
+	menu.project.runProject = false;
 }
 
 }

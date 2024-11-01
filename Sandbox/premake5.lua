@@ -30,6 +30,7 @@ project "Sandbox"
         "%{Includes.yaml_cpp}",
         "%{Includes.ImGuiFileDialog}",
         "%{Includes.flecs}",
+        "%{Includes.rapidjson}",
         "%{Includes.PhysX}",
 
         "%{Includes.glfw}",
@@ -54,6 +55,7 @@ project "Sandbox"
         "yaml-cpp",
         "ImGuiFileDialog",
         "flecs",
+        "rapidjson",
         -- "PhysX",
     }
 

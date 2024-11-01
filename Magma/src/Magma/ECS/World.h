@@ -1,6 +1,6 @@
 #pragma once
 
-#include <flecs.h>
+#include <flecs/flecs.h>
 
 #include <VolcaniCore/Core/Time.h>
 #include <VolcaniCore/Core/Defines.h>

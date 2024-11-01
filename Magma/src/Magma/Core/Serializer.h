@@ -40,7 +40,13 @@ public:
 	virtual Serializer& Write(const std::string& value) = 0;
 
 	template<typename TData>
-	Serializer& WriteObject(const std::string& name, const TData& value);
+	Serializer& Write(const List<TData>& values) {
+		for(const auto& val : values)
+			Write(val);
+	}
+
+	template<typename TData>
+	Serializer& WriteObject(const TData& value);
 
 	// template<typename TData>
 	// Serializer& Read(const std::string& name, TData& value);

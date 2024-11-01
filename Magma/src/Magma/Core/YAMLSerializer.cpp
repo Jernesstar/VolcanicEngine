@@ -4,49 +4,49 @@
 
 namespace YAML {
 
-// YAML::Emitter& operator <<(YAML::Emitter& out, const glm::vec2& v) {
-// 	out << YAML::Flow;
-// 	out << YAML::BeginSeq << v.x << v.y << YAML::EndSeq;
-// 	return out;
-// }
+YAML::Emitter& operator <<(YAML::Emitter& out, const glm::vec2& v) {
+	out << YAML::Flow;
+	out << YAML::BeginSeq << v.x << v.y << YAML::EndSeq;
+	return out;
+}
 
-// YAML::Emitter& operator <<(YAML::Emitter& out, const glm::vec3& v) {
-// 	out << YAML::Flow;
-// 	out << YAML::BeginSeq << v.x << v.y << v.z << YAML::EndSeq;
-// 	return out;
-// }
+YAML::Emitter& operator <<(YAML::Emitter& out, const glm::vec3& v) {
+	out << YAML::Flow;
+	out << YAML::BeginSeq << v.x << v.y << v.z << YAML::EndSeq;
+	return out;
+}
 
-// YAML::Emitter& operator <<(YAML::Emitter& out, const glm::vec4& v) {
-// 	out << YAML::Flow;
-// 	out << YAML::BeginSeq << v.x << v.y << v.z << v.w << YAML::EndSeq;
-// 	return out;
-// }
+YAML::Emitter& operator <<(YAML::Emitter& out, const glm::vec4& v) {
+	out << YAML::Flow;
+	out << YAML::BeginSeq << v.x << v.y << v.z << v.w << YAML::EndSeq;
+	return out;
+}
 
 }
 
 namespace VolcaniCore {
 
-Serializer& YAMLSerializer::BeginSequence() {
+YAMLSerializer& YAMLSerializer::BeginSequence() {
 	m_Out << YAML::BeginSeq;
 	return *this;
 }
 
-Serializer& YAMLSerializer::EndSequence() {
+YAMLSerializer& YAMLSerializer::EndSequence() {
 	m_Out << YAML::EndSeq;
 	return *this;
 }
 
-Serializer& YAMLSerializer::BeginMapping() {
+YAMLSerializer& YAMLSerializer::BeginMapping() {
 	m_Out << YAML::BeginMap;
 	return *this;
 }
 
-Serializer& YAMLSerializer::EndMapping() {
+YAMLSerializer& YAMLSerializer::EndMapping() {
 	m_Out << YAML::EndMap;
 	return *this;
 }
 
-YAMLSerializer& YAMLSerializer::WriteKey(const std::string& name) {
+Serializer& YAMLSerializer::WriteKey(const std::string& name) {
 	m_Out << YAML::Key << name;
 	return *this;
 }
@@ -77,17 +77,17 @@ YAMLSerializer& YAMLSerializer::Write(float value) {
 }
 
 YAMLSerializer& YAMLSerializer::Write(const glm::vec2& value) {
-	// m_Out << YAML::Value << value;
+	m_Out << YAML::Value << value;
 	return *this;
 }
 
 YAMLSerializer& YAMLSerializer::Write(const glm::vec3& value) {
-	// m_Out << YAML::Value << value;
+	m_Out << YAML::Value << value;
 	return *this;
 }
 
 YAMLSerializer& YAMLSerializer::Write(const glm::vec4& value) {
-	// m_Out << YAML::Value << value;
+	m_Out << YAML::Value << value;
 	return *this;
 }
 

@@ -33,3 +33,6 @@
 [submodule "Magma/vendor/PhysX"]
 	path = Magma/vendor/PhysX
 	url = https://github.com/NVIDIA-Omniverse/PhysX.git
+[submodule "Magma/vendor/rapidjson"]
+	path = Magma/vendor/rapidjson
+	url = https://github.com/Tencent/rapidjson.git

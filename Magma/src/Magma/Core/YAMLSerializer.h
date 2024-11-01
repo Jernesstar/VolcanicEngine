@@ -12,12 +12,12 @@ public:
 	YAMLSerializer() = default;
 	~YAMLSerializer() = default;
 
-	Serializer& BeginSequence() override;
-	Serializer& EndSequence() override;
-	Serializer& BeginMapping() override;
-	Serializer& EndMapping() override;
+	YAMLSerializer& BeginSequence() override;
+	YAMLSerializer& EndSequence() override;
+	YAMLSerializer& BeginMapping() override;
+	YAMLSerializer& EndMapping() override;
 
-	YAMLSerializer& WriteKey(const std::string& name) override;
+	Serializer& WriteKey(const std::string& name) override;
 
 	YAMLSerializer& Write(uint32_t value) override;
 	YAMLSerializer& Write(int32_t value) override;
@@ -33,8 +33,6 @@ public:
 	YAMLSerializer& Write(const std::string& value) override;
 
 	void Finalize(const std::string& path) override;
-
-	YAML::Emitter& Get() { return m_Out; }
 
 private:
 	YAML::Emitter m_Out;

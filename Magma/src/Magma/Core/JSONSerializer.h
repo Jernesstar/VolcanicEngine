@@ -2,23 +2,47 @@
 
 #include "Serializer.h"
 
-#include <glm/vec2.hpp>
-#include <glm/vec3.hpp>
-#include <glm/vec4.hpp>
+#define RAPIDJSON_HAS_STDSTRING 1
+#include <rapidjson/rapidjson.h>
+#include <rapidjson/document.h>
+#include <rapidjson/prettywriter.h>
+#include <rapidjson/stringbuffer.h>
+
+using namespace rapidjson;
 
 namespace VolcaniCore {
 
 class JSONSerializer : public Serializer {
 public:
-	JSONSerializer() = default;
+	JSONSerializer();
 	~JSONSerializer() = default;
 
+	JSONSerializer& BeginSequence() override;
+	JSONSerializer& EndSequence() override;
+	JSONSerializer& BeginMapping() override;
+	JSONSerializer& EndMapping() override;
+
+	JSONSerializer& WriteKey(const std::string& name) override;
+
+	JSONSerializer& Write(uint32_t value) override;
 	JSONSerializer& Write(int32_t value) override;
+	JSONSerializer& Write(uint64_t value) override;
+	JSONSerializer& Write(int64_t value) override;
+
+	JSONSerializer& Write(float value) override;
+
+	JSONSerializer& Write(const glm::vec2& value) override;
+	JSONSerializer& Write(const glm::vec3& value) override;
+	JSONSerializer& Write(const glm::vec4& value) override;
+
+	JSONSerializer& Write(const std::string& value) override;
 
 	void Finalize(const std::string& path) override;
 
 private:
-	// JSON::Emitter m_Out;
+	// Document m_Doc;
+	StringBuffer m_Buffer;
+	PrettyWriter<StringBuffer> m_Writer;
 };
 
 }

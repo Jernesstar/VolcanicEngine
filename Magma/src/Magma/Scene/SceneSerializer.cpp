@@ -1,8 +1,6 @@
 #include "SceneSerializer.h"
 #include "Scene.h"
 
-#include <fstream>
-
 #include <VolcaniCore/Core/Assert.h>
 #include <VolcaniCore/Core/UUID.h>
 #include <VolcaniCore/Renderer/StereographicCamera.h>
@@ -14,40 +12,15 @@
 using namespace Magma::ECS;
 using namespace Magma::Physics;
 
-namespace YAML {
-
-YAML::Emitter& operator <<(YAML::Emitter& out, const glm::vec2& v) {
-	out << YAML::Flow;
-	out << YAML::BeginSeq << v.x << v.y << YAML::EndSeq;
-	return out;
-}
-
-YAML::Emitter& operator <<(YAML::Emitter& out, const glm::vec3& v) {
-	out << YAML::Flow;
-	out << YAML::BeginSeq << v.x << v.y << v.z << YAML::EndSeq;
-	return out;
-}
-
-YAML::Emitter& operator <<(YAML::Emitter& out, const glm::vec4& v) {
-	out << YAML::Flow;
-	out << YAML::BeginSeq << v.x << v.y << v.z << v.w << YAML::EndSeq;
-	return out;
-}
-
-YAML::Emitter& operator <<(YAML::Emitter& out, const VolcaniCore::Vertex& v) {
-	out << YAML::Flow;
-	out << YAML::BeginSeq;
-	out << v.Position << v.Normal << v.TexCoord_Color;
-	out << YAML::EndSeq;
-	return out;
-}
-
-}
-
 namespace Magma {
 
 static void SerializeEntity(YAMLSerializer& out, Entity& entity);
 static void DeserializeEntity(YAML::Node entityNode, Scene* scene);
+
+// template<>
+// Serializer& Serializer::WriteObject(const VolcaniCore::Vertex& value) {
+	
+// }
 
 SceneSerializer::SceneSerializer(Scene* scene)
 	: m_Scene(scene) { }
@@ -98,8 +71,6 @@ void SceneSerializer::Deserialize(const std::string& path) {
 }
 
 void SerializeEntity(YAMLSerializer& serializer, Entity& entity) {
-	auto& out = serializer.Get();
-
 	serializer.WriteKey("Entity").BeginMapping(); // Entity
 	serializer.WriteKey("ID").Write((uint64_t)entity.GetHandle());
 
@@ -151,8 +122,8 @@ void SerializeEntity(YAMLSerializer& serializer, Entity& entity) {
 		if(mesh->Path != "")
 			serializer.WriteKey("Path").Write(mesh->Path);
 		else {
-			out << YAML::Key << "Vertices" << YAML::Flow << mesh->GetVertices();
-			out << YAML::Key << "Indices" << YAML::Flow << mesh->GetIndices();
+			// serializer.WriteKey("Vertices").Write(mesh->GetVertices());
+			serializer.WriteKey("Indices").Write(mesh->GetIndices());
 
 			serializer.WriteKey("Material")
 			.BeginMapping();
