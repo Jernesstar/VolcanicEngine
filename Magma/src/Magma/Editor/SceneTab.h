@@ -15,7 +15,7 @@ public:
 	SceneTab(Ref<Scene> scene);
 	~SceneTab();
 
-	void Update(VolcaniCore::TimeStep ts) override;
+	void Update(TimeStep ts) override;
 	void Render() override;
 
 private:

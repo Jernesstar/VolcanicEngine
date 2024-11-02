@@ -4,7 +4,7 @@
 
 #include <Core/Defines.h>
 
-#include <Object/Texture.h>
+#include "Core/JSONSerializer.h"
 
 using namespace VolcaniCore;
 
@@ -42,6 +42,9 @@ public:
 
 	void Render();
 
+	void Load(const std::string& path);
+	void Save(const std::string& path);
+
 	Ref<UIElement> Add(Ref<UIElement> element);
 
 	template<typename TUIElement, typename ...Args>
@@ -63,6 +66,8 @@ public:
 	float GetPositionX() const { return x; }
 	float GetPositionY() const { return y; }
 
+	glm::vec4 GetColor() const { return m_Color; }
+
 	UIElement* SetSize(uint32_t width, uint32_t height) {
 		this->m_Width = width;
 		this->m_Height = height;
@@ -83,6 +88,9 @@ protected:
 	virtual bool OnAttach() = 0;
 	virtual bool OnAddElement(Ref<UIElement> element) = 0;
 
+	virtual void OnSerialize(Serializer& serializer) = 0;
+	// virtual void OnParse(Parser& parser) = 0;
+
 protected:
 	const Type m_Type;
 
@@ -94,6 +102,9 @@ protected:
 	float x = 0;
 	float y = 0;
 	glm::vec4 m_Color;
+
+private:
+	void Serialize(UIElement* element, Serializer& serializer);
 };
 
 }

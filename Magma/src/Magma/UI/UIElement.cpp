@@ -2,9 +2,15 @@
 
 #include <imgui/imgui.h>
 
+
 using namespace VolcaniCore;
 
 namespace Magma::UI {
+
+// Ref<UIElement> UIElement::Create(const UIElement::Specification& specs) {
+// 	return CreateRef<UIElement>(specs.Width, specs.Height, specs.x, specs.y,
+// 								specs.Color);
+// }
 
 // UIElement::UIElement()
 // 	: UIElement(UIElement::Type::Type)
@@ -22,11 +28,6 @@ namespace Magma::UI {
 
 // bool UIElement::OnAddElement(Ref<UIElement> element) {
 
-// }
-
-// Ref<UIElement> UIElement::Create(const UIElement::Specification& specs) {
-// 	return CreateRef<UIElement>(specs.Width, specs.Height, specs.x, specs.y,
-// 								specs.Color);
 // }
 
 UIElement::UIElement(UIElement::Type type,
@@ -57,6 +58,51 @@ void UIElement::Render() {
 
 	if(this->GetType() == UIElement::Type::Window)
 		ImGui::End();
+}
+
+void UIElement::Load(const std::string& path) {
+
+}
+
+void UIElement::Save(const std::string& path) {
+	JSONSerializer serializer;
+	serializer.BeginMapping(); // File
+
+	Serialize(this, serializer);
+
+	serializer.EndMapping(); // File
+}
+
+void UIElement::Serialize(UIElement* element, Serializer& serializer) {
+	if(element->GetType() == UIElement::Type::Empty)
+		serializer.WriteKey("Empty");
+	if(element->GetType() == UIElement::Type::Window)
+		serializer.WriteKey("Window");
+	if(element->GetType() == UIElement::Type::Button)
+		serializer.WriteKey("Button");
+	if(element->GetType() == UIElement::Type::Dropdown)
+		serializer.WriteKey("Dropdown");
+	if(element->GetType() == UIElement::Type::Text)
+		serializer.WriteKey("Text");
+	if(element->GetType() == UIElement::Type::TextInput)
+		serializer.WriteKey("TextInput");
+	if(element->GetType() == UIElement::Type::Image)
+		serializer.WriteKey("Image");
+
+	serializer
+	.BeginMapping()
+		.WriteKey("Width").Write(element->GetWidth())
+		.WriteKey("Height").Write(element->GetHeight())
+		.WriteKey("x").Write(element->GetPositionX())
+		.WriteKey("y").Write(element->GetPositionY())
+		.WriteKey("Color").Write(element->GetColor());
+
+	element->OnSerialize(serializer);
+
+	serializer.WriteKey("Children").BeginSequence();
+	for(auto child : m_Children)
+		Serialize(child.get(), serializer);
+	serializer.EndSequence();
 }
 
 }
