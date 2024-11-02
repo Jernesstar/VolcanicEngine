@@ -99,6 +99,8 @@ void UIElement::Serialize(UIElement* element, Serializer& serializer) {
 
 	element->OnSerialize(serializer);
 
+	serializer.EndMapping();
+
 	serializer.WriteKey("Children").BeginSequence();
 	for(auto child : m_Children)
 		Serialize(child.get(), serializer);

@@ -5,6 +5,7 @@
 #include <Core/Defines.h>
 
 #include "Core/JSONSerializer.h"
+#include "Core/JSONParser.h"
 
 using namespace VolcaniCore;
 
@@ -89,7 +90,7 @@ protected:
 	virtual bool OnAddElement(Ref<UIElement> element) = 0;
 
 	virtual void OnSerialize(Serializer& serializer) = 0;
-	// virtual void OnParse(Parser& parser) = 0;
+	virtual void OnParse(Parser& parser) = 0;
 
 protected:
 	const Type m_Type;

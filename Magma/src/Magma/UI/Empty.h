@@ -16,6 +16,8 @@ private:
 	void Draw() override { }
 	bool OnAttach() override { return true; }
 	bool OnAddElement(Ref<UIElement> element) override { return true; }
+	void OnSerialize(Serializer& serializer) override { }
+	void OnParse(Parser& parser) override { }
 };
 
 }
