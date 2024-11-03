@@ -6,7 +6,6 @@
 #include "Physics/World.h"
 
 #include "SceneRenderer.h"
-#include "SceneSerializer.h"
 
 using namespace VolcaniCore;
 
@@ -29,6 +28,10 @@ public:
 	void Load(const std::string& path);
 	void Save(const std::string& path);
 
+	void SetRenderer(const SceneRenderer& renderer) {
+		m_Renderer = renderer;
+		m_Renderer.SetContext(this);
+	}
 	SceneRenderer& GetRenderer() { return m_Renderer; }
 
 private:
@@ -38,8 +41,6 @@ private:
 private:
 	void RegisterSystems();
 	void RegisterObservers();
-
-	friend class Editor;
 };
 
 }

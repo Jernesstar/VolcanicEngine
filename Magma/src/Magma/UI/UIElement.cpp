@@ -60,10 +60,6 @@ void UIElement::Render() {
 		ImGui::End();
 }
 
-void UIElement::Load(const std::string& path) {
-
-}
-
 void UIElement::Save(const std::string& path) {
 	JSONSerializer serializer;
 	serializer.BeginMapping(); // File

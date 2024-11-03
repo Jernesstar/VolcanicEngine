@@ -12,6 +12,10 @@ public:
 		m_Element = CreateRef<TUIElement>();
 	}
 
+	UIBuilder(const std::string& path) {
+		// JSONParser& parser;
+	}
+
 	UIBuilder(const TUIElement::Specification& specs) {
 		m_Element = TUIElement::Create(specs);
 	}
@@ -42,7 +46,7 @@ public:
 
 	Ref<TUIElement> Finalize() const { return m_Element; }
 
-public:
+private:
 	Ref<TUIElement> m_Element;
 };
 

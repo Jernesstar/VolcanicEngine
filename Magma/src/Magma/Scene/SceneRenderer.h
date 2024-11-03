@@ -17,12 +17,29 @@ class Scene;
 
 class SceneRenderer {
 public:
-	// TODO(Change): Rename to BloomPass or LightingPass, has its own render function
+	SceneRenderer() = default;
+	virtual ~SceneRenderer() = default;
+
+	virtual void Update(TimeStep ts) = 0;
+	virtual void Render() = 0;
+
+	void SetContext(Scene* scene) {
+		m_Scene = scene;
+	}
+	Ref<Framebuffer> GetOutput() { return m_Output; }
+
+protected:
+	Scene* m_Scene;
+	Ref<Framebuffer> m_Output;
+};
+
+class DefaultSceneRenderer : public SceneRenderer {
+public:
 	struct Options {
 		struct Lighting {
 			bool Enabled = false;
 		} LightingOptions;
-
+		
 		struct Bloom {
 			bool Enabled	   = false;
 			float Exposure	   = 1.0f;
@@ -32,28 +49,23 @@ public:
 	};
 
 public:
-	SceneRenderer() = default;
-	SceneRenderer(Scene* scene);
-	~SceneRenderer() = default;
+	DefaultSceneRenderer() = default;
+	DefaultSceneRenderer(Scene* scene);
+	~DefaultSceneRenderer() = default;
 
-	void Render();
-	void UpdateCamera(TimeStep ts);
-	void UpdatePasses();
+	void Update(TimeStep ts) override;
+	void Render() override;
 
-	const SceneRenderer::Options& GetOptions() const { return m_Options; }
-	Ref<Framebuffer> GetOutput() { return m_Output; }
+	const Options& GetOptions() const { return m_Options; }
 	CameraController& GetCameraController() { return m_Controller; }
 
 private:
-	Scene* m_Scene;
-	SceneRenderer::Options m_Options;
+	Options m_Options;
 	
 	Ref<RenderPass> m_DrawPass;
 	Ref<RenderPass> m_LightingPass;
-	// TODO(Implement): List of Framebuffer's for multiple targets, i.e Player pov, bird's eye view pov
 	Ref<Framebuffer> m_Output;
 
-	// TODO(Implement): CameraControllerEntity
 	CameraController m_Controller;
 
 	flecs::system m_RenderSystem;

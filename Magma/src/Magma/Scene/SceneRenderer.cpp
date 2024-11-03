@@ -13,7 +13,7 @@ using namespace Magma::ECS;
 
 namespace Magma {
 
-SceneRenderer::SceneRenderer(Scene* scene)
+DefaultSceneRenderer::DefaultSceneRenderer(Scene* scene)
 	: m_Scene(scene)
 {
 	Ref<ShaderPipeline> shader;
@@ -48,7 +48,7 @@ SceneRenderer::SceneRenderer(Scene* scene)
 		});
 }
 
-void SceneRenderer::UpdateCamera(TimeStep ts) {
+void DefaultSceneRenderer::UpdateCamera(TimeStep ts) {
 	auto cameraEntity = m_Scene->EntityWorld.GetEntity("MainCamera");
 	if(!cameraEntity.IsValid())
 		return;
@@ -64,11 +64,11 @@ void SceneRenderer::UpdateCamera(TimeStep ts) {
 	cc.Direction = camera->GetDirection();
 }
 
-void SceneRenderer::UpdatePasses() {
+void DefaultSceneRenderer::UpdatePasses() {
 
 }
 
-void SceneRenderer::Render() {
+void DefaultSceneRenderer::Render() {
 	auto camera = m_Controller.GetCamera();
 
 	Renderer::StartPass(m_DrawPass);

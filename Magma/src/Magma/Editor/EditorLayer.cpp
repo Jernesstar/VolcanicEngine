@@ -20,20 +20,12 @@ struct {
 		bool openProject = false;
 		bool saveProject = false;
 		bool runProject  = false;
-
-		operator bool() const {
-			return newProject || openProject || saveProject || runProject;
-		}
 	} project;
-
-	operator bool() const {
-		return project;
-	}
 } menu;
 
 EditorLayer::EditorLayer() {
 	NewProject();
-	m_Project->Load("Magma/assets/scenes/temp.volc.proj");
+	m_Project->Load("Magma/projects/Project/.volc.proj");
 
 	auto scene1 = CreateRef<Scene>();
 	scene1->Load("Magma/assets/scenes/temp.magma.scene");
@@ -129,10 +121,8 @@ void EditorLayer::Render() {
 				}
 				
 				auto closeButtonID = ImGui::GetID(("Close##" + strID).c_str());
-				if(ImGui::CloseButton(closeButtonID, pos)) {
-					tab->GetPanel("SceneHierarchy")->Close();
+				if(ImGui::CloseButton(closeButtonID, pos))
 					tabToDelete = tab;
-				}
 			}
 
 			if(tabToDelete != nullptr) {

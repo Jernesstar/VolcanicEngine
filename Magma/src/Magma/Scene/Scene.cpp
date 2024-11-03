@@ -5,8 +5,7 @@
 
 #include "ECS/PhysicsSystem.h"
 
-#include "SceneRenderer.h"
-#include "SceneSerializer.h"
+#include "DefaultSceneRenderer.h"
 
 using namespace Magma::ECS;
 using namespace Magma::Physics;
@@ -19,7 +18,7 @@ Scene::Scene(const std::string& name)
 	RegisterSystems();
 	RegisterObservers();
 
-	m_Renderer = SceneRenderer{ this };
+	m_Renderer = DefaultSceneRenderer{ this };
 	m_Serializer = SceneSerializer{ this };
 }
 
@@ -29,7 +28,7 @@ Scene::~Scene() {
 
 void Scene::OnUpdate(TimeStep ts) {
 	EntityWorld.OnUpdate(ts);
-	m_Renderer.UpdateCamera(ts);
+	m_Renderer.Update(ts);
 }
 
 void Scene::OnRender() {
