@@ -58,9 +58,6 @@ public:
 		return *this;
 	}
 
-	// template<typename TData>
-	// Serializer& Read(const std::string& name, TData& value);
-
 	virtual void Finalize(const std::string& path) = 0;
 };
 

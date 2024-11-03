@@ -191,7 +191,8 @@ void SerializeEntity(YAMLSerializer& serializer, Entity& entity) {
 					break;
 			}
 
-				serializer.WriteKey("ShapeType").Write(shapeType);
+			serializer
+				.WriteKey("ShapeType").Write(shapeType);
 		}
 			serializer
 			.EndMapping() // Body
