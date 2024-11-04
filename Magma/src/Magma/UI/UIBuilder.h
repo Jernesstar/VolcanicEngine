@@ -11,11 +11,12 @@ public:
 	UIBuilder() {
 		m_Element = CreateRef<TUIElement>();
 	}
-
+	UIBuilder(Ref<UIElement> element) {
+		m_Element = element;
+	}
 	UIBuilder(const std::string& path) {
 		// JSONParser& parser;
 	}
-
 	UIBuilder(const TUIElement::Specification& specs) {
 		m_Element = TUIElement::Create(specs);
 	}
@@ -33,6 +34,7 @@ public:
 	requires std::derived_from<TElement, UIElement>
 	UIBuilder& Add(const TElement::Specification& specs) {
 		return this->Add(TElement::Create(specs));
+		return *this;
 	}
 
 	template<typename TElement, typename ...Args>
@@ -40,11 +42,14 @@ public:
 	UIBuilder& Add(Args&&... args) {
 		Ref<TElement> element{ new TElement(std::forward<Args>(args)...) };
 		return this->Add(element);
+		return *this;
 	}
 
 	operator Ref<UIElement>() const { return Finalize(); }
 
 	Ref<TUIElement> Finalize() const { return m_Element; }
+
+	void Save(const std::string& path);
 
 private:
 	Ref<TUIElement> m_Element;

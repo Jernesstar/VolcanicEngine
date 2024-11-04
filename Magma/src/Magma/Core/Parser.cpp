@@ -3,17 +3,17 @@
 namespace Magma {
 
 template<>
-int64_t Parser::As() {
+int64_t ParserNode::As() {
 	return GetInt();
 }
 
 template<>
-uint64_t Parser::As() {
+uint64_t ParserNode::As() {
 	return GetUInt();
 }
 
 template<>
-float Parser::As() {
+float ParserNode::As() {
 	return GetFloat();
 }
 

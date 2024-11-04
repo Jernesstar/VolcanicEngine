@@ -5,6 +5,9 @@
 #include <imgui/misc/cpp/imgui_stdlib.h>
 #include <ImGuiFileDialog/ImGuiFileDialog.h>
 
+#include "UI/Empty.h"
+#include "UI/UIBuilder.h"
+
 // #include "UIElementPickerPanel.h"
 // #include "UIVisualizerPanel.h"
 
@@ -35,7 +38,7 @@ UITab::UITab(Ref<UI::UIElement> root) {
 }
 
 UITab::~UITab() {
-	m_Root->Save("Magma/assets/scenes/" + m_Scene->Name + ".magma.scene");
+	// UI::UIBuilder(m_Root).Save("Magma/assets/scenes/.magma.ui.json");
 }
 
 void UITab::Update(TimeStep ts) {
@@ -98,7 +101,7 @@ void UITab::Render() {
 }
 
 void UITab::NewUI() {
-	m_Root = CreateRef<UI::UIElement>();
+	m_Root = CreateRef<UI::Empty>();
 	menu.file.newUI = false;
 }
 
@@ -111,7 +114,7 @@ void UITab::OpenUI() {
 	if(instance->Display("ChooseFile")) {
 		if(instance->IsOk()) {
 			std::string path = instance->GetFilePathName();
-			m_Root = UIBuilder(path).Finalize();
+			// m_Root = UI::UIBuilder<UI::UIElement>(path).Finalize();
 		}
 
 		instance->Close();
@@ -128,7 +131,7 @@ void UITab::SaveUI() {
 	if(instance->Display("ChooseFile")) {
 		if(instance->IsOk()) {
 			std::string path = instance->GetFilePathName();
-			m_Root->Save(path);
+			// UI::UIBuilder(m_Root).Save(path);
 		}
 
 		instance->Close();

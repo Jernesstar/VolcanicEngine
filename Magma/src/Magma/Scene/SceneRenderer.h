@@ -18,6 +18,8 @@ class Scene;
 class SceneRenderer {
 public:
 	SceneRenderer() = default;
+	SceneRenderer(Scene* scene)
+		: m_Scene(scene) { }
 	virtual ~SceneRenderer() = default;
 
 	virtual void Update(TimeStep ts) = 0;
@@ -35,17 +37,11 @@ protected:
 
 class DefaultSceneRenderer : public SceneRenderer {
 public:
+	// TODO: Replace with map of string values
 	struct Options {
 		struct Lighting {
 			bool Enabled = false;
 		} LightingOptions;
-		
-		struct Bloom {
-			bool Enabled	   = false;
-			float Exposure	   = 1.0f;
-			float FilterRadius = 0.005f;
-			float Strength	   = 0.04f;
-		} BloomOptions;
 	};
 
 public:

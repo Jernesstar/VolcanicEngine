@@ -42,8 +42,6 @@ public:
 
 	void Render();
 
-	void Save(const std::string& path);
-
 	Ref<UIElement> Add(Ref<UIElement> element);
 
 	template<typename TUIElement, typename ...Args>
@@ -87,8 +85,6 @@ protected:
 	virtual bool OnAttach() = 0;
 	virtual bool OnAddElement(Ref<UIElement> element) = 0;
 
-	virtual void OnSerialize(Serializer& serializer) = 0;
-
 protected:
 	const Type m_Type;
 
@@ -100,9 +96,6 @@ protected:
 	float x = 0;
 	float y = 0;
 	glm::vec4 m_Color;
-
-private:
-	void Serialize(UIElement* element, Serializer& serializer);
 };
 
 }

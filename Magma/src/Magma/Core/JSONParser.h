@@ -9,7 +9,7 @@ public:
 	JSONParserNode();
 	~JSONParserNode() = default;
 
-	JSONParserNode operator [](const std::string& node) override;
+	// JSONParserNode& operator [](const std::string& node) override;
 	bool IsValid() override;
 
 private:
@@ -29,6 +29,8 @@ class JSONParser : public Parser {
 public:
 	JSONParser(const std::string& path);
 	~JSONParser() = default;
+
+	// JSONParserNode& GetRootNode() { return m_Node; }
 };
 
 }

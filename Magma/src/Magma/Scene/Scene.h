@@ -6,6 +6,7 @@
 #include "Physics/World.h"
 
 #include "SceneRenderer.h"
+#include "SceneSerializer.h"
 
 using namespace VolcaniCore;
 
@@ -28,14 +29,14 @@ public:
 	void Load(const std::string& path);
 	void Save(const std::string& path);
 
-	void SetRenderer(const SceneRenderer& renderer) {
+	void SetRenderer(Ref<SceneRenderer> renderer) {
 		m_Renderer = renderer;
-		m_Renderer.SetContext(this);
+		m_Renderer->SetContext(this);
 	}
-	SceneRenderer& GetRenderer() { return m_Renderer; }
+	Ref<SceneRenderer> GetRenderer() { return m_Renderer; }
 
 private:
-	SceneRenderer m_Renderer;
+	Ref<SceneRenderer> m_Renderer;
 	SceneSerializer m_Serializer;
 
 private:

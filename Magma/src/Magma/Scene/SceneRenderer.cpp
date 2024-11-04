@@ -14,7 +14,7 @@ using namespace Magma::ECS;
 namespace Magma {
 
 DefaultSceneRenderer::DefaultSceneRenderer(Scene* scene)
-	: m_Scene(scene)
+	: SceneRenderer(scene)
 {
 	Ref<ShaderPipeline> shader;
 	shader = ShaderPipeline::Create("VolcaniCore/assets/shaders", "Mesh");
@@ -48,7 +48,7 @@ DefaultSceneRenderer::DefaultSceneRenderer(Scene* scene)
 		});
 }
 
-void DefaultSceneRenderer::UpdateCamera(TimeStep ts) {
+void DefaultSceneRenderer::Update(TimeStep ts) {
 	auto cameraEntity = m_Scene->EntityWorld.GetEntity("MainCamera");
 	if(!cameraEntity.IsValid())
 		return;
@@ -62,10 +62,6 @@ void DefaultSceneRenderer::UpdateCamera(TimeStep ts) {
 
 	cc.Position = camera->GetPosition();
 	cc.Direction = camera->GetDirection();
-}
-
-void DefaultSceneRenderer::UpdatePasses() {
-
 }
 
 void DefaultSceneRenderer::Render() {

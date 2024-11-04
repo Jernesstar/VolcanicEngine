@@ -25,7 +25,7 @@ ECS::ECS() {
 		});
 
 	scene = CreateRef<Scene>("Titled Scene");
-	scene->GetRenderer().GetCameraController().TranslationSpeed = 20.0f;
+	// scene->GetRenderer()->GetCameraController().TranslationSpeed = 20.0f;
 
 	auto& world = scene->EntityWorld;
 
@@ -73,7 +73,7 @@ ECS::ECS() {
 		.Height = 100
 	});
 
-	auto output = scene->GetRenderer().GetOutput();
+	auto output = scene->GetRenderer()->GetOutput();
 	image->SetImage(output, AttachmentTarget::Color);
 	VOLCANICORE_LOG_INFO("Success");
 }
@@ -89,7 +89,7 @@ void ECS::OnUpdate(TimeStep ts) {
 	scene->OnUpdate(ts);
 	scene->OnRender();
 
-	auto output = scene->GetRenderer().GetOutput();
+	auto output = scene->GetRenderer()->GetOutput();
 	// RendererAPI::Get()->RenderFramebuffer(output, AttachmentTarget::Color);
 
 	image->SetSize(400, 400);

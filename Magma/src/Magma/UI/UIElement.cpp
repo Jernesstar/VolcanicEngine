@@ -60,47 +60,47 @@ void UIElement::Render() {
 		ImGui::End();
 }
 
-void UIElement::Save(const std::string& path) {
-	JSONSerializer serializer;
-	serializer.BeginMapping(); // File
+// void UIElement::Save(const std::string& path) {
+// 	JSONSerializer serializer;
+// 	serializer.BeginMapping(); // File
 
-	Serialize(this, serializer);
+// 	Serialize(this, serializer);
 
-	serializer.EndMapping(); // File
-}
+// 	serializer.EndMapping(); // File
+// }
 
-void UIElement::Serialize(UIElement* element, Serializer& serializer) {
-	if(element->GetType() == UIElement::Type::Empty)
-		serializer.WriteKey("Empty");
-	if(element->GetType() == UIElement::Type::Window)
-		serializer.WriteKey("Window");
-	if(element->GetType() == UIElement::Type::Button)
-		serializer.WriteKey("Button");
-	if(element->GetType() == UIElement::Type::Dropdown)
-		serializer.WriteKey("Dropdown");
-	if(element->GetType() == UIElement::Type::Text)
-		serializer.WriteKey("Text");
-	if(element->GetType() == UIElement::Type::TextInput)
-		serializer.WriteKey("TextInput");
-	if(element->GetType() == UIElement::Type::Image)
-		serializer.WriteKey("Image");
+// void UIElement::Serialize(UIElement* element, Serializer& serializer) {
+// 	if(element->GetType() == UIElement::Type::Empty)
+// 		serializer.WriteKey("Empty");
+// 	if(element->GetType() == UIElement::Type::Window)
+// 		serializer.WriteKey("Window");
+// 	if(element->GetType() == UIElement::Type::Button)
+// 		serializer.WriteKey("Button");
+// 	if(element->GetType() == UIElement::Type::Dropdown)
+// 		serializer.WriteKey("Dropdown");
+// 	if(element->GetType() == UIElement::Type::Text)
+// 		serializer.WriteKey("Text");
+// 	if(element->GetType() == UIElement::Type::TextInput)
+// 		serializer.WriteKey("TextInput");
+// 	if(element->GetType() == UIElement::Type::Image)
+// 		serializer.WriteKey("Image");
 
-	serializer
-	.BeginMapping()
-		.WriteKey("Width").Write(element->GetWidth())
-		.WriteKey("Height").Write(element->GetHeight())
-		.WriteKey("x").Write(element->GetPositionX())
-		.WriteKey("y").Write(element->GetPositionY())
-		.WriteKey("Color").Write(element->GetColor());
+// 	serializer
+// 	.BeginMapping()
+// 		.WriteKey("Width").Write(element->GetWidth())
+// 		.WriteKey("Height").Write(element->GetHeight())
+// 		.WriteKey("x").Write(element->GetPositionX())
+// 		.WriteKey("y").Write(element->GetPositionY())
+// 		.WriteKey("Color").Write(element->GetColor());
 
-	element->OnSerialize(serializer);
+// 	element->OnSerialize(serializer);
 
-	serializer.EndMapping();
+// 	serializer.EndMapping();
 
-	serializer.WriteKey("Children").BeginSequence();
-	for(auto child : m_Children)
-		Serialize(child.get(), serializer);
-	serializer.EndSequence();
-}
+// 	serializer.WriteKey("Children").BeginSequence();
+// 	for(auto child : m_Children)
+// 		Serialize(child.get(), serializer);
+// 	serializer.EndSequence();
+// }
 
 }

@@ -5,9 +5,9 @@ namespace Magma {
 JSONParserNode::JSONParserNode()
 	{ }
 
-JSONParserNode JSONParserNode::operator [](const std::string& node) {
+// JSONParserNode JSONParserNode::operator [](const std::string& node) {
 
-}
+// }
 
 bool JSONParserNode::IsValid() {
 

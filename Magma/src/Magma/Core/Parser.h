@@ -2,6 +2,10 @@
 
 #include <VolcaniCore/Core/Defines.h>
 
+#include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
+
 namespace Magma {
 
 class ParserNode {
@@ -10,11 +14,11 @@ public:
 	virtual ~ParserNode() = default;
 
 	template<typename T>
-	T GetAs();
+	T As();
 
 	// TODO: List's of data
 
-	ParserNode operator [](const std::string& node) = 0;
+	// virtual ParserNode operator [](const std::string& node) = 0;
 
 	virtual bool IsValid() = 0;
 
@@ -32,13 +36,13 @@ protected:
 
 class Parser {
 public:
-	Parser(const std::string& path);
+	Parser() = default;
 	virtual ~Parser() = default;
 
-	ParserNode GetRootNode() { return m_Root; }
+	virtual ParserNode& GetRootNode() = 0;
 
 protected:
-	ParserNode m_Root;
+	std::string m_Path;
 };
 
 }
