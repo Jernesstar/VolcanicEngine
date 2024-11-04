@@ -30,8 +30,8 @@ EditorLayer::EditorLayer() {
 	auto scene1 = CreateRef<Scene>();
 	scene1->Load("Magma/assets/scenes/temp.magma.scene");
 
-	m_CurrentTab = CreateRef<SceneTab>(scene1);
-	NewTab(m_CurrentTab);
+	// m_CurrentTab = CreateRef<SceneTab>(scene1);
+	// NewTab(m_CurrentTab);
 }
 
 EditorLayer::~EditorLayer() {

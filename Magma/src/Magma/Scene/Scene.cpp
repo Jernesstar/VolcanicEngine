@@ -18,7 +18,7 @@ Scene::Scene(const std::string& name)
 	RegisterSystems();
 	RegisterObservers();
 
-	m_Renderer = CreateRef<DefaultSceneRenderer>(this);
+	// m_Renderer = CreateRef<DefaultSceneRenderer>(this);
 	m_Serializer = SceneSerializer{ this };
 }
 
