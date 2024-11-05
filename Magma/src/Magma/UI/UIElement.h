@@ -65,6 +65,8 @@ public:
 
 	glm::vec4 GetColor() const { return m_Color; }
 
+	List<Ref<UI::UIElement>> GetChildren() const { return m_Children; }
+
 	UIElement* SetSize(uint32_t width, uint32_t height) {
 		this->m_Width = width;
 		this->m_Height = height;

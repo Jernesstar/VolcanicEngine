@@ -10,14 +10,21 @@ namespace Magma {
 
 class UITab : public Tab {
 public:
+	UITab();
 	UITab(Ref<UI::UIElement> scene);
 	~UITab();
 
 	void Update(TimeStep ts) override;
 	void Render() override;
 
+	void SetUI(Ref<UI::UIElement> element);
+	void SetUI(const std::string& path);
+
 private:
 	Ref<UI::UIElement> m_Root;
+
+private:
+	void Setup();
 
 	void NewUI();
 	void OpenUI();
@@ -25,7 +32,7 @@ private:
 
 	void AddWindow();
 	void AddButton();
-	// void AddImage();
+	void AddImage();
 };
 
 }

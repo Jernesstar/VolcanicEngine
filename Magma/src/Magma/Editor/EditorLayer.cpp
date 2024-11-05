@@ -27,11 +27,8 @@ EditorLayer::EditorLayer() {
 	NewProject();
 	m_Project->Load("Magma/projects/Project/.volc.proj");
 
-	auto scene1 = CreateRef<Scene>();
-	scene1->Load("Magma/assets/scenes/temp.magma.scene");
-
-	// m_CurrentTab = CreateRef<SceneTab>(scene1);
-	// NewTab(m_CurrentTab);
+	m_CurrentTab = CreateRef<SceneTab>("Magma/assets/scenes/temp.magma.scene");
+	NewTab(m_CurrentTab);
 }
 
 EditorLayer::~EditorLayer() {
@@ -89,9 +86,9 @@ void EditorLayer::Render() {
 		ImGui::BeginTabBar("Tabs", ImGuiTabBarFlags_Reorderable);
 		{
 			if(ImGui::BeginTabItem("+", nullptr, ImGuiTabItemFlags_NoReorder)) {
-				if(ImGui::IsItemActivated()) {
-					NewTab(CreateRef<Scene>("New Scene"));
-				}
+				if(ImGui::IsItemActivated())
+					NewTab(Scene("New Scene"));
+
 				ImGui::EndTabItem();
 			}
 			
@@ -160,10 +157,14 @@ void EditorLayer::NewTab(Ref<Tab> tab) {
 	m_CurrentTab = tab;
 }
 
-void EditorLayer::NewTab(Ref<Scene> scene) {
+void EditorLayer::NewTab(const Scene& scene) {
 	Ref<Tab> newTab = CreateRef<SceneTab>(scene);
-	m_Tabs.push_back(newTab);
-	m_CurrentTab = newTab;
+	NewTab(newTab);
+}
+
+void EditorLayer::NewTab(Ref<UI::UIElement> element) {
+	Ref<Tab> newTab = CreateRef<UITab>(element);
+	NewTab(newTab);
 }
 
 void EditorLayer::NewTab() {

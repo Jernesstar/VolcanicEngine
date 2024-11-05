@@ -12,18 +12,28 @@ namespace Magma {
 
 class SceneTab : public Tab {
 public:
-	SceneTab(Ref<Scene> scene);
+	SceneTab();
+	SceneTab(const Scene& scene);
+	SceneTab(const std::string& path);
 	~SceneTab();
 
 	void Update(TimeStep ts) override;
 	void Render() override;
 
+	void SetScene(const Scene& scene);
+	void SetScene(const std::string& path);
+
 private:
-	Ref<Scene> m_Scene;
+	Scene m_Scene;
 	Ref<UI::Button> m_PlayButton, m_PauseButton, m_StopButton;
 	
 	enum class SceneState { Edit, Play, Pause };
 	SceneState m_SceneState = SceneState::Edit;
+
+private:
+	void Setup();
+
+	void ToolbarUI();
 
 	void NewScene();
 	void OpenScene();
@@ -31,7 +41,6 @@ private:
 
 	void AddEntity();
 
-	void ToolbarUI();
 	void OnScenePlay();
 	void OnScenePause();
 	void OnSceneStop();

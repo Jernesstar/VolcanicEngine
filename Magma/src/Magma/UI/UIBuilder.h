@@ -2,6 +2,8 @@
 
 #include "UIElement.h"
 
+#include "UISerializer.h"
+
 namespace Magma::UI {
 
 template<typename TUIElement>
@@ -15,7 +17,7 @@ public:
 		m_Element = element;
 	}
 	UIBuilder(const std::string& path) {
-		// JSONParser& parser;
+		// m_Element = UISerializer::Load(path);
 	}
 	UIBuilder(const TUIElement::Specification& specs) {
 		m_Element = TUIElement::Create(specs);

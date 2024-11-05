@@ -13,7 +13,7 @@ using namespace Magma::ECS;
 
 namespace Magma {
 
-SceneVisualizerPanel::SceneVisualizerPanel(Ref<Scene> context)
+SceneVisualizerPanel::SceneVisualizerPanel(Scene* context)
 	: Panel("SceneVisualizer")
 {
 	auto width = Application::GetWindow()->GetWidth();
@@ -23,7 +23,7 @@ SceneVisualizerPanel::SceneVisualizerPanel(Ref<Scene> context)
 	SetContext(context);
 }
 
-void SceneVisualizerPanel::SetContext(Ref<Scene> context) {
+void SceneVisualizerPanel::SetContext(Scene* context) {
 	m_Context = context;
 	auto framebuffer = m_Context->GetRenderer()->GetOutput();
 	m_Image->SetImage(framebuffer, AttachmentTarget::Color);

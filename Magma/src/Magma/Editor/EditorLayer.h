@@ -1,13 +1,10 @@
 #pragma once
 
-#include <filesystem>
-
-#include <VolcaniCore/Core/Time.h>
-
 #include "Project.h"
 #include "Tab.h"
 #include "SceneTab.h"
-// #include "UITab.h"
+#include "UITab.h"
+// #include "TilemapTab.h"
 
 using namespace VolcaniCore;
 
@@ -28,7 +25,8 @@ private:
 
 	void NewTab();
 	void NewTab(Ref<Tab> tab);
-	void NewTab(Ref<Scene> scene);
+	void NewTab(const Scene& scene);
+	void NewTab(Ref<UI::UIElement> ui);
 
 	void NewProject();
 	void OpenProject();

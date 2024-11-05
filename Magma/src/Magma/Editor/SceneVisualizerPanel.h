@@ -16,10 +16,10 @@ struct EditorEntity {
 
 class SceneVisualizerPanel : public Panel {
 public:
-	SceneVisualizerPanel(Ref<Scene> scene);
+	SceneVisualizerPanel(Scene* scene);
 	~SceneVisualizerPanel() = default;
 
-	void SetContext(Ref<Scene> scene);
+	void SetContext(Scene* scene);
 
 	void Update(TimeStep ts) override;
 	void Draw() override;
@@ -30,7 +30,7 @@ public:
 	ECS::Entity GetSelected() { return m_Selected.Handle; }
 
 private:
-	Ref<Scene> m_Context;
+	Scene* m_Context;
 	EditorEntity m_Selected;
 
 	Ref<UI::Image> m_Image;

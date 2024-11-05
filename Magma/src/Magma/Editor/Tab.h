@@ -22,6 +22,10 @@ public:
 	void AddPanel(Ref<Panel> panel);
 	Ref<Panel> GetPanel(const std::string& name);
 
+	template<typename TTab>
+	requires std::derived_from<TTab, Tab>
+	TTab* As() const { return (TTab*)(this); }
+
 protected:
 	std::string m_Name;
 	List<Ref<Panel>> m_Panels;

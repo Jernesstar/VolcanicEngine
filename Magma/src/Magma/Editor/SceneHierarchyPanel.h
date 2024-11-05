@@ -7,10 +7,10 @@ namespace Magma {
 
 class SceneHierarchyPanel : public Panel {
 public:
-	SceneHierarchyPanel(Ref<Scene> scene);
+	SceneHierarchyPanel(Scene* scene);
 	~SceneHierarchyPanel() = default;
 
-	void SetContext(Ref<Scene> scene);
+	void SetContext(Scene* scene);
 
 	void Update(TimeStep ts) override;
 	void Draw() override;
@@ -21,7 +21,7 @@ public:
 	ECS::Entity GetSelected() { return m_Selected; }
 
 private:
-	Ref<Scene> m_Context;
+	Scene* m_Context;
 	ECS::Entity m_Selected;
 
 private:

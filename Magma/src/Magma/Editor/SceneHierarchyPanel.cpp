@@ -16,13 +16,13 @@ using namespace Magma::ECS;
 
 namespace Magma {
 
-SceneHierarchyPanel::SceneHierarchyPanel(Ref<Scene> context)
+SceneHierarchyPanel::SceneHierarchyPanel(Scene* context)
 	: Panel("SceneHierarchy")
 {
 	SetContext(context);
 }
 
-void SceneHierarchyPanel::SetContext(Ref<Scene> context) {
+void SceneHierarchyPanel::SetContext(Scene* context) {
 	m_Context = context;
 	m_Selected = Entity{ };
 }
@@ -68,7 +68,6 @@ void SceneHierarchyPanel::DrawEntityNode(Entity& entity) {
 		// 	ImGui::Text("Test");
 		// 	ImGui::EndPopup();
 		// }
-
 
 		ImGui::TreePop();
 	}

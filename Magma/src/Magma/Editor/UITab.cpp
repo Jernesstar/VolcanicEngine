@@ -6,7 +6,7 @@
 #include <ImGuiFileDialog/ImGuiFileDialog.h>
 
 #include "UI/Empty.h"
-#include "UI/UIBuilder.h"
+#include "UI/UISerializer.h"
 
 // #include "UIElementPickerPanel.h"
 // #include "UIVisualizerPanel.h"
@@ -22,23 +22,22 @@ struct {
 	struct {
 		bool addWindow = false;
 		bool addButton = false;
+		bool addImage = false;
 	} edit;
 } menu;
 
+UITab::UITab() {
+	SetUI(CreateRef<UI::Empty>());
+	Setup();
+}
+
 UITab::UITab(Ref<UI::UIElement> root) {
-	m_Root = root;
-
-	// auto panel1 = CreateRef<UIElementPickerPanel>(m_Root);
-	// panel1->Close();
-	// auto panel2 = CreateRef<UIVisualizerPanel>(m_Root);
-	// panel2->Close();
-
-	// m_Panels.push_back(panel1);
-	// m_Panels.push_back(panel2);
+	SetUI(root);
+	Setup();
 }
 
 UITab::~UITab() {
-	// UI::UIBuilder(m_Root).Save("Magma/assets/scenes/.magma.ui.json");
+	// UI::UISerializer::Save(m_Root, "Magma/assets/scenes/.magma.ui.json");
 }
 
 void UITab::Update(TimeStep ts) {
@@ -100,6 +99,29 @@ void UITab::Render() {
 			panel->Draw();
 }
 
+void UITab::Setup() {
+	// auto panel1 = CreateRef<UIElementPickerPanel>(m_Root);
+	// panel1->Close();
+	// auto panel2 = CreateRef<UIVisualizerPanel>(m_Root);
+	// panel2->Close();
+
+	// m_Panels.push_back(panel1);
+	// m_Panels.push_back(panel2);
+}
+
+void UITab::SetUI(Ref<UI::UIElement> ui) {
+	m_Root = ui;
+
+	// auto picker = GetPanel("UIElementPicker")->As<UIElementPickerPanel>();
+	// auto visual = GetPanel("UIVisualizer")->As<UIVisualizerPanel>();
+	// picker->SetContext(m_Root);
+	// visual->SetContext(m_Root);
+}
+
+void UITab::SetUI(const std::string& path) {
+	// SetUI(UI::UISerializer::Load(path));
+}
+
 void UITab::NewUI() {
 	m_Root = CreateRef<UI::Empty>();
 	menu.file.newUI = false;
@@ -143,9 +165,15 @@ void UITab::AddWindow() {
 
 	menu.edit.addWindow = false;
 }
+
 void UITab::AddButton() {
 
 	menu.edit.addButton = false;
+}
+
+void UITab::AddImage() {
+
+	menu.edit.addImage = false;
 }
 
 }

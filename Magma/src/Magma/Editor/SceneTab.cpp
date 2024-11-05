@@ -22,12 +22,30 @@ struct {
 	} edit;
 } menu;
 
-SceneTab::SceneTab(Ref<Scene> scene) {
-	m_Scene = scene;
+SceneTab::SceneTab()
+	: m_Scene("New Scene")
+{
+	Setup();
+}
 
-	auto panel1 = CreateRef<SceneHierarchyPanel>(m_Scene);
+SceneTab::SceneTab(const Scene& scene) {
+	SetScene(scene);
+	Setup();
+}
+
+SceneTab::SceneTab(const std::string& path) {
+	SetScene(path);
+	Setup();
+}
+
+SceneTab::~SceneTab() {
+	m_Scene.Save("Magma/assets/scenes/" + m_Scene.Name + ".magma.scene");
+}
+
+void SceneTab::Setup() {
+	auto panel1 = CreateRef<SceneHierarchyPanel>(&m_Scene);
 	panel1->Close();
-	auto panel2 = CreateRef<SceneVisualizerPanel>(m_Scene);
+	auto panel2 = CreateRef<SceneVisualizerPanel>(&m_Scene);
 	panel2->Close();
 
 	m_Panels.push_back(panel1);
@@ -54,12 +72,23 @@ SceneTab::SceneTab(Ref<Scene> scene) {
 		});
 }
 
-SceneTab::~SceneTab() {
-	m_Scene->Save("Magma/assets/scenes/" + m_Scene->Name + ".magma.scene");
+void SceneTab::SetScene(const Scene& scene) {
+	m_Scene = scene;
+
+	auto hierarchy = GetPanel("SceneHierarchy")->As<SceneHierarchyPanel>();
+	auto visual = GetPanel("SceneVisualizer")->As<SceneVisualizerPanel>();
+	hierarchy->SetContext(&m_Scene);
+	visual->SetContext(&m_Scene);
+}
+
+void SceneTab::SetScene(const std::string& path) {
+	auto scene = Scene();
+	scene.Load(path);
+	SetScene(scene);
 }
 
 void SceneTab::Update(TimeStep ts) {
-	m_Name = "Scene: " + m_Scene->Name;
+	m_Name = "Scene: " + m_Scene.Name;
 
 	auto hierarchy = GetPanel("SceneHierarchy")->As<SceneHierarchyPanel>();
 	auto visual = GetPanel("SceneVisualizer")->As<SceneVisualizerPanel>();
@@ -122,9 +151,7 @@ void SceneTab::Render() {
 }
 
 void SceneTab::NewScene() {
-	m_Scene = CreateRef<Scene>("New Scene");
-	GetPanel("SceneHierarchy")->As<SceneHierarchyPanel>()->SetContext(m_Scene);
-	GetPanel("SceneVisualizer")->As<SceneVisualizerPanel>()->SetContext(m_Scene);
+	SetScene(Scene("New Scene"));
 	menu.file.newScene = false;
 }
 
@@ -137,7 +164,7 @@ void SceneTab::OpenScene() {
 	if(instance->Display("ChooseFile")) {
 		if(instance->IsOk()) {
 			std::string path = instance->GetFilePathName();
-			m_Scene->Load(path);
+			m_Scene.Load(path);
 		}
 
 		instance->Close();
@@ -154,7 +181,7 @@ void SceneTab::SaveScene() {
 	if(instance->Display("ChooseFile")) {
 		if(instance->IsOk()) {
 			std::string path = instance->GetFilePathName();
-			m_Scene->Save(path);
+			m_Scene.Save(path);
 		}
 
 		instance->Close();
