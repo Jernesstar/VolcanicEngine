@@ -29,12 +29,12 @@ SceneTab::SceneTab()
 }
 
 SceneTab::SceneTab(const Scene& scene) {
-	SetScene(scene);
+	m_Scene = scene;
 	Setup();
 }
 
 SceneTab::SceneTab(const std::string& path) {
-	SetScene(path);
+	m_Scene.Load(path);
 	Setup();
 }
 
@@ -143,7 +143,7 @@ void SceneTab::Render() {
 	if(menu.edit.addEntity)
 		AddEntity();
 
-	ToolbarUI();
+	// ToolbarUI();
 
 	for(auto panel : m_Panels)
 		if(panel->IsOpen())

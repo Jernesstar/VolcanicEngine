@@ -60,7 +60,6 @@ private:
 	
 	Ref<RenderPass> m_DrawPass;
 	Ref<RenderPass> m_LightingPass;
-	Ref<Framebuffer> m_Output;
 
 	CameraController m_Controller;
 

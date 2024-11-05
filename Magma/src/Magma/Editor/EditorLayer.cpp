@@ -27,8 +27,8 @@ EditorLayer::EditorLayer() {
 	NewProject();
 	m_Project->Load("Magma/projects/Project/.volc.proj");
 
-	m_CurrentTab = CreateRef<SceneTab>("Magma/assets/scenes/temp.magma.scene");
-	NewTab(m_CurrentTab);
+	auto tab = CreateRef<SceneTab>("Magma/assets/scenes/temp.magma.scene");
+	NewTab(tab);
 }
 
 EditorLayer::~EditorLayer() {
@@ -87,7 +87,7 @@ void EditorLayer::Render() {
 		{
 			if(ImGui::BeginTabItem("+", nullptr, ImGuiTabItemFlags_NoReorder)) {
 				if(ImGui::IsItemActivated())
-					NewTab(Scene("New Scene"));
+					NewTab(CreateRef<SceneTab>());
 
 				ImGui::EndTabItem();
 			}
@@ -125,8 +125,8 @@ void EditorLayer::Render() {
 			if(tabToDelete != nullptr) {
 				// AddToClosedTabs(tab)
 				auto it = std::find(m_Tabs.begin(), m_Tabs.end(), tabToDelete);
-				m_Tabs.erase(it);
 				uint32_t index = std::distance(m_Tabs.begin(), it);
+				m_Tabs.erase(it);
 				if(tabToDelete == m_CurrentTab)
 					m_CurrentTab = (index > 0) ? m_Tabs[index - 1] : nullptr;
 			}
