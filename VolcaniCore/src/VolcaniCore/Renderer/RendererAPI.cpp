@@ -17,8 +17,6 @@ void RendererAPI::Create(RendererAPI::Backend backend) {
 		// 	break;
 	}
 
-	ShaderLibrary::Init();
-
 	s_Instance->Init();
 }
 

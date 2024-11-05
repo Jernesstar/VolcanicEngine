@@ -8,6 +8,7 @@
 #include <ImGuiFileDialog/ImGuiFileDialog.h>
 
 #include <VolcaniCore/Core/Log.h>
+#include <VolcaniCore/Core/Input.h>
 #include <VolcaniCore/Renderer/RendererAPI.h>
 
 using namespace VolcaniCore;
@@ -73,7 +74,7 @@ void EditorLayer::Render() {
 					menu.project.newProject = true;
 				if(ImGui::MenuItem("Open", "Ctrl+O"))
 					menu.project.openProject = true;
-				if(ImGui::MenuItem("Reload", "Ctrl+S"))
+				if(ImGui::MenuItem("Reload", "Ctrl+S") || Input::KeysPressed(Key::Ctrl, Key::S))
 					menu.project.reloadProject = true;
 				if(ImGui::MenuItem("Run", "Ctrl+R"))
 					menu.project.runProject = true;
