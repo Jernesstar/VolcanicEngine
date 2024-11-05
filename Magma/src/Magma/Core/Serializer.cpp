@@ -8,8 +8,8 @@ namespace Magma {
 Ref<Serializer> Serializer::Create(Serializer::Format format) {
 	if(format == Serializer::Format::YAML)
 		return CreateRef<YAMLSerializer>();
-	// if(format == Serializer::Format::JSON)
-	// 	return CreateRef<JSONSerializer>();
+	if(format == Serializer::Format::JSON)
+		return CreateRef<JSONSerializer>();
 }
 
 template<>

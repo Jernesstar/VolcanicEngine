@@ -72,7 +72,6 @@ private:
 };
 
 Cube::Cube()
-	// : Application(800, 600, "Cube Demo")
 	: Application(1920, 1080, "Cube Demo")
 {
 	Events::RegisterListener<KeyPressedEvent>(

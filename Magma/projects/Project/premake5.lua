@@ -1,20 +1,4 @@
-workspace "Project"
-    location ("build")
-    architecture "x86_64"
-    configurations { "Debug", "Release" }
-
-    filter "configurations:Debug"
-        optimize "Debug"
-        symbols "On"
-
-    filter "configurations:Release"
-        optimize "Full"
-
-RootPath = "%{_MAIN_SCRIPT_DIR}/../../..";
-VolcaniCoreVendorDir = "%{RootPath}/VolcaniCore/vendor"
-MagmaVendorDir = "%{RootPath}/Magma/vendor"
-
-project "Sandbox"
+project "Project"
     kind "ConsoleApp"
     language "C++"
     cppdialect "C++latest"
@@ -22,24 +6,27 @@ project "Sandbox"
     rtti "Off"
     staticruntime "Off"
 
-    objdir ("%{RootPath}/build/Sandbox/obj")
-    targetdir ("%{RootPath}/build/Sandbox/bin")
+    ProjectDir = _OPTIONS["project"]
+    ProjectSrcDir = _OPTIONS["src"]
+
+    objdir ("build/obj")
+    targetdir ("build/bin")
 
     files {
-        "src/**.h",
-        "src/**.cpp",
+        "%{ProjectSrcDir}/**.h",
+        "%{ProjectSrcDir}/**.cpp",
     }
 
     includedirs {
-        "src",
+        "%{ProjectSrcDir}/**",
 
-        "%{RootPath}/VolcaniCore/src",
-        "%{RootPath}/VolcaniCore/src/VolcaniCore",
-        "%{RootPath}/VolcaniCore/src/impl",
-        "%{RootPath}/Magma/src",
-        "%{RootPath}/Magma/src/Magma",
-        "%{RootPath}/Ash/src",
-        "%{RootPath}/Ash/src/Magma",
+        "%{VolcanicEngineDir}/VolcaniCore/src",
+        "%{VolcanicEngineDir}/VolcaniCore/src/VolcaniCore",
+        "%{VolcanicEngineDir}/VolcaniCore/src/impl",
+        "%{VolcanicEngineDir}/Magma/src",
+        "%{VolcanicEngineDir}/Magma/src/Magma",
+        "%{VolcanicEngineDir}/Ash/src",
+        "%{VolcanicEngineDir}/Ash/src/Magma",
 
         "%{Includes.imgui}",
         "%{Includes.imgui}/imgui",
@@ -55,6 +42,11 @@ project "Sandbox"
         "%{Includes.freetype}",
         "%{Includes.assimp}",
         "%{Includes.stb_image}",
+    }
+
+    libdirs {
+        "%{VolcanicEngineDir}/build/VolcaniCore/lib",
+        "%{VolcanicEngineDir}/build/Magma/lib"
     }
 
     links {

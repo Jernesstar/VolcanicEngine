@@ -1,5 +1,3 @@
-#pragma once
-
 #include "UISerializer.h"
 
 namespace Magma::UI {

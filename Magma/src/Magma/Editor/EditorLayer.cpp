@@ -18,21 +18,21 @@ struct {
 	struct {
 		bool newProject  = false;
 		bool openProject = false;
-		bool saveProject = false;
+		bool reloadProject = false;
 		bool runProject  = false;
 	} project;
 } menu;
 
 EditorLayer::EditorLayer() {
 	NewProject();
-	m_Project->Load("Magma/projects/Project/.volc.proj");
+	m_Project->Load("../TheMazeIsLava/.volc.proj");
 
 	auto tab = CreateRef<SceneTab>("Magma/assets/scenes/temp.magma.scene");
 	NewTab(tab);
 }
 
 EditorLayer::~EditorLayer() {
-	m_Project->Save();
+
 }
 
 void EditorLayer::Update(TimeStep ts) {
@@ -73,8 +73,8 @@ void EditorLayer::Render() {
 					menu.project.newProject = true;
 				if(ImGui::MenuItem("Open", "Ctrl+O"))
 					menu.project.openProject = true;
-				if(ImGui::MenuItem("Save", "Ctrl+S"))
-					menu.project.saveProject = true;
+				if(ImGui::MenuItem("Reload", "Ctrl+S"))
+					menu.project.reloadProject = true;
 				if(ImGui::MenuItem("Run", "Ctrl+R"))
 					menu.project.runProject = true;
 
@@ -146,8 +146,8 @@ void EditorLayer::Render() {
 		NewProject();
 	if(menu.project.openProject)
 		OpenProject();
-	if(menu.project.saveProject)
-		SaveProject();
+	if(menu.project.reloadProject)
+		ReloadProject();
 	if(menu.project.runProject)
 		RunProject();
 }
@@ -194,9 +194,9 @@ void EditorLayer::OpenProject() {
 	}
 }
 
-void EditorLayer::SaveProject() {
-	m_Project->Save();
-	menu.project.saveProject = false;
+void EditorLayer::ReloadProject() {
+	m_Project->Reload();
+	menu.project.reloadProject = false;
 }
 
 void EditorLayer::RunProject() {

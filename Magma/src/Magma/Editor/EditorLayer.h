@@ -30,7 +30,7 @@ private:
 
 	void NewProject();
 	void OpenProject();
-	void SaveProject();
+	void ReloadProject();
 	void RunProject();
 };
 
