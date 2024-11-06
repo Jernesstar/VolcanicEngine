@@ -175,10 +175,10 @@ void Bloom::OnUpdate(TimeStep ts) {
 				return filterRadius;
 			});
 
-		glBlendFunc(GL_ONE, GL_ONE);
-		glBlendEquation(GL_FUNC_ADD);
+		// glBlendFunc(GL_ONE, GL_ONE);
+		// glBlendEquation(GL_FUNC_ADD);
 		Upsample();
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	}
 	Renderer::EndPass();
 	Renderer::Flush();
@@ -247,7 +247,8 @@ void Bloom::InitMips() {
 		mipChain.push_back(mip);
 	}
 
-	mips = Framebuffer::Create({
+	mips = Framebuffer::Create(
+		{
 			{ AttachmentTarget::Color, { { mipChain[0].Sampler } } }
 		});
 }
@@ -288,9 +289,10 @@ void Bloom::Upsample() {
 		const BloomMip& mip = mipChain[i];
 		const BloomMip& nextMip = mipChain[i - 1];
 
-		// Renderer::PushOptions({
-		// 		.Blending = RendererAPI::Options::BlendingMode::Additive
-		// 	});
+		Renderer::PushOptions(
+			{
+				.Blending = RendererAPI::Options::BlendingMode::Additive
+			});
 
 		auto& uniforms = Renderer::GetDrawCommand().GetUniforms()
 		.Set("u_SrcTexture",
@@ -301,7 +303,6 @@ void Bloom::Upsample() {
 		.Set("WriteTexture",
 			[nextMip, &mips = mips]() -> TextureSlot
 			{
-				// Renderer::Resize(nextMip.IntSize.x, nextMip.IntSize.y);
 				mips->Set(AttachmentTarget::Color, nextMip.Sampler);
 				return { };
 			});

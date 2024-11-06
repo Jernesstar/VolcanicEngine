@@ -1,3 +1,5 @@
+#include <cstdlib>
+
 #include "Application.h"
 
 #include "Assert.h"
@@ -7,6 +9,8 @@
 #include "Renderer/Renderer.h"
 #include "Renderer/RendererAPI.h"
 #include "Renderer/ShaderLibrary.h"
+
+namespace fs = std::filesystem;
 
 namespace VolcaniCore {
 
@@ -26,6 +30,7 @@ void Application::Init() {
 	Events::Init();
 
 	RendererAPI::Create(RendererAPI::Backend::OpenGL);
+	ShaderLibrary::Init();
 	Renderer::Init();
 }
 
@@ -58,6 +63,41 @@ void Application::Run() {
 
 		s_Window->Update();
 	}
+}
+
+static std::string s_OldPath;
+
+std::string Application::GetCurrentDir() {
+	return s_Path;
+}
+
+void Application::PushDir() {
+	PushDir(s_LibraryPath);
+}
+
+void Application::PushDir(const std::string& path) {
+	if(path == "")
+		return;
+
+	s_OldPath = s_Path;
+	s_Path = path;
+	fs::current_path(s_Path);
+}
+
+void Application::PopDir() {
+	s_Path = s_OldPath;
+	fs::current_path(s_Path);
+}
+
+void Application::SetCurrentDir(const char* path) {
+	s_LibraryPath = getenv("VOLC_PATH");
+
+	fs::path p(path);
+	if(p.stem() == "Sandbox")
+		s_Path = s_LibraryPath;
+	else
+		s_Path = fs::current_path().string();
+	s_OldPath = s_Path;
 }
 
 }

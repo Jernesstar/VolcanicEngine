@@ -6,6 +6,7 @@ using namespace VolcaniCore;
 extern Application* CreateApplication(const CommandLineArgs& args);
 
 int main(int argc, char** argv) {
+	Application::SetCurrentDir(argv[0]);
 	Application::Init();
 	Application* app = CreateApplication(CommandLineArgs((uint32_t)argc, argv));
 	Application::Run();

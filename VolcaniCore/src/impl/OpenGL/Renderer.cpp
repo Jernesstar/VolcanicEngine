@@ -287,6 +287,9 @@ void Renderer::RenderCubemap(Ref<VolcaniCore::Cubemap> cubemap) {
 void Renderer::RenderFramebuffer(Ref<VolcaniCore::Framebuffer> buffer,
 								 AttachmentTarget target)
 {
+	if(!buffer) {
+		VOLCANICORE_LOG_INFO("WHYYY?");
+	}
 	if(!buffer->Has(target)) {
 		VOLCANICORE_LOG_WARNING("Framebuffer does not have needed attachment");
 		return;

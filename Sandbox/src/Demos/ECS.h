@@ -90,10 +90,10 @@ void ECS::OnUpdate(TimeStep ts) {
 	scene->OnRender();
 
 	auto output = scene->GetRenderer()->GetOutput();
-	// RendererAPI::Get()->RenderFramebuffer(output, AttachmentTarget::Color);
+	RendererAPI::Get()->RenderFramebuffer(output, AttachmentTarget::Color);
 
-	image->SetSize(400, 400);
-	image->Render();
+	// image->SetSize(400, 400);
+	// image->Render();
 
 	UI::End();
 }

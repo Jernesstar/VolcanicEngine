@@ -3,7 +3,6 @@
 #include <glad/glad.h>
 #include <stb_image/stb_image.h>
 
-#include "Core/Application.h"
 #include "Core/Assert.h"
 #include "Core/FileUtils.h"
 
@@ -81,6 +80,8 @@ constexpr uint32_t GetInternalFormat(Texture::InternalFormat format) {
 		case Texture::InternalFormat::Depth:
 			return GL_DEPTH_COMPONENT32F;
 	}
+
+	return GL_RGBA8;
 }
 
 uint32_t Texture2D::CreateTexture(uint32_t width, uint32_t height,

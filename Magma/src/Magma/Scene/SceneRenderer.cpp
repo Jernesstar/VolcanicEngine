@@ -16,9 +16,11 @@ namespace Magma {
 DefaultSceneRenderer::DefaultSceneRenderer(Scene* scene)
 	: SceneRenderer(scene)
 {
+	Application::PushDir();
 	Ref<ShaderPipeline> shader;
 	shader = ShaderPipeline::Create("VolcaniCore/assets/shaders", "Mesh");
 	m_DrawPass = RenderPass::Create("Draw", shader);
+	Application::PopDir();
 
 	auto window = Application::GetWindow();
 	auto width = window->GetWidth();

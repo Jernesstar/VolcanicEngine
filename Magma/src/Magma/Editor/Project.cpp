@@ -56,7 +56,7 @@ void Project::Run() {
 	command = "powershell";
 	command += " $ExePath = Resolve-Path Magma\\projects\\Project\\build\\bin\\Project.exe;";
 	command += " cd \'" + m_RootPath + "\';";
-	command += " Start-Process $ExePath -Wait;";
+	command += " Start-Process $ExePath;";
 	system(command.c_str());
 }
 

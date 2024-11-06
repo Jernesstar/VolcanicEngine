@@ -5,7 +5,6 @@
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>
 
-#include "Core/Application.h"
 #include "Core/Input.h"
 #include "Core/Log.h"
 

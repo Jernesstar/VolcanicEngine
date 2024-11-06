@@ -19,18 +19,26 @@ public:
 
 	static Ref<Window> GetWindow() { return s_Window; }
 
+	static std::string GetCurrentDir();
+	static void PushDir();
+	static void PushDir(const std::string& path);
+	static void PopDir();
+
 protected:
 	virtual void OnUpdate(TimeStep ts) = 0;
 
 private:
 	static void Init();
 	static void Run();
+	static void SetCurrentDir(const char* path);
+
+	inline static std::string s_LibraryPath;
+	inline static std::string s_Path;
 
 	inline static Application* s_Instance;
 	inline static Ref<Window> s_Window;
 
 	inline static TimePoint s_LastFrame{ Time::GetTime() };
-	inline static TimeStep s_TimeStep;
 
 	friend int ::main(int argc, char** argv);
 };

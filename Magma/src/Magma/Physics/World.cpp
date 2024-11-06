@@ -1,7 +1,5 @@
 #include "World.h"
 
-#include <VolcaniCore/Core/Application.h>
-
 #include "Physics.h"
 
 namespace Magma::Physics {
@@ -58,7 +56,7 @@ HitInfo World::Raycast(const glm::vec3& start, const glm::vec3& direction,
 	// 	return HitInfo(actor, hit.distance);
 	// }
 
-	// return HitInfo();
+	return HitInfo();
 }
 
 void World::AddContactCallback(

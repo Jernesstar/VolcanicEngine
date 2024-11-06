@@ -5,8 +5,6 @@
 #include "Core/Defines.h"
 
 #include "Renderer/RendererAPI.h"
-	#include <glad/glad.h>
-
 
 namespace VolcaniCore {
 

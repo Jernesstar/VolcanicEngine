@@ -88,12 +88,15 @@ void Init() {
 	}
 
 	ImGui::StyleColorsDark();
+
+	Application::PushDir();
 	float fontSize = 18.0f;
 	io.Fonts->AddFontFromFileTTF(
 		"VolcaniCore/assets/fonts/JetBrainsMono-Bold.ttf", fontSize);
 	io.FontDefault =
 		io.Fonts->AddFontFromFileTTF(
 			"VolcaniCore/assets/fonts/JetBrainsMono-Regular.ttf", fontSize);
+	Application::PopDir();
 }
 
 void Close() {

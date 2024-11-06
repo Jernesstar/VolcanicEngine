@@ -28,11 +28,14 @@ public:
 	void SetContext(Scene* scene) {
 		m_Scene = scene;
 	}
+
 	Ref<Framebuffer> GetOutput() { return m_Output; }
+	CameraController& GetCameraController() { return m_Controller; }
 
 protected:
 	Scene* m_Scene;
 	Ref<Framebuffer> m_Output;
+	CameraController m_Controller;
 };
 
 class DefaultSceneRenderer : public SceneRenderer {
@@ -52,16 +55,9 @@ public:
 	void Update(TimeStep ts) override;
 	void Render() override;
 
-	const Options& GetOptions() const { return m_Options; }
-	CameraController& GetCameraController() { return m_Controller; }
-
 private:
-	Options m_Options;
-	
 	Ref<RenderPass> m_DrawPass;
 	Ref<RenderPass> m_LightingPass;
-
-	CameraController m_Controller;
 
 	flecs::system m_RenderSystem;
 };

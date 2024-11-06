@@ -63,9 +63,7 @@ std::string FileUtils::ReadFile(const std::string& filePath) {
 	return str;
 }
 
-void FileUtils::WriteToFile(const std::string& path,
-							const std::string& info)
-{
+void FileUtils::WriteToFile(const std::string& path, const std::string& info) {
 	std::ofstream fout(path);
 	fout << info.c_str();
 }

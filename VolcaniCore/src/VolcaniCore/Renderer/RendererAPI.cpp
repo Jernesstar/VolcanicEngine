@@ -1,7 +1,5 @@
 #include "RendererAPI.h"
 
-#include "ShaderLibrary.h"
-
 #include "OpenGL/Renderer.h"
 
 namespace VolcaniCore {
