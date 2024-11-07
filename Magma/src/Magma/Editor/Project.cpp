@@ -29,23 +29,31 @@ void Project::Load(const fs::path& path) {
 void Project::Reload() {
 	// TODO(Implement): Dependencies
 	std::string command;
+	command = "powershell 'Creating Makefiles';";
+	command += "Start-Process ";
+
 #ifdef VOLCANICENGINE_LINUX
-	command = "vendor\\premake\\bin\\Linux\\premake5.exe";
+	command += "vendor\\premake\\bin\\Linux\\premake5.exe";
 #elif VOLCANICENGINE_WINDOWS
-	command = "vendor\\premake\\bin\\Windows\\premake5.exe";
+	command += "vendor\\premake\\bin\\Windows\\premake5.exe";
 #endif
-	command += " gmake2 --file=Magma\\projects\\premake5.lua";
+	command += " -ArgumentList '";
+	command += "gmake2 --file=Magma\\projects\\premake5.lua";
 	command += " --project=\"" + m_RootPath + "\"";
 	command += " --src=\""     + m_SrcPath  + "\"";
+	command += "';";
+	command += "'Finished creating Makefiles'";
 	system(command.c_str());
 
-	command = "powershell cd Magma\\projects\\build;";
-	command += "mingw32-make.exe -f Makefile;";
+	command = "powershell Start-Process mingw32-make.exe";
+	command += " -WorkingDir Magma\\projects\\build";
+	command += " -ArgumentList '-f Makefile';";
+
 	command += "if($Error.count -eq 0) {";
-	command +=		"\'Project built successfully\'";
+	command +=		"'Project built successfully'";
 	command += "}";
 	command += "else {";
-	command +=		"\'Project encountered build errors\'";
+	command +=		"'Project encountered build errors'";
 	command += "}";
 	system(command.c_str());
 }
@@ -53,10 +61,10 @@ void Project::Reload() {
 void Project::Run() {
 	std::string command;
 
-	command = "powershell";
-	command += " $ExePath = Resolve-Path Magma\\projects\\Project\\build\\bin\\Project.exe;";
-	command += " cd \'" + m_RootPath + "\';";
-	command += " Start-Process $ExePath;";
+	command = "powershell $ExePath = Resolve-Path";
+	command += " Magma\\projects\\Project\\build\\bin\\Project.exe;";
+	command += " Start-Process $ExePath";
+	command += " -WorkingDir \'" + m_RootPath + "\';";
 	system(command.c_str());
 }
 
