@@ -80,29 +80,58 @@ void DefaultSceneRenderer::Render() {
 	}
 	Renderer::EndPass();
 	Renderer::Flush();
-	
-	// if(m_Options.LightingOptions.Enabled) {
-		// auto& lights = m_Scene->GetLights();
-		
-		// auto shader = m_LightingPass->GetPipeline();
-		// shader->Bind();
-		// LightBuffer->SetData();
-		// for(const auto& light : m_Scene->GetPointLights()) {
-		// 	shader->SetVec3("u_PointLights[0].Position", light.Position);
-		// 	shader->SetVec3("u_PointLights[0].Ambient",  light.Ambient);
-		// 	shader->SetVec3("u_PointLights[0].Diffuse",  light.Diffuse);
-		// 	shader->SetVec3("u_PointLights[0].Specular", light.Specular);
-
-		// 	shader->SetFloat("u_PointLights[0].Constant",  light.Constant);
-		// 	shader->SetFloat("u_PointLights[0].Linear",    light.Linear);
-		// 	shader->SetFloat("u_PointLights[0].Quadratic", light.Quadratic);
-		// }
-		// shader->SetInt("u_PointLightCount", 1);
-
-		// shader->SetTexture("u_Material.Diffuse", cube->GetMaterial().Diffuse, 0);
-		// shader->SetTexture("u_Material.Specular", cube->GetMaterial().Specular, 1);
-		// shader->SetFloat("u_Material.Shininess", 32.0f);
-	// }
 }
+
+#if 0
+
+void DefaultSceneRenderer::Render() {
+	auto camera = m_Controller.GetCamera();
+
+	Renderer::StartPass(m_DrawPass);
+	{
+		Renderer::Clear();
+		Renderer3D::Begin(camera);
+	
+		if(Options["Lighting"]["Enabled"])
+		{
+			// TODO(Fix): Only submit NEW lights
+			m_PointLightBuffer.Clear();
+			m_Scene->EntityWorld
+			.ForEach<MeshComponent>(
+				[this](Entity& entity)
+				{
+					auto meshComponent = entity.Get<MeshComponent>();
+					auto mat = meshComponent.Mesh->GetMaterial();
+					if(mat.Emissive) {
+						PointLight light;
+						light.Position = entity.Get<TransformComponent>().Translation;
+						light.Ambient = mat.Emissive.Ambient;
+						light.Diffuse = mat.Emissive.Diffuse;
+						light.Specular = mat.Emissive.Specular;
+						m_PointLightBuffer.Add(light);
+					}
+				});
+
+			Renderer::GetPass()->GetUniforms()
+			.Set("u_PointLightCount",
+				[this]() -> int32_t
+				{
+					return m_PointLightBuffer.GetCount();
+				});
+	
+			// shader->SetTexture("u_Material.Diffuse", cube->GetMaterial().Diffuse, 0);
+			// shader->SetTexture("u_Material.Specular", cube->GetMaterial().Specular, 1);
+			// shader->SetFloat("u_Material.Shininess", 32.0f);
+		}
+
+		m_RenderSystem.run();
+
+		Renderer3D::End();
+	}
+	Renderer::EndPass();
+	Renderer::Flush();
+}
+
+#endif
 
 }

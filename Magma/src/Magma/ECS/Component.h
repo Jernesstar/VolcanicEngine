@@ -43,7 +43,7 @@ struct CameraComponent : public Component {
 };
 
 struct MeshComponent : public Component {
-	// TODO(Fix): AssetID
+	// TODO(Change): AssetID
 	Ref<VolcaniCore::Mesh> Mesh;
 
 	MeshComponent() = default;

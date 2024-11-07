@@ -7,6 +7,8 @@
 #include <VolcaniCore/Renderer/Camera.h>
 #include <VolcaniCore/Renderer/CameraController.h>
 
+#include "JSONParser.h"
+
 #include "Light.h"
 
 using namespace VolcaniCore;
@@ -41,11 +43,7 @@ protected:
 class DefaultSceneRenderer : public SceneRenderer {
 public:
 	// TODO: Replace with map of string values
-	struct Options {
-		struct Lighting {
-			bool Enabled = false;
-		} LightingOptions;
-	};
+	JSONParserNode Options;
 
 public:
 	DefaultSceneRenderer() = default;
@@ -58,6 +56,8 @@ public:
 private:
 	Ref<RenderPass> m_DrawPass;
 	Ref<RenderPass> m_LightingPass;
+
+	Buffer<PointLight> m_PointLightBuffer;
 
 	flecs::system m_RenderSystem;
 };
