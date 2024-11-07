@@ -92,7 +92,7 @@ void DefaultSceneRenderer::Render() {
 		Renderer::Clear();
 		Renderer3D::Begin(camera);
 	
-		if(Options["Lighting"]["Enabled"])
+		if(Options["Lighting"]["Enabled"].As<bool>())
 		{
 			// TODO(Fix): Only submit NEW lights
 			m_PointLightBuffer.Clear();

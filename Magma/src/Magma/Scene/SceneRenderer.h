@@ -7,7 +7,7 @@
 #include <VolcaniCore/Renderer/Camera.h>
 #include <VolcaniCore/Renderer/CameraController.h>
 
-#include "JSONParser.h"
+#include "Core/JSONParser.h"
 
 #include "Light.h"
 
@@ -43,7 +43,7 @@ protected:
 class DefaultSceneRenderer : public SceneRenderer {
 public:
 	// TODO: Replace with map of string values
-	JSONParserNode Options;
+	// JSONParserNode Options;
 
 public:
 	DefaultSceneRenderer() = default;

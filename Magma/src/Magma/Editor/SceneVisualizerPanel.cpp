@@ -20,11 +20,14 @@ SceneVisualizerPanel::SceneVisualizerPanel(Scene* context)
 	auto height = Application::GetWindow()->GetHeight();
 	m_Image = CreateRef<UI::Image>(Texture::Create(width, height));
 
+	m_Renderer = CreateRef<SceneVisualizerPanel::Renderer>();
+
 	SetContext(context);
 }
 
 void SceneVisualizerPanel::SetContext(Scene* context) {
 	m_Context = context;
+	// m_Context->SetRenderer(m_Renderer);
 	auto framebuffer = m_Context->GetRenderer()->GetOutput();
 	m_Image->SetImage(framebuffer, AttachmentTarget::Color);
 
@@ -86,6 +89,14 @@ void SceneVisualizerPanel::Draw() {
 		}
 	}
 	ImGui::End();
+}
+
+void SceneVisualizerPanel::Renderer::Update(TimeStep ts) {
+
+}
+
+void SceneVisualizerPanel::Renderer::Render() {
+
 }
 
 }

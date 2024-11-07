@@ -21,8 +21,8 @@ public:
 
 	template<typename TComponent>
 	requires std::derived_from<TComponent, Component>
-	bool Has() {
-		return m_Handle.get_mut<TComponent>() != nullptr;
+	bool Has() const {
+		return m_Handle.get<TComponent>() != nullptr;
 	}
 
 	template<typename TComponent, typename ...Args>
