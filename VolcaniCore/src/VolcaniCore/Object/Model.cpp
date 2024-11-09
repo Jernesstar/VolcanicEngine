@@ -73,8 +73,10 @@ Ref<Mesh> LoadMesh(const std::string& path,
 									  : aiVector3D(0.0f, 0.0f, 0.0f);
 
 		glm::vec4 uvColor = glm::vec4(texCoord.x, texCoord.y, 0, 0);
-		if(res == AI_SUCCESS && !mesh->HasTextureCoords(0))
+		if(!mesh->HasTextureCoords(0)) {
+			VOLCANICORE_LOG_INFO("No texture!");
 			uvColor = diffuse;
+		}
 
 		Vertex v{
 			.Position		= glm::vec3(pos.x, pos.y, pos.z),
@@ -103,10 +105,10 @@ Ref<Mesh> LoadMesh(const std::string& path,
 
 	Ref<Mesh> newMesh = Mesh::Create(vertices, indices,
 		Material{
-			.Diffuse   = LoadTexture(dir, mat, aiTextureType_DIFFUSE),
-			.Specular  = LoadTexture(dir, mat, aiTextureType_SPECULAR),
+			.Diffuse  = LoadTexture(dir, mat, aiTextureType_DIFFUSE),
+			.Specular = LoadTexture(dir, mat, aiTextureType_SPECULAR),
+			.Emissive = LoadTexture(dir, mat, aiTextureType_EMISSIVE)
 			// .Roughness = LoadTexture(dir, mat, aiTextureType_DIFFUSE_ROUGHNESS)
-			// .Emissive = LoadTexture(dir, mat, aiTextureType_EMISSIVE)
 		}
 	);
 

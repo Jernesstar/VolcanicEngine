@@ -13,6 +13,7 @@ namespace VolcaniCore {
 struct Material {
 	Ref<Texture> Diffuse = nullptr;
 	Ref<Texture> Specular = nullptr;
+	Ref<Texture> Emissive = nullptr;
 };
 
 // TODO(Change): Make Point and Line a kind of Mesh
