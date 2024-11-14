@@ -1,12 +1,14 @@
 #pragma once
 
-#include "Entity.h"
+#include "System.h"
 
 namespace Magma::ECS {
 
-class ScriptSystem {
+class ScriptSystem : public System<ScriptComponent> {
 public:
-
+	void Submit(Entity& entity) override;
+	void Update(TimeStep ts) override;
+	void Run() override;
 };
 
 }

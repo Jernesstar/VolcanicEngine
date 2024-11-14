@@ -7,6 +7,8 @@
 #include <VolcaniCore/Core/UUID.h>
 
 #include "Entity.h"
+#include "Component.h"
+#include "System.h"
 
 using namespace VolcaniCore;
 
@@ -29,11 +31,33 @@ public:
 	void RemoveEntity(VolcaniCore::UUID id);
 	void RemoveEntity(const std::string& tag);
 
+	template<typename TSystem>
+	void Add(TSystem::RunStage stage) {
+		Ref<System<>> sys = CreateRef<TSystem>();
+		m_Systems.push_back(sys);
+
+		m_World
+		.system<TSystem::RequiredComponents>(m_Systems.size())
+		.kind(stage)
+		.run(
+			[&](flecs::iter& it)
+			{
+				while(it.next())
+					for(auto entityID : it) {
+						Entity entity{ entityID };
+						sys->Submit(entity);
+					}
+
+				sys->Update(it.delta_time());
+				sys->Run();
+			});
+	}
+
 	void ForEach(const Func<Entity&, void>& func);
 
 	template<typename TComponent>
 	void ForEach(const Func<Entity&, void>& func) {
-		flecs::query<TComponent>& query = GetQuery<TComponent>();
+		flecs::query<TComponent> query = GetQuery<TComponent>();
 
 		query.each(
 			[func](flecs::entity handle, TComponent& _)
@@ -57,9 +81,16 @@ private:
 	flecs::query<TransformComponent> m_TransformComponentQuery;
 	flecs::query<ScriptComponent>	 m_ScriptComponentQuery;
 
+	List<Ref<System<>>> m_Systems;
+
 private:
-	template<typename TComponent>
-	flecs::query<TComponent>& GetQuery();
+	template<typename ...TComponents>
+	flecs::query<TComponents...> GetQuery() {
+		return m_World.query_builder<TComponents...>()
+		.template with<TComponents...>()
+		.cached()
+		.build();
+	}
 };
 
 }

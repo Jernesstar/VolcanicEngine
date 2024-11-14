@@ -49,7 +49,7 @@ struct HitInfo {
 
 class World {
 public:
-	static constexpr float StepSize = 1.0f / 60.0f;
+	static const float StepSize;
 
 public:
 	World();
@@ -70,14 +70,10 @@ public:
 	void AddContactCallback(Ref<RigidBody> actor1, Ref<RigidBody> actor2,
 		const std::function<void(Ref<RigidBody>, Ref<RigidBody>)>& callback);
 
-	const std::vector<Ref<RigidBody>>& GetActors() const { return m_Actors; }
+	const List<Ref<RigidBody>>& GetActors() const { return m_Actors; }
 
-	std::vector<Ref<RigidBody>>::const_iterator begin() {
-		return m_Actors.begin();
-	}
-	std::vector<Ref<RigidBody>>::const_iterator end() {
-		return m_Actors.end();
-	}
+	List<Ref<RigidBody>>::const_iterator begin() { return m_Actors.begin(); }
+	List<Ref<RigidBody>>::const_iterator end() { return m_Actors.end(); }
 
 	// PxScene* Get() { return m_Scene; }
 
@@ -87,7 +83,7 @@ private:
 
 	uint64_t m_ActorCount = 0;
 	uint64_t m_MaxActorCount = 0;
-	std::vector<Ref<RigidBody>> m_Actors;
+	List<Ref<RigidBody>> m_Actors;
 
 	float m_Accumulator = 0.0f;
 };

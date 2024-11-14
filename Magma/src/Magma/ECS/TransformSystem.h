@@ -2,20 +2,22 @@
 
 #include <VolcaniCore/Renderer/Transform.h>
 
-#include "Entity.h"
-
-using namespace VolcaniCore;
+#include "System.h"
 
 namespace Magma::ECS {
 
-class TransformSystem {
+class TransformSystem : public System<TransformComponent> {
 public:
-	static Transform GetTransform(Entity& entity);
-	static void SetTransform(Entity& entity, const Transform& tr);
+	void Submit(Entity& entity) override;
+	void Update(TimeStep ts) override;
+	void Run() override;
 
-	static void Translate(Entity& entity);
-	static void Rotate(Entity& entity);
-	static void Scale(Entity& entity);
+	Transform GetTransform(Entity& entity);
+	void SetTransform(Entity& entity, const Transform& tr);
+
+	void Translate(Entity& entity);
+	void Rotate(Entity& entity);
+	void Scale(Entity& entity);
 };
 
 }
