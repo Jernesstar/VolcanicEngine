@@ -10,6 +10,8 @@
 #include "Component.h"
 #include "System.h"
 
+#include "EntityBuilder.h"
+
 using namespace VolcaniCore;
 
 namespace Magma::ECS {
@@ -24,6 +26,13 @@ public:
 	Entity GetEntity(const std::string& tag);
 	Entity GetEntity(VolcaniCore::UUID id);
 
+	EntityBuilder BuildEntity() { return EntityBuilder{ *this }; }
+	EntityBuilder BuildEntity(VolcaniCore::UUID id) {
+		return EntityBuilder{ *this, id };
+	}
+	EntityBuilder BuildEntity(const std::string& tag) {
+		return EntityBuilder{ *this, tag };
+	}
 	Entity AddEntity();
 	Entity AddEntity(VolcaniCore::UUID id);
 	Entity AddEntity(const std::string& tag);
@@ -32,42 +41,17 @@ public:
 	void RemoveEntity(const std::string& tag);
 
 	template<typename TSystem>
-	void Add(TSystem::RunStage stage) {
-		Ref<System<>> sys = CreateRef<TSystem>();
-		m_Systems.push_back(sys);
+	void Add(TSystem::RunStage stage);
 
-		m_World
-		.system<TSystem::RequiredComponents>(m_Systems.size())
-		.kind(stage)
-		.run(
-			[&](flecs::iter& it)
-			{
-				while(it.next())
-					for(auto entityID : it) {
-						Entity entity{ entityID };
-						sys->Submit(entity);
-					}
-
-				sys->Update(it.delta_time());
-				sys->Run();
-			});
-	}
+	template<typename TSystem>
+	void Get();
 
 	void ForEach(const Func<Entity&, void>& func);
 
 	template<typename TComponent>
-	void ForEach(const Func<Entity&, void>& func) {
-		flecs::query<TComponent> query = GetQuery<TComponent>();
+	void ForEach(const Func<Entity&, void>& func);
 
-		query.each(
-			[func](flecs::entity handle, TComponent& _)
-			{
-				Entity entity{ handle };
-				func(entity);
-			});
-	}
-
-	flecs::world& Get() { return m_World; }
+	flecs::world& GetNative() { return m_World; }
 
 private:
 	flecs::world m_World;

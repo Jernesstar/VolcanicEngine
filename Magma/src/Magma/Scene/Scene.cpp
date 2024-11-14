@@ -44,7 +44,7 @@ void Scene::Save(const std::string& path) {
 }
 
 void Scene::RegisterSystems() {
-	auto& world = EntityWorld.Get();
+	auto& world = EntityWorld.GetNative();
 
 	world
 	.system<const ScriptComponent, TransformComponent>("InputUpdate")
@@ -84,7 +84,7 @@ void Scene::RegisterSystems() {
 }
 
 void Scene::RegisterObservers() {
-	auto& world = EntityWorld.Get();
+	auto& world = EntityWorld.GetNative();
 
 	// Creating RigidBodyComponent then MeshComponent ==> bounding volume
 	// Creating MeshComponent then RigidBodyComponent ==> tightly-fitting volume

@@ -8,7 +8,7 @@ class ScriptSystem : public System<ScriptComponent> {
 public:
 	void Submit(Entity& entity) override;
 	void Update(TimeStep ts) override;
-	void Run() override;
+	void Run(Phase phase) override;
 };
 
 }

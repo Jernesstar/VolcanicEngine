@@ -10,7 +10,7 @@ class PhysicsSystem : public System<RigidBodyComponent> {
 public:
 	void Submit(Entity& entity) override;
 	void Update(TimeStep ts) override;
-	void Run() override;
+	void Run(Phase phase) override;
 
 	void Register(Entity& entity);
 	void Collides(Entity& e1, Entity& e2);

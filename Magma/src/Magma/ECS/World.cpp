@@ -106,4 +106,43 @@ void World::ForEach(const Func<Entity&, void>& func) {
 	m_World.defer_end();
 }
 
+template<typename TComponent>
+void World::ForEach(const Func<Entity&, void>& func) {
+	flecs::query<TComponent> query = GetQuery<TComponent>();
+
+	query.each(
+		[func](flecs::entity handle, TComponent& _)
+		{
+			Entity entity{ handle };
+			func(entity);
+		});
+}
+
+template<typename TSystem>
+void World::Add(TSystem::RunStage stage) {
+	Ref<System<>> sys = CreateRef<TSystem>();
+	m_Systems.push_back(sys);
+
+	m_World
+	.system<TSystem::RequiredComponents>(m_Systems.size())
+	.kind(stage)
+	.run(
+		[&](flecs::iter& it)
+		{
+			while(it.next())
+				for(auto entityID : it) {
+					Entity entity{ entityID };
+					sys->Submit(entity);
+				}
+
+			sys->Update(it.delta_time());
+			sys->Run();
+		});
+}
+
+template<typename TSystem>
+void World::Get() {
+
+}
+
 }

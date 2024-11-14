@@ -26,19 +26,20 @@ class System {
 	using RequiredComponents = TypeList<TRequires...>;
 
 public:
-	enum class RunStage { PreUpdate, OnUpdate, PostUpdate };
+	enum class Phase { PreUpdate, OnUpdate, PostUpdate };
 
 public:
-	RunStage Stage;
-
-public:
-	System(RunStage stage)
+	System(Phase stage)
 		: Stage(stage) { }
 	virtual ~System() = default;
 
-	virtual void Submit(Entity& entity) { }
-	virtual void Update(TimeStep ts) { }
-	virtual void Run() { }
+	virtual void Submit(Entity& entity) = 0;
+	virtual void Update(TimeStep ts) = 0;
+	virtual void Run(Phase phase) = 0;
+
+	RequiredComponents& GetRequired(Entity& entity) {
+		return entity.Get<TRequires>()...;
+	}
 
 private:
 	

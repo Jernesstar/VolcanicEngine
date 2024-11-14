@@ -11,15 +11,15 @@ void TransformSystem::SetTransform(Entity& entity, const Transform& tr) {
 	entity.Get<TransformComponent>() = tr;
 }
 
-void TransformSystem::Translate(Entity& entity) {
+void TransformSystem::Translate(Entity& entity, const glm::vec3& vec) {
+	auto& [tc] = GetRequired(entity);
+}
+
+void TransformSystem::Rotate(Entity& entity, const glm::vec3& vec) {
 
 }
 
-void TransformSystem::Rotate(Entity& entity) {
-
-}
-
-void TransformSystem::Scale(Entity& entity) {
+void TransformSystem::Scale(Entity& entity, const glm::vec3& vec) {
 
 }
 

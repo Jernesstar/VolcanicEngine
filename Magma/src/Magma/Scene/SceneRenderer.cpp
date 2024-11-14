@@ -32,7 +32,7 @@ DefaultSceneRenderer::DefaultSceneRenderer(Scene* scene)
 	m_Controller.SetCamera(camera);
 	m_Controller.TranslationSpeed = 10.0f;
 
-	auto& world = m_Scene->EntityWorld.Get();
+	auto& world = m_Scene->EntityWorld.GetNative();
 	m_RenderSystem = world
 	.system<const TransformComponent, const MeshComponent>("RenderSystem")
 	.kind(0)
