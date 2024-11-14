@@ -5,7 +5,7 @@
 #include <VolcaniCore/Core/Assert.h>
 #include <VolcaniCore/Core/Buffer.h>
 
-#include "BufferLayout.h"
+#include "Renderer/BufferLayout.h"
 
 namespace VolcaniCore::OpenGL {
 
@@ -57,16 +57,15 @@ public:
 
 	void Wait() {
 		GLenum exit = GL_UNSIGNALED;
-		while(exit != GL_ALREADY_SIGNALED && exit != GL_CONDITION_SATISFIED)
-		{
+		while(exit != GL_ALREADY_SIGNALED && exit != GL_CONDITION_SATISFIED) {
 			exit = glClientWaitSync(m_Sync, GL_SYNC_FLUSH_COMMANDS_BIT, 1);
 		}
 	}
 
 private:
 	uint32_t m_BufferID;
-	void* m_DataPointer;
 	GLsync m_Sync;
+	void* m_DataPointer;
 };
 
 }

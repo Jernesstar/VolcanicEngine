@@ -1,8 +1,8 @@
 #include "BufferLayout.h"
 
-namespace VolcaniCore::OpenGL {
+namespace VolcaniCore {
 
-uint32_t BufferElement::CalcSize(BufferDataType type) {
+uint32_t CalcSize(BufferDataType type) {
 	switch(type) {
 		case BufferDataType::Float: return 4;
 		case BufferDataType::Int:   return 4;
@@ -17,7 +17,7 @@ uint32_t BufferElement::CalcSize(BufferDataType type) {
 	return 0;
 }
 
-uint32_t BufferElement::CalcCount(BufferDataType type) {
+uint32_t CalcCount(BufferDataType type) {
 	switch(type) {
 		case BufferDataType::Float: return 1;
 		case BufferDataType::Int:   return 1;
