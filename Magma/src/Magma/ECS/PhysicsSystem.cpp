@@ -6,13 +6,23 @@ namespace Magma::ECS {
 
 struct CollidedWith { }; // Tag, indicates that a collision has occured
 
-
 void PhysicsSystem::Update(TimeStep ts) {
 	m_World.OnUpdate(ts);
 }
 
-void PhysicsSystem::Run() {
-
+void PhysicsSystem::Run(Phase phase) {
+	if(phase == Phase::PreUpdate) {
+		auto query =
+		m_EntityWorld->query_builder(m_Query)
+		.with<TransformComponent>()
+		.each(
+			[](flecs::entity id, RigidBodyComponent& r)
+			{
+				Entity entity{ id };
+				auto t = entity.Get<TransformComponent>();
+				r.Body->UpdateTransform({ t.Translation, t.Rotation, t.Scale });
+			});
+	}
 }
 
 void PhysicsSystem::Register(Entity& entity) {

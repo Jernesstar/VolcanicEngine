@@ -120,7 +120,7 @@ void World::ForEach(const Func<Entity&, void>& func) {
 
 template<typename TSystem>
 void World::Add(TSystem::RunStage stage) {
-	Ref<System<>> sys = CreateRef<TSystem>();
+	auto sys = CreateRef<TSystem>();
 	m_Systems.push_back(sys);
 
 	m_World
@@ -129,12 +129,6 @@ void World::Add(TSystem::RunStage stage) {
 	.run(
 		[&](flecs::iter& it)
 		{
-			while(it.next())
-				for(auto entityID : it) {
-					Entity entity{ entityID };
-					sys->Submit(entity);
-				}
-
 			sys->Update(it.delta_time());
 			sys->Run();
 		});
@@ -142,7 +136,7 @@ void World::Add(TSystem::RunStage stage) {
 
 template<typename TSystem>
 void World::Get() {
-
+	for()
 }
 
 }

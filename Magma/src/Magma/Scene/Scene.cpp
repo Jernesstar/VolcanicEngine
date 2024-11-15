@@ -54,22 +54,22 @@ void Scene::RegisterSystems() {
 		{
 			s.OnInput(t);
 		});
-	world
-	.system<const TransformComponent, RigidBodyComponent>("RigidBodyUpdate")
-	.kind(flecs::PreUpdate)
-	.each(
-		[](const TransformComponent& t, RigidBodyComponent& r)
-		{
-			r.Body->UpdateTransform({ t.Translation, t.Rotation, t.Scale });
-		});
-	world
-	.system("PhysicsUpdate")
-	.kind(flecs::OnUpdate)
-	.run(
-		[&](flecs::iter& it)
-		{
-			PhysicsWorld.OnUpdate(it.delta_time());
-		});
+	// world
+	// .system<const TransformComponent, RigidBodyComponent>("RigidBodyUpdate")
+	// .kind(flecs::PreUpdate)
+	// .each(
+	// 	[](const TransformComponent& t, RigidBodyComponent& r)
+	// 	{
+	// 		r.Body->UpdateTransform({ t.Translation, t.Rotation, t.Scale });
+	// 	});
+	// world
+	// .system("PhysicsUpdate")
+	// .kind(flecs::OnUpdate)
+	// .run(
+	// 	[&](flecs::iter& it)
+	// 	{
+	// 		PhysicsWorld.OnUpdate(it.delta_time());
+	// 	});
 	world
 	.system<const RigidBodyComponent, TransformComponent>("TransformUpdate")
 	.kind(flecs::PostUpdate)

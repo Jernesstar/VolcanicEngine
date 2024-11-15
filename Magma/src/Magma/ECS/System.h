@@ -23,17 +23,17 @@ namespace Magma::ECS {
 
 template<typename ...TRequires>
 class System {
+public:
 	using RequiredComponents = TypeList<TRequires...>;
 
 public:
 	enum class Phase { PreUpdate, OnUpdate, PostUpdate };
 
 public:
-	System(Phase stage)
-		: Stage(stage) { }
+	System(World& world)
+		: m_EntityWorld(&world) { }
 	virtual ~System() = default;
 
-	virtual void Submit(Entity& entity) = 0;
 	virtual void Update(TimeStep ts) = 0;
 	virtual void Run(Phase phase) = 0;
 
@@ -41,8 +41,10 @@ public:
 		return entity.Get<TRequires>()...;
 	}
 
-private:
-	
+protected:
+	World* m_EntityWorld;
+
+	flecs::query<TRequires&...> m_Query;
 };
 
 }
