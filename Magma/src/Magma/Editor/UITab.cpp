@@ -136,7 +136,7 @@ void UITab::OpenUI() {
 	if(instance->Display("ChooseFile")) {
 		if(instance->IsOk()) {
 			std::string path = instance->GetFilePathName();
-			// m_Root = UI::UIBuilder<UI::UIElement>(path).Finalize();
+			m_Root = UI::UISerializer::Load(path);
 		}
 
 		instance->Close();

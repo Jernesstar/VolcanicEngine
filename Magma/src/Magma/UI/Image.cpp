@@ -19,6 +19,7 @@ Ref<UI::Image> Image::Create(const UI::Image::Specification& specs) {
 		image = CreateRef<UI::Image>(specs.Path);
 	else
 		image = CreateRef<UI::Image>(Texture::Create(specs.Width, specs.Height));
+
 	image->SetPosition(specs.x, specs.y);
 	if(specs.Width && specs.Height)
 		image->SetSize(specs.Width, specs.Height);
@@ -41,9 +42,9 @@ void Image::SetImage(Ref<Texture> image) {
 	if(!image)
 		return;
 
-	m_Image = image;
-	m_Width = m_Image->GetWidth();
-	m_Height = m_Image->GetHeight();
+	Content = image;
+	Width = Content->GetWidth();
+	Height = Content->GetHeight();
 }
 
 void Image::SetImage(const std::string& imagePath) {
@@ -56,15 +57,15 @@ void Image::SetImage(const std::string& imagePath) {
 void Image::SetImage(Ref<Framebuffer> framebuffer, AttachmentTarget target) {
 	auto& attachment = framebuffer->As<OpenGL::Framebuffer>()->Get(target);
 
-	m_Image->As<OpenGL::Texture2D>()->SetID(attachment.GetRendererID());
-	m_Width = attachment.GetWidth();
-	m_Height = attachment.GetHeight();
+	Content->As<OpenGL::Texture2D>()->SetID(attachment.GetRendererID());
+	Width = attachment.GetWidth();
+	Height = attachment.GetHeight();
 }
 
 void Image::Draw() {
-	auto image = m_Image->As<OpenGL::Texture2D>();
+	auto image = Content->As<OpenGL::Texture2D>();
 
-	ImVec2 dim = ImVec2(m_Width, m_Height);
+	ImVec2 dim = ImVec2(Width, Height);
 	ImGui::SetCursorPos(ImVec2(x, y));
 	ImGui::Image((ImTextureID)(intptr_t)image->GetID(), dim);
 }

@@ -21,8 +21,6 @@ Ref<UI::Button> Button::Create(const UI::Button::Specification& specs) {
 		CreateRef<UI::Button>(specs.Color, specs.Text, specs.TextColor);
 	button->x = specs.x;
 	button->y = specs.y;
-	button->OnPressed = specs.OnPressed;
-	button->OnReleased = specs.OnReleased;
 
 	return button;
 }
@@ -32,7 +30,7 @@ Button::Button(const glm::vec4& color, const std::string& text,
 	: UIElement(UIElement::Type::Button)
 {
 	Add(CreateRef<UI::Text>(text, textColor));
-	m_Color = color;
+	Color = color;
 }
 
 Button::Button(const std::string& imagePath)
@@ -42,9 +40,10 @@ Button::Button(const std::string& imagePath)
 }
 
 void Button::Draw() {
-	ImVec4 color{ m_Color.r, m_Color.g, m_Color.b, m_Color.a };
-	ImVec4 hover{ m_Color.r, m_Color.g, m_Color.b, m_Color.a - 0.4f };
-	ImVec4 press{ m_Color.r, m_Color.g, m_Color.b, m_Color.a - 0.8f };
+	ImVec4 color{ Color.r, Color.g, Color.b, Color.a };
+	// TODO(Change): Move to Animation
+	ImVec4 hover{ Color.r, Color.g, Color.b, Color.a - 0.4f };
+	ImVec4 press{ Color.r, Color.g, Color.b, Color.a - 0.8f };
 
 	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 0, 0 });
 	ImGui::PushStyleColor(ImGuiCol_Button, color);
@@ -53,10 +52,10 @@ void Button::Draw() {
 
 	ImGui::SetCursorPos(ImVec2(x, y));
 
-	if(ButtonFunction(m_Display, ImVec2(m_Width, m_Height)))
-		OnPressed();
+	if(ButtonFunction(m_Display, ImVec2(Width, Height)))
+		// OnPressed();
 	if(ImGui::IsItemDeactivated())
-		OnReleased();
+		// OnReleased();
 
 	ImGui::PopStyleColor();
 	ImGui::PopStyleColor();
@@ -74,27 +73,27 @@ bool Button::OnAddElement(Ref<UIElement> element) {
 		return false;
 
 	m_Display = element;
-	hasText = element->GetType() == UIElement::Type::Text;
-	hasImage = !hasText;
+	m_HasImage = element->GetType() == UIElement::Type::Image;
 
-	if(hasText)
-		ButtonFunction = ButtonText;
-	else
+	if(m_HasImage)
 		ButtonFunction = ButtonImage;
+	else
+		ButtonFunction = ButtonText;
 
 	return false;
 }
 
 bool ButtonText(Ref<UIElement> element, ImVec2 dim) {
-	std::string text = element->As<Text>()->Get();
+	std::string text = element->As<Text>()->Content;
 	return ImGui::Button(text.c_str(), dim);
 }
 
 bool ButtonImage(Ref<UIElement> element, ImVec2 dim) {
-	auto tex = element->As<Image>()->GetImage()->As<OpenGL::Texture2D>();
+	auto tex = element->As<Image>()->Content->As<OpenGL::Texture2D>();
 	tex->Bind();
-	return ImGui::ImageButton(
-			"##Button", (void*)(uint64_t)(uint32_t)tex->GetID(), dim);
+	return
+		ImGui::ImageButton(element->GetID().c_str(),
+			(ImTextureID)(intptr_t)tex->GetID(), dim);
 }
 
 }

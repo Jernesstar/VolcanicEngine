@@ -3,6 +3,7 @@
 #include <glm/vec4.hpp>
 
 #include <Core/Defines.h>
+#include <Core/UUID.h>
 
 #include "Core/JSONSerializer.h"
 
@@ -17,8 +18,8 @@ public:
 		Window,
 		Button,
 		Dropdown,
-		TextInput,
 		Text,
+		TextInput,
 		Image
 	};
 
@@ -35,8 +36,17 @@ public:
 // 	static Ref<UIElement> Create(const UIElement::Specification& specs);
 
 public:
-	UIElement(UIElement::Type type, uint32_t width = 0, uint32_t height = 0,
-			  float x = 0.0f, float y = 0.0f, const glm::vec4& color = { },
+	uint32_t Width = 0;
+	uint32_t Height = 0;
+	float x = 0;
+	float y = 0;
+	glm::vec4 Color;
+
+public:
+	UIElement(UIElement::Type type)
+		: m_Type(type), m_ID(std::to_string(UUID())) { }
+	UIElement(UIElement::Type type, uint32_t width, uint32_t height,
+			  float x, float y, const glm::vec4& color,
 			  Ref<UIElement> parent = nullptr);
 	virtual ~UIElement() = default;
 
@@ -46,37 +56,25 @@ public:
 
 	template<typename TUIElement, typename ...Args>
 	requires std::derived_from<TUIElement, UIElement>
-	Ref<TUIElement> Add(Args&&... args) {
-		Ref<UIElement> element{ new TUIElement(std::forward<Args>(args)...) };
-		return std::static_pointer_cast<TUIElement>(Add(element));
-	}
+	Ref<TUIElement> Add(Args&&... args);
 
-	void Clear() {
-		m_Children.clear();
-	}
+	bool IsClicked() const { return m_Clicked; }
+	bool IsHovered() const { return m_Hovered; }
 
-	UIElement::Type GetType() { return m_Type; }
+	UIElement* SetSize(uint32_t width, uint32_t height);
+	UIElement* SetPosition(float x, float y);
 
-	uint32_t GetWidth() const { return m_Width; }
-	uint32_t GetHeight() const { return m_Height; }
+	UIElement* CenterX();
+	UIElement* CenterY();
+	UIElement* Center();
 
-	float GetPositionX() const { return x; }
-	float GetPositionY() const { return y; }
+	void Clear();
 
-	glm::vec4 GetColor() const { return m_Color; }
+	UIElement::Type GetType() const { return m_Type; }
+	std::string GetID() const { return m_ID; }
 
+	Ref<UIElement> GetChild(const std::string& id);
 	List<Ref<UI::UIElement>> GetChildren() const { return m_Children; }
-
-	UIElement* SetSize(uint32_t width, uint32_t height) {
-		this->m_Width = width;
-		this->m_Height = height;
-		return this;
-	}
-	UIElement* SetPosition(float x, float y) {
-		this->x = x;
-		this->y = y;
-		return this;
-	}
 
 	template<typename TUIElement>
 	requires std::derived_from<TUIElement, UIElement>
@@ -89,15 +87,17 @@ protected:
 
 protected:
 	const Type m_Type;
+	const std::string m_ID;
 
 	UIElement* m_Parent;
 	std::vector<Ref<UIElement>> m_Children;
 
-	uint32_t m_Width = 0;
-	uint32_t m_Height = 0;
-	float x = 0;
-	float y = 0;
-	glm::vec4 m_Color;
+	bool m_Clicked;
+	bool m_Hovered;
+	bool m_MouseDown;
+	bool m_MouseUp;
+
+	friend class UISerializer;
 };
 
 }

@@ -62,6 +62,11 @@ JSONSerializer& JSONSerializer::Write(int64_t value) {
 	return *this;
 }
 
+JSONSerializer& JSONSerializer::Write(bool value) {
+	m_Writer.Bool(value);
+	return *this;
+}
+
 JSONSerializer& JSONSerializer::Write(float value) {
 	m_Writer.Double(value);
 	return *this;

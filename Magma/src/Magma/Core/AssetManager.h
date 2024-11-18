@@ -20,7 +20,7 @@ public:
 	// static Ref<T> Create(Args&&... args);
 
 	template<typename T, typename ...Args>
-	static Ref<T> CreateOrReturn(const Args&... args);
+	static Ref<T> GetOrCreate(const Args&... args);
 };
 
 }

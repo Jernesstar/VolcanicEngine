@@ -4,9 +4,9 @@
 
 namespace Magma::UI {
 
-class DropDown : public UIElement {
+class Dropdown : public UIElement {
 public:
-	DropDown();
+	Dropdown();
 
 	std::string GetSelection() const { return std::string(m_CurrentItem); }
 

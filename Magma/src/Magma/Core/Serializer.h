@@ -36,6 +36,8 @@ public:
 	virtual Serializer& Write(uint64_t value) = 0;
 	virtual Serializer& Write(int64_t  value) = 0;
 
+	virtual Serializer& Write(bool value) = 0;
+
 	virtual Serializer& Write(float value) = 0;
 
 	virtual Serializer& Write(const glm::vec2& value) = 0;
@@ -45,7 +47,9 @@ public:
 	virtual Serializer& Write(const char* value) = 0;
 
 	template<typename TData>
-	Serializer& Write(const TData& value);
+	Serializer& Write(const TData& value) {
+		return *this;
+	}
 
 	template<typename TData>
 	Serializer& Write(const List<TData>& values) {

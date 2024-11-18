@@ -276,7 +276,7 @@ void DeserializeEntity(YAML::Node entityNode, Scene* scene) {
 
 		if(meshNode["Path"]) {
 			auto path = meshNode["Path"].as<std::string>();
-			entity.Add<MeshComponent>(AssetManager::CreateOrReturn<Mesh>(path));
+			entity.Add<MeshComponent>(AssetManager::GetOrCreate<Mesh>(path));
 		}
 		else {
 			auto v = meshNode["Vertices"].as<std::vector<VolcaniCore::Vertex>>();

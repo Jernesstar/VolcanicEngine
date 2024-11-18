@@ -31,6 +31,8 @@ public:
 	JSONSerializer& Write(uint64_t value) override;
 	JSONSerializer& Write(int64_t value) override;
 
+	JSONSerializer& Write(bool value) override;
+
 	JSONSerializer& Write(float value) override;
 
 	JSONSerializer& Write(const glm::vec2& value) override;

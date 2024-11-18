@@ -9,7 +9,6 @@ namespace Magma::UI {
 class Window : public UIElement {
 public:
 	struct Specification {
-		std::string Name = "##Window";
 		uint32_t Width = 100;
 		uint32_t Height = 100;
 		float x = 0;
@@ -18,20 +17,22 @@ public:
 
 		uint32_t BorderWidth = 0;
 		uint32_t BorderHeight = 0;
-		glm::vec4 BorderColor = glm::vec4(1.0f);
+		glm::vec4 BorderColor = glm::vec4(0.0f);
 	};
+
+public:
+	uint32_t BorderWidth = 0;
+	uint32_t BorderHeight = 0;
+	glm::vec4 BorderColor = glm::vec4(0.0f);
 
 public:
 	static Ref<UI::Window> Create(const UI::Window::Specification& specs);
 
 public:
-	Window(std::string name, uint32_t width = 100, uint32_t height = 100,
-			float x = 0.0f, float y = 0.0f,
-			const glm::vec4& bgColor = glm::vec4(1.0f),
-			uint32_t borderWidth = 0, uint32_t borderHeight = 0,
-			const glm::vec4& borderColor = glm::vec4(1.0f));
-
-	std::string GetName() const { return m_Name; }
+	Window(uint32_t width, uint32_t height, float x, float y,
+			const glm::vec4& bgColor,
+			uint32_t borderWidth, uint32_t borderHeight,
+			const glm::vec4& borderColor);
 
 	bool IsOpen() const { return m_Open; }
 	void Open() { m_Open = true; }
@@ -43,9 +44,6 @@ protected:
 	bool OnAddElement(Ref<UIElement> element) override;
 
 private:
-	std::string m_Name;
-	uint32_t m_BorderWidth, m_BorderHeight;
-	glm::vec4 m_BorderColor;
 	bool m_Open = true;
 };
 

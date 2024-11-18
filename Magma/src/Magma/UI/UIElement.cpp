@@ -33,8 +33,9 @@ namespace Magma::UI {
 UIElement::UIElement(UIElement::Type type,
 					 uint32_t width, uint32_t height, float x, float y,
 					 const glm::vec4& color, Ref<UIElement> parent)
-	: m_Type(type), m_Width(width), m_Height(height), x(x), y(y),
-		m_Color(color), m_Parent(parent.get()) { }
+	: m_Type(type), m_ID(std::to_string(UUID())),
+		Width(width), Height(height), x(x), y(y), Color(color),
+			m_Parent(parent.get()) { }
 
 Ref<UIElement> UIElement::Add(Ref<UIElement> element) {
 	if(OnAddElement(element)) {
@@ -58,6 +59,50 @@ void UIElement::Render() {
 
 	if(this->GetType() == UIElement::Type::Window)
 		ImGui::End();
+}
+
+template<typename TUIElement, typename ...Args>
+requires std::derived_from<TUIElement, UIElement>
+Ref<TUIElement> UIElement::Add(Args&&... args) {
+	Ref<UIElement> element{ new TUIElement(std::forward<Args>(args)...) };
+	return std::static_pointer_cast<TUIElement>(Add(element));
+}
+
+UIElement* UIElement::SetSize(uint32_t width, uint32_t height) {
+	this->Width = width;
+	this->Height = height;
+	return this;
+}
+UIElement* UIElement::SetPosition(float x, float y) {
+	this->x = x;
+	this->y = y;
+	return this;
+}
+
+UIElement* UIElement::CenterX() {
+	if(m_Parent)
+		x = m_Parent->x + float(m_Parent->Width - Width)/ 2.0f;
+	return this;
+}
+
+UIElement* UIElement::CenterY() {
+	if(m_Parent)
+		y = m_Parent->y - float(m_Parent->Height - Height) / 2.0f;
+	return this;
+}
+
+UIElement* UIElement::Center() {
+	CenterX();
+	CenterY();
+	return this;
+}
+
+void UIElement::Clear() {
+	m_Children.clear();
+}
+
+Ref<UIElement> UIElement::GetChild(const std::string& id) {
+	// TODO(Implement):
 }
 
 }

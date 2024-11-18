@@ -15,8 +15,11 @@ public:
 	static Ref<UIElement> Load(const std::string& path);
 
 private:
-	static void Serialize(Ref<UIElement> element, JSONSerializer& serializer);
-	static Ref<UIElement> Deserialize(JSONParserNode& serializer);
+	template<typename TUIElement>
+	static void Serialize(Ref<TUIElement> ui, JSONSerializer& serializer) { }
+
+	template<typename TUIElement>
+	static Ref<TUIElement> Deserialize(JSONParserNode& serializer) { }
 };
 
 }

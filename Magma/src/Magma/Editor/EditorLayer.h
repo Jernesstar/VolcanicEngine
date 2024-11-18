@@ -23,10 +23,12 @@ private:
 	List<Ref<Tab>> m_Tabs;
 	Ref<Tab> m_CurrentTab;
 
-	void NewTab();
 	void NewTab(Ref<Tab> tab);
 	void NewTab(const Scene& scene);
 	void NewTab(Ref<UI::UIElement> ui);
+	void NewTab();
+	void OpenTab();
+	void CloseTab();
 
 	void NewProject();
 	void OpenProject();

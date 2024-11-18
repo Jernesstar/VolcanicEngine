@@ -26,6 +26,8 @@ public:
 	YAMLSerializer& Write(uint64_t value) override;
 	YAMLSerializer& Write(int64_t value) override;
 
+	YAMLSerializer& Write(bool value) override;
+
 	YAMLSerializer& Write(float value) override;
 
 	YAMLSerializer& Write(const glm::vec2& value) override;

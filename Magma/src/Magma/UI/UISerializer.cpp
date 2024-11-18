@@ -1,21 +1,46 @@
 #include "UISerializer.h"
 
+#include "UI.h"
+
 namespace Magma::UI {
 
-void UISerializer::Save(Ref<UIElement> ui, const std::string& path) {
-	JSONSerializer serializer;
-	serializer.BeginMapping(); // File
-
-	Serialize(ui, serializer);
-
-	serializer.EndMapping(); // File
-	serializer.Finalize(path);
+template<>
+void UISerializer::Serialize(Ref<Window> ui, JSONSerializer& serializer) {
+	serializer
+		.WriteKey("BorderWidth").Write(ui->BorderWidth)
+		.WriteKey("BorderHeight").Write(ui->BorderHeight)
+		.WriteKey("BorderColor").Write(ui->BorderColor)
+		.WriteKey("Open").Write(ui->IsOpen());
 }
 
-Ref<UI::UIElement> UISerializer::Load(const std::string& path) {
+template<>
+void UISerializer::Serialize(Ref<Button> ui, JSONSerializer& serializer) {
 
 }
 
+template<>
+void UISerializer::Serialize(Ref<Dropdown> ui, JSONSerializer& serializer) {
+
+}
+
+template<>
+void UISerializer::Serialize(Ref<Text> ui, JSONSerializer& serializer) {
+	serializer
+		.WriteKey("Text").Write(ui->Content);
+}
+
+template<>
+void UISerializer::Serialize(Ref<TextInput> ui, JSONSerializer& serializer) {
+	serializer
+		.WriteKey("Text").Write(ui->Text);
+}
+
+template<>
+void UISerializer::Serialize(Ref<Image> ui, JSONSerializer& serializer) {
+	serializer.WriteKey("Path").Write(ui->Content->GetPath());
+}
+
+template<>
 void UISerializer::Serialize(Ref<UIElement> ui, JSONSerializer& serializer) {
 	serializer
 	.BeginMapping()
@@ -46,13 +71,35 @@ void UISerializer::Serialize(Ref<UIElement> ui, JSONSerializer& serializer) {
 	}
 
 	serializer
-		.WriteKey("Width").Write(ui->GetWidth())
-		.WriteKey("Height").Write(ui->GetHeight())
-		.WriteKey("x").Write(ui->GetPositionX())
-		.WriteKey("y").Write(ui->GetPositionY())
-		.WriteKey("Color").Write(ui->GetColor());
+		.WriteKey("Width").Write(ui->Width)
+		.WriteKey("Height").Write(ui->Height)
+		.WriteKey("x").Write(ui->x)
+		.WriteKey("y").Write(ui->y)
+		.WriteKey("Color").Write(ui->Color);
 
-	// ui->OnSerialize(serializer);
+	switch(ui->GetType()) {
+		case UIElement::Type::Empty:
+			Serialize(std::static_pointer_cast<Empty>(ui), serializer);
+			break;
+		case UIElement::Type::Window:
+			Serialize(std::static_pointer_cast<Window>(ui), serializer);
+			break;
+		case UIElement::Type::Button:
+			Serialize(std::static_pointer_cast<Button>(ui), serializer);
+			break;
+		case UIElement::Type::Dropdown:
+			Serialize(std::static_pointer_cast<Dropdown>(ui), serializer);
+			break;
+		case UIElement::Type::Text:
+			Serialize(std::static_pointer_cast<Text>(ui), serializer);
+			break;
+		case UIElement::Type::TextInput:
+			Serialize(std::static_pointer_cast<TextInput>(ui), serializer);
+			break;
+		case UIElement::Type::Image:
+			Serialize(std::static_pointer_cast<Image>(ui), serializer);
+			break;
+	}
 
 	serializer.WriteKey("Children").BeginSequence();
 	for(auto child : ui->GetChildren())
@@ -62,9 +109,53 @@ void UISerializer::Serialize(Ref<UIElement> ui, JSONSerializer& serializer) {
 	serializer.EndMapping();
 }
 
+void UISerializer::Save(Ref<UIElement> ui, const std::string& path) {
+	JSONSerializer serializer;
+	serializer.BeginMapping(); // File
+
+	Serialize(ui, serializer);
+
+	serializer.EndMapping(); // File
+	serializer.Finalize(path);
+}
+
+template<>
+Ref<Window> UISerializer::Deserialize(JSONParserNode& serializer) {
+	
+}
+
+template<>
+Ref<Button> UISerializer::Deserialize(JSONParserNode& serializer) {
+	
+}
+
+template<>
+Ref<Dropdown> UISerializer::Deserialize(JSONParserNode& serializer) {
+	
+}
+
+template<>
+Ref<Text> UISerializer::Deserialize(JSONParserNode& serializer) {
+	
+}
+
+template<>
+Ref<TextInput> UISerializer::Deserialize(JSONParserNode& serializer) {
+	
+}
+
+template<>
+Ref<Image> UISerializer::Deserialize(JSONParserNode& serializer) {
+	
+}
+
+template<>
 Ref<UIElement> UISerializer::Deserialize(JSONParserNode& serializer) {
 	
 }
 
+Ref<UI::UIElement> UISerializer::Load(const std::string& path) {
+	// TODO(Implement):
+}
 
 }

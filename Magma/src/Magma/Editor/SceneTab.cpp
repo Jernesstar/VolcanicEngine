@@ -56,19 +56,19 @@ void SceneTab::Setup() {
 		{
 			.Image = "Magma/assets/icons/PlayButton.png",
 			.Width = 20, .Height = 20,
-			.OnPressed = [this]() { OnScenePlay(); }
+			// .OnPressed = [this]() { OnScenePlay(); }
 		});
 	m_PauseButton = UI::Button::Create(
 		{
 			.Image = "Magma/assets/icons/PauseButton.png",
 			.Width = 20, .Height = 20,
-			.OnPressed = [this]() { OnScenePause(); }
+			// .OnPressed = [this]() { OnScenePause(); }
 		});
 	m_StopButton = UI::Button::Create(
 		{
 			.Image = "Magma/assets/icons/StopButton.png",
 			.Width = 20, .Height = 20,
-			.OnPressed = [this]() { OnSceneStop(); }
+			// .OnPressed = [this]() { OnSceneStop(); }
 		});
 }
 

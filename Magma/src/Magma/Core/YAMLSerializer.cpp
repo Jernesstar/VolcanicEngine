@@ -32,7 +32,6 @@ Serializer& YAMLSerializer::SetOptions(Serializer::Options options) {
 	return *this;
 }
 
-
 YAMLSerializer& YAMLSerializer::BeginSequence() {
 	m_Out << YAML::BeginSeq;
 	return *this;
@@ -74,6 +73,11 @@ YAMLSerializer& YAMLSerializer::Write(uint64_t value) {
 }
 
 YAMLSerializer& YAMLSerializer::Write(int64_t value) {
+	m_Out << YAML::Value << value;
+	return *this;
+}
+
+YAMLSerializer& YAMLSerializer::Write(bool value) {
 	m_Out << YAML::Value << value;
 	return *this;
 }

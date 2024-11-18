@@ -11,17 +11,26 @@
 #include <VolcaniCore/Core/Input.h>
 #include <VolcaniCore/Renderer/RendererAPI.h>
 
+#include "UI/UISerializer.h"
+
 using namespace VolcaniCore;
 
 namespace Magma {
 
 struct {
 	struct {
-		bool newProject  = false;
-		bool openProject = false;
+		bool newProject    = false;
+		bool openProject   = false;
 		bool reloadProject = false;
-		bool runProject  = false;
+		bool runProject    = false;
 	} project;
+
+	struct {
+		bool newTab    = false;
+		bool openTab   = false;
+		bool reopenTab = false;
+		bool closeTab  = false;
+	} tab;
 } menu;
 
 EditorLayer::EditorLayer() {
@@ -72,12 +81,29 @@ void EditorLayer::Render() {
 			if(ImGui::BeginMenu("Project")) {
 				if(ImGui::MenuItem("New", "Ctrl+N"))
 					menu.project.newProject = true;
-				if(ImGui::MenuItem("Open", "Ctrl+O"))
+				if(ImGui::MenuItem("Open", "Ctrl+P"))
 					menu.project.openProject = true;
-				if(ImGui::MenuItem("Reload", "Ctrl+S") || Input::KeysPressed(Key::Ctrl, Key::S))
+				if(ImGui::MenuItem("Reload", "Ctrl+S")
+				|| Input::KeysPressed(Key::Ctrl, Key::S))
 					menu.project.reloadProject = true;
 				if(ImGui::MenuItem("Run", "Ctrl+R"))
 					menu.project.runProject = true;
+
+				ImGui::EndMenu();
+			}
+
+			if(ImGui::BeginMenu("Tab")) {
+				if(ImGui::MenuItem("New", "Ctrl+T")
+				|| Input::KeysPressed(Key::Ctrl, Key::T))
+					menu.tab.newTab = true;
+				if(ImGui::MenuItem("Open", "Ctrl+O"))
+					menu.tab.openTab = true;
+				if(ImGui::MenuItem("Reopen", "Ctrl+Shift+T")
+				|| Input::KeysPressed(Key::Ctrl, Key::Shift, Key::T))
+					menu.tab.reopenTab = true;
+				if(ImGui::MenuItem("Close", "Ctrl+W")
+				|| Input::KeysPressed(Key::Ctrl, Key::W))
+					menu.tab.closeTab = true;
 
 				ImGui::EndMenu();
 			}
@@ -88,7 +114,7 @@ void EditorLayer::Render() {
 		{
 			if(ImGui::BeginTabItem("+", nullptr, ImGuiTabItemFlags_NoReorder)) {
 				if(ImGui::IsItemActivated())
-					NewTab(CreateRef<SceneTab>());
+					menu.tab.newTab = true;
 
 				ImGui::EndTabItem();
 			}
@@ -151,6 +177,17 @@ void EditorLayer::Render() {
 		ReloadProject();
 	if(menu.project.runProject)
 		RunProject();
+
+	if(menu.tab.newTab)
+		NewTab();
+	if(menu.tab.openTab)
+		OpenTab();
+	if(menu.tab.reopenTab)
+		// ReopenTab();
+	if(menu.tab.closeTab)
+		// CloseTab();
+		;
+
 }
 
 void EditorLayer::NewTab(Ref<Tab> tab) {
@@ -171,6 +208,28 @@ void EditorLayer::NewTab(Ref<UI::UIElement> element) {
 void EditorLayer::NewTab() {
 	// TODO(Implement): Dialog box to pick which kind of new tab to create:
 	// Scene, UI, or Level
+}
+
+void EditorLayer::OpenTab() {
+	namespace fs = std::filesystem;
+
+	IGFD::FileDialogConfig config;
+	config.path = ".";
+	auto instance = ImGuiFileDialog::Instance();
+	instance->OpenDialog("ChooseFile", "Choose File", ".magma.scene, .magma.ui.json", config);
+
+	if(instance->Display("ChooseFile")) {
+		if(instance->IsOk()) {
+			fs::path path = instance->GetFilePathName();
+			if(path.extension() == ".json")
+				NewTab(UI::UISerializer::Load(path.string()));
+			else
+				NewTab(Scene(path.string()));
+		}
+
+		instance->Close();
+		menu.tab.openTab = false;
+	}
 }
 
 void EditorLayer::NewProject() {
