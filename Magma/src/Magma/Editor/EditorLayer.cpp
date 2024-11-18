@@ -132,21 +132,21 @@ void EditorLayer::Render() {
 
 				float tabHeight{6.5f};
 				float radius{ tabHeight * 0.5f - padding };
-				ImVec2 pos(ImGui::GetItemRectMin());
-				pos.x = ImGui::GetItemRectMax().x;
-				pos.x -= radius + 5.0f*padding;
-				pos.y += radius + padding;
+				ImVec2 pos;
+				pos.x = ImGui::GetItemRectMax().x - radius - 5.0f*padding;
+				pos.y = ImGui::GetItemRectMin().y + radius + padding;
 
 				if(tabItem) {
-					if(ImGui::IsMouseClicked(0) && ImGui::IsItemHovered())
+					if(ImGui::IsItemClicked(0))
 						m_CurrentTab = tab;
 
 					ImGui::EndTabItem();
 				}
-				
+
 				auto closeButtonID = ImGui::GetID(("Close##" + strID).c_str());
 				if(ImGui::CloseButton(closeButtonID, pos))
 					tabToDelete = tab;
+				ImGui::Dummy(ImVec2(0.0f, 0.0f));
 			}
 
 			if(tabToDelete != nullptr) {
@@ -159,8 +159,8 @@ void EditorLayer::Render() {
 			}
 		}
 		ImGui::EndTabBar();
-		// ImGui::Dummy(ImVec2(0.0f, 0.0f));
 
+		// DockSpace
 		ImGuiID dockspaceID = ImGui::GetID("DockSpace");
 		ImGui::DockSpace(dockspaceID, ImVec2(0.0f, 0.0f), dockspaceFlags);
 

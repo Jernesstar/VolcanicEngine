@@ -1,7 +1,5 @@
 #include "SceneHierarchyPanel.h"
 
-#include <cstring>
-
 #include <imgui/imgui.h>
 #include <imgui/imgui_internal.h>
 #include <imgui/misc/cpp/imgui_stdlib.h>

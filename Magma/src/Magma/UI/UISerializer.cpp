@@ -154,8 +154,9 @@ Ref<UIElement> UISerializer::Deserialize(JSONParserNode& serializer) {
 	
 }
 
-Ref<UI::UIElement> UISerializer::Load(const std::string& path) {
+Ref<UIElement> UISerializer::Load(const std::string& path) {
 	// TODO(Implement):
+	return CreateRef<Empty>();
 }
 
 }

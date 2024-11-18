@@ -8,8 +8,8 @@
 #include "UI/Empty.h"
 #include "UI/UISerializer.h"
 
-// #include "UIElementPickerPanel.h"
-// #include "UIVisualizerPanel.h"
+#include "UIElementPickerPanel.h"
+#include "UIVisualizerPanel.h"
 
 namespace Magma {
 
@@ -37,7 +37,7 @@ UITab::UITab(Ref<UI::UIElement> root) {
 }
 
 UITab::~UITab() {
-	// UI::UISerializer::Save(m_Root, "Magma/assets/scenes/.magma.ui.json");
+	UI::UISerializer::Save(m_Root, "Magma/assets/scenes/.magma.ui.json");
 }
 
 void UITab::Update(TimeStep ts) {
@@ -100,13 +100,13 @@ void UITab::Render() {
 }
 
 void UITab::Setup() {
-	// auto panel1 = CreateRef<UIElementPickerPanel>(m_Root);
-	// panel1->Close();
-	// auto panel2 = CreateRef<UIVisualizerPanel>(m_Root);
-	// panel2->Close();
+	auto panel1 = CreateRef<UIElementPickerPanel>(m_Root);
+	panel1->Close();
+	auto panel2 = CreateRef<UIVisualizerPanel>(m_Root);
+	panel2->Close();
 
-	// m_Panels.push_back(panel1);
-	// m_Panels.push_back(panel2);
+	m_Panels.push_back(panel1);
+	m_Panels.push_back(panel2);
 }
 
 void UITab::SetUI(Ref<UI::UIElement> ui) {
