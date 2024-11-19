@@ -254,15 +254,15 @@ void DeserializeEntity(YAML::Node entityNode, Scene* scene) {
 		auto h	  = cameraComponentNode["ViewportHeight"].as<uint32_t>();
 		auto near = cameraComponentNode["Near"]			 .as<float>();
 		auto far  = cameraComponentNode["Far"]			 .as<float>();
+		auto typeStr = cameraComponentNode["Type"].as<std::string>();
 		float fr;
 		Camera::Type type;
 
-		if(cameraComponentNode["Type"].as<std::string>() == "Stereographic") {
+		if(typeStr == "Stereographic") {
 			fr = cameraComponentNode["VerticalFOV"].as<float>();
 			type = Camera::Type::Stereo;
 		}
-		else if(cameraComponentNode["Type"].as<std::string>() == "Orthographic")
-		{
+		else if(typeStr == "Orthographic") {
 			fr = cameraComponentNode["Rotation"].as<float>();
 			type = Camera::Type::Ortho;
 		}

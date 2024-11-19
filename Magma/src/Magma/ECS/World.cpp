@@ -118,25 +118,38 @@ void World::ForEach(const Func<Entity&, void>& func) {
 		});
 }
 
+template<typename>
+struct strip;
+
+template<typename ...T>
+struct strip<std::tuple<T...>>
+{
+	using type = System<T...>;
+};
+
 template<typename TSystem>
-void World::Add(TSystem::RunStage stage) {
-	auto sys = CreateRef<TSystem>();
+void World::Add(List<Phase> phases) {
+	auto sys = CreateRef<TSystem>(this);
 	m_Systems.push_back(sys);
 
-	m_World
-	.system<TSystem::RequiredComponents>(m_Systems.size())
-	.kind(stage)
-	.run(
-		[&](flecs::iter& it)
-		{
-			sys->Update(it.delta_time());
-			sys->Run();
-		});
+	using TComponents = typename strip<TSystem::RequiredComponents>::type;
+
+	for(auto phase : phases)
+		m_World
+		.system<TComponents...>(m_Systems.size())
+		.kind(phase)
+		.run(
+			[sys = sys, phase = phase](flecs::iter& it)
+			{
+				if(phase == Phase::OnUpdate)
+					sys->Update(it.delta_time());
+				sys->Run(phase);
+			});
 }
 
 template<typename TSystem>
 void World::Get() {
-	for()
+	return m_Systems[RegisteredSystems<TSystem>::id];
 }
 
 }

@@ -1,5 +1,7 @@
 #include "PhysicsSystem.h"
 
+#include "World.h"
+
 using namespace Magma::Physics;
 
 namespace Magma::ECS {
@@ -12,16 +14,41 @@ void PhysicsSystem::Update(TimeStep ts) {
 
 void PhysicsSystem::Run(Phase phase) {
 	if(phase == Phase::PreUpdate) {
-		auto query =
-		m_EntityWorld->query_builder(m_Query)
-		.with<TransformComponent>()
-		.each(
-			[](flecs::entity id, RigidBodyComponent& r)
-			{
-				Entity entity{ id };
-				auto t = entity.Get<TransformComponent>();
-				r.Body->UpdateTransform({ t.Translation, t.Rotation, t.Scale });
-			});
+		// m_EntityWorld->GetNative()
+		// .query_builder(m_EntityWorld->GetNative(), m_Query)
+		// .with<TransformComponent>()
+		// .build()
+		// .each(
+		// 	[this](flecs::entity id)
+		// 	{
+		// 		Entity entity{ id };
+		// 		auto [rc] = GetRequired(entity);
+		// 		auto t = entity.Get<TransformComponent>();
+
+		// 		rc.Body->UpdateTransform({ t.Translation, t.Rotation, t.Scale });
+		// 	});
+	}
+
+	if(phase == Phase::OnUpdate) {
+		
+	}
+
+	if(phase == Phase::PostUpdate) {
+		// m_EntityWorld->GetNative()
+		// .query_builder(m_EntityWorld->GetNative(), m_Query)
+		// .build()
+		// .each(
+		// [this](flecs::entity id)
+		// {
+		// 	Entity entity{ id };
+		// 	auto& [rc] = GetRequired(entity);
+		// 	auto& tc = entity.Get<TransformComponent>();
+
+		// 	Transform tr = rc.Body->GetTransform();
+		// 	tc.Translation = tr.Translation;
+		// 	tc.Rotation	   = tr.Rotation;
+		// 	tc.Scale	   = tr.Scale;
+		// });
 	}
 }
 
@@ -57,5 +84,40 @@ bool PhysicsSystem::Collided(Entity& e1, Entity& e2) {
 	return handle1.has<CollidedWith>(handle2);
 }
 
+// void Scene::RegisterObservers() {
+// 	auto& world = EntityWorld.GetNative();
+
+// 	// Creating RigidBodyComponent then MeshComponent ==> bounding volume
+// 	// Creating MeshComponent then RigidBodyComponent ==> tightly-fitting volume
+
+// 	world
+// 	.observer<RigidBodyComponent>("OnSetRigidBody")
+// 	.event(flecs::OnSet)
+// 	.each(
+// 		[&](flecs::entity e, RigidBodyComponent& r)
+// 		{
+// 			Entity entity{ e };
+
+// 			// If the RigidBody was created without a shape,
+// 			// inherit the shape of the current MeshComponent
+// 			if(entity.Has<MeshComponent>() && !r.Body->HasShape()) {
+// 				auto mesh = entity.Get<MeshComponent>().Mesh;
+// 				Ref<Shape> shape = Shape::Create(mesh);
+// 				r.Body->SetShape(shape);
+// 			}
+// 			if(entity.Has<TransformComponent>()) {
+// 				auto& t = entity.Get<TransformComponent>();
+
+// 				Transform tr{
+// 					.Translation = t.Translation,
+// 					.Rotation	 = t.Rotation,
+// 					.Scale		 = t.Scale
+// 				};
+// 				r.Body->UpdateTransform(tr);
+// 			}
+
+// 			Register(entity);
+// 		});
+// }
 
 }

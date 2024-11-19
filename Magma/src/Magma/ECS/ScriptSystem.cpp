@@ -1,25 +1,26 @@
 #include "ScriptSystem.h"
 
-#include "VolcaniCore/Renderer/Renderer.h"
-#include "VolcaniCore/Renderer/Renderer3D.h"
+#include "World.h"
 
 namespace Magma::ECS {
 
 void ScriptSystem::Update(TimeStep ts) {
 
-	
-	m_Query
-	.each(
-		[this](flecs::entity id)
-		{
-			Entity entity{ id };
-			auto& [sc] = GetRequired(entity);
-
-		});
 }
 
 void ScriptSystem::Run(Phase phase) {
-
+	// m_EntityWorld->GetNative()
+	// .query_builder(m_EntityWorld->GetNative(), m_Query)
+	// .with<TransformComponent>()
+	// .build()
+	// .each(
+	// 	[this](flecs::entity id)
+	// 	{
+	// 		Entity entity{ id };
+	// 		auto& [sc] = GetRequired(entity);
+	// 		auto& tr = entity.Get<TransformComponent>();
+	// 		sc.OnInput(tr);
+	// 	});
 }
 
 }

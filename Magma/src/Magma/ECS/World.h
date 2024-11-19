@@ -41,7 +41,7 @@ public:
 	void RemoveEntity(const std::string& tag);
 
 	template<typename TSystem>
-	void Add(TSystem::RunStage stage);
+	void Add(List<Phase> phases);
 
 	template<typename TSystem>
 	void Get();

@@ -39,13 +39,8 @@ void Camera::Resize(uint32_t width, uint32_t height) {
 	if(width == ViewportWidth && height == ViewportHeight)
 		return;
 
-	if(width == 0 || height == 0) {
-		VOLCANICORE_LOG_WARNING("Viewport width and height may not be 0");
-		return;
-	}
-
-	ViewportWidth = width;
-	ViewportHeight = height;
+	ViewportWidth = width ? width : ViewportWidth;
+	ViewportHeight = height ? height : ViewportHeight;
 	CalculateProjection();
 }
 
@@ -53,14 +48,8 @@ void Camera::SetProjection(float near, float far) {
 	if(near == Near && far == Far)
 		return;
 
-	if(near == 0 || far == 0) {
-		VOLCANICORE_LOG_WARNING(
-			"[SetProjection]: Near and far clips may not be 0");
-		return;
-	}
-
-	Near = near;
-	Far = far;
+	Near = near ? near : Near;
+	Far = far ? far : Far;
 	CalculateProjection();
 }
 
@@ -68,15 +57,15 @@ void Camera::SetPosition(const glm::vec3& position) {
 	Position = position;
 	CalculateView();
 }
+
 void Camera::SetDirection(const glm::vec3& direction) {
 	Direction = glm::normalize(direction);
 	CalculateView();
 }
-void Camera::SetPositionDirection(const glm::vec3& position,
-							const glm::vec3& direction)
-{
-	Position = position;
-	Direction = direction;
+
+void Camera::SetPositionDirection(const glm::vec3& pos, const glm::vec3& dir) {
+	Position = pos;
+	Direction = dir;
 	CalculateView();
 }
 

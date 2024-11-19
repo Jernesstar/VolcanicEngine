@@ -17,28 +17,20 @@ struct Component {
 };
 
 struct CameraComponent : public Component {
-	Camera::Type CameraType = Camera::Type::Stereo;
-	glm::vec3 Position  = { 0.0f, 0.0f, 0.0f };
-	glm::vec3 Direction = { 0.0f, 0.0f, -1.0f };
-	uint32_t ViewportWidth = 800;
-	uint32_t ViewportHeight = 600;
-	float Near = 0.01f;
-	float Far  = 1000.0f;
-	union
-	{
-		float VerticalFOV, Rotation;
-	};
+	// TODO(Change): AssetID
+	Ref<Camera> Cam;
 
 	CameraComponent() = default;
 	CameraComponent(Camera::Type type,
 					const glm::vec3& pos, const glm::vec3& dir,
 					uint32_t width, uint32_t height, float near, float far,
 					float fr)
-		: CameraType(type), Position(pos), Direction(dir),
-		  ViewportWidth(width), ViewportHeight(height), Near(near), Far(far),
-		  VerticalFOV(fr) { }
-	CameraComponent(uint32_t width, uint32_t height)
-		: ViewportWidth(width), ViewportHeight(height) { }
+	{
+		Cam = Camera::Create(type, fr);
+		Cam->SetPositionDirection(pos, dir);
+		Cam->Resize(width, height);
+		Cam->SetProjection(near, far);
+	}
 	CameraComponent(const CameraComponent& other) = default;
 };
 
@@ -64,6 +56,7 @@ struct MeshComponent : public Component {
 };
 
 struct RigidBodyComponent : public Component {
+	// TODO(Change): AssetID
 	Ref<Physics::RigidBody> Body;
 
 	RigidBodyComponent() = default;
@@ -95,8 +88,7 @@ struct TransformComponent : public Component {
 	glm::vec3 Scale		  = { 1.0f, 1.0f, 1.0f };
 
 	TransformComponent() = default;
-	TransformComponent(const glm::vec3& t, const glm::vec3& r,
-					   const glm::vec3& s)
+	TransformComponent(const glm::vec3& t, const glm::vec3& r, const glm::vec3& s)
 		: Translation(t), Rotation(r), Scale(s) { }
 	TransformComponent(const Transform& t)
 		: Translation(t.Translation), Rotation(t.Rotation), Scale(t.Scale) { }

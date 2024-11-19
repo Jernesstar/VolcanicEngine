@@ -1,20 +1,20 @@
 #pragma once
 
-#include "ECS/World.h"
+#include <VolcaniCore/Core/Defines.h>
+#include <VolcaniCore/Core/UUID.h>
+
+#include "flecs/flecs.h"
 
 namespace Magma::ECS {
 
+class World;
+
 class EntityBuilder {
 public:
-	EntityBuilder(World& world) {
-		m_Handle = world.AddEntity().GetHandle();
-	}
-	EntityBuilder(World& world, VolcaniCore::UUID id) {
-		m_Handle = world.AddEntity(id).GetHandle();
-	}
-	EntityBuilder(World& world, const std::string& tag) {
-		m_Handle = world.AddEntity(tag).GetHandle();
-	}
+	EntityBuilder(const Entity& entity);
+	EntityBuilder(World& world);
+	EntityBuilder(World& world, VolcaniCore::UUID id);
+	EntityBuilder(World& world, const std::string& tag);
 	~EntityBuilder() = default;
 
 	template<typename TComponent, typename ...Args>

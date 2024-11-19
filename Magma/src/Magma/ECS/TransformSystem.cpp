@@ -4,7 +4,7 @@ namespace Magma::ECS {
 
 Transform TransformSystem::GetTransform(Entity& entity) {
 	auto& [tc] = GetRequired(entity);
-	return Transform{ tc.Translation, tc.Rotation, tc.Scale };
+	return { tc.Translation, tc.Rotation, tc.Scale };
 }
 
 void TransformSystem::SetTransform(Entity& entity, const Transform& tr) {

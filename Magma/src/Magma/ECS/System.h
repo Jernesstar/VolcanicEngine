@@ -21,30 +21,31 @@ using TypeList = typename TypeListWrapper<Args...>::type;
 
 namespace Magma::ECS {
 
-template<typename ...TRequires>
+enum class Phase { PreUpdate, OnUpdate, PostUpdate };
+
+class World;
+
+template<typename ...TComponents>
 class System {
 public:
-	using RequiredComponents = TypeList<TRequires...>;
+	using RequiredComponents = TypeList<TComponents&...>;
 
 public:
-	enum class Phase { PreUpdate, OnUpdate, PostUpdate };
-
-public:
-	System(World& world)
-		: m_EntityWorld(&world) { }
+	System(World* world)
+		: m_EntityWorld(world) { }
 	virtual ~System() = default;
 
 	virtual void Update(TimeStep ts) = 0;
 	virtual void Run(Phase phase) = 0;
 
-	RequiredComponents& GetRequired(Entity& entity) {
-		return entity.Get<TRequires>()...;
+	RequiredComponents GetRequired(Entity& entity) {
+		return std::make_tuple((entity.Get<TComponents>(), 0)...); // Weird, isn't it?
 	}
 
 protected:
 	World* m_EntityWorld;
 
-	flecs::query<TRequires&...> m_Query;
+	flecs::query<TComponents&...> m_Query;
 };
 
 }
