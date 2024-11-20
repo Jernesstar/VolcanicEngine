@@ -14,13 +14,16 @@ static bool ButtonImage(Ref<UIElement>, ImVec2);
 static bool (*ButtonFunction)(Ref<UIElement>, ImVec2);
 
 Ref<UI::Button> Button::Create(const UI::Button::Specification& specs) {
+	Ref<UI::Button> button;
 	if(specs.Image != "")
-		return CreateRef<UI::Button>(specs.Image);
+		button = CreateRef<UI::Button>(specs.Image);
+	else
+		button = CreateRef<UI::Button>(specs.Color, specs.Text, specs.TextColor);
 
-	auto button =
-		CreateRef<UI::Button>(specs.Color, specs.Text, specs.TextColor);
 	button->x = specs.x;
 	button->y = specs.y;
+	button->Width = specs.Width;
+	button->Height = specs.Height;
 
 	return button;
 }
@@ -52,14 +55,9 @@ void Button::Draw() {
 
 	ImGui::SetCursorPos(ImVec2(x, y));
 
-	if(ButtonFunction(m_Display, ImVec2(Width, Height)))
-		// OnPressed();
-	if(ImGui::IsItemDeactivated())
-		// OnReleased();
+	ButtonFunction(m_Display, ImVec2(Width, Height));
 
-	ImGui::PopStyleColor();
-	ImGui::PopStyleColor();
-	ImGui::PopStyleColor();
+	ImGui::PopStyleColor(3);
 	ImGui::PopStyleVar();
 }
 
@@ -90,10 +88,8 @@ bool ButtonText(Ref<UIElement> element, ImVec2 dim) {
 
 bool ButtonImage(Ref<UIElement> element, ImVec2 dim) {
 	auto tex = element->As<Image>()->Content->As<OpenGL::Texture2D>();
-	tex->Bind();
-	return
-		ImGui::ImageButton(element->GetID().c_str(),
-			(ImTextureID)(intptr_t)tex->GetID(), dim);
+	auto id = (ImTextureID)(intptr_t)tex->GetID();
+	return ImGui::ImageButton(id, dim);
 }
 
 }

@@ -42,7 +42,8 @@ void Window::Draw() {
 				 | ImGuiWindowFlags_NoBringToFrontOnFocus
 				 | ImGuiWindowFlags_NoNavFocus;
 
-	ImGui::Begin(m_ID.c_str(), &m_Open, windowFlags);
+	ImGui::Begin("##Window", &m_Open, windowFlags);
+	// ImGui::Begin(m_ID.c_str(), &m_Open, windowFlags);
 
 	ImGui::PopStyleColor();
 	ImGui::PopStyleVar(3);

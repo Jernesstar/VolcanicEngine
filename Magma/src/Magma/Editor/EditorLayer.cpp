@@ -74,7 +74,7 @@ void EditorLayer::Render() {
 
 	ImGui::Begin("DockSpaceWindow", &dockspaceOpen, windowFlags);
 	{
-		ImGui::PopStyleVar(3);
+		ImGui::PopStyleVar(2);
 
 		ImGui::BeginMainMenuBar();
 		{
@@ -146,7 +146,6 @@ void EditorLayer::Render() {
 				auto closeButtonID = ImGui::GetID(("Close##" + strID).c_str());
 				if(ImGui::CloseButton(closeButtonID, pos))
 					tabToDelete = tab;
-				ImGui::Dummy(ImVec2(0.0f, 0.0f));
 			}
 
 			if(tabToDelete != nullptr) {

@@ -8,10 +8,10 @@ namespace Magma {
 
 class UIVisualizerPanel : public Panel {
 public:
-	UIVisualizerPanel(UI::UIElement* scene);
+	UIVisualizerPanel(Ref<UI::UIElement> scene);
 	~UIVisualizerPanel() = default;
 
-	void SetContext(UI::UIElement* scene);
+	void SetContext(Ref<UI::UIElement> scene);
 
 	void Update(TimeStep ts) override;
 	void Draw() override;

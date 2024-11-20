@@ -10,13 +10,13 @@
 
 namespace Magma {
 
-UIElementPickerPanel::UIElementPickerPanel(UI::UIElement* ui)
+UIElementPickerPanel::UIElementPickerPanel(Ref<UI::UIElement> ui)
 	: Panel("UIElementPicker")
 {
 	SetContext(ui);
 }
 
-void UIElementPickerPanel::SetContext(UI::UIElement* ui) {
+void UIElementPickerPanel::SetContext(Ref<UI::UIElement> ui) {
 
 }
 

@@ -1,234 +1,238 @@
-// #include "EditorLayer.h"
+#if 0
 
-// #include <filesystem>
+#include "EditorLayer.h"
 
-// #include <imgui/imgui.h>
-// #include <imgui/imgui_internal.h>
-// #include <imgui/misc/cpp/imgui_stdlib.h>
-// #include <ImGuiFileDialog/ImGuiFileDialog.h>
+#include <filesystem>
 
-// #include <OpenGL/Texture2D.h>
-// #include <OpenGL/Framebuffer.h>
+#include <imgui/imgui.h>
+#include <imgui/imgui_internal.h>
+#include <imgui/misc/cpp/imgui_stdlib.h>
+#include <ImGuiFileDialog/ImGuiFileDialog.h>
 
-// #include <VolcaniCore/Core/Application.h>
-// #include <VolcaniCore/Core/Log.h>
-// #include <VolcaniCore/Renderer/RendererAPI.h>
+#include <OpenGL/Texture2D.h>
+#include <OpenGL/Framebuffer.h>
 
-// using namespace VolcaniCore;
+#include <VolcaniCore/Core/Application.h>
+#include <VolcaniCore/Core/Log.h>
+#include <VolcaniCore/Renderer/RendererAPI.h>
 
-// namespace Magma {
+using namespace VolcaniCore;
 
-// struct {
-// 	struct {
-// 		bool newScene = false;
-// 		bool openScene = false;
-// 		bool saveScene = false;
-// 	} file;
-// 	struct {
-// 		bool addEntity = false;
-// 	} edit;
-// } menu;
+namespace Magma {
 
-// void EditorLayer::Render() {
-// 	static bool dockspaceOpen = true;
-// 	static ImGuiDockNodeFlags dockspaceFlags = ImGuiDockNodeFlags_None;
+struct {
+	struct {
+		bool newScene = false;
+		bool openScene = false;
+		bool saveScene = false;
+	} file;
+	struct {
+		bool addEntity = false;
+	} edit;
+} menu;
 
-// 	// We are using the ImGuiWindowFlags_NoDocking flag
-// 	// to make the parent window not dockable into,
-// 	// because it would be confusing to have
-// 	// two docking targets within each others.
-// 	ImGuiWindowFlags windowFlags = ImGuiWindowFlags_MenuBar
-// 								 | ImGuiWindowFlags_NoDocking;
+void EditorLayer::Render() {
+	static bool dockspaceOpen = true;
+	static ImGuiDockNodeFlags dockspaceFlags = ImGuiDockNodeFlags_None;
 
-// 	windowFlags |= ImGuiWindowFlags_NoTitleBar
-// 				 | ImGuiWindowFlags_NoCollapse
-// 				 | ImGuiWindowFlags_NoResize
-// 				 | ImGuiWindowFlags_NoMove
-// 				 | ImGuiWindowFlags_NoBringToFrontOnFocus
-// 				 | ImGuiWindowFlags_NoNavFocus;
+	// We are using the ImGuiWindowFlags_NoDocking flag
+	// to make the parent window not dockable into,
+	// because it would be confusing to have
+	// two docking targets within each others.
+	// ImGuiWindowFlags windowFlags = ImGuiWindowFlags_MenuBar
+	// 							 | ImGuiWindowFlags_NoDocking;
 
-// 	// When using ImGuiDockNodeFlags_PassthruCentralNode,
-// 	// DockSpace() will render our background and handle the pass-thru hole,
-// 	// so we ask Begin() to not render a background.
-// 	if(dockspaceFlags & ImGuiDockNodeFlags_PassthruCentralNode)
-// 		windowFlags |= ImGuiWindowFlags_NoBackground;
+	windowFlags |= ImGuiWindowFlags_NoTitleBar
+				 | ImGuiWindowFlags_NoCollapse
+				 | ImGuiWindowFlags_NoResize
+				 | ImGuiWindowFlags_NoMove
+				 | ImGuiWindowFlags_NoBringToFrontOnFocus
+				 | ImGuiWindowFlags_NoNavFocus;
 
-// 	ImGuiViewport* viewport = ImGui::GetMainViewport();
-// 	ImGui::SetNextWindowPos(viewport->Pos);
-// 	ImGui::SetNextWindowSize(viewport->Size);
-// 	ImGui::SetNextWindowViewport(viewport->ID);
-// 	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-// 	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+	// When using ImGuiDockNodeFlags_PassthruCentralNode,
+	// DockSpace() will render our background and handle the pass-thru hole,
+	// so we ask Begin() to not render a background.
+	if(dockspaceFlags & ImGuiDockNodeFlags_PassthruCentralNode)
+		windowFlags |= ImGuiWindowFlags_NoBackground;
 
-// 	// Important: note that we proceed even if Begin() returns false (aka window is collapsed).
-// 	// This is because we want to keep our DockSpace() active. If a DockSpace() is inactive,
-// 	// all active windows docked into it will lose their parent and become undocked.
-// 	// We cannot preserve the docking relationship between an active window and an inactive docking, otherwise 
-// 	// any change of dockspace/settings would lead to windows being stuck in limbo and never being visible.
+	ImGuiViewport* viewport = ImGui::GetMainViewport();
+	ImGui::SetNextWindowPos(viewport->Pos);
+	ImGui::SetNextWindowSize(viewport->Size);
+	ImGui::SetNextWindowViewport(viewport->ID);
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
 
-// 	ImGui::Begin("DockSpace Demo", &dockspaceOpen, windowFlags);
-// 	ImGui::PopStyleVar(2);
+	// Important: note that we proceed even if Begin() returns false (aka window is collapsed).
+	// This is because we want to keep our DockSpace() active. If a DockSpace() is inactive,
+	// all active windows docked into it will lose their parent and become undocked.
+	// We cannot preserve the docking relationship between an active window and an inactive docking, otherwise 
+	// any change of dockspace/settings would lead to windows being stuck in limbo and never being visible.
 
-// 	// DockSpace
-// 	ImGuiIO& io = ImGui::GetIO();
-// 	ImGuiStyle& style = ImGui::GetStyle();
-// 	if(io.ConfigFlags & ImGuiConfigFlags_DockingEnable) {
-// 		ImGuiID dockspaceID = ImGui::GetID("MyDockSpace");
-// 		ImGui::DockSpace(dockspaceID, ImVec2(0.0f, 0.0f), dockspaceFlags);
-// 	}
+	ImGui::Begin("DockSpace Demo", &dockspaceOpen, windowFlags);
+	ImGui::PopStyleVar(2);
 
-// 	if(ImGui::BeginMainMenuBar()) {
-// 		if(ImGui::BeginMenu("File")) {
-// 			if(ImGui::MenuItem("New", "Ctrl+N"))
-// 				menu.file.newScene = true;
-// 			if(ImGui::MenuItem("Open", "Ctrl+O"))
-// 				menu.file.openScene = true;
-// 			if(ImGui::MenuItem("Save", "Ctrl+S"))
-// 				menu.file.saveScene = true;
+	// DockSpace
+	ImGuiIO& io = ImGui::GetIO();
+	ImGuiStyle& style = ImGui::GetStyle();
+	if(io.ConfigFlags & ImGuiConfigFlags_DockingEnable) {
+		ImGuiID dockspaceID = ImGui::GetID("MyDockSpace");
+		ImGui::DockSpace(dockspaceID, ImVec2(0.0f, 0.0f), dockspaceFlags);
+	}
 
-// 			ImGui::EndMenu();
-// 		}
-// 		if(ImGui::BeginMenu("Edit")) {
-// 			if(ImGui::MenuItem("Add Entity", "Ctrl+N"))
-// 				menu.edit.addEntity = true;
+	if(ImGui::BeginMainMenuBar()) {
+		if(ImGui::BeginMenu("File")) {
+			if(ImGui::MenuItem("New", "Ctrl+N"))
+				menu.file.newScene = true;
+			if(ImGui::MenuItem("Open", "Ctrl+O"))
+				menu.file.openScene = true;
+			if(ImGui::MenuItem("Save", "Ctrl+S"))
+				menu.file.saveScene = true;
 
-// 			ImGui::EndMenu();
-// 		}
+			ImGui::EndMenu();
+		}
+		if(ImGui::BeginMenu("Edit")) {
+			if(ImGui::MenuItem("Add Entity", "Ctrl+N"))
+				menu.edit.addEntity = true;
 
-// 		ImGui::EndMainMenuBar();
-// 	}
+			ImGui::EndMenu();
+		}
 
-// 	if(menu.file.newScene)
-// 		NewScene();
-// 	if(menu.file.openScene)
-// 		OpenScene();
-// 	if(menu.file.saveScene)
-// 		SaveScene();
-// 	if(menu.edit.addEntity)
-// 		AddEntity();
+		ImGui::EndMainMenuBar();
+	}
 
-// 	// m_SceneHierarchyPanel.Render();
+	if(menu.file.newScene)
+		NewScene();
+	if(menu.file.openScene)
+		OpenScene();
+	if(menu.file.saveScene)
+		SaveScene();
+	if(menu.edit.addEntity)
+		AddEntity();
 
-// 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0, 0 });
-// 	ImGui::Begin("Viewport");
-// 	{
-// 		auto minReg = ImGui::GetWindowContentRegionMin();
-// 		auto maxReg = ImGui::GetWindowContentRegionMax();
-// 		auto offset = ImGui::GetWindowPos();
-// 		m_ViewportBounds[0] = { minReg.x + offset.x, minReg.y + offset.y };
-// 		m_ViewportBounds[1] = { maxReg.x + offset.x, maxReg.y + offset.y };
+	m_SceneHierarchyPanel.Render();
 
-// 		m_ViewportFocused = ImGui::IsWindowFocused();
-// 		m_ViewportHovered = ImGui::IsWindowHovered();
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0, 0 });
+	ImGui::Begin("Viewport");
+	{
+		auto minReg = ImGui::GetWindowContentRegionMin();
+		auto maxReg = ImGui::GetWindowContentRegionMax();
+		auto offset = ImGui::GetWindowPos();
+		m_ViewportBounds[0] = { minReg.x + offset.x, minReg.y + offset.y };
+		m_ViewportBounds[1] = { maxReg.x + offset.x, maxReg.y + offset.y };
 
-// 		auto framebuffer = m_CurrentScene->GetRenderer().GetOutput();
-// 		auto& colorAttachment = framebuffer->As<OpenGL::Framebuffer>()
-// 											->Get(AttachmentTarget::Color);
-// 		uint64_t textureID = colorAttachment.GetRendererID();
-// 		framebuffer->Bind();
-// 		colorAttachment.Bind();
-// 		ImGui::Image(reinterpret_cast<void*>(textureID),
-// 					 ImVec2{ m_ViewportSize.x, m_ViewportSize.y });
-// 		framebuffer->Unbind();
+		m_ViewportFocused = ImGui::IsWindowFocused();
+		m_ViewportHovered = ImGui::IsWindowHovered();
 
-// 		// if(ImGui::BeginDragDropTarget()) {
-// 		// 	auto payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM");
-// 		// 	if(payload) {
-// 		// 		const wchar_t* path = (const wchar_t*)payload->Data;
-// 		// 		OpenScene(path);
-// 		// 	}
-// 		// 	ImGui::EndDragDropTarget();
-// 		// }
-// 	}
-// 	ImGui::End();
-// 	ImGui::PopStyleVar();
+		auto framebuffer = m_CurrentScene->GetRenderer().GetOutput();
+		auto& colorAttachment = framebuffer->As<OpenGL::Framebuffer>()
+											->Get(AttachmentTarget::Color);
+		uint64_t textureID = colorAttachment.GetRendererID();
+		framebuffer->Bind();
+		colorAttachment.Bind();
+		ImGui::Image(reinterpret_cast<void*>(textureID),
+					 ImVec2{ m_ViewportSize.x, m_ViewportSize.y });
+		framebuffer->Unbind();
 
-// 	// ToolbarUI();
+		if(ImGui::BeginDragDropTarget()) {
+			auto payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM");
+			if(payload) {
+				const wchar_t* path = (const wchar_t*)payload->Data;
+				OpenScene(path);
+			}
+			ImGui::EndDragDropTarget();
+		}
+	}
+	ImGui::End();
+	ImGui::PopStyleVar();
 
-// 	ImGui::End();
-// }
+	ToolbarUI();
 
-// void EditorLayer::AddEntity() {
-// 	ImGui::Begin("Add New Entity");
-// 	{
-// 		std::string s{ "Name" };
-// 		ImGui::InputText("##EntityName", &s);
+	ImGui::End();
+}
 
-// 		if(ImGui::Button("Add Entity")) {
-// 			Entity entity = m_CurrentScene->EntityWorld.AddEntity(s);
+void EditorLayer::AddEntity() {
+	ImGui::Begin("Add New Entity");
+	{
+		std::string s{ "Name" };
+		ImGui::InputText("##EntityName", &s);
 
-// 			menu.edit.addEntity = false;
-// 		}
-// 	}
-// 	ImGui::End();
-// }
+		if(ImGui::Button("Add Entity")) {
+			Entity entity = m_CurrentScene->EntityWorld.AddEntity(s);
 
-// void EditorLayer::ToolbarUI() {
-// 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 2));
-// 	ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(0, 0));
-// 	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+			menu.edit.addEntity = false;
+		}
+	}
+	ImGui::End();
+}
 
-// 	auto& colors = ImGui::GetStyle().Colors;
-// 	const auto& buttonHovered = colors[ImGuiCol_ButtonHovered];
-// 	const auto& buttonActive = colors[ImGuiCol_ButtonActive];
+void EditorLayer::ToolbarUI() {
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 2));
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(0, 0));
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
 
-// 	ImGui::PushStyleColor(ImGuiCol_ButtonHovered,
-// 		ImVec4(buttonHovered.x, buttonHovered.y, buttonHovered.z, 0.5f));
-// 	ImGui::PushStyleColor(ImGuiCol_ButtonActive,
-// 		ImVec4(buttonActive.x, buttonActive.y, buttonActive.z, 0.5f));
+	auto& colors = ImGui::GetStyle().Colors;
+	const auto& buttonHovered = colors[ImGuiCol_ButtonHovered];
+	const auto& buttonActive = colors[ImGuiCol_ButtonActive];
 
-// 	ImGui::Begin("##toolbar", nullptr, ImGuiWindowFlags_NoDecoration
-// 									 | ImGuiWindowFlags_NoScrollbar
-// 									 | ImGuiWindowFlags_NoScrollWithMouse);
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered,
+		ImVec4(buttonHovered.x, buttonHovered.y, buttonHovered.z, 0.5f));
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive,
+		ImVec4(buttonActive.x, buttonActive.y, buttonActive.z, 0.5f));
 
-// 	float size = ImGui::GetWindowHeight() - 4.0f;
-// 	ImGui::SetCursorPosX(
-// 		(ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
+	ImGui::Begin("##toolbar", nullptr, ImGuiWindowFlags_NoDecoration
+									 | ImGuiWindowFlags_NoScrollbar
+									 | ImGuiWindowFlags_NoScrollWithMouse);
 
-// 	ImVec4 tintColor = ImVec4(1, 1, 1, 1);
-// 	ImVec4 v0 = ImVec4(0.0f, 0.0f, 0.0f, 0.0f);
-// 	ImVec2 v1 = ImVec2(size, size);
-// 	ImVec2 v2 = ImVec2(0, 0);
-// 	ImVec2 v3 = ImVec2(1, 1);
+	float size = ImGui::GetWindowHeight() - 4.0f;
+	ImGui::SetCursorPosX(
+		(ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
 
-// 	bool hasPlayButton = m_SceneState != SceneState::Play;
-// 	bool hasStopButton = true;
+	ImVec4 tintColor = ImVec4(1, 1, 1, 1);
+	ImVec4 v0 = ImVec4(0.0f, 0.0f, 0.0f, 0.0f);
+	ImVec2 v1 = ImVec2(size, size);
+	ImVec2 v2 = ImVec2(0, 0);
+	ImVec2 v3 = ImVec2(1, 1);
 
-// 	if(hasPlayButton) {
-// 		auto icon = m_IconPlay->As<OpenGL::Texture2D>();
-// 		if (ImGui::ImageButton((ImTextureID)(uint64_t)icon->GetID(),
-// 								v1, v2, v3, 0, v0, tintColor))
-// 		{
-// 			m_SceneState = SceneState::Play;
-// 			// OnScenePlay();
-// 		}
-// 	}
+	bool hasPlayButton = m_SceneState != SceneState::Play;
+	bool hasStopButton = true;
 
-// 	if(!hasPlayButton) {
-// 		auto icon = m_IconPause->As<OpenGL::Texture2D>();
-// 		if(ImGui::ImageButton((ImTextureID)(uint64_t)icon->GetID(),
-// 								v1, v2, v3, 0, v0, tintColor))
-// 		{
-// 			m_SceneState = SceneState::Pause;
-// 			// OnScenePause();
-// 		}
-// 	}
+	if(hasPlayButton) {
+		auto icon = m_IconPlay->As<OpenGL::Texture2D>();
+		if(ImGui::ImageButton((ImTextureID)(uint64_t)icon->GetID(),
+								v1, v2, v3, 0, v0, tintColor))
+		{
+			m_SceneState = SceneState::Play;
+			OnScenePlay();
+		}
+	}
 
-// 	if(hasStopButton) {
-// 		ImGui::SameLine();
+	if(!hasPlayButton) {
+		auto icon = m_IconPause->As<OpenGL::Texture2D>();
+		if(ImGui::ImageButton((ImTextureID)(uint64_t)icon->GetID(),
+								v1, v2, v3, 0, v0, tintColor))
+		{
+			m_SceneState = SceneState::Pause;
+			OnScenePause();
+		}
+	}
 
-// 		auto icon = m_IconStop->As<OpenGL::Texture2D>();
-// 		if(ImGui::ImageButton((ImTextureID)(uint64_t)icon->GetID(),
-// 								v1, v2, v3, 0, v0, tintColor))
-// 		{
-// 			m_SceneState = SceneState::Edit;
-// 			// OnSceneStop();
-// 		}
-// 	}
+	if(hasStopButton) {
+		ImGui::SameLine();
 
-// 	ImGui::PopStyleVar(2);
-// 	ImGui::PopStyleColor(3);
-// 	ImGui::End();
-// }
+		auto icon = m_IconStop->As<OpenGL::Texture2D>();
+		if(ImGui::ImageButton((ImTextureID)(uint64_t)icon->GetID(),
+								v1, v2, v3, 0, v0, tintColor))
+		{
+			m_SceneState = SceneState::Edit;
+			OnSceneStop();
+		}
+	}
 
-// }
+	ImGui::PopStyleVar(2);
+	ImGui::PopStyleColor(3);
+	ImGui::End();
+}
+
+}
+
+#endif

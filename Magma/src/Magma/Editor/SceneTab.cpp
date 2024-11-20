@@ -61,6 +61,7 @@ void SceneTab::Setup() {
 	m_PauseButton = UI::Button::Create(
 		{
 			.Image = "Magma/assets/icons/PauseButton.png",
+			.x = 100, .y = 100,
 			.Width = 20, .Height = 20,
 			// .OnPressed = [this]() { OnScenePause(); }
 		});
@@ -134,6 +135,8 @@ void SceneTab::Render() {
 	}
 	ImGui::EndMainMenuBar();
 
+	ToolbarUI();
+
 	if(menu.file.newScene)
 		NewScene();
 	if(menu.file.openScene)
@@ -142,8 +145,6 @@ void SceneTab::Render() {
 		SaveScene();
 	if(menu.edit.addEntity)
 		AddEntity();
-
-	// ToolbarUI();
 
 	for(auto panel : m_Panels)
 		if(panel->IsOpen())
@@ -210,30 +211,26 @@ void SceneTab::ToolbarUI() {
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(0, 0));
 	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
 
-	auto& colors = ImGui::GetStyle().Colors;
-	const auto& buttonHovered = colors[ImGuiCol_ButtonHovered];
-	const auto& buttonActive = colors[ImGuiCol_ButtonActive];
-
-	ImGui::PushStyleColor(ImGuiCol_ButtonHovered,
-		ImVec4(buttonHovered.x, buttonHovered.y, buttonHovered.z, 0.5f));
-	ImGui::PushStyleColor(ImGuiCol_ButtonActive,
-		ImVec4(buttonActive.x, buttonActive.y, buttonActive.z, 0.5f));
-
 	auto flags = ImGuiWindowFlags_NoDecoration
 			   | ImGuiWindowFlags_NoScrollbar
 			   | ImGuiWindowFlags_NoScrollWithMouse;
 	ImGui::Begin("##toolbar", nullptr, flags);
 	{
-		if(m_SceneState == SceneState::Play)
-			m_PlayButton->Render();
-		else
-			m_PauseButton->Render();
+		float size = ImGui::GetWindowHeight() - 4.0f;
+		ImGui::SetCursorPosX(
+			(ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
 
+		if(m_SceneState == SceneState::Play)
+			m_PauseButton->Render();
+		else
+			m_PlayButton->Render();
+
+		ImGui::SameLine();
 		m_StopButton->Render();
 	}
 	ImGui::End();
 
-	ImGui::PopStyleColor(3);
+	ImGui::PopStyleColor();
 	ImGui::PopStyleVar(2);
 }
 

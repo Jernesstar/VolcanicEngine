@@ -112,14 +112,14 @@ void UITab::Setup() {
 void UITab::SetUI(Ref<UI::UIElement> ui) {
 	m_Root = ui;
 
-	// auto picker = GetPanel("UIElementPicker")->As<UIElementPickerPanel>();
-	// auto visual = GetPanel("UIVisualizer")->As<UIVisualizerPanel>();
-	// picker->SetContext(m_Root);
-	// visual->SetContext(m_Root);
+	auto picker = GetPanel("UIElementPicker")->As<UIElementPickerPanel>();
+	auto visual = GetPanel("UIVisualizer")->As<UIVisualizerPanel>();
+	picker->SetContext(m_Root);
+	visual->SetContext(m_Root);
 }
 
 void UITab::SetUI(const std::string& path) {
-	// SetUI(UI::UISerializer::Load(path));
+	SetUI(UI::UISerializer::Load(path));
 }
 
 void UITab::NewUI() {
@@ -153,7 +153,7 @@ void UITab::SaveUI() {
 	if(instance->Display("ChooseFile")) {
 		if(instance->IsOk()) {
 			std::string path = instance->GetFilePathName();
-			// UI::UIBuilder(m_Root).Save(path);
+			UI::UISerializer::Save(m_Root, path);
 		}
 
 		instance->Close();

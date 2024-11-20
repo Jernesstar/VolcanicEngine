@@ -77,6 +77,8 @@ bool Image::OnAttach() {
 	return true;
 }
 
-bool Image::OnAddElement(Ref<UIElement> element) { return false; }
+bool Image::OnAddElement(Ref<UIElement> element) {
+	return false;
+}
 
 }

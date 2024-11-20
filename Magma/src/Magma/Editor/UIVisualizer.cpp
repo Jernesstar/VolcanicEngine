@@ -10,13 +10,13 @@
 
 namespace Magma {
 
-UIVisualizerPanel::UIVisualizerPanel(UI::UIElement* ui)
+UIVisualizerPanel::UIVisualizerPanel(Ref<UI::UIElement> ui)
 	: Panel("UIVisualizer")
 {
 	SetContext(ui);
 }
 
-void UIVisualizerPanel::SetContext(UI::UIElement* ui) {
+void UIVisualizerPanel::SetContext(Ref<UI::UIElement> ui) {
 
 }
 
