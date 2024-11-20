@@ -23,6 +23,7 @@ public:
 	~Scene();
 
 	void OnUpdate(TimeStep ts);
+	void OnRender(SceneRenderer& renderer);
 
 	void Load(const std::string& path);
 	void Save(const std::string& path);

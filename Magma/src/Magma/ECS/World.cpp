@@ -124,7 +124,7 @@ struct strip;
 template<typename ...T>
 struct strip<std::tuple<T...>>
 {
-	using type = System<T...>;
+	using type = flecs::system_builder<T...>;
 };
 
 template<typename TSystem>
@@ -132,11 +132,10 @@ void World::Add(List<Phase> phases) {
 	auto sys = CreateRef<TSystem>(this);
 	m_Systems.push_back(sys);
 
-	using TComponents = typename strip<TSystem::RequiredComponents>::type;
+	using SystemType = strip<TSystem::RequiredComponents>::type;
 
 	for(auto phase : phases)
-		m_World
-		.system<TComponents...>(m_Systems.size())
+		SystemType(m_World, m_Systems.size())
 		.kind(phase)
 		.run(
 			[sys = sys, phase = phase](flecs::iter& it)

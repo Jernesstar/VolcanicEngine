@@ -41,7 +41,7 @@ void PhysicsSystem::Run(Phase phase) {
 		// [this](flecs::entity id)
 		// {
 		// 	Entity entity{ id };
-		// 	auto& [rc] = GetRequired(entity);
+		// 	auto [rc] = GetRequired(entity);
 		// 	auto& tc = entity.Get<TransformComponent>();
 
 		// 	Transform tr = rc.Body->GetTransform();

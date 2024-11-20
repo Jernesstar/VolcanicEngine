@@ -20,6 +20,18 @@ struct CameraComponent : public Component {
 	// TODO(Change): AssetID
 	Ref<Camera> Cam;
 
+	Camera::Type CameraType = Camera::Type::Stereo;
+	glm::vec3 Position  = { 0.0f, 0.0f, 0.0f };
+	glm::vec3 Direction = { 0.0f, 0.0f, -1.0f };
+	uint32_t ViewportWidth = 800;
+	uint32_t ViewportHeight = 600;
+	float Near = 0.01f;
+	float Far  = 1000.0f;
+	union
+	{
+		float VerticalFOV, Rotation;
+	};
+
 	CameraComponent() = default;
 	CameraComponent(Camera::Type type,
 					const glm::vec3& pos, const glm::vec3& dir,

@@ -20,27 +20,25 @@ SceneVisualizerPanel::SceneVisualizerPanel(Scene* context)
 	auto height = Application::GetWindow()->GetHeight();
 	m_Image = CreateRef<UI::Image>(Texture::Create(width, height));
 
-	m_Renderer = CreateRef<SceneVisualizerPanel::Renderer>();
-
 	SetContext(context);
 }
 
 void SceneVisualizerPanel::SetContext(Scene* context) {
 	m_Context = context;
-	// m_Context->SetRenderer(m_Renderer);
-	auto framebuffer = m_Context->GetRenderer()->GetOutput();
-	m_Image->SetImage(framebuffer, AttachmentTarget::Color);
-
 	m_Selected.Handle = Entity{ };
 	// m_Selected.Collider = CreateRef<Physics::RigidBody>();
+
+	m_Renderer.SetContext(context);
+	auto framebuffer = m_Renderer.GetOutput();
+	m_Image->SetImage(framebuffer, AttachmentTarget::Color);
 }
 
 void SceneVisualizerPanel::Update(TimeStep ts) {
-	m_Context->GetRenderer()->Update(ts);
+	m_Renderer.Update(ts);
 }
 
 void SceneVisualizerPanel::Draw() {
-	m_Context->OnRender();
+	m_Context->OnRender(m_Renderer);
 
 	auto flags = ImGuiWindowFlags_NoScrollbar
 			   | ImGuiWindowFlags_NoScrollWithMouse;
@@ -57,8 +55,7 @@ void SceneVisualizerPanel::Draw() {
 		m_Image->Render();
 
 		if(ImGui::IsMouseClicked(0) && ImGui::IsWindowHovered()) {
-			auto renderer = m_Context->GetRenderer();
-			// auto& cameraController = renderer->GetCameraController();
+			auto& cameraController = m_Renderer.GetCameraController();
 			// auto& world = m_Context->PhysicsWorld;
 			// auto camera = cameraController.GetCamera();
 

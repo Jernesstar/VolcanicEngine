@@ -23,6 +23,11 @@ void Scene::OnUpdate(TimeStep ts) {
 	EntityWorld.OnUpdate(ts);
 }
 
+void Scene::OnRender(SceneRenderer& renderer) {
+	renderer.SetContext(this);
+	renderer.Render();
+}
+
 void Scene::Load(const std::string& path) {
 	SceneSerializer(this).Deserialize(path);
 }

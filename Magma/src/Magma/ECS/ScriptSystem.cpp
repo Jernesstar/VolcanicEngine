@@ -17,7 +17,7 @@ void ScriptSystem::Run(Phase phase) {
 	// 	[this](flecs::entity id)
 	// 	{
 	// 		Entity entity{ id };
-	// 		auto& [sc] = GetRequired(entity);
+	// 		auto [sc] = GetRequired(entity);
 	// 		auto& tr = entity.Get<TransformComponent>();
 	// 		sc.OnInput(tr);
 	// 	});
