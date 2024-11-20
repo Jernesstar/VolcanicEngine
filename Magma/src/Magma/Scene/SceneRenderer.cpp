@@ -32,22 +32,22 @@ DefaultSceneRenderer::DefaultSceneRenderer(Scene* scene)
 	m_Controller.SetCamera(camera);
 	m_Controller.TranslationSpeed = 10.0f;
 
-	auto& world = m_Scene->EntityWorld.Get();
-	m_RenderSystem = world
-	.system<const TransformComponent, const MeshComponent>("RenderSystem")
-	.kind(0)
-	.each(
-		[](const TransformComponent& tc, const MeshComponent& mc)
-		{
-			Transform tr
-			{
-				.Translation = tc.Translation,
-				.Rotation	 = tc.Rotation,
-				.Scale		 = tc.Scale
-			};
+	// auto& world = m_Scene->EntityWorld.GetNative();
+	// m_RenderSystem = world
+	// .system<const TransformComponent, const MeshComponent>("RenderSystem")
+	// .kind(0)
+	// .each(
+	// 	[](const TransformComponent& tc, const MeshComponent& mc)
+	// 	{
+	// 		Transform tr
+	// 		{
+	// 			.Translation = tc.Translation,
+	// 			.Rotation	 = tc.Rotation,
+	// 			.Scale		 = tc.Scale
+	// 		};
 
-			Renderer3D::DrawMesh(mc.Mesh, tr);
-		});
+	// 		Renderer3D::DrawMesh(mc.Mesh, tr);
+	// 	});
 }
 
 void DefaultSceneRenderer::Update(TimeStep ts) {
@@ -57,13 +57,12 @@ void DefaultSceneRenderer::Update(TimeStep ts) {
 
 	auto& cc = cameraEntity.Get<CameraComponent>();
 	auto camera = m_Controller.GetCamera();
-	camera->Resize(cc.ViewportWidth, cc.ViewportHeight);
-	camera->SetPositionDirection(cc.Position, cc.Direction);
+	camera->Resize(cc.Cam->GetViewportWidth(), cc.Cam->GetViewportHeight());
+	camera->SetPositionDirection(cc.Cam->GetPosition(), cc.Cam->GetDirection());
 
 	m_Controller.OnUpdate(ts);
 
-	cc.Position = camera->GetPosition();
-	cc.Direction = camera->GetDirection();
+	cc.Cam->SetPositionDirection(camera->GetPosition(), camera->GetDirection());
 }
 
 void DefaultSceneRenderer::Render() {

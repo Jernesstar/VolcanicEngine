@@ -17,6 +17,7 @@ struct EditorEntity {
 class SceneVisualizerPanel : public Panel {
 public:
 	class Renderer : public Magma::SceneRenderer {
+	public:
 		void Update(TimeStep ts) override;
 		void Render() override;
 	};
@@ -40,7 +41,7 @@ private:
 	EditorEntity m_Selected;
 
 	Ref<UI::Image> m_Image;
-	Ref<Renderer> m_Renderer;
+	// Renderer m_Renderer;
 };
 
 }

@@ -1,18 +1,25 @@
 #pragma once
 
-#include "ECS/Entity.h"
-
 #include "Physics/World.h"
+
+#include "System.h"
 
 namespace Magma::ECS {
 
-class PhysicsSystem {
+class PhysicsSystem : public System<RigidBodyComponent> {
 public:
-	static void Register(Physics::World& world, Entity& entity);
+	PhysicsSystem(World* world)
+		: System(world) { }
 
-	static void RegisterForCollisionDetection(
-					Physics::World& world, Entity& e1, Entity& e2);
-	static bool Collides(Entity& e1, Entity& e2);
+	void Update(TimeStep ts) override;
+	void Run(Phase phase) override;
+
+	void Register(Entity& entity);
+	void Collides(Entity& e1, Entity& e2);
+	bool Collided(Entity& e1, Entity& e2);
+
+public:
+	Physics::World m_World;
 };
 
 }

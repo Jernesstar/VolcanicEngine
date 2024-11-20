@@ -4,7 +4,7 @@
 
 #define GET_QUERY(TComponent) \
 template<> \
-flecs::query<TComponent>& World::GetQuery<TComponent>() { \
+flecs::query<TComponent> World::GetQuery<TComponent>() { \
 	return m_##TComponent##Query; \
 }
 
