@@ -94,26 +94,32 @@ void SerializeEntity(YAMLSerializer& serializer, Entity& entity) {
 	}
 
 	if(entity.Has<CameraComponent>()) {
-		auto& camera = entity.Get<CameraComponent>();
-		auto type = camera.CameraType;
+		auto& camera = entity.Get<CameraComponent>().Cam;
+		auto type = camera->GetType();
 		auto s = type == Camera::Type::Ortho ? "Orthographic" : "Stereographic";
 
 		serializer.WriteKey("CameraComponent")
 		.BeginMapping()
+			.WriteKey("Camera").BeginMapping()
 			.WriteKey("Type").Write(s);
 
 		if(type == Camera::Type::Stereo)
-			serializer.WriteKey("VerticalFOV").Write(camera.VerticalFOV);
+			serializer
+			.WriteKey("VerticalFOV")
+			.Write(camera->As<StereographicCamera>()->GetVerticalFOV());
 		else if(type == Camera::Type::Ortho)
-			serializer.WriteKey("Rotation").Write(camera.Rotation);
+			serializer
+			.WriteKey("Rotation")
+			.Write(camera->As<OrthographicCamera>()->GetRotation());
 
 		serializer
-			.WriteKey("Position").Write(camera.Position)
-			.WriteKey("Direction").Write(camera.Direction)
-			.WriteKey("ViewportWidth").Write(camera.ViewportWidth)
-			.WriteKey("ViewportHeight").Write(camera.ViewportHeight)
-			.WriteKey("Near").Write(camera.Near)
-			.WriteKey("Far").Write(camera.Far)
+			.WriteKey("Position").Write(camera->GetPosition())
+			.WriteKey("Direction").Write(camera->GetDirection())
+			.WriteKey("ViewportWidth").Write(camera->GetViewportWidth())
+			.WriteKey("ViewportHeight").Write(camera->GetViewportHeight())
+			.WriteKey("Near").Write(camera->GetNear())
+			.WriteKey("Far").Write(camera->GetFar())
+		.EndMapping()
 		.EndMapping();
 	}
 
@@ -123,8 +129,7 @@ void SerializeEntity(YAMLSerializer& serializer, Entity& entity) {
 
 		serializer.WriteKey("MeshComponent")
 		.BeginMapping()
-			.WriteKey("Mesh")
-			.BeginMapping();
+			.WriteKey("Mesh").BeginMapping();
 
 		if(mesh->Path != "")
 			serializer.WriteKey("Path").Write(mesh->Path);
@@ -155,9 +160,9 @@ void SerializeEntity(YAMLSerializer& serializer, Entity& entity) {
 			serializer
 			.EndMapping(); // Material
 		}
-		serializer.EndMapping(); // Mesh
-
-		serializer.EndMapping(); // MeshComponent
+		serializer
+		.EndMapping() // Mesh
+		.EndMapping(); // MeshComponent
 	}
 
 	if(entity.Has<RigidBodyComponent>()) {
@@ -167,8 +172,7 @@ void SerializeEntity(YAMLSerializer& serializer, Entity& entity) {
 
 		serializer.WriteKey("RigidBodyComponent")
 		.BeginMapping()
-			.WriteKey("Body")
-			.BeginMapping()
+			.WriteKey("Body").BeginMapping()
 				.WriteKey("Type").Write(t);
 
 		if(body->HasShape()) {
@@ -194,7 +198,7 @@ void SerializeEntity(YAMLSerializer& serializer, Entity& entity) {
 			serializer
 				.WriteKey("ShapeType").Write(shapeType);
 		}
-			serializer
+		serializer
 			.EndMapping() // Body
 		.EndMapping(); // RigidBodyComponent
 	}
@@ -204,7 +208,9 @@ void SerializeEntity(YAMLSerializer& serializer, Entity& entity) {
 
 		serializer.WriteKey("ScriptComponent")
 		.BeginMapping()
+			.WriteKey("Script").BeginMapping()
 			// .WriteKey("Path").Write(path)
+			.EndMapping()
 		.EndMapping();
 	}
 
@@ -215,9 +221,11 @@ void SerializeEntity(YAMLSerializer& serializer, Entity& entity) {
 
 		serializer.WriteKey("TransformComponent")
 		.BeginMapping()
-			.WriteKey("Translation").Write(t)
-			.WriteKey("Rotation")	.Write(r)
-			.WriteKey("Scale")		.Write(s)
+			.WriteKey("Transform").BeginMapping()
+				.WriteKey("Translation").Write(t)
+				.WriteKey("Rotation")	.Write(r)
+				.WriteKey("Scale")		.Write(s)
+			.EndMapping()
 		.EndMapping(); // TransformComponent
 	}
 	serializer.EndMapping(); // Components
@@ -248,23 +256,24 @@ void DeserializeEntity(YAML::Node entityNode, Scene* scene) {
 
 	auto cameraComponentNode = components["CameraComponent"];
 	if(cameraComponentNode) {
-		auto pos  = cameraComponentNode["Position"]		 .as<glm::vec3>();
-		auto dir  = cameraComponentNode["Direction"]	 .as<glm::vec3>();
-		auto w	  = cameraComponentNode["ViewportWidth"] .as<uint32_t>();
-		auto h	  = cameraComponentNode["ViewportHeight"].as<uint32_t>();
-		auto near = cameraComponentNode["Near"]			 .as<float>();
-		auto far  = cameraComponentNode["Far"]			 .as<float>();
-		auto typeStr = cameraComponentNode["Type"].as<std::string>();
+		auto cameraNode = cameraComponentNode["Camera"];
+		auto pos  = cameraNode["Position"]		.as<glm::vec3>();
+		auto dir  = cameraNode["Direction"]		.as<glm::vec3>();
+		auto w	  = cameraNode["ViewportWidth"] .as<uint32_t>();
+		auto h	  = cameraNode["ViewportHeight"].as<uint32_t>();
+		auto near = cameraNode["Near"]			.as<float>();
+		auto far  = cameraNode["Far"]			.as<float>();
+		auto typeStr = cameraNode["Type"].as<std::string>();
 		float fr;
 		Camera::Type type;
 
 		if(typeStr == "Stereographic") {
-			fr = cameraComponentNode["VerticalFOV"].as<float>();
 			type = Camera::Type::Stereo;
+			fr = cameraNode["VerticalFOV"].as<float>();
 		}
 		else if(typeStr == "Orthographic") {
-			fr = cameraComponentNode["Rotation"].as<float>();
 			type = Camera::Type::Ortho;
+			fr = cameraNode["Rotation"].as<float>();
 		}
 
 		entity.Add<CameraComponent>(type, pos, dir, w, h, near, far, fr);
@@ -299,7 +308,7 @@ void DeserializeEntity(YAML::Node entityNode, Scene* scene) {
 
 	auto scriptComponentNode = components["ScriptComponent"];
 	if(scriptComponentNode) {
-		// auto scriptNode = scriptComponentNode["Path"];
+		// auto scriptNode = scriptComponentNode["Script"];
 		// std::string path = scriptNode.as<std::string>();
 
 		// ScriptComponent& sc = entity.Add<ScriptComponent>(path);
@@ -309,9 +318,10 @@ void DeserializeEntity(YAML::Node entityNode, Scene* scene) {
 
 	auto transformComponentNode = components["TransformComponent"];
 	if(transformComponentNode) {
-		auto translationNode = transformComponentNode["Translation"];
-		auto rotationNode	 = transformComponentNode["Rotation"];
-		auto scaleNode		 = transformComponentNode["Scale"];
+		auto transformNode = transformComponentNode["Transform"];
+		auto translationNode = transformNode["Translation"];
+		auto rotationNode	 = transformNode["Rotation"];
+		auto scaleNode		 = transformNode["Scale"];
 
 		TransformComponent& tc = entity.Add<TransformComponent>();
 		tc.Translation = translationNode.as<glm::vec3>();

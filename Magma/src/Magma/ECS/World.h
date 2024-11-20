@@ -16,6 +16,15 @@ using namespace VolcaniCore;
 
 namespace Magma::ECS {
 
+template<typename>
+struct strip;
+
+template<typename ...T>
+struct strip<std::tuple<T...>>
+{
+	using type = flecs::system_builder<T...>;
+};
+
 class World {
 public:
 	World();
@@ -41,15 +50,56 @@ public:
 	void RemoveEntity(const std::string& tag);
 
 	template<typename TSystem>
-	void Add(List<Phase> phases);
+	void Add(List<Phase> phases) {
+		auto sys = CreateRef<TSystem>(this);
+
+		using SystemType = strip<typename TSystem::RequiredComponents>::type;
+
+		for(auto phase : phases)
+			SystemType(m_World)
+			.kind(phase)
+			.run(
+				[sys = sys, phase = phase](flecs::iter& it)
+				{
+					if(phase == Phase::OnUpdate)
+						sys->Update(it.delta_time());
+					sys->Run(phase);
+				});
+
+		// m_Systems.push_back(sys);
+	}
+
 
 	template<typename TSystem>
-	void Get();
+	void Get() {
+		// return m_Systems[RegisteredSystems<TSystem>::id];
+	}
 
 	void ForEach(const Func<Entity&, void>& func);
 
 	template<typename TComponent>
-	void ForEach(const Func<Entity&, void>& func);
+	void ForEach(const Func<Entity&, void>& func) {
+		flecs::query<TComponent> query = GetQuery<TComponent>();
+
+		query.each(
+			[func](flecs::entity handle, TComponent& _)
+			{
+				Entity entity{ handle };
+				func(entity);
+			});
+	}
+
+	template<typename ...TComponents>
+	void ForEach(const Func<Entity&, void>& func) {
+		flecs::query<TComponents...> query = GetQuery<TComponents...>();
+
+		query.each(
+			[func](flecs::entity handle, TComponents&...)
+			{
+				Entity entity{ handle };
+				func(entity);
+			});
+	}
 
 	flecs::world& GetNative() { return m_World; }
 
@@ -72,7 +122,7 @@ private:
 	flecs::query<TComponents...> GetQuery() {
 		return m_World.query_builder<TComponents...>()
 		.template with<TComponents...>()
-		.cached()
+		// .cached()
 		.build();
 	}
 };

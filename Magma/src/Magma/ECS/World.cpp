@@ -106,49 +106,4 @@ void World::ForEach(const Func<Entity&, void>& func) {
 	m_World.defer_end();
 }
 
-template<typename TComponent>
-void World::ForEach(const Func<Entity&, void>& func) {
-	flecs::query<TComponent> query = GetQuery<TComponent>();
-
-	query.each(
-		[func](flecs::entity handle, TComponent& _)
-		{
-			Entity entity{ handle };
-			func(entity);
-		});
-}
-
-template<typename>
-struct strip;
-
-template<typename ...T>
-struct strip<std::tuple<T...>>
-{
-	using type = flecs::system_builder<T...>;
-};
-
-template<typename TSystem>
-void World::Add(List<Phase> phases) {
-	auto sys = CreateRef<TSystem>(this);
-	m_Systems.push_back(sys);
-
-	using SystemType = strip<TSystem::RequiredComponents>::type;
-
-	for(auto phase : phases)
-		SystemType(m_World, m_Systems.size())
-		.kind(phase)
-		.run(
-			[sys = sys, phase = phase](flecs::iter& it)
-			{
-				if(phase == Phase::OnUpdate)
-					sys->Update(it.delta_time());
-				sys->Run(phase);
-			});
-}
-
-template<typename TSystem>
-void World::Get() {
-	return m_Systems[RegisteredSystems<TSystem>::id];
-}
-
 }

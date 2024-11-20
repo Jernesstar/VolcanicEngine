@@ -39,7 +39,7 @@ public:
 	virtual void Run(Phase phase) = 0;
 
 	RequiredComponents GetRequired(Entity& entity) {
-		return std::make_tuple((entity.Get<TComponents>(), 0)...); // Weird, isn't it?
+		return { entity.Get<TComponents>()... }; // Weird, isn't it?
 	}
 
 protected:

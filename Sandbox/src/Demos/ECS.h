@@ -13,6 +13,7 @@ public:
 
 private:
 	Ref<Scene> scene;
+	// DefaultSceneRenderer renderer;
 	Ref<UI::Image> image;
 };
 
@@ -25,12 +26,12 @@ ECS::ECS() {
 		});
 
 	scene = CreateRef<Scene>("Titled Scene");
-	// scene->GetRenderer()->GetCameraController().TranslationSpeed = 20.0f;
+	// renderer.GetCameraController().TranslationSpeed = 20.0f;
 
 	auto& world = scene->EntityWorld;
 
 	EntityBuilder(world, "MainCamera")
-	.Add<CameraComponent>()
+	.Add<CameraComponent>(CreateRef<StereographicCamera>())
 	.Finalize();
 
 	auto cube = Mesh::Create(MeshPrimitive::Cube,
@@ -39,7 +40,7 @@ ECS::ECS() {
 			.Diffuse = Texture::Create("Sandbox/assets/images/wood.png")
 		});
 	for(uint32_t i = 0; i < 20; i++)
-		EntityBuilder(world, "Cube" + std::to_string(i + 1))
+		world.BuildEntity("Cube" + std::to_string(i + 1))
 		.Add<TransformComponent>(
 			Transform
 			{
@@ -51,7 +52,7 @@ ECS::ECS() {
 
 	auto ball = Mesh::Create("Sandbox/assets/models/sphere/wooden_sphere.obj");
 	for(uint32_t i = 0; i < 20; i++)
-		EntityBuilder(world, "Ball" + std::to_string(i + 1))
+		world.BuildEntity("Ball" + std::to_string(i + 1))
 		.Add<TransformComponent>(
 			Transform
 			{
@@ -63,39 +64,39 @@ ECS::ECS() {
 		.Finalize();
 
 	scene->Save("Magma/assets/scenes/temp.magma.scene");
-
-	UI::Init();
-
-	image = UI::Image::Create(
-	{
-		.Path = "Sandbox/assets/images/stone.png",
-		.Width = 100,
-		.Height = 100
-	});
-
-	auto output = scene->GetRenderer()->GetOutput();
-	image->SetImage(output, AttachmentTarget::Color);
 	VOLCANICORE_LOG_INFO("Success");
+
+	// UI::Init();
+
+	// image = UI::Image::Create(
+	// {
+	// 	.Path = "Sandbox/assets/images/stone.png",
+	// 	.Width = 100,
+	// 	.Height = 100
+	// });
+
+	// auto output = renderer.GetOutput();
+	// image->SetImage(output, AttachmentTarget::Color);
 }
 
 ECS::~ECS() {
-	UI::Close();
+	// UI::Close();
 }
 
 void ECS::OnUpdate(TimeStep ts) {
-	RendererAPI::Get()->Clear();
-	UI::Begin();
+	// RendererAPI::Get()->Clear();
+	// UI::Begin();
 
-	scene->OnUpdate(ts);
-	scene->OnRender();
+	// scene->OnUpdate(ts);
+	// scene->OnRender(renderer);
 
-	auto output = scene->GetRenderer()->GetOutput();
-	RendererAPI::Get()->RenderFramebuffer(output, AttachmentTarget::Color);
+	// auto output = renderer.GetOutput();
+	// RendererAPI::Get()->RenderFramebuffer(output, AttachmentTarget::Color);
 
 	// image->SetSize(400, 400);
 	// image->Render();
 
-	UI::End();
+	// UI::End();
 }
 
 }

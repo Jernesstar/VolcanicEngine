@@ -8,6 +8,9 @@ namespace Magma::ECS {
 
 class TransformSystem : public System<TransformComponent> {
 public:
+	TransformSystem(World* world)
+		: System(world) { }
+
 	void Update(TimeStep ts) override { }
 	void Run(Phase phase) override { }
 

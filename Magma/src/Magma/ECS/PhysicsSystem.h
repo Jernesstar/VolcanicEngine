@@ -8,6 +8,9 @@ namespace Magma::ECS {
 
 class PhysicsSystem : public System<RigidBodyComponent> {
 public:
+	PhysicsSystem(World* world)
+		: System(world) { }
+
 	void Update(TimeStep ts) override;
 	void Run(Phase phase) override;
 
@@ -16,7 +19,7 @@ public:
 	bool Collided(Entity& e1, Entity& e2);
 
 public:
-	Physics::World& m_World;
+	Physics::World m_World;
 };
 
 }
