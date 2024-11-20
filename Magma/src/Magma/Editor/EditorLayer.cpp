@@ -74,7 +74,7 @@ void EditorLayer::Render() {
 
 	ImGui::Begin("DockSpaceWindow", &dockspaceOpen, windowFlags);
 	{
-		ImGui::PopStyleVar(2);
+		ImGui::PopStyleVar(3);
 
 		ImGui::BeginMainMenuBar();
 		{

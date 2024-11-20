@@ -211,26 +211,40 @@ void SceneTab::ToolbarUI() {
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(0, 0));
 	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
 
+	auto& colors = ImGui::GetStyle().Colors;
+	const auto& buttonHovered = colors[ImGuiCol_ButtonHovered];
+	const auto& buttonActive = colors[ImGuiCol_ButtonActive];
+
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered,
+		ImVec4(buttonHovered.x, buttonHovered.y, buttonHovered.z, 0.5f));
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive,
+		ImVec4(buttonActive.x, buttonActive.y, buttonActive.z, 0.5f));
+
 	auto flags = ImGuiWindowFlags_NoDecoration
 			   | ImGuiWindowFlags_NoScrollbar
 			   | ImGuiWindowFlags_NoScrollWithMouse;
 	ImGui::Begin("##toolbar", nullptr, flags);
 	{
-		float size = ImGui::GetWindowHeight() - 4.0f;
-		ImGui::SetCursorPosX(
-			(ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
-
+		float size = ImGui::GetWindowHeight() - 2.0f;
+		auto x = 0.5f*ImGui::GetWindowContentRegionMax().x - 0.5f*size;
+		auto button = m_PlayButton;
 		if(m_SceneState == SceneState::Play)
-			m_PauseButton->Render();
-		else
-			m_PlayButton->Render();
+			button = m_PauseButton;
+
+		button->x = x;
+		button->y = ImGui::GetCursorPosY();
+		button->SetSize(size, size);
+		button->Render();
 
 		ImGui::SameLine();
+		m_StopButton->x = ImGui::GetCursorPosX() + 5.0f;
+		m_StopButton->y = ImGui::GetCursorPosY();
+		m_StopButton->SetSize(size, size);
 		m_StopButton->Render();
 	}
 	ImGui::End();
 
-	ImGui::PopStyleColor();
+	ImGui::PopStyleColor(3);
 	ImGui::PopStyleVar(2);
 }
 
