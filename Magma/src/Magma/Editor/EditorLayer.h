@@ -28,6 +28,7 @@ private:
 	void NewTab(Ref<UI::UIElement> ui);
 	void NewTab();
 	void OpenTab();
+	void ReopenTab();
 	void CloseTab();
 
 	void NewProject();

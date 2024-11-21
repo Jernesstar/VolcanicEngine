@@ -182,10 +182,9 @@ void EditorLayer::Render() {
 	if(menu.tab.openTab)
 		OpenTab();
 	if(menu.tab.reopenTab)
-		// ReopenTab();
+		ReopenTab();
 	if(menu.tab.closeTab)
-		// CloseTab();
-		;
+		CloseTab();
 
 }
 
@@ -229,6 +228,13 @@ void EditorLayer::OpenTab() {
 		instance->Close();
 		menu.tab.openTab = false;
 	}
+}
+
+void EditorLayer::ReopenTab() {
+	
+}
+
+void EditorLayer::CloseTab() {
 }
 
 void EditorLayer::NewProject() {
