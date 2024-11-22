@@ -5,6 +5,7 @@
 #include <VolcaniCore/Core/Time.h>
 #include <VolcaniCore/Core/Defines.h>
 #include <VolcaniCore/Core/UUID.h>
+#include <VolcaniCore/Core/TypeID.h>
 
 #include "Entity.h"
 #include "Component.h"
@@ -50,12 +51,15 @@ public:
 	void RemoveEntity(const std::string& tag);
 
 	template<typename TSystem>
-	void Add(List<Phase> phases) {
-		auto sys = CreateRef<TSystem>(this);
+	void Add(const List<Phase>& phases) {
+		auto id = TypeIDGenerator<System<>>::GetID<TSystem>();
+		if(!m_Systems.count(id))
+			m_Systems[id] = CreateRef<TSystem>(this);
+		auto sys = m_Systems[id];
 
 		using SystemType = strip<typename TSystem::RequiredComponents>::type;
 
-		for(auto phase : phases)
+		for(const auto& phase : phases)
 			SystemType(m_World)
 			.kind(phase)
 			.run(
@@ -66,13 +70,15 @@ public:
 					sys->Run(phase);
 				});
 
-		// m_Systems.push_back(sys);
 	}
 
-
 	template<typename TSystem>
-	void Get() {
-		// return m_Systems[RegisteredSystems<TSystem>::id];
+	Ref<TSystem> Get() {
+		auto id = TypeIDGenerator<System<>>::GetID<TSystem>();
+		if(!m_Systems.count(id))
+			Add<TSystem>({ Phase::OnUpdate });
+
+		return m_Systems[id];
 	}
 
 	void ForEach(const Func<Entity&, void>& func);
@@ -115,7 +121,7 @@ private:
 	flecs::query<TransformComponent> m_TransformComponentQuery;
 	flecs::query<ScriptComponent>	 m_ScriptComponentQuery;
 
-	List<Ref<System<>>> m_Systems;
+	Map<uint32_t, Ref<System<>>> m_Systems;
 
 private:
 	template<typename ...TComponents>

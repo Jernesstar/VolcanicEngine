@@ -21,7 +21,7 @@ using TypeList = typename TypeListWrapper<Args...>::type;
 
 namespace Magma::ECS {
 
-enum class Phase { PreUpdate, OnUpdate, PostUpdate };
+enum Phase { PreUpdate, OnUpdate, PostUpdate };
 
 class World;
 

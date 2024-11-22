@@ -66,7 +66,7 @@ ECS::ECS() {
 	scene->Save("Magma/assets/scenes/temp.magma.scene");
 	VOLCANICORE_LOG_INFO("Success");
 
-	// UI::Init();
+	UI::Init();
 
 	// image = UI::Image::Create(
 	// {
@@ -80,14 +80,14 @@ ECS::ECS() {
 }
 
 ECS::~ECS() {
-	// UI::Close();
+	UI::Close();
 }
 
 void ECS::OnUpdate(TimeStep ts) {
-	// RendererAPI::Get()->Clear();
-	// UI::Begin();
+	RendererAPI::Get()->Clear();
+	UI::Begin();
 
-	// scene->OnUpdate(ts);
+	scene->OnUpdate(ts);
 	// scene->OnRender(renderer);
 
 	// auto output = renderer.GetOutput();
@@ -96,7 +96,7 @@ void ECS::OnUpdate(TimeStep ts) {
 	// image->SetSize(400, 400);
 	// image->Render();
 
-	// UI::End();
+	UI::End();
 }
 
 }
