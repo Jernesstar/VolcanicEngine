@@ -7,14 +7,12 @@ namespace Demo {
 class ECS : public Application {
 public:
 	ECS();
-	~ECS();
 
 	void OnUpdate(TimeStep ts);
 
 private:
 	Ref<Scene> scene;
-	// DefaultSceneRenderer renderer;
-	Ref<UI::Image> image;
+	DefaultSceneRenderer renderer;
 };
 
 ECS::ECS() {
@@ -26,12 +24,24 @@ ECS::ECS() {
 		});
 
 	scene = CreateRef<Scene>("Titled Scene");
-	// renderer.GetCameraController().TranslationSpeed = 20.0f;
+	renderer.SetContext(scene.get());
+	renderer.GetCameraController().TranslationSpeed = 20.0f;
 
 	auto& world = scene->EntityWorld;
 
 	EntityBuilder(world, "MainCamera")
 	.Add<CameraComponent>(CreateRef<StereographicCamera>())
+	.Finalize();
+
+	auto player = Model::Create("Sandbox/assets/models/player/Knight_Golden_Male.obj");
+	world.BuildEntity("Player")
+	.Add<TransformComponent>(
+		Transform
+		{
+			.Scale = glm::vec3(1.0f)
+		})
+	.Add<MeshComponent>(player)
+	// .Add<RigidBodyComponent>(RigidBody::Type::Static)
 	.Finalize();
 
 	auto cube = Mesh::Create(MeshPrimitive::Cube,
@@ -65,38 +75,17 @@ ECS::ECS() {
 
 	scene->Save("Magma/assets/scenes/temp.magma.scene");
 	VOLCANICORE_LOG_INFO("Success");
-
-	UI::Init();
-
-	// image = UI::Image::Create(
-	// {
-	// 	.Path = "Sandbox/assets/images/stone.png",
-	// 	.Width = 100,
-	// 	.Height = 100
-	// });
-
-	// auto output = renderer.GetOutput();
-	// image->SetImage(output, AttachmentTarget::Color);
-}
-
-ECS::~ECS() {
-	UI::Close();
 }
 
 void ECS::OnUpdate(TimeStep ts) {
 	RendererAPI::Get()->Clear();
-	UI::Begin();
 
+	renderer.Update(ts);
 	scene->OnUpdate(ts);
-	// scene->OnRender(renderer);
+	scene->OnRender(renderer);
 
-	// auto output = renderer.GetOutput();
-	// RendererAPI::Get()->RenderFramebuffer(output, AttachmentTarget::Color);
-
-	// image->SetSize(400, 400);
-	// image->Render();
-
-	UI::End();
+	auto output = renderer.GetOutput();
+	RendererAPI::Get()->RenderFramebuffer(output, AttachmentTarget::Color);
 }
 
 }

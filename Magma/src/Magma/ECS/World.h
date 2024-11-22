@@ -54,9 +54,9 @@ public:
 	void Add(const List<Phase>& phases) {
 		auto id = TypeIDGenerator<System<>>::GetID<TSystem>();
 		if(!m_Systems.count(id))
-			m_Systems[id] = CreateRef<TSystem>(this);
-		auto sys = m_Systems[id];
+			m_Systems[id] = new TSystem(this);
 
+		auto sys = (TSystem*)m_Systems[id];
 		using SystemType = strip<typename TSystem::RequiredComponents>::type;
 
 		for(const auto& phase : phases)
@@ -78,7 +78,7 @@ public:
 		if(!m_Systems.count(id))
 			Add<TSystem>({ Phase::OnUpdate });
 
-		return m_Systems[id];
+		return Ref<TSystem>((TSystem*)m_Systems[id]);
 	}
 
 	void ForEach(const Func<Entity&, void>& func);
@@ -121,7 +121,7 @@ private:
 	flecs::query<TransformComponent> m_TransformComponentQuery;
 	flecs::query<ScriptComponent>	 m_ScriptComponentQuery;
 
-	Map<uint32_t, Ref<System<>>> m_Systems;
+	Map<uint64_t, void*> m_Systems;
 
 private:
 	template<typename ...TComponents>

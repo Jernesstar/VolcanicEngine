@@ -102,7 +102,7 @@ YAMLSerializer& YAMLSerializer::Write(const glm::vec4& value) {
 	return *this;
 }
 
-YAMLSerializer& YAMLSerializer::Write(const char* value) {
+YAMLSerializer& YAMLSerializer::Write(const std::string& value) {
 	m_Out << YAML::Value << value;
 	return *this;
 }

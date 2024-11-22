@@ -20,14 +20,12 @@ class Scene;
 class SceneRenderer {
 public:
 	SceneRenderer() = default;
-	SceneRenderer(Scene* scene)
-		: m_Scene(scene) { }
 	virtual ~SceneRenderer() = default;
 
 	virtual void Update(TimeStep ts) = 0;
 	virtual void Render() = 0;
 
-	void SetContext(Scene* scene) {
+	virtual void SetContext(Scene* scene) {
 		m_Scene = scene;
 	}
 
@@ -46,12 +44,12 @@ public:
 	// JSONParserNode Options;
 
 public:
-	DefaultSceneRenderer() = default;
-	DefaultSceneRenderer(Scene* scene);
+	DefaultSceneRenderer();
 	~DefaultSceneRenderer() = default;
 
 	void Update(TimeStep ts) override;
 	void Render() override;
+	void SetContext(Scene* scene) override;
 
 private:
 	Ref<RenderPass> m_DrawPass;

@@ -13,8 +13,8 @@ Ref<Serializer> Serializer::Create(Serializer::Format format) {
 }
 
 template<>
-Serializer& Serializer::Write(const std::string& value) {
-	Write(value.c_str());
+Serializer& Serializer::Write(const char* const& value) {
+	Write(std::string(value));
 	return *this;
 }
 

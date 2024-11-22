@@ -43,34 +43,34 @@ SceneTab::~SceneTab() {
 }
 
 void SceneTab::Setup() {
-	// auto panel1 = CreateRef<SceneHierarchyPanel>(&m_Scene);
-	// panel1->Close();
+	auto panel1 = CreateRef<SceneHierarchyPanel>(&m_Scene);
+	panel1->Close();
 	auto panel2 = CreateRef<SceneVisualizerPanel>(&m_Scene);
-	// panel2->Close();
+	panel2->Close();
 
-	// m_Panels.push_back(panel1);
-	// m_Panels.push_back(panel2);
+	m_Panels.push_back(panel1);
+	m_Panels.push_back(panel2);
 	// TODO(Implement): ComponentPanel
 
-	// m_PlayButton = UI::Button::Create(
-	// 	{
-	// 		.Image = "Magma/assets/icons/PlayButton.png",
-	// 		.Width = 20, .Height = 20,
-	// 		// .OnPressed = [this]() { OnScenePlay(); }
-	// 	});
-	// m_PauseButton = UI::Button::Create(
-	// 	{
-	// 		.Image = "Magma/assets/icons/PauseButton.png",
-	// 		.x = 100, .y = 100,
-	// 		.Width = 20, .Height = 20,
-	// 		// .OnPressed = [this]() { OnScenePause(); }
-	// 	});
-	// m_StopButton = UI::Button::Create(
-	// 	{
-	// 		.Image = "Magma/assets/icons/StopButton.png",
-	// 		.Width = 20, .Height = 20,
-	// 		// .OnPressed = [this]() { OnSceneStop(); }
-	// 	});
+	m_PlayButton = UI::Button::Create(
+		{
+			.Image = "Magma/assets/icons/PlayButton.png",
+			.Width = 20, .Height = 20,
+			// .OnPressed = [this]() { OnScenePlay(); }
+		});
+	m_PauseButton = UI::Button::Create(
+		{
+			.Image = "Magma/assets/icons/PauseButton.png",
+			.x = 100, .y = 100,
+			.Width = 20, .Height = 20,
+			// .OnPressed = [this]() { OnScenePause(); }
+		});
+	m_StopButton = UI::Button::Create(
+		{
+			.Image = "Magma/assets/icons/StopButton.png",
+			.Width = 20, .Height = 20,
+			// .OnPressed = [this]() { OnSceneStop(); }
+		});
 }
 
 void SceneTab::SetScene(const Scene& scene) {

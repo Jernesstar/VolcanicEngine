@@ -13,12 +13,9 @@ using namespace Magma::ECS;
 
 namespace Magma {
 
-DefaultSceneRenderer::DefaultSceneRenderer(Scene* scene)
-	: SceneRenderer(scene)
-{
+DefaultSceneRenderer::DefaultSceneRenderer() {
 	Application::PushDir();
-	Ref<ShaderPipeline> shader;
-	shader = ShaderPipeline::Create("VolcaniCore/assets/shaders", "Mesh");
+	auto shader = ShaderPipeline::Create("VolcaniCore/assets/shaders", "Mesh");
 	m_DrawPass = RenderPass::Create("Draw", shader);
 	Application::PopDir();
 
@@ -31,7 +28,11 @@ DefaultSceneRenderer::DefaultSceneRenderer(Scene* scene)
 	auto camera = CreateRef<StereographicCamera>(75.0f);
 	m_Controller.SetCamera(camera);
 	m_Controller.TranslationSpeed = 10.0f;
+}
 
+void DefaultSceneRenderer::SetContext(Scene* scene) {
+	m_Scene = scene;
+	// TODO(Change): Move to Scene::OnRender
 	auto& world = m_Scene->EntityWorld.GetNative();
 	m_RenderSystem = world
 	.system<const TransformComponent, const MeshComponent>("RenderSystem")
@@ -55,14 +56,14 @@ void DefaultSceneRenderer::Update(TimeStep ts) {
 	if(!cameraEntity.IsValid())
 		return;
 
-	auto& cc = cameraEntity.Get<CameraComponent>();
+	auto& cam = cameraEntity.Get<CameraComponent>().Cam;
 	auto camera = m_Controller.GetCamera();
-	camera->Resize(cc.Cam->GetViewportWidth(), cc.Cam->GetViewportHeight());
-	camera->SetPositionDirection(cc.Cam->GetPosition(), cc.Cam->GetDirection());
+	camera->Resize(cam->GetViewportWidth(), cam->GetViewportHeight());
+	camera->SetPositionDirection(cam->GetPosition(), cam->GetDirection());
 
 	m_Controller.OnUpdate(ts);
 
-	cc.Cam->SetPositionDirection(camera->GetPosition(), camera->GetDirection());
+	cam->SetPositionDirection(camera->GetPosition(), camera->GetDirection());
 }
 
 void DefaultSceneRenderer::Render() {

@@ -7,6 +7,7 @@
 #include <imgui/misc/cpp/imgui_stdlib.h>
 #include <ImGuiFileDialog/ImGuiFileDialog.h>
 
+#include <VolcaniCore/Core/Application.h>
 #include <VolcaniCore/Core/Log.h>
 #include <VolcaniCore/Core/Input.h>
 #include <VolcaniCore/Renderer/RendererAPI.h>
@@ -36,6 +37,7 @@ struct {
 EditorLayer::EditorLayer() {
 	NewProject();
 	m_Project->Load("../TheMazeIsLava/.volc.proj");
+	Application::GetWindow()->SetTitle("Magma Editor: " + m_Project->GetName());
 
 	auto tab = CreateRef<SceneTab>("Magma/assets/scenes/temp.magma.scene");
 	NewTab(tab);
@@ -251,6 +253,8 @@ void EditorLayer::OpenProject() {
 		instance->Close();
 		menu.project.openProject = false;
 	}
+
+	Application::GetWindow()->SetTitle("Magma Editor: " + m_Project->GetName());
 }
 
 void EditorLayer::ReloadProject() {

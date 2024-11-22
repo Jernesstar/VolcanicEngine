@@ -5,8 +5,6 @@
 #include <Core/Defines.h>
 #include <Core/UUID.h>
 
-#include "Core/JSONSerializer.h"
-
 using namespace VolcaniCore;
 
 namespace Magma::UI {
@@ -56,7 +54,10 @@ public:
 
 	template<typename TUIElement, typename ...Args>
 	requires std::derived_from<TUIElement, UIElement>
-	Ref<TUIElement> Add(Args&&... args);
+	Ref<TUIElement> Add(Args&&... args) {
+		Ref<UIElement> element{ new TUIElement(std::forward<Args>(args)...) };
+		return std::static_pointer_cast<TUIElement>(Add(element));
+	}
 
 	bool IsClicked() const { return m_Clicked; }
 	bool IsHovered() const { return m_Hovered; }

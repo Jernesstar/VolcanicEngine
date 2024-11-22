@@ -26,16 +26,6 @@ struct CameraComponent : public Component {
 	CameraComponent() = default;
 	CameraComponent(Ref<Camera> camera)
 		: Cam(camera) { }
-	CameraComponent(Camera::Type type,
-					const glm::vec3& pos, const glm::vec3& dir,
-					uint32_t width, uint32_t height, float near, float far,
-					float fr)
-	{
-		Cam = Camera::Create(type, fr);
-		Cam->SetPositionDirection(pos, dir);
-		Cam->Resize(width, height);
-		Cam->SetProjection(near, far);
-	}
 	CameraComponent(const CameraComponent& other) = default;
 };
 
@@ -43,7 +33,9 @@ struct MeshComponent : public Component {
 	// TODO(Change): AssetID
 	Ref<Model> Mesh;
 
-	MeshComponent() = default;
+	MeshComponent() {
+		Mesh = Model::Create("");
+	}
 	MeshComponent(Ref<Model> mesh)
 		: Mesh(mesh) { }
 	MeshComponent(Ref<VolcaniCore::Mesh> mesh) {

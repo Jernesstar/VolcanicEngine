@@ -42,6 +42,7 @@ private:
 
 	Ref<UI::Image> m_Image;
 	// Renderer m_Renderer;
+	DefaultSceneRenderer m_Renderer;
 };
 
 }

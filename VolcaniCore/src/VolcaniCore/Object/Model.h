@@ -14,16 +14,14 @@ public:
 	Model(const std::string& path);
 	~Model() = default;
 
-	void AddMesh(Ref<Mesh> mesh) {
-		m_Meshes.push_back(mesh);
+	void AddMesh(Ref<Mesh> mesh);
+
+	Ref<Mesh> GetMesh(uint32_t i) const {
+		return m_Meshes[i];
 	}
 
 	uint32_t GetMeshCount() const {
 		return m_Meshes.size();
-	}
-
-	Ref<Mesh> GetMesh(uint32_t i) const {
-		return m_Meshes[i];
 	}
 
 	std::vector<Ref<Mesh>>::const_iterator begin() const {

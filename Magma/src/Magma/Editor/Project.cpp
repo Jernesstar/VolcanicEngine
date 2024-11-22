@@ -8,16 +8,16 @@ namespace fs = std::filesystem;
 
 namespace Magma {
 
-Project::Project(const fs::path& path) {
-	Load(path);
+Project::Project(const fs::path& volcFilePath) {
+	Load(volcFilePath);
 }
 
 Project::~Project() {
 
 }
 
-void Project::Load(const fs::path& path) {
-	auto fullPath = fs::canonical(path).parent_path();
+void Project::Load(const fs::path& volcFilePath) {
+	auto fullPath = fs::canonical(volcFilePath).parent_path();
 	m_Name = fullPath.stem().string();
 	m_RootPath = fullPath.string();
 	m_SrcPath   = (fullPath / m_Name / "src").string();
@@ -45,7 +45,7 @@ void Project::Reload() {
 	command += "'Finished creating Makefiles'";
 	system(command.c_str());
 
-	command = "powershell Start-Process mingw32-make.exe";
+	command = "powershell Start-Process mingw32-make.exe -NoNewWindow";
 	command += " -WorkingDir Magma\\projects\\build";
 	command += " -ArgumentList '-f Makefile';";
 
@@ -63,8 +63,7 @@ void Project::Run() {
 
 	command = "powershell $ExePath = Resolve-Path";
 	command += " Magma\\projects\\Project\\build\\bin\\Project.exe;";
-	command += " Start-Process $ExePath";
-	command += " -WorkingDir \'" + m_RootPath + "\';";
+	command += "Start-Process $ExePath -NoNewWindow -WorkingDir \'" + m_RootPath + "\';";
 	system(command.c_str());
 }
 

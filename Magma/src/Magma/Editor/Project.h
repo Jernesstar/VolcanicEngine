@@ -9,8 +9,10 @@ namespace Magma {
 class Project {
 public:
 	Project() = default;
-	Project(const std::filesystem::path& path);
+	Project(const std::filesystem::path& volcFilePath);
 	~Project();
+
+	std::string GetName() const { return m_Name; }
 
 	void Load(const std::filesystem::path& path);
 	void Reload();

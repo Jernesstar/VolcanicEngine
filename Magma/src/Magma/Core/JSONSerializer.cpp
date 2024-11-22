@@ -102,7 +102,7 @@ JSONSerializer& JSONSerializer::Write(const glm::vec4& value) {
 	return *this;
 }
 
-JSONSerializer& JSONSerializer::Write(const char* value) {
+JSONSerializer& JSONSerializer::Write(const std::string& value) {
 	m_Writer.String(value);
 	return *this;
 }
