@@ -2,9 +2,9 @@ project "Project"
     kind "ConsoleApp"
     language "C++"
     cppdialect "C++latest"
-    exceptionhandling "On"
-    rtti "Off"
-    staticruntime "Off"
+    -- exceptionhandling "On"
+    -- rtti "Off"
+    -- staticruntime "Off"
 
     ProjectDir = _OPTIONS["project"]
     ProjectSrcDir = _OPTIONS["src"]
@@ -45,13 +45,14 @@ project "Project"
     }
 
     libdirs {
+        "%{VolcanicEngineDir}/build/**",
         "%{VolcanicEngineDir}/build/VolcaniCore/lib",
         "%{VolcanicEngineDir}/build/Magma/lib"
     }
 
     links {
-        "Magma",
         "VolcaniCore",
+        "Magma",
 
         "glfw",
         "glad",

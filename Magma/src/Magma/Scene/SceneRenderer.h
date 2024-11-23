@@ -40,7 +40,7 @@ protected:
 
 class DefaultSceneRenderer : public SceneRenderer {
 public:
-	// TODO: Replace with map of string values
+	// TODO(Change): Replace with map of string values
 	// JSONParserNode Options;
 
 public:

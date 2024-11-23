@@ -150,14 +150,8 @@ void EditorLayer::Render() {
 					tabToDelete = tab;
 			}
 
-			if(tabToDelete != nullptr) {
-				// AddToClosedTabs(tab)
-				auto it = std::find(m_Tabs.begin(), m_Tabs.end(), tabToDelete);
-				uint32_t index = std::distance(m_Tabs.begin(), it);
-				m_Tabs.erase(it);
-				if(tabToDelete == m_CurrentTab)
-					m_CurrentTab = (index > 0) ? m_Tabs[index - 1] : nullptr;
-			}
+			if(tabToDelete != nullptr)
+				CloseTab(tabToDelete);
 		}
 		ImGui::EndTabBar();
 
@@ -184,10 +178,9 @@ void EditorLayer::Render() {
 	if(menu.tab.openTab)
 		OpenTab();
 	if(menu.tab.reopenTab)
-		// ReopenTab();
+		ReopenTab();
 	if(menu.tab.closeTab)
-		// CloseTab();
-		;
+		CloseTab(m_CurrentTab);
 
 }
 
@@ -207,7 +200,7 @@ void EditorLayer::NewTab(Ref<UI::UIElement> element) {
 }
 
 void EditorLayer::NewTab() {
-	// TODO(Implement): Dialog box to pick which kind of new tab to create:
+	// TODO(Fix): Dialog box to pick which kind of new tab to create:
 	// Scene, UI, or Level
 }
 
@@ -231,6 +224,24 @@ void EditorLayer::OpenTab() {
 		instance->Close();
 		menu.tab.openTab = false;
 	}
+}
+
+void EditorLayer::ReopenTab() {
+	NewTab(m_ClosedTabs.back());
+	m_ClosedTabs.pop_back();
+}
+
+void EditorLayer::CloseTab(Ref<Tab> tabToDelete) {
+	if(tabToDelete == nullptr)
+		return;
+
+	auto it = std::find(m_Tabs.begin(), m_Tabs.end(), tabToDelete);
+	m_Tabs.erase(it);
+	m_ClosedTabs.push_back(tabToDelete);
+
+	uint32_t index = std::distance(m_Tabs.begin(), it);
+	if(tabToDelete == m_CurrentTab)
+		m_CurrentTab = (index > 0) ? m_Tabs[index - 1] : nullptr;
 }
 
 void EditorLayer::NewProject() {

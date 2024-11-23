@@ -37,7 +37,7 @@ void Project::Reload() {
 #elif VOLCANICENGINE_WINDOWS
 	command += "vendor\\premake\\bin\\Windows\\premake5.exe";
 #endif
-	command += " -ArgumentList '";
+	command += " -NoNewWindow -ArgumentList '";
 	command += "gmake2 --file=Magma\\projects\\premake5.lua";
 	command += " --project=\"" + m_RootPath + "\"";
 	command += " --src=\""     + m_SrcPath  + "\"";
@@ -45,9 +45,9 @@ void Project::Reload() {
 	command += "'Finished creating Makefiles'";
 	system(command.c_str());
 
-	command = "powershell Start-Process mingw32-make.exe -NoNewWindow";
+	command = "powershell mingw32-make.exe";
 	command += " -WorkingDir Magma\\projects\\build";
-	command += " -ArgumentList '-f Makefile';";
+	command += " -ArgumentList 'Makefile';";
 
 	command += "if($Error.count -eq 0) {";
 	command +=		"'Project built successfully'";
@@ -63,7 +63,7 @@ void Project::Run() {
 
 	command = "powershell $ExePath = Resolve-Path";
 	command += " Magma\\projects\\Project\\build\\bin\\Project.exe;";
-	command += "Start-Process $ExePath -NoNewWindow -WorkingDir \'" + m_RootPath + "\';";
+	command += "Start-Process $ExePath -WorkingDir \'" + m_RootPath + "\';";
 	system(command.c_str());
 }
 

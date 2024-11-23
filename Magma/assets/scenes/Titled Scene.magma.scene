@@ -36,7 +36,7 @@ Scene:
             Tag: Cube1
           TransformComponent:
             Transform:
-              Translation: [-1, 10, 1]
+              Translation: [-2, -4, 10]
               Rotation: [0, 0, 0]
               Scale: [1, 1, 1]
           MeshComponent:
@@ -54,7 +54,7 @@ Scene:
             Tag: Cube2
           TransformComponent:
             Transform:
-              Translation: [-8, -3, 9]
+              Translation: [1, 1, 1]
               Rotation: [0, 0, 0]
               Scale: [1, 1, 1]
           MeshComponent:
@@ -72,7 +72,7 @@ Scene:
             Tag: Cube3
           TransformComponent:
             Transform:
-              Translation: [5, 9, 0]
+              Translation: [-10, 0, 10]
               Rotation: [0, 0, 0]
               Scale: [1, 1, 1]
           MeshComponent:
@@ -90,7 +90,7 @@ Scene:
             Tag: Cube4
           TransformComponent:
             Transform:
-              Translation: [5, 1, -6]
+              Translation: [1, -5, -7]
               Rotation: [0, 0, 0]
               Scale: [1, 1, 1]
           MeshComponent:
@@ -108,7 +108,7 @@ Scene:
             Tag: Cube5
           TransformComponent:
             Transform:
-              Translation: [-6, -10, 2]
+              Translation: [4, 3, 7]
               Rotation: [0, 0, 0]
               Scale: [1, 1, 1]
           MeshComponent:
@@ -126,7 +126,7 @@ Scene:
             Tag: Cube6
           TransformComponent:
             Transform:
-              Translation: [8, -8, -7]
+              Translation: [6, -4, 5]
               Rotation: [0, 0, 0]
               Scale: [1, 1, 1]
           MeshComponent:
@@ -144,7 +144,7 @@ Scene:
             Tag: Cube7
           TransformComponent:
             Transform:
-              Translation: [0, 9, 10]
+              Translation: [4, 0, 4]
               Rotation: [0, 0, 0]
               Scale: [1, 1, 1]
           MeshComponent:
@@ -162,7 +162,7 @@ Scene:
             Tag: Cube8
           TransformComponent:
             Transform:
-              Translation: [1, 8, -10]
+              Translation: [9, -7, 7]
               Rotation: [0, 0, 0]
               Scale: [1, 1, 1]
           MeshComponent:
@@ -180,7 +180,7 @@ Scene:
             Tag: Cube9
           TransformComponent:
             Transform:
-              Translation: [2, 2, 4]
+              Translation: [5, -6, 9]
               Rotation: [0, 0, 0]
               Scale: [1, 1, 1]
           MeshComponent:
@@ -198,7 +198,7 @@ Scene:
             Tag: Cube10
           TransformComponent:
             Transform:
-              Translation: [3, -3, -3]
+              Translation: [9, -7, -4]
               Rotation: [0, 0, 0]
               Scale: [1, 1, 1]
           MeshComponent:
@@ -216,7 +216,7 @@ Scene:
             Tag: Cube11
           TransformComponent:
             Transform:
-              Translation: [-4, -10, 8]
+              Translation: [1, 5, -9]
               Rotation: [0, 0, 0]
               Scale: [1, 1, 1]
           MeshComponent:
@@ -234,7 +234,7 @@ Scene:
             Tag: Cube12
           TransformComponent:
             Transform:
-              Translation: [-2, 0, -5]
+              Translation: [-2, 8, -4]
               Rotation: [0, 0, 0]
               Scale: [1, 1, 1]
           MeshComponent:
@@ -252,7 +252,7 @@ Scene:
             Tag: Cube13
           TransformComponent:
             Transform:
-              Translation: [-6, -2, -2]
+              Translation: [8, 4, -8]
               Rotation: [0, 0, 0]
               Scale: [1, 1, 1]
           MeshComponent:
@@ -270,7 +270,7 @@ Scene:
             Tag: Cube14
           TransformComponent:
             Transform:
-              Translation: [9, -9, -2]
+              Translation: [3, 5, 7]
               Rotation: [0, 0, 0]
               Scale: [1, 1, 1]
           MeshComponent:
@@ -288,7 +288,7 @@ Scene:
             Tag: Cube15
           TransformComponent:
             Transform:
-              Translation: [4, -7, 9]
+              Translation: [3, 6, 1]
               Rotation: [0, 0, 0]
               Scale: [1, 1, 1]
           MeshComponent:
@@ -306,7 +306,7 @@ Scene:
             Tag: Cube16
           TransformComponent:
             Transform:
-              Translation: [-2, 10, -8]
+              Translation: [-9, 3, -4]
               Rotation: [0, 0, 0]
               Scale: [1, 1, 1]
           MeshComponent:
@@ -324,7 +324,7 @@ Scene:
             Tag: Cube17
           TransformComponent:
             Transform:
-              Translation: [-5, 8, -1]
+              Translation: [-10, -9, -8]
               Rotation: [0, 0, 0]
               Scale: [1, 1, 1]
           MeshComponent:
@@ -342,7 +342,7 @@ Scene:
             Tag: Cube18
           TransformComponent:
             Transform:
-              Translation: [5, 2, -6]
+              Translation: [-1, -6, 3]
               Rotation: [0, 0, 0]
               Scale: [1, 1, 1]
           MeshComponent:
@@ -360,7 +360,7 @@ Scene:
             Tag: Cube19
           TransformComponent:
             Transform:
-              Translation: [6, 5, -7]
+              Translation: [-2, -1, 10]
               Rotation: [0, 0, 0]
               Scale: [1, 1, 1]
           MeshComponent:
@@ -378,7 +378,7 @@ Scene:
             Tag: Cube20
           TransformComponent:
             Transform:
-              Translation: [3, 6, -3]
+              Translation: [-8, -1, -9]
               Rotation: [0, 0, 0]
               Scale: [1, 1, 1]
           MeshComponent:
@@ -396,7 +396,7 @@ Scene:
             Tag: Ball1
           TransformComponent:
             Transform:
-              Translation: [-6, 4, 5]
+              Translation: [-7, -8, 8]
               Rotation: [0, 0, 0]
               Scale: [0.100000001, 0.100000001, 0.100000001]
           MeshComponent:
@@ -410,7 +410,7 @@ Scene:
             Tag: Ball2
           TransformComponent:
             Transform:
-              Translation: [10, 0, -3]
+              Translation: [-5, 10, 6]
               Rotation: [0, 0, 0]
               Scale: [0.100000001, 0.100000001, 0.100000001]
           MeshComponent:
@@ -424,7 +424,7 @@ Scene:
             Tag: Ball3
           TransformComponent:
             Transform:
-              Translation: [4, 0, -10]
+              Translation: [2, 6, -5]
               Rotation: [0, 0, 0]
               Scale: [0.100000001, 0.100000001, 0.100000001]
           MeshComponent:
@@ -438,7 +438,7 @@ Scene:
             Tag: Ball4
           TransformComponent:
             Transform:
-              Translation: [9, -5, -9]
+              Translation: [3, -3, -10]
               Rotation: [0, 0, 0]
               Scale: [0.100000001, 0.100000001, 0.100000001]
           MeshComponent:
@@ -452,7 +452,7 @@ Scene:
             Tag: Ball5
           TransformComponent:
             Transform:
-              Translation: [3, 10, -6]
+              Translation: [-7, -8, 2]
               Rotation: [0, 0, 0]
               Scale: [0.100000001, 0.100000001, 0.100000001]
           MeshComponent:
@@ -466,7 +466,7 @@ Scene:
             Tag: Ball6
           TransformComponent:
             Transform:
-              Translation: [3, 8, 1]
+              Translation: [-10, 3, 2]
               Rotation: [0, 0, 0]
               Scale: [0.100000001, 0.100000001, 0.100000001]
           MeshComponent:
@@ -480,7 +480,7 @@ Scene:
             Tag: Ball7
           TransformComponent:
             Transform:
-              Translation: [-6, -7, 10]
+              Translation: [9, 0, 0]
               Rotation: [0, 0, 0]
               Scale: [0.100000001, 0.100000001, 0.100000001]
           MeshComponent:
@@ -494,7 +494,7 @@ Scene:
             Tag: Ball8
           TransformComponent:
             Transform:
-              Translation: [0, -5, 1]
+              Translation: [2, -3, -8]
               Rotation: [0, 0, 0]
               Scale: [0.100000001, 0.100000001, 0.100000001]
           MeshComponent:
@@ -508,7 +508,7 @@ Scene:
             Tag: Ball9
           TransformComponent:
             Transform:
-              Translation: [7, -6, -5]
+              Translation: [1, 3, -6]
               Rotation: [0, 0, 0]
               Scale: [0.100000001, 0.100000001, 0.100000001]
           MeshComponent:
@@ -522,7 +522,7 @@ Scene:
             Tag: Ball10
           TransformComponent:
             Transform:
-              Translation: [6, 3, -7]
+              Translation: [1, 1, 10]
               Rotation: [0, 0, 0]
               Scale: [0.100000001, 0.100000001, 0.100000001]
           MeshComponent:
@@ -536,7 +536,7 @@ Scene:
             Tag: Ball11
           TransformComponent:
             Transform:
-              Translation: [-6, -7, 9]
+              Translation: [-7, -4, 9]
               Rotation: [0, 0, 0]
               Scale: [0.100000001, 0.100000001, 0.100000001]
           MeshComponent:
@@ -550,7 +550,7 @@ Scene:
             Tag: Ball12
           TransformComponent:
             Transform:
-              Translation: [-1, 7, 3]
+              Translation: [-5, -8, 10]
               Rotation: [0, 0, 0]
               Scale: [0.100000001, 0.100000001, 0.100000001]
           MeshComponent:
@@ -564,7 +564,7 @@ Scene:
             Tag: Ball13
           TransformComponent:
             Transform:
-              Translation: [10, 8, -2]
+              Translation: [3, -7, 4]
               Rotation: [0, 0, 0]
               Scale: [0.100000001, 0.100000001, 0.100000001]
           MeshComponent:
@@ -578,7 +578,7 @@ Scene:
             Tag: Ball14
           TransformComponent:
             Transform:
-              Translation: [9, 7, 6]
+              Translation: [7, -7, 5]
               Rotation: [0, 0, 0]
               Scale: [0.100000001, 0.100000001, 0.100000001]
           MeshComponent:
@@ -592,7 +592,7 @@ Scene:
             Tag: Ball15
           TransformComponent:
             Transform:
-              Translation: [-3, 10, 10]
+              Translation: [0, -6, -8]
               Rotation: [0, 0, 0]
               Scale: [0.100000001, 0.100000001, 0.100000001]
           MeshComponent:
@@ -606,7 +606,7 @@ Scene:
             Tag: Ball16
           TransformComponent:
             Transform:
-              Translation: [10, 5, -5]
+              Translation: [2, 0, -9]
               Rotation: [0, 0, 0]
               Scale: [0.100000001, 0.100000001, 0.100000001]
           MeshComponent:
@@ -620,7 +620,7 @@ Scene:
             Tag: Ball17
           TransformComponent:
             Transform:
-              Translation: [3, -9, 2]
+              Translation: [-9, -1, 3]
               Rotation: [0, 0, 0]
               Scale: [0.100000001, 0.100000001, 0.100000001]
           MeshComponent:
@@ -634,7 +634,7 @@ Scene:
             Tag: Ball18
           TransformComponent:
             Transform:
-              Translation: [-6, 0, -10]
+              Translation: [-4, -4, -8]
               Rotation: [0, 0, 0]
               Scale: [0.100000001, 0.100000001, 0.100000001]
           MeshComponent:
@@ -648,7 +648,7 @@ Scene:
             Tag: Ball19
           TransformComponent:
             Transform:
-              Translation: [10, 3, -8]
+              Translation: [2, 0, -3]
               Rotation: [0, 0, 0]
               Scale: [0.100000001, 0.100000001, 0.100000001]
           MeshComponent:
@@ -662,7 +662,7 @@ Scene:
             Tag: Ball20
           TransformComponent:
             Transform:
-              Translation: [-1, 1, 2]
+              Translation: [10, 1, -5]
               Rotation: [0, 0, 0]
               Scale: [0.100000001, 0.100000001, 0.100000001]
           MeshComponent:
