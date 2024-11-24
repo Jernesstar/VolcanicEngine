@@ -45,9 +45,9 @@ void Project::Reload() {
 	command += "'Finished creating Makefiles'";
 	system(command.c_str());
 
-	command = "powershell mingw32-make.exe";
-	command += " -WorkingDir Magma\\projects\\build";
-	command += " -ArgumentList 'Makefile';";
+	command = "powershell Start-Process mingw32-make.exe";
+	command += " -NoNewWindow -WorkingDir Magma\\projects\\build";
+	command += " -ArgumentList '-f Makefile';";
 
 	command += "if($Error.count -eq 0) {";
 	command +=		"'Project built successfully'";
