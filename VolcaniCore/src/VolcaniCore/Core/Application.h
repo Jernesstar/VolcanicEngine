@@ -25,6 +25,10 @@ public:
 	static void PushDir(const std::string& path);
 	static void PopDir();
 
+	template<typename TDerived>
+	requires std::derived_from<TDerived, Application>
+	static TDerived* As() { return (TDerived*)(s_Instance); }
+
 protected:
 	virtual void OnUpdate(TimeStep ts) = 0;
 

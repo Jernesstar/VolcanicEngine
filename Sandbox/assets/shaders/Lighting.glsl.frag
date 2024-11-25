@@ -53,17 +53,17 @@ uniform PointLight u_PointLights[MAX_POINT_LIGHTS];
 // uniform DirectionalLight u_DirectionalLight;
 // uniform SpotLight u_Spotlight;
 
-// layout(std140, binding = 0) uniform SpotLight
-// {
-//     vec3 Position;
-//     float CutoffAngle;
-//     vec3 Direction;
-//     float OuterCutoffAngle;
-// } spotlight;
+layout(std140, binding = 0) uniform SpotLight
+{
+    vec3 Position;
+    float CutoffAngle;
+    vec3 Direction;
+    float OuterCutoffAngle;
+} spotlight;
 
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 viewDir);
 // vec3 CalcDirLight(vec3 normal, vec3 viewDir);
-// vec3 CalcSpotLight(vec3 normal, vec3 viewDir);
+vec3 CalcSpotLight(vec3 normal, vec3 viewDir);
 
 out vec4 FragColor;
 
@@ -77,7 +77,7 @@ void main()
         result += CalcPointLight(u_PointLights[i], normal, viewDir);
 
     // result += CalcDirLight(normal, viewDir);
-    // result += CalcSpotLight(normal, viewDir);
+    result += CalcSpotLight(normal, viewDir);
 
     FragColor = vec4(result, 1.0);
 }
@@ -113,25 +113,25 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 viewDir)
 //     return (ambient + diffuse + specular);
 // }
 
-// vec3 CalcSpotLight(vec3 normal, vec3 viewDir)
-// {
-//     // SpotLight spotlight = u_Spotlight;
+vec3 CalcSpotLight(vec3 normal, vec3 viewDir)
+{
+    // SpotLight spotlight = u_Spotlight;
 
-//     float cutoff = cos(spotlight.CutoffAngle);
-//     float outer = cos(spotlight.OuterCutoffAngle);
+    float cutoff = cos(spotlight.CutoffAngle);
+    float outer = cos(spotlight.OuterCutoffAngle);
 
-//     vec3 lightDir = normalize(v_Position - spotlight.Position);
-//     vec3 reflectDir = reflect(lightDir, normal);
-//     float diff = clamp(dot(normal, -lightDir), 0.0, 1.0);
-//     float spec = pow(max(dot(viewDir, reflectDir), 0.0), u_Material.Shininess);
+    vec3 lightDir = normalize(v_Position - spotlight.Position);
+    vec3 reflectDir = reflect(lightDir, normal);
+    float diff = clamp(dot(normal, -lightDir), 0.0, 1.0);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), u_Material.Shininess);
 
-//     float theta = dot(-lightDir, -normalize(spotlight.Direction.xyz));
-//     float epsilon = cutoff - outer;
-//     float intensity = clamp((theta - outer) / epsilon, 0.0, 1.0);
+    float theta = dot(-lightDir, -normalize(spotlight.Direction.xyz));
+    float epsilon = cutoff - outer;
+    float intensity = clamp((theta - outer) / epsilon, 0.0, 1.0);
 
-//     vec3 ambient  = vec3(1.0)  * 1.0  * vec3(texture(u_Material.Diffuse, v_TexCoords.xy));
-//     vec3 diffuse  = vec3(1.0)  * diff * vec3(texture(u_Material.Diffuse, v_TexCoords.xy));
-//     vec3 specular = vec3(1.0)  * spec * vec3(texture(u_Material.Specular, v_TexCoords.xy));
+    vec3 ambient  = vec3(1.0)  * 1.0  * vec3(texture(u_Material.Diffuse, v_TexCoords.xy));
+    vec3 diffuse  = vec3(1.0)  * diff * vec3(texture(u_Material.Diffuse, v_TexCoords.xy));
+    vec3 specular = vec3(1.0)  * spec * vec3(texture(u_Material.Specular, v_TexCoords.xy));
 
-//     return (ambient + diffuse + specular) * intensity;
-// }
+    return (ambient + diffuse + specular) * intensity;
+}

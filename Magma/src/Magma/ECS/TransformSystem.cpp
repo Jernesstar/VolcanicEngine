@@ -18,7 +18,7 @@ void TransformSystem::Translate(Entity& entity, const glm::vec3& vec) {
 
 void TransformSystem::Rotate(Entity& entity, const glm::vec3& vec) {
 	auto [tc] = GetRequired(entity);
-	tc.Rotation = glm::rotate(glm::quat(tc.Rotation), vec);
+	tc.Rotation = glm::rotate(glm::quat(vec), tc.Rotation);
 }
 
 void TransformSystem::Scale(Entity& entity, const glm::vec3& vec) {
