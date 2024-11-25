@@ -98,7 +98,8 @@ void EditorLayer::Render() {
 				if(ImGui::MenuItem("New", "Ctrl+T")
 				|| Input::KeysPressed(Key::Ctrl, Key::T))
 					menu.tab.newTab = true;
-				if(ImGui::MenuItem("Open", "Ctrl+O"))
+				if(ImGui::MenuItem("Open", "Ctrl+O")
+				|| Input::KeyPressed(Key::O))
 					menu.tab.openTab = true;
 				if(ImGui::MenuItem("Reopen", "Ctrl+Shift+T")
 				|| Input::KeysPressed(Key::Ctrl, Key::Shift, Key::T))
@@ -200,7 +201,8 @@ void EditorLayer::NewTab(Ref<UI::UIElement> element) {
 }
 
 void EditorLayer::NewTab() {
-	// TODO(Fix): Dialog box to pick which kind of new tab to create:
+	menu.tab.newTab = false;
+	// TODO(Implement): Dialog box to pick which kind of new tab to create:
 	// Scene, UI, or Level
 }
 
@@ -227,11 +229,17 @@ void EditorLayer::OpenTab() {
 }
 
 void EditorLayer::ReopenTab() {
-	NewTab(m_ClosedTabs.back());
-	m_ClosedTabs.pop_back();
+	menu.tab.reopenTab = false;
+
+	if(m_ClosedTabs.size()) {
+		NewTab(m_ClosedTabs.back());
+		m_ClosedTabs.pop_back();
+	}
 }
 
 void EditorLayer::CloseTab(Ref<Tab> tabToDelete) {
+	menu.tab.closeTab = false;
+
 	if(tabToDelete == nullptr)
 		return;
 
@@ -242,11 +250,12 @@ void EditorLayer::CloseTab(Ref<Tab> tabToDelete) {
 	uint32_t index = std::distance(m_Tabs.begin(), it);
 	if(tabToDelete == m_CurrentTab)
 		m_CurrentTab = (index > 0) ? m_Tabs[index - 1] : nullptr;
+
 }
 
 void EditorLayer::NewProject() {
-	m_Project = CreateRef<Project>();
 	menu.project.newProject = false;
+	m_Project = CreateRef<Project>();
 }
 
 void EditorLayer::OpenProject() {
@@ -269,13 +278,13 @@ void EditorLayer::OpenProject() {
 }
 
 void EditorLayer::ReloadProject() {
-	m_Project->Reload();
 	menu.project.reloadProject = false;
+	m_Project->Reload();
 }
 
 void EditorLayer::RunProject() {
-	m_Project->Run();
 	menu.project.runProject = false;
+	m_Project->Run();
 }
 
 }

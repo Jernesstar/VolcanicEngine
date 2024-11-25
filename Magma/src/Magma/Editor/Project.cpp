@@ -17,6 +17,9 @@ Project::~Project() {
 }
 
 void Project::Load(const fs::path& volcFilePath) {
+	if(volcFilePath == "")
+		return;
+
 	auto fullPath = fs::canonical(volcFilePath).parent_path();
 	m_Name = fullPath.stem().string();
 	m_RootPath = fullPath.string();
@@ -30,6 +33,7 @@ void Project::Reload() {
 	// TODO(Implement): Dependencies
 	std::string command;
 	command = "powershell 'Creating Makefiles';";
+	command += "$ProjectPath = \'" + m_SrcPath + "\';";
 	command += "Start-Process ";
 
 #ifdef VOLCANICENGINE_LINUX
@@ -37,25 +41,23 @@ void Project::Reload() {
 #elif VOLCANICENGINE_WINDOWS
 	command += "vendor\\premake\\bin\\Windows\\premake5.exe";
 #endif
-	command += " -NoNewWindow -ArgumentList '";
-	command += "gmake2 --file=Magma\\projects\\premake5.lua";
-	command += " --project=\"" + m_RootPath + "\"";
-	command += " --src=\""     + m_SrcPath  + "\"";
-	command += "';";
+	command += " -Wait -NoNewWindow";
+	command += " -Args 'gmake2 --file=Magma\\projects\\premake5.lua',";
+	command += " (' --src=' + '\"' + $ProjectPath + '\"');";
 	command += "'Finished creating Makefiles'";
 	system(command.c_str());
 
-	command = "powershell Start-Process mingw32-make.exe";
-	command += " -NoNewWindow -WorkingDir Magma\\projects\\build";
-	command += " -ArgumentList '-f Makefile';";
+	// command = "powershell Start-Process mingw32-make.exe";
+	// command += " -NoNewWindow -WorkingDir Magma\\projects\\build";
+	// command += " -ArgumentList '-f Makefile';";
 
-	command += "if($Error.count -eq 0) {";
-	command +=		"'Project built successfully'";
-	command += "}";
-	command += "else {";
-	command +=		"'Project encountered build errors'";
-	command += "}";
-	system(command.c_str());
+	// command += "if($Error.count -eq 0) {";
+	// command +=		"'Project built successfully'";
+	// command += "}";
+	// command += "else {";
+	// command +=		"'Project encountered build errors'";
+	// command += "}";
+	// system(command.c_str());
 }
 
 void Project::Run() {

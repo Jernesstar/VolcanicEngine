@@ -6,8 +6,8 @@ project "Project"
     -- rtti "Off"
     -- staticruntime "Off"
 
-    ProjectDir = _OPTIONS["project"]
     ProjectSrcDir = _OPTIONS["src"]
+    -- ProjectSrcDir = "C:/Users/Jercy Mukala/Code/TheMazeIsLava/TheMazeIsLava/src"
 
     objdir ("build/obj")
     targetdir ("build/bin")
@@ -16,6 +16,7 @@ project "Project"
         "%{ProjectSrcDir}/**.h",
         "%{ProjectSrcDir}/**.cpp",
     }
+    print(ProjectSrcDir)
 
     includedirs {
         "%{ProjectSrcDir}/**",
@@ -45,14 +46,13 @@ project "Project"
     }
 
     libdirs {
-        "%{VolcanicEngineDir}/build/**",
         "%{VolcanicEngineDir}/build/VolcaniCore/lib",
         "%{VolcanicEngineDir}/build/Magma/lib"
     }
 
     links {
-        "VolcaniCore",
         "Magma",
+        "VolcaniCore",
 
         "glfw",
         "glad",
@@ -84,6 +84,7 @@ project "Project"
             "psapi",
             "Ws2_32",
         }
+
     filter "system:macosx"
         links {
             "QuartzCore.framework",
@@ -92,10 +93,6 @@ project "Project"
             "IOKit.framework",
             "CoreVideo.framework"
         }
-
-    filter "configurations:Debug"
-        runtime "Debug"
-        symbols "on"
 
     filter "toolset:gcc or toolset:clang"
         buildoptions {
