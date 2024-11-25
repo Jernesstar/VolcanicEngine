@@ -13,7 +13,7 @@ using namespace VolcaniCore;
 
 namespace VolcaniCore::OpenGL {
 
-class UniformBuffer {
+class UniformBuffer : Buffer{
 public:
 	// const std::string Name;
 	const BufferLayout Layout;
@@ -52,11 +52,6 @@ public:
 	void SetData(const void* data, uint32_t count = 1, uint32_t offset = 0) {
 		glNamedBufferSubData(m_BufferID, offset * Layout.Stride,
 							 count == 0 ? Size : count * Layout.Stride, data);
-	}
-
-	template<typename T>
-	void SetData(const Buffer<T>& buffer, uint32_t offset = 0) {
-		SetData(buffer.Get(), buffer.GetSize(), offset);
 	}
 
 private:

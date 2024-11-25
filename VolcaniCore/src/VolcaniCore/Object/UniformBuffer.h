@@ -3,23 +3,27 @@
 #include <functional>
 
 #include "Core/Defines.h"
+#include "Core/Buffer.h"
+#include "Core/BufferLayout.h"
 
 namespace VolcaniCore {
 
-template<typename TUniform, typename THandle>
 class UniformBuffer {
 public:
-	Func<Ref<THandle>, TUniform> SetData = [](){};
+	const uint32_t BindingPoint;
+	const BufferLayout Layout;
 
 public:
-	UniformBuffer() = default;
-	UniformBuffer(Ref<THandle> handle)
-		: m_Handle(handle) { }
-
+	UniformBuffer(uint32_t binding)
+		: BindingPoint(binding) { }
 	virtual ~UniformBuffer() = default;
 
-protected:
-	Ref<THandle> m_Handle;
+	template<typename T>
+	void SetData(const Buffer<T>& buffer, uint32_t offset = 0) {
+		SetData(buffer.Get(), buffer.GetSize(), offset);
+	}
+
+	virtual void SetData(const void* data, uint32_t count, uint32_t offset) = 0;
 };
 
 }
