@@ -129,17 +129,17 @@ void Lighting::OnUpdate(TimeStep ts) {
 
 	controller.OnUpdate(ts);
 
-	// spot.Position = camera->GetPosition();
-	// spot.Direction = camera->GetDirection();
+	spot.Position = camera->GetPosition();
+	spot.Direction = camera->GetDirection();
 
-	// ImGui::Begin("Spotlight");
-	// {
-	// 	ImGui::SliderFloat("Cutoff Angle", &spot.CutoffAngle, 0.0f, 1.0f);
-	// 	ImGui::SliderFloat("Outer Angle", &spot.OuterCutoffAngle, spot.CutoffAngle, 2.0f);
-	// }
-	// ImGui::End();
+	ImGui::Begin("Spotlight");
+	{
+		ImGui::SliderFloat("Cutoff Angle", &spot.CutoffAngle, 0.0f, 1.0f);
+		ImGui::SliderFloat("Outer Angle", &spot.OuterCutoffAngle, spot.CutoffAngle, 2.0f);
+	}
+	ImGui::End();
 
-	// buffer->SetData(&spot);
+	buffer->SetData(&spot);
 
 	Renderer::StartPass(lightingPass);
 	{
