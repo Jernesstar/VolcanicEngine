@@ -7,9 +7,12 @@
 #include <imgui/misc/cpp/imgui_stdlib.h>
 #include <ImGuiFileDialog/ImGuiFileDialog.h>
 
+#include <VolcaniCore/Core/Application.h>
 #include <VolcaniCore/Core/Log.h>
 #include <VolcaniCore/Core/Input.h>
 #include <VolcaniCore/Renderer/RendererAPI.h>
+
+#include "UI/UISerializer.h"
 
 using namespace VolcaniCore;
 
@@ -17,16 +20,24 @@ namespace Magma {
 
 struct {
 	struct {
-		bool newProject  = false;
-		bool openProject = false;
+		bool newProject    = false;
+		bool openProject   = false;
 		bool reloadProject = false;
-		bool runProject  = false;
+		bool runProject    = false;
 	} project;
+
+	struct {
+		bool newTab    = false;
+		bool openTab   = false;
+		bool reopenTab = false;
+		bool closeTab  = false;
+	} tab;
 } menu;
 
 EditorLayer::EditorLayer() {
 	NewProject();
 	m_Project->Load("../TheMazeIsLava/.volc.proj");
+	Application::GetWindow()->SetTitle("Magma Editor: " + m_Project->GetName());
 
 	auto tab = CreateRef<SceneTab>("Magma/assets/scenes/temp.magma.scene");
 	NewTab(tab);
@@ -72,12 +83,30 @@ void EditorLayer::Render() {
 			if(ImGui::BeginMenu("Project")) {
 				if(ImGui::MenuItem("New", "Ctrl+N"))
 					menu.project.newProject = true;
-				if(ImGui::MenuItem("Open", "Ctrl+O"))
+				if(ImGui::MenuItem("Open", "Ctrl+P"))
 					menu.project.openProject = true;
-				if(ImGui::MenuItem("Reload", "Ctrl+S") || Input::KeysPressed(Key::Ctrl, Key::S))
+				if(ImGui::MenuItem("Reload", "Ctrl+S")
+				|| Input::KeysPressed(Key::Ctrl, Key::S))
 					menu.project.reloadProject = true;
 				if(ImGui::MenuItem("Run", "Ctrl+R"))
 					menu.project.runProject = true;
+
+				ImGui::EndMenu();
+			}
+
+			if(ImGui::BeginMenu("Tab")) {
+				if(ImGui::MenuItem("New", "Ctrl+T")
+				|| Input::KeysPressed(Key::Ctrl, Key::T))
+					menu.tab.newTab = true;
+				if(ImGui::MenuItem("Open", "Ctrl+O")
+				|| Input::KeyPressed(Key::O))
+					menu.tab.openTab = true;
+				if(ImGui::MenuItem("Reopen", "Ctrl+Shift+T")
+				|| Input::KeysPressed(Key::Ctrl, Key::Shift, Key::T))
+					menu.tab.reopenTab = true;
+				if(ImGui::MenuItem("Close", "Ctrl+W")
+				|| Input::KeysPressed(Key::Ctrl, Key::W))
+					menu.tab.closeTab = true;
 
 				ImGui::EndMenu();
 			}
@@ -88,7 +117,7 @@ void EditorLayer::Render() {
 		{
 			if(ImGui::BeginTabItem("+", nullptr, ImGuiTabItemFlags_NoReorder)) {
 				if(ImGui::IsItemActivated())
-					NewTab(CreateRef<SceneTab>());
+					menu.tab.newTab = true;
 
 				ImGui::EndTabItem();
 			}
@@ -106,35 +135,28 @@ void EditorLayer::Render() {
 
 				float tabHeight{6.5f};
 				float radius{ tabHeight * 0.5f - padding };
-				ImVec2 pos(ImGui::GetItemRectMin());
-				pos.x = ImGui::GetItemRectMax().x;
-				pos.x -= radius + 5.0f*padding;
-				pos.y += radius + padding;
+				ImVec2 pos;
+				pos.x = ImGui::GetItemRectMax().x - radius - 5.0f*padding;
+				pos.y = ImGui::GetItemRectMin().y + radius + padding;
 
 				if(tabItem) {
-					if(ImGui::IsMouseClicked(0) && ImGui::IsItemHovered())
+					if(ImGui::IsItemClicked(0))
 						m_CurrentTab = tab;
 
 					ImGui::EndTabItem();
 				}
-				
+
 				auto closeButtonID = ImGui::GetID(("Close##" + strID).c_str());
 				if(ImGui::CloseButton(closeButtonID, pos))
 					tabToDelete = tab;
 			}
 
-			if(tabToDelete != nullptr) {
-				// AddToClosedTabs(tab)
-				auto it = std::find(m_Tabs.begin(), m_Tabs.end(), tabToDelete);
-				uint32_t index = std::distance(m_Tabs.begin(), it);
-				m_Tabs.erase(it);
-				if(tabToDelete == m_CurrentTab)
-					m_CurrentTab = (index > 0) ? m_Tabs[index - 1] : nullptr;
-			}
+			if(tabToDelete != nullptr)
+				CloseTab(tabToDelete);
 		}
 		ImGui::EndTabBar();
-		// ImGui::Dummy(ImVec2(0.0f, 0.0f));
 
+		// DockSpace
 		ImGuiID dockspaceID = ImGui::GetID("DockSpace");
 		ImGui::DockSpace(dockspaceID, ImVec2(0.0f, 0.0f), dockspaceFlags);
 
@@ -151,6 +173,16 @@ void EditorLayer::Render() {
 		ReloadProject();
 	if(menu.project.runProject)
 		RunProject();
+
+	if(menu.tab.newTab)
+		NewTab();
+	if(menu.tab.openTab)
+		OpenTab();
+	if(menu.tab.reopenTab)
+		ReopenTab();
+	if(menu.tab.closeTab)
+		CloseTab(m_CurrentTab);
+
 }
 
 void EditorLayer::NewTab(Ref<Tab> tab) {
@@ -169,13 +201,61 @@ void EditorLayer::NewTab(Ref<UI::UIElement> element) {
 }
 
 void EditorLayer::NewTab() {
+	menu.tab.newTab = false;
 	// TODO(Implement): Dialog box to pick which kind of new tab to create:
 	// Scene, UI, or Level
 }
 
+void EditorLayer::OpenTab() {
+	namespace fs = std::filesystem;
+
+	IGFD::FileDialogConfig config;
+	config.path = ".";
+	auto instance = ImGuiFileDialog::Instance();
+	instance->OpenDialog("ChooseFile", "Choose File", ".magma.scene, .magma.ui.json", config);
+
+	if(instance->Display("ChooseFile")) {
+		if(instance->IsOk()) {
+			fs::path path = instance->GetFilePathName();
+			if(path.extension() == ".json")
+				NewTab(UI::UISerializer::Load(path.string()));
+			else
+				NewTab(Scene(path.string()));
+		}
+
+		instance->Close();
+		menu.tab.openTab = false;
+	}
+}
+
+void EditorLayer::ReopenTab() {
+	menu.tab.reopenTab = false;
+
+	if(m_ClosedTabs.size()) {
+		NewTab(m_ClosedTabs.back());
+		m_ClosedTabs.pop_back();
+	}
+}
+
+void EditorLayer::CloseTab(Ref<Tab> tabToDelete) {
+	menu.tab.closeTab = false;
+
+	if(tabToDelete == nullptr)
+		return;
+
+	auto it = std::find(m_Tabs.begin(), m_Tabs.end(), tabToDelete);
+	m_Tabs.erase(it);
+	m_ClosedTabs.push_back(tabToDelete);
+
+	uint32_t index = std::distance(m_Tabs.begin(), it);
+	if(tabToDelete == m_CurrentTab)
+		m_CurrentTab = (index > 0) ? m_Tabs[index - 1] : nullptr;
+
+}
+
 void EditorLayer::NewProject() {
-	m_Project = CreateRef<Project>();
 	menu.project.newProject = false;
+	m_Project = CreateRef<Project>();
 }
 
 void EditorLayer::OpenProject() {
@@ -193,16 +273,18 @@ void EditorLayer::OpenProject() {
 		instance->Close();
 		menu.project.openProject = false;
 	}
+
+	Application::GetWindow()->SetTitle("Magma Editor: " + m_Project->GetName());
 }
 
 void EditorLayer::ReloadProject() {
-	m_Project->Reload();
 	menu.project.reloadProject = false;
+	m_Project->Reload();
 }
 
 void EditorLayer::RunProject() {
-	m_Project->Run();
 	menu.project.runProject = false;
+	m_Project->Run();
 }
 
 }

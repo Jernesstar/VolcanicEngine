@@ -26,13 +26,14 @@ public:
 	YAMLSerializer& Write(uint64_t value) override;
 	YAMLSerializer& Write(int64_t value) override;
 
+	YAMLSerializer& Write(bool value) override;
 	YAMLSerializer& Write(float value) override;
 
 	YAMLSerializer& Write(const glm::vec2& value) override;
 	YAMLSerializer& Write(const glm::vec3& value) override;
 	YAMLSerializer& Write(const glm::vec4& value) override;
 
-	YAMLSerializer& Write(const char* value) override;
+	YAMLSerializer& Write(const std::string& value) override;
 
 	void Finalize(const std::string& path) override;
 

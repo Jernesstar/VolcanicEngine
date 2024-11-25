@@ -8,6 +8,9 @@
 
 #include <Physics/RigidBody.h>
 
+using namespace VolcaniCore;
+using namespace Magma::Physics;
+
 namespace Magma::ECS {
 
 struct Component {
@@ -17,64 +20,46 @@ struct Component {
 };
 
 struct CameraComponent : public Component {
-	Camera::Type CameraType = Camera::Type::Stereo;
-	glm::vec3 Position  = { 0.0f, 0.0f, 0.0f };
-	glm::vec3 Direction = { 0.0f, 0.0f, -1.0f };
-	uint32_t ViewportWidth = 800;
-	uint32_t ViewportHeight = 600;
-	float Near = 0.01f;
-	float Far  = 1000.0f;
-	union
-	{
-		float VerticalFOV, Rotation;
-	};
+	// TODO(Change): AssetID
+	Ref<Camera> Cam;
 
 	CameraComponent() = default;
-	CameraComponent(Camera::Type type,
-					const glm::vec3& pos, const glm::vec3& dir,
-					uint32_t width, uint32_t height, float near, float far,
-					float fr)
-		: CameraType(type), Position(pos), Direction(dir),
-		  ViewportWidth(width), ViewportHeight(height), Near(near), Far(far),
-		  VerticalFOV(fr) { }
-	CameraComponent(uint32_t width, uint32_t height)
-		: ViewportWidth(width), ViewportHeight(height) { }
+	CameraComponent(Ref<Camera> camera)
+		: Cam(camera) { }
 	CameraComponent(const CameraComponent& other) = default;
 };
 
 struct MeshComponent : public Component {
 	// TODO(Change): AssetID
-	Ref<VolcaniCore::Mesh> Mesh;
+	Ref<Model> Mesh;
 
-	MeshComponent() = default;
-	MeshComponent(Ref<VolcaniCore::Mesh> mesh)
+	MeshComponent() {
+		Mesh = Model::Create("");
+	}
+	MeshComponent(Ref<Model> mesh)
 		: Mesh(mesh) { }
+	MeshComponent(Ref<VolcaniCore::Mesh> mesh) {
+		Mesh = Model::Create("");
+		Mesh->AddMesh(mesh);
+	}
 	MeshComponent(const std::string& path) {
-		Mesh = Mesh::Create(path);
-	}
-	MeshComponent(MeshPrimitive primitive, const Material& material) {
-		Mesh = Mesh::Create(primitive, material);
-	}
-	MeshComponent(const std::vector<VolcaniCore::Vertex>& vertices,
-				  const std::vector<uint32_t> indices, const Material& material)
-	{
-		Mesh = Mesh::Create(vertices, indices, material);
+		Mesh = Model::Create(path);
 	}
 	MeshComponent(const MeshComponent& other) = default;
 };
 
 struct RigidBodyComponent : public Component {
-	Ref<Physics::RigidBody> Body;
+	// TODO(Change): AssetID
+	Ref<RigidBody> Body;
 
 	RigidBodyComponent() = default;
-	RigidBodyComponent(Ref<Physics::RigidBody> body)
+	RigidBodyComponent(Ref<RigidBody> body)
 		: Body(body) { }
-	RigidBodyComponent(Physics::RigidBody::Type type) {
-		Body = Physics::RigidBody::Create(type);
+	RigidBodyComponent(RigidBody::Type type) {
+		Body = RigidBody::Create(type);
 	}
-	RigidBodyComponent(Physics::RigidBody::Type type, Ref<Physics::Shape> shape)
-	{
-		Body = Physics::RigidBody::Create(type, shape);
+	RigidBodyComponent(RigidBody::Type type, Ref<Shape> shape) {
+		Body = RigidBody::Create(type, shape);
 	}
 	RigidBodyComponent(const RigidBodyComponent& other) = default;
 };
@@ -95,8 +80,7 @@ struct TransformComponent : public Component {
 	glm::vec3 Scale		  = { 1.0f, 1.0f, 1.0f };
 
 	TransformComponent() = default;
-	TransformComponent(const glm::vec3& t, const glm::vec3& r,
-					   const glm::vec3& s)
+	TransformComponent(const glm::vec3& t, const glm::vec3& r, const glm::vec3& s)
 		: Translation(t), Rotation(r), Scale(s) { }
 	TransformComponent(const Transform& t)
 		: Translation(t.Translation), Rotation(t.Rotation), Scale(t.Scale) { }

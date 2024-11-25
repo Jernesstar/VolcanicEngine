@@ -9,11 +9,11 @@ bool Input::KeyPressed(Key key) {
 		return false;
 
 	if(key == Key::Ctrl)
-		return KeyPressed(Key::LeftCtrl)  || KeyPressed(Key::RightCtrl);
+		return KeyPressed(Key::LeftCtrl) || KeyPressed(Key::RightCtrl);
 	if(key == Key::Shift)
 		return KeyPressed(Key::LeftShift) || KeyPressed(Key::RightShift);
 	if(key == Key::Alt)
-		return KeyPressed(Key::LeftAlt)   || KeyPressed(Key::RightAlt);
+		return KeyPressed(Key::LeftAlt) || KeyPressed(Key::RightAlt);
 
 	auto window = Application::GetWindow()->GetNativeWindow();
 	auto state = glfwGetKey(window, (int)key);
@@ -50,24 +50,15 @@ float Input::GetMouseX() { return GetMousePosition().x; }
 float Input::GetMouseY() { return GetMousePosition().y; }
 
 bool Input::KeysPressed(Key key1, Key key2) {
-	if(KeyPressed(key1))
-		if(KeyPressed(key2)) return true;
-	return false;
+	return KeyPressed(key1) && KeyPressed(key2);
 }
 
 bool Input::KeysPressed(Key key1, Key key2, Key key3) {
-	if(KeyPressed(key1))
-		if(KeyPressed(key2))
-			if(KeyPressed(key3)) return true;
-	return false;
+	return KeysPressed(key1, key2) && KeyPressed(key3);
 }
 
 bool Input::KeysPressed(Key key1, Key key2, Key key3, Key key4) {
-	if(KeyPressed(key1))
-		if(KeyPressed(key2))
-			if(KeyPressed(key3))
-				if(KeyPressed(key4)) return true;
-	return false;
+	return KeysPressed(key1, key2, key3) && KeyPressed(key4);
 }
 
 }

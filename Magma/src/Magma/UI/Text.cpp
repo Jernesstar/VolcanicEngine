@@ -10,18 +10,20 @@ Ref<UI::Text> UI::Text::Create(const UI::Text::Specification& specs) {
 
 Text::Text(const std::string& text, const glm::vec4& textColor)
 	: UIElement(UIElement::Type::Text, 0, 0, 0.0f, 0.0f, textColor),
-		m_Text(text) { }
+		Content(text) { }
 
 void Text::Draw() {
-	ImVec2 size = ImGui::CalcTextSize(m_Text.c_str());
-	m_Width = size.x;
-	m_Height = size.y;
+	ImVec2 size = ImGui::CalcTextSize(Content.c_str());
+	Width = size.x;
+	Height = size.y;
 
-	ImVec4 color{ m_Color.r, m_Color.g, m_Color.b, m_Color.a };
+	ImVec4 color{ Color.r, Color.g, Color.b, Color.a };
 	ImGui::PushStyleColor(ImGuiCol_Text, color);
 	ImGui::SetCursorPos(ImVec2(x, y));
 
-	ImGui::Text(m_Text.c_str());
+	ImGui::Text(Content.c_str());
+	m_Clicked = ImGui::IsItemClicked();
+	m_Hovered = ImGui::IsItemHovered();
 
 	ImGui::PopStyleColor();
 }
@@ -29,10 +31,11 @@ void Text::Draw() {
 bool Text::OnAttach() {
 	if(m_Parent->GetType() == UIElement::Type::Button)
 		return false; // The button captures the text
-
 	return true;
 }
 
-bool Text::OnAddElement(Ref<UIElement> element) { return false; }
+bool Text::OnAddElement(Ref<UIElement> element) {
+	return false;
+}
 
 }

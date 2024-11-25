@@ -32,7 +32,6 @@ Serializer& YAMLSerializer::SetOptions(Serializer::Options options) {
 	return *this;
 }
 
-
 YAMLSerializer& YAMLSerializer::BeginSequence() {
 	m_Out << YAML::BeginSeq;
 	return *this;
@@ -78,6 +77,11 @@ YAMLSerializer& YAMLSerializer::Write(int64_t value) {
 	return *this;
 }
 
+YAMLSerializer& YAMLSerializer::Write(bool value) {
+	m_Out << YAML::Value << value;
+	return *this;
+}
+
 YAMLSerializer& YAMLSerializer::Write(float value) {
 	m_Out << YAML::Value << value;
 	return *this;
@@ -98,7 +102,7 @@ YAMLSerializer& YAMLSerializer::Write(const glm::vec4& value) {
 	return *this;
 }
 
-YAMLSerializer& YAMLSerializer::Write(const char* value) {
+YAMLSerializer& YAMLSerializer::Write(const std::string& value) {
 	m_Out << YAML::Value << value;
 	return *this;
 }

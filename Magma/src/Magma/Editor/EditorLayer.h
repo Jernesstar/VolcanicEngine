@@ -20,13 +20,17 @@ public:
 
 private:
 	Ref<Project> m_Project;
-	List<Ref<Tab>> m_Tabs;
 	Ref<Tab> m_CurrentTab;
+	List<Ref<Tab>> m_Tabs;
+	List<Ref<Tab>> m_ClosedTabs;
 
-	void NewTab();
 	void NewTab(Ref<Tab> tab);
 	void NewTab(const Scene& scene);
 	void NewTab(Ref<UI::UIElement> ui);
+	void NewTab();
+	void OpenTab();
+	void ReopenTab();
+	void CloseTab(Ref<Tab> tab);
 
 	void NewProject();
 	void OpenProject();

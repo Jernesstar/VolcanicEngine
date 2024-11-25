@@ -21,17 +21,10 @@ public:
 		uint32_t y = 100;
 		float Width = 10;
 		float Height = 10;
-
-		std::function<void(void)> OnPressed = [](){};
-		std::function<void(void)> OnReleased = [](){};
 	};
 
 public:
 	static Ref<UI::Button> Create(const UI::Button::Specification& specs);
-
-public:
-	std::function<void(void)> OnPressed = [](){};
-	std::function<void(void)> OnReleased = [](){};
 
 public:
 	Button(const glm::vec4& color = glm::vec4(1.0f),
@@ -40,23 +33,13 @@ public:
 
 	Button(const std::string& imagePath);
 
-	Button* SetOnPressed(const std::function<void(void)>& callback) {
-		OnPressed = callback;
-		return this;
-	}
-	Button* SetOnReleased(const std::function<void(void)>& callback) {
-		OnReleased = callback;
-		return this;
-	}
-
 private:
 	void Draw() override;
 	bool OnAttach() override;
 	bool OnAddElement(Ref<UIElement> element) override;
 
 private:
-	bool hasText = false;
-	bool hasImage = false;
+	bool m_HasImage = false;
 	Ref<UIElement> m_Display;
 };
 

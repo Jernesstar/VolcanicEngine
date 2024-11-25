@@ -62,6 +62,11 @@ JSONSerializer& JSONSerializer::Write(int64_t value) {
 	return *this;
 }
 
+JSONSerializer& JSONSerializer::Write(bool value) {
+	m_Writer.Bool(value);
+	return *this;
+}
+
 JSONSerializer& JSONSerializer::Write(float value) {
 	m_Writer.Double(value);
 	return *this;
@@ -97,7 +102,7 @@ JSONSerializer& JSONSerializer::Write(const glm::vec4& value) {
 	return *this;
 }
 
-JSONSerializer& JSONSerializer::Write(const char* value) {
+JSONSerializer& JSONSerializer::Write(const std::string& value) {
 	m_Writer.String(value);
 	return *this;
 }

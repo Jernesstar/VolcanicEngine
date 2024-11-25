@@ -20,11 +20,6 @@ Window::Window(uint32_t width, uint32_t height) {
 	glfwMakeContextCurrent(m_NativeWindow);
 	glfwSwapInterval(0);
 
-	Events::RegisterListener<WindowClosedEvent>(
-		[](const WindowClosedEvent& event)
-		{
-			Application::Close();
-		});
 	Events::RegisterListener<WindowResizedEvent>(
 		[&](const WindowResizedEvent& event)
 		{

@@ -26,7 +26,7 @@ public:
 private:
 	Scene m_Scene;
 	Ref<UI::Button> m_PlayButton, m_PauseButton, m_StopButton;
-	
+
 	enum class SceneState { Edit, Play, Pause };
 	SceneState m_SceneState = SceneState::Edit;
 

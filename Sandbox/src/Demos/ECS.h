@@ -7,13 +7,12 @@ namespace Demo {
 class ECS : public Application {
 public:
 	ECS();
-	~ECS();
 
 	void OnUpdate(TimeStep ts);
 
 private:
 	Ref<Scene> scene;
-	Ref<UI::Image> image;
+	DefaultSceneRenderer renderer;
 };
 
 ECS::ECS() {
@@ -25,12 +24,24 @@ ECS::ECS() {
 		});
 
 	scene = CreateRef<Scene>("Titled Scene");
-	// scene->GetRenderer()->GetCameraController().TranslationSpeed = 20.0f;
+	renderer.SetContext(scene.get());
+	renderer.GetCameraController().TranslationSpeed = 20.0f;
 
 	auto& world = scene->EntityWorld;
 
 	EntityBuilder(world, "MainCamera")
-	.Add<CameraComponent>()
+	.Add<CameraComponent>(CreateRef<StereographicCamera>())
+	.Finalize();
+
+	auto player = Model::Create("Sandbox/assets/models/player/Knight_Golden_Male.obj");
+	world.BuildEntity("Player")
+	.Add<TransformComponent>(
+		Transform
+		{
+			.Scale = glm::vec3(1.0f)
+		})
+	.Add<MeshComponent>(player)
+	// .Add<RigidBodyComponent>(RigidBody::Type::Static)
 	.Finalize();
 
 	auto cube = Mesh::Create(MeshPrimitive::Cube,
@@ -39,7 +50,7 @@ ECS::ECS() {
 			.Diffuse = Texture::Create("Sandbox/assets/images/wood.png")
 		});
 	for(uint32_t i = 0; i < 20; i++)
-		EntityBuilder(world, "Cube" + std::to_string(i + 1))
+		world.BuildEntity("Cube" + std::to_string(i + 1))
 		.Add<TransformComponent>(
 			Transform
 			{
@@ -51,7 +62,7 @@ ECS::ECS() {
 
 	auto ball = Mesh::Create("Sandbox/assets/models/sphere/wooden_sphere.obj");
 	for(uint32_t i = 0; i < 20; i++)
-		EntityBuilder(world, "Ball" + std::to_string(i + 1))
+		world.BuildEntity("Ball" + std::to_string(i + 1))
 		.Add<TransformComponent>(
 			Transform
 			{
@@ -63,39 +74,18 @@ ECS::ECS() {
 		.Finalize();
 
 	scene->Save("Magma/assets/scenes/temp.magma.scene");
-
-	UI::Init();
-
-	image = UI::Image::Create(
-	{
-		.Path = "Sandbox/assets/images/stone.png",
-		.Width = 100,
-		.Height = 100
-	});
-
-	auto output = scene->GetRenderer()->GetOutput();
-	image->SetImage(output, AttachmentTarget::Color);
 	VOLCANICORE_LOG_INFO("Success");
-}
-
-ECS::~ECS() {
-	UI::Close();
 }
 
 void ECS::OnUpdate(TimeStep ts) {
 	RendererAPI::Get()->Clear();
-	UI::Begin();
 
+	renderer.Update(ts);
 	scene->OnUpdate(ts);
-	scene->OnRender();
+	scene->OnRender(renderer);
 
-	auto output = scene->GetRenderer()->GetOutput();
+	auto output = renderer.GetOutput();
 	RendererAPI::Get()->RenderFramebuffer(output, AttachmentTarget::Color);
-
-	// image->SetSize(400, 400);
-	// image->Render();
-
-	UI::End();
 }
 
 }

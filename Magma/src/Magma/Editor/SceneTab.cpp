@@ -56,19 +56,20 @@ void SceneTab::Setup() {
 		{
 			.Image = "Magma/assets/icons/PlayButton.png",
 			.Width = 20, .Height = 20,
-			.OnPressed = [this]() { OnScenePlay(); }
+			// .OnPressed = [this]() { OnScenePlay(); }
 		});
 	m_PauseButton = UI::Button::Create(
 		{
 			.Image = "Magma/assets/icons/PauseButton.png",
+			.x = 100, .y = 100,
 			.Width = 20, .Height = 20,
-			.OnPressed = [this]() { OnScenePause(); }
+			// .OnPressed = [this]() { OnScenePause(); }
 		});
 	m_StopButton = UI::Button::Create(
 		{
 			.Image = "Magma/assets/icons/StopButton.png",
 			.Width = 20, .Height = 20,
-			.OnPressed = [this]() { OnSceneStop(); }
+			// .OnPressed = [this]() { OnSceneStop(); }
 		});
 }
 
@@ -134,6 +135,8 @@ void SceneTab::Render() {
 	}
 	ImGui::EndMainMenuBar();
 
+	ToolbarUI();
+
 	if(menu.file.newScene)
 		NewScene();
 	if(menu.file.openScene)
@@ -142,8 +145,6 @@ void SceneTab::Render() {
 		SaveScene();
 	if(menu.edit.addEntity)
 		AddEntity();
-
-	// ToolbarUI();
 
 	for(auto panel : m_Panels)
 		if(panel->IsOpen())
@@ -224,11 +225,21 @@ void SceneTab::ToolbarUI() {
 			   | ImGuiWindowFlags_NoScrollWithMouse;
 	ImGui::Begin("##toolbar", nullptr, flags);
 	{
+		float size = ImGui::GetWindowHeight() - 2.0f;
+		auto x = 0.5f*ImGui::GetWindowContentRegionMax().x - 0.5f*size;
+		auto button = m_PlayButton;
 		if(m_SceneState == SceneState::Play)
-			m_PlayButton->Render();
-		else
-			m_PauseButton->Render();
+			button = m_PauseButton;
 
+		button->x = x;
+		button->y = ImGui::GetCursorPosY();
+		button->SetSize(size, size);
+		button->Render();
+
+		ImGui::SameLine();
+		m_StopButton->x = ImGui::GetCursorPosX() + 5.0f;
+		m_StopButton->y = ImGui::GetCursorPosY();
+		m_StopButton->SetSize(size, size);
 		m_StopButton->Render();
 	}
 	ImGui::End();

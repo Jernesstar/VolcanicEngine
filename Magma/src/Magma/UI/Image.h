@@ -21,22 +21,21 @@ public:
 	static Ref<UI::Image> Create(const UI::Image::Specification& specs);
 
 public:
+	Ref<Texture> Content;
+
+public:
 	Image(Ref<Texture> image = nullptr);
 	Image(const std::string& imagePath);
 
 	void SetImage(Ref<Texture> texture);
 	void SetImage(const std::string& imagePath);
+	// TODO(Change): Move this to Texture
 	void SetImage(Ref<Framebuffer> framebuffer, AttachmentTarget target);
-
-	Ref<Texture> GetImage() { return m_Image; }
 
 private:
 	void Draw() override;
 	bool OnAttach() override;
 	bool OnAddElement(Ref<UIElement> element) override;
-
-private:
-	Ref<Texture> m_Image;
 };
 
 }

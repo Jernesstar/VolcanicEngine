@@ -39,6 +39,11 @@ void Init() {
 					| ImGuiConfigFlags_NavEnableSetMousePos;
 	io.DisplaySize = ImVec2(window->GetWidth(), window->GetHeight());
 
+	if(RendererAPI::Get()->GetBackend() == RendererAPI::Backend::OpenGL) {
+		ImGui_ImplGlfw_InitForOpenGL(window->GetNativeWindow(), true);
+		ImGui_ImplOpenGL3_Init("#version 450");
+	}
+
 	Events::RegisterListener<KeyPressedEvent>(
 		[](KeyPressedEvent& event)
 		{
@@ -81,11 +86,6 @@ void Init() {
 			ImGuiIO& io = ImGui::GetIO();
 			io.DisplaySize = ImVec2(event.Width, event.Height);
 		});
-
-	if(RendererAPI::Get()->GetBackend() == RendererAPI::Backend::OpenGL) {
-		ImGui_ImplGlfw_InitForOpenGL(window->GetNativeWindow(), true);
-		ImGui_ImplOpenGL3_Init("#version 450");
-	}
 
 	ImGui::StyleColorsDark();
 

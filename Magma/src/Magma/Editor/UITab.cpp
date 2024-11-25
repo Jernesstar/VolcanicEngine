@@ -8,8 +8,8 @@
 #include "UI/Empty.h"
 #include "UI/UISerializer.h"
 
-// #include "UIElementPickerPanel.h"
-// #include "UIVisualizerPanel.h"
+#include "UIElementPickerPanel.h"
+#include "UIVisualizerPanel.h"
 
 namespace Magma {
 
@@ -37,7 +37,7 @@ UITab::UITab(Ref<UI::UIElement> root) {
 }
 
 UITab::~UITab() {
-	// UI::UISerializer::Save(m_Root, "Magma/assets/scenes/.magma.ui.json");
+	UI::UISerializer::Save(m_Root, "Magma/assets/scenes/.magma.ui.json");
 }
 
 void UITab::Update(TimeStep ts) {
@@ -100,26 +100,26 @@ void UITab::Render() {
 }
 
 void UITab::Setup() {
-	// auto panel1 = CreateRef<UIElementPickerPanel>(m_Root);
-	// panel1->Close();
-	// auto panel2 = CreateRef<UIVisualizerPanel>(m_Root);
-	// panel2->Close();
+	auto panel1 = CreateRef<UIElementPickerPanel>(m_Root);
+	panel1->Close();
+	auto panel2 = CreateRef<UIVisualizerPanel>(m_Root);
+	panel2->Close();
 
-	// m_Panels.push_back(panel1);
-	// m_Panels.push_back(panel2);
+	m_Panels.push_back(panel1);
+	m_Panels.push_back(panel2);
 }
 
 void UITab::SetUI(Ref<UI::UIElement> ui) {
 	m_Root = ui;
 
-	// auto picker = GetPanel("UIElementPicker")->As<UIElementPickerPanel>();
-	// auto visual = GetPanel("UIVisualizer")->As<UIVisualizerPanel>();
-	// picker->SetContext(m_Root);
-	// visual->SetContext(m_Root);
+	auto picker = GetPanel("UIElementPicker")->As<UIElementPickerPanel>();
+	auto visual = GetPanel("UIVisualizer")->As<UIVisualizerPanel>();
+	picker->SetContext(m_Root);
+	visual->SetContext(m_Root);
 }
 
 void UITab::SetUI(const std::string& path) {
-	// SetUI(UI::UISerializer::Load(path));
+	SetUI(UI::UISerializer::Load(path));
 }
 
 void UITab::NewUI() {
@@ -136,7 +136,7 @@ void UITab::OpenUI() {
 	if(instance->Display("ChooseFile")) {
 		if(instance->IsOk()) {
 			std::string path = instance->GetFilePathName();
-			// m_Root = UI::UIBuilder<UI::UIElement>(path).Finalize();
+			m_Root = UI::UISerializer::Load(path);
 		}
 
 		instance->Close();
@@ -153,7 +153,7 @@ void UITab::SaveUI() {
 	if(instance->Display("ChooseFile")) {
 		if(instance->IsOk()) {
 			std::string path = instance->GetFilePathName();
-			// UI::UIBuilder(m_Root).Save(path);
+			UI::UISerializer::Save(m_Root, path);
 		}
 
 		instance->Close();

@@ -16,6 +16,7 @@ public:
 	virtual ~Application() = default;
 
 	static void Close();
+	static Application* Get() { return s_Instance; }
 
 	static Ref<Window> GetWindow() { return s_Window; }
 
@@ -23,6 +24,10 @@ public:
 	static void PushDir();
 	static void PushDir(const std::string& path);
 	static void PopDir();
+
+	template<typename TDerived>
+	requires std::derived_from<TDerived, Application>
+	static TDerived* As() { return (TDerived*)(s_Instance); }
 
 protected:
 	virtual void OnUpdate(TimeStep ts) = 0;

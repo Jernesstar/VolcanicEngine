@@ -4,6 +4,8 @@
 
 namespace Magma::Physics {
 
+const float World::StepSize = 1.0f / 60.0f;
+
 World::World() {
 	// PxSceneDesc sceneDesc(Physics::GetPhysicsLib()->getTolerancesScale());
 	// sceneDesc.cpuDispatcher	= Physics::GetDispatcher();
