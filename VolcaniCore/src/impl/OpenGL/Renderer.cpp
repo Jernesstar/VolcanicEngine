@@ -23,14 +23,18 @@ using namespace VolcaniCore;
 
 namespace VolcaniCore::OpenGL {
 
+struct BackendBuffer {
+	Ref<VertexArray> Array;
+	Buffer<void> Vertices;
+	Buffer<uint32_t> Indices;
+	Buffer<void> InstanceData;
+};
+
 struct RendererData {
 	Ptr<VertexArray> CubemapArray;
 	Ptr<VertexArray> FramebufferArray;
 
-	Ref<VertexArray> Array;
-	Ref<VertexBuffer> GeometryBuffer;
-	Ref<VertexBuffer> TransformBuffer;
-	Ref<IndexBuffer> Indices;
+	List<BackendBuffer> Arrays;
 };
 
 static RendererData s_Data;
@@ -45,8 +49,6 @@ void Renderer::Init() {
 	glEnable(GL_MULTISAMPLE);				// Smooth edges
 	glEnable(GL_FRAMEBUFFER_SRGB);			// Gamma correction
 	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS); // Smooth cubemap edges
-
-	SetOptions(m_Options);
 
 	float cubemapVertices[] =
 	{
@@ -151,10 +153,32 @@ void Renderer::Init() {
 }
 
 void Renderer::Close() {
-	s_Data.Array.reset();
+	s_Data.Arrays.clear();
 }
 
-void Renderer::SetOptions(const RendererAPI::Options& options) {
+static void Clear();
+static void Resize(uint32_t width, uint32_t height);
+static void SetOptions(DrawCommand& command);
+
+void Renderer::StartFrame() {
+	Clear();
+}
+
+void Renderer::EndFrame() {
+
+}
+
+DrawCommand CreateDrawCommand(BufferLayout vertex, BufferLayout instance) {
+	for(auto array : s_Data.Arrays) {
+		if(array->GetVertexBuffers()[0] == )
+	}
+}
+
+void SubmitDrawCommand(DrawCommand& command) {
+
+}
+
+static void SetOptions(DrawCommand& command) {
 	if(options.DepthTest == RendererAPI::Options::DepthTestingMode::On)
 		glEnable(GL_DEPTH_TEST);
 	if(options.DepthTest == RendererAPI::Options::DepthTestingMode::Off)
@@ -181,27 +205,17 @@ void Renderer::SetOptions(const RendererAPI::Options& options) {
 		glCullFace(GL_FRONT);
 	else if(options.Cull == RendererAPI::Options::CullingMode::Back)
 		glCullFace(GL_BACK);
-
-	m_Options = options;
 }
 
-void Renderer::StartFrame() {
-	s_Data.Array->Bind();
-}
-void Renderer::EndFrame() {
-	s_Data.Array->Unbind();
-}
-
-void Renderer::Clear(const glm::vec4& color) {
+void Clear(const glm::vec4& color) {
 	glClearColor(color.x, color.y, color.z, color.w);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void Renderer::Resize(uint32_t width, uint32_t height) {
+void Resize(uint32_t width, uint32_t height) {
 	glViewport(0, 0, width, height);
 }
 
-// TODO(Implement):
 static void DrawPoint(DrawCall& call) {
 	auto& geometry = call.GeometryBuffer;
 	auto& transforms = call.TransformBuffer;
@@ -259,7 +273,7 @@ static void DrawMesh(DrawCall& call) {
 	}
 }
 
-void Renderer::SubmitDrawCall(DrawCall& call) {
+static void SubmitDrawCall(DrawCall& call) {
 	switch(call.Primitive) {
 		case DrawPrimitive::Point:
 			DrawPoint(call);
@@ -273,7 +287,7 @@ void Renderer::SubmitDrawCall(DrawCall& call) {
 	}
 }
 
-void Renderer::RenderCubemap(Ref<VolcaniCore::Cubemap> cubemap) {
+static void RenderCubemap(Ref<VolcaniCore::Cubemap> cubemap) {
 	glDepthMask(GL_FALSE);
 
 	cubemap->As<OpenGL::Cubemap>()->Bind();
@@ -284,8 +298,7 @@ void Renderer::RenderCubemap(Ref<VolcaniCore::Cubemap> cubemap) {
 }
 
 // TODO(Change): Move to VolcaniCore::Renderer2D::DrawFullScreenQuad
-void Renderer::RenderFramebuffer(Ref<VolcaniCore::Framebuffer> buffer,
-								 AttachmentTarget target)
+static void RenderFramebuffer(Ref<VolcaniCore::Framebuffer> buffer, AttachmentTarget target)
 {
 	if(!buffer) {
 		VOLCANICORE_LOG_INFO("WHYYY?");
