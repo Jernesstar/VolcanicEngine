@@ -6,6 +6,7 @@
 
 #include <VolcaniCore/Core/Application.h>
 #include <VolcaniCore/Core/Input.h>
+#include <VolcaniCore/Renderer/RendererAPI.h>
 
 #include "ECS/Component.h"
 
@@ -28,17 +29,16 @@ void SceneVisualizerPanel::SetContext(Scene* context) {
 	m_Selected.Handle = Entity{ };
 	// m_Selected.Collider = CreateRef<Physics::RigidBody>();
 
-	// m_Renderer.SetContext(context);
-	// auto framebuffer = m_Renderer.GetOutput();
-	// m_Image->SetImage(framebuffer, AttachmentTarget::Color);
+	m_Renderer.SetContext(context);
+	m_Image->SetImage(m_Renderer.GetOutput(), AttachmentTarget::Color);
 }
 
 void SceneVisualizerPanel::Update(TimeStep ts) {
-	// m_Renderer.Update(ts);
+	m_Renderer.Update(ts);
 }
 
 void SceneVisualizerPanel::Draw() {
-	// m_Context->OnRender(m_Renderer);
+	m_Context->OnRender(m_Renderer);
 
 	auto flags = ImGuiWindowFlags_NoScrollbar
 			   | ImGuiWindowFlags_NoScrollWithMouse;

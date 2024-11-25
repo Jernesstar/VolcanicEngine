@@ -11,22 +11,16 @@ workspace "Projects"
         optimize "Full"
 
     newoption {
-        trigger = "project",
-        value = "Path",
-        description = "The path of a directory containing a .volc.proj file"
-    }
-
-    newoption {
         trigger = "src",
-        value = "SrcPath",
+        value = "Src Path",
         description = "The path to the directory of a the source files"
     }
 
-include "Project/premake5.lua"
-
-VolcanicEngineDir    = "%{_MAIN_SCRIPT_DIR}/../../";
+VolcanicEngineDir    = os.getenv("VOLC_PATH");
 VolcaniCoreVendorDir = "%{VolcanicEngineDir}/VolcaniCore/vendor"
 MagmaVendorDir       = "%{VolcanicEngineDir}/Magma/vendor"
+
+include "Project/premake5.lua"
 
 VendorPaths = {}
 Includes = {}

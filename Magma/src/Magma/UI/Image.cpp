@@ -65,9 +65,11 @@ void Image::SetImage(Ref<Framebuffer> framebuffer, AttachmentTarget target) {
 void Image::Draw() {
 	auto image = Content->As<OpenGL::Texture2D>();
 
+	auto v0 = ImVec2(0.0f, 1.0f);
+	auto v1 = ImVec2(1.0f, 0.0f);
 	ImVec2 dim = ImVec2(Width, Height);
 	ImGui::SetCursorPos(ImVec2(x, y));
-	ImGui::Image((ImTextureID)(intptr_t)image->GetID(), dim);
+	ImGui::Image((ImTextureID)(intptr_t)image->GetID(), dim, v0, v1);
 }
 
 bool Image::OnAttach() {

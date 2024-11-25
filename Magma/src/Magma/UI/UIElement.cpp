@@ -61,13 +61,6 @@ void UIElement::Render() {
 		ImGui::End();
 }
 
-template<typename TUIElement, typename ...Args>
-requires std::derived_from<TUIElement, UIElement>
-Ref<TUIElement> UIElement::Add(Args&&... args) {
-	Ref<UIElement> element{ new TUIElement(std::forward<Args>(args)...) };
-	return std::static_pointer_cast<TUIElement>(Add(element));
-}
-
 UIElement* UIElement::SetSize(uint32_t width, uint32_t height) {
 	this->Width = width;
 	this->Height = height;

@@ -19,11 +19,16 @@ Model::Model(const std::string& path)
 	Load(path);
 }
 
+void Model::AddMesh(Ref<Mesh> mesh) {
+	m_Meshes.push_back(mesh);
+}
+
 static Ref<Mesh> LoadMesh(const std::string& path,
 						  const aiScene* scene, uint32_t meshIndex);
 
 void Model::Load(const std::string& path) {
-	VOLCANICORE_ASSERT(path != "");
+	if(path == "")
+		return;
 
 	Assimp::Importer importer;
 	uint32_t loadFlags = aiProcess_Triangulate
@@ -36,14 +41,9 @@ void Model::Load(const std::string& path) {
 									path.c_str(), importer.GetErrorString());
 
 	m_Meshes.reserve(scene->mNumMeshes);
-
 	for(uint32_t i = 0; i < scene->mNumMeshes; i++)
 		m_Meshes.push_back(LoadMesh(path, scene, i));
 }
-
-// void Model::Unload() {
-
-// }
 
 static Ref<Texture> LoadTexture(const std::string& dir,
 								const aiMaterial* mat, aiTextureType type);

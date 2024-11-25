@@ -32,14 +32,13 @@ public:
 	JSONSerializer& Write(int64_t value) override;
 
 	JSONSerializer& Write(bool value) override;
-
 	JSONSerializer& Write(float value) override;
 
 	JSONSerializer& Write(const glm::vec2& value) override;
 	JSONSerializer& Write(const glm::vec3& value) override;
 	JSONSerializer& Write(const glm::vec4& value) override;
 
-	JSONSerializer& Write(const char* value) override;
+	JSONSerializer& Write(const std::string& value) override;
 
 	void Finalize(const std::string& path) override;
 

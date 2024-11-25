@@ -8,6 +8,9 @@
 
 #include <Physics/RigidBody.h>
 
+using namespace VolcaniCore;
+using namespace Magma::Physics;
+
 namespace Magma::ECS {
 
 struct Component {
@@ -23,53 +26,40 @@ struct CameraComponent : public Component {
 	CameraComponent() = default;
 	CameraComponent(Ref<Camera> camera)
 		: Cam(camera) { }
-	CameraComponent(Camera::Type type,
-					const glm::vec3& pos, const glm::vec3& dir,
-					uint32_t width, uint32_t height, float near, float far,
-					float fr)
-	{
-		Cam = Camera::Create(type, fr);
-		Cam->SetPositionDirection(pos, dir);
-		Cam->Resize(width, height);
-		Cam->SetProjection(near, far);
-	}
 	CameraComponent(const CameraComponent& other) = default;
 };
 
 struct MeshComponent : public Component {
 	// TODO(Change): AssetID
-	Ref<VolcaniCore::Mesh> Mesh;
+	Ref<Model> Mesh;
 
-	MeshComponent() = default;
-	MeshComponent(Ref<VolcaniCore::Mesh> mesh)
+	MeshComponent() {
+		Mesh = Model::Create("");
+	}
+	MeshComponent(Ref<Model> mesh)
 		: Mesh(mesh) { }
+	MeshComponent(Ref<VolcaniCore::Mesh> mesh) {
+		Mesh = Model::Create("");
+		Mesh->AddMesh(mesh);
+	}
 	MeshComponent(const std::string& path) {
-		Mesh = Mesh::Create(path);
-	}
-	MeshComponent(MeshPrimitive primitive, const Material& material) {
-		Mesh = Mesh::Create(primitive, material);
-	}
-	MeshComponent(const std::vector<VolcaniCore::Vertex>& vertices,
-				  const std::vector<uint32_t> indices, const Material& material)
-	{
-		Mesh = Mesh::Create(vertices, indices, material);
+		Mesh = Model::Create(path);
 	}
 	MeshComponent(const MeshComponent& other) = default;
 };
 
 struct RigidBodyComponent : public Component {
 	// TODO(Change): AssetID
-	Ref<Physics::RigidBody> Body;
+	Ref<RigidBody> Body;
 
 	RigidBodyComponent() = default;
-	RigidBodyComponent(Ref<Physics::RigidBody> body)
+	RigidBodyComponent(Ref<RigidBody> body)
 		: Body(body) { }
-	RigidBodyComponent(Physics::RigidBody::Type type) {
-		Body = Physics::RigidBody::Create(type);
+	RigidBodyComponent(RigidBody::Type type) {
+		Body = RigidBody::Create(type);
 	}
-	RigidBodyComponent(Physics::RigidBody::Type type, Ref<Physics::Shape> shape)
-	{
-		Body = Physics::RigidBody::Create(type, shape);
+	RigidBodyComponent(RigidBody::Type type, Ref<Shape> shape) {
+		Body = RigidBody::Create(type, shape);
 	}
 	RigidBodyComponent(const RigidBodyComponent& other) = default;
 };

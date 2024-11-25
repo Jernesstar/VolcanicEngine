@@ -89,8 +89,23 @@ void SerializeEntity(YAMLSerializer& serializer, Entity& entity) {
 
 		serializer.WriteKey("TagComponent")
 		.BeginMapping()
-			.WriteKey("Tag").Write(tag.c_str()) // TODO(Fix): Only works on const char*
+			.WriteKey("Tag").Write(tag)
 		.EndMapping();
+	}
+
+	if(entity.Has<TransformComponent>()) {
+		auto& t = entity.Get<TransformComponent>().Translation;
+		auto& r = entity.Get<TransformComponent>().Rotation;
+		auto& s = entity.Get<TransformComponent>().Scale;
+
+		serializer.WriteKey("TransformComponent")
+		.BeginMapping()
+			.WriteKey("Transform").BeginMapping()
+				.WriteKey("Translation").Write(t)
+				.WriteKey("Rotation")	.Write(r)
+				.WriteKey("Scale")		.Write(s)
+			.EndMapping()
+		.EndMapping(); // TransformComponent
 	}
 
 	if(entity.Has<CameraComponent>()) {
@@ -124,45 +139,61 @@ void SerializeEntity(YAMLSerializer& serializer, Entity& entity) {
 	}
 
 	if(entity.Has<MeshComponent>()) {
-		auto mesh = entity.Get<MeshComponent>().Mesh;
-		auto& mat = mesh->GetMaterial();
-
+		auto model = entity.Get<MeshComponent>().Mesh;
 		serializer.WriteKey("MeshComponent")
-		.BeginMapping()
-			.WriteKey("Mesh").BeginMapping();
+		.BeginMapping();
 
-		if(mesh->Path != "")
-			serializer.WriteKey("Path").Write(mesh->Path);
-		else {
-			serializer.WriteKey("Vertices")
-			.SetOptions(Serializer::Options::ArrayOneLine)
-			.Write(mesh->GetVertices());
-
-			serializer.WriteKey("Indices")
-			.SetOptions(Serializer::Options::ArrayOneLine)
-			.Write(mesh->GetIndices());
-
-			serializer.WriteKey("Material")
-			.BeginMapping();
-
-			if(mat.Diffuse)
-				serializer.WriteKey("Diffuse")
-				.BeginMapping()
-					.WriteKey("Path").Write(mat.Diffuse->GetPath())
-				.EndMapping();
-
-			if(mat.Specular)
-				serializer.WriteKey("Specular")
-				.BeginMapping()
-					.WriteKey("Path").Write(mat.Specular->GetPath())
-				.EndMapping();
-
-			serializer
-			.EndMapping(); // Material
+		if(model->Path != "") {
+			serializer.WriteKey("Model")
+			.BeginMapping()
+				.WriteKey("Path").Write(model->Path)
+			.EndMapping();
 		}
-		serializer
-		.EndMapping() // Mesh
-		.EndMapping(); // MeshComponent
+		else {
+			serializer.WriteKey("Meshes").BeginSequence();
+
+			for(auto& mesh : *model) {
+				auto& mat = mesh->GetMaterial();
+
+				serializer.BeginMapping();
+				serializer.WriteKey("Mesh").BeginMapping();
+
+				if(mesh->Path != "")
+					serializer.WriteKey("Path").Write(mesh->Path);
+				else {
+					serializer.WriteKey("Vertices")
+					.SetOptions(Serializer::Options::ArrayOneLine)
+					.Write(mesh->GetVertices());
+
+					serializer.WriteKey("Indices")
+					.SetOptions(Serializer::Options::ArrayOneLine)
+					.Write(mesh->GetIndices());
+
+					serializer.WriteKey("Material")
+					.BeginMapping();
+
+					if(mat.Diffuse)
+						serializer.WriteKey("Diffuse")
+						.BeginMapping()
+							.WriteKey("Path").Write(mat.Diffuse->GetPath())
+						.EndMapping();
+
+					if(mat.Specular)
+						serializer.WriteKey("Specular")
+						.BeginMapping()
+							.WriteKey("Path").Write(mat.Specular->GetPath())
+						.EndMapping();
+
+					serializer
+					.EndMapping(); // Material
+				}
+				serializer.EndMapping(); // Mesh
+				serializer.EndMapping();
+			}
+			serializer.EndSequence();
+		}
+
+		serializer.EndMapping(); // MeshComponent
 	}
 
 	if(entity.Has<RigidBodyComponent>()) {
@@ -213,21 +244,6 @@ void SerializeEntity(YAMLSerializer& serializer, Entity& entity) {
 			.EndMapping()
 		.EndMapping();
 	}
-
-	if(entity.Has<TransformComponent>()) {
-		auto& t = entity.Get<TransformComponent>().Translation;
-		auto& r = entity.Get<TransformComponent>().Rotation;
-		auto& s = entity.Get<TransformComponent>().Scale;
-
-		serializer.WriteKey("TransformComponent")
-		.BeginMapping()
-			.WriteKey("Transform").BeginMapping()
-				.WriteKey("Translation").Write(t)
-				.WriteKey("Rotation")	.Write(r)
-				.WriteKey("Scale")		.Write(s)
-			.EndMapping()
-		.EndMapping(); // TransformComponent
-	}
 	serializer.EndMapping(); // Components
 
 	serializer.EndMapping(); // Entity
@@ -276,33 +292,51 @@ void DeserializeEntity(YAML::Node entityNode, Scene* scene) {
 			fr = cameraNode["Rotation"].as<float>();
 		}
 
-		entity.Add<CameraComponent>(type, pos, dir, w, h, near, far, fr);
+		auto camera = Camera::Create(type, fr);
+		camera->SetPositionDirection(pos, dir);
+		camera->Resize(w, h);
+		camera->SetProjection(near, far);
+
+		entity.Add<CameraComponent>(camera);
 	}
 
 	auto meshComponentNode = components["MeshComponent"];
 	if(meshComponentNode) {
-		auto meshNode = meshComponentNode["Mesh"];
-
-		if(meshNode["Path"]) {
-			auto path = meshNode["Path"].as<std::string>();
-			entity.Add<MeshComponent>(AssetManager::GetOrCreate<Mesh>(path));
+		auto modelNode = meshComponentNode["Model"];
+		if(modelNode) {
+			auto path = modelNode["Path"].as<std::string>();
+			// auto model = AssetManager::GetOrCreate<Model>(path);
+			auto model = Model::Create(path);
+			entity.Add<MeshComponent>(model);
 		}
 		else {
-			auto v = meshNode["Vertices"].as<std::vector<VolcaniCore::Vertex>>();
-			auto i = meshNode["Indices"].as<std::vector<uint32_t>>();
-			auto diffuseNode = meshNode["Material"]["Diffuse"];
-			auto specularNode = meshNode["Material"]["Specular"];
+			auto model = entity.Add<MeshComponent>().Mesh;
+			for(auto meshNode : meshComponentNode["Meshes"]) {
+				auto node = meshNode["Mesh"];
+				if(node["Path"]) {
+					auto path = node["Path"].as<std::string>();
+					auto mesh = AssetManager::GetOrCreate<Mesh>(path);
+					model->AddMesh(mesh);
+					continue;
+				}
 
-			Material mat;
-			if(diffuseNode) {
-				auto path = diffuseNode["Path"].as<std::string>();
-				mat.Diffuse = Texture::Create(path);
+				auto v = node["Vertices"].as<List<VolcaniCore::Vertex>>();
+				auto i = node["Indices"].as<List<uint32_t>>();
+				auto diffuseNode = node["Material"]["Diffuse"];
+				auto specularNode = node["Material"]["Specular"];
+
+				Material mat;
+				if(diffuseNode) {
+					auto path = diffuseNode["Path"].as<std::string>();
+					mat.Diffuse = Texture::Create(path);
+				}
+				if(specularNode) {
+					auto path = specularNode["Path"].as<std::string>();
+					mat.Diffuse = Texture::Create(path);
+				}
+
+				model->AddMesh(Mesh::Create(v, i, mat));
 			}
-			if(specularNode) {
-				auto path = specularNode["Path"].as<std::string>();
-				mat.Diffuse = Texture::Create(path);
-			}
-			entity.Add<MeshComponent>(v, i, mat);
 		}
 	}
 
@@ -323,10 +357,13 @@ void DeserializeEntity(YAML::Node entityNode, Scene* scene) {
 		auto rotationNode	 = transformNode["Rotation"];
 		auto scaleNode		 = transformNode["Scale"];
 
-		TransformComponent& tc = entity.Add<TransformComponent>();
-		tc.Translation = translationNode.as<glm::vec3>();
-		tc.Rotation	   = rotationNode	.as<glm::vec3>();
-		tc.Scale	   = scaleNode		.as<glm::vec3>();
+		entity.Add<TransformComponent>(
+			Transform
+			{
+				.Translation = translationNode.as<glm::vec3>(),
+				.Rotation	 = rotationNode.as<glm::vec3>(),
+				.Scale		 = scaleNode.as<glm::vec3>()
+			});
 	}
 
 	auto rigidBodyComponentNode = components["RigidBodyComponent"];
@@ -356,7 +393,6 @@ void DeserializeEntity(YAML::Node entityNode, Scene* scene) {
 
 }
 
-
 namespace YAML {
 
 template<>
@@ -370,7 +406,7 @@ struct convert<glm::vec2> {
 	}
 
 	static bool decode(const Node& node, glm::vec2& v) {
-		if(!node.IsSequence() || node.size() != 3)
+		if(!node.IsSequence() || node.size() != 2)
 			return false;
 
 		v.x = node[0].as<float>();

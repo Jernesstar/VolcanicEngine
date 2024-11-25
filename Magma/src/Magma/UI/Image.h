@@ -29,7 +29,7 @@ public:
 
 	void SetImage(Ref<Texture> texture);
 	void SetImage(const std::string& imagePath);
-	// TODO: Move this to Texture
+	// TODO(Change): Move this to Texture
 	void SetImage(Ref<Framebuffer> framebuffer, AttachmentTarget target);
 
 private:

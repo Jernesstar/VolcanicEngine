@@ -7,6 +7,7 @@
 #include <imgui/misc/cpp/imgui_stdlib.h>
 #include <ImGuiFileDialog/ImGuiFileDialog.h>
 
+#include <VolcaniCore/Core/Application.h>
 #include <VolcaniCore/Core/Log.h>
 #include <VolcaniCore/Core/Input.h>
 #include <VolcaniCore/Renderer/RendererAPI.h>
@@ -36,6 +37,7 @@ struct {
 EditorLayer::EditorLayer() {
 	NewProject();
 	m_Project->Load("../TheMazeIsLava/.volc.proj");
+	Application::GetWindow()->SetTitle("Magma Editor: " + m_Project->GetName());
 
 	auto tab = CreateRef<SceneTab>("Magma/assets/scenes/temp.magma.scene");
 	NewTab(tab);
@@ -96,7 +98,8 @@ void EditorLayer::Render() {
 				if(ImGui::MenuItem("New", "Ctrl+T")
 				|| Input::KeysPressed(Key::Ctrl, Key::T))
 					menu.tab.newTab = true;
-				if(ImGui::MenuItem("Open", "Ctrl+O"))
+				if(ImGui::MenuItem("Open", "Ctrl+O")
+				|| Input::KeyPressed(Key::O))
 					menu.tab.openTab = true;
 				if(ImGui::MenuItem("Reopen", "Ctrl+Shift+T")
 				|| Input::KeysPressed(Key::Ctrl, Key::Shift, Key::T))
@@ -148,14 +151,8 @@ void EditorLayer::Render() {
 					tabToDelete = tab;
 			}
 
-			if(tabToDelete != nullptr) {
-				// AddToClosedTabs(tab)
-				auto it = std::find(m_Tabs.begin(), m_Tabs.end(), tabToDelete);
-				uint32_t index = std::distance(m_Tabs.begin(), it);
-				m_Tabs.erase(it);
-				if(tabToDelete == m_CurrentTab)
-					m_CurrentTab = (index > 0) ? m_Tabs[index - 1] : nullptr;
-			}
+			if(tabToDelete != nullptr)
+				CloseTab(tabToDelete);
 		}
 		ImGui::EndTabBar();
 
@@ -184,7 +181,7 @@ void EditorLayer::Render() {
 	if(menu.tab.reopenTab)
 		ReopenTab();
 	if(menu.tab.closeTab)
-		CloseTab();
+		CloseTab(m_CurrentTab);
 
 }
 
@@ -204,6 +201,7 @@ void EditorLayer::NewTab(Ref<UI::UIElement> element) {
 }
 
 void EditorLayer::NewTab() {
+	menu.tab.newTab = false;
 	// TODO(Implement): Dialog box to pick which kind of new tab to create:
 	// Scene, UI, or Level
 }
@@ -231,15 +229,33 @@ void EditorLayer::OpenTab() {
 }
 
 void EditorLayer::ReopenTab() {
-	
+	menu.tab.reopenTab = false;
+
+	if(m_ClosedTabs.size()) {
+		NewTab(m_ClosedTabs.back());
+		m_ClosedTabs.pop_back();
+	}
 }
 
-void EditorLayer::CloseTab() {
+void EditorLayer::CloseTab(Ref<Tab> tabToDelete) {
+	menu.tab.closeTab = false;
+
+	if(tabToDelete == nullptr)
+		return;
+
+	auto it = std::find(m_Tabs.begin(), m_Tabs.end(), tabToDelete);
+	m_Tabs.erase(it);
+	m_ClosedTabs.push_back(tabToDelete);
+
+	uint32_t index = std::distance(m_Tabs.begin(), it);
+	if(tabToDelete == m_CurrentTab)
+		m_CurrentTab = (index > 0) ? m_Tabs[index - 1] : nullptr;
+
 }
 
 void EditorLayer::NewProject() {
-	m_Project = CreateRef<Project>();
 	menu.project.newProject = false;
+	m_Project = CreateRef<Project>();
 }
 
 void EditorLayer::OpenProject() {
@@ -257,16 +273,18 @@ void EditorLayer::OpenProject() {
 		instance->Close();
 		menu.project.openProject = false;
 	}
+
+	Application::GetWindow()->SetTitle("Magma Editor: " + m_Project->GetName());
 }
 
 void EditorLayer::ReloadProject() {
-	m_Project->Reload();
 	menu.project.reloadProject = false;
+	m_Project->Reload();
 }
 
 void EditorLayer::RunProject() {
-	m_Project->Run();
 	menu.project.runProject = false;
+	m_Project->Run();
 }
 
 }

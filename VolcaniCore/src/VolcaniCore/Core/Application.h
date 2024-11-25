@@ -16,6 +16,7 @@ public:
 	virtual ~Application() = default;
 
 	static void Close();
+	static Application* Get() { return s_Instance; }
 
 	static Ref<Window> GetWindow() { return s_Window; }
 

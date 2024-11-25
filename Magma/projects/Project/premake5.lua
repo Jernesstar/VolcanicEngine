@@ -2,12 +2,12 @@ project "Project"
     kind "ConsoleApp"
     language "C++"
     cppdialect "C++latest"
-    exceptionhandling "On"
-    rtti "Off"
-    staticruntime "Off"
+    -- exceptionhandling "On"
+    -- rtti "Off"
+    -- staticruntime "Off"
 
-    ProjectDir = _OPTIONS["project"]
     ProjectSrcDir = _OPTIONS["src"]
+    -- ProjectSrcDir = "C:/Users/Jercy Mukala/Code/TheMazeIsLava/TheMazeIsLava/src"
 
     objdir ("build/obj")
     targetdir ("build/bin")
@@ -16,6 +16,7 @@ project "Project"
         "%{ProjectSrcDir}/**.h",
         "%{ProjectSrcDir}/**.cpp",
     }
+    print(ProjectSrcDir)
 
     includedirs {
         "%{ProjectSrcDir}/**",
@@ -83,6 +84,7 @@ project "Project"
             "psapi",
             "Ws2_32",
         }
+
     filter "system:macosx"
         links {
             "QuartzCore.framework",
@@ -91,10 +93,6 @@ project "Project"
             "IOKit.framework",
             "CoreVideo.framework"
         }
-
-    filter "configurations:Debug"
-        runtime "Debug"
-        symbols "on"
 
     filter "toolset:gcc or toolset:clang"
         buildoptions {

@@ -16,7 +16,7 @@ public:
 	template<typename T>
 	T As();
 
-	// TODO: List's of data
+	// TODO(Implement): List's of data
 
 	// virtual ParserNode operator [](const std::string& node) = 0;
 
