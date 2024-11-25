@@ -48,37 +48,37 @@ void Init() {
 		[](KeyPressedEvent& event)
 		{
 			ImGuiIO& io = ImGui::GetIO();
-			event.Handled = io.WantCaptureKeyboard;
+			// event.Handled = io.WantCaptureKeyboard;
 		});
 	Events::RegisterListener<KeyReleasedEvent>(
 		[](KeyReleasedEvent& event)
 		{
 			ImGuiIO& io = ImGui::GetIO();
-			event.Handled = io.WantCaptureKeyboard;
+			// event.Handled = io.WantCaptureKeyboard;
 		});
 	Events::RegisterListener<MouseButtonPressedEvent>(
 		[](MouseButtonPressedEvent& event)
 		{
 			ImGuiIO& io = ImGui::GetIO();
-			event.Handled = io.WantCaptureMouse;
+			// event.Handled = io.WantCaptureMouse;
 		});
 	Events::RegisterListener<MouseButtonReleasedEvent>(
 		[](MouseButtonReleasedEvent& event)
 		{
 			ImGuiIO& io = ImGui::GetIO();
-			event.Handled = io.WantCaptureMouse;
+			// event.Handled = io.WantCaptureMouse;
 		});
 	Events::RegisterListener<MouseScrolledEvent>(
 		[](MouseScrolledEvent& event)
 		{
 			ImGuiIO& io = ImGui::GetIO();
-			event.Handled = io.WantCaptureMouse;
+			// event.Handled = io.WantCaptureMouse;
 		});
 	Events::RegisterListener<MouseMovedEvent>(
 		[](MouseMovedEvent& event)
 		{
 			ImGuiIO& io = ImGui::GetIO();
-			event.Handled = io.WantCaptureMouse;
+			// event.Handled = io.WantCaptureMouse;
 		});
 	Events::RegisterListener<WindowResizedEvent>(
 		[](const WindowResizedEvent& event)

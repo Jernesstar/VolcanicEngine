@@ -47,6 +47,7 @@ void SceneHierarchyPanel::Draw() {
 
 void SceneHierarchyPanel::DrawEntityNode(Entity& entity) {
 	auto flags = ImGuiTreeNodeFlags_SpanAvailWidth
+			   | ImGuiTreeNodeFlags_OpenOnDoubleClick
 			   | ImGuiTreeNodeFlags_OpenOnArrow; // Expands only when pressing the arrow
 	if(m_Selected && entity == m_Selected)
 		flags |= ImGuiTreeNodeFlags_Selected;
@@ -55,11 +56,11 @@ void SceneHierarchyPanel::DrawEntityNode(Entity& entity) {
 	auto id = (void*)(uint64_t)(uint32_t)entity.GetHandle();
 
 	if(ImGui::TreeNodeEx(id, flags, tag)) {
-		if(ImGui::IsMouseClicked(0) && ImGui::IsItemActivated())
+		if(ImGui::IsItemClicked(0))
 			m_Selected = entity;
 		// if(ImGui::IsMouseClicked(1) && ImGui::IsItemActivated())
 		// 	ImGui::OpenPopup("Properties");
-		if(ImGui::IsMouseClicked(1) && ImGui::IsItemActivated())
+		if(ImGui::IsMouseClicked(1) && ImGui::IsItemClicked())
 			VOLCANICORE_LOG_INFO("Here");
 
 		// if(ImGui::BeginPopupModal("Properties")) {
@@ -69,7 +70,6 @@ void SceneHierarchyPanel::DrawEntityNode(Entity& entity) {
 
 		ImGui::TreePop();
 	}
-
 }
 
 }

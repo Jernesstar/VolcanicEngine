@@ -89,22 +89,21 @@ void DrawComponents(ECS::Entity& entity) {
 			DrawVec3Control("Scale", component.Scale, 1.0f);
 		});
 
-	// DrawComponent<MeshComponent>("Texture", entity,
-	// [&](auto& component) {
-	// 	ImGui::Button("Texture", ImVec2(120.0f, 0.0f));
-	// 	if(ImGui::BeginDragDropTarget()) {
-	// 		if(const ImGuiPayload* payload =
-	// 					ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
-	// 		{
-	// 			const wchar_t* path = (const wchar_t*)payload->Data;
-	// 			std::filesystem::path texturePath(path);
-	// 			Ref<Texture> texture = Texture::Create(texturePath.string());
-	// 			component.Texture = texture;
-	// 		}
+	DrawComponent<MeshComponent>("Texture", entity,
+	[&](auto& component) {
+		ImGui::Button("Texture", ImVec2(120.0f, 0.0f));
+		if(ImGui::BeginDragDropTarget()) {
+			if(const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+			{
+				const wchar_t* path = (const wchar_t*)payload->Data;
+				std::filesystem::path texturePath(path);
+				Ref<Texture> texture = Texture::Create(texturePath.string());
+				component.Texture = texture;
+			}
 
-	// 		ImGui::EndDragDropTarget();
-	// 	}
-	// });
+			ImGui::EndDragDropTarget();
+		}
+	});
 }
 
 void SceneHierarchyPanel::DrawEntityNode(ECS::Entity& entity) {
@@ -143,9 +142,9 @@ template<typename TComponent>
 void DisplayAddComponentEntry(const std::string& entryName)
 {
 	if(!m_Selected.Has<TComponent>()) {
-		if(ImGui::MenuItem(entryName.c_str())) {
+		if(ImGui::MenuItem(entryName.c_str()))
 			m_Selected.Add<TComponent>();
-		}
+
 		ImGui::CloseCurrentPopup();
 	}
 }
