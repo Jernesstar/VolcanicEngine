@@ -21,8 +21,13 @@ public:
 
 	static void DrawText(Ref<Text> text, const Transform& t = { });
 
-	static void DrawFullScreenQuad(Ref<Framebuffer> framebuffer,
-								   AttachmentTarget target);
+	static void DrawFullScreenQuad(Ref<Framebuffer> buffer, AttachmentTarget target);
+
+private:
+	static void Init();
+	static void Close();
+
+	friend class Renderer;
 };
 
 }

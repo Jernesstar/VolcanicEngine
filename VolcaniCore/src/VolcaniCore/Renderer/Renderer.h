@@ -13,51 +13,6 @@
 
 namespace VolcaniCore {
 
-enum class DrawType { Array, Indexed };
-enum class DrawPartition { Single, Instanced, Multi };
-enum class DrawPrimitive { Point, Line, Mesh };
-
-struct DrawOptions {
-	DrawType Type;
-	DrawPartition Partition;
-};
-
-// struct DrawCall {
-// 	DrawType Type;
-// 	DrawPartition Partition;
-// 	DrawPrimitive Primitive;
-
-// 	Buffer<Vertex> GeometryBuffer;
-// 	Buffer<uint32_t> IndexBuffer;
-// 	Buffer<glm::mat4> TransformBuffer;
-// };
-
-using DrawOptionsMap = Map<DrawPrimitive, DrawOptions>;
-
-// struct DrawCommand {
-// 	Ref<RenderPass> Pass;
-// 	Uniforms PerUniforms;
-// 	DrawOptionsMap OptionsMap;
-
-// 	bool Clear = false;
-// 	glm::ivec2 Size;
-
-// 	Map<Ref<Point>, Buffer<glm::mat4>> Points;
-// 	Map<Ref<Line>,  Buffer<glm::mat4>> Lines;
-// 	Map<Ref<Mesh>,  Buffer<glm::mat4>> Meshes;
-
-// 	Map<Ref<Point>, Uniforms> PointUniforms;
-// 	Map<Ref<Line>,  Uniforms> LineUniforms;
-// 	Map<Ref<Mesh>,  Uniforms> MeshUniforms;
-
-// 	void AddPoint(Ref<Point> point, const glm::mat4& transform);
-// 	void AddLine(Ref<Line> line,	const glm::mat4& transform);
-// 	void AddMesh(Ref<Mesh> mesh,	const glm::mat4& transform);
-
-// 	Uniforms& GetUniforms() { return PerUniforms; }
-// 	Uniforms& GetUniforms(Ref<Mesh> mesh) { return MeshUniforms[mesh]; }
-// };
-
 struct FrameDebugInfo {
 	float FPS;
 
@@ -68,7 +23,7 @@ struct FrameDebugInfo {
 };
 
 struct FrameData {
-	List<DrawCommand> DrawCommands;
+	// List<DrawCall> DrawCalls;
 	FrameDebugInfo Info;
 };
 
@@ -83,15 +38,16 @@ public:
 	static void StartPass(Ref<RenderPass> pass);
 	static void EndPass();
 
-	static void NewDrawCommand(const DrawOptionsMap& = { });
+	static void NewDrawCall();
 	static void Flush();
 
 	static void Clear(const glm::vec4& color = glm::vec4(0.0f));
 	static void Resize(uint32_t width, uint32_t height);
+
 	// static void PushOptions(const RendererAPI::Options& options);
 
 	static Ref<RenderPass> GetPass();
-	static DrawCommand& GetDrawCommand();
+	static DrawBuffer& GetDrawBuffer();
 	static FrameDebugInfo GetDebugInfo();
 
 private:

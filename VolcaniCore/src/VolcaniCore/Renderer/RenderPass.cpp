@@ -44,8 +44,6 @@ void RenderPass::SetUniforms(const Uniforms& uniforms) {
 
 void RenderPass::SetGlobalUniforms()
 {
-	m_Pipeline->Bind();
-
 	SetUniforms(m_GlobalUniforms);
 }
 }

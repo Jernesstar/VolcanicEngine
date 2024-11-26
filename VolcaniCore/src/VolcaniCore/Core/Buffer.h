@@ -6,6 +6,11 @@
 
 namespace VolcaniCore {
 
+template<typename T = void>
+class Buffer {
+
+};
+
 template<typename T>
 class Buffer {
 public:

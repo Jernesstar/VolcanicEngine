@@ -217,8 +217,10 @@ void Bloom::OnUpdate(TimeStep ts) {
 
 		Renderer::GetPass()->SetUniforms(uniforms);
 
-		RendererAPI::Get()->Resize(window->GetWidth(), window->GetHeight());
-		RendererAPI::Get()->RenderFramebuffer(mips, AttachmentTarget::Color);
+		// RendererAPI::Get()->Resize(window->GetWidth(), window->GetHeight());
+		// RendererAPI::Get()->RenderFramebuffer(mips, AttachmentTarget::Color);
+
+		Renderer2D::DrawFullScreenQuad(mips, AttachmentTarget::Color);
 	}
 	Renderer::EndPass();
 	Renderer::Flush();
@@ -289,7 +291,7 @@ void Bloom::Upsample() {
 		const BloomMip& mip = mipChain[i];
 		const BloomMip& nextMip = mipChain[i - 1];
 
-		Renderer::PushOptions(
+		Renderer::SetOptions(
 			{
 				.Blending = RendererAPI::Options::BlendingMode::Additive
 			});

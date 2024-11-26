@@ -14,6 +14,10 @@ struct Material {
 	Ref<Texture> Diffuse = nullptr;
 	Ref<Texture> Specular = nullptr;
 	Ref<Texture> Emissive = nullptr;
+
+	glm::vec4 DiffuseColor = glm::vec4(0.0f);
+	glm::vec4 SpecularColor = glm::vec4(0.0f);
+	glm::vec4 EmissiveColor = glm::vec4(0.0f);
 };
 
 // TODO(Change): Make Point and Line a kind of Mesh

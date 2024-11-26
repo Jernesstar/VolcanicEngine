@@ -55,11 +55,13 @@ void Application::Run() {
 
 		Events::PollEvents();
 
+		RendererAPI::Get()->StartFrame();
 		Renderer::BeginFrame();
 		{
 			s_Instance->OnUpdate(ts);
 		}
 		Renderer::EndFrame();
+		RendererAPI::Get()->EndFrame();
 
 		s_Window->Update();
 	}

@@ -11,56 +11,9 @@
 
 namespace VolcaniCore {
 
-struct DrawCommand {
-	Buffer<void> Vertices;
-	Buffer<uint32_t> Indices;
-	Buffer<void> InstanceData;
-
-	BufferLayout VertexLayout;
-	BufferLayout InstanceLayout;
-
-	List<DrawCall> Calls;
-};
-
-struct DrawCall {
-	DrawCommand* Command;
-	Buffer<void> Vertices;
-	Buffer<uint32_t> Indices;
-	Buffer<void> InstanceData;
-
-	struct Modes {
-		enum class DepthTestingMode {
-			On,
-			Off
-		} DepthTest = DepthTestingMode::On;
-
-		enum class BlendingModd {
-			Off,
-			Greatest,
-			Additive
-		} Blending = BlendingModd::Greatest;
-
-		enum class CullingMode {
-			Off,
-			Front,
-			Back
-		} Cull = CullingMode::Back;
-	} const ModeOptions;
-
-	struct Types {
-		enum class PrimitiveType {
-			Point,
-			Line,
-			Triangle,
-			Cubemap
-		} Primitive = PrimitiveType::Triangle;
-		enum class PartitionType {
-			Single,
-			Instanced,
-			MultiDraw
-		} Partition = PartitionType::Instanced;
-	} const TypeOptions;
-};
+struct DrawBufferSpecification;
+struct DrawBuffer;
+struct DrawCall;
 
 class RendererAPI {
 public:
@@ -77,15 +30,18 @@ public:
 		: m_Backend(backend) { }
 	virtual ~RendererAPI() = default;
 
-	RendererAPI::Backend GetBackend() const { return m_Backend; }
-
 	virtual void StartFrame() = 0;
-	virtual void EndFrame() = 0;
+	virtual void EndFrame()   = 0;
 
-	virtual DrawCommand CreateDrawCommand(
-		const BufferLayout& vertex, const BufferLayout& instance = { }) = 0;
+	virtual DrawBuffer* NewDrawBuffer(DrawBufferSpecification& specs,
+									  void* data = nullptr) = 0;
+	virtual DrawBuffer* GetDrawBuffer(DrawBufferSpecification& specs) = 0;
 
-	virtual void SubmitDrawCommand(DrawCommand& command) = 0;
+	virtual void Submit(DrawCall& call) = 0;
+
+	virtual void ReleaseBuffer(DrawBuffer* buffer) = 0;
+
+	RendererAPI::Backend GetBackend() const { return m_Backend; }
 
 protected:
 	const RendererAPI::Backend m_Backend;
@@ -96,6 +52,49 @@ protected:
 
 private:
 	inline static Ref<RendererAPI> s_Instance;
+};
+
+struct DrawBufferSpecification {
+	BufferLayout VertexLayout;
+	BufferLayout InstanceLayout = { };
+
+	uint64_t MaxVertexCount	  = 0;
+	uint64_t MaxIndexCount	  = 0;
+	uint64_t MaxInstanceCount = 0;
+};
+
+struct DrawBuffer {
+	DrawBufferSpecification Specs;
+
+	Buffer<void> Vertices;
+	Buffer<uint32_t> Indices;
+	Buffer<void> Instances;
+};
+
+enum class DepthTestingMode { On, Off };
+enum class BlendingMode { Off, Greatest, Additive };
+enum class CullingMode { Off, Front, Back };
+
+enum class PrimitiveType { Point, Line, Triangle, Cubemap };
+enum class PartitionType { Single, Instanced, MultiDraw };
+
+struct DrawCall {
+	DrawBuffer* Buffer;
+	Ref<ShaderPipeline> Pipeline;
+	// TODO(Change): Perhaps?
+	// Uniforms Uniforms;
+
+	uint64_t VertexStart   = 0;
+	uint64_t VertexCount   = 0;
+	uint64_t IndexCount	   = 0;
+	uint64_t InstanceCount = 0;
+
+	PartitionType Partition = PartitionType::Instanced;
+	PrimitiveType Primitive = PrimitiveType::Triangle;
+
+	DepthTestingMode DepthTest = DepthTestingMode::On;
+	BlendingMode Blending	   = BlendingMode::Greatest;
+	CullingMode Culling		   = CullingMode::Back;
 };
 
 }

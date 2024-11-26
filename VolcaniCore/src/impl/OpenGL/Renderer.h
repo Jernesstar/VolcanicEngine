@@ -12,10 +12,11 @@ public:
 	void StartFrame() override;
 	void EndFrame() override;
 
-	DrawCommand CreateDrawCommand(
-		const BufferLayout& vertex, const BufferLayout& instance = { }) override;
+	DrawBuffer* NewDrawBuffer(DrawBufferSpecification& specs,
+							  void* data = nullptr) override;
+	DrawBuffer* GetDrawBuffer(DrawBufferSpecification& specs) override;
 
-	void SubmitDrawCommand(DrawCommand& command) override;
+	void Submit(DrawCall& call) override;
 
 private:
 	void Init() override;
