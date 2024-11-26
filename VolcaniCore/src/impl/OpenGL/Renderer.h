@@ -13,7 +13,7 @@ public:
 	void EndFrame() override;
 
 	DrawCommand CreateDrawCommand(
-		BufferLayout vertex, BufferLayout instance = { }) override;
+		const BufferLayout& vertex, const BufferLayout& instance = { }) override;
 
 	void SubmitDrawCommand(DrawCommand& command) override;
 

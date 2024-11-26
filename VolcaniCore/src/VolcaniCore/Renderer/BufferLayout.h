@@ -35,6 +35,13 @@ public:
 		: Elements(elements), Stride(CalcStride(elements)),
 			Dynamic(dynamic), StructureOfArrays(structureOfArrays) { }
 
+	bool operator ==(const BufferLayout& other) const {
+		return Elements == other.Elements
+			&& Stride == other.Stride
+			&& Dynamic == other.Dynamic
+			&& StructureOfArrays == other.StructureOfArrays;
+	}
+
 	List<BufferElement>::const_iterator begin() const {
 		return Elements.begin();
 	}

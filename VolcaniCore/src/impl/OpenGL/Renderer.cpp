@@ -34,7 +34,7 @@ struct RendererData {
 	Ptr<VertexArray> CubemapArray;
 	Ptr<VertexArray> FramebufferArray;
 
-	List<BackendBuffer> Arrays;
+	Map<DrawCommand*, BackendBuffer> Arrays;
 };
 
 static RendererData s_Data;
@@ -110,46 +110,17 @@ void Renderer::Init() {
 		BufferLayout{
 			{ "Position", BufferDataType::Vec3 }
 		},
-		cubemapVertices
-	);
+		cubemapVertices);
 	s_Data.CubemapArray = CreatePtr<VertexArray>(cubemapBuffer);
 
-	Ref<VertexBuffer> buffer = CreateRef<VertexBuffer>(
-		BufferLayout{
-			{ "TexCoord", BufferDataType::Vec2 }
-		},
-		framebufferCoords
-	);
-	s_Data.FramebufferArray = CreatePtr<VertexArray>(buffer);
+	// 	VolcaniCore::Renderer::MaxInstances);
+	// s_Data.Indices =
+	// 	CreateRef<IndexBuffer>(VolcaniCore::Renderer::MaxIndices, true);
 
-	s_Data.GeometryBuffer = CreateRef<VertexBuffer>(
-		BufferLayout{
-			{
-				{ "Coordinate", BufferDataType::Vec3 },
-				{ "Normal",		BufferDataType::Vec3 },
-				{ "TexCoord_Color", BufferDataType::Vec4 },
-			},
-			true, // Dynamic
-			false // Structure of arrays
-		},
-		VolcaniCore::Renderer::MaxVertices
-	);
-	// TODO(Change): Turn into MappedBuffer
-	s_Data.TransformBuffer = CreateRef<VertexBuffer>(
-		BufferLayout{
-			{ { "Transform", BufferDataType::Mat4 } },
-			true, // Dynamic
-			true // Structure of arrays
-		},
-		VolcaniCore::Renderer::MaxInstances
-	);
-	s_Data.Indices =
-		CreateRef<IndexBuffer>(VolcaniCore::Renderer::MaxIndices, true);
-
-	s_Data.Array = CreatePtr<VertexArray>();
-	s_Data.Array->SetIndexBuffer(s_Data.Indices);
-	s_Data.Array->AddVertexBuffer(s_Data.GeometryBuffer);
-	s_Data.Array->AddVertexBuffer(s_Data.TransformBuffer);
+	// s_Data.Array = CreatePtr<VertexArray>();
+	// s_Data.Array->SetIndexBuffer(s_Data.Indices);
+	// s_Data.Array->AddVertexBuffer(s_Data.GeometryBuffer);
+	// s_Data.Array->AddVertexBuffer(s_Data.TransformBuffer);
 }
 
 void Renderer::Close() {
@@ -168,10 +139,10 @@ void Renderer::EndFrame() {
 
 }
 
-DrawCommand CreateDrawCommand(BufferLayout vertex, BufferLayout instance) {
-	for(auto array : s_Data.Arrays) {
-		if(array->GetVertexBuffers()[0] == )
-	}
+DrawCommand Renderer::CreateDrawCommand(const BufferLayout& vertex, const BufferLayout& instance) {
+	for(auto& [command, buffer] : s_Data.Arrays)
+		if(buffer.Array->GetVertexBuffer(0)->Layout == vertex)
+			return DrawCommand{ buffer.Vertices, buffer.Indices, buffer.InstanceData };
 }
 
 void SubmitDrawCommand(DrawCommand& command) {
@@ -179,32 +150,32 @@ void SubmitDrawCommand(DrawCommand& command) {
 }
 
 static void SetOptions(DrawCommand& command) {
-	if(options.DepthTest == RendererAPI::Options::DepthTestingMode::On)
-		glEnable(GL_DEPTH_TEST);
-	if(options.DepthTest == RendererAPI::Options::DepthTestingMode::Off)
-		glDisable(GL_DEPTH_TEST);
+	// if(options.DepthTest == RendererAPI::Options::DepthTestingMode::On)
+	// 	glEnable(GL_DEPTH_TEST);
+	// if(options.DepthTest == RendererAPI::Options::DepthTestingMode::Off)
+	// 	glDisable(GL_DEPTH_TEST);
 
-	if(options.Blending == RendererAPI::Options::BlendingMode::Off)
-		glDisable(GL_BLEND);
-	else
-		glEnable(GL_BLEND);
-	if(options.Blending == RendererAPI::Options::BlendingMode::Greatest)
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	else if(options.Blending == RendererAPI::Options::BlendingMode::Additive) {
-		glBlendFunc(GL_ONE, GL_ONE);
-		glBlendEquation(GL_FUNC_ADD);
-	}
+	// if(options.Blending == RendererAPI::Options::BlendingMode::Off)
+	// 	glDisable(GL_BLEND);
+	// else
+	// 	glEnable(GL_BLEND);
+	// if(options.Blending == RendererAPI::Options::BlendingMode::Greatest)
+	// 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	// else if(options.Blending == RendererAPI::Options::BlendingMode::Additive) {
+	// 	glBlendFunc(GL_ONE, GL_ONE);
+	// 	glBlendEquation(GL_FUNC_ADD);
+	// }
 
-	if(options.Cull == RendererAPI::Options::CullingMode::Off)
-		glDisable(GL_CULL_FACE);
-	else {
-		glEnable(GL_CULL_FACE);
-		glFrontFace(GL_CCW);
-	}
-	if(options.Cull == RendererAPI::Options::CullingMode::Front)
-		glCullFace(GL_FRONT);
-	else if(options.Cull == RendererAPI::Options::CullingMode::Back)
-		glCullFace(GL_BACK);
+	// if(options.Cull == RendererAPI::Options::CullingMode::Off)
+	// 	glDisable(GL_CULL_FACE);
+	// else {
+	// 	glEnable(GL_CULL_FACE);
+	// 	glFrontFace(GL_CCW);
+	// }
+	// if(options.Cull == RendererAPI::Options::CullingMode::Front)
+	// 	glCullFace(GL_FRONT);
+	// else if(options.Cull == RendererAPI::Options::CullingMode::Back)
+	// 	glCullFace(GL_BACK);
 }
 
 void Clear(const glm::vec4& color) {
@@ -221,9 +192,6 @@ static void DrawPoint(DrawCall& call) {
 	auto& transforms = call.TransformBuffer;
 	uint32_t instanceCount = transforms.GetCount();
 
-	s_Data.GeometryBuffer->SetData(geometry);
-	s_Data.TransformBuffer->SetData(transforms);
-
 	glDrawArrays(GL_POINTS, 0, instanceCount);
 }
 
@@ -233,17 +201,14 @@ static void DrawLine(DrawCall& call) {
 	auto& transforms = call.TransformBuffer;
 	uint32_t instanceCount = transforms.GetCount();
 
-	s_Data.GeometryBuffer->SetData(geometry);
-	s_Data.TransformBuffer->SetData(transforms);
-
-	glDrawArrays(GL_LINES, 0, 2);
+	glDrawArraysInstanced(GL_LINES, 0, 2, instanceCount);
 }
 
 static void DrawMesh(DrawCall& call) {
-	if(call.Partition == DrawPartition::Multi) {
-		// TODO(Implement): Pack meshes together and issue a single draw call
-		return;
-	}
+	// if(call.TypeOptions.Partition == DrawPartition::Multi) {
+	// 	// TODO(Implement): Pack meshes together and issue a single draw call
+	// 	return;
+	// }
 
 	auto& indices	 = call.IndexBuffer;
 	auto& geometry	 = call.GeometryBuffer;
@@ -251,26 +216,27 @@ static void DrawMesh(DrawCall& call) {
 	uint32_t indexCount = indices.GetCount();
 	uint32_t instanceCount = transforms.GetCount();
 
-	s_Data.GeometryBuffer->SetData(geometry);
+	auto array = s_Data.Arrays[call.Command].Array;
+	array->GetVertexBuffer(0)->SetData(geometry);
 
-	if(call.Type == DrawType::Indexed)
-		s_Data.Indices->SetData(indices);
+	// if(call.Type == DrawType::Indexed)
+	// 	s_Data.Indices->SetData(indices);
 
-	if(call.Partition == DrawPartition::Single) {
-		if(call.Type == DrawType::Array)
-			glDrawArrays(GL_TRIANGLES, 0, indexCount);
-		else
-			glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
-	}
-	else if(call.Partition == DrawPartition::Instanced) {
-		s_Data.TransformBuffer->SetData(transforms);
+	// if(call.Partition == DrawPartition::Single) {
+	// 	if(call.Type == DrawType::Array)
+	// 		glDrawArrays(GL_TRIANGLES, 0, indexCount);
+	// 	else
+	// 		glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
+	// }
+	// else if(call.Partition == DrawPartition::Instanced) {
+	// 	s_Data.TransformBuffer->SetData(transforms);
 
-		if(call.Type == DrawType::Array)
-			glDrawArraysInstanced(GL_TRIANGLES, 0, indexCount, instanceCount);
-		else
-			glDrawElementsInstanced(GL_TRIANGLES, indexCount,
-									GL_UNSIGNED_INT, 0, instanceCount);
-	}
+	// 	if(call.Type == DrawType::Array)
+	// 		glDrawArraysInstanced(GL_TRIANGLES, 0, indexCount, instanceCount);
+	// 	else
+	// 		glDrawElementsInstanced(GL_TRIANGLES, indexCount,
+	// 								GL_UNSIGNED_INT, 0, instanceCount);
+	// }
 }
 
 static void SubmitDrawCall(DrawCall& call) {

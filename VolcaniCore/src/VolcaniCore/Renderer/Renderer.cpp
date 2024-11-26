@@ -71,9 +71,31 @@ void DrawCommand::AddMesh(Ref<Mesh> mesh, const glm::mat4& transform) {
 
 void Renderer::Init() {
 	s_Frame = { };
-	IndexBuffer     = Buffer<uint32_t>(Renderer::MaxIndices);
-	GeometryBuffer  = Buffer<Vertex>(Renderer::MaxVertices);
-	TransformBuffer = Buffer<glm::mat4>(Renderer::MaxInstances);
+	// IndexBuffer     = Buffer<uint32_t>(Renderer::MaxIndices);
+	// GeometryBuffer  = Buffer<Vertex>(Renderer::MaxVertices);
+	// TransformBuffer = Buffer<glm::mat4>(Renderer::MaxInstances);
+
+	BufferLayout vertex =
+	{
+		{
+			{ "Coordinate", BufferDataType::Vec3 },
+			{ "Normal",		BufferDataType::Vec3 },
+			{ "TexCoord_Color", BufferDataType::Vec4 },
+		},
+		true, // Dynamic
+		false // Structure of arrays
+	};
+
+	BufferLayout instance =
+	{
+		{
+			{ "Transform", BufferDataType::Mat4 }
+		},
+		true, // Dynamic
+		true // Structure of arrays
+	};
+
+	
 }
 
 void Renderer::Close() {

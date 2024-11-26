@@ -2,6 +2,7 @@
 
 #include "Object/Cubemap.h"
 #include "Object/Framebuffer.h"
+#include "Object/Shader.h"
 
 #include "Core/Buffer.h"
 
@@ -17,12 +18,12 @@ struct DrawCommand {
 
 	BufferLayout VertexLayout;
 	BufferLayout InstanceLayout;
-	Ref<ShaderPipeline> Pipeline;
 
 	List<DrawCall> Calls;
 };
 
 struct DrawCall {
+	DrawCommand* Command;
 	Buffer<void> Vertices;
 	Buffer<uint32_t> Indices;
 	Buffer<void> InstanceData;
@@ -46,7 +47,7 @@ struct DrawCall {
 		} Cull = CullingMode::Back;
 	} const ModeOptions;
 
-	class Types {
+	struct Types {
 		enum class PrimitiveType {
 			Point,
 			Line,
@@ -82,7 +83,7 @@ public:
 	virtual void EndFrame() = 0;
 
 	virtual DrawCommand CreateDrawCommand(
-		BufferLayout vertexLayout, BufferLayout instanceLayout = { }) = 0;
+		const BufferLayout& vertex, const BufferLayout& instance = { }) = 0;
 
 	virtual void SubmitDrawCommand(DrawCommand& command) = 0;
 
