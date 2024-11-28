@@ -5,7 +5,8 @@
 #include <VolcaniCore/Core/Time.h>
 #include <VolcaniCore/Core/Defines.h>
 #include <VolcaniCore/Core/UUID.h>
-#include <VolcaniCore/Core/TypeID.h>
+
+#include "Core/TypeID.h"
 
 #include "Entity.h"
 #include "Component.h"
