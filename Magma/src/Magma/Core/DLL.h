@@ -7,18 +7,21 @@ namespace Magma {
 template<typename TReturn, class ...Args>
 using Function = TReturn(*)(Args...);
 
-Function<void> Func;
-
 class DLL {
 public:
 	DLL(const std::string& path);
 	~DLL();
 
-	template<typename TReturn, class ...Args>
-	Function<TReturn, Args...> GetFunction(const std::string& name);
+	template<typename TReturn, typename ...Args>
+	Function<TReturn, Args...> GetFunction(const std::string& name) {
+		return (Function<TReturn, Args...>)GetFunc(m_Handle, name);
+	}
 
 private:
 	void* m_Handle;
+
+private:
+	static Function<void> GetFunc(void* handle, const std::string& name);
 };
 
 }
