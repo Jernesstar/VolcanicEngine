@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Core/Defines.h"
-
 namespace Demo {
 
 class Template : public Application {

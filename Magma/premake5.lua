@@ -14,9 +14,10 @@ project "Magma"
 
     includedirs {
         "src/Magma",
+
         "%{RootPath}/VolcaniCore/src",
         "%{RootPath}/VolcaniCore/src/VolcaniCore",
-        "%{RootPath}/VolcaniCore/src/impl/",
+        "%{RootPath}/VolcaniCore/src/impl",
 
         "%{Includes.imgui}/imgui",
         "%{Includes.yaml_cpp}",

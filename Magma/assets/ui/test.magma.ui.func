@@ -1,0 +1,15 @@
+#pragma once
+
+class Clickable {
+public:
+	virtual void OnClick() {
+		// Creates OnClickEvent(ID)
+	}
+};
+
+class Button1 : public Clickable {
+public:
+	void OnClick() override {
+		Clickable::OnClick();
+	}
+};
