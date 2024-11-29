@@ -38,8 +38,7 @@ public:
 	static void StartPass(Ref<RenderPass> pass);
 	static void EndPass();
 
-	static void NewDrawCall() { }
-	static void Flush() { }
+	static void NewDrawCommand();
 
 	static void Clear(const glm::vec4& color = glm::vec4(0.0f)) { }
 	static void Resize(uint32_t width, uint32_t height) { }

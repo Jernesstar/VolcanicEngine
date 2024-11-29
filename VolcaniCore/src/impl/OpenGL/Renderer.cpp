@@ -27,11 +27,12 @@ struct BackendBuffer {
 	Ref<VertexArray> Array;
 	Buffer<void> Vertices;
 	Buffer<uint32_t> Indices;
-	Buffer<void> InstanceData;
+	Buffer<void> Instances;
 };
 
 struct RendererData {
 	Map<DrawBuffer*, BackendBuffer> Arrays;
+	List<DrawCommand> Commands;
 };
 
 static RendererData s_Data;
@@ -55,6 +56,11 @@ void Renderer::Close() {
 
 static void Clear();
 static void Resize(uint32_t width, uint32_t height);
+
+static void FlushCommand(DrawCommand& command);
+static void FlushCalls();
+static void FlushCall(DrawCall& call);
+
 static void SetOptions(DrawCall& call);
 static void SetUniforms(DrawCall& call);
 
@@ -67,7 +73,7 @@ void Renderer::StartFrame() {
 }
 
 void Renderer::EndFrame() {
-
+	FlushCalls();
 }
 
 DrawBuffer* Renderer::NewDrawBuffer(DrawBufferSpecification& specs,
@@ -94,9 +100,9 @@ DrawBuffer* Renderer::NewDrawBuffer(DrawBufferSpecification& specs,
 			BackendBuffer
 			{
 				array,
-				Buffer<void>(specs.MaxVertexCount * specs.VertexLayout.Stride),
+				Buffer<void>(specs.MaxVertexCount, specs.VertexLayout.Stride),
 				Buffer<uint32_t>(specs.MaxIndexCount),
-				Buffer<void>(specs.MaxInstanceCount * specs.VertexLayout.Stride)
+				Buffer<void>(specs.MaxInstanceCount, specs.VertexLayout.Stride)
 			};
 	}
 
@@ -119,20 +125,33 @@ DrawBuffer* Renderer::GetDrawBuffer(DrawBufferSpecification& specs) {
 	return NewDrawBuffer(specs);
 }
 
+void Renderer::SetBufferData(DrawBuffer* buffer, uint32_t bufferIndex,
+							 void* data, uint64_t count)
+{
+	auto backendBuffer = s_Data.Arrays[buffer];
+	if(bufferIndex == 0)
+		if(count == 0)
+			backendBuffer.Indices.Clear();
+		else
+			backendBuffer.Indices.Add(data, count);
+	else if(bufferIndex == 1)
+		if(count == 0)
+			backendBuffer.Vertices.Clear();
+		else
+			backendBuffer.Vertices.Add(data, count);
+	else if(bufferIndex == 2)
+		if(count == 0)
+			backendBuffer.Instances.Clear();
+		else
+			backendBuffer.Instances.Add(data, count);
+}
+
 void Renderer::ReleaseBuffer(DrawBuffer* buffer) {
 	s_Data.Arrays.erase(buffer);
 }
 
 void Renderer::Submit(DrawCall& call) {
-	call.Pipeline->As<OpenGL::ShaderProgram>()->Bind();
-
-	auto array = s_Data.Arrays[call.Buffer].Array;
-	array->GetVertexBuffer(0)->SetData(call.Buffer->Vertices);
-
-	if(call.IndexCount)
-		array->GetIndexBuffer()->SetData(call.Buffer->Indices);
-	if(call.InstanceCount)
-		array->GetVertexBuffer(1)->SetData(call.Buffer->Instances);
+	// call.Pipeline->As<OpenGL::ShaderProgram>()->Bind();
 
 	SetOptions(call);
 	SetUniforms(call);
@@ -166,7 +185,7 @@ static void DrawLine(DrawCall& call) {
 static void DrawMesh(DrawCall& call) {
 	if(call.Partition == PartitionType::MultiDraw) {
 		// TODO(Implement): Pack meshes together and issue a single draw call
-		// return;
+		return;
 	}
 	else if(call.Partition == PartitionType::Single) {
 		if(call.IndexCount == 0)

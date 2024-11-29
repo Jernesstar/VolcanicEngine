@@ -13,11 +13,15 @@ namespace VolcaniCore {
 
 struct DrawBufferSpecification;
 struct DrawBuffer;
+struct DrawPass;
+struct DrawCommand;
 struct DrawCall;
 
 class RendererAPI {
 public:
 	enum class Backend { OpenGL, Vulkan, DirectX };
+
+	static const uint32_t MaxTextureSlots;
 
 public:
 	static void Create(RendererAPI::Backend backend);
@@ -31,14 +35,16 @@ public:
 	virtual ~RendererAPI() = default;
 
 	virtual void StartFrame() = 0;
-	virtual void EndFrame()   = 0;
+	virtual void EndFrame() = 0;
 
 	virtual DrawBuffer* NewDrawBuffer(DrawBufferSpecification& specs,
 									  void* data = nullptr) = 0;
 	virtual DrawBuffer* GetDrawBuffer(DrawBufferSpecification& specs) = 0;
+	virtual void SetBufferData(DrawBuffer* buffer, uint32_t bufferIndex,
+							   void* data, uint64_t count) = 0;
 	virtual void ReleaseBuffer(DrawBuffer* buffer) = 0;
 
-	virtual void Submit(DrawCall& call) = 0;
+	virtual void SubmitCommand(DrawCommand& command) = 0;
 
 	RendererAPI::Backend GetBackend() const { return m_Backend; }
 
@@ -64,10 +70,55 @@ struct DrawBufferSpecification {
 
 struct DrawBuffer {
 	DrawBufferSpecification Specs;
+};
 
-	Buffer<void> Vertices;
-	Buffer<uint32_t> Indices;
-	Buffer<void> Instances;
+struct DrawCommand {
+	DrawBuffer* BufferData;
+	// Uniforms UniformData;
+	Ref<ShaderPipeline> Pipeline;
+	Ref<Framebuffer> Output;
+	List<DrawCall> Calls;
+
+	uint32_t ViewportWidth = 0;
+	uint32_t ViewportHeight = 0;
+
+	uint64_t VerticesIndex	= 0;
+	uint64_t IndicesIndex	= 0;
+	uint64_t InstancesIndex = 0;
+
+	void AddIndices(Buffer<uint32_t> data) {
+		RendererAPI::Get()
+			->SetBufferData(BufferData, 0, data.Get(), data.GetCount());
+		IndicesIndex += data.GetCount();
+	}
+
+	template<typename T>
+	void AddVertices(Buffer<T> data) {
+		RendererAPI::Get()
+			->SetBufferData(BufferData, 1, data.Get(), data.GetCount());
+		VerticesIndex += data.GetCount();
+	}
+
+	template<typename T>
+	void AddInstances(Buffer<T> data) {
+		RendererAPI::Get()
+			->SetBufferData(BufferData, 2, data.Get(), data.GetCount());
+		InstancesIndex += data.GetCount();
+	}
+
+	void ClearBuffers() {
+		RendererAPI::Get()->SetBufferData(BufferData, 0, nullptr, 0);
+		RendererAPI::Get()->SetBufferData(BufferData, 1, nullptr, 0);
+		RendererAPI::Get()->SetBufferData(BufferData, 2, nullptr, 0);
+
+		VerticesIndex  = 0;
+		IndicesIndex   = 0;
+		InstancesIndex = 0;
+	}
+
+	DrawCall& NewDrawCall() {
+		return Calls.emplace_back(VerticesIndex, 0, IndicesIndex, 0);
+	}
 };
 
 enum class DepthTestingMode { On, Off };
@@ -78,10 +129,6 @@ enum class PrimitiveType { Point, Line, Triangle, Cubemap };
 enum class PartitionType { Single, Instanced, MultiDraw };
 
 struct DrawCall {
-	// TODO(Change): Replace with DrawCommand
-	DrawBuffer* Buffer;
-	Ref<ShaderPipeline> Pipeline;
-
 	uint64_t VertexStart   = 0;
 	uint64_t VertexCount   = 0;
 	uint64_t IndexCount	   = 0;

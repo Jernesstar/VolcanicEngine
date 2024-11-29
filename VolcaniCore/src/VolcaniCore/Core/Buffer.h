@@ -97,6 +97,9 @@ public:
 		memcpy(m_Data + m_Count, list.data(), list.size() * sizeof(T));
 		m_Count += list.size();
 	}
+	void Add(void* data, uint64_t count) {
+		memcpy(m_Data + m_Count, data, count * sizeof(T));
+	}
 
 	void Clear() {
 		m_Count = 0;
@@ -140,18 +143,11 @@ class Buffer<void> {
 public:
 	Buffer() = default;
 
-	Buffer(uint64_t maxSize)
-		: m_Count(0)
+	Buffer(uint64_t size, uint32_t maxCount)
+		: m_SizeT(size), m_MaxCount(maxCount)
 	{
-		// if(maxCount != 0)
-			m_Data = malloc(maxSize);
+		m_Data = malloc(m_SizeT * m_MaxCount);
 	}
-	// Buffer(uint64_t maxCount)
-	// 	: m_MaxCount(maxCount), m_Count(0)
-	// {
-	// 	if(maxCount != 0)
-	// 		m_Data = malloc(m_MaxCount);
-	// }
 	Buffer(const Buffer& other)
 		: m_MaxCount(other.GetMaxCount()), m_Count(other.GetCount())
 	{
@@ -233,6 +229,9 @@ public:
 	// 	memcpy(m_Data + m_Count, list.data(), list.size() * m_SizeT);
 	// 	m_Count += list.size();
 	// }
+	void Add(void* data, uint64_t count) {
+		memcpy(m_Data + m_Count, data, count * m_SizeT);
+	}
 
 	void Clear() {
 		m_Count = 0;

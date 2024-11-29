@@ -10,15 +10,13 @@
 
 namespace VolcaniCore {
 
-// static void FlushDrawCalls();
-
 const uint64_t Renderer::MaxTriangles = 1'000'000;
 const uint64_t Renderer::MaxIndices   = MaxVertices  * 3; /* (3.0f / 2.0f) */
 const uint64_t Renderer::MaxVertices  = MaxTriangles * 3;
 const uint64_t Renderer::MaxInstances = 200'000;
 
 static Ref<RenderPass> s_RenderPass;
-static DrawCall* s_DrawCall;
+static DrawCommand* s_DrawCommand;
 static FrameData s_Frame;
 
 static uint64_t DrawCallCount;
@@ -26,8 +24,7 @@ static uint64_t IndexCount;
 static uint64_t VertexCount;
 static uint64_t TransformCount;
 
-void Renderer::Init()
-{
+void Renderer::Init() {
 	s_Frame = { };
 
 	Renderer2D::Init();
@@ -47,14 +44,12 @@ void Renderer::BeginFrame() {
 }
 
 void Renderer::EndFrame() {
-	Flush();
-
 	s_Frame.Info.DrawCalls = DrawCallCount;
 	s_Frame.Info.Indices   = IndexCount;
 	s_Frame.Info.Vertices  = VertexCount;
 	s_Frame.Info.Instances = TransformCount;
 
-	// s_DrawCommand->Clear();
+	s_DrawCommand->ClearBuffers();
 }
 
 void Renderer::StartPass(Ref<RenderPass> pass) {
@@ -62,6 +57,10 @@ void Renderer::StartPass(Ref<RenderPass> pass) {
 }
 
 void Renderer::EndPass() {
+
+}
+
+void Renderer::NewDrawCommand() {
 
 }
 
