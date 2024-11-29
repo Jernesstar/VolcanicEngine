@@ -38,16 +38,13 @@ public:
 	static void StartPass(Ref<RenderPass> pass);
 	static void EndPass();
 
-	static void NewDrawCall();
-	static void Flush();
+	static void NewDrawCall() { }
+	static void Flush() { }
 
-	static void Clear(const glm::vec4& color = glm::vec4(0.0f));
-	static void Resize(uint32_t width, uint32_t height);
-
-	// static void PushOptions(const RendererAPI::Options& options);
+	static void Clear(const glm::vec4& color = glm::vec4(0.0f)) { }
+	static void Resize(uint32_t width, uint32_t height) { }
 
 	static Ref<RenderPass> GetPass();
-	static DrawBuffer& GetDrawBuffer();
 	static FrameDebugInfo GetDebugInfo();
 
 private:

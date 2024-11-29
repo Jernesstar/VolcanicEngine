@@ -36,10 +36,9 @@ public:
 	virtual DrawBuffer* NewDrawBuffer(DrawBufferSpecification& specs,
 									  void* data = nullptr) = 0;
 	virtual DrawBuffer* GetDrawBuffer(DrawBufferSpecification& specs) = 0;
+	virtual void ReleaseBuffer(DrawBuffer* buffer) = 0;
 
 	virtual void Submit(DrawCall& call) = 0;
-
-	virtual void ReleaseBuffer(DrawBuffer* buffer) = 0;
 
 	RendererAPI::Backend GetBackend() const { return m_Backend; }
 
@@ -79,10 +78,9 @@ enum class PrimitiveType { Point, Line, Triangle, Cubemap };
 enum class PartitionType { Single, Instanced, MultiDraw };
 
 struct DrawCall {
+	// TODO(Change): Replace with DrawCommand
 	DrawBuffer* Buffer;
 	Ref<ShaderPipeline> Pipeline;
-	// TODO(Change): Perhaps?
-	// Uniforms Uniforms;
 
 	uint64_t VertexStart   = 0;
 	uint64_t VertexCount   = 0;

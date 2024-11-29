@@ -182,7 +182,6 @@ void EditorLayer::Render() {
 		ReopenTab();
 	if(menu.tab.closeTab)
 		CloseTab(m_CurrentTab);
-
 }
 
 void EditorLayer::NewTab(Ref<Tab> tab) {

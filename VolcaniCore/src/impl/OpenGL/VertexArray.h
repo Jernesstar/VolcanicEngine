@@ -2,11 +2,11 @@
 
 #include <vector>
 
-#include <Core/Defines.h>
+#include <VolcaniCore/Core/Defines.h>
+#include <VolcaniCore/Renderer/BufferLayout.h>
 
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
-#include "BufferLayout.h"
 
 namespace VolcaniCore::OpenGL {
 

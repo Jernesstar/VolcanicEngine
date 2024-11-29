@@ -144,18 +144,18 @@ void Bloom::OnUpdate(TimeStep ts) {
 	{
 		Renderer::GetPass()->SetGlobalUniforms();
 
-		Renderer::GetDrawCommand().GetUniforms()
-		.Set("u_SrcResolution",
-			[&]() -> glm::vec2
-			{
-				return { window->GetWidth(), window->GetHeight() };
-			})
-		.Set("u_SrcTexture",
-			[&]() -> TextureSlot
-			{
-				src->Bind(AttachmentTarget::Color, 0);
-				return { };
-			});
+		// Renderer::GetDrawCommand().GetUniforms()
+		// .Set("u_SrcResolution",
+		// 	[&]() -> glm::vec2
+		// 	{
+		// 		return { window->GetWidth(), window->GetHeight() };
+		// 	})
+		// .Set("u_SrcTexture",
+		// 	[&]() -> TextureSlot
+		// 	{
+		// 		src->Bind(AttachmentTarget::Color, 0);
+		// 		return { };
+		// 	});
 
 		Downsample();
 	}
@@ -201,21 +201,21 @@ void Bloom::OnUpdate(TimeStep ts) {
 				return bloomStrength;
 			});
 
-		auto& uniforms = Renderer::GetDrawCommand().GetUniforms()
-		.Set("u_BloomTexture",
-			[&]() -> TextureSlot
-			{
-				mips->Bind(AttachmentTarget::Color, 0);
-				return { };
-			})
-		.Set("u_SceneTexture",
-			[&]() -> TextureSlot
-			{
-				src->Bind(AttachmentTarget::Color, 1);
-				return { };
-			});
+		// auto& uniforms = Renderer::GetDrawCommand().GetUniforms()
+		// .Set("u_BloomTexture",
+		// 	[&]() -> TextureSlot
+		// 	{
+		// 		mips->Bind(AttachmentTarget::Color, 0);
+		// 		return { };
+		// 	})
+		// .Set("u_SceneTexture",
+		// 	[&]() -> TextureSlot
+		// 	{
+		// 		src->Bind(AttachmentTarget::Color, 1);
+		// 		return { };
+		// 	});
 
-		Renderer::GetPass()->SetUniforms(uniforms);
+		// Renderer::GetPass()->SetUniforms(uniforms);
 
 		// RendererAPI::Get()->Resize(window->GetWidth(), window->GetHeight());
 		// RendererAPI::Get()->RenderFramebuffer(mips, AttachmentTarget::Color);
@@ -257,32 +257,32 @@ void Bloom::InitMips() {
 
 void Bloom::Downsample() {
 	for(const auto& mip : mipChain) {
-		auto& uniforms = Renderer::GetDrawCommand().GetUniforms()
-		.Set("WriteTexture",
-			[mip, &mips = mips]() -> TextureSlot
-			{
-				mips->Set(AttachmentTarget::Color, mip.Sampler);
-				return { };
-			});
+		// auto& uniforms = Renderer::GetDrawCommand().GetUniforms()
+		// .Set("WriteTexture",
+		// 	[mip, &mips = mips]() -> TextureSlot
+		// 	{
+		// 		mips->Set(AttachmentTarget::Color, mip.Sampler);
+		// 		return { };
+		// 	});
 
-		Renderer::GetPass()->SetUniforms(uniforms);
+		// Renderer::GetPass()->SetUniforms(uniforms);
 
-		RendererAPI::Get()->RenderFramebuffer(mips, AttachmentTarget::Color);
+		// RendererAPI::Get()->RenderFramebuffer(mips, AttachmentTarget::Color);
 
 		Renderer::Flush();
-		Renderer::NewDrawCommand();
+		// Renderer::NewDrawCommand();
 
-		Renderer::GetDrawCommand().GetUniforms()
-		.Set("u_SrcResolution",
-			[mip]() -> glm::vec2
-			{
-				return mip.Size;
-			})
-		.Set("u_SrcTexture",
-			[mip]() -> TextureSlot
-			{
-				return { mip.Sampler, 0 };
-			});
+		// Renderer::GetDrawCommand().GetUniforms()
+		// .Set("u_SrcResolution",
+		// 	[mip]() -> glm::vec2
+		// 	{
+		// 		return mip.Size;
+		// 	})
+		// .Set("u_SrcTexture",
+		// 	[mip]() -> TextureSlot
+		// 	{
+		// 		return { mip.Sampler, 0 };
+		// 	});
 	}
 }
 
@@ -291,30 +291,30 @@ void Bloom::Upsample() {
 		const BloomMip& mip = mipChain[i];
 		const BloomMip& nextMip = mipChain[i - 1];
 
-		Renderer::SetOptions(
-			{
-				.Blending = RendererAPI::Options::BlendingMode::Additive
-			});
+		// Renderer::SetOptions(
+		// 	{
+		// 		.Blending = RendererAPI::Options::BlendingMode::Additive
+		// 	});
 
-		auto& uniforms = Renderer::GetDrawCommand().GetUniforms()
-		.Set("u_SrcTexture",
-			[mip]() -> TextureSlot
-			{
-				return { mip.Sampler, 0 };
-			})
-		.Set("WriteTexture",
-			[nextMip, &mips = mips]() -> TextureSlot
-			{
-				mips->Set(AttachmentTarget::Color, nextMip.Sampler);
-				return { };
-			});
+		// auto& uniforms = Renderer::GetDrawCommand().GetUniforms()
+		// .Set("u_SrcTexture",
+		// 	[mip]() -> TextureSlot
+		// 	{
+		// 		return { mip.Sampler, 0 };
+		// 	})
+		// .Set("WriteTexture",
+		// 	[nextMip, &mips = mips]() -> TextureSlot
+		// 	{
+		// 		mips->Set(AttachmentTarget::Color, nextMip.Sampler);
+		// 		return { };
+		// 	});
 
-		Renderer::GetPass()->SetUniforms(uniforms);
+		// Renderer::GetPass()->SetUniforms(uniforms);
 
-		RendererAPI::Get()->RenderFramebuffer(mips, AttachmentTarget::Color);
+		// RendererAPI::Get()->RenderFramebuffer(mips, AttachmentTarget::Color);
 
 		Renderer::Flush();
-		Renderer::NewDrawCommand();
+		// Renderer::NewDrawCommand();
 	}
 }
 

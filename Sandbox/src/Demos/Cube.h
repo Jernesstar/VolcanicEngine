@@ -162,7 +162,7 @@ void Cube::OnUpdate(TimeStep ts) {
 	Renderer::EndPass();
 	Renderer::Flush();
 
-	RendererAPI::Get()->RenderFramebuffer(framebuffer, AttachmentTarget::Color);
+	// RendererAPI::Get()->RenderFramebuffer(framebuffer, AttachmentTarget::Color);
 
 	UI::End();
 }

@@ -96,9 +96,10 @@ void Shadows::OnUpdate(TimeStep ts) {
 				return depthCamera->GetViewProjection();
 			});
 
-		Renderer::PushOptions({
-				.Cull = RendererAPI::Options::CullingMode::Front
-			});
+		// Renderer::PushOptions(
+		// 	{
+		// 		.Cull = RendererAPI::Options::CullingMode::Front
+		// 	});
 
 		RenderScene();
 	}

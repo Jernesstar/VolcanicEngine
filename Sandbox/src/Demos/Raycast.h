@@ -173,16 +173,16 @@ void Raycast::OnUpdate(TimeStep ts) {
 	Renderer::EndPass();
 	Renderer::Flush();
 
-	// 4. Render full-screen quad that creates outline
+	// 3. Render full-screen quad that creates outline
 	Renderer::StartPass(outlinePass);
 	{
 		auto mask = maskPass->GetOutput();
 
-		RendererAPI::Get()->RenderFramebuffer(mask, AttachmentTarget::Color);
+		// RendererAPI::Get()->RenderFramebuffer(mask, AttachmentTarget::Color);
 	}
 	Renderer::EndPass();
 
-	// 6. Draw selected object
+	// 4. Draw selected object
 	Renderer::StartPass(drawPass);
 	{
 		Renderer3D::Begin(camera);

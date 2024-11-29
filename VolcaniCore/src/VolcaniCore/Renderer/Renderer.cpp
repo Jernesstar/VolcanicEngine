@@ -10,7 +10,7 @@
 
 namespace VolcaniCore {
 
-static void FlushDrawCalls();
+// static void FlushDrawCalls();
 
 const uint64_t Renderer::MaxTriangles = 1'000'000;
 const uint64_t Renderer::MaxIndices   = MaxVertices  * 3; /* (3.0f / 2.0f) */
@@ -26,7 +26,8 @@ static uint64_t IndexCount;
 static uint64_t VertexCount;
 static uint64_t TransformCount;
 
-void Renderer::Init() {
+void Renderer::Init()
+{
 	s_Frame = { };
 
 	Renderer2D::Init();
@@ -54,6 +55,26 @@ void Renderer::EndFrame() {
 	s_Frame.Info.Instances = TransformCount;
 
 	// s_DrawCommand->Clear();
+}
+
+void Renderer::StartPass(Ref<RenderPass> pass) {
+	
+}
+
+void Renderer::EndPass() {
+
+}
+
+Ref<RenderPass> Renderer::GetPass() {
+	// return s_RenderPass;
+}
+
+FrameDebugInfo Renderer::GetDebugInfo() {
+	return s_Frame.Info;
+}
+
+FrameData& Renderer::GetFrame() {
+	return s_Frame;
 }
 
 }

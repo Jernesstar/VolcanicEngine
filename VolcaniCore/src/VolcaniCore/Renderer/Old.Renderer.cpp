@@ -80,7 +80,7 @@
 // 		{
 // 			{ "Coordinate", BufferDataType::Vec3 },
 // 			{ "Normal",		BufferDataType::Vec3 },
-// 			{ "TexCoord_Color", BufferDataType::Vec4 },
+// 			{ "TexCoord", BufferDataType::Vec4 },
 // 		},
 // 		true, // Dynamic
 // 		false // Structure of arrays
@@ -243,7 +243,7 @@
 
 // 	// 	p0.Position = point->Position * transform[0];
 // 	// 	p0.Normal = glm::vec3(0.0f);
-// 	// 	p0.TexCoord_Color = point->Color;
+// 	// 	p0.TexCoord = point->Color;
 
 // 	// 	pointCall.GeometryBuffer->Add(p0);
 // 	// }
@@ -259,11 +259,11 @@
 
 // 	// 	p0.Position		  = line.P0.Position * transform[0];
 // 	// 	p0.Normal		  = glm::vec3(0.0f);
-// 	// 	p0.TexCoord_Color = line.P0.Color;
+// 	// 	p0.TexCoord = line.P0.Color;
 
 // 	// 	p1.Position		  = line.P1.Position * transform[0];
 // 	// 	p1.Normal		  = glm::vec3(0.0f);
-// 	// 	p1.TexCoord_Color = line.P1.Color;
+// 	// 	p1.TexCoord = line.P1.Color;
 
 // 	// 	lineCall.GeometryBuffer->Add(p0);
 // 	// 	lineCall.GeometryBuffer->Add(p1);

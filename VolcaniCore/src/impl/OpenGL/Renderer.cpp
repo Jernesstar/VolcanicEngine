@@ -94,9 +94,9 @@ DrawBuffer* Renderer::NewDrawBuffer(DrawBufferSpecification& specs,
 			BackendBuffer
 			{
 				array,
-				Buffer<void>(specs.MaxVertexCount),
+				Buffer<void>(specs.MaxVertexCount * specs.VertexLayout.Stride),
 				Buffer<uint32_t>(specs.MaxIndexCount),
-				Buffer<void>(specs.MaxInstanceCount)
+				Buffer<void>(specs.MaxInstanceCount * specs.VertexLayout.Stride)
 			};
 	}
 
@@ -117,6 +117,10 @@ DrawBuffer* Renderer::GetDrawBuffer(DrawBufferSpecification& specs) {
 			return buffer;
 
 	return NewDrawBuffer(specs);
+}
+
+void Renderer::ReleaseBuffer(DrawBuffer* buffer) {
+	s_Data.Arrays.erase(buffer);
 }
 
 void Renderer::Submit(DrawCall& call) {

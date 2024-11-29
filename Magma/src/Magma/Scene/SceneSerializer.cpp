@@ -21,9 +21,9 @@ template<>
 Serializer& Serializer::Write(const VolcaniCore::Vertex& value) {
 	SetOptions(Serializer::Options::ArrayOneLine);
 	BeginSequence();
-	Write(value.Position);
-	Write(value.Normal);
-	Write(value.TexCoord_Color);
+		Write(value.Position);
+		Write(value.Normal);
+		Write(value.TexCoord);
 	EndSequence();
 	return *this;
 }
@@ -467,7 +467,7 @@ struct convert<VolcaniCore::Vertex> {
 		Node node;
 		node.push_back(vertex.Position);
 		node.push_back(vertex.Normal);
-		node.push_back(vertex.TexCoord_Color);
+		node.push_back(vertex.TexCoord);
 		node.SetStyle(EmitterStyle::Flow);
 		return node;
 	}
@@ -476,9 +476,9 @@ struct convert<VolcaniCore::Vertex> {
 		if(!node.IsSequence() || node.size() != 3)
 			return false;
 
-		vertex.Position		  = node[0].as<glm::vec3>();
-		vertex.Normal		  = node[1].as<glm::vec3>();
-		vertex.TexCoord_Color = node[2].as<glm::vec4>();
+		vertex.Position = node[0].as<glm::vec3>();
+		vertex.Normal	= node[1].as<glm::vec3>();
+		vertex.TexCoord = node[2].as<glm::vec2>();
 		return true;
 	}
 };

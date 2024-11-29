@@ -15,6 +15,7 @@ public:
 	DrawBuffer* NewDrawBuffer(DrawBufferSpecification& specs,
 							  void* data = nullptr) override;
 	DrawBuffer* GetDrawBuffer(DrawBufferSpecification& specs) override;
+	void ReleaseBuffer(DrawBuffer* buffer) override;
 
 	void Submit(DrawCall& call) override;
 

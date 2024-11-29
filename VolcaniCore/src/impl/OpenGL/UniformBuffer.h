@@ -13,7 +13,7 @@ using namespace VolcaniCore;
 
 namespace VolcaniCore::OpenGL {
 
-class UniformBuffer : Buffer{
+class UniformBuffer /* : public UniformBuffer */ {
 public:
 	// const std::string Name;
 	const BufferLayout Layout;
