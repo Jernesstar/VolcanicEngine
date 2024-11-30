@@ -1,5 +1,7 @@
 #pragma once
 
+#include "UIEngine.h"
+#include "UIPage.h"
 #include "UIElement.h"
 #include "UIBuilder.h"
 #include "UISerializer.h"
@@ -10,14 +12,3 @@
 #include "Image.h"
 #include "Text.h"
 #include "TextInput.h"
-
-using namespace VolcaniCore;
-
-namespace Magma::UI {
-
-void Init();
-void Close();
-void Begin();
-void End();
-
-}

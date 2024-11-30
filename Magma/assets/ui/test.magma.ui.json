@@ -1,0 +1,40 @@
+{
+    "Theme":
+    {
+        "Window":
+        {
+            "Border": {
+                "Width": 0.0,
+                "Height": 0.0,
+                "Image": "assets/image/aesthetic_window_border.png"
+            },
+            "Color": [0.3, 0.4, 0.6]
+        },
+
+        "Button": {}
+    },
+
+    "Elements":
+    [
+        {
+            "ID": "Window1",
+            "Type": "Window",
+            "Width": 200,
+            "Height": 400
+        },
+        {
+            "ID": "Button1",
+            "Type": "Button",
+            "Width": 20,
+            "Height": 40,
+            "OnClick": "@cpp{ UI::UIEngine::SetPage(\"assets/ui/some_other_page.magma.ui.json\") }",
+            // Will use the Button1::OnHover function defined in test.magma.ui.func,
+            "OnHover": "Default",
+            // Define an animation
+            "OnMouseUp": {
+                "Speed": 0.4,
+                "Translate": -2
+            }
+        }
+    ]
+}

@@ -24,7 +24,7 @@ public:
 	};
 
 public:
-	static Ref<UI::Button> Create(const UI::Button::Specification& specs);
+	Ref<UIElement> Display;
 
 public:
 	Button(const glm::vec4& color = glm::vec4(1.0f),
@@ -35,12 +35,8 @@ public:
 
 private:
 	void Draw() override;
-	bool OnAttach() override;
-	bool OnAddElement(Ref<UIElement> element) override;
 
-private:
-	bool m_HasImage = false;
-	Ref<UIElement> m_Display;
+	friend class UIEngine;
 };
 
 }

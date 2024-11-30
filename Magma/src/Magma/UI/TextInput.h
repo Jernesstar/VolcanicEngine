@@ -14,8 +14,6 @@ public:
 
 private:
 	void Draw() override;
-	bool OnAttach() override;
-	bool OnAddElement(Ref<UIElement> element) override;
 };
 
 }

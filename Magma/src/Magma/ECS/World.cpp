@@ -93,7 +93,7 @@ void World::RemoveEntity(const std::string& tag) {
 	GetEntity(tag).Kill();
 }
 
-void World::ForEach(const Func<Entity&, void>& func) {
+void World::ForEach(const Func<void, Entity&>& func) {
 	m_World.defer_begin();
 
 	m_AllEntitiesQuery.each(

@@ -66,17 +66,17 @@ Shadows::Shadows()
 	controller = CameraController{ sceneCamera };
 	controller.TranslationSpeed = 5.0f;
 
-	UI::Init();
+	UI::UIEngine::Init();
 }
 
 Shadows::~Shadows() {
-	UI::Close();
+	UI::UIEngine::Close();
 }
 
 void Shadows::OnUpdate(TimeStep ts) {
 	controller.OnUpdate(ts);
 
-	UI::Begin();
+	UI::UIEngine::BeginFrame();
 	ImGui::Begin("Light");
 	{
 		glm::vec3 position = depthCamera->GetPosition();
@@ -155,7 +155,7 @@ void Shadows::OnUpdate(TimeStep ts) {
 	Renderer::EndPass();
 	Renderer::Flush();
 
-	UI::End();
+	UI::UIEngine::EndFrame();
 }
 
 void Shadows::RenderScene() {

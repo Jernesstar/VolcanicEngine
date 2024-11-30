@@ -31,7 +31,7 @@ using List = std::vector<TValue>;
 template<typename TKey, typename TValue>
 using Map = std::unordered_map<TKey, TValue>;
 
-template<class TInput, typename TReturn>
-using Func = std::function<TReturn(TInput)>;
+template<typename TReturn, typename ...Args>
+using Func = std::function<TReturn(Args...)>;
 
 }

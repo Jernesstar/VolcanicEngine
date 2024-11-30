@@ -11,15 +11,15 @@ namespace Magma::UI {
 
 class UISerializer {
 public:
-	static void Save(Ref<UIElement> ui, const std::string& path);
-	static Ref<UIElement> Load(const std::string& path);
+	static void Save(UIPage* page, const std::string& path);
+	static UIPage* Load(const std::string& path);
 
 private:
 	template<typename TUIElement>
-	static void Serialize(Ref<TUIElement> ui, JSONSerializer& serializer) { }
+	static void Serialize(TUIElement* ui, JSONSerializer& serializer) { }
 
 	template<typename TUIElement>
-	static Ref<TUIElement> Deserialize(JSONParserNode& serializer) { }
+	static TUIElement* Deserialize(JSONParserNode& serializer) { }
 };
 
 }

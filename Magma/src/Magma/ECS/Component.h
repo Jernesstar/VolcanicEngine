@@ -90,7 +90,7 @@ struct TransformComponent : public Component {
 struct ScriptComponent : public Component {
 	// std::string Path;
 	
-	Func<TransformComponent&, void> OnInput;
+	Func<void, TransformComponent&> OnInput;
 
 	ScriptComponent() = default;
 	ScriptComponent(const std::string& path)

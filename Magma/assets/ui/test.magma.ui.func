@@ -5,11 +5,20 @@ public:
 	virtual void OnClick() {
 		// Creates OnClickEvent(ID)
 	}
+	virtual void OnHover() {
+		// Creates OnHoveredEvent(ID)
+	}
+	virtual void OnMouseUp() {
+		// Creates OnMouseUpEvent(ID)
+	}
 };
 
 class Button1 : public Clickable {
 public:
-	void OnClick() override {
-		Clickable::OnClick();
+	void OnHover() override {
+		// TODO(Change): Automatically put this in the generated cpp file
+		Clickable::OnHover();
+
+		UI::UIEngine::ShowPopupLabel("This is Button1");
 	}
 };

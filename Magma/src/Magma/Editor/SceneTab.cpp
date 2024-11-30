@@ -52,25 +52,25 @@ void SceneTab::Setup() {
 	m_Panels.push_back(panel2);
 	// TODO(Implement): ComponentPanel
 
-	m_PlayButton = UI::Button::Create(
-		{
-			.Image = "Magma/assets/icons/PlayButton.png",
-			.Width = 20, .Height = 20,
-			// .OnPressed = [this]() { OnScenePlay(); }
-		});
-	m_PauseButton = UI::Button::Create(
-		{
-			.Image = "Magma/assets/icons/PauseButton.png",
-			.x = 100, .y = 100,
-			.Width = 20, .Height = 20,
-			// .OnPressed = [this]() { OnScenePause(); }
-		});
-	m_StopButton = UI::Button::Create(
-		{
-			.Image = "Magma/assets/icons/StopButton.png",
-			.Width = 20, .Height = 20,
-			// .OnPressed = [this]() { OnSceneStop(); }
-		});
+	// m_PlayButton = UI::Button::Create(
+	// 	{
+	// 		.Image = "Magma/assets/icons/PlayButton.png",
+	// 		.Width = 20, .Height = 20,
+	// 		// .OnPressed = [this]() { OnScenePlay(); }
+	// 	});
+	// m_PauseButton = UI::Button::Create(
+	// 	{
+	// 		.Image = "Magma/assets/icons/PauseButton.png",
+	// 		.x = 100, .y = 100,
+	// 		.Width = 20, .Height = 20,
+	// 		// .OnPressed = [this]() { OnScenePause(); }
+	// 	});
+	// m_StopButton = UI::Button::Create(
+	// 	{
+	// 		.Image = "Magma/assets/icons/StopButton.png",
+	// 		.Width = 20, .Height = 20,
+	// 		// .OnPressed = [this]() { OnSceneStop(); }
+	// 	});
 }
 
 void SceneTab::SetScene(const Scene& scene) {
@@ -231,16 +231,16 @@ void SceneTab::ToolbarUI() {
 		if(m_SceneState == SceneState::Play)
 			button = m_PauseButton;
 
-		button->x = x;
-		button->y = ImGui::GetCursorPosY();
-		button->SetSize(size, size);
-		button->Render();
+		// button->x = x;
+		// button->y = ImGui::GetCursorPosY();
+		// button->SetSize(size, size);
+		// button->Render();
 
-		ImGui::SameLine();
-		m_StopButton->x = ImGui::GetCursorPosX() + 5.0f;
-		m_StopButton->y = ImGui::GetCursorPosY();
-		m_StopButton->SetSize(size, size);
-		m_StopButton->Render();
+		// ImGui::SameLine();
+		// m_StopButton->x = ImGui::GetCursorPosX() + 5.0f;
+		// m_StopButton->y = ImGui::GetCursorPosY();
+		// m_StopButton->SetSize(size, size);
+		// m_StopButton->Render();
 	}
 	ImGui::End();
 

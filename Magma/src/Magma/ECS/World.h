@@ -82,10 +82,10 @@ public:
 		return Ref<TSystem>((TSystem*)m_Systems[id]);
 	}
 
-	void ForEach(const Func<Entity&, void>& func);
+	void ForEach(const Func<void, Entity&>& func);
 
 	template<typename TComponent>
-	void ForEach(const Func<Entity&, void>& func) {
+	void ForEach(const Func<void, Entity&>& func) {
 		flecs::query<TComponent> query = GetQuery<TComponent>();
 
 		query.each(
@@ -97,7 +97,7 @@ public:
 	}
 
 	template<typename ...TComponents>
-	void ForEach(const Func<Entity&, void>& func) {
+	void ForEach(const Func<void, Entity&>& func) {
 		flecs::query<TComponents...> query = GetQuery<TComponents...>();
 
 		query.each(

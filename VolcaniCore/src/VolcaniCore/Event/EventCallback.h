@@ -12,11 +12,11 @@ requires std::derived_from<TEvent, Event>
 class EventCallback {
 public:
 	EventCallback(
-		const Func<TEvent&, void>& callback = [](TEvent& event) { })
+		const Func<void, TEvent&>& callback = [](TEvent& event) { })
 			: m_ID(), m_Callback(callback) { }
 
 	const UUID& GetID() const { return m_ID; }
-	const Func<TEvent&, void>& GetCallback() const {
+	const Func<void, TEvent&>& GetCallback() const {
 		return m_Callback;
 	}
 
@@ -27,7 +27,7 @@ public:
 	EventCallback<TEvent>& operator =(
 		const EventCallback<TEvent>& other) = default;
 	EventCallback<TEvent>& operator =(
-		const Func<TEvent&, void>& callback)
+		const Func<void, TEvent&>& callback)
 	{
 		m_Callback = callback;
 		return *this;
@@ -44,7 +44,7 @@ public:
 
 private:
 	UUID m_ID;
-	Func<TEvent&, void> m_Callback;
+	Func<void, TEvent&> m_Callback;
 };
 
 }

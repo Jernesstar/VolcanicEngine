@@ -218,7 +218,8 @@ void EditorLayer::OpenTab() {
 		if(instance->IsOk()) {
 			fs::path path = instance->GetFilePathName();
 			if(path.extension() == ".json")
-				NewTab(UI::UISerializer::Load(path.string()));
+				;
+				// NewTab(UI::UISerializer::Load(path.string()));
 			else
 				NewTab(Scene(path.string()));
 		}

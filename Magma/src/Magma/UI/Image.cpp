@@ -13,19 +13,6 @@ using namespace VolcaniCore;
 
 namespace Magma::UI {
 
-Ref<UI::Image> Image::Create(const UI::Image::Specification& specs) {
-	Ref<UI::Image> image;
-	if(specs.Path != "")
-		image = CreateRef<UI::Image>(specs.Path);
-	else
-		image = CreateRef<UI::Image>(Texture::Create(specs.Width, specs.Height));
-
-	image->SetPosition(specs.x, specs.y);
-	if(specs.Width && specs.Height)
-		image->SetSize(specs.Width, specs.Height);
-	return image;
-}
-
 Image::Image(Ref<Texture> image)
 	: UIElement(UIElement::Type::Image)
 {
@@ -63,24 +50,7 @@ void Image::SetImage(Ref<Framebuffer> framebuffer, AttachmentTarget target) {
 }
 
 void Image::Draw() {
-	auto image = Content->As<OpenGL::Texture2D>();
 
-	auto v0 = ImVec2(0.0f, 1.0f);
-	auto v1 = ImVec2(1.0f, 0.0f);
-	ImVec2 dim = ImVec2(Width, Height);
-	ImGui::SetCursorPos(ImVec2(x, y));
-	ImGui::Image((ImTextureID)(intptr_t)image->GetID(), dim, v0, v1);
-}
-
-bool Image::OnAttach() {
-	if(m_Parent->GetType() == UIElement::Type::Button)
-		return false; // The button captures the image
-
-	return true;
-}
-
-bool Image::OnAddElement(Ref<UIElement> element) {
-	return false;
 }
 
 }

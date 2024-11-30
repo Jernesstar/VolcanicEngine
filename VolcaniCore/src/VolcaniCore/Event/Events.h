@@ -37,7 +37,7 @@ public:
 
 	template<typename TEvent>
 	requires std::derived_from<TEvent, Event>
-	static UUID RegisterListener(const Func<TEvent&, void>& callback) {
+	static UUID RegisterListener(const Func<void,TEvent&>& callback) {
 		EventCallback<TEvent> eventCallback(callback);
 		RegisterListener<TEvent>(eventCallback);
 		return eventCallback.GetID();

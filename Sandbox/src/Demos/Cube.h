@@ -117,15 +117,15 @@ Cube::Cube()
 	controller.RotationSpeed = 0.0f;
 	controller.TranslationSpeed = 20.0f;
 
-	UI::Init();
+	UI::UIEngine::Init();
 }
 
 Cube::~Cube() {
-	UI::Close();
+	UI::UIEngine::Close();
 }
 
 void Cube::OnUpdate(TimeStep ts) {
-	UI::Begin();
+	UI::UIEngine::BeginFrame();
 
 	controller.OnUpdate(ts);
 
@@ -164,7 +164,7 @@ void Cube::OnUpdate(TimeStep ts) {
 
 	RendererAPI::Get()->RenderFramebuffer(framebuffer, AttachmentTarget::Color);
 
-	UI::End();
+	UI::UIEngine::EndFrame();
 }
 
 }

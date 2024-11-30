@@ -37,7 +37,7 @@ UITab::UITab(Ref<UI::UIElement> root) {
 }
 
 UITab::~UITab() {
-	UI::UISerializer::Save(m_Root, "Magma/assets/scenes/.magma.ui.json");
+	// UI::UISerializer::Save(m_Root, "Magma/assets/scenes/.magma.ui.json");
 }
 
 void UITab::Update(TimeStep ts) {
@@ -119,7 +119,7 @@ void UITab::SetUI(Ref<UI::UIElement> ui) {
 }
 
 void UITab::SetUI(const std::string& path) {
-	SetUI(UI::UISerializer::Load(path));
+	// SetUI(UI::UISerializer::Load(path));
 }
 
 void UITab::NewUI() {
@@ -136,7 +136,7 @@ void UITab::OpenUI() {
 	if(instance->Display("ChooseFile")) {
 		if(instance->IsOk()) {
 			std::string path = instance->GetFilePathName();
-			m_Root = UI::UISerializer::Load(path);
+			// m_Root = UI::UISerializer::Load(path);
 		}
 
 		instance->Close();
@@ -153,7 +153,7 @@ void UITab::SaveUI() {
 	if(instance->Display("ChooseFile")) {
 		if(instance->IsOk()) {
 			std::string path = instance->GetFilePathName();
-			UI::UISerializer::Save(m_Root, path);
+			// UI::UISerializer::Save(m_Root, path);
 		}
 
 		instance->Close();

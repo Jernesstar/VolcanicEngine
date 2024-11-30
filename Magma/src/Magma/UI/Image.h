@@ -18,9 +18,6 @@ public:
 	};
 
 public:
-	static Ref<UI::Image> Create(const UI::Image::Specification& specs);
-
-public:
 	Ref<Texture> Content;
 
 public:
@@ -34,8 +31,6 @@ public:
 
 private:
 	void Draw() override;
-	bool OnAttach() override;
-	bool OnAddElement(Ref<UIElement> element) override;
 };
 
 }

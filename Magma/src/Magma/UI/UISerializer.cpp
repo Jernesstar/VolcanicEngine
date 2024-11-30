@@ -5,43 +5,43 @@
 namespace Magma::UI {
 
 template<>
-void UISerializer::Serialize(Ref<Window> ui, JSONSerializer& serializer) {
+void UISerializer::Serialize(Window* ui, JSONSerializer& serializer) {
 	serializer
 		.WriteKey("BorderWidth").Write(ui->BorderWidth)
 		.WriteKey("BorderHeight").Write(ui->BorderHeight)
 		.WriteKey("BorderColor").Write(ui->BorderColor)
-		.WriteKey("Open").Write(ui->IsOpen());
+		.WriteKey("Open").Write(ui->Open);
 }
 
 template<>
-void UISerializer::Serialize(Ref<Button> ui, JSONSerializer& serializer) {
-
-}
-
-template<>
-void UISerializer::Serialize(Ref<Dropdown> ui, JSONSerializer& serializer) {
+void UISerializer::Serialize(Button* ui, JSONSerializer& serializer) {
 
 }
 
 template<>
-void UISerializer::Serialize(Ref<Text> ui, JSONSerializer& serializer) {
+void UISerializer::Serialize(Dropdown* ui, JSONSerializer& serializer) {
+
+}
+
+template<>
+void UISerializer::Serialize(Text* ui, JSONSerializer& serializer) {
 	serializer
 		.WriteKey("Text").Write(ui->Content);
 }
 
 template<>
-void UISerializer::Serialize(Ref<TextInput> ui, JSONSerializer& serializer) {
+void UISerializer::Serialize(TextInput* ui, JSONSerializer& serializer) {
 	serializer
 		.WriteKey("Text").Write(ui->Text);
 }
 
 template<>
-void UISerializer::Serialize(Ref<Image> ui, JSONSerializer& serializer) {
+void UISerializer::Serialize(Image* ui, JSONSerializer& serializer) {
 	serializer.WriteKey("Path").Write(ui->Content->GetPath());
 }
 
 template<>
-void UISerializer::Serialize(Ref<UIElement> ui, JSONSerializer& serializer) {
+void UISerializer::Serialize(UIElement* ui, JSONSerializer& serializer) {
 	serializer
 	.BeginMapping()
 		.WriteKey("Type");
@@ -79,25 +79,25 @@ void UISerializer::Serialize(Ref<UIElement> ui, JSONSerializer& serializer) {
 
 	switch(ui->GetType()) {
 		case UIElement::Type::Empty:
-			Serialize(std::static_pointer_cast<Empty>(ui), serializer);
+			Serialize(ui->As<Empty>(), serializer);
 			break;
 		case UIElement::Type::Window:
-			Serialize(std::static_pointer_cast<Window>(ui), serializer);
+			Serialize(ui->As<Window>(), serializer);
 			break;
 		case UIElement::Type::Button:
-			Serialize(std::static_pointer_cast<Button>(ui), serializer);
+			Serialize(ui->As<Button>(), serializer);
 			break;
 		case UIElement::Type::Dropdown:
-			Serialize(std::static_pointer_cast<Dropdown>(ui), serializer);
+			Serialize(ui->As<Dropdown>(), serializer);
 			break;
 		case UIElement::Type::Text:
-			Serialize(std::static_pointer_cast<Text>(ui), serializer);
+			Serialize(ui->As<Text>(), serializer);
 			break;
 		case UIElement::Type::TextInput:
-			Serialize(std::static_pointer_cast<TextInput>(ui), serializer);
+			Serialize(ui->As<TextInput>(), serializer);
 			break;
 		case UIElement::Type::Image:
-			Serialize(std::static_pointer_cast<Image>(ui), serializer);
+			Serialize(ui->As<Image>(), serializer);
 			break;
 	}
 
@@ -109,54 +109,62 @@ void UISerializer::Serialize(Ref<UIElement> ui, JSONSerializer& serializer) {
 	serializer.EndMapping();
 }
 
-void UISerializer::Save(Ref<UIElement> ui, const std::string& path) {
+void UISerializer::Save(UIPage* page, const std::string& path) {
 	JSONSerializer serializer;
 	serializer.BeginMapping(); // File
 
-	Serialize(ui, serializer);
+	// TODO(Implement): Serialize theme
+
+	serializer.WriteKey("Elements")
+	.BeginSequence();
+
+	for(auto* ui : page->GetFirstOrderElements())
+		Serialize(ui, serializer);
+
+	serializer.EndSequence();
 
 	serializer.EndMapping(); // File
 	serializer.Finalize(path);
 }
 
 template<>
-Ref<Window> UISerializer::Deserialize(JSONParserNode& serializer) {
+Window* UISerializer::Deserialize(JSONParserNode& serializer) {
 	
 }
 
 template<>
-Ref<Button> UISerializer::Deserialize(JSONParserNode& serializer) {
+Button* UISerializer::Deserialize(JSONParserNode& serializer) {
 	
 }
 
 template<>
-Ref<Dropdown> UISerializer::Deserialize(JSONParserNode& serializer) {
+Dropdown* UISerializer::Deserialize(JSONParserNode& serializer) {
 	
 }
 
 template<>
-Ref<Text> UISerializer::Deserialize(JSONParserNode& serializer) {
+Text* UISerializer::Deserialize(JSONParserNode& serializer) {
 	
 }
 
 template<>
-Ref<TextInput> UISerializer::Deserialize(JSONParserNode& serializer) {
+TextInput* UISerializer::Deserialize(JSONParserNode& serializer) {
 	
 }
 
 template<>
-Ref<Image> UISerializer::Deserialize(JSONParserNode& serializer) {
+Image* UISerializer::Deserialize(JSONParserNode& serializer) {
 	
 }
 
 template<>
-Ref<UIElement> UISerializer::Deserialize(JSONParserNode& serializer) {
+UIElement* UISerializer::Deserialize(JSONParserNode& serializer) {
 	
 }
 
-Ref<UIElement> UISerializer::Load(const std::string& path) {
+UIPage* UISerializer::Load(const std::string& path) {
 	// TODO(Implement):
-	return CreateRef<Empty>();
+
 }
 
 }
