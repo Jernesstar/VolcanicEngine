@@ -32,7 +32,7 @@ public:
 protected:
 	void Draw() override;
 
-	friend class UIEngine;
+	friend class UIRenderer;
 };
 
 }

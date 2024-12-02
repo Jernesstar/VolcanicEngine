@@ -19,7 +19,7 @@ private:
 private:
 	const char* m_CurrentItem = nullptr;
 
-	friend class UIEngine;
+	friend class UIRenderer;
 };
 
 }

@@ -23,6 +23,8 @@ public:
 		Image
 	};
 
+using UINode = std::pair<UIElement::Type, uint32_t>;
+
 public:
 	uint32_t Width = 0;
 	uint32_t Height = 0;
@@ -31,18 +33,22 @@ public:
 	glm::vec4 Color;
 
 public:
-	UIElement(UIElement::Type type)
-		: m_Type(type), m_ID(std::to_string(UUID())) { }
-	UIElement(UIElement::Type type, const std::string& id)
-		: m_Type(type), m_ID(id) { }
+	UIElement(UIElement::Type type, UIPage* root = nullptr);
+	UIElement(UIElement::Type type, const std::string& id, UIPage* root);
 	UIElement(UIElement::Type type, uint32_t width, uint32_t height,
-			  float x, float y, const glm::vec4& color);
-
+			  float x, float y, const glm::vec4& color, UIPage* root = nullptr);
+	// ~UIElement();
 	virtual ~UIElement() = default;
+
+	void Render();
 
 	template<typename TUIElement, typename ...Args>
 	requires std::derived_from<TUIElement, UIElement>
-	TUIElement& Add(Args&&... args);
+	TUIElement& Add(Args&&... args) {
+		auto node = m_Root->Add(std::forward<Args>(args)...);
+		m_Children.push_back(node);
+		m_Root->Get(node)->m_Parent = m_Node;
+	}
 
 	bool IsClicked() const { return m_Clicked; }
 	bool IsHovered() const { return m_Hovered; }
@@ -74,15 +80,16 @@ protected:
 	const std::string m_ID;
 
 	UIPage* m_Root;
-	uint32_t m_Parent;
-	std::vector<uint32_t> m_Children;
+	UINode m_Node;
+	UINode m_Parent;
+	std::vector<UINode> m_Children;
 
 	bool m_Clicked;
 	bool m_Hovered;
 	bool m_MouseDown;
 	bool m_MouseUp;
 
-	friend class UIEngine;
+	friend class UIRenderer;
 	friend class UISerializer;
 };
 

@@ -18,14 +18,26 @@ public:
 
 	template<typename TUIElement, typename ...Args>
 	requires std::derived_from<TUIElement, UIElement>
-	TUIElement& Add(Args&&... args) {
-		GetList<TUIElement>().emplace_back(std::forward<Args>(args)...);
+	UINode Add(Args&&... args) {
+		auto node = AddNew(std::forward<Args>(args)...);
+		m_FirstOrders.push_back(node);
+		return node;
+	}
+
+	template<typename TUIElement, typename ...Args>
+	requires std::derived_from<TUIElement, UIElement>
+	UINode AddNew(Args&&... args) {
+		auto& list = GetList<TUIElement>();
+		list.emplace_back(std::forward<Args>(args)...);
+		return { GetType<TUIElement>(), list.size() };
 	}
 
 	void Load(const std::string& filePath);
 
+	UIElement* Get(const UINode& node) const;
 	UIElement* Get(const std::string& id) const;
 	List<UIElement*> GetFirstOrderElements() const;
+	std::string GetName() const;
 
 	// void SetTheme();
 
@@ -42,6 +54,9 @@ private:
 private:
 	template<typename TUIType>
 	List<TUIType>& GetList();
+
+	template<typename TUIType>
+	UIElement::Type GetType();
 
 	void Render(UINode& node);
 };

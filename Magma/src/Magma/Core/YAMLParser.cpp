@@ -25,7 +25,7 @@ YAMLParser::YAMLParser(const std::string& path) {
 								path, e.what());
 	}
 
-	m_Root = YAMLParserNode(file);
+	// m_Root = YAMLParserNode(file);
 }
 
 }

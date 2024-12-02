@@ -36,7 +36,7 @@ public:
 private:
 	void Draw() override;
 
-	friend class UIEngine;
+	friend class UIRenderer;
 };
 
 }

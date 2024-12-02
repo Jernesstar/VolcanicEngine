@@ -18,20 +18,20 @@ Editor::Editor()
 				Application::Close();
 		});
 
-	UI::UIEngine::Init();
+	UI::UIRenderer::Init();
 }
 
 Editor::~Editor() {
-	UI::UIEngine::Close();
+	UI::UIRenderer::Close();
 }
 
 void Editor::OnUpdate(TimeStep ts) {
 	RendererAPI::Get()->Clear();
 
-	UI::UIEngine::BeginFrame();
+	UI::UIRenderer::BeginFrame();
 	m_EditorLayer.Update(ts);
 	m_EditorLayer.Render();
-	UI::UIEngine::EndFrame();
+	UI::UIRenderer::EndFrame();
 }
 
 }

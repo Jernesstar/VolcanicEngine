@@ -10,7 +10,7 @@
 
 #include "ECS/Component.h"
 
-#include "UI/UIEngine.h"
+#include "UI/UIRenderer.h"
 
 using namespace Magma::ECS;
 
@@ -54,7 +54,7 @@ void SceneVisualizerPanel::Draw() {
 		auto width = size.x;
 		auto height = size.y;
 
-		UI::UIEngine::DrawImage(*m_Image);
+		UI::UIRenderer::DrawImage(*m_Image);
 
 		if(ImGui::IsMouseClicked(0) && ImGui::IsWindowHovered()) {
 			// auto& cameraController = m_Renderer.GetCameraController();

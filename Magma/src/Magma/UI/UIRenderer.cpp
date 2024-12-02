@@ -1,4 +1,4 @@
-#include "UIEngine.h"
+#include "UIRenderer.h"
 
 #define IM_VEC2_CLASS_EXTRA \
 	constexpr ImVec2(glm::vec2& v) : x(v.x), y(v.y) {} \
@@ -39,7 +39,7 @@ enum class UIElementType { Window, MenuBar, Menu, TabBar, Tab };
 
 static List<UIElementType> s_Types; // Elements that need ImGui::End to be called
 
-void UIEngine::DrawWindow(UI::Window& window) {
+void UIRenderer::DrawWindow(UI::Window& window) {
 	ImGuiViewport* viewport = ImGui::GetMainViewport();
 	ImGui::SetNextWindowPos(ImVec2(viewport->Pos.x + window.x, viewport->Pos.y + window.y));
 	ImGui::SetNextWindowSize(ImVec2(window.Width, window.Height));
@@ -82,7 +82,7 @@ void ButtonImage(Ref<UIElement> element, ImVec2 dim) {
 	// ImGui::ImageButton(id, dim);
 }
 
-void UIEngine::DrawButton(UI::Button& button) {
+void UIRenderer::DrawButton(UI::Button& button) {
 	if(button.Display->GetType() == UIElement::Type::Image)
 		ButtonFunction = ButtonImage;
 	else
@@ -100,7 +100,7 @@ void UIEngine::DrawButton(UI::Button& button) {
 	button.m_MouseDown = ImGui::IsItemClicked();
 }
 
-void UIEngine::DrawImage(UI::Image& image) {
+void UIRenderer::DrawImage(UI::Image& image) {
 	auto texture = image.Content->As<OpenGL::Texture2D>();
 
 	auto v0 = ImVec2(0.0f, 1.0f);
@@ -113,7 +113,7 @@ void UIEngine::DrawImage(UI::Image& image) {
 	image.m_MouseDown = ImGui::IsItemClicked();
 }
 
-void UIEngine::DrawText(UI::Text& text) {
+void UIRenderer::DrawText(UI::Text& text) {
 	ImVec2 size = ImGui::CalcTextSize(text.Content.c_str());
 	text.Width = size.x;
 	text.Height = size.y;
@@ -129,7 +129,7 @@ void UIEngine::DrawText(UI::Text& text) {
 	text.m_MouseDown = ImGui::IsItemClicked();
 }
 
-void UIEngine::DrawTextInput(TextInput& textInput) {
+void UIRenderer::DrawTextInput(TextInput& textInput) {
 	char input[textInput.MaxCharCount]{""};
 	// char input[255]{ "" };
 
@@ -137,7 +137,7 @@ void UIEngine::DrawTextInput(TextInput& textInput) {
 	textInput.Text = std::string(input);
 }
 
-void UIEngine::DrawDropdown(Dropdown& dropdown) {
+void UIRenderer::DrawDropdown(Dropdown& dropdown) {
 	uint32_t n = dropdown.Options.size();
 	//const char* items[n];
 	const char** items = new const char*[255];
@@ -159,33 +159,36 @@ void UIEngine::DrawDropdown(Dropdown& dropdown) {
 	}
 }
 
-void UIEngine::DrawMenuBar(const std::string& name) {
+void UIRenderer::DrawMenuBar(const std::string& name) {
+	ImGui::BeginMainMenuBar();
 
 	s_Types.push_back(UIElementType::MenuBar);
 }
 
-void UIEngine::DrawMenu(const std::string& name) {
+void UIRenderer::DrawMenu(const std::string& name) {
+	ImGui::BeginMenu(name.c_str());
 
 	s_Types.push_back(UIElementType::Menu);
 }
 
-void UIEngine::DrawTabBar(const std::string& name) {
+void UIRenderer::DrawTabBar(const std::string& name) {
+	ImGui::BeginTabBar(name.c_str(), ImGuiTabBarFlags_Reorderable);
 
 	s_Types.push_back(UIElementType::TabBar);
 }
 
-void UIEngine::DrawTab(const std::string& name) {
+void UIRenderer::DrawTab(const std::string& name) {
 
 	s_Types.push_back(UIElementType::Tab);
 }
 
-void UIEngine::BeginFrame() {
+void UIRenderer::BeginFrame() {
 	ImGui_ImplGlfw_NewFrame();
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui::NewFrame();
 }
 
-void UIEngine::EndFrame() {
+void UIRenderer::EndFrame() {
 	while(s_Types.size() > 0) {
 		auto type = s_Types.back();
 		s_Types.pop_back();
@@ -217,7 +220,7 @@ void UIEngine::EndFrame() {
 	glfwMakeContextCurrent(backup_current_context);
 }
 
-void UIEngine::Init() {
+void UIRenderer::Init() {
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 
@@ -290,7 +293,7 @@ void UIEngine::Init() {
 	Application::PopDir();
 }
 
-void UIEngine::Close() {
+void UIRenderer::Close() {
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();

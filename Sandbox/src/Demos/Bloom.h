@@ -97,15 +97,15 @@ Bloom::Bloom()
 	controller = CameraController{ camera };
 	controller.TranslationSpeed = 5.0f;
 
-	UI::UIEngine::Init();
+	UI::UIRenderer::Init();
 }
 
 Bloom::~Bloom() {
-	UI::UIEngine::Close();
+	UI::UIRenderer::Close();
 }
 
 void Bloom::OnUpdate(TimeStep ts) {
-	UI::UIEngine::BeginFrame();
+	UI::UIRenderer::BeginFrame();
 
 	controller.OnUpdate(ts);
 
@@ -223,7 +223,7 @@ void Bloom::OnUpdate(TimeStep ts) {
 	Renderer::EndPass();
 	Renderer::Flush();
 
-	UI::UIEngine::EndFrame();
+	UI::UIRenderer::EndFrame();
 }
 
 void Bloom::InitMips() {

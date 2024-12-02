@@ -6,6 +6,8 @@
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 
+using namespace VolcaniCore;
+
 namespace Magma {
 
 class ParserNode {
@@ -16,13 +18,22 @@ public:
 	template<typename T>
 	T As();
 
-	// TODO(Implement): List's of data
+	template<typename T>
+	List<T> As();
 
-	// virtual ParserNode operator [](const std::string& node) = 0;
+	virtual ParserNode operator [](const std::string& nodeName) = 0;
 
 	virtual bool IsValid() = 0;
 
 	operator bool() { return IsValid(); }
+
+	// virtual bool IsInt() = 0;
+	// virtual bool IsUInt() = 0;
+	// virtual bool IsFloat() = 0;
+	// virtual bool IsVec2() = 0;
+	// virtual bool IsVec3() = 0;
+	// virtual bool IsVec4() = 0;
+	// virtual bool IsString() = 0;
 
 protected:
 	virtual int64_t    GetInt() = 0;

@@ -10,14 +10,19 @@ namespace Magma::UI {
 
 UIElement::UIElement(UIElement::Type type,
 					 uint32_t width, uint32_t height, float x, float y,
-					 const glm::vec4& color)
+					 const glm::vec4& color, UIPage* root)
 	: m_Type(type), m_ID(std::to_string(UUID())),
-		Width(width), Height(height), x(x), y(y), Color(color) { }
+		Width(width), Height(height), x(x), y(y), Color(color), m_Root(root) { }
 
-template<typename TUIElement, typename ...Args>
-requires std::derived_from<TUIElement, UIElement>
-TUIElement& UIElement::Add(Args&&... args) {
-	return m_Root->Add(std::forward<Args>(args)...);
+UIElement::UIElement(UIElement::Type type, UIPage* root)
+	: m_Type(type), m_ID(std::to_string(UUID())), m_Root(root) { }
+UIElement::UIElement(UIElement::Type type, const std::string& id, UIPage* root)
+	: m_Type(type), m_ID(id), m_Root(root) { }
+
+void UIElement::Render() {
+	Draw();
+	for(auto* child : GetChildren())
+		child->Render();
 }
 
 UIElement& UIElement::SetSize(uint32_t width, uint32_t height) {
@@ -32,14 +37,14 @@ UIElement& UIElement::SetPosition(float x, float y) {
 }
 
 UIElement& UIElement::CenterX() {
-	auto parent = m_Root->Get(m_ID + "/..");
+	auto parent = m_Root->Get(m_Parent);
 	if(parent)
 		x = parent->x + float(parent->Width - Width)/ 2.0f;
 	return *this;
 }
 
 UIElement& UIElement::CenterY() {
-	auto parent = m_Root->Get(m_ID + "/..");
+	auto parent = m_Root->Get(m_Parent);
 	if(parent)
 		y = parent->y - float(parent->Height - Height) / 2.0f;
 	return *this;
@@ -56,7 +61,11 @@ void UIElement::Clear() {
 }
 
 List<UIElement*> UIElement::GetChildren() const {
+	List<UIElement*> res(m_Children.size());
+	for(auto node : m_Children)
+		res.push_back(m_Root->Get(node));
 
+	return res;
 }
 
 UIElement* UIElement::GetChild(const std::string& id) const {

@@ -9,7 +9,7 @@ public:
 	JSONParserNode();
 	~JSONParserNode() = default;
 
-	// JSONParserNode& operator [](const std::string& node) override;
+	ParserNode operator [](const std::string& node) override;
 	bool IsValid() override;
 
 private:

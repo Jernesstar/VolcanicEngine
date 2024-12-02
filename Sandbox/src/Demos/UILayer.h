@@ -16,7 +16,7 @@ private:
 UILayer::UILayer()
 	: Application(1920, 1080)
 {
-	UI::UIEngine::Init();
+	UI::UIRenderer::Init();
 
 	Events::RegisterListener<KeyPressedEvent>(
 		[](const KeyPressedEvent& event)
@@ -59,15 +59,15 @@ UILayer::UILayer()
 }
 
 UILayer::~UILayer() {
-	UI::UIEngine::Close();
+	UI::UIRenderer::Close();
 }
 
 void UILayer::OnUpdate(TimeStep ts) {
-	UI::UIEngine::BeginFrame();
+	UI::UIRenderer::BeginFrame();
 
 	// Root->Render();
 
-	UI::UIEngine::EndFrame();
+	UI::UIRenderer::EndFrame();
 }
 
 }

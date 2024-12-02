@@ -27,7 +27,7 @@
             "Type": "Button",
             "Width": 20,
             "Height": 40,
-            "OnClick": "@cpp{ UI::UIEngine::SetPage(\"assets/ui/some_other_page.magma.ui.json\") }",
+            "OnClick": "@cpp{ UIBrowser::SetPage(\"some_other_page\"); }",
             // Will use the Button1::OnHover function defined in test.magma.ui.func,
             "OnHover": "Default",
             // Define an animation

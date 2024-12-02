@@ -1,5 +1,9 @@
 #pragma once
 
+#include <UI/UIRenderer.h>
+
+using namespace Magma::UI;
+
 class Clickable {
 public:
 	virtual void OnClick() {
@@ -19,6 +23,6 @@ public:
 		// TODO(Change): Automatically put this in the generated cpp file
 		Clickable::OnHover();
 
-		UI::UIEngine::ShowPopupLabel("This is Button1");
+		// UIRenderer::ShowPopupLabel("This is Button1");
 	}
 };

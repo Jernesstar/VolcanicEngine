@@ -117,15 +117,15 @@ Lighting::Lighting() {
 	width = 5;
 	length = 5;
 
-	UI::UIEngine::Init();
+	UI::UIRenderer::Init();
 }
 
 Lighting::~Lighting() {
-	UI::UIEngine::Close();
+	UI::UIRenderer::Close();
 }
 
 void Lighting::OnUpdate(TimeStep ts) {
-	UI::UIEngine::BeginFrame();
+	UI::UIRenderer::BeginFrame();
 
 	controller.OnUpdate(ts);
 
@@ -249,7 +249,7 @@ void Lighting::OnUpdate(TimeStep ts) {
 
 	Renderer::Flush();
 
-	UI::UIEngine::EndFrame();
+	UI::UIRenderer::EndFrame();
 }
 
 }

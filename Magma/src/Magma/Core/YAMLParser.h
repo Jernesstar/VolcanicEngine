@@ -35,7 +35,7 @@ public:
 	~YAMLParser() = default;
 
 private:
-	YAMLParserNode m_Root;
+	// YAMLParserNode m_Root;
 };
 
 }

@@ -9,7 +9,7 @@
 
 namespace Magma::UI {
 
-class UIEngine {
+class UIRenderer {
 public:
 	static void Init();
 	static void Close();
