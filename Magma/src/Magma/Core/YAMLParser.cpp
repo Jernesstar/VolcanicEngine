@@ -21,8 +21,8 @@ YAMLParser::YAMLParser(const std::string& path) {
 		file = YAML::LoadFile(path);
 	}
 	catch(YAML::ParserException e) {
-		VOLCANICORE_ASSERT_ARGS(false, "Could not load file {0}: {1}",
-								path, e.what());
+		VOLCANICORE_ASSERT_ARGS(false, "Could not load file %s: %s",
+								path.c_str(), e.what());
 	}
 
 	// m_Root = YAMLParserNode(file);

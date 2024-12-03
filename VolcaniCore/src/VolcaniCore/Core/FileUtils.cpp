@@ -9,20 +9,31 @@
 
 namespace VolcaniCore {
 
+File::File(const std::string& path)
+	: m_Data(path), Path(path) { }
+
+File& File::Write(const std::string& data) {
+	m_Data << data.c_str() << "\n";
+	return *this;
+}
+
+std::string File::Get() const {
+	return FileUtils::ReadFile(Path);
+}
+
 bool FileUtils::FileExists(const std::string& path) {
 	return std::filesystem::exists(path.c_str());
 }
 
 void FileUtils::CreateFile(const std::string& path) {
-	std::ofstream { path.c_str() };
+	std::ofstream{ path.c_str() };
 }
 
 std::vector<std::string> FileUtils::GetFiles(const std::string& dir)
 {
 	std::vector<std::string> files;
-	for(auto p : std::filesystem::directory_iterator(dir.c_str())) {
+	for(auto p : std::filesystem::directory_iterator(dir.c_str()))
 		files.push_back(p.path().string());
-	}
 
 	return files;
 }

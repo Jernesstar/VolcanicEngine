@@ -17,6 +17,8 @@ project "Sandbox"
     includedirs {
         "src",
 
+        "%{RootPath}",
+
         "%{RootPath}/VolcaniCore/src",
         "%{RootPath}/VolcaniCore/src/VolcaniCore",
         "%{RootPath}/VolcaniCore/src/impl",

@@ -1,6 +1,6 @@
 #include "TextInput.h"
 
-#include <imgui/imgui.h>
+#include "UIPage.h"
 
 namespace Magma::UI {
 
@@ -9,7 +9,9 @@ TextInput::TextInput(uint32_t maxChars)
 		MaxCharCount(maxChars), Text("") { }
 
 void TextInput::Draw() {
-
+	m_State = UIRenderer::DrawTextInput(*this);
+	if(m_Root)
+		m_Root->OnEvent(m_State, m_ID);
 }
 
 }

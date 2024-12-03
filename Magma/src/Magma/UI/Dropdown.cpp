@@ -2,7 +2,7 @@
 
 #include <imgui/imgui.h>
 
-#include "Text.h"
+#include "UIPage.h"
 
 using namespace VolcaniCore;
 
@@ -12,7 +12,9 @@ Dropdown::Dropdown()
 	: UIElement(UIElement::Type::Dropdown) { }
 
 void Dropdown::Draw() {
-
+	m_State = UIRenderer::DrawDropdown(*this);
+	if(m_Root)
+		m_Root->OnEvent(m_State, m_ID);
 }
 
 }

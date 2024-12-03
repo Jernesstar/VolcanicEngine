@@ -14,7 +14,7 @@ DLL::DLL(const std::string& path) {
 #if VOLCANICENGINE_WINDOWS
 	m_Handle = LoadLibraryA(path.c_str());
 #elif VOLCANICENGINE_LINUX
-	m_Handle = dlopen(path.c_str(), RTLD_LAZY);
+	m_Handle = dlopen(path.c_str(), RTLD_NOW);
 #endif
 
 	VOLCANICORE_ASSERT(m_Handle);
@@ -28,7 +28,7 @@ DLL::~DLL() {
 #endif
 }
 
-Function<void> DLL::GetFunc(void* handle, const std::string& name) {
+FuncPtr<void> DLL::GetFuncPtr(void* handle, const std::string& name) {
 #if VOLCANICENGINE_WINDOWS
 	VOLCANICORE_ASSERT(GetProcAddress((HMODULE)handle, name.c_str()));
 	DWORD lastError = GetLastError();
@@ -36,9 +36,9 @@ Function<void> DLL::GetFunc(void* handle, const std::string& name) {
 	FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, lastError, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), buf, sizeof(buf), NULL);
 	VOLCANICORE_LOG_ERROR(buf);
 
-	return (Function<void>)GetProcAddress((HMODULE)handle, name.c_str());
+	return (FuncPtr<void>)GetProcAddress((HMODULE)handle, name.c_str());
 #elif VOLCANICENGINE_LINUX
-	return (Function<void>)dlsym(handle, name);
+	return (FuncPtr<void>)dlsym(handle, name);
 #endif
 }
 

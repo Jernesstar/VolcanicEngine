@@ -1,13 +1,9 @@
 #include "Image.h"
 
-#include <imgui/imgui.h>
-#include <imgui/backends/imgui_impl_glfw.h>
-#include <imgui/backends/imgui_impl_opengl3.h>
-
-#include "VolcaniCore/Core/Log.h"
-
 #include <OpenGL/Framebuffer.h>
 #include <OpenGL/Texture2D.h>
+
+#include "UIPage.h"
 
 using namespace VolcaniCore;
 
@@ -42,15 +38,17 @@ void Image::SetImage(const std::string& imagePath) {
 }
 
 void Image::SetImage(Ref<Framebuffer> framebuffer, AttachmentTarget target) {
+	// TODO(Change): Move to texture
 	auto& attachment = framebuffer->As<OpenGL::Framebuffer>()->Get(target);
-
 	Content->As<OpenGL::Texture2D>()->SetID(attachment.GetRendererID());
 	Width = attachment.GetWidth();
 	Height = attachment.GetHeight();
 }
 
 void Image::Draw() {
-
+	m_State = UIRenderer::DrawImage(*this);
+	if(m_Root)
+		m_Root->OnEvent(m_State, m_ID);
 }
 
 }

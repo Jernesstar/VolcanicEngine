@@ -19,12 +19,13 @@
 #include <VolcaniCore/Object/Model.h>
 #include <VolcaniCore/Object/Texture.h>
 
+#include <imgui/imgui.h>
+
+#include <Magma/UI/UI.h>
+
 #include <Magma/Scene/Scene.h>
 #include <Magma/Scene/SceneSerializer.h>
 #include <Magma/Editor/Editor.h>
-
-#include <imgui/imgui.h>
-#include <Magma/UI/UI.h>
 
 #include <Magma/ECS/World.h>
 #include <Magma/ECS/Entity.h>

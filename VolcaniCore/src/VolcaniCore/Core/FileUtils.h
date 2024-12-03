@@ -2,8 +2,25 @@
 
 #include <string>
 #include <vector>
+#include <filesystem>
+#include <fstream>
 
 namespace VolcaniCore {
+
+class File {
+public:
+	const std::string Path;
+
+public:
+	File(const std::string& path);
+
+	File& Write(const std::string& info);
+
+	std::string Get() const;
+
+private:
+	std::ofstream m_Data;
+};
 
 class FileUtils {
 public:

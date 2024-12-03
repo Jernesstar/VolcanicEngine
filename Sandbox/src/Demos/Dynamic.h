@@ -2,6 +2,10 @@
 
 #include <Magma/Core/DLL.h>
 
+#include <TestLib/TestObject.h>
+
+using namespace TestLib;
+
 namespace Demo {
 
 class DLL : public Application {
@@ -24,13 +28,17 @@ DLL::DLL() {
 
 	m_DLL = CreateRef<Magma::DLL>("build\\TestLib\\lib\\TestLib.dll");
 
-	auto func = m_DLL->GetFunction<uint32_t, uint32_t, uint32_t>("Add");
+	auto load = m_DLL->GetFunction<void>("Load");
+	auto get = m_DLL->GetFunction<TestObject*, std::string>("Load");
 
 	VOLCANICORE_LOG_INFO("DLL Project Successful");
-	if(func)
-		VOLCANICORE_LOG_INFO("1 + 1 = %i", func(1, 1));
-	else
-		VOLCANICORE_LOG_INFO("We are unable to do math");
+	load();
+	auto* object0 = get("Object0");
+	auto* object1 = get("Object1");
+	auto* object2 = get("Object2");
+	// VOLCANICORE_LOG_INFO(object0->ToString().c_str());
+	// VOLCANICORE_LOG_INFO(object1->ToString().c_str());
+	// VOLCANICORE_LOG_INFO(object2->ToString().c_str());
 }
 
 void DLL::OnUpdate(TimeStep ts) {

@@ -1,6 +1,6 @@
 #include "Text.h"
 
-#include <imgui/imgui.h>
+#include "UIPage.h"
 
 namespace Magma::UI {
 
@@ -13,7 +13,9 @@ Text::Text(const std::string& text, const glm::vec4& textColor)
 		Content(text) { }
 
 void Text::Draw() {
-
+	m_State = UIRenderer::DrawText(*this);
+	if(m_Root)
+		m_Root->OnEvent(m_State, m_ID);
 }
 
 }

@@ -56,11 +56,10 @@ public:
 	TUIElement& Add(Args&&... args) {
 		// auto node = Add(GetType<TUIElement>());
 		// auto* element = Get(node);
-		// *((TUIElement)element) = TUIElement(std::forward<Args>(args)...);
+		// *((TUIElement*)element) = TUIElement(std::forward<Args>(args)...);
 	}
 
-	bool IsClicked() const { return m_State.Clicked; }
-	bool IsHovered() const { return m_State.Hovered; }
+	UIState& GetState() { return m_State; }
 
 	UIElement& SetSize(uint32_t width, uint32_t height);
 	UIElement& SetPosition(float x, float y);

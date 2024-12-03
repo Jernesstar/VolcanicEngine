@@ -1,21 +1,21 @@
-#include <cstdint>
+#include <VolcaniCore/Core/Defines.h>
 
-#if defined(_MSC_VER) || defined(__MINGW32__) || defined(__MINGW64__)
-	#define EXPORT __declspec(dllexport)
-	#define IMPORT __declspec(dllimport)
-#elif defined(__GNUC__)
-	#define EXPORT __attribute__((visibility("default")))
-	#define IMPORT
-#else
-	#define EXPORT
-	#define IMPORT
-	#pragma warning Unknown dynamic link import/export semantics.
-#endif
+#include "TestObject.h"
+
+using namespace VolcaniCore;
 
 namespace TestLib {
 
-extern "C" EXPORT uint32_t Add(uint32_t x, uint32_t y) {
-	return x + y;
+static Map<std::string, TestObject*> m_Objects;
+
+extern "C" EXPORT void Load() {
+	m_Objects["Object0"] = new TestObject();
+	m_Objects["Object1"] = new InheritedA();
+	m_Objects["Object2"] = new InheritedB();
+}
+
+extern "C" EXPORT TestObject* Get(const std::string& id) {
+	return m_Objects[id];
 }
 
 }

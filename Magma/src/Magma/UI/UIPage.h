@@ -2,6 +2,8 @@
 
 #include "UI.h"
 
+#include "Core/DLL.h"
+
 namespace Magma::UI {
 
 using UINode = std::pair<UIElement::Type, uint32_t>;
@@ -13,8 +15,11 @@ public:
 	~UIPage() = default;
 
 	void Load(const std::string& filePath);
+	void Reload();
 
 	void Render();
+
+	void OnEvent(const UIState& state, const std::string& id);
 
 	UINode Add(UIElement::Type type, const std::string& id = "");
 
@@ -50,6 +55,8 @@ private:
 	List<Image> Images;
 
 	List<UINode> m_FirstOrders;
+	Map<std::string, UIState> m_States;
+	Ref<DLL> m_GenFile;
 
 private:
 	template<typename TUIType>

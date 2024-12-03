@@ -8,7 +8,7 @@
                 "Height": 0.0,
                 "Image": "assets/image/aesthetic_window_border.png"
             },
-            "Color": [0.3, 0.4, 0.6]
+            "Color": [0.3, 0.4, 0.2, 0.6]
         },
 
         "Button": {}
@@ -23,18 +23,21 @@
             "Height": 400,
             "x": 20,
             "y": 20,
-            "Color": [0.3, 0.3, 1.0]
+            "Color": [0.3, 0.3, 0.3, 1.0]
         },
         {
+            "Parent": "Window1",
+
             "ID": "Button1",
             "Type": "Button",
-            "Parent": "Window1",
             "Width": 20,
             "Height": 40,
+            "x": 20,
+            "y": 20,
+            "Color": [0.3, 0.3, 0.3, 1.0],
+
             "OnClick": "@cpp{ UIBrowser::SetPage(\"some_other_page\"); }",
-            // Will use the Button1::OnHover function defined in test.magma.ui.func,
             "OnHover": "Default",
-            // Define an animation
             "OnMouseUp": {
                 "Speed": 0.4,
                 "Translate": -2

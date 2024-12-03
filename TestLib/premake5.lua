@@ -10,6 +10,10 @@ project "TestLib"
         "func.cpp"
     }
 
+    includedirs {
+        "%{RootPath}/VolcaniCore/src",
+    }
+
     filter "toolset:gcc or toolset:clang"
         buildoptions {
             "-fexceptions",

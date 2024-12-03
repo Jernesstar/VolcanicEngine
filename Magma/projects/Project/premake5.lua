@@ -15,6 +15,7 @@ project "Project"
     files {
         "%{ProjectSrcDir}/**.h",
         "%{ProjectSrcDir}/**.cpp",
+        "gen/*.cpp"
     }
     print(ProjectSrcDir)
 

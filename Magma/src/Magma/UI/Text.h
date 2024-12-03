@@ -25,6 +25,8 @@ public:
 public:
 	Text(const std::string& text = "",
 		 const glm::vec4& textColor = glm::vec4(1.0f));
+	Text(const std::string& id, UIPage* root)
+		: UIElement(UIElement::Type::Text, id, root) { }
 
 private:
 	void Draw() override;

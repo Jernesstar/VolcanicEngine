@@ -30,8 +30,9 @@ public:
 	Button(const glm::vec4& color = glm::vec4(1.0f),
 		   const std::string& text = "",
 		   const glm::vec4& textColor = glm::vec4(1.0f));
-
 	Button(const std::string& imagePath);
+	Button(const std::string& id, UIPage* root)
+		: UIElement(UIElement::Type::Button, id, root) { }
 
 private:
 	void Draw() override;
