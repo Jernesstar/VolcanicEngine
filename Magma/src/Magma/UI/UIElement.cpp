@@ -19,6 +19,13 @@ UIElement::UIElement(UIElement::Type type, UIPage* root)
 UIElement::UIElement(UIElement::Type type, const std::string& id, UIPage* root)
 	: m_Type(type), m_ID(id), m_Root(root) { }
 
+UINode UIElement::Add(UIElement::Type type) {
+	auto node = m_Root->Add(type);
+	m_Children.push_back(node);
+	m_Root->Get(node)->m_Parent = m_Node;
+	return node;
+}
+
 void UIElement::Render() {
 	Draw();
 	for(auto* child : GetChildren())
@@ -66,6 +73,10 @@ List<UIElement*> UIElement::GetChildren() const {
 		res.push_back(m_Root->Get(node));
 
 	return res;
+}
+
+UIElement* UIElement::GetChild(const UINode& node) const {
+	return m_Root->Get(node);
 }
 
 UIElement* UIElement::GetChild(const std::string& id) const {

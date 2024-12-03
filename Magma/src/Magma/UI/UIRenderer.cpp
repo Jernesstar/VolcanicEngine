@@ -39,7 +39,7 @@ enum class UIElementType { Window, MenuBar, Menu, TabBar, Tab };
 
 static List<UIElementType> s_Types; // Elements that need ImGui::End to be called
 
-void UIRenderer::DrawWindow(UI::Window& window) {
+UIState UIRenderer::DrawWindow(UI::Window& window) {
 	ImGuiViewport* viewport = ImGui::GetMainViewport();
 	ImGui::SetNextWindowPos(ImVec2(viewport->Pos.x + window.x, viewport->Pos.y + window.y));
 	ImGui::SetNextWindowSize(ImVec2(window.Width, window.Height));
@@ -63,12 +63,14 @@ void UIRenderer::DrawWindow(UI::Window& window) {
 	ImGui::Begin(window.GetID().c_str(), &window.Open, windowFlags);
 	ImGui::PopStyleColor();
 	ImGui::PopStyleVar(3);
-	window.m_Clicked = ImGui::IsItemClicked();
-	window.m_Hovered = ImGui::IsItemHovered();
-	window.m_MouseDown = ImGui::IsItemClicked();
-	// window.m_MouseUp = ImGui::IsItemDeactivated();
-
 	s_Types.push_back(UIElementType::Window);
+
+	return {
+		ImGui::IsItemClicked(),
+		ImGui::IsItemHovered(),
+		ImGui::IsMouseDown(0),
+		// ImGui::IsItemDeactivated()
+	};
 }
 
 void ButtonText(Ref<UIElement> element, ImVec2 dim) {
@@ -82,7 +84,7 @@ void ButtonImage(Ref<UIElement> element, ImVec2 dim) {
 	// ImGui::ImageButton(id, dim);
 }
 
-void UIRenderer::DrawButton(UI::Button& button) {
+UIState UIRenderer::DrawButton(UI::Button& button) {
 	if(button.Display->GetType() == UIElement::Type::Image)
 		ButtonFunction = ButtonImage;
 	else
@@ -95,12 +97,16 @@ void UIRenderer::DrawButton(UI::Button& button) {
 	ButtonFunction(button.Display, ImVec2(button.Width, button.Height));
 	ImGui::PopStyleColor(3);
 	ImGui::PopStyleVar();
-	button.m_Clicked = ImGui::IsItemClicked();
-	button.m_Hovered = ImGui::IsItemHovered();
-	button.m_MouseDown = ImGui::IsItemClicked();
+
+	return {
+		ImGui::IsItemClicked(),
+		ImGui::IsItemHovered(),
+		ImGui::IsMouseDown(0),
+		// ImGui::IsItemDeactivated()
+	};
 }
 
-void UIRenderer::DrawImage(UI::Image& image) {
+UIState UIRenderer::DrawImage(UI::Image& image) {
 	auto texture = image.Content->As<OpenGL::Texture2D>();
 
 	auto v0 = ImVec2(0.0f, 1.0f);
@@ -108,12 +114,16 @@ void UIRenderer::DrawImage(UI::Image& image) {
 	ImVec2 dim = ImVec2(image.Width, image.Height);
 	ImGui::SetCursorPos(ImVec2(image.x, image.y));
 	ImGui::Image((ImTextureID)(intptr_t)texture->GetID(), dim, v0, v1);
-	image.m_Clicked = ImGui::IsItemClicked();
-	image.m_Hovered = ImGui::IsItemHovered();
-	image.m_MouseDown = ImGui::IsItemClicked();
+
+	return {
+		ImGui::IsItemClicked(),
+		ImGui::IsItemHovered(),
+		ImGui::IsMouseDown(0),
+		// ImGui::IsItemDeactivated()
+	};
 }
 
-void UIRenderer::DrawText(UI::Text& text) {
+UIState UIRenderer::DrawText(UI::Text& text) {
 	ImVec2 size = ImGui::CalcTextSize(text.Content.c_str());
 	text.Width = size.x;
 	text.Height = size.y;
@@ -124,20 +134,31 @@ void UIRenderer::DrawText(UI::Text& text) {
 
 	ImGui::Text(text.Content.c_str());
 	ImGui::PopStyleColor();
-	text.m_Clicked = ImGui::IsItemClicked();
-	text.m_Hovered = ImGui::IsItemHovered();
-	text.m_MouseDown = ImGui::IsItemClicked();
+
+	return {
+		ImGui::IsItemClicked(),
+		ImGui::IsItemHovered(),
+		ImGui::IsMouseDown(0),
+		// ImGui::IsItemDeactivated()
+	};
 }
 
-void UIRenderer::DrawTextInput(TextInput& textInput) {
+UIState UIRenderer::DrawTextInput(TextInput& textInput) {
 	char input[textInput.MaxCharCount]{""};
 	// char input[255]{ "" };
 
 	ImGui::InputText(textInput.GetID().c_str(), input, sizeof(input));
 	textInput.Text = std::string(input);
+
+	return {
+		ImGui::IsItemClicked(),
+		ImGui::IsItemHovered(),
+		ImGui::IsMouseDown(0),
+		// ImGui::IsItemDeactivated()
+	};
 }
 
-void UIRenderer::DrawDropdown(Dropdown& dropdown) {
+UIState UIRenderer::DrawDropdown(Dropdown& dropdown) {
 	uint32_t n = dropdown.Options.size();
 	//const char* items[n];
 	const char** items = new const char*[255];
@@ -157,29 +178,63 @@ void UIRenderer::DrawDropdown(Dropdown& dropdown) {
 
 		ImGui::EndCombo();
 	}
+
+	return {
+		// ImGui::IsItemClicked(),
+		// ImGui::IsItemHovered(),
+		// ImGui::IsMouseDown(0),
+		// ImGui::IsItemDeactivated()
+	};
 }
 
-void UIRenderer::DrawMenuBar(const std::string& name) {
+UIState UIRenderer::DrawMenuBar(const std::string& name) {
 	ImGui::BeginMainMenuBar();
 
 	s_Types.push_back(UIElementType::MenuBar);
+
+	return {
+		ImGui::IsItemClicked(),
+		ImGui::IsItemHovered(),
+		ImGui::IsMouseDown(0),
+		// ImGui::IsItemDeactivated()
+	};
 }
 
-void UIRenderer::DrawMenu(const std::string& name) {
+UIState UIRenderer::DrawMenu(const std::string& name) {
 	ImGui::BeginMenu(name.c_str());
 
 	s_Types.push_back(UIElementType::Menu);
+
+	return {
+		ImGui::IsItemClicked(),
+		ImGui::IsItemHovered(),
+		ImGui::IsMouseDown(0),
+		// ImGui::IsItemDeactivated()
+	};
 }
 
-void UIRenderer::DrawTabBar(const std::string& name) {
+UIState UIRenderer::DrawTabBar(const std::string& name) {
 	ImGui::BeginTabBar(name.c_str(), ImGuiTabBarFlags_Reorderable);
 
 	s_Types.push_back(UIElementType::TabBar);
+
+	return {
+		ImGui::IsItemClicked(),
+		ImGui::IsItemHovered(),
+		ImGui::IsMouseDown(0),
+		// ImGui::IsItemDeactivated()
+	};
 }
 
-void UIRenderer::DrawTab(const std::string& name) {
-
+UIState UIRenderer::DrawTab(const std::string& name) {
 	s_Types.push_back(UIElementType::Tab);
+
+	return {
+		ImGui::IsItemClicked(),
+		ImGui::IsItemHovered(),
+		ImGui::IsMouseDown(0),
+		// ImGui::IsItemDeactivated()
+	};
 }
 
 void UIRenderer::BeginFrame() {

@@ -1,7 +1,5 @@
 #pragma once
 
-#include <VolcaniCore/Core/Buffer.h>
-
 #include "UI.h"
 
 namespace Magma::UI {
@@ -14,7 +12,11 @@ public:
 	UIPage(const std::string& filePath);
 	~UIPage() = default;
 
+	void Load(const std::string& filePath);
+
 	void Render();
+
+	UINode Add(UIElement::Type type, const std::string& id = "");
 
 	template<typename TUIElement, typename ...Args>
 	requires std::derived_from<TUIElement, UIElement>
@@ -31,8 +33,6 @@ public:
 		list.emplace_back(std::forward<Args>(args)...);
 		return { GetType<TUIElement>(), list.size() };
 	}
-
-	void Load(const std::string& filePath);
 
 	UIElement* Get(const UINode& node) const;
 	UIElement* Get(const std::string& id) const;
@@ -54,11 +54,8 @@ private:
 private:
 	template<typename TUIType>
 	List<TUIType>& GetList();
-
 	template<typename TUIType>
 	UIElement::Type GetType();
-
-	void Render(UINode& node);
 };
 
 }

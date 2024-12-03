@@ -20,11 +20,15 @@
             "ID": "Window1",
             "Type": "Window",
             "Width": 200,
-            "Height": 400
+            "Height": 400,
+            "x": 20,
+            "y": 20,
+            "Color": [0.3, 0.3, 1.0]
         },
         {
             "ID": "Button1",
             "Type": "Button",
+            "Parent": "Window1",
             "Width": 20,
             "Height": 40,
             "OnClick": "@cpp{ UIBrowser::SetPage(\"some_other_page\"); }",

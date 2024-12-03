@@ -11,6 +11,13 @@ namespace Magma::UI {
 
 class UIPage;
 
+struct UIState {
+	bool Clicked;
+	bool Hovered;
+	bool MouseDown;
+	bool MouseUp;
+};
+
 class UIElement {
 public:
 	enum class Type {
@@ -42,16 +49,18 @@ public:
 
 	void Render();
 
+	UINode Add(UIElement::Type type);
+
 	template<typename TUIElement, typename ...Args>
 	requires std::derived_from<TUIElement, UIElement>
 	TUIElement& Add(Args&&... args) {
-		auto node = m_Root->Add(std::forward<Args>(args)...);
-		m_Children.push_back(node);
-		m_Root->Get(node)->m_Parent = m_Node;
+		// auto node = Add(GetType<TUIElement>());
+		// auto* element = Get(node);
+		// *((TUIElement)element) = TUIElement(std::forward<Args>(args)...);
 	}
 
-	bool IsClicked() const { return m_Clicked; }
-	bool IsHovered() const { return m_Hovered; }
+	bool IsClicked() const { return m_State.Clicked; }
+	bool IsHovered() const { return m_State.Hovered; }
 
 	UIElement& SetSize(uint32_t width, uint32_t height);
 	UIElement& SetPosition(float x, float y);
@@ -64,6 +73,7 @@ public:
 	UIElement::Type GetType() const { return m_Type; }
 	std::string GetID() const { return m_ID; }
 
+	UIElement* GetChild(const UINode& node) const;
 	UIElement* GetChild(const std::string& id) const;
 	List<UIElement*> GetChildren() const;
 	UIPage* GetRoot() const { return m_Root; }
@@ -84,10 +94,7 @@ protected:
 	UINode m_Parent;
 	std::vector<UINode> m_Children;
 
-	bool m_Clicked;
-	bool m_Hovered;
-	bool m_MouseDown;
-	bool m_MouseUp;
+	UIState m_State;
 
 	friend class UIRenderer;
 	friend class UISerializer;

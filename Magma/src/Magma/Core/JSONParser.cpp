@@ -8,12 +8,12 @@ JSONParserNode::JSONParserNode() { }
 
 // }
 
-bool JSONParserNode::IsValid() {
+// bool JSONParserNode::IsValid() {
 
-}
+// }
 
-JSONParser::JSONParser(const std::string& path) {
+// JSONParser::JSONParser(const std::string& path) {
 
-}
+// }
 
 }

@@ -16,19 +16,18 @@ public:
 	static void BeginFrame();
 	static void EndFrame();
 
-	static void DrawWindow(Window& window);
-	static void DrawButton(Button& button);
-	static void DrawImage(Image& image);
-	static void DrawText(Text& text);
-	static void DrawTextInput(TextInput& textInput);
-	static void DrawDropdown(Dropdown& dropdown);
+	static UIState DrawWindow(Window& window);
+	static UIState DrawButton(Button& button);
+	static UIState DrawImage(Image& image);
+	static UIState DrawText(Text& text);
+	static UIState DrawTextInput(TextInput& textInput);
+	static UIState DrawDropdown(Dropdown& dropdown);
 
-	static void DrawMenuBar(const std::string& name);
-	// static UIState DrawMenuBar(const std::string& name);
-	static void DrawMenu(const std::string& name);
+	static UIState DrawMenuBar(const std::string& name);
+	static UIState DrawMenu(const std::string& name);
 
-	static void DrawTabBar(const std::string& name);
-	static void DrawTab(const std::string& name);
+	static UIState DrawTabBar(const std::string& name);
+	static UIState DrawTab(const std::string& name);
 };
 
 }
