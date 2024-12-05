@@ -29,16 +29,17 @@ DLL::DLL() {
 	m_DLL = CreateRef<Magma::DLL>("build\\TestLib\\lib\\TestLib.dll");
 
 	auto load = m_DLL->GetFunction<void>("Load");
-	auto get = m_DLL->GetFunction<TestObject*, std::string>("Load");
-
-	VOLCANICORE_LOG_INFO("DLL Project Successful");
+	auto get = m_DLL->GetFunction<TestObject*, std::string>("Get");
 	load();
+
+	VOLCANICORE_LOG_INFO("DLL Project Started Successfully");
 	auto* object0 = get("Object0");
 	auto* object1 = get("Object1");
 	auto* object2 = get("Object2");
-	// VOLCANICORE_LOG_INFO(object0->ToString().c_str());
-	// VOLCANICORE_LOG_INFO(object1->ToString().c_str());
-	// VOLCANICORE_LOG_INFO(object2->ToString().c_str());
+	VOLCANICORE_LOG_INFO(object0->ToString().c_str());
+	VOLCANICORE_LOG_INFO(object1->ToString().c_str());
+	VOLCANICORE_LOG_INFO(object2->ToString().c_str());
+	VOLCANICORE_LOG_INFO("DLL Project Completed Successfully");
 }
 
 void DLL::OnUpdate(TimeStep ts) {

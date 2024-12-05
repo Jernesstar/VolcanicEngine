@@ -54,7 +54,7 @@ void SceneVisualizerPanel::Draw() {
 		auto width = size.x;
 		auto height = size.y;
 
-		UI::UIRenderer::DrawImage(*m_Image);
+		m_Image->Render();
 
 		if(ImGui::IsMouseClicked(0) && ImGui::IsWindowHovered()) {
 			// auto& cameraController = m_Renderer.GetCameraController();

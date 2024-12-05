@@ -28,6 +28,8 @@ public:
 
 	static UIState DrawTabBar(const std::string& name);
 	static UIState DrawTab(const std::string& name);
+
+	static void ShowPopupLabel(const std::string& str);
 };
 
 }

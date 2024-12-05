@@ -51,8 +51,9 @@ UIPage::UIPage(const std::string& filePathName) {
 void UIPage::Load(const std::string& filePathName) {
 	using namespace rapidjson;
 
-	auto jsonPath = filePathName + ".magma.ui.json";
-	auto funcPath = filePathName + ".magma.ui.func";
+	m_Path = filePathName;
+	auto jsonPath = m_Path + ".magma.ui.json";
+	auto funcPath = m_Path + ".magma.ui.func";
 	if(!FileUtils::FileExists(jsonPath))
 		return;
 
@@ -72,8 +73,8 @@ void UIPage::Load(const std::string& filePathName) {
 	}
 
 	namespace fs = std::filesystem;
-	auto name = fs::path(filePathName).filename();
-	auto genPath = "projects/gen/" + name.string();
+	auto name = fs::path(m_Path).filename();
+	auto genPath = "Magma/projects/Project/gen/" + name.string();
 
 	GenFiles(genPath, funcPath);
 
@@ -93,10 +94,14 @@ void UIPage::Load(const std::string& filePathName) {
 	}
 
 	CompleteFiles(genPath);
-	// m_GenFile = CreateRef<DLL>(genPath + ".dll");
 }
 
 void UIPage::Reload() {
+	namespace fs = std::filesystem;
+	auto name = fs::path(m_Path).filename();
+	auto genPath = "Magma/projects/Project/gen/" + name.string();
+
+	m_GenFile = CreateRef<DLL>(genPath + ".dll");
 	auto func = m_GenFile->GetFunction<void>("LoadElements");
 	func();
 }
@@ -223,8 +228,9 @@ void CompileElement(const std::string& genPath, const std::string& funcPath,
 					const rapidjson::Value& docElement)
 {
 	if(!docElement.HasMember("OnClick")
-	|| !docElement.HasMember("OnHover")
-	|| !docElement.HasMember("OnMouseUp"))
+	&& !docElement.HasMember("OnHover")
+	&& !docElement.HasMember("OnMouseUp")
+	&& !docElement.HasMember("OnMouseDown"))
 		return;
 
 	auto hFile = File(genPath + ".h");
@@ -232,20 +238,23 @@ void CompileElement(const std::string& genPath, const std::string& funcPath,
 	auto funcFile = File(funcPath);
 
 	std::string id = docElement["ID"].Get<std::string>();
-	cppFile.Write("m_Elements[id] = new " + id + ";");
+	cppFile.Write("m_Elements[\"" + id + "\"] = new " + id + ";");
 	hFile
 	.Write("class " + id + " : public UIClickable {")
 		.Write("public:");
 
 	std::string funcFileStr = funcFile.Get();
+	VOLCANICORE_LOG_INFO(id.c_str());
 	auto elementIdx = funcFileStr.find_first_of(id);
 
-	for(auto name : List<std::string>{ "OnClick", "OnHover", "OnMouseUp" }) {
+	for(auto func : { "OnClick", "OnHover", "OnMouseUp", "OnMouseDown" }) {
+		std::string name = func;
 		if(!docElement.HasMember(name))
 			continue;
+
 		const auto& element = docElement[name];
 
-		hFile.Write("void " + name + " override {");
+		hFile.Write("void " + name + "() override {");
 		hFile.Write("UIClickable::" + name + "();");
 
 		if(element.IsObject()) {
@@ -254,61 +263,83 @@ void CompileElement(const std::string& genPath, const std::string& funcPath,
 		if(element.IsString()) {
 			auto string = element.Get<std::string>();
 			if(string.substr(0, 4) == "@cpp") {
-				auto left = string.find_first_of("{");
-				auto right = string.find_last_of("}");
-
-				hFile.Write(string.substr(left + 1, right - 1));
+				uint32_t left = string.find_first_of("{");
+				uint32_t right = string.find_last_of("}");
+				hFile.Write(string.substr(left + 2, right - 6));
 			}
 			else if(string == "Default") {
-				// // Use function defined in .func file
-				// uint32_t funcIdx = funcFileStr.find_first_of(name);
-				// uint32_t startScope = funcFileStr.substr(funcIdx).find_first_of("{");
-				// uint32_t last = 0;
-				// List<uint32_t> scopeStack;
-				// scopeStack.push_back(startScope);
-				// while(scopeStack.size()) {
-				// 	last = scopeStack.back() + 1;
-				// 	auto left = funcFileStr.substr(last).find_first_of("{");
-				// 	auto right = funcFileStr.substr(last).find_first_of("}");
+				uint32_t funcIdx = funcFileStr.find_first_of(name, elementIdx);
+				uint32_t start = funcFileStr.find_first_of("{", funcIdx);
+				uint32_t left = start;
+				uint32_t right = start;
+				uint32_t max = left + 1;
+				List<uint32_t> scopeStack;
+				scopeStack.push_back(left);
 
-				// 	if(left < right)
+				// while(scopeStack.size()) {
+				// 	left = funcFileStr.find_first_of("{", max);
+				// 	right = funcFileStr.find_first_of("}", max);
+
+				// 	VOLCANICORE_LOG_INFO("Size %i", scopeStack.size());
+				// 	VOLCANICORE_LOG_INFO("Left %i", left);
+				// 	VOLCANICORE_LOG_INFO("Right %i", right);
+
+				// 	if(left < right) {
 				// 		scopeStack.push_back(left);
-				// 	else if(funcFileStr[scopeStack[scopeStack.size() - 2]] == '{')
+				// 		max = scopeStack.back() + 1;
+				// 	}
+				// 	else {
 				// 		scopeStack.pop_back();
+				// 		max = right + 1;
+				// 	}
 				// }
 
-				// hFile.Write(funcFileStr.substr(startScope + 1, last - 1));
+				hFile.Write(funcFileStr.substr(elementIdx + 1, 40));
 			}
 		}
 
 		hFile.Write("}");
 	}
+
+	hFile.Write("};");
 }
 
 void GenFiles(const std::string& genPath, const std::string& funcPath) {
+	FileUtils::CreateFile(genPath + ".h");
+	FileUtils::CreateFile(genPath + ".cpp");
+
 	auto hFile = File(genPath + ".h");
 	auto cppFile = File(genPath + ".cpp");
-	// hFile.Write(FileUtils::ReadFile(funcPath));
+
+	hFile
+	.Write("#pragma once")
+	.Write("#include <Magma/UI/UI.h>")
+	.Write("#include <Magma/UI/UIClickable.h>")
+	.Write("#include <VolcaniCore/Core/Defines.h>")
+	.Write("using namespace VolcaniCore;")
+	.Write("using namespace Magma::UI;")
+	.Write("namespace UIElements {");
 
 	auto str = 
-	"#include <VolcaniCore/Core/Defines.h> \n"
-	"#include \"" + hFile.Path + "\" \n"
-	"using namespace VolcaniCore; \n"
-	"using namespace Magma::UI; \n"
-	"namespace UIElements { \n"
-	"static Map<std::string, UIClickable*> m_Elements; \n"
-	"extern \"C\" EXPORT UIClickable* GetElement(const std::string& id) { \n"
-		"return m_Elements[id]; \n"
-	"} \n"
-	"extern \"C\" EXPORT UIClickable* LoadElements() {";
+	"#include \"" + hFile.Path + "\"\n"
+	"namespace UIElements {\n"
+	"static Map<std::string, UIClickable*> m_Elements;\n"
+	"extern \"C\" EXPORT UIClickable* GetElement(const std::string& id) {\n"
+		"return m_Elements[id];\n"
+	"}\n"
+	"extern \"C\" EXPORT void LoadElements() {";
 
 	cppFile.Write(str);
 }
 
 void CompleteFiles(const std::string& genPath) {
+	auto hFile = File(genPath + ".h");
 	auto cppFile = File(genPath + ".cpp");
+
 	cppFile.Write("}"); // LoadElements
 	cppFile.Write("}"); // namespace UIElements
+
+	hFile.Write("}"); // namespace UIElements
 }
 
 }

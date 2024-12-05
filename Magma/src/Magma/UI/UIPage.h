@@ -56,6 +56,8 @@ private:
 
 	List<UINode> m_FirstOrders;
 	Map<std::string, UIState> m_States;
+
+	std::string m_Path;
 	Ref<DLL> m_GenFile;
 
 private:
