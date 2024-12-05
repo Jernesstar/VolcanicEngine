@@ -17,7 +17,7 @@ public:
 	}
 
 	virtual void OnMouseDown() {
-		// Creates OnMouseUpEvent(ID)
+		// Creates OnMouseDownEvent(ID)
 	}
 };
 

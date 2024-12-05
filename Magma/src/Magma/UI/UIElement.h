@@ -49,7 +49,8 @@ public:
 
 	void Render();
 
-	UINode Add(UIElement::Type type);
+	UINode Add(UIElement::Type type, const std::string& id);
+	void Add(const UINode& node);
 
 	template<typename TUIElement, typename ...Args>
 	requires std::derived_from<TUIElement, UIElement>
@@ -86,7 +87,7 @@ protected:
 
 protected:
 	const Type m_Type;
-	const std::string m_ID;
+	std::string m_ID;
 
 	UIPage* m_Root;
 	UINode m_Node;

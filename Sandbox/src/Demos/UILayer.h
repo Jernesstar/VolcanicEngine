@@ -38,7 +38,7 @@ UILayer::~UILayer() {
 void UILayer::OnUpdate(TimeStep ts) {
 	UI::UIRenderer::BeginFrame();
 
-	// Root.Render();
+	Root.Render();
 
 	UI::UIRenderer::EndFrame();
 }

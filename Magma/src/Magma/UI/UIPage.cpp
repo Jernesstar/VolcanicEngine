@@ -49,13 +49,15 @@ UIPage::UIPage(const std::string& filePathName) {
 }
 
 void UIPage::Load(const std::string& filePathName) {
-	using namespace rapidjson;
-
-	m_Path = filePathName;
-	auto jsonPath = m_Path + ".magma.ui.json";
-	auto funcPath = m_Path + ".magma.ui.func";
+	auto jsonPath = filePathName + ".magma.ui.json";
+	auto funcPath = filePathName + ".magma.ui.func";
 	if(!FileUtils::FileExists(jsonPath))
 		return;
+
+	using namespace rapidjson;
+	namespace fs = std::filesystem;
+	m_Path = filePathName;
+	m_Name = fs::path(m_Path).filename().string();
 
 	std::string file = FileUtils::ReadFile(jsonPath);
 	Document doc;
@@ -72,34 +74,30 @@ void UIPage::Load(const std::string& filePathName) {
 
 	}
 
-	namespace fs = std::filesystem;
-	auto name = fs::path(m_Path).filename();
-	auto genPath = "Magma/projects/Project/gen/" + name.string();
-
-	GenFiles(genPath, funcPath);
-
-	Windows.reserve(10);
-	Buttons.reserve(10);
-	Dropdowns.reserve(10);
-	Texts.reserve(10);
-	TextInputs.reserve(10);
-	Images.reserve(10);
+	Windows.reserve(20);
+	Buttons.reserve(20);
+	Dropdowns.reserve(20);
+	Texts.reserve(20);
+	TextInputs.reserve(20);
+	Images.reserve(20);
 
 	if(doc.HasMember("Elements")) {
+		auto genPath = "Magma/projects/Project/gen/" + m_Name;
+		GenFiles(genPath, funcPath);
+
 		const auto& elements = doc["Elements"];
 		for(const auto& element : elements.GetArray()) {
 			LoadElement(this, element);
 			CompileElement(genPath, funcPath, element);
 		}
+
+		CompleteFiles(genPath);
 	}
 
-	CompleteFiles(genPath);
 }
 
 void UIPage::Reload() {
-	namespace fs = std::filesystem;
-	auto name = fs::path(m_Path).filename();
-	auto genPath = "Magma/projects/Project/gen/" + name.string();
+	auto genPath = "Magma/projects/Project/gen/" + m_Name;
 
 	m_GenFile = CreateRef<DLL>(genPath + ".dll");
 	auto func = m_GenFile->GetFunction<void>("LoadElements");
@@ -107,13 +105,15 @@ void UIPage::Reload() {
 }
 
 void UIPage::Render() {
-	for(auto* element : GetFirstOrderElements())
-		element->Render();
+	// VOLCANICORE_LOG_INFO(Get({ UIElement::Type::Window, 0 })->GetID().c_str());
+	// for(auto* element : GetFirstOrderElements())
+	// 	element->Render();
 }
 
 void UIPage::OnEvent(const UIState& state, const std::string& id) {
-	auto func = m_GenFile->GetFunction<UIClickable*, std::string>("GetElement");
-	auto* element = func(id);
+	auto get = m_GenFile->GetFunction<UIClickable*, std::string>("GetElement");
+	auto* element = get(id);
+
 	if(state.Clicked)
 		element->OnClick();
 	if(state.Hovered)
@@ -128,23 +128,25 @@ UINode UIPage::Add(UIElement::Type type, const std::string& id) {
 	switch(type) {
 		case UIElement::Type::Window:
 			Windows.emplace_back(id, this);
-			return { type, Windows.size() };
+			return { type, Windows.size() - 1 };
 		case UIElement::Type::Button:
 			Buttons.emplace_back(id, this);
-			return { type, Buttons.size() };
+			return { type, Buttons.size() - 1 };
 		case UIElement::Type::Dropdown:
 			Dropdowns.emplace_back(id, this);
-			return { type, Dropdowns.size() };
+			return { type, Dropdowns.size() - 1 };
 		case UIElement::Type::Text:
 			Texts.emplace_back(id, this);
-			return { type, Texts.size() };
+			return { type, Texts.size() - 1 };
 		case UIElement::Type::TextInput:
 			TextInputs.emplace_back(id, this);
-			return { type, TextInputs.size() };
+			return { type, TextInputs.size() - 1 };
 		case UIElement::Type::Image:
 			Images.emplace_back(id, this);
-			return { type, Images.size() };
+			return { type, Images.size() - 1 };
 	}
+
+	return { UIElement::Type::Window, 0 };
 }
 
 UIElement* UIPage::Get(const UINode& node) const {
@@ -163,10 +165,31 @@ UIElement* UIPage::Get(const UINode& node) const {
 		case UIElement::Type::Image:
 			return (UIElement*)&Images[node.second];
 	}
+
+	return nullptr;
 }
 
 UIElement* UIPage::Get(const std::string& id) const {
+	for(auto& element : Windows)
+		if(element.GetID() == id)
+			return (UIElement*)&element;
+	for(auto& element : Buttons)
+		if(element.GetID() == id)
+			return (UIElement*)&element;
+	for(auto& element : Dropdowns)
+		if(element.GetID() == id)
+			return (UIElement*)&element;
+	for(auto& element : Texts)
+		if(element.GetID() == id)
+			return (UIElement*)&element;
+	for(auto& element : TextInputs)
+		if(element.GetID() == id)
+			return (UIElement*)&element;
+	for(auto& element : Images)
+		if(element.GetID() == id)
+			return (UIElement*)&element;
 
+	return nullptr;
 }
 
 List<UIElement*> UIPage::GetFirstOrderElements() const {
@@ -180,31 +203,46 @@ List<UIElement*> UIPage::GetFirstOrderElements() const {
 void LoadElement(UIPage* page, const rapidjson::Value& docElement) {
 	std::string id = docElement["ID"].GetString();
 	std::string typeStr = docElement["Type"].GetString();
-	UIElement* element;
-	if(typeStr == "Window") {
-		element = page->Get(page->Add(UIElement::Type::Window, id));
+	std::string parent = "";
 
+	if(docElement.HasMember("Parent"))
+		parent = docElement["Parent"].Get<std::string>();
+
+	UINode node;
+	UIElement* element;
+
+	if(typeStr == "Window") {
+		node = page->Add(UIElement::Type::Window, id);
+		element = page->Get(node);
 	}
 	if(typeStr == "Button") {
-		element = page->Get(page->Add(UIElement::Type::Button, id));
-
+		node = page->Add(UIElement::Type::Button, id);
+		element = page->Get(node);
 	}
 	if(typeStr == "Dropdown") {
-		element = page->Get(page->Add(UIElement::Type::Dropdown, id));
-		
+		node = page->Add(UIElement::Type::Dropdown, id);
+		element = page->Get(node);
 	}
 	if(typeStr == "Text") {
-		element = page->Get(page->Add(UIElement::Type::Text, id));
-		
+		node = page->Add(UIElement::Type::Text, id);
+		element = page->Get(node);
 	}
 	if(typeStr == "TextInput") {
-		element = page->Get(page->Add(UIElement::Type::TextInput, id));
-		
+		node = page->Add(UIElement::Type::TextInput, id);
+		element = page->Get(node);
 	}
 	if(typeStr == "Image") {
-		element = page->Get(page->Add(UIElement::Type::Image, id));
-		
+		node = page->Add(UIElement::Type::Image, id);
+		element = page->Get(node);
 	}
+
+	if(parent == "")
+		page->Add(node);
+	else
+		page->Get(parent)->Add(node);
+	
+	auto parentPtr = page->Get(parent);
+	// VOLCANICORE_LOG_INFO(parentPtr->GetID().c_str());
 
 	// TODO(Implement): Element alignement
 	auto width = docElement["Width"].Get<uint32_t>();
@@ -222,6 +260,7 @@ void LoadElement(UIPage* page, const rapidjson::Value& docElement) {
 	element->Color = color;
 	element->SetSize(width, height);
 	element->SetPosition(x, y);
+	VOLCANICORE_LOG_INFO(element->GetID().c_str());
 }
 
 void CompileElement(const std::string& genPath, const std::string& funcPath,
@@ -238,14 +277,13 @@ void CompileElement(const std::string& genPath, const std::string& funcPath,
 	auto funcFile = File(funcPath);
 
 	std::string id = docElement["ID"].Get<std::string>();
-	cppFile.Write("m_Elements[\"" + id + "\"] = new " + id + ";");
+	cppFile.Write("\tm_Elements[\"" + id + "\"] = new " + id + ";");
 	hFile
 	.Write("class " + id + " : public UIClickable {")
-		.Write("public:");
+	.Write("public:");
 
 	std::string funcFileStr = funcFile.Get();
-	VOLCANICORE_LOG_INFO(id.c_str());
-	auto elementIdx = funcFileStr.find_first_of(id);
+	auto elementIdx = funcFileStr.find(id);
 
 	for(auto func : { "OnClick", "OnHover", "OnMouseUp", "OnMouseDown" }) {
 		std::string name = func;
@@ -254,8 +292,8 @@ void CompileElement(const std::string& genPath, const std::string& funcPath,
 
 		const auto& element = docElement[name];
 
-		hFile.Write("void " + name + "() override {");
-		hFile.Write("UIClickable::" + name + "();");
+		hFile.Write("\tvoid " + name + "() override {");
+		hFile.Write("\t\tUIClickable::" + name + "();");
 
 		if(element.IsObject()) {
 			// Animation
@@ -263,42 +301,38 @@ void CompileElement(const std::string& genPath, const std::string& funcPath,
 		if(element.IsString()) {
 			auto string = element.Get<std::string>();
 			if(string.substr(0, 4) == "@cpp") {
-				uint32_t left = string.find_first_of("{");
-				uint32_t right = string.find_last_of("}");
-				hFile.Write(string.substr(left + 2, right - 6));
+				uint32_t left = string.find_first_of('{');
+				uint32_t right = string.find_last_of('}');
+				hFile.Write("\t\t" + string.substr(left + 2, right - left - 3));
 			}
 			else if(string == "Default") {
-				uint32_t funcIdx = funcFileStr.find_first_of(name, elementIdx);
-				uint32_t start = funcFileStr.find_first_of("{", funcIdx);
+				uint32_t funcIdx = funcFileStr.find(name, elementIdx);
+				uint32_t start = funcFileStr.find_first_of('{', funcIdx);
 				uint32_t left = start;
 				uint32_t right = start;
 				uint32_t max = left + 1;
 				List<uint32_t> scopeStack;
 				scopeStack.push_back(left);
 
-				// while(scopeStack.size()) {
-				// 	left = funcFileStr.find_first_of("{", max);
-				// 	right = funcFileStr.find_first_of("}", max);
+				while(scopeStack.size()) {
+					left = funcFileStr.find_first_of('{', max);
+					right = funcFileStr.find_first_of('}', max);
 
-				// 	VOLCANICORE_LOG_INFO("Size %i", scopeStack.size());
-				// 	VOLCANICORE_LOG_INFO("Left %i", left);
-				// 	VOLCANICORE_LOG_INFO("Right %i", right);
+					if(left < right) {
+						scopeStack.push_back(left);
+						max = scopeStack.back() + 1;
+					}
+					else {
+						scopeStack.pop_back();
+						max = right + 1;
+					}
+				}
 
-				// 	if(left < right) {
-				// 		scopeStack.push_back(left);
-				// 		max = scopeStack.back() + 1;
-				// 	}
-				// 	else {
-				// 		scopeStack.pop_back();
-				// 		max = right + 1;
-				// 	}
-				// }
-
-				hFile.Write(funcFileStr.substr(elementIdx + 1, 40));
+				hFile.Write("\t\t" + funcFileStr.substr(start + 1, max - start - 2));
 			}
 		}
 
-		hFile.Write("}");
+		hFile.Write("\t}");
 	}
 
 	hFile.Write("};");
@@ -310,26 +344,23 @@ void GenFiles(const std::string& genPath, const std::string& funcPath) {
 
 	auto hFile = File(genPath + ".h");
 	auto cppFile = File(genPath + ".cpp");
+	auto funcFile = File(funcPath);
+	auto funcFileStr = funcFile.Get();
+	auto elementsIdx = funcFileStr.find("namespace UIElements");
 
 	hFile
-	.Write("#pragma once")
+	.Write(funcFileStr.substr(0, elementsIdx))
 	.Write("#include <Magma/UI/UI.h>")
-	.Write("#include <Magma/UI/UIClickable.h>")
-	.Write("#include <VolcaniCore/Core/Defines.h>")
-	.Write("using namespace VolcaniCore;")
-	.Write("using namespace Magma::UI;")
-	.Write("namespace UIElements {");
+	.Write("namespace UIElements {\n");
 
-	auto str = 
-	"#include \"" + hFile.Path + "\"\n"
-	"namespace UIElements {\n"
-	"static Map<std::string, UIClickable*> m_Elements;\n"
-	"extern \"C\" EXPORT UIClickable* GetElement(const std::string& id) {\n"
-		"return m_Elements[id];\n"
-	"}\n"
-	"extern \"C\" EXPORT void LoadElements() {";
-
-	cppFile.Write(str);
+	cppFile
+	.Write("#include \"" + hFile.Path + "\"\n")
+	.Write("namespace UIElements {\n")
+	.Write("static Map<std::string, UIClickable*> m_Elements;\n")
+	.Write("extern \"C\" EXPORT UIClickable* GetElement(const std::string& id) {")
+	.Write(	"\treturn m_Elements[id];")
+	.Write("}\n")
+	.Write("extern \"C\" EXPORT void LoadElements() {");
 }
 
 void CompleteFiles(const std::string& genPath) {
@@ -337,9 +368,9 @@ void CompleteFiles(const std::string& genPath) {
 	auto cppFile = File(genPath + ".cpp");
 
 	cppFile.Write("}"); // LoadElements
-	cppFile.Write("}"); // namespace UIElements
+	cppFile.Write("\n}"); // namespace UIElements
 
-	hFile.Write("}"); // namespace UIElements
+	hFile.Write("\n}"); // namespace UIElements
 }
 
 }

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <UIRenderer.h>
-#include <UIClickable.h>
+#include <Magma/UI/UIRenderer.h>
+#include <Magma/UI/UIClickable.h>
 
 using namespace Magma::UI;
 

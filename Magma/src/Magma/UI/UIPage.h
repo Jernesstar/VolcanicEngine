@@ -21,7 +21,10 @@ public:
 
 	void OnEvent(const UIState& state, const std::string& id);
 
-	UINode Add(UIElement::Type type, const std::string& id = "");
+	UINode Add(UIElement::Type type, const std::string& id);
+	void Add(const UINode& node) {
+		m_FirstOrders.push_back(node);
+	}
 
 	template<typename TUIElement, typename ...Args>
 	requires std::derived_from<TUIElement, UIElement>
@@ -42,7 +45,8 @@ public:
 	UIElement* Get(const UINode& node) const;
 	UIElement* Get(const std::string& id) const;
 	List<UIElement*> GetFirstOrderElements() const;
-	std::string GetName() const;
+	std::string GetPath() const { return m_Path; }
+	std::string GetName() const { return m_Name; }
 
 	// void SetTheme();
 
@@ -58,6 +62,7 @@ private:
 	Map<std::string, UIState> m_States;
 
 	std::string m_Path;
+	std::string m_Name;
 	Ref<DLL> m_GenFile;
 
 private:

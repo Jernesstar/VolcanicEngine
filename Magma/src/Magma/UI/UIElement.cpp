@@ -1,5 +1,7 @@
 #include "UIElement.h"
 
+#include <VolcaniCore/Core/Log.h>
+
 #include <imgui/imgui.h>
 
 #include "UIPage.h"
@@ -19,11 +21,15 @@ UIElement::UIElement(UIElement::Type type, UIPage* root)
 UIElement::UIElement(UIElement::Type type, const std::string& id, UIPage* root)
 	: m_Type(type), m_ID(id), m_Root(root) { }
 
-UINode UIElement::Add(UIElement::Type type) {
-	auto node = m_Root->Add(type);
+UINode UIElement::Add(UIElement::Type type, const std::string& id) {
+	auto node = m_Root->Add(type, id);
+	Add(node);
+	return node;
+}
+
+void UIElement::Add(const UINode& node) {
 	m_Children.push_back(node);
 	m_Root->Get(node)->m_Parent = m_Node;
-	return node;
 }
 
 void UIElement::Render() {
