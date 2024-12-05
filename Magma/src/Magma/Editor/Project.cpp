@@ -3,8 +3,13 @@
 #include <cstdlib>
 
 #include <VolcaniCore/Core/Log.h>
+#include <VolcaniCore/Core/FileUtils.h>
+
+#include "UI/UIBrowser.h"
 
 namespace fs = std::filesystem;
+
+using namespace VolcaniCore;
 
 namespace Magma {
 
@@ -30,7 +35,8 @@ void Project::Load(const fs::path& volcFilePath) {
 }
 
 void Project::Reload() {
-	// TODO(Implement): Dependencies
+	UI::UIBrowser::Load(m_AssetPath + "/ui");
+
 	std::string command;
 	command = "powershell 'Creating Makefiles';";
 	command += "$ProjectPath = \'" + m_SrcPath + "\';";

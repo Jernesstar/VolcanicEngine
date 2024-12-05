@@ -17,8 +17,10 @@
 #include <glm/vec4.hpp>
 
 #include <imgui/imgui.h>
+#include <imgui/imgui_internal.h>
 #include <imgui/backends/imgui_impl_glfw.h>
 #include <imgui/backends/imgui_impl_opengl3.h>
+#include <imgui/misc/cpp/imgui_stdlib.h>
 
 #include <OpenGL/Texture2D.h>
 
@@ -32,9 +34,11 @@ namespace Magma::UI {
 
 enum class UIElementType { Window, MenuBar, Menu, TabBar, Tab };
 
-static List<UIElementType> s_Types; // Elements that need ImGui::End to be called
+static List<UIElementType> s_Stack; // Elements that need ImGui::End to be called
 
 UIState UIRenderer::DrawWindow(UI::Window& window) {
+	s_Stack.push_back(UIElementType::Window);
+
 	ImGuiViewport* viewport = ImGui::GetMainViewport();
 	ImGui::SetNextWindowPos(ImVec2(viewport->Pos.x + window.x, viewport->Pos.y + window.y));
 	ImGui::SetNextWindowSize(ImVec2(window.Width, window.Height));
@@ -58,7 +62,6 @@ UIState UIRenderer::DrawWindow(UI::Window& window) {
 	ImGui::Begin(window.GetID().c_str(), &window.Open, windowFlags);
 	ImGui::PopStyleColor();
 	ImGui::PopStyleVar(3);
-	s_Types.push_back(UIElementType::Window);
 
 	return {
 		ImGui::IsItemClicked(),
@@ -187,7 +190,7 @@ UIState UIRenderer::DrawDropdown(Dropdown& dropdown) {
 UIState UIRenderer::DrawMenuBar(const std::string& name) {
 	ImGui::BeginMainMenuBar();
 
-	s_Types.push_back(UIElementType::MenuBar);
+	s_Stack.push_back(UIElementType::MenuBar);
 
 	return {
 		ImGui::IsItemClicked(),
@@ -200,7 +203,7 @@ UIState UIRenderer::DrawMenuBar(const std::string& name) {
 UIState UIRenderer::DrawMenu(const std::string& name) {
 	ImGui::BeginMenu(name.c_str());
 
-	s_Types.push_back(UIElementType::Menu);
+	s_Stack.push_back(UIElementType::Menu);
 
 	return {
 		ImGui::IsItemClicked(),
@@ -211,9 +214,9 @@ UIState UIRenderer::DrawMenu(const std::string& name) {
 }
 
 UIState UIRenderer::DrawTabBar(const std::string& name) {
-	ImGui::BeginTabBar(name.c_str(), ImGuiTabBarFlags_Reorderable);
+	s_Stack.push_back(UIElementType::TabBar);
 
-	s_Types.push_back(UIElementType::TabBar);
+	ImGui::BeginTabBar(name.c_str(), ImGuiTabBarFlags_Reorderable);
 
 	return {
 		ImGui::IsItemClicked(),
@@ -223,15 +226,37 @@ UIState UIRenderer::DrawTabBar(const std::string& name) {
 	};
 }
 
-UIState UIRenderer::DrawTab(const std::string& name) {
-	s_Types.push_back(UIElementType::Tab);
+TabState UIRenderer::DrawTab(const std::string& name) {
+	s_Stack.push_back(UIElementType::Tab);
 
-	return {
-		ImGui::IsItemClicked(),
-		ImGui::IsItemHovered(),
-		ImGui::IsMouseReleased(0),
-		ImGui::IsMouseDown(0),
-	};
+	auto size = ImGui::CalcTextSize(name.c_str());
+	float padding{4.0f};
+	ImGui::SetNextItemWidth(size.x + 6.0f*padding);
+
+	auto strID = name + "##";
+	bool tabItem = ImGui::BeginTabItem(strID.c_str());
+
+	float tabHeight{6.5f};
+	float radius{ tabHeight * 0.5f - padding };
+	ImVec2 pos;
+	pos.x = ImGui::GetItemRectMax().x - radius - 5.0f*padding;
+	pos.y = ImGui::GetItemRectMin().y + radius + padding;
+
+	TabState state;
+	if(tabItem) {
+		if(ImGui::IsItemClicked(0))
+			state.Clicked = true;
+		if(ImGui::IsItemHovered())
+			state.Hovered = true;
+
+		ImGui::EndTabItem();
+	}
+
+	auto closeButtonID = ImGui::GetID(("Close##" + strID).c_str());
+	if(ImGui::CloseButton(closeButtonID, pos))
+		state.Closed = true;
+
+	return state;
 }
 
 void UIRenderer::ShowPopupLabel(const std::string& str) {
@@ -245,9 +270,9 @@ void UIRenderer::BeginFrame() {
 }
 
 void UIRenderer::EndFrame() {
-	while(s_Types.size() > 0) {
-		auto type = s_Types.back();
-		s_Types.pop_back();
+	while(s_Stack.size() > 0) {
+		auto type = s_Stack.back();
+		s_Stack.pop_back();
 
 		switch(type) {
 			case UIElementType::Window:

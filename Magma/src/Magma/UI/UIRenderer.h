@@ -9,6 +9,12 @@
 
 namespace Magma::UI {
 
+struct TabState {
+	bool Clicked;
+	bool Hovered;
+	bool Closed;
+};
+
 class UIRenderer {
 public:
 	static void Init();
@@ -27,7 +33,7 @@ public:
 	static UIState DrawMenu(const std::string& name);
 
 	static UIState DrawTabBar(const std::string& name);
-	static UIState DrawTab(const std::string& name);
+	static TabState DrawTab(const std::string& name);
 
 	static void ShowPopupLabel(const std::string& str);
 };
