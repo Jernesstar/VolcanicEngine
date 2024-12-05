@@ -30,11 +30,6 @@ using namespace VolcaniCore;
 
 namespace Magma::UI {
 
-static void ButtonText(Ref<UIElement>, ImVec2);
-static void ButtonImage(Ref<UIElement>, ImVec2);
-
-static void (*ButtonFunction)(Ref<UIElement>, ImVec2);
-
 enum class UIElementType { Window, MenuBar, Menu, TabBar, Tab };
 
 static List<UIElementType> s_Types; // Elements that need ImGui::End to be called
@@ -68,20 +63,22 @@ UIState UIRenderer::DrawWindow(UI::Window& window) {
 	return {
 		ImGui::IsItemClicked(),
 		ImGui::IsItemHovered(),
+		ImGui::IsMouseReleased(0),
 		ImGui::IsMouseDown(0),
-		// ImGui::IsItemDeactivated()
 	};
 }
 
-void ButtonText(Ref<UIElement> element, ImVec2 dim) {
+static void (*ButtonFunction)(Ref<UIElement>, ImVec2);
+
+static void ButtonText(Ref<UIElement> element, ImVec2 dim) {
 	std::string text = element->As<Text>()->Content;
 	ImGui::Button(text.c_str(), dim);
 }
 
-void ButtonImage(Ref<UIElement> element, ImVec2 dim) {
-	// auto tex = element->As<Image>()->Content->As<OpenGL::Texture2D>();
-	// auto id = (ImTextureID)(intptr_t)tex->GetID();
-	// ImGui::ImageButton(id, dim);
+static void ButtonImage(Ref<UIElement> element, ImVec2 dim) {
+	auto tex = element->As<Image>()->Content->As<OpenGL::Texture2D>();
+	auto id = (ImTextureID)(intptr_t)tex->GetID();
+	ImGui::ImageButton(id, dim);
 }
 
 UIState UIRenderer::DrawButton(UI::Button& button) {
@@ -95,14 +92,14 @@ UIState UIRenderer::DrawButton(UI::Button& button) {
 	ImGui::SetCursorPos(ImVec2(button.x, button.y));
 
 	ButtonFunction(button.Display, ImVec2(button.Width, button.Height));
-	ImGui::PopStyleColor(3);
+	ImGui::PopStyleColor();
 	ImGui::PopStyleVar();
 
 	return {
 		ImGui::IsItemClicked(),
 		ImGui::IsItemHovered(),
+		ImGui::IsMouseReleased(0),
 		ImGui::IsMouseDown(0),
-		// ImGui::IsItemDeactivated()
 	};
 }
 
@@ -118,8 +115,8 @@ UIState UIRenderer::DrawImage(UI::Image& image) {
 	return {
 		ImGui::IsItemClicked(),
 		ImGui::IsItemHovered(),
+		ImGui::IsMouseReleased(0),
 		ImGui::IsMouseDown(0),
-		// ImGui::IsItemDeactivated()
 	};
 }
 
@@ -138,8 +135,8 @@ UIState UIRenderer::DrawText(UI::Text& text) {
 	return {
 		ImGui::IsItemClicked(),
 		ImGui::IsItemHovered(),
+		ImGui::IsMouseReleased(0),
 		ImGui::IsMouseDown(0),
-		// ImGui::IsItemDeactivated()
 	};
 }
 
@@ -153,8 +150,8 @@ UIState UIRenderer::DrawTextInput(TextInput& textInput) {
 	return {
 		ImGui::IsItemClicked(),
 		ImGui::IsItemHovered(),
+		ImGui::IsMouseReleased(0),
 		ImGui::IsMouseDown(0),
-		// ImGui::IsItemDeactivated()
 	};
 }
 
@@ -182,8 +179,8 @@ UIState UIRenderer::DrawDropdown(Dropdown& dropdown) {
 	return {
 		// ImGui::IsItemClicked(),
 		// ImGui::IsItemHovered(),
+		// ImGui::IsMouseReleased(0),
 		// ImGui::IsMouseDown(0),
-		// ImGui::IsItemDeactivated()
 	};
 }
 
@@ -195,8 +192,8 @@ UIState UIRenderer::DrawMenuBar(const std::string& name) {
 	return {
 		ImGui::IsItemClicked(),
 		ImGui::IsItemHovered(),
+		ImGui::IsMouseReleased(0),
 		ImGui::IsMouseDown(0),
-		// ImGui::IsItemDeactivated()
 	};
 }
 
@@ -208,8 +205,8 @@ UIState UIRenderer::DrawMenu(const std::string& name) {
 	return {
 		ImGui::IsItemClicked(),
 		ImGui::IsItemHovered(),
+		ImGui::IsMouseReleased(0),
 		ImGui::IsMouseDown(0),
-		// ImGui::IsItemDeactivated()
 	};
 }
 
@@ -221,8 +218,8 @@ UIState UIRenderer::DrawTabBar(const std::string& name) {
 	return {
 		ImGui::IsItemClicked(),
 		ImGui::IsItemHovered(),
+		ImGui::IsMouseReleased(0),
 		ImGui::IsMouseDown(0),
-		// ImGui::IsItemDeactivated()
 	};
 }
 
@@ -232,9 +229,13 @@ UIState UIRenderer::DrawTab(const std::string& name) {
 	return {
 		ImGui::IsItemClicked(),
 		ImGui::IsItemHovered(),
+		ImGui::IsMouseReleased(0),
 		ImGui::IsMouseDown(0),
-		// ImGui::IsItemDeactivated()
 	};
+}
+
+void UIRenderer::ShowPopupLabel(const std::string& str) {
+
 }
 
 void UIRenderer::BeginFrame() {

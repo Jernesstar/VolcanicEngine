@@ -6,6 +6,9 @@
 
 namespace Magma::UI {
 
+static List<UIPage> s_Pages;
+static UIPage* s_CurrentPage;
+
 void UIBrowser::Render() {
 	s_CurrentPage->Render();
 }

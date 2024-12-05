@@ -14,8 +14,8 @@ class UIPage;
 struct UIState {
 	bool Clicked;
 	bool Hovered;
-	bool MouseDown;
 	bool MouseUp;
+	bool MouseDown;
 };
 
 class UIElement {
@@ -72,11 +72,11 @@ public:
 
 	UIElement::Type GetType() const { return m_Type; }
 	std::string GetID() const { return m_ID; }
+	UIPage* GetRoot() const { return m_Root; }
 
 	UIElement* GetChild(const UINode& node) const;
 	UIElement* GetChild(const std::string& id) const;
 	List<UIElement*> GetChildren() const;
-	UIPage* GetRoot() const { return m_Root; }
 
 	template<typename TUIElement>
 	requires std::derived_from<TUIElement, UIElement>

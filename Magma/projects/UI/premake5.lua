@@ -1,19 +1,13 @@
-project "Project"
-    kind "ConsoleApp"
+project "UI"
+    kind "SharedLib"
     language "C++"
     cppdialect "C++latest"
-    -- exceptionhandling "On"
-    -- rtti "Off"
-    -- staticruntime "Off"
-
-    ProjectSrcDir = _OPTIONS["src"]
-    -- ProjectSrcDir = "C:/Users/Jercy Mukala/Code/TheMazeIsLava/TheMazeIsLava/src"
 
     objdir ("build/obj")
     targetdir ("build/bin")
 
     files {
-        "%{ProjectSrcDir}/**.cpp"
+        "gen/*.cpp"
     }
 
     includedirs {
@@ -43,12 +37,9 @@ project "Project"
         "%{Includes.stb_image}",
     }
 
-    libdirs {
-        "%{VolcanicEngineDir}/build/VolcaniCore/lib",
-        "%{VolcanicEngineDir}/build/Magma/lib"
-    }
-
     links {
+        "Project"
+
         "Magma",
         "VolcaniCore",
 
@@ -66,39 +57,11 @@ project "Project"
         -- "PhysX",
     }
 
-    filter "system:linux"
-        links {
-            "pthread",
-            "dl",
-            "GL",
-            "X11",
-        }
-
-    filter "system:windows"
-        systemversion "latest"
-        links {
-            "gdi32",
-            "kernel32",
-            "psapi",
-            "Ws2_32",
-        }
-
-    filter "system:macosx"
-        links {
-            "QuartzCore.framework",
-            "Metal.framework",
-            "Cocoa.framework",
-            "IOKit.framework",
-            "CoreVideo.framework"
-        }
-
     filter "toolset:gcc or toolset:clang"
         buildoptions {
             "-fexceptions",
             "-Wno-format-security"
         }
 
-    filter "toolset:msc"
-        buildoptions {
-            "/NODEFAULTLIB:library"
-        }
+    filter "system:windows"
+        systemversion "latest"

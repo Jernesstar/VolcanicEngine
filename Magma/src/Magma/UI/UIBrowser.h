@@ -10,10 +10,6 @@ public:
 
 	static void Load(const std::string& folderPath);
 	static void SetPage(const std::string& name);
-
-private:
-	static List<UIPage> s_Pages;
-	static UIPage* s_CurrentPage;
 };
 
 }

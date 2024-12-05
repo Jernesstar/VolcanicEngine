@@ -24,7 +24,7 @@ public:
 	Image(Ref<Texture> image = nullptr);
 	Image(const std::string& imagePath);
 	Image(const std::string& id, UIPage* root)
-	: UIElement(UIElement::Type::Image, id, root) { }
+		: UIElement(UIElement::Type::Image, id, root) { }
 
 	void SetImage(Ref<Texture> texture);
 	void SetImage(const std::string& imagePath);

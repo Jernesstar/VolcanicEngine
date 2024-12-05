@@ -2,6 +2,9 @@
 
 #include "UIPage.h"
 
+#include "Text.h"
+#include "Image.h"
+
 namespace Magma::UI {
 
 Button::Button(const glm::vec4& color, const std::string& text,
@@ -9,13 +12,13 @@ Button::Button(const glm::vec4& color, const std::string& text,
 	: UIElement(UIElement::Type::Button)
 {
 	Color = color;
-	// Text = text;
+	Display = CreateRef<Text>(text, textColor);
 }
 
 Button::Button(const std::string& imagePath)
 	: UIElement(UIElement::Type::Button)
 {
-	// Display = CreateRef<Image>(imagePath);
+	Display = CreateRef<Image>(imagePath);
 }
 
 void Button::Draw() {

@@ -74,15 +74,15 @@ void UIPage::Load(const std::string& filePathName) {
 
 	}
 
-	Windows.reserve(20);
-	Buttons.reserve(20);
-	Dropdowns.reserve(20);
-	Texts.reserve(20);
-	TextInputs.reserve(20);
-	Images.reserve(20);
+	// Windows.reserve(20);
+	// Buttons.reserve(20);
+	// Dropdowns.reserve(20);
+	// Texts.reserve(20);
+	// TextInputs.reserve(20);
+	// Images.reserve(20);
 
 	if(doc.HasMember("Elements")) {
-		auto genPath = "Magma/projects/Project/gen/" + m_Name;
+		auto genPath = "Magma/projects/UI/gen/" + m_Name;
 		GenFiles(genPath, funcPath);
 
 		const auto& elements = doc["Elements"];
@@ -97,7 +97,7 @@ void UIPage::Load(const std::string& filePathName) {
 }
 
 void UIPage::Reload() {
-	auto genPath = "Magma/projects/Project/gen/" + m_Name;
+	auto genPath = "Magma/projects/UI/gen/" + m_Name;
 
 	m_GenFile = CreateRef<DLL>(genPath + ".dll");
 	auto func = m_GenFile->GetFunction<void>("LoadElements");
@@ -105,12 +105,14 @@ void UIPage::Reload() {
 }
 
 void UIPage::Render() {
-	// VOLCANICORE_LOG_INFO(Get({ UIElement::Type::Window, 0 })->GetID().c_str());
-	// for(auto* element : GetFirstOrderElements())
-	// 	element->Render();
+	for(auto* element : GetFirstOrderElements())
+		element->Render();
 }
 
 void UIPage::OnEvent(const UIState& state, const std::string& id) {
+	if(!m_GenFile)
+		return;
+
 	auto get = m_GenFile->GetFunction<UIClickable*, std::string>("GetElement");
 	auto* element = get(id);
 
@@ -193,7 +195,7 @@ UIElement* UIPage::Get(const std::string& id) const {
 }
 
 List<UIElement*> UIPage::GetFirstOrderElements() const {
-	List<UIElement*> res(m_FirstOrders.size());
+	List<UIElement*> res;
 	for(auto node : m_FirstOrders)
 		res.push_back(Get(node));
 
@@ -218,6 +220,7 @@ void LoadElement(UIPage* page, const rapidjson::Value& docElement) {
 	if(typeStr == "Button") {
 		node = page->Add(UIElement::Type::Button, id);
 		element = page->Get(node);
+		element->As<Button>()->Display = CreateRef<Text>("Button1");
 	}
 	if(typeStr == "Dropdown") {
 		node = page->Add(UIElement::Type::Dropdown, id);
@@ -240,9 +243,6 @@ void LoadElement(UIPage* page, const rapidjson::Value& docElement) {
 		page->Add(node);
 	else
 		page->Get(parent)->Add(node);
-	
-	auto parentPtr = page->Get(parent);
-	// VOLCANICORE_LOG_INFO(parentPtr->GetID().c_str());
 
 	// TODO(Implement): Element alignement
 	auto width = docElement["Width"].Get<uint32_t>();
@@ -260,7 +260,6 @@ void LoadElement(UIPage* page, const rapidjson::Value& docElement) {
 	element->Color = color;
 	element->SetSize(width, height);
 	element->SetPosition(x, y);
-	VOLCANICORE_LOG_INFO(element->GetID().c_str());
 }
 
 void CompileElement(const std::string& genPath, const std::string& funcPath,
@@ -339,6 +338,8 @@ void CompileElement(const std::string& genPath, const std::string& funcPath,
 }
 
 void GenFiles(const std::string& genPath, const std::string& funcPath) {
+	namespace fs = std::filesystem;
+
 	FileUtils::CreateFile(genPath + ".h");
 	FileUtils::CreateFile(genPath + ".cpp");
 
@@ -354,7 +355,7 @@ void GenFiles(const std::string& genPath, const std::string& funcPath) {
 	.Write("namespace UIElements {\n");
 
 	cppFile
-	.Write("#include \"" + hFile.Path + "\"\n")
+	.Write("#include \"" + fs::path(hFile.Path).filename().string() + "\"\n")
 	.Write("namespace UIElements {\n")
 	.Write("static Map<std::string, UIClickable*> m_Elements;\n")
 	.Write("extern \"C\" EXPORT UIClickable* GetElement(const std::string& id) {")

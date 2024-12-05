@@ -30,7 +30,7 @@ public:
 	static TDerived* As() { return (TDerived*)(s_Instance); }
 
 protected:
-	virtual void OnUpdate(TimeStep ts) = 0;
+	virtual void OnUpdate(TimeStep ts) { }
 
 private:
 	static void Init();

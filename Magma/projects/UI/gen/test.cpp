@@ -1,4 +1,4 @@
-#include "Magma/projects/Project/gen/test.h"
+#include "test.h"
 
 namespace UIElements {
 

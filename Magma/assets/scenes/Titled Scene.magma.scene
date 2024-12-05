@@ -10,8 +10,8 @@ Scene:
             Camera:
               Type: Stereographic
               VerticalFOV: 45
-              Position: [-3.67294192, 0.196762919, 9.31842136]
-              Direction: [0.0471116565, 0.380996376, -0.923375666]
+              Position: [0, 0, 0]
+              Direction: [0, 0, -1]
               ViewportWidth: 800
               ViewportHeight: 600
               Near: 0.00100000005

@@ -74,7 +74,7 @@ void UIElement::Clear() {
 }
 
 List<UIElement*> UIElement::GetChildren() const {
-	List<UIElement*> res(m_Children.size());
+	List<UIElement*> res;
 	for(auto node : m_Children)
 		res.push_back(m_Root->Get(node));
 

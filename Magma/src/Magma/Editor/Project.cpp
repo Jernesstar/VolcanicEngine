@@ -41,14 +41,14 @@ void Project::Reload() {
 #elif VOLCANICENGINE_WINDOWS
 	command += "vendor\\premake\\bin\\Windows\\premake5.exe";
 #endif
-	// command += " -Wait -NoNewWindow";
+	command += " -Wait -NoNewWindow";
 	command += " -Args 'gmake2 --file=Magma\\projects\\premake5.lua',";
 	command += " (' --src=' + '\"' + $ProjectPath + '\"');";
 	command += "'Finished creating Makefiles'";
 	// VOLCANICORE_LOG_INFO(command.c_str());
 	system(command.c_str());
 
-	command = "powershell Start-Process mingw32-make.exe";
+	command = "powershell Start-Process mingw32-make.exe -NoNewWindow";
 	command += " -WorkingDir Magma\\projects\\build";
 	command += " -ArgumentList '-f Makefile';";
 	system(command.c_str());
