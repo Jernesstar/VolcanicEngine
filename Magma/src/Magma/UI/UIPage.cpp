@@ -74,13 +74,6 @@ void UIPage::Load(const std::string& filePathName) {
 
 	}
 
-	// Windows.reserve(20);
-	// Buttons.reserve(20);
-	// Dropdowns.reserve(20);
-	// Texts.reserve(20);
-	// TextInputs.reserve(20);
-	// Images.reserve(20);
-
 	if(doc.HasMember("Elements")) {
 		auto genPath = "Magma/projects/UI/gen/" + m_Name;
 		GenFiles(genPath, funcPath);
@@ -99,23 +92,23 @@ void UIPage::Reload() {
 	auto genPath = "Magma/projects/UI/gen/" + m_Name;
 
 	m_GenFile = CreateRef<DLL>(genPath + ".dll");
-	auto func = m_GenFile->GetFunction<void>("LoadObjects");
-	func();
+	auto load = m_GenFile->GetFunction<void>("LoadObjects");
+	load();
 }
 
 void UIPage::Update(TimeStep ts) {
 	for(auto* element : GetFirstOrderElements())
-		UpdateElement(ts, element);
+		UpdateElement(element, ts);
 }
 
-void UIPage::UpdateElement(TimeStep ts, UIElement* element) {
+void UIPage::UpdateElement(UIElement* element, TimeStep ts) {
 	auto get = m_GenFile->GetFunction<UIObject*, std::string>("GetObject");
 	auto* object = get(element->GetID());
 
-	object->OnUpdate(TimeStep ts);
+	object->OnUpdate(ts);
 
 	for(auto* child : element->GetChildren())
-		UpdateElement(child);
+		UpdateElement(child, ts);
 }
 
 void UIPage::Render() {
@@ -128,16 +121,16 @@ void UIPage::OnEvent(const std::string& id, const UIState& state) {
 		return;
 
 	auto get = m_GenFile->GetFunction<UIObject*, std::string>("GetObject");
-	auto* clickable = get(id);
+	auto* object = get(id);
 
 	if(state.Clicked)
-		clickable->OnClick();
+		object->OnClick();
 	if(state.Hovered)
-		clickable->OnHover();
+		object->OnHover();
 	if(state.MouseUp)
-		clickable->OnMouseUp();
+		object->OnMouseUp();
 	if(state.MouseDown)
-		clickable->OnMouseDown();
+		object->OnMouseDown();
 }
 
 UINode UIPage::Add(UIElement::Type type, const std::string& id) {
@@ -162,7 +155,7 @@ UINode UIPage::Add(UIElement::Type type, const std::string& id) {
 			return { type, Images.size() - 1 };
 	}
 
-	return { UIElement::Type::Window, 0 };
+	return { UIElement::Type::Window, Windows.size() };
 }
 
 UIElement* UIPage::Get(const UINode& node) const {
@@ -234,7 +227,16 @@ void LoadElement(UIPage* page, const rapidjson::Value& docElement) {
 	if(typeStr == "Button") {
 		node = page->Add(UIElement::Type::Button, id);
 		element = page->Get(node);
-		element->As<Button>()->Display = CreateRef<Text>("Button1");
+		auto* button = element->As<Button>();
+
+		if(docElement.HasMember("Image"))
+			button->Display
+				= CreateRef<Image>(docElement["Image"].Get<std::string>());
+		else if(docElement.HasMember("Text"))
+			button->Display
+				= CreateRef<Text>(docElement["Text"].Get<std::string>());
+		else
+			button->Display = CreateRef<Text>(button->GetID());
 	}
 	if(typeStr == "Dropdown") {
 		node = page->Add(UIElement::Type::Dropdown, id);

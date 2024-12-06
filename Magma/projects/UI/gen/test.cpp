@@ -1,14 +1,14 @@
 #include "test.h"
 
-namespace UIElements {
+namespace UIObjects {
 
-static Map<std::string, UIObject*> m_Elements;
+static Map<std::string, UIObject*> m_Objects;
 
-extern "C" EXPORT UIObject* GetElement(const std::string& id) {
-	return m_Elements[id];
+extern "C" EXPORT UIObject* GetObject(const std::string& id) {
+	return m_Objects[id];
 }
 
-extern "C" EXPORT void LoadElements() {
+extern "C" EXPORT void LoadObjects() {
 	m_Elements["Button1"] = new Button1;
 }
 

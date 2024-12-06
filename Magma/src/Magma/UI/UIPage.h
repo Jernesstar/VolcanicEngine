@@ -1,8 +1,12 @@
 #pragma once
 
-#include "UI.h"
+#include <VolcaniCore/Core/Time.h>
 
 #include "Core/DLL.h"
+
+#include "UI.h"
+
+using namespace VolcaniCore;
 
 namespace Magma::UI {
 
@@ -75,7 +79,7 @@ private:
 	template<typename TUIType>
 	UIElement::Type GetType();
 
-	void UpdateElement(TimeStep ts, UIElement* element);
+	void UpdateElement(UIElement* element, TimeStep ts);
 };
 
 }

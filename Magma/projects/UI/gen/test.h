@@ -7,7 +7,7 @@ using namespace Magma::UI;
 
 
 #include <Magma/UI/UI.h>
-namespace UIElements {
+namespace UIObjects {
 
 class Button1 : public UIObject {
 public:
@@ -19,11 +19,6 @@ public:
 		UIObject::OnHover();
 		
 		UIRenderer::ShowPopupLabel("This is Button1");
-		{}
-		{
-			{ }
-		}
-		{}
 	
 	}
 	void OnMouseUp() override {

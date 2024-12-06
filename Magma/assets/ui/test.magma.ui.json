@@ -34,7 +34,7 @@
             "Height": 40,
             "x": 20,
             "y": 20,
-            "Color": [0.3, 0.3, 0.3, 1.0],
+            "Color": [0.0, 0.0, 0.0, 1.0],
 
             "OnClick": "@cpp{ UIBrowser::SetPage(\"some_other_page\"); }",
             "OnHover": "Default",
