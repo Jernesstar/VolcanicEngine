@@ -48,7 +48,7 @@ void Image::SetImage(Ref<Framebuffer> framebuffer, AttachmentTarget target) {
 void Image::Draw() {
 	m_State = UIRenderer::DrawImage(*this);
 	if(m_Root)
-		m_Root->OnEvent(m_State, m_ID);
+		m_Root->OnEvent(m_ID, m_State);
 }
 
 }

@@ -7,7 +7,7 @@ namespace Magma::UI {
 void Window::Draw() {
 	m_State = UIRenderer::DrawWindow(*this);
 	if(m_Root)
-		m_Root->OnEvent(m_State, m_ID);
+		m_Root->OnEvent(m_ID, m_State);
 }
 
 }

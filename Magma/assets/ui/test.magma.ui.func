@@ -1,21 +1,16 @@
 #pragma once
 
 #include <Magma/UI/UIRenderer.h>
-#include <Magma/UI/UIClickable.h>
+#include <Magma/UI/UIObject.h>
 
 using namespace Magma::UI;
 
-namespace UIElements {
+namespace UIObjects {
 
-class Button1 : public UIClickable {
+class Button1 : public UIObject {
 public:
 	void OnHover() override {
 		UIRenderer::ShowPopupLabel("This is Button1");
-		{}
-		{
-			{ }
-		}
-		{}
 	}
 };
 

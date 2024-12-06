@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Magma/UI/UIRenderer.h>
-#include <Magma/UI/UIClickable.h>
+#include <Magma/UI/UIObject.h>
 
 using namespace Magma::UI;
 
@@ -9,14 +9,14 @@ using namespace Magma::UI;
 #include <Magma/UI/UI.h>
 namespace UIElements {
 
-class Button1 : public UIClickable {
+class Button1 : public UIObject {
 public:
 	void OnClick() override {
-		UIClickable::OnClick();
+		UIObject::OnClick();
 		UIBrowser::SetPage("some_other_page");
 	}
 	void OnHover() override {
-		UIClickable::OnHover();
+		UIObject::OnHover();
 		
 		UIRenderer::ShowPopupLabel("This is Button1");
 		{}
@@ -27,7 +27,7 @@ public:
 	
 	}
 	void OnMouseUp() override {
-		UIClickable::OnMouseUp();
+		UIObject::OnMouseUp();
 	}
 };
 

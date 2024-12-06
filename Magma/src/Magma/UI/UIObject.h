@@ -2,8 +2,12 @@
 
 namespace Magma::UI {
 
-class UIClickable {
+class UIObject {
 public:
+	virtual void OnUpdate(TimeStep ts) {
+		// Updatep
+	}
+
 	virtual void OnClick() {
 		// Creates OnClickEvent(ID)
 	}

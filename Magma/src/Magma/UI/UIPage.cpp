@@ -7,7 +7,7 @@
 #include <VolcaniCore/Core/Log.h>
 #include <VolcaniCore/Core/FileUtils.h>
 
-#include "UIClickable.h"
+#include "UIObject.h"
 
 #define GET_LIST(TUIElement) \
 template<> \
@@ -93,15 +93,29 @@ void UIPage::Load(const std::string& filePathName) {
 
 		CompleteFiles(genPath);
 	}
-
 }
 
 void UIPage::Reload() {
 	auto genPath = "Magma/projects/UI/gen/" + m_Name;
 
 	m_GenFile = CreateRef<DLL>(genPath + ".dll");
-	auto func = m_GenFile->GetFunction<void>("LoadElements");
+	auto func = m_GenFile->GetFunction<void>("LoadObjects");
 	func();
+}
+
+void UIPage::Update(TimeStep ts) {
+	for(auto* element : GetFirstOrderElements())
+		UpdateElement(ts, element);
+}
+
+void UIPage::UpdateElement(TimeStep ts, UIElement* element) {
+	auto get = m_GenFile->GetFunction<UIObject*, std::string>("GetObject");
+	auto* object = get(element->GetID());
+
+	object->OnUpdate(TimeStep ts);
+
+	for(auto* child : element->GetChildren())
+		UpdateElement(child);
 }
 
 void UIPage::Render() {
@@ -109,21 +123,21 @@ void UIPage::Render() {
 		element->Render();
 }
 
-void UIPage::OnEvent(const UIState& state, const std::string& id) {
+void UIPage::OnEvent(const std::string& id, const UIState& state) {
 	if(!m_GenFile)
 		return;
 
-	auto get = m_GenFile->GetFunction<UIClickable*, std::string>("GetElement");
-	auto* element = get(id);
+	auto get = m_GenFile->GetFunction<UIObject*, std::string>("GetObject");
+	auto* clickable = get(id);
 
 	if(state.Clicked)
-		element->OnClick();
+		clickable->OnClick();
 	if(state.Hovered)
-		element->OnHover();
+		clickable->OnHover();
 	if(state.MouseUp)
-		element->OnMouseUp();
+		clickable->OnMouseUp();
 	if(state.MouseDown)
-		element->OnMouseDown();
+		clickable->OnMouseDown();
 }
 
 UINode UIPage::Add(UIElement::Type type, const std::string& id) {
@@ -278,7 +292,7 @@ void CompileElement(const std::string& genPath, const std::string& funcPath,
 	std::string id = docElement["ID"].Get<std::string>();
 	cppFile.Write("\tm_Elements[\"" + id + "\"] = new " + id + ";");
 	hFile
-	.Write("class " + id + " : public UIClickable {")
+	.Write("class " + id + " : public UIObject {")
 	.Write("public:");
 
 	std::string funcFileStr = funcFile.Get();
@@ -292,7 +306,7 @@ void CompileElement(const std::string& genPath, const std::string& funcPath,
 		const auto& element = docElement[name];
 
 		hFile.Write("\tvoid " + name + "() override {");
-		hFile.Write("\t\tUIClickable::" + name + "();");
+		hFile.Write("\t\tUIObject::" + name + "();");
 
 		if(element.IsObject()) {
 			// Animation
@@ -347,28 +361,28 @@ void GenFiles(const std::string& genPath, const std::string& funcPath) {
 	auto cppFile = File(genPath + ".cpp");
 	auto funcFile = File(funcPath);
 	auto funcFileStr = funcFile.Get();
-	auto elementsIdx = funcFileStr.find("namespace UIElements");
+	auto elementsIdx = funcFileStr.find("namespace UIObjects");
 
 	hFile
 	.Write(funcFileStr.substr(0, elementsIdx))
 	.Write("#include <Magma/UI/UI.h>")
-	.Write("namespace UIElements {\n");
+	.Write("namespace UIObjects {\n");
 
 	cppFile
 	.Write("#include \"" + fs::path(hFile.Path).filename().string() + "\"\n")
-	.Write("namespace UIElements {\n")
-	.Write("static Map<std::string, UIClickable*> m_Elements;\n")
-	.Write("extern \"C\" EXPORT UIClickable* GetElement(const std::string& id) {")
-	.Write(	"\treturn m_Elements[id];")
+	.Write("namespace UIObjects {\n")
+	.Write("static Map<std::string, UIObject*> m_Objects;\n")
+	.Write("extern \"C\" EXPORT UIObject* GetObject(const std::string& id) {")
+	.Write(	"\treturn m_Objects[id];")
 	.Write("}\n")
-	.Write("extern \"C\" EXPORT void LoadElements() {");
+	.Write("extern \"C\" EXPORT void LoadObjects() {");
 }
 
 void CompleteFiles(const std::string& genPath) {
 	auto hFile = File(genPath + ".h");
 	auto cppFile = File(genPath + ".cpp");
 
-	cppFile.Write("}"); // LoadElements
+	cppFile.Write("}"); // LoadObjects
 	cppFile.Write("\n}"); // namespace UIElements
 
 	hFile.Write("\n}"); // namespace UIElements

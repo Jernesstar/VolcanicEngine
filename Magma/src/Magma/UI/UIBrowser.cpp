@@ -9,7 +9,12 @@ namespace Magma::UI {
 static List<UIPage> s_Pages;
 static UIPage* s_CurrentPage;
 
-void UIBrowser::Render() {
+void UIBrowser::OnUpdate(TimeStep ts) {
+	for(auto& page : s_Pages)
+		page.Update(ts);
+}
+
+void UIBrowser::OnRender() {
 	s_CurrentPage->Render();
 }
 

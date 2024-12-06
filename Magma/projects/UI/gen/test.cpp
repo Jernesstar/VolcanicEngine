@@ -2,9 +2,9 @@
 
 namespace UIElements {
 
-static Map<std::string, UIClickable*> m_Elements;
+static Map<std::string, UIObject*> m_Elements;
 
-extern "C" EXPORT UIClickable* GetElement(const std::string& id) {
+extern "C" EXPORT UIObject* GetElement(const std::string& id) {
 	return m_Elements[id];
 }
 

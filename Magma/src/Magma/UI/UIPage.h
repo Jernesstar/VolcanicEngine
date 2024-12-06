@@ -10,6 +10,9 @@ using UINode = std::pair<UIElement::Type, uint32_t>;
 
 class UIPage {
 public:
+	bool Visible = true;
+
+public:
 	UIPage() = default;
 	UIPage(const std::string& filePath);
 	~UIPage() = default;
@@ -17,9 +20,10 @@ public:
 	void Load(const std::string& filePath);
 	void Reload();
 
+	void Update(TimeStep ts);
 	void Render();
 
-	void OnEvent(const UIState& state, const std::string& id);
+	void OnEvent(const std::string& id, const UIState& state);
 
 	UINode Add(UIElement::Type type, const std::string& id);
 	void Add(const UINode& node) {
@@ -70,6 +74,8 @@ private:
 	List<TUIType>& GetList();
 	template<typename TUIType>
 	UIElement::Type GetType();
+
+	void UpdateElement(TimeStep ts, UIElement* element);
 };
 
 }
