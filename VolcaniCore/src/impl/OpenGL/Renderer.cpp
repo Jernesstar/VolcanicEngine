@@ -117,8 +117,8 @@ DrawBuffer* Renderer::NewDrawBuffer(DrawBufferSpecification& specs, void* data) 
 }
 
 DrawBuffer* Renderer::GetDrawBuffer(DrawBufferSpecification& specs) {
-	auto vertexLayout = specs.VertexLayout;
-	auto instanceLayout = specs.InstanceLayout;
+	auto& vertexLayout = specs.VertexLayout;
+	auto& instanceLayout = specs.InstanceLayout;
 	for(auto& [buffer, backendBuffer] : s_Data.Arrays)
 		if(backendBuffer.Array->GetVertexBuffer(0)->Layout == vertexLayout
 		&& backendBuffer.Array->GetVertexBuffer(1)->Layout == instanceLayout)
@@ -128,32 +128,36 @@ DrawBuffer* Renderer::GetDrawBuffer(DrawBufferSpecification& specs) {
 }
 
 void Renderer::SetBufferData(DrawBuffer* buffer, uint32_t bufferIndex,
-							 void* data, uint64_t count)
+							 const void* data, uint64_t count, uint64_t offset)
 {
 	auto& backendBuffer = s_Data.Arrays[buffer];
 	if(bufferIndex == 0)
 		if(count == 0)
 			backendBuffer.Indices.Clear();
 		else
-			backendBuffer.Indices.Add(data, count);
+			backendBuffer.Indices.Set(data, count, offset);
 	else if(bufferIndex == 1)
 		if(count == 0)
 			backendBuffer.Vertices.Clear();
 		else
-			backendBuffer.Vertices.Add(data, count);
+			backendBuffer.Vertices.Set(data, count, offset);
 	else if(bufferIndex == 2)
 		if(count == 0)
 			backendBuffer.Instances.Clear();
 		else
-			backendBuffer.Instances.Add(data, count);
+			backendBuffer.Instances.Set(data, count, offset);
+
+	buffer->IndicesCount = backendBuffer.Indices.GetCount();
+	buffer->VerticesCount = backendBuffer.Vertices.GetCount();
+	buffer->InstancesCount = backendBuffer.Instances.GetCount();
 }
 
 void Renderer::ReleaseBuffer(DrawBuffer* buffer) {
 	s_Data.Arrays.erase(buffer);
 }
 
-DrawCommand* Renderer::NewDrawCommand() {
-	return &s_Data.Commands.emplace_back();
+DrawCommand* Renderer::NewDrawCommand(DrawBuffer* buffer) {
+	return &s_Data.Commands.emplace_back(buffer);
 }
 
 void FlushCommand(DrawCommand& command) {
@@ -167,13 +171,15 @@ void FlushCommand(DrawCommand& command) {
 		Resize(command.ViewportWidth, command.ViewportHeight);
 
 	if(command.BufferData) {
-		s_Data.Arrays[command.BufferData].Array->Bind();
+		auto array = s_Data.Arrays[command.BufferData].Array;
+		array->Bind();
 
+		VOLCANICORE_LOG_INFO("%i", s_Data.Arrays[command.BufferData].Instances.GetCount());
 		SetUniforms(command);
 		for(auto& call : command.Calls)
 			FlushCall(call);
 
-		s_Data.Arrays[command.BufferData].Array->Unbind();
+		array->Unbind();
 	}
 
 	if(command.Image)

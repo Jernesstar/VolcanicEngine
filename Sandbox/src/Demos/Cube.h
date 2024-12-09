@@ -69,6 +69,8 @@ private:
 
 	Ref<Camera> camera;
 	CameraController controller;
+
+	DrawBuffer* buffer;
 };
 
 Cube::Cube()
@@ -82,7 +84,6 @@ Cube::Cube()
 		});
 
 	shader = ShaderPipeline::Create("VolcaniCore/assets/shaders", "Mesh");
-
 	color = Texture::Create(480, 270,
 			Texture::InternalFormat::Normal, Texture::SamplingOption::Nearest);
 	depth = Texture::Create(1920, 1080, Texture::InternalFormat::Depth);
@@ -91,11 +92,12 @@ Cube::Cube()
 			{ AttachmentTarget::Depth, { { depth } } },
 		});
 
-	drawPass = RenderPass::Create("Draw", shader);
+	// drawPass = RenderPass::Create("Draw", shader);
 	// drawPass->SetOutput(framebuffer);
 
 	cube = Mesh::Create(MeshPrimitive::Cube,
-		Material{
+		Material
+		{
 			.Diffuse = Texture::Create("Sandbox/assets/images/wood.png"),
 		});
 
@@ -104,19 +106,52 @@ Cube::Cube()
 	controller =
 		CameraController(
 			MovementControls(
-				ControlMap{
+				ControlMap
+				{
 					{ Control::Up,   Key::W },
 					{ Control::Down, Key::S },
 					{ Control::Forward,  Key::Invalid },
 					{ Control::Backward, Key::Invalid },
-				}
-			)
-		);
+				})
+			);
 
 	controller.SetCamera(camera);
 	controller.RotationSpeed = 0.0f;
 	controller.TranslationSpeed = 20.0f;
 
+	BufferLayout vertexLayout =
+		{
+			{
+				{ "Position", BufferDataType::Vec3 },
+				{ "Normal",	  BufferDataType::Vec3 },
+				{ "TexCoord", BufferDataType::Vec2 },
+			},
+			true, // Dynamic
+			false // Structure of arrays
+		};
+
+	BufferLayout instanceLayout =
+		{
+			{
+				{ "Transform", BufferDataType::Mat4 }
+			},
+			true, // Dynamic
+			true // Structure of arrays
+		};
+
+	DrawBufferSpecification specs
+	{
+		vertexLayout,
+		instanceLayout,
+		1'000'000,
+		1'000'000,
+		100'000
+	};
+
+	buffer = RendererAPI::Get()->NewDrawBuffer(specs);
+	VOLCANICORE_LOG_INFO("AddVertices");
+	buffer->AddIndices(Buffer(cube->GetIndices()));
+	// buffer->AddVertices(Buffer(cube->GetVertices()));
 	// UI::Init();
 }
 
@@ -147,21 +182,40 @@ void Cube::OnUpdate(TimeStep ts) {
 	// }
 	// ImGui::End();
 
-	Renderer::StartPass(drawPass);
-	{
-		Renderer::Clear();
+	// Renderer::StartPass(drawPass);
+	// {
+	// 	Renderer::Clear();
 
-		Renderer3D::Begin(camera);
+	// 	Renderer3D::Begin(camera);
 
-		for(int y = -50; y < 50; y++)
-			for(int x = -50; x < 50; x++)
-				Renderer3D::DrawMesh(cube, { .Translation = { x, 0.0f, y } });
+	// 	for(int y = -50; y < 50; y++)
+	// 		for(int x = -50; x < 50; x++)
+	// 			Renderer3D::DrawMesh(cube, { .Translation = { x, 0.0f, y } });
 
-		Renderer3D::End();
-	}
-	Renderer::EndPass();
+	// 	Renderer3D::End();
+	// }
+	// Renderer::EndPass();
 
 	// Renderer2D::DrawFullscreenQuad(framebuffer, AttachmentTarget::Color);
+
+	// auto* command = RendererAPI::Get()->NewDrawCommand(buffer);
+	// auto& call = command->NewDrawCall();
+
+	// call.Primitive = PrimitiveType::Triangle;
+	// call.Partition = PartitionType::Instanced;
+	// call.IndexStart = 0;
+	// call.VertexStart = 0;
+	// call.IndexCount = cube->GetIndices().size();
+	// call.VertexCount = cube->GetVertices().size();
+
+	// for(int y = -50; y < 50; y++)
+	// 	for(int x = -50; x < 50; x++) {
+	// 		auto transform = Transform{ .Translation = { x, 0.0f, y } };
+	// 		auto tr = transform.GetTransform();
+	// 		RendererAPI::Get()
+	// 			->SetBufferData(command->BufferData, 2, glm::value_ptr(tr), 1);
+	// 		call.InstanceCount++;
+	// 	}
 
 	// UI::End();
 }

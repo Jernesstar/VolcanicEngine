@@ -39,7 +39,7 @@ public:
 	static Ref<RenderPass> GetPass();
 
 	static DrawCommand* GetCommand();
-	static DrawCommand* NewCommand();
+	static DrawCommand* NewCommand(DrawBuffer* buffer = nullptr);
 	static void EndCommand();
 
 	static void Clear();

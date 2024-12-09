@@ -100,7 +100,8 @@ Lighting::Lighting() {
 
 	std::string assetPath = "Sandbox/assets/";
 	cube = Mesh::Create(MeshPrimitive::Cube,
-		Material{
+		Material
+		{
 			.Diffuse = Texture::Create(assetPath + "images/wood.png"),
 			.Specular = Texture::Create(assetPath + "images/wood_specular.png"),
 		});

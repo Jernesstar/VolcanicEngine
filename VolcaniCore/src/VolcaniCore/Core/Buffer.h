@@ -3,6 +3,7 @@
 #include <cstring>
 
 #include "Core/Defines.h"
+#include "Core/Log.h"
 
 namespace VolcaniCore {
 
@@ -21,14 +22,14 @@ public:
 		: m_MaxCount(other.GetMaxCount()), m_Count(other.GetCount())
 	{
 		m_Data = new T[m_MaxCount];
-		memcpy(m_Data, other.Get(), other.GetSize());
+		Set(other.Get(), other.GetCount());
 	}
 	Buffer(Buffer&& other)
 		: m_MaxCount(other.GetMaxCount()), m_Count(other.GetCount())
 	{
 		std::swap(m_Data, other.m_Data);
 	}
-	Buffer(T* buffer, uint32_t count, uint64_t maxCount = 0)
+	Buffer(T* buffer, uint64_t count, uint64_t maxCount = 0)
 		: m_MaxCount(maxCount), m_Count(count)
 	{
 		m_Data = buffer;
@@ -36,8 +37,9 @@ public:
 	Buffer(const List<T>& list)
 		: m_MaxCount(list.size()), m_Count(list.size())
 	{
+		VOLCANICORE_LOG_INFO("List Copy Construtor");
 		m_Data = new T[m_MaxCount];
-		memcpy(m_Data, list.data(), GetSize());
+		Set(list.data(), m_Count);
 	}
 
 	~Buffer() {
@@ -71,7 +73,7 @@ public:
 		return Buffer<T>(*this);
 	}
 
-	Buffer<T> Partition(uint32_t count = 0) {
+	Buffer<T> Partition(uint64_t count = 0) {
 		if(count == 0)
 			count = m_MaxCount;
 		return Buffer<T>(m_Data + (m_Count += count), count, 0);
@@ -87,18 +89,24 @@ public:
 		if(m_MaxCount != 0 && m_Count + buffer.GetCount() >= m_MaxCount)
 			Reallocate(buffer.GetCount());
 
-		memcpy(m_Data + m_Count, buffer.Get(), buffer.GetSize());
-		m_Count += buffer.GetCount();
+		Set(buffer.Get(), buffer.GetCount(), m_Count);
 	}
 	void Add(const List<T>& list) {
 		if(m_MaxCount != 0 && m_Count + list.size() >= m_MaxCount)
 			Reallocate(list.size());
 
-		memcpy(m_Data + m_Count, list.data(), list.size() * sizeof(T));
-		m_Count += list.size();
+		Set(list.data(), list.size(), m_Count);
 	}
-	void Add(void* data, uint64_t count) {
-		memcpy(m_Data + m_Count, data, count * sizeof(T));
+	void Add(const void* data, uint64_t count) {
+		Set(data, count, m_Count);
+	}
+
+	void Set(const void* data, uint64_t count, uint64_t offset = 0) {
+		if(offset + count >= m_MaxCount)
+			count = (m_MaxCount - 1) - offset;
+		memcpy(m_Data + offset, data, count * sizeof(T));
+		if(offset + count > m_Count)
+			m_Count = offset + count;
 	}
 
 	void Clear() {
@@ -135,7 +143,7 @@ private:
 	uint64_t m_Count = 0;
 
 	// TODO(Implement): Reference counting
-	uint32_t m_RefCount = 0;
+	uint64_t m_RefCount = 0;
 };
 
 template<>
@@ -143,34 +151,37 @@ class Buffer<void> {
 public:
 	Buffer() = default;
 
-	Buffer(uint64_t size, uint32_t maxCount)
-		: m_SizeT(size), m_MaxCount(maxCount)
+	Buffer(uint64_t maxCount, uint64_t size)
+		: m_MaxCount(maxCount), m_Count(0), m_SizeT(size)
 	{
-		m_Data = malloc(m_SizeT * m_MaxCount);
+		m_Data = malloc(GetMaxSize());
 	}
 	Buffer(const Buffer& other)
-		: m_MaxCount(other.GetMaxCount()), m_Count(other.GetCount())
+		: m_MaxCount(other.GetMaxCount()), m_Count(other.GetCount()),
+			m_SizeT(other.m_SizeT)
 	{
-		m_Data = malloc(m_MaxCount);
-		memcpy(m_Data, other.Get(), other.GetSize());
+		m_Data = malloc(GetMaxSize());
+		Set(other.Get(), other.GetSize());
 	}
 	Buffer(Buffer&& other)
-		: m_MaxCount(other.GetMaxCount()), m_Count(other.GetCount())
+		: m_MaxCount(other.GetMaxCount()), m_Count(other.GetCount()),
+			m_SizeT(other.m_SizeT)
 	{
 		std::swap(m_Data, other.m_Data);
 	}
-	Buffer(void* buffer, uint64_t maxCount = 0)
-		: m_MaxCount(maxCount), m_Count(0)
+	Buffer(void* buffer, uint64_t count, uint64_t size)
+		: m_MaxCount(count), m_Count(count), m_SizeT(size)
 	{
 		m_Data = (void*)buffer;
 	}
 
-	// Buffer(const List<T>& list)
-	// 	: m_MaxCount(list.size()), m_Count(list.size())
-	// {
-	// 	m_Data = malloc(m_MaxCount);
-	// 	memcpy(m_Data, list.data(), GetSize());
-	// }
+	template<typename T>
+	Buffer(const List<T>& list)
+		: m_MaxCount(list.size()), m_Count(list.size()), m_SizeT(sizeof(T))
+	{
+		m_Data = malloc(GetMaxSize());
+		Set(list.data(), m_Count);
+	}
 
 	~Buffer() {
 		if(m_MaxCount != 0) // We do in fact own this pointer
@@ -203,10 +214,10 @@ public:
 		return Buffer<void>(*this);
 	}
 
-	Buffer<void> Partition(uint32_t count = 0) {
+	Buffer<void> Partition(uint64_t count = 0) {
 		if(count == 0)
 			count = m_MaxCount;
-		return Buffer(m_Data + (m_Count += count), 0);
+		return Buffer(m_Data + (m_Count += count), count, m_SizeT);
 	}
 
 	// void Add(const T& element) {
@@ -219,8 +230,7 @@ public:
 		if(m_MaxCount != 0 && m_Count + buffer.GetCount() >= m_MaxCount)
 			Reallocate(buffer.GetCount());
 
-		memcpy(m_Data + m_Count, buffer.Get(), buffer.GetSize());
-		m_Count += buffer.GetCount();
+		Set(buffer.Get(), buffer.GetCount(), m_Count);
 	}
 	// void Add(const List<T>& list) {
 	// 	if(m_MaxCount != 0 && m_Count + list.size() >= m_MaxCount)
@@ -229,8 +239,13 @@ public:
 	// 	memcpy(m_Data + m_Count, list.data(), list.size() * m_SizeT);
 	// 	m_Count += list.size();
 	// }
-	void Add(void* data, uint64_t count) {
-		memcpy(m_Data + m_Count, data, count * m_SizeT);
+	void Add(const void* data, uint64_t count) {
+		Set(data, count, m_Count);
+	}
+	void Set(const void* data, uint64_t count, uint64_t offset = 0) {
+		memcpy(m_Data + offset, data, count * m_SizeT);
+		if(offset + count > m_Count)
+			m_Count = offset + count;
 	}
 
 	void Clear() {
@@ -252,15 +267,6 @@ public:
 		m_Data = newData;
 	}
 
-	// using iterator = void*;
-	// using const_iterator = const void*;
-	// iterator begin() { return m_Data; }
-	// iterator end() { return m_Data + m_Count; }
-	// const_iterator cbegin() const { return m_Data; }
-	// const_iterator cend()	const { return m_Data + m_Count; }
-	// const_iterator begin()	const { return cbegin(); }
-	// const_iterator end()	const { return cend(); }
-
 private:
 	void* m_Data = nullptr;
 	uint64_t m_SizeT = 0;
@@ -268,7 +274,7 @@ private:
 	uint64_t m_Count = 0;
 
 	// TODO(Implement): Reference counting
-	uint32_t m_RefCount = 0;
+	uint64_t m_RefCount = 0;
 };
 
 }

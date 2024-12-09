@@ -78,7 +78,8 @@ Collision::Collision() {
 	drawPass = RenderPass::Create("Draw", shader);
 
 	cube = Mesh::Create(MeshPrimitive::Cube,
-		Material{
+		Material
+		{
 			.Diffuse = Texture::Create("Sandbox/assets/images/wood.png")
 		});
 
@@ -113,6 +114,8 @@ void Collision::OnUpdate(TimeStep ts) {
 			body->UpdateTransform();
 			Renderer3D::DrawMesh(cube, body->GetTransform());
 		}
+
+		Renderer3D::End();
 	}
 	Renderer::EndPass();
 }

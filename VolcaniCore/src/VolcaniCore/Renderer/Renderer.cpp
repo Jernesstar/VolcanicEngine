@@ -68,12 +68,13 @@ DrawCommand* Renderer::GetCommand() {
 	return s_DrawCommand;
 }
 
-DrawCommand* Renderer::NewCommand() {
+DrawCommand* Renderer::NewCommand(DrawBuffer* buffer) {
 	EndCommand();
 
 	s_DrawCommand = RendererAPI::Get()->NewDrawCommand();
 	s_DrawCommand->Pipeline = s_RenderPass->GetPipeline();
 	s_DrawCommand->Image = s_RenderPass->GetOutput();
+	s_DrawCommand->BufferData = buffer;
 	return s_DrawCommand;
 }
 

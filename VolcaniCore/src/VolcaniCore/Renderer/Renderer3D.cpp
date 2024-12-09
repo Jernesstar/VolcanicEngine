@@ -1,5 +1,7 @@
 #include "Renderer3D.h"
 
+#include <glm/gtc/type_ptr.hpp>
+
 #include "Core/Assert.h"
 
 #include "Renderer.h"
@@ -9,7 +11,7 @@ namespace VolcaniCore {
 
 static DrawBuffer* s_CubemapBuffer;
 static DrawBuffer* s_MeshBuffer;
-static DrawBuffer* s_PointBuffer;
+// static DrawBuffer* s_PointBuffer;
 static Map<Ref<Mesh>, std::pair<uint32_t, uint32_t>> s_Meshes;
 
 void Renderer3D::Init() {
@@ -18,7 +20,7 @@ void Renderer3D::Init() {
 			{
 				{ "Position", BufferDataType::Vec3 },
 				{ "Normal",	  BufferDataType::Vec3 },
-				{ "TexCoord", BufferDataType::Vec4 },
+				{ "TexCoord", BufferDataType::Vec2 },
 			},
 			true, // Dynamic
 			false // Structure of arrays
@@ -34,13 +36,13 @@ void Renderer3D::Init() {
 		};
 
 	DrawBufferSpecification specs
-		{
-			vertexLayout,
-			instanceLayout,
-			Renderer::MaxVertices,
-			Renderer::MaxIndices,
-			Renderer::MaxInstances
-		};
+	{
+		vertexLayout,
+		instanceLayout,
+		Renderer::MaxVertices,
+		Renderer::MaxIndices,
+		Renderer::MaxInstances
+	};
 
 	float cubemapVertices[] =
 	{
@@ -124,7 +126,7 @@ void Renderer3D::Begin(Ref<Camera> camera) {
 }
 
 void Renderer3D::End() {
-
+	Renderer::EndCommand();
 }
 
 void Renderer3D::DrawSkybox(Ref<Cubemap> cubemap) {
@@ -143,25 +145,23 @@ void Renderer3D::DrawMesh(Ref<Mesh> mesh, const glm::mat4& tr) {
 
 	call.Primitive = PrimitiveType::Triangle;
 	call.Partition = PartitionType::Instanced;
-	call.VertexCount = mesh->GetVertices().size();
 	call.IndexCount  = mesh->GetIndices().size();
+	call.VertexCount = mesh->GetVertices().size();
 	call.InstanceCount = 1;
 
 	if(!s_Meshes.count(mesh)) {
 		s_Meshes[mesh] = { command->VerticesIndex, command->IndicesIndex };
 
-		command->AddVertices(Buffer(mesh->GetVertices()));
 		command->AddIndices(Buffer(mesh->GetIndices()));
+		command->AddVertices(Buffer(mesh->GetVertices()));
 
-		auto& uniforms = Renderer::GetPass()->GetUniforms();
-		uniforms
+		Renderer::GetPass()->GetUniforms()
 		.Set("u_Diffuse",
 			[mesh]() -> TextureSlot
 			{
 				Material& mat = mesh->GetMaterial();
 				return { mat.Diffuse, 0 };
-			});
-		uniforms
+			})
 		.Set("u_Specular",
 			[mesh]() -> TextureSlot
 			{
@@ -174,7 +174,8 @@ void Renderer3D::DrawMesh(Ref<Mesh> mesh, const glm::mat4& tr) {
 		call.IndexStart = s_Meshes[mesh].second;
 	}
 
-	command->AddInstance(tr);
+	RendererAPI::Get()
+		->SetBufferData(command->BufferData, 2, glm::value_ptr(tr), 1);
 }
 
 void Renderer3D::DrawModel(Ref<Model> model, const glm::mat4& tr) {

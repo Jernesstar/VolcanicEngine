@@ -88,12 +88,12 @@ void Renderer2D::DrawFullscreenQuad(Ref<Framebuffer> buffer,
 	}
 	else {
 		pipeline = ShaderLibrary::Get("Framebuffer");
-		command = RendererAPI::Get()->NewDrawCommand();
+		command = RendererAPI::Get()->NewDrawCommand(s_ScreenQuadBuffer);
 	}
 
-	command->BufferData = s_ScreenQuadBuffer;
 	command->Pipeline = pipeline;
 	command->Image = output;
+	// command->UniformData.SetTexture("u_ScreenTexture", { buffer->Get(target), 0 });
 
 	auto& call = command->NewDrawCall();
 	call.DepthTest = DepthTestingMode::Off;
