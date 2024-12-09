@@ -14,6 +14,7 @@ namespace VolcaniCore {
 struct DrawBufferSpecification;
 struct DrawBuffer;
 struct DrawPass;
+struct DrawUniforms;
 struct DrawCommand;
 struct DrawCall;
 
@@ -44,7 +45,7 @@ public:
 							   void* data, uint64_t count) = 0;
 	virtual void ReleaseBuffer(DrawBuffer* buffer) = 0;
 
-	virtual void SubmitCommand(DrawCommand& command) = 0;
+	virtual DrawCommand* NewDrawCommand() = 0;
 
 	RendererAPI::Backend GetBackend() const { return m_Backend; }
 
@@ -70,15 +71,73 @@ struct DrawBufferSpecification {
 
 struct DrawBuffer {
 	DrawBufferSpecification Specs;
+
+	void Clear() {
+		RendererAPI::Get()->SetBufferData(this, 0, nullptr, 0);
+		RendererAPI::Get()->SetBufferData(this, 1, nullptr, 0);
+		RendererAPI::Get()->SetBufferData(this, 2, nullptr, 0);
+	}
+};
+
+struct DrawPass {
+	Ref<Framebuffer> Output;
+};
+
+struct TextureSlot {
+	Ref<Texture> Sampler = nullptr;
+	uint32_t Index = 0;
+};
+
+struct DrawUniforms {
+	Map<std::string, int32_t> IntUniforms;
+	Map<std::string, float> FloatUniforms;
+	Map<std::string, TextureSlot> TextureUniforms;
+
+	Map<std::string, glm::vec2> Vec2Uniforms;
+	Map<std::string, glm::vec3> Vec3Uniforms;
+	Map<std::string, glm::vec4> Vec4Uniforms;
+
+	Map<std::string, glm::mat2> Mat2Uniforms;
+	Map<std::string, glm::mat3> Mat3Uniforms;
+	Map<std::string, glm::mat4> Mat4Uniforms;
+
+	void SetInt(const std::string& name, int32_t data) {
+		IntUniforms[name] = data;
+	}
+	void SetFloat(const std::string& name, float data) {
+		FloatUniforms[name] = data;
+	}
+	void SetTexture(const std::string& name, TextureSlot data) {
+		TextureUniforms[name] = data;
+	}
+	void SetVec2(const std::string& name, glm::vec2 data) {
+		Vec2Uniforms[name] = data;
+	}
+	void SetVec3(const std::string& name, glm::vec3 data) {
+		Vec3Uniforms[name] = data;
+	}
+	void SetVec4(const std::string& name, glm::vec4 data) {
+		Vec4Uniforms[name] = data;
+	}
+	void SetMat2(const std::string& name, glm::mat2 data) {
+		Mat2Uniforms[name] = data;
+	}
+	void SetMat3(const std::string& name, glm::mat3 data) {
+		Mat3Uniforms[name] = data;
+	}
+	void SetMat4(const std::string& name, glm::mat4 data) {
+		Mat4Uniforms[name] = data;
+	}
 };
 
 struct DrawCommand {
 	DrawBuffer* BufferData;
-	// Uniforms UniformData;
+	DrawUniforms UniformData;
 	Ref<ShaderPipeline> Pipeline;
-	Ref<Framebuffer> Output;
+	Ref<Framebuffer> Image;
 	List<DrawCall> Calls;
 
+	bool Clear = true;
 	uint32_t ViewportWidth = 0;
 	uint32_t ViewportHeight = 0;
 
@@ -86,38 +145,35 @@ struct DrawCommand {
 	uint64_t IndicesIndex	= 0;
 	uint64_t InstancesIndex = 0;
 
-	void AddIndices(Buffer<uint32_t> data) {
+	void AddIndices(const Buffer<uint32_t>& data) {
 		RendererAPI::Get()
 			->SetBufferData(BufferData, 0, data.Get(), data.GetCount());
 		IndicesIndex += data.GetCount();
 	}
 
 	template<typename T>
-	void AddVertices(Buffer<T> data) {
+	void AddVertices(const Buffer<T>& data) {
 		RendererAPI::Get()
 			->SetBufferData(BufferData, 1, data.Get(), data.GetCount());
 		VerticesIndex += data.GetCount();
 	}
 
 	template<typename T>
-	void AddInstances(Buffer<T> data) {
+	void AddInstances(const Buffer<T>& data) {
 		RendererAPI::Get()
 			->SetBufferData(BufferData, 2, data.Get(), data.GetCount());
 		InstancesIndex += data.GetCount();
 	}
 
-	void ClearBuffers() {
-		RendererAPI::Get()->SetBufferData(BufferData, 0, nullptr, 0);
-		RendererAPI::Get()->SetBufferData(BufferData, 1, nullptr, 0);
-		RendererAPI::Get()->SetBufferData(BufferData, 2, nullptr, 0);
-
-		VerticesIndex  = 0;
-		IndicesIndex   = 0;
-		InstancesIndex = 0;
+	template<typename T>
+	void AddInstance(T& data) {
+		RendererAPI::Get()->SetBufferData(BufferData, 2, (void*)&data, sizeof(T));
+		InstancesIndex += 1;
 	}
 
 	DrawCall& NewDrawCall() {
-		return Calls.emplace_back(VerticesIndex, 0, IndicesIndex, 0);
+		return Calls.emplace_back(VerticesIndex, 0,
+								  IndicesIndex, 0, InstancesIndex, 0);
 	}
 };
 
@@ -131,7 +187,9 @@ enum class PartitionType { Single, Instanced, MultiDraw };
 struct DrawCall {
 	uint64_t VertexStart   = 0;
 	uint64_t VertexCount   = 0;
+	uint64_t IndexStart	   = 0;
 	uint64_t IndexCount	   = 0;
+	uint64_t InstanceStart = 0;
 	uint64_t InstanceCount = 0;
 
 	PartitionType Partition = PartitionType::Instanced;

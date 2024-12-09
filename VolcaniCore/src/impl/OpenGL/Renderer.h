@@ -19,7 +19,7 @@ public:
 					   void* data, uint64_t count) override;
 	void ReleaseBuffer(DrawBuffer* buffer) override;
 
-	void SubmitCommand(DrawCommand& call) override;
+	DrawCommand* NewDrawCommand() override;
 
 private:
 	void Init() override;

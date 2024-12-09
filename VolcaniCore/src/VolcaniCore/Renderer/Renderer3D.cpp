@@ -8,7 +8,9 @@
 namespace VolcaniCore {
 
 static DrawBuffer* s_CubemapBuffer;
-static DrawBuffer* s_VertexBuffer;
+static DrawBuffer* s_MeshBuffer;
+static DrawBuffer* s_PointBuffer;
+static Map<Ref<Mesh>, std::pair<uint32_t, uint32_t>> s_Meshes;
 
 void Renderer3D::Init() {
 	BufferLayout vertexLayout =
@@ -95,17 +97,19 @@ void Renderer3D::Init() {
 		};
 	DrawBufferSpecification specsCubemap{ cubemapLayout };
 
-	s_VertexBuffer = RendererAPI::Get()->NewDrawBuffer(specs);
+	s_MeshBuffer = RendererAPI::Get()->NewDrawBuffer(specs);
 	s_CubemapBuffer =
 		RendererAPI::Get()->NewDrawBuffer(specsCubemap, cubemapVertices);
 }
 
 void Renderer3D::Close() {
 	RendererAPI::Get()->ReleaseBuffer(s_CubemapBuffer);
-	RendererAPI::Get()->ReleaseBuffer(s_VertexBuffer);
+	RendererAPI::Get()->ReleaseBuffer(s_MeshBuffer);
 }
 
 void Renderer3D::Begin(Ref<Camera> camera) {
+	s_Meshes.clear();
+
 	Renderer::GetPass()->GetUniforms()
 	.Set("u_ViewProj",
 		[camera]() -> glm::mat4
@@ -124,40 +128,53 @@ void Renderer3D::End() {
 }
 
 void Renderer3D::DrawSkybox(Ref<Cubemap> cubemap) {
-	DrawCall call{ s_CubemapBuffer };
-	RendererAPI::Get()->Submit(call);
+	Renderer::GetCommand();
+
 }
 
 void Renderer3D::DrawMesh(Ref<Mesh> mesh, const glm::mat4& tr) {
 	if(!mesh)
 		return;
 
-	// auto& command = Renderer::GetDrawCommand();
-	// auto& options = command.OptionsMap;
-	// if(options[DrawPrimitive::Mesh].Partition == DrawPartition::Single)
-	// 	Renderer::NewDrawCommand();
+	auto* command = Renderer::GetCommand();
+	command->BufferData = s_MeshBuffer;
 
-	// command = Renderer::GetDrawCommand();
-	// auto& uniforms = command.GetUniforms(mesh);
-	// command.AddMesh(mesh, tr);
+	auto& call = command->NewDrawCall();
 
-	// if(uniforms)
-	// 	return;
+	call.Primitive = PrimitiveType::Triangle;
+	call.Partition = PartitionType::Instanced;
+	call.VertexCount = mesh->GetVertices().size();
+	call.IndexCount  = mesh->GetIndices().size();
+	call.InstanceCount = 1;
 
-	// uniforms
-	// .Set("u_Diffuse",
-	// 	[mesh]() -> TextureSlot
-	// 	{
-	// 		Material& mat = mesh->GetMaterial();
-	// 		return { mat.Diffuse, 0 };
-	// 	});
-	// uniforms
-	// .Set("u_Specular",
-	// 	[mesh]() -> TextureSlot
-	// 	{
-	// 		Material& mat = mesh->GetMaterial();
-	// 		return { mat.Specular, 1 };
-	// 	});
+	if(!s_Meshes.count(mesh)) {
+		s_Meshes[mesh] = { command->VerticesIndex, command->IndicesIndex };
+
+		command->AddVertices(Buffer(mesh->GetVertices()));
+		command->AddIndices(Buffer(mesh->GetIndices()));
+
+		auto& uniforms = Renderer::GetPass()->GetUniforms();
+		uniforms
+		.Set("u_Diffuse",
+			[mesh]() -> TextureSlot
+			{
+				Material& mat = mesh->GetMaterial();
+				return { mat.Diffuse, 0 };
+			});
+		uniforms
+		.Set("u_Specular",
+			[mesh]() -> TextureSlot
+			{
+				Material& mat = mesh->GetMaterial();
+				return { mat.Specular, 1 };
+			});
+	}
+	else {
+		call.VertexStart = s_Meshes[mesh].first;
+		call.IndexStart = s_Meshes[mesh].second;
+	}
+
+	command->AddInstance(tr);
 }
 
 void Renderer3D::DrawModel(Ref<Model> model, const glm::mat4& tr) {
@@ -185,15 +202,13 @@ void Renderer3D::DrawQuad(const glm::vec4& color, const glm::mat4& tr) {
 }
 
 void Renderer3D::DrawPoint(const Point& point, const glm::mat4& tr) {
-	// auto& command = Renderer::GetDrawCommand();
+	auto* command = Renderer::GetCommand();
 
-	// command.PointTransforms[point].Add(tr);
 }
 
 void Renderer3D::DrawLine(const Line& line, const glm::mat4& tr) {
-	// auto& command = Renderer::GetDrawCommand();
+	// auto* command = Renderer::GetCommand();
 
-	// command.LineTransforms[line].Add(tr);
 }
 
 void Renderer3D::DrawText(Ref<Text> text, const glm::mat4& tr) {

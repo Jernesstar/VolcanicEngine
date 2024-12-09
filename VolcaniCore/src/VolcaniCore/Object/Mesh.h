@@ -20,7 +20,6 @@ struct Material {
 	glm::vec4 EmissiveColor = glm::vec4(0.0f);
 };
 
-// TODO(Change): Make Point and Line a kind of Mesh
 enum class MeshPrimitive { Point, Line, Quad, Cube, Pyramid };
 
 class Mesh {

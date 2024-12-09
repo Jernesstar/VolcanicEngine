@@ -11,6 +11,8 @@
 #include <Renderer/Renderer.h>
 #include <Renderer/ShaderLibrary.h>
 
+#include "Defines.h"
+
 #include "Shader.h"
 #include "Mesh.h"
 #include "Cubemap.h"
@@ -25,8 +27,8 @@ namespace VolcaniCore::OpenGL {
 
 struct BackendBuffer {
 	Ref<VertexArray> Array;
-	Buffer<void> Vertices;
 	Buffer<uint32_t> Indices;
+	Buffer<void> Vertices;
 	Buffer<void> Instances;
 };
 
@@ -58,57 +60,57 @@ static void Clear();
 static void Resize(uint32_t width, uint32_t height);
 
 static void FlushCommand(DrawCommand& command);
-static void FlushCalls();
 static void FlushCall(DrawCall& call);
 
+static void SetUniforms(DrawCommand& command);
 static void SetOptions(DrawCall& call);
-static void SetUniforms(DrawCall& call);
-
-static void DrawPoint(DrawCall& call);
-static void DrawLine(DrawCall& call);
-static void DrawMesh(DrawCall& call);
 
 void Renderer::StartFrame() {
-
+	s_Data.Commands.clear();
 }
 
 void Renderer::EndFrame() {
-	FlushCalls();
+	for(auto& [buffer, backend] : s_Data.Arrays) {
+		if(!backend.Vertices.GetCount() && !backend.Indices.GetCount()
+		&& !backend.Instances.GetCount())
+			continue; // Static buffer
+
+		backend.Array->GetIndexBuffer()->SetData(backend.Indices);
+		backend.Array->GetVertexBuffer(0)->SetData(backend.Vertices);
+		backend.Array->GetVertexBuffer(1)->SetData(backend.Instances);
+	}
+
+	for(auto& command : s_Data.Commands)
+		FlushCommand(command);
 }
 
-DrawBuffer* Renderer::NewDrawBuffer(DrawBufferSpecification& specs,
-									void* data)
-{
+DrawBuffer* Renderer::NewDrawBuffer(DrawBufferSpecification& specs, void* data) {
 	auto* buffer = new DrawBuffer{ specs };
 
 	auto array = CreateRef<VertexArray>();
-	array->SetIndexBuffer(CreateRef<IndexBuffer>(specs.MaxIndexCount));
+	s_Data.Arrays[buffer] = BackendBuffer{ array };
 
 	if(data) {
 		array->AddVertexBuffer(
 			CreateRef<VertexBuffer>(
-				specs.VertexLayout, specs.MaxVertexCount, data)
-		);
-		s_Data.Arrays[buffer] = BackendBuffer{ array }; // Static Buffer
+				specs.VertexLayout, specs.MaxVertexCount, data));
 	}
 	else {
+		array->SetIndexBuffer(CreateRef<IndexBuffer>(specs.MaxIndexCount));
 		array->AddVertexBuffer(
 			CreateRef<VertexBuffer>(specs.VertexLayout, specs.MaxVertexCount));
 
-		// TODO(Fix): Replace with emplace
-		s_Data.Arrays[buffer] =
-			BackendBuffer
-			{
-				array,
-				Buffer<void>(specs.MaxVertexCount, specs.VertexLayout.Stride),
-				Buffer<uint32_t>(specs.MaxIndexCount),
-				Buffer<void>(specs.MaxInstanceCount, specs.VertexLayout.Stride)
-			};
+		s_Data.Arrays[buffer].Indices = Buffer<uint32_t>(specs.MaxIndexCount);
+		s_Data.Arrays[buffer].Vertices
+			= Buffer<void>(specs.MaxVertexCount, specs.VertexLayout.Stride);
+		s_Data.Arrays[buffer].Instances
+			= Buffer<void>(specs.MaxInstanceCount, specs.VertexLayout.Stride);
 	}
 
 	if(specs.InstanceLayout != BufferLayout{ })
 		array->AddVertexBuffer(
-			CreateRef<VertexBuffer>(specs.InstanceLayout, specs.MaxInstanceCount)
+			CreateRef<VertexBuffer>(
+				specs.InstanceLayout, specs.MaxInstanceCount)
 		);
 
 	return buffer;
@@ -128,7 +130,7 @@ DrawBuffer* Renderer::GetDrawBuffer(DrawBufferSpecification& specs) {
 void Renderer::SetBufferData(DrawBuffer* buffer, uint32_t bufferIndex,
 							 void* data, uint64_t count)
 {
-	auto backendBuffer = s_Data.Arrays[buffer];
+	auto& backendBuffer = s_Data.Arrays[buffer];
 	if(bufferIndex == 0)
 		if(count == 0)
 			backendBuffer.Indices.Clear();
@@ -150,61 +152,108 @@ void Renderer::ReleaseBuffer(DrawBuffer* buffer) {
 	s_Data.Arrays.erase(buffer);
 }
 
-void Renderer::Submit(DrawCall& call) {
-	// call.Pipeline->As<OpenGL::ShaderProgram>()->Bind();
+DrawCommand* Renderer::NewDrawCommand() {
+	return &s_Data.Commands.emplace_back();
+}
 
+void FlushCommand(DrawCommand& command) {
+	command.Pipeline->As<OpenGL::ShaderProgram>()->Bind();
+	if(command.Image)
+		command.Image->As<OpenGL::Framebuffer>()->Bind();
+
+	if(command.Clear)
+		Clear();
+	if(command.ViewportWidth && command.ViewportHeight)
+		Resize(command.ViewportWidth, command.ViewportHeight);
+
+	if(command.BufferData) {
+		s_Data.Arrays[command.BufferData].Array->Bind();
+
+		SetUniforms(command);
+		for(auto& call : command.Calls)
+			FlushCall(call);
+
+		s_Data.Arrays[command.BufferData].Array->Unbind();
+	}
+
+	if(command.Image)
+		command.Image->As<OpenGL::Framebuffer>()->Unbind();
+}
+
+void FlushCall(DrawCall& call) {
 	SetOptions(call);
-	SetUniforms(call);
 
+	uint32_t primitive;
 	switch(call.Primitive) {
 		case PrimitiveType::Point:
-			DrawPoint(call);
+			primitive = GL_POINTS;
 			break;
 		case PrimitiveType::Line:
-			DrawLine(call);
+			primitive = GL_LINES;
 			break;
 		case PrimitiveType::Triangle:
-			DrawMesh(call);
+			primitive = GL_TRIANGLES;
 			break;
 	}
-}
 
-static void DrawPoint(DrawCall& call) {
-	uint32_t instanceCount = call.InstanceCount;
-
-	glDrawArrays(GL_POINTS, 0, instanceCount);
-}
-
-// TODO(Implement):
-static void DrawLine(DrawCall& call) {
-	uint32_t instanceCount = call.InstanceCount;
-
-	glDrawArraysInstanced(GL_LINES, 0, 2, instanceCount);
-}
-
-static void DrawMesh(DrawCall& call) {
 	if(call.Partition == PartitionType::MultiDraw) {
-		// TODO(Implement): Pack meshes together and issue a single draw call
-		return;
+		// if(call.IndexCount == 0)
+		// 	glMultiDrawArraysIndirect();
+		// else
+		// 	glMultiDrawElements();
 	}
 	else if(call.Partition == PartitionType::Single) {
 		if(call.IndexCount == 0)
-			glDrawArrays(GL_TRIANGLES, call.VertexStart, call.VertexCount);
+			glDrawArrays(primitive, call.VertexStart, call.VertexCount);
 		else
-			glDrawElements(GL_TRIANGLES, call.IndexCount,
-						   GL_UNSIGNED_INT, nullptr);
+			glDrawElementsBaseVertex(primitive, call.IndexCount,
+									 GL_UNSIGNED_INT, 0, call.IndexStart);
 	}
 	else if(call.Partition == PartitionType::Instanced) {
 		if(call.IndexCount == 0)
-			glDrawArraysInstanced(GL_TRIANGLES, call.VertexStart,
-								  call.VertexCount, call.InstanceCount);
+			glDrawArraysInstancedBaseInstance(
+				primitive, call.VertexStart, call.VertexCount,
+				call.InstanceCount, call.InstanceStart);
 		else
-			glDrawElementsInstanced(GL_TRIANGLES, call.IndexCount,
-									GL_UNSIGNED_INT, nullptr, call.InstanceCount);
+			glDrawElementsInstancedBaseVertexBaseInstance(
+				primitive, call.IndexCount, GL_UNSIGNED_INT, 0,
+				call.InstanceCount, call.IndexStart, call.InstanceStart);
 	}
 }
 
-static void SetOptions(DrawCall& call) {
+void Clear() {
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
+void Resize(uint32_t width, uint32_t height) {
+	glViewport(0, 0, width, height);
+}
+
+void SetUniforms(DrawCommand& command) {
+	auto& uniforms = command.UniformData;
+	auto shader = command.Pipeline;
+
+	for(auto& [name, data] : uniforms.IntUniforms)
+		shader->SetInt(name, data);
+	for(auto& [name, data] : uniforms.FloatUniforms)
+		shader->SetFloat(name, data);
+	for(auto& [name, slot] : uniforms.TextureUniforms)
+		shader->SetTexture(name, slot.Sampler, slot.Index);
+	for(auto& [name, data] : uniforms.Vec2Uniforms)
+		shader->SetVec2(name, data);
+	for(auto& [name, data] : uniforms.Vec3Uniforms)
+		shader->SetVec3(name, data);
+	for(auto& [name, data] : uniforms.Vec4Uniforms)
+		shader->SetVec4(name, data);
+	for(auto& [name, data] : uniforms.Mat2Uniforms)
+		shader->SetMat2(name, data);
+	for(auto& [name, data] : uniforms.Mat3Uniforms)
+		shader->SetMat3(name, data);
+	for(auto& [name, data] : uniforms.Mat4Uniforms)
+		shader->SetMat4(name, data);
+}
+
+void SetOptions(DrawCall& call) {
 	if(call.DepthTest == DepthTestingMode::On)
 		glEnable(GL_DEPTH_TEST);
 	if(call.DepthTest == DepthTestingMode::Off)
@@ -231,18 +280,6 @@ static void SetOptions(DrawCall& call) {
 		glCullFace(GL_FRONT);
 	else if(call.Culling == CullingMode::Back)
 		glCullFace(GL_BACK);
-}
-
-static void SetUniforms(DrawCall& call) {
-	// TODO(Implement):
-}
-
-static void Clear() {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-}
-
-static void Resize(uint32_t width, uint32_t height) {
-	glViewport(0, 0, width, height);
 }
 
 }

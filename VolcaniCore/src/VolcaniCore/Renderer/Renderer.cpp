@@ -22,7 +22,7 @@ static FrameData s_Frame;
 static uint64_t DrawCallCount;
 static uint64_t IndexCount;
 static uint64_t VertexCount;
-static uint64_t TransformCount;
+static uint64_t InstanceCount;
 
 void Renderer::Init() {
 	s_Frame = { };
@@ -40,32 +40,69 @@ void Renderer::BeginFrame() {
 	DrawCallCount  = 0;
 	IndexCount     = 0;
 	VertexCount    = 0;
-	TransformCount = 0;
+	InstanceCount  = 0;
 }
 
 void Renderer::EndFrame() {
 	s_Frame.Info.DrawCalls = DrawCallCount;
 	s_Frame.Info.Indices   = IndexCount;
 	s_Frame.Info.Vertices  = VertexCount;
-	s_Frame.Info.Instances = TransformCount;
-
-	s_DrawCommand->ClearBuffers();
+	s_Frame.Info.Instances = InstanceCount;
 }
 
 void Renderer::StartPass(Ref<RenderPass> pass) {
-	
+	s_RenderPass = pass;
+	NewCommand();
 }
 
 void Renderer::EndPass() {
-
-}
-
-void Renderer::NewDrawCommand() {
-
+	EndCommand();
+	s_RenderPass = nullptr;
 }
 
 Ref<RenderPass> Renderer::GetPass() {
-	// return s_RenderPass;
+	return s_RenderPass;
+}
+
+DrawCommand* Renderer::GetCommand() {
+	return s_DrawCommand;
+}
+
+DrawCommand* Renderer::NewCommand() {
+	EndCommand();
+
+	s_DrawCommand = RendererAPI::Get()->NewDrawCommand();
+	s_DrawCommand->Pipeline = s_RenderPass->GetPipeline();
+	s_DrawCommand->Image = s_RenderPass->GetOutput();
+	return s_DrawCommand;
+}
+
+void Renderer::EndCommand() {
+	if(!s_DrawCommand)
+		return;
+
+	DrawCallCount += s_DrawCommand->Calls.size();
+	IndexCount    += s_DrawCommand->IndicesIndex;
+	VertexCount   += s_DrawCommand->VerticesIndex;
+	InstanceCount += s_DrawCommand->InstancesIndex;
+
+	s_RenderPass->SetUniforms(s_DrawCommand->UniformData);
+	s_DrawCommand = nullptr;
+}
+
+void Renderer::Clear() {
+	VOLCANICORE_ASSERT(s_DrawCommand, "Did you forget to call StartPass?");
+	s_DrawCommand->Clear = true;
+}
+
+void Renderer::Resize(uint32_t width, uint32_t height) {
+	VOLCANICORE_ASSERT(s_DrawCommand, "Did you forget to call StartPass?");
+	s_DrawCommand->ViewportWidth = width;
+	s_DrawCommand->ViewportHeight = height;
+}
+
+void Renderer::Flush() {
+
 }
 
 FrameDebugInfo Renderer::GetDebugInfo() {

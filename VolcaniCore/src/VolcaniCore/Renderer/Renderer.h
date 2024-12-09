@@ -23,7 +23,6 @@ struct FrameDebugInfo {
 };
 
 struct FrameData {
-	// List<DrawCall> DrawCalls;
 	FrameDebugInfo Info;
 };
 
@@ -37,13 +36,17 @@ public:
 public:
 	static void StartPass(Ref<RenderPass> pass);
 	static void EndPass();
-
-	static void NewDrawCommand();
-
-	static void Clear(const glm::vec4& color = glm::vec4(0.0f)) { }
-	static void Resize(uint32_t width, uint32_t height) { }
-
 	static Ref<RenderPass> GetPass();
+
+	static DrawCommand* GetCommand();
+	static DrawCommand* NewCommand();
+	static void EndCommand();
+
+	static void Clear();
+	static void Resize(uint32_t width, uint32_t height);
+
+	static void Flush();
+
 	static FrameDebugInfo GetDebugInfo();
 
 private:

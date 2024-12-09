@@ -11,7 +11,7 @@
 
 namespace VolcaniCore {
 
-static DrawBuffer* FramebufferCoords;
+static DrawBuffer* s_ScreenQuadBuffer;
 
 void Renderer2D::Init() {
 	float framebufferCoords[] =
@@ -25,15 +25,25 @@ void Renderer2D::Init() {
 		0.0f, 1.0f
 	};
 
+	BufferLayout layout =
+		{
+			{
+				{ "Position", BufferDataType::Vec2 },
+			},
+			false, // Dynamic
+			false // Structure of arrays
+		};
+	DrawBufferSpecification specs{ layout };
 
+	s_ScreenQuadBuffer = RendererAPI::Get()->NewDrawBuffer(specs);
 }
 
 void Renderer2D::Close() {
-
+	RendererAPI::Get()->ReleaseBuffer(s_ScreenQuadBuffer);
 }
 
 void Renderer2D::Begin(Ref<OrthographicCamera> camera) {
-	
+
 }
 
 void Renderer2D::End() {
@@ -56,29 +66,40 @@ void Renderer2D::DrawText(Ref<Text> text, const Transform& t) {
 
 }
 
-void Renderer2D::DrawFullScreenQuad(Ref<Framebuffer> buffer,
+void Renderer2D::DrawFullscreenQuad(Ref<Framebuffer> buffer,
 									AttachmentTarget target)
 {
-	// if(!buffer) {
-	// 	VOLCANICORE_LOG_INFO("WHYYY?");
-	// }
-	// if(!buffer->Has(target)) {
-	// 	VOLCANICORE_LOG_WARNING("Framebuffer does not have needed attachment");
-	// 	return;
-	// }
+	if(!buffer) {
+		VOLCANICORE_LOG_INFO("Buffer is null");
+		return;
+	}
+	if(!buffer->Has(target)) {
+		VOLCANICORE_LOG_WARNING("Framebuffer does not have needed attachment");
+		return;
+	}
 
-	// auto pass = Renderer::GetPass();
-	// Ref<ShaderPipeline> pipeline = nullptr;
-	// Ref<Framebuffer> output = nullptr;
-	// if(pass) {
-	// 	pipeline = pass->GetPipeline();
-	// 	output = pass->GetOutput();
-	// }
+	auto pass = Renderer::GetPass();
+	auto command = Renderer::GetCommand();
+	Ref<ShaderPipeline> pipeline = nullptr;
+	Ref<Framebuffer> output = nullptr;
+	if(pass) {
+		pipeline = pass->GetPipeline();
+		output = pass->GetOutput();
+	}
+	else {
+		pipeline = ShaderLibrary::Get("Framebuffer");
+		command = RendererAPI::Get()->NewDrawCommand();
+	}
 
-	// if(!pipeline)
-	// 	ShaderLibrary::Get("Framebuffer")->Bind();
-	// else
-	// 	pipeline->Bind();
+	command->BufferData = s_ScreenQuadBuffer;
+	command->Pipeline = pipeline;
+	command->Image = output;
+
+	auto& call = command->NewDrawCall();
+	call.DepthTest = DepthTestingMode::Off;
+	call.Primitive = PrimitiveType::Triangle;
+	call.Partition = PartitionType::Single;
+	call.VertexCount = 6;
 
 	// if(output) {
 	// 	output->Bind();
@@ -100,8 +121,6 @@ void Renderer2D::DrawFullScreenQuad(Ref<Framebuffer> buffer,
 	// 	Resize(window->GetWidth(), window->GetHeight());
 	// 	output->Unbind();
 	// }
-	// if(pipeline)
-	// 	pipeline->Unbind();
 }
 
 }

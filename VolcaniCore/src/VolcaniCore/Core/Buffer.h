@@ -28,10 +28,10 @@ public:
 	{
 		std::swap(m_Data, other.m_Data);
 	}
-	Buffer(T* buffer, uint64_t maxCount = 0)
-		: m_MaxCount(maxCount), m_Count(0)
+	Buffer(T* buffer, uint32_t count, uint64_t maxCount = 0)
+		: m_MaxCount(maxCount), m_Count(count)
 	{
-		m_Data = (T*)buffer;
+		m_Data = buffer;
 	}
 	Buffer(const List<T>& list)
 		: m_MaxCount(list.size()), m_Count(list.size())
@@ -74,7 +74,7 @@ public:
 	Buffer<T> Partition(uint32_t count = 0) {
 		if(count == 0)
 			count = m_MaxCount;
-		return Buffer<T>(m_Data + (m_Count += count), 0);
+		return Buffer<T>(m_Data + (m_Count += count), count, 0);
 	}
 
 	void Add(const T& element) {

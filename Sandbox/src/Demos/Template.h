@@ -6,7 +6,7 @@ class Template : public Application {
 public:
 	Template();
 
-	void OnUpdate(TimeStep ts);
+	void OnUpdate(TimeStep ts) override;
 
 private:
 	Ref<Camera> camera;

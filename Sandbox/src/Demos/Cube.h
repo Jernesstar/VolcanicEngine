@@ -92,7 +92,7 @@ Cube::Cube()
 		});
 
 	drawPass = RenderPass::Create("Draw", shader);
-	drawPass->SetOutput(framebuffer);
+	// drawPass->SetOutput(framebuffer);
 
 	cube = Mesh::Create(MeshPrimitive::Cube,
 		Material{
@@ -117,35 +117,35 @@ Cube::Cube()
 	controller.RotationSpeed = 0.0f;
 	controller.TranslationSpeed = 20.0f;
 
-	UI::Init();
+	// UI::Init();
 }
 
 Cube::~Cube() {
-	UI::Close();
+	// UI::Close();
 }
 
 void Cube::OnUpdate(TimeStep ts) {
-	UI::Begin();
+	// UI::Begin();
 
 	controller.OnUpdate(ts);
 
-	ImGui::Begin("Lights");
-	{
-		float r = camera->As<IsometricCamera>()->R;
-		if(ImGui::SliderFloat("Light.R", &r, 10.0f, 100.0f))
-			camera->As<IsometricCamera>()->SetDistance(r);
-	}
-	ImGui::End();
+	// ImGui::Begin("Lights");
+	// {
+	// 	float r = camera->As<IsometricCamera>()->R;
+	// 	if(ImGui::SliderFloat("Light.R", &r, 10.0f, 100.0f))
+	// 		camera->As<IsometricCamera>()->SetDistance(r);
+	// }
+	// ImGui::End();
 
-	ImGui::Begin("Debug");
-	{
-		ImGui::Text("FPS: %0.1f", Renderer::GetDebugInfo().FPS);
-		ImGui::Text("Draw Calls: %i", Renderer::GetDebugInfo().DrawCalls);
-		ImGui::Text("Indices: %i", Renderer::GetDebugInfo().Indices);
-		ImGui::Text("Vertices: %i", Renderer::GetDebugInfo().Vertices);
-		ImGui::Text("Instances: %i", Renderer::GetDebugInfo().Instances);
-	}
-	ImGui::End();
+	// ImGui::Begin("Debug");
+	// {
+	// 	ImGui::Text("FPS: %0.1f", Renderer::GetDebugInfo().FPS);
+	// 	ImGui::Text("Draw Calls: %i", Renderer::GetDebugInfo().DrawCalls);
+	// 	ImGui::Text("Indices: %i", Renderer::GetDebugInfo().Indices);
+	// 	ImGui::Text("Vertices: %i", Renderer::GetDebugInfo().Vertices);
+	// 	ImGui::Text("Instances: %i", Renderer::GetDebugInfo().Instances);
+	// }
+	// ImGui::End();
 
 	Renderer::StartPass(drawPass);
 	{
@@ -153,18 +153,17 @@ void Cube::OnUpdate(TimeStep ts) {
 
 		Renderer3D::Begin(camera);
 
-		for(int y = -10; y < 10; y++)
-			for(int x = -10; x < 10; x++)
+		for(int y = -50; y < 50; y++)
+			for(int x = -50; x < 50; x++)
 				Renderer3D::DrawMesh(cube, { .Translation = { x, 0.0f, y } });
 
 		Renderer3D::End();
 	}
 	Renderer::EndPass();
-	Renderer::Flush();
 
-	// RendererAPI::Get()->RenderFramebuffer(framebuffer, AttachmentTarget::Color);
+	// Renderer2D::DrawFullscreenQuad(framebuffer, AttachmentTarget::Color);
 
-	UI::End();
+	// UI::End();
 }
 
 }
