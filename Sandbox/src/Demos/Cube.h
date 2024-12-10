@@ -149,9 +149,8 @@ Cube::Cube()
 	};
 
 	buffer = RendererAPI::Get()->NewDrawBuffer(specs);
-	VOLCANICORE_LOG_INFO("AddVertices");
 	buffer->AddIndices(Buffer(cube->GetIndices()));
-	// buffer->AddVertices(Buffer(cube->GetVertices()));
+	buffer->AddVertices(Buffer(cube->GetVertices()));
 	// UI::Init();
 }
 
@@ -198,24 +197,35 @@ void Cube::OnUpdate(TimeStep ts) {
 
 	// Renderer2D::DrawFullscreenQuad(framebuffer, AttachmentTarget::Color);
 
-	// auto* command = RendererAPI::Get()->NewDrawCommand(buffer);
-	// auto& call = command->NewDrawCall();
+	RendererAPI::Get()->SetBufferData(buffer, 2, nullptr, 0);
 
-	// call.Primitive = PrimitiveType::Triangle;
-	// call.Partition = PartitionType::Instanced;
-	// call.IndexStart = 0;
-	// call.VertexStart = 0;
-	// call.IndexCount = cube->GetIndices().size();
-	// call.VertexCount = cube->GetVertices().size();
+	auto* command = RendererAPI::Get()->NewDrawCommand(buffer);
+	command->Pipeline = shader;
+	command->Clear = true;
+	// command->UniformData
+	// 	.SetTexture("u_Diffuse",
+	// 	{
+	// 		cube->GetMaterial().Diffuse, 0
+	// 	});
+	command->UniformData
+		.SetMat4("u_ViewProj", camera->GetViewProjection());
 
-	// for(int y = -50; y < 50; y++)
-	// 	for(int x = -50; x < 50; x++) {
-	// 		auto transform = Transform{ .Translation = { x, 0.0f, y } };
-	// 		auto tr = transform.GetTransform();
-	// 		RendererAPI::Get()
-	// 			->SetBufferData(command->BufferData, 2, glm::value_ptr(tr), 1);
-	// 		call.InstanceCount++;
-	// 	}
+	auto& call = command->NewDrawCall();
+	call.Primitive = PrimitiveType::Triangle;
+	call.Partition = PartitionType::Instanced;
+	call.IndexStart = 0;
+	call.VertexStart = 0;
+	call.IndexCount = cube->GetIndices().size();
+	call.VertexCount = cube->GetVertices().size();
+
+	for(int y = -50; y < 50; y++)
+		for(int x = -50; x < 50; x++) {
+			auto transform = Transform{ .Translation = { x, 0.0f, y } };
+			auto tr = transform.GetTransform();
+			RendererAPI::Get()
+				->SetBufferData(command->BufferData, 2,
+								glm::value_ptr(tr), call.InstanceCount++);
+		}
 
 	// UI::End();
 }

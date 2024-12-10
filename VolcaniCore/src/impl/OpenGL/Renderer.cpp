@@ -49,7 +49,7 @@ void Renderer::Init() {
 	glEnable(GL_MULTISAMPLE);				// Smooth edges
 	glEnable(GL_FRAMEBUFFER_SRGB);			// Gamma correction
 	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS); // Smooth cubemap edges
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glClearColor(1.0f, 0.0f, 0.0f, 0.0f);
 }
 
 void Renderer::Close() {
@@ -71,13 +71,15 @@ void Renderer::StartFrame() {
 
 void Renderer::EndFrame() {
 	for(auto& [buffer, backend] : s_Data.Arrays) {
-		if(!backend.Vertices.GetCount() && !backend.Indices.GetCount()
-		&& !backend.Instances.GetCount())
-			continue; // Static buffer
+		if(!buffer->Specs.MaxVertexCount) // Static buffer 
+			continue;
 
-		backend.Array->GetIndexBuffer()->SetData(backend.Indices);
-		backend.Array->GetVertexBuffer(0)->SetData(backend.Vertices);
-		backend.Array->GetVertexBuffer(1)->SetData(backend.Instances);
+		if(backend.Indices.GetCount())
+			backend.Array->GetIndexBuffer()->SetData(backend.Indices);
+		if(backend.Vertices.GetCount())
+			backend.Array->GetVertexBuffer(0)->SetData(backend.Vertices);
+		if(backend.Instances.GetCount())
+			backend.Array->GetVertexBuffer(1)->SetData(backend.Instances);
 	}
 
 	for(auto& command : s_Data.Commands)
@@ -94,24 +96,29 @@ DrawBuffer* Renderer::NewDrawBuffer(DrawBufferSpecification& specs, void* data) 
 		array->AddVertexBuffer(
 			CreateRef<VertexBuffer>(
 				specs.VertexLayout, specs.MaxVertexCount, data));
+		buffer->Specs.MaxVertexCount = 0;
+
+		return buffer;
 	}
-	else {
+
+	if(specs.MaxIndexCount) {
 		array->SetIndexBuffer(CreateRef<IndexBuffer>(specs.MaxIndexCount));
+		s_Data.Arrays[buffer].Indices
+			= Buffer<uint32_t>(specs.MaxIndexCount);
+	}
+	if(specs.InstanceLayout != BufferLayout{ }) {
 		array->AddVertexBuffer(
 			CreateRef<VertexBuffer>(specs.VertexLayout, specs.MaxVertexCount));
-
-		s_Data.Arrays[buffer].Indices = Buffer<uint32_t>(specs.MaxIndexCount);
 		s_Data.Arrays[buffer].Vertices
 			= Buffer<void>(specs.MaxVertexCount, specs.VertexLayout.Stride);
+	}
+	if(specs.InstanceLayout != BufferLayout{ }) {
+		array->AddVertexBuffer(
+			CreateRef<VertexBuffer>(
+				specs.InstanceLayout, specs.MaxInstanceCount));
 		s_Data.Arrays[buffer].Instances
 			= Buffer<void>(specs.MaxInstanceCount, specs.VertexLayout.Stride);
 	}
-
-	if(specs.InstanceLayout != BufferLayout{ })
-		array->AddVertexBuffer(
-			CreateRef<VertexBuffer>(
-				specs.InstanceLayout, specs.MaxInstanceCount)
-		);
 
 	return buffer;
 }
@@ -170,12 +177,14 @@ void FlushCommand(DrawCommand& command) {
 	if(command.ViewportWidth && command.ViewportHeight)
 		Resize(command.ViewportWidth, command.ViewportHeight);
 
+	SetUniforms(command);
+
 	if(command.BufferData) {
 		auto array = s_Data.Arrays[command.BufferData].Array;
+		VOLCANICORE_LOG_INFO("%i", s_Data.Arrays[command.BufferData].Instances.GetCount());
+
 		array->Bind();
 
-		VOLCANICORE_LOG_INFO("%i", s_Data.Arrays[command.BufferData].Instances.GetCount());
-		SetUniforms(command);
 		for(auto& call : command.Calls)
 			FlushCall(call);
 
@@ -192,7 +201,7 @@ void FlushCall(DrawCall& call) {
 	uint32_t primitive;
 	switch(call.Primitive) {
 		case PrimitiveType::Point:
-			primitive = GL_POINTS;
+			 primitive = GL_POINTS;
 			break;
 		case PrimitiveType::Line:
 			primitive = GL_LINES;
@@ -206,7 +215,7 @@ void FlushCall(DrawCall& call) {
 		// if(call.IndexCount == 0)
 		// 	glMultiDrawArraysIndirect();
 		// else
-		// 	glMultiDrawElements();
+		// 	glMultiDrawElementsIndirect();
 	}
 	else if(call.Partition == PartitionType::Single) {
 		if(call.IndexCount == 0)

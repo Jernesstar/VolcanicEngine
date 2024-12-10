@@ -17,6 +17,5 @@ void main()
     v_Normal = a_Normal;
     v_TexCoord = a_TexCoord;
 
-    // gl_Position = u_ViewProj * vec4(v_Position, 1.0);
-    gl_Position = u_ViewProj * vec4(1.0);
+    gl_Position = u_ViewProj * vec4(v_Position, 1.0);
 }

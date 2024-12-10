@@ -3,7 +3,7 @@
 #include <cstring>
 
 #include "Core/Defines.h"
-#include "Core/Log.h"
+#include "Core/Assert.h"
 
 namespace VolcaniCore {
 
@@ -18,28 +18,27 @@ public:
 		if(maxCount != 0)
 			m_Data = new T[m_MaxCount];
 	}
-	Buffer(const Buffer& other)
-		: m_MaxCount(other.GetMaxCount()), m_Count(other.GetCount())
-	{
-		m_Data = new T[m_MaxCount];
-		Set(other.Get(), other.GetCount());
-	}
 	Buffer(Buffer&& other)
 		: m_MaxCount(other.GetMaxCount()), m_Count(other.GetCount())
 	{
 		std::swap(m_Data, other.m_Data);
 	}
+	Buffer(const Buffer& other)
+		: m_MaxCount(other.GetMaxCount())
+	{
+		m_Data = new T[m_MaxCount];
+		Set(other.Get(), other.GetCount());
+	}
+	Buffer(const List<T>& list)
+		: m_MaxCount(list.size())
+	{
+		m_Data = new T[m_MaxCount];
+		Set(list.data(), list.size());
+	}
 	Buffer(T* buffer, uint64_t count, uint64_t maxCount = 0)
 		: m_MaxCount(maxCount), m_Count(count)
 	{
 		m_Data = buffer;
-	}
-	Buffer(const List<T>& list)
-		: m_MaxCount(list.size()), m_Count(list.size())
-	{
-		VOLCANICORE_LOG_INFO("List Copy Construtor");
-		m_Data = new T[m_MaxCount];
-		Set(list.data(), m_Count);
 	}
 
 	~Buffer() {
@@ -62,7 +61,10 @@ public:
 		return List<T>(m_Data, m_Data + m_Count);
 	}
 
-	T& operator [](uint64_t index) const { return m_Data[index]; }
+	T& operator [](uint64_t index) const {
+		VOLCANICORE_ASSERT(index < m_Count);
+		return m_Data[index];
+	}
 
 	uint64_t GetCount()	   const { return m_Count; }
 	uint64_t GetMaxCount() const { return m_MaxCount; }
@@ -102,9 +104,13 @@ public:
 	}
 
 	void Set(const void* data, uint64_t count, uint64_t offset = 0) {
+		if(offset >= m_MaxCount)
+			return;
 		if(offset + count >= m_MaxCount)
-			count = (m_MaxCount - 1) - offset;
+			count = m_MaxCount - offset;
+
 		memcpy(m_Data + offset, data, count * sizeof(T));
+
 		if(offset + count > m_Count)
 			m_Count = offset + count;
 	}
@@ -156,31 +162,31 @@ public:
 	{
 		m_Data = malloc(GetMaxSize());
 	}
-	Buffer(const Buffer& other)
-		: m_MaxCount(other.GetMaxCount()), m_Count(other.GetCount()),
-			m_SizeT(other.m_SizeT)
-	{
-		m_Data = malloc(GetMaxSize());
-		Set(other.Get(), other.GetSize());
-	}
 	Buffer(Buffer&& other)
 		: m_MaxCount(other.GetMaxCount()), m_Count(other.GetCount()),
 			m_SizeT(other.m_SizeT)
 	{
 		std::swap(m_Data, other.m_Data);
 	}
-	Buffer(void* buffer, uint64_t count, uint64_t size)
-		: m_MaxCount(count), m_Count(count), m_SizeT(size)
+	Buffer(const Buffer& other)
+		: m_MaxCount(other.GetMaxCount()), m_SizeT(other.m_SizeT)
 	{
-		m_Data = (void*)buffer;
+		m_Data = malloc(GetMaxSize());
+		Set(other.Get(), other.GetCount());
 	}
 
 	template<typename T>
 	Buffer(const List<T>& list)
-		: m_MaxCount(list.size()), m_Count(list.size()), m_SizeT(sizeof(T))
+		: m_MaxCount(list.size()), m_SizeT(sizeof(T))
 	{
 		m_Data = malloc(GetMaxSize());
-		Set(list.data(), m_Count);
+		Set(list.data(), list.size());
+	}
+
+	Buffer(void* buffer, uint64_t count, uint64_t size)
+		: m_MaxCount(count), m_Count(count), m_SizeT(size)
+	{
+		m_Data = (void*)buffer;
 	}
 
 	~Buffer() {
@@ -199,12 +205,6 @@ public:
 
 	void* Get() const { return m_Data; }
 
-	// List<T> GetList() const {
-	// 	return List<T>(m_Data, m_Data + m_Count);
-	// }
-
-	// T& operator [](uint64_t index) const { return m_Data[index]; }
-
 	uint64_t GetCount()	   const { return m_Count; }
 	uint64_t GetMaxCount() const { return m_MaxCount; }
 	uint64_t GetSize()	   const { return m_Count	 * m_SizeT; }
@@ -220,11 +220,12 @@ public:
 		return Buffer(m_Data + (m_Count += count), count, m_SizeT);
 	}
 
+	// template<typename T>
 	// void Add(const T& element) {
 	// 	if(m_MaxCount != 0 && m_Count >= m_MaxCount)
 	// 		Reallocate(100);
 
-	// 	m_Data[m_Count++] = element;
+	// 	memset(m_Data, element, sizeof(T));
 	// }
 	void Add(const Buffer& buffer) {
 		if(m_MaxCount != 0 && m_Count + buffer.GetCount() >= m_MaxCount)
@@ -243,7 +244,13 @@ public:
 		Set(data, count, m_Count);
 	}
 	void Set(const void* data, uint64_t count, uint64_t offset = 0) {
+		if(offset >= m_MaxCount)
+			return;
+		if(offset + count >= m_MaxCount)
+			count = m_MaxCount - offset;
+
 		memcpy(m_Data + offset, data, count * m_SizeT);
+
 		if(offset + count > m_Count)
 			m_Count = offset + count;
 	}
