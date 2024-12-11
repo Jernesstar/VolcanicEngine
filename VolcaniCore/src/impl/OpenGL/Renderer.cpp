@@ -8,8 +8,8 @@
 #include <Core/Assert.h>
 #include <Event/Events.h>
 
-#include <Renderer/Renderer.h>
-#include <Renderer/ShaderLibrary.h>
+#include <Graphics/Renderer.h>
+#include <Graphics/ShaderLibrary.h>
 
 #include "Defines.h"
 
@@ -103,38 +103,35 @@ DrawBuffer* Renderer::NewDrawBuffer(DrawBufferSpecification& specs, void* data) 
 
 	if(specs.MaxIndexCount) {
 		array->SetIndexBuffer(CreateRef<IndexBuffer>(specs.MaxIndexCount));
-		s_Data.Arrays[buffer].Indices
-			= Buffer<uint32_t>(specs.MaxIndexCount);
+		s_Data.Arrays[buffer].Indices = Buffer<uint32_t>(specs.MaxIndexCount);
 	}
-	if(specs.InstanceLayout != BufferLayout{ }) {
+	if(specs.MaxVertexCount) {
 		array->AddVertexBuffer(
 			CreateRef<VertexBuffer>(specs.VertexLayout, specs.MaxVertexCount));
 		s_Data.Arrays[buffer].Vertices
 			= Buffer<void>(specs.MaxVertexCount, specs.VertexLayout.Stride);
 	}
-	if(specs.InstanceLayout != BufferLayout{ }) {
+	if(specs.MaxInstanceCount) {
 		array->AddVertexBuffer(
 			CreateRef<VertexBuffer>(
 				specs.InstanceLayout, specs.MaxInstanceCount));
 		s_Data.Arrays[buffer].Instances
-			= Buffer<void>(specs.MaxInstanceCount, specs.VertexLayout.Stride);
+			= Buffer<void>(specs.MaxInstanceCount, specs.InstanceLayout.Stride);
 	}
 
 	return buffer;
 }
 
 DrawBuffer* Renderer::GetDrawBuffer(DrawBufferSpecification& specs) {
-	auto& vertexLayout = specs.VertexLayout;
-	auto& instanceLayout = specs.InstanceLayout;
 	for(auto& [buffer, backendBuffer] : s_Data.Arrays)
-		if(backendBuffer.Array->GetVertexBuffer(0)->Layout == vertexLayout
-		&& backendBuffer.Array->GetVertexBuffer(1)->Layout == instanceLayout)
+		if(buffer->Specs.VertexLayout == specs.VertexLayout
+		&& buffer->Specs.InstanceLayout == specs.InstanceLayout)
 			return buffer;
 
 	return NewDrawBuffer(specs);
 }
 
-void Renderer::SetBufferData(DrawBuffer* buffer, uint32_t bufferIndex,
+void Renderer::SetBufferData(DrawBuffer* buffer, uint8_t bufferIndex,
 							 const void* data, uint64_t count, uint64_t offset)
 {
 	auto& backendBuffer = s_Data.Arrays[buffer];
@@ -169,19 +166,19 @@ DrawCommand* Renderer::NewDrawCommand(DrawBuffer* buffer) {
 
 void FlushCommand(DrawCommand& command) {
 	command.Pipeline->As<OpenGL::ShaderProgram>()->Bind();
+
 	if(command.Image)
 		command.Image->As<OpenGL::Framebuffer>()->Bind();
 
+	if(command.ViewportWidth != 0 && command.ViewportHeight != 0)
+		Resize(command.ViewportWidth, command.ViewportHeight);
 	if(command.Clear)
 		Clear();
-	if(command.ViewportWidth && command.ViewportHeight)
-		Resize(command.ViewportWidth, command.ViewportHeight);
 
 	SetUniforms(command);
 
 	if(command.BufferData) {
 		auto array = s_Data.Arrays[command.BufferData].Array;
-		VOLCANICORE_LOG_INFO("%i", s_Data.Arrays[command.BufferData].Instances.GetCount());
 
 		array->Bind();
 
@@ -193,6 +190,8 @@ void FlushCommand(DrawCommand& command) {
 
 	if(command.Image)
 		command.Image->As<OpenGL::Framebuffer>()->Unbind();
+
+	command.Pipeline->As<OpenGL::ShaderProgram>()->Unbind();
 }
 
 void FlushCall(DrawCall& call) {

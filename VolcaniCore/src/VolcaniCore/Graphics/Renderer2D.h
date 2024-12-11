@@ -1,12 +1,12 @@
 #pragma once
 
-#include "Renderer/OrthographicCamera.h"
-#include "Renderer/Transform.h"
+#include "Graphics/OrthographicCamera.h"
+#include "Graphics/Transform.h"
 
-#include "Object/Quad.h"
-#include "Object/Text.h"
-#include "Object/Texture.h"
-#include "Object/Framebuffer.h"
+#include "Graphics/Quad.h"
+#include "Graphics/Text.h"
+#include "Graphics/Texture.h"
+#include "Graphics/Framebuffer.h"
 
 namespace VolcaniCore {
 

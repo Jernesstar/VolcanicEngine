@@ -4,7 +4,7 @@
 
 #include <glm/vec2.hpp>
 
-#include "Object/Texture.h"
+#include "Graphics/Texture.h"
 
 namespace VolcaniCore::OpenGL {
 

@@ -15,5 +15,5 @@ void main()
     // color = texture(u_Diffuse, v_TexCoord.xy).rgb;
 
     // FragColor = vec4(color, 1.0);
-    FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+    FragColor = vec4(1.0);
 }

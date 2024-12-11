@@ -4,9 +4,9 @@
 #include "Core/Assert.h"
 #include "Core/Defines.h"
 
-#include "Renderer/RendererAPI.h"
-#include "Renderer/Renderer2D.h"
-#include "Renderer/Renderer3D.h"
+#include "Graphics/RendererAPI.h"
+#include "Graphics/Renderer2D.h"
+#include "Graphics/Renderer3D.h"
 
 namespace VolcaniCore {
 
@@ -71,10 +71,9 @@ DrawCommand* Renderer::GetCommand() {
 DrawCommand* Renderer::NewCommand(DrawBuffer* buffer) {
 	EndCommand();
 
-	s_DrawCommand = RendererAPI::Get()->NewDrawCommand();
+	s_DrawCommand = RendererAPI::Get()->NewDrawCommand(buffer);
 	s_DrawCommand->Pipeline = s_RenderPass->GetPipeline();
 	s_DrawCommand->Image = s_RenderPass->GetOutput();
-	s_DrawCommand->BufferData = buffer;
 	return s_DrawCommand;
 }
 

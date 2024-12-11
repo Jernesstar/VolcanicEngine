@@ -2,7 +2,7 @@
 
 #include "UIElement.h"
 
-#include <VolcaniCore/Object/Framebuffer.h>
+#include <VolcaniCore/Graphics/Framebuffer.h>
 
 namespace Magma::UI {
 

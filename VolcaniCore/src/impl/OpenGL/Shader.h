@@ -11,8 +11,8 @@
 #include <glm/mat3x3.hpp>
 #include <glm/mat4x4.hpp>
 
-#include "Object/Shader.h"
-#include "Object/Texture.h"
+#include "Graphics/Shader.h"
+#include "Graphics/Texture.h"
 
 namespace VolcaniCore::OpenGL {
 

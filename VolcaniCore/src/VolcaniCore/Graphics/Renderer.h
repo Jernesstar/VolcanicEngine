@@ -3,11 +3,6 @@
 #include "Core/Defines.h"
 #include "Core/Buffer.h"
 
-#include "Object/Vertex.h"
-#include "Object/Point.h"
-#include "Object/Line.h"
-#include "Object/Mesh.h"
-
 #include "RendererAPI.h"
 #include "RenderPass.h"
 

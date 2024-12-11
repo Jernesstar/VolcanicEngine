@@ -2,9 +2,9 @@
 
 #include "Core/Defines.h"
 
-#include "Object/Shader.h"
-#include "Object/Texture.h"
-#include "Object/Framebuffer.h"
+#include "Graphics/Shader.h"
+#include "Graphics/Texture.h"
+#include "Graphics/Framebuffer.h"
 
 #include "RendererAPI.h"
 

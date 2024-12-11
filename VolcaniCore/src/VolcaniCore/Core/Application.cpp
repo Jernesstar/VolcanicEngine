@@ -6,9 +6,9 @@
 
 #include "Event/Events.h"
 
-#include "Renderer/Renderer.h"
-#include "Renderer/RendererAPI.h"
-#include "Renderer/ShaderLibrary.h"
+#include "Graphics/Renderer.h"
+#include "Graphics/RendererAPI.h"
+#include "Graphics/ShaderLibrary.h"
 
 namespace fs = std::filesystem;
 

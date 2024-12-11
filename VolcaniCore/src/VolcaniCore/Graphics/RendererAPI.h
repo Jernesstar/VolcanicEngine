@@ -1,12 +1,11 @@
 #pragma once
 
-#include "Object/Cubemap.h"
-#include "Object/Framebuffer.h"
-#include "Object/Shader.h"
-
 #include "Core/Buffer.h"
 
-#include "Transform.h"
+#include "Graphics/Shader.h"
+#include "Graphics/Texture.h"
+#include "Graphics/Framebuffer.h"
+
 #include "BufferLayout.h"
 
 namespace VolcaniCore {
@@ -41,7 +40,7 @@ public:
 	virtual DrawBuffer* NewDrawBuffer(DrawBufferSpecification& specs,
 									  void* data = nullptr) = 0;
 	virtual DrawBuffer* GetDrawBuffer(DrawBufferSpecification& specs) = 0;
-	virtual void SetBufferData(DrawBuffer* buffer, uint32_t bufferIndex,
+	virtual void SetBufferData(DrawBuffer* buffer, uint8_t bufferIndex,
 		const void* data, uint64_t count, uint64_t offset = 0) = 0;
 	virtual void ReleaseBuffer(DrawBuffer* buffer) = 0;
 
@@ -69,6 +68,8 @@ struct DrawBufferSpecification {
 	uint64_t MaxInstanceCount = 0;
 };
 
+enum DrawBufferIndex : uint8_t { Indices , Vertices , Instances };
+
 struct DrawBuffer {
 	DrawBufferSpecification Specs;
 
@@ -78,25 +79,32 @@ struct DrawBuffer {
 
 	void AddIndices(const Buffer<uint32_t>& data) {
 		RendererAPI::Get()
-		->SetBufferData(this, 0, data.Get(), data.GetCount(), IndicesCount);
+			->SetBufferData(this, DrawBufferIndex::Indices,
+							data.Get(), data.GetCount(), IndicesCount);
 	}
 
 	template<typename T>
 	void AddVertices(const Buffer<T>& data) {
 		RendererAPI::Get()
-		->SetBufferData(this, 1, data.Get(), data.GetCount(), VerticesCount);
+			->SetBufferData(this, DrawBufferIndex::Vertices,
+							data.Get(), data.GetCount(), VerticesCount);
 	}
 
 	template<typename T>
 	void AddInstances(const Buffer<T>& data) {
 		RendererAPI::Get()
-		->SetBufferData(this, 2, data.Get(), data.GetCount(). InstancesCount);
+			->SetBufferData(this, DrawBufferIndex::Instances,
+							data.Get(), data.GetCount(), InstancesCount);
+	}
+
+	void Clear(DrawBufferIndex idx) {
+		RendererAPI::Get()->SetBufferData(this, idx, nullptr, 0);
 	}
 
 	void Clear() {
-		RendererAPI::Get()->SetBufferData(this, 0, nullptr, 0);
-		RendererAPI::Get()->SetBufferData(this, 1, nullptr, 0);
-		RendererAPI::Get()->SetBufferData(this, 2, nullptr, 0);
+		Clear(DrawBufferIndex::Indices);
+		Clear(DrawBufferIndex::Vertices);
+		Clear(DrawBufferIndex::Instances);
 	}
 };
 
@@ -128,25 +136,25 @@ struct DrawUniforms {
 	void SetFloat(const std::string& name, float data) {
 		FloatUniforms[name] = data;
 	}
-	void SetTexture(const std::string& name, TextureSlot data) {
+	void SetTexture(const std::string& name, const TextureSlot& data) {
 		TextureUniforms[name] = data;
 	}
-	void SetVec2(const std::string& name, glm::vec2 data) {
+	void SetVec2(const std::string& name, const glm::vec2& data) {
 		Vec2Uniforms[name] = data;
 	}
-	void SetVec3(const std::string& name, glm::vec3 data) {
+	void SetVec3(const std::string& name, const glm::vec3& data) {
 		Vec3Uniforms[name] = data;
 	}
-	void SetVec4(const std::string& name, glm::vec4 data) {
+	void SetVec4(const std::string& name, const glm::vec4& data) {
 		Vec4Uniforms[name] = data;
 	}
-	void SetMat2(const std::string& name, glm::mat2 data) {
+	void SetMat2(const std::string& name, const glm::mat2& data) {
 		Mat2Uniforms[name] = data;
 	}
-	void SetMat3(const std::string& name, glm::mat3 data) {
+	void SetMat3(const std::string& name, const glm::mat3& data) {
 		Mat3Uniforms[name] = data;
 	}
-	void SetMat4(const std::string& name, glm::mat4 data) {
+	void SetMat4(const std::string& name, const glm::mat4& data) {
 		Mat4Uniforms[name] = data;
 	}
 };

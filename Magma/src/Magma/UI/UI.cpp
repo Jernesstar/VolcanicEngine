@@ -6,7 +6,7 @@
 
 #include <VolcaniCore/Core/Application.h>
 #include <VolcaniCore/Event/Events.h>
-#include <VolcaniCore/Renderer/RendererAPI.h>
+#include <VolcaniCore/Graphics/RendererAPI.h>
 
 namespace Magma::UI {
 

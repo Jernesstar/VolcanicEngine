@@ -4,10 +4,10 @@
 #include <VolcaniCore/Core/Assert.h>
 
 #include <VolcaniCore/Core/Application.h>
-#include <VolcaniCore/Renderer/Renderer.h>
-#include <VolcaniCore/Renderer/Renderer3D.h>
-#include <VolcaniCore/Renderer/StereographicCamera.h>
-#include <VolcaniCore/Renderer/OrthographicCamera.h>
+#include <VolcaniCore/Graphics/Renderer.h>
+#include <VolcaniCore/Graphics/Renderer3D.h>
+#include <VolcaniCore/Graphics/StereographicCamera.h>
+#include <VolcaniCore/Graphics/OrthographicCamera.h>
 
 using namespace Magma::ECS;
 

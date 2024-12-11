@@ -3,7 +3,7 @@
 #include <vector>
 
 #include <VolcaniCore/Core/Defines.h>
-#include <VolcaniCore/Renderer/BufferLayout.h>
+#include <VolcaniCore/Graphics/BufferLayout.h>
 
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"

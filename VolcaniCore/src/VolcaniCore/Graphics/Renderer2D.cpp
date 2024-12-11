@@ -2,12 +2,12 @@
 
 #include "Core/Assert.h"
 
-#include "Renderer/Renderer.h"
-#include "Renderer/RendererAPI.h"
-#include "Renderer/ShaderLibrary.h"
-#include "Renderer/OrthographicCamera.h"
+#include "Graphics/Renderer.h"
+#include "Graphics/RendererAPI.h"
+#include "Graphics/ShaderLibrary.h"
+#include "Graphics/OrthographicCamera.h"
 
-#include "Object/Shader.h"
+#include "Graphics/Shader.h"
 
 namespace VolcaniCore {
 

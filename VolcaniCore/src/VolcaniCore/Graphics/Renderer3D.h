@@ -1,17 +1,17 @@
 #pragma once
 
-#include "Renderer/Camera.h"
-#include "Renderer/RenderPass.h"
-#include "Renderer/Transform.h"
+#include "Graphics/Camera.h"
+#include "Graphics/RenderPass.h"
+#include "Graphics/Transform.h"
 
-#include "Object/Cubemap.h"
-#include "Object/Point.h"
-#include "Object/Line.h"
-#include "Object/Quad.h"
-#include "Object/Mesh.h"
-#include "Object/Model.h"
-#include "Object/Texture.h"
-#include "Object/Text.h"
+#include "Graphics/Cubemap.h"
+#include "Graphics/Point.h"
+#include "Graphics/Line.h"
+#include "Graphics/Quad.h"
+#include "Graphics/Mesh.h"
+#include "Graphics/Model.h"
+#include "Graphics/Texture.h"
+#include "Graphics/Text.h"
 
 namespace VolcaniCore {
 

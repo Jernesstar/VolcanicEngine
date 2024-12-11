@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Object/Mesh.h"
+#include "Graphics/Mesh.h"
 
 namespace VolcaniCore {
 

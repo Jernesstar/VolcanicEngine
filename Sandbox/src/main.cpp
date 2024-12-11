@@ -5,19 +5,19 @@
 
 #include <VolcaniCore/Event/Events.h>
 
-#include <VolcaniCore/Renderer/Renderer.h>
-#include <VolcaniCore/Renderer/RendererAPI.h>
-#include <VolcaniCore/Renderer/Renderer2D.h>
-#include <VolcaniCore/Renderer/Renderer3D.h>
-#include <VolcaniCore/Renderer/Camera.h>
-#include <VolcaniCore/Renderer/StereographicCamera.h>
-#include <VolcaniCore/Renderer/OrthographicCamera.h>
-#include <VolcaniCore/Renderer/CameraController.h>
+#include <VolcaniCore/Graphics/Renderer.h>
+#include <VolcaniCore/Graphics/RendererAPI.h>
+#include <VolcaniCore/Graphics/Renderer2D.h>
+#include <VolcaniCore/Graphics/Renderer3D.h>
+#include <VolcaniCore/Graphics/Camera.h>
+#include <VolcaniCore/Graphics/StereographicCamera.h>
+#include <VolcaniCore/Graphics/OrthographicCamera.h>
+#include <VolcaniCore/Graphics/CameraController.h>
 
-#include <VolcaniCore/Object/Shader.h>
-#include <VolcaniCore/Object/Mesh.h>
-#include <VolcaniCore/Object/Model.h>
-#include <VolcaniCore/Object/Texture.h>
+#include <VolcaniCore/Graphics/Shader.h>
+#include <VolcaniCore/Graphics/Mesh.h>
+#include <VolcaniCore/Graphics/Model.h>
+#include <VolcaniCore/Graphics/Texture.h>
 
 #include <Magma/Scene/Scene.h>
 #include <Magma/Scene/SceneSerializer.h>

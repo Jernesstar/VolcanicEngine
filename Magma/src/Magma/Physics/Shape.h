@@ -7,8 +7,8 @@
 
 // using namespace physx;
 
-#include <VolcaniCore/Renderer/Transform.h>
-#include <VolcaniCore/Object/Mesh.h>
+#include <VolcaniCore/Graphics/Transform.h>
+#include <VolcaniCore/Graphics/Mesh.h>
 
 using namespace VolcaniCore;
 

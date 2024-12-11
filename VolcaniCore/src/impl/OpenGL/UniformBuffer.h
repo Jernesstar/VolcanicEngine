@@ -5,9 +5,9 @@
 #include <VolcaniCore/Core/Buffer.h>
 #include <VolcaniCore/Core/Assert.h>
 
-// #include "Object/UniformBuffer.h"
+// #include "Graphics/UniformBuffer.h"
 
-#include "Renderer/BufferLayout.h"
+#include "Graphics/BufferLayout.h"
 
 using namespace VolcaniCore;
 

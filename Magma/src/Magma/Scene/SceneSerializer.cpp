@@ -3,8 +3,8 @@
 
 #include <VolcaniCore/Core/Assert.h>
 #include <VolcaniCore/Core/UUID.h>
-#include <VolcaniCore/Renderer/StereographicCamera.h>
-#include <VolcaniCore/Renderer/OrthographicCamera.h>
+#include <VolcaniCore/Graphics/StereographicCamera.h>
+#include <VolcaniCore/Graphics/OrthographicCamera.h>
 
 #include "Core/AssetManager.h"
 #include "Core/YAMLSerializer.h"
