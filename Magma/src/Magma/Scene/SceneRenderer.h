@@ -3,9 +3,9 @@
 #include <flecs/flecs.h>
 
 #include <VolcaniCore/Core/Buffer.h>
-#include <VolcaniCore/Renderer/RenderPass.h>
-#include <VolcaniCore/Renderer/Camera.h>
-#include <VolcaniCore/Renderer/CameraController.h>
+#include <VolcaniCore/Graphics/RenderPass.h>
+#include <VolcaniCore/Graphics/Camera.h>
+#include <VolcaniCore/Graphics/CameraController.h>
 
 #include "Core/JSONParser.h"
 

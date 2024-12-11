@@ -29,13 +29,12 @@ public:
 	static Ref<ShaderPipeline> Create(const std::string& folderPath,
 									  const std::string& name);
 
+public:
+	ShaderPipeline() = default;
 	virtual ~ShaderPipeline() = default;
 
 	virtual void AddShader(const ShaderFile& shader) = 0;
 	virtual void Compile() = 0;
-
-	virtual void Bind() const = 0;
-	virtual void Unbind() const = 0;
 
 	virtual void SetInt(const std::string& name, int32_t _int) = 0;
 	virtual void SetFloat(const std::string& name, float _float) = 0;
@@ -49,6 +48,10 @@ public:
 	virtual void SetMat2(const std::string& name, const glm::mat2& mat) = 0;
 	virtual void SetMat3(const std::string& name, const glm::mat3& mat) = 0;
 	virtual void SetMat4(const std::string& name, const glm::mat4& mat) = 0;
+
+	template<typename TDerived>
+	requires std::derived_from<TDerived, ShaderPipeline>
+	TDerived* As() { return (TDerived*)(this); }
 };
 
 }

@@ -10,7 +10,7 @@ Mesh::Mesh(const std::string& path)
 // 	BufferLayout layout({
 // 		{ "Position", BufferDataType::Vec3 },
 // 		{ "Normal",   BufferDataType::Vec3 },
-// 		{ "TexCoord_Color", BufferDataType::Vec4 }
+// 		{ "TexCoord", BufferDataType::Vec4 }
 // 	});
 
 // 	Ref<VertexBuffer> vBuffer;
@@ -28,7 +28,7 @@ Mesh::Mesh(const std::vector<Vertex>& verts,
 	// BufferLayout layout({
 	// 	{ "Position", BufferDataType::Vec3 },
 	// 	{ "Normal",   BufferDataType::Vec3 },
-	// 	{ "TexCoord_Color", BufferDataType::Vec4 }
+	// 	{ "TexCoord", BufferDataType::Vec4 }
 	// });
 
 	// Ref<VertexBuffer> vBuffer;

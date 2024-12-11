@@ -78,14 +78,14 @@ ECS::ECS() {
 }
 
 void ECS::OnUpdate(TimeStep ts) {
-	RendererAPI::Get()->Clear();
+	// RendererAPI::Get()->Clear();
 
 	renderer.Update(ts);
 	scene->OnUpdate(ts);
 	scene->OnRender(renderer);
 
 	auto output = renderer.GetOutput();
-	RendererAPI::Get()->RenderFramebuffer(output, AttachmentTarget::Color);
+	// RendererAPI::Get()->RenderFramebuffer(output, AttachmentTarget::Color);
 }
 
 }

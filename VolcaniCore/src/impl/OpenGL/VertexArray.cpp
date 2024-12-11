@@ -49,28 +49,26 @@ void VertexArray::SetIndexBuffer(Ref<IndexBuffer> indexBuffer) {
 	if(!indexBuffer)
 		return;
 
-	glBindVertexArray(m_VertexArrayID);
-	indexBuffer->Bind();
-
 	m_IndexBuffer = indexBuffer;
+	Bind();
+	indexBuffer->Bind();
+	Unbind();
 }
 
 void VertexArray::AddVertexBuffer(Ref<VertexBuffer> vertexBuffer) {
 	VOLCANICORE_ASSERT(vertexBuffer, "Vertex buffer was null");
+	m_VertexBuffers.push_back(vertexBuffer);
 
-	glBindVertexArray(m_VertexArrayID);
+	Bind();
 	vertexBuffer->Bind();
 
 	auto& layout = vertexBuffer->Layout;
-	uint32_t stride = layout.Stride;
+	uint64_t stride = layout.Stride;
 	uint64_t offset = 0;
 
-	uint32_t count;
-	bool normalized;
-
 	for(auto& element : layout) {
-		count  = element.Count;
-		normalized = element.Normalized ? GL_FALSE : GL_TRUE;
+		uint64_t count = element.Count;
+		bool normalized = element.Normalized ? GL_TRUE : GL_FALSE;
 
 		switch(element.Type) {
 			case BufferDataType::Int:
@@ -78,7 +76,6 @@ void VertexArray::AddVertexBuffer(Ref<VertexBuffer> vertexBuffer) {
 				glEnableVertexAttribArray(m_BufferIndex);
 				glVertexAttribIPointer(
 					m_BufferIndex++, count, GL_INT, stride, (void*)offset);
-
 				break;
 			}
 			case BufferDataType::Float:
@@ -87,31 +84,24 @@ void VertexArray::AddVertexBuffer(Ref<VertexBuffer> vertexBuffer) {
 			case BufferDataType::Vec4:
 			{
 				glEnableVertexAttribArray(m_BufferIndex);
-				glVertexAttribPointer(
-					m_BufferIndex++, count, GL_FLOAT, normalized, stride,
-					(void*)offset
-				);
+				glVertexAttribPointer(m_BufferIndex++, count, GL_FLOAT,
+									  normalized, stride, (void*)offset);
 				break;
 			}
 			case BufferDataType::Mat2:
 			case BufferDataType::Mat3:
 			case BufferDataType::Mat4:
 			{
-				uint64_t offsetVal = offset;
-				uint32_t perInstance = 0; // How many instances before switching vec?
-				uint32_t vecSize = sizeof(float) * count;
-				if(layout.StructureOfArrays) {
-					offsetVal = 0;
-					perInstance = 1;
-				}
-				for(uint32_t i = 0; i < count; i++) {
+				bool instanced = layout.StructureOfArrays;
+				uint64_t vecSize = sizeof(float) * count;
+
+				for(uint64_t i = 0; i < count; i++) {
 					glEnableVertexAttribArray(m_BufferIndex);
 					glVertexAttribPointer(
 						m_BufferIndex, count, GL_FLOAT, normalized, stride,
-						(void*)(offsetVal + (vecSize * i))
-					);
+						(void*)(offset + (vecSize * i)));
 
-					glVertexAttribDivisor(m_BufferIndex++, perInstance);
+					glVertexAttribDivisor(m_BufferIndex++, (uint32_t)instanced);
 				}
 				break;
 			}
@@ -120,7 +110,7 @@ void VertexArray::AddVertexBuffer(Ref<VertexBuffer> vertexBuffer) {
 		offset += element.Size;
 	}
 
-	m_VertexBuffers.push_back(vertexBuffer);
+	Unbind();
 }
 
 }

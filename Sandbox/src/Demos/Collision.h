@@ -6,10 +6,11 @@ static void createWall(Physics::World& world) {
 		for(uint32_t j = 0; j < 4; j++) {
 			Ref<RigidBody> body =
 				RigidBody::Create(RigidBody::Type::Dynamic, box,
-					Transform{
+					Transform
+					{
 						.Translation = { j*2 - (4 - i), i*2 + 1, 0.0f },
 					});
-			
+
 			world.AddActor(body);
 		}
 	}
@@ -78,7 +79,8 @@ Collision::Collision() {
 	drawPass = RenderPass::Create("Draw", shader);
 
 	cube = Mesh::Create(MeshPrimitive::Cube,
-		Material{
+		Material
+		{
 			.Diffuse = Texture::Create("Sandbox/assets/images/wood.png")
 		});
 
@@ -113,6 +115,8 @@ void Collision::OnUpdate(TimeStep ts) {
 			body->UpdateTransform();
 			Renderer3D::DrawMesh(cube, body->GetTransform());
 		}
+
+		Renderer3D::End();
 	}
 	Renderer::EndPass();
 }

@@ -1,6 +1,6 @@
 #include "Cubemap.h"
 
-#include "Renderer/RendererAPI.h"
+#include "Graphics/RendererAPI.h"
 
 #include "OpenGL/Cubemap.h"
 

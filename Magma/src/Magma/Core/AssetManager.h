@@ -2,7 +2,7 @@
 
 #include <VolcaniCore/Core/Defines.h>
 
-#include "Object/Mesh.h"
+#include "Graphics/Mesh.h"
 
 using namespace VolcaniCore;
 

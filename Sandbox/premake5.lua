@@ -93,7 +93,8 @@ project "Sandbox"
     filter "toolset:gcc or toolset:clang"
         buildoptions {
             "-fexceptions",
-            "-Wno-format-security"
+            "-Wno-format-security",
+            "-Wno-pointer-arith"
         }
 
     filter "toolset:msc"

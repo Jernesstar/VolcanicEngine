@@ -5,7 +5,7 @@
 #include "Core/Assert.h"
 #include "Core/Buffer.h"
 
-#include "BufferLayout.h"
+#include "Graphics/BufferLayout.h"
 
 namespace VolcaniCore::OpenGL {
 

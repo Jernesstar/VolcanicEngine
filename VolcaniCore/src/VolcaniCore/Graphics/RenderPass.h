@@ -2,9 +2,11 @@
 
 #include "Core/Defines.h"
 
-#include "Object/Shader.h"
-#include "Object/Texture.h"
-#include "Object/Framebuffer.h"
+#include "Graphics/Shader.h"
+#include "Graphics/Texture.h"
+#include "Graphics/Framebuffer.h"
+
+#include "RendererAPI.h"
 
 namespace VolcaniCore {
 
@@ -14,15 +16,10 @@ using ValueCallback = std::function<TOut(void)>;
 template<typename TOut>
 using HandleMap = Map<std::string, ValueCallback<TOut>>;
 
-struct TextureSlot {
-	Ref<Texture> Sampler = nullptr;
-	uint32_t Index = 0;
-};
-
 class Uniforms {
 public:
 	HandleMap<int32_t> IntHandles;
-	HandleMap<float>	FloatHandles;
+	HandleMap<float> FloatHandles;
 	HandleMap<TextureSlot> TextureHandles;
 
 	HandleMap<glm::vec2> Vec2Handles;
@@ -67,7 +64,7 @@ public:
 	RenderPass(const std::string& name,
 				Ref<ShaderPipeline> pipeline,
 				const Uniforms& uniforms = { })
-		: Name(name), m_Pipeline(pipeline), m_GlobalUniforms(uniforms) { }
+		: Name(name), m_Pipeline(pipeline), m_Uniforms(uniforms) { }
 
 	~RenderPass() = default;
 
@@ -75,15 +72,14 @@ public:
 		m_Output = output;
 	}
 
-	void SetUniforms(const Uniforms& uniforms);
-	void SetGlobalUniforms();
+	void SetUniforms(DrawUniforms& uniformData);
 
 	Ref<ShaderPipeline> GetPipeline() const { return m_Pipeline; }
 	Ref<Framebuffer> GetOutput() const { return m_Output; }
-	Uniforms& GetUniforms() { return m_GlobalUniforms; }
+	Uniforms& GetUniforms() { return m_Uniforms; }
 
 private:
-	Uniforms m_GlobalUniforms;
+	Uniforms m_Uniforms;
 	Ref<Framebuffer> m_Output;
 	Ref<ShaderPipeline> m_Pipeline;
 };

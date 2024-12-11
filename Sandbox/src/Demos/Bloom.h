@@ -122,12 +122,6 @@ void Bloom::OnUpdate(TimeStep ts) {
 		Renderer::Clear();
 		Renderer3D::Begin(camera);
 
-		// rotation += (float)ts * 0.001;
-		// Renderer3D::DrawMesh(cube,
-		// 	{
-		// 		.Rotation = rotation * glm::vec3{ 3.0f, 2.0f, 0.1f }
-		// 	});
-
 		Renderer3D::DrawMesh(cube, { .Translation = { -2.0f,  0.0f,  0.0f } });
 		Renderer3D::DrawMesh(cube, { .Translation = {  2.0f,  0.0f,  0.0f } });
 		Renderer3D::DrawMesh(cube, { .Translation = {  0.0f,  0.0f, -2.0f } });
@@ -136,15 +130,12 @@ void Bloom::OnUpdate(TimeStep ts) {
 		Renderer3D::End();
 	}
 	Renderer::EndPass();
-	Renderer::Flush();
 
-	// RendererAPI::Get()->RenderFramebuffer(src, AttachmentTarget::Color);
+	// Renderer2D::DrawFullscreenQuad(src, AttachmentTarget::Color);
 
 	Renderer::StartPass(downsamplePass);
 	{
-		Renderer::GetPass()->SetGlobalUniforms();
-
-		Renderer::GetDrawCommand().GetUniforms()
+		Renderer::GetPass()->GetUniforms()
 		.Set("u_SrcResolution",
 			[&]() -> glm::vec2
 			{
@@ -153,21 +144,19 @@ void Bloom::OnUpdate(TimeStep ts) {
 		.Set("u_SrcTexture",
 			[&]() -> TextureSlot
 			{
-				src->Bind(AttachmentTarget::Color, 0);
+				// src->Bind(AttachmentTarget::Color, 0);
+				// return { src->Get(AttachmentTarget::Color), 0 };
 				return { };
 			});
 
 		Downsample();
 	}
 	Renderer::EndPass();
-	Renderer::Flush();
 
-	// RendererAPI::Get()->RenderFramebuffer(mips, AttachmentTarget::Color);
+	// Renderer2D::DrawFullscreenQuad(mips, AttachmentTarget::Color);
 
 	Renderer::StartPass(upsamplePass);
 	{
-		Renderer::GetPass()->SetGlobalUniforms();
-
 		Renderer::GetPass()->GetUniforms()
 		.Set("u_FilterRadius",
 			[&]() -> float
@@ -175,20 +164,14 @@ void Bloom::OnUpdate(TimeStep ts) {
 				return filterRadius;
 			});
 
-		// glBlendFunc(GL_ONE, GL_ONE);
-		// glBlendEquation(GL_FUNC_ADD);
 		Upsample();
-		// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	}
 	Renderer::EndPass();
-	Renderer::Flush();
 
-	// RendererAPI::Get()->RenderFramebuffer(mips, AttachmentTarget::Color);
+	// Renderer2D::DrawFullscreenQuad(mips, AttachmentTarget::Color);
 
 	Renderer::StartPass(bloomPass);
 	{
-		Renderer::GetPass()->SetGlobalUniforms();
-
 		Renderer::GetPass()->GetUniforms()
 		.Set("u_Exposure",
 			[&]() -> float
@@ -201,7 +184,7 @@ void Bloom::OnUpdate(TimeStep ts) {
 				return bloomStrength;
 			});
 
-		auto& uniforms = Renderer::GetDrawCommand().GetUniforms()
+		auto& uniforms = Renderer::GetPass()->GetUniforms()
 		.Set("u_BloomTexture",
 			[&]() -> TextureSlot
 			{
@@ -215,13 +198,10 @@ void Bloom::OnUpdate(TimeStep ts) {
 				return { };
 			});
 
-		Renderer::GetPass()->SetUniforms(uniforms);
-
-		RendererAPI::Get()->Resize(window->GetWidth(), window->GetHeight());
-		RendererAPI::Get()->RenderFramebuffer(mips, AttachmentTarget::Color);
+		Renderer::Resize(window->GetWidth(), window->GetHeight());
+		Renderer2D::DrawFullscreenQuad(mips, AttachmentTarget::Color);
 	}
 	Renderer::EndPass();
-	Renderer::Flush();
 
 	UI::UIRenderer::EndFrame();
 }
@@ -255,22 +235,17 @@ void Bloom::InitMips() {
 
 void Bloom::Downsample() {
 	for(const auto& mip : mipChain) {
-		auto& uniforms = Renderer::GetDrawCommand().GetUniforms()
-		.Set("WriteTexture",
-			[mip, &mips = mips]() -> TextureSlot
-			{
-				mips->Set(AttachmentTarget::Color, mip.Sampler);
-				return { };
-			});
+		auto* command = Renderer::GetCommand();
+		auto& uniforms = Renderer::GetPass()->GetUniforms();
 
-		Renderer::GetPass()->SetUniforms(uniforms);
+		// mips->Set(AttachmentTarget::Color, mip.Sampler);
+		command->Image = mips;
 
-		RendererAPI::Get()->RenderFramebuffer(mips, AttachmentTarget::Color);
+		Renderer2D::DrawFullscreenQuad(mips, AttachmentTarget::Color);
 
-		Renderer::Flush();
-		Renderer::NewDrawCommand();
+		Renderer::NewCommand();
 
-		Renderer::GetDrawCommand().GetUniforms()
+		uniforms
 		.Set("u_SrcResolution",
 			[mip]() -> glm::vec2
 			{
@@ -289,30 +264,24 @@ void Bloom::Upsample() {
 		const BloomMip& mip = mipChain[i];
 		const BloomMip& nextMip = mipChain[i - 1];
 
-		Renderer::PushOptions(
-			{
-				.Blending = RendererAPI::Options::BlendingMode::Additive
-			});
+		// Renderer::SetOptions(
+		// 	{
+		// 		.Blending = RendererAPI::Options::BlendingMode::Additive
+		// 	});
 
-		auto& uniforms = Renderer::GetDrawCommand().GetUniforms()
+		auto command = Renderer::GetCommand();
+		auto& uniforms = Renderer::GetPass()->GetUniforms()
 		.Set("u_SrcTexture",
 			[mip]() -> TextureSlot
 			{
 				return { mip.Sampler, 0 };
-			})
-		.Set("WriteTexture",
-			[nextMip, &mips = mips]() -> TextureSlot
-			{
-				mips->Set(AttachmentTarget::Color, nextMip.Sampler);
-				return { };
 			});
+		
+		// command->Image = nextMip.Sampler;
 
-		Renderer::GetPass()->SetUniforms(uniforms);
+		Renderer2D::DrawFullscreenQuad(mips, AttachmentTarget::Color);
 
-		RendererAPI::Get()->RenderFramebuffer(mips, AttachmentTarget::Color);
-
-		Renderer::Flush();
-		Renderer::NewDrawCommand();
+		Renderer::NewCommand();
 	}
 }
 

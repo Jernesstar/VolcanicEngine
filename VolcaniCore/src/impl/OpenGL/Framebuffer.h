@@ -2,7 +2,7 @@
 
 #include <Core/Defines.h>
 
-#include <Object/Framebuffer.h>
+#include <Graphics/Framebuffer.h>
 
 namespace VolcaniCore::OpenGL {
 

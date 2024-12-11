@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Renderer/RendererAPI.h>
+#include <Graphics/RendererAPI.h>
 
 namespace VolcaniCore::OpenGL {
 
@@ -9,19 +9,17 @@ public:
 	Renderer();
 	~Renderer() = default;
 
-	void SetOptions(const RendererAPI::Options& options) override;
-
 	void StartFrame() override;
 	void EndFrame() override;
 
-	void Clear(const glm::vec4& color = glm::vec4(1.0f)) override;
-	void Resize(uint32_t width, uint32_t height) override;
+	DrawBuffer* NewDrawBuffer(DrawBufferSpecification& specs,
+							  void* data = nullptr) override;
+	DrawBuffer* GetDrawBuffer(DrawBufferSpecification& specs) override;
+	void SetBufferData(DrawBuffer* buffer, uint8_t bufferIndex,
+		const void* data, uint64_t count, uint64_t offset = 0) override;
+	void ReleaseBuffer(DrawBuffer* buffer) override;
 
-	void SubmitDrawCall(DrawCall& call) override;
-
-	void RenderCubemap(Ref<VolcaniCore::Cubemap> cubemap) override;
-	void RenderFramebuffer(Ref<VolcaniCore::Framebuffer> framebuffer,
-							AttachmentTarget target) override;
+	DrawCommand* NewDrawCommand(DrawBuffer* buffer = nullptr) override;
 
 private:
 	void Init() override;

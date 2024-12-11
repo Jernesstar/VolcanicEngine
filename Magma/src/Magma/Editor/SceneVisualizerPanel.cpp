@@ -6,7 +6,7 @@
 
 #include <VolcaniCore/Core/Application.h>
 #include <VolcaniCore/Core/Input.h>
-#include <VolcaniCore/Renderer/RendererAPI.h>
+#include <VolcaniCore/Graphics/RendererAPI.h>
 
 #include "ECS/Component.h"
 

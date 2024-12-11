@@ -11,8 +11,8 @@
 #include <glm/mat3x3.hpp>
 #include <glm/mat4x4.hpp>
 
-#include "Object/Shader.h"
-#include "Object/Texture.h"
+#include "Graphics/Shader.h"
+#include "Graphics/Texture.h"
 
 namespace VolcaniCore::OpenGL {
 
@@ -23,9 +23,6 @@ public:
 
 	void AddShader(const ShaderFile& shader) override;
 	void Compile() override;
-
-	void Bind() const override;
-	void Unbind() const override;
 
 	void SetInt(const std::string& name, int32_t _int) override;
 	void SetFloat(const std::string& name, float _float) override;
@@ -39,6 +36,9 @@ public:
 	void SetMat2(const std::string& name, const glm::mat2& mat) override;
 	void SetMat3(const std::string& name, const glm::mat3& mat) override;
 	void SetMat4(const std::string& name, const glm::mat4& mat) override;
+
+	void Bind() const;
+	void Unbind() const;
 
 private:
 	uint32_t m_ProgramID;

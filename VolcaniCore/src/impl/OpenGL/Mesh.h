@@ -1,11 +1,11 @@
 #pragma once
 
-#include "Object/Mesh.h"
+#include "Graphics/Mesh.h"
 
 #include "OpenGL/Texture2D.h"
 #include "OpenGL/VertexArray.h"
 
-#include "Object/Texture.h"
+#include "Graphics/Texture.h"
 
 namespace VolcaniCore::OpenGL {
 

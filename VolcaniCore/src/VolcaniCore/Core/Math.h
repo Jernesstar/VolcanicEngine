@@ -1,5 +1,7 @@
 #pragma once
 
+#include <glm/gtc/type_ptr.hpp>
+
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 
@@ -13,7 +15,7 @@ using Vec2 = Vec2f;
 using Vec3 = Vec3f;
 
 constexpr float PI = 3.14159265358979328462f;
-// constexpr float E  = 2.71828182859f;
+constexpr float e  = 2.71828182859f;
 
 static constexpr float RadToDeg(float radians) {
 	return (180.0f / PI) * radians;

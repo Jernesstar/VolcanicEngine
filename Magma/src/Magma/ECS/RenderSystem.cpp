@@ -1,7 +1,7 @@
 #include "RenderSystem.h"
 
-#include "VolcaniCore/Renderer/Renderer.h"
-#include "VolcaniCore/Renderer/Renderer3D.h"
+#include "VolcaniCore/Graphics/Renderer.h"
+#include "VolcaniCore/Graphics/Renderer3D.h"
 
 namespace Magma::ECS {
 

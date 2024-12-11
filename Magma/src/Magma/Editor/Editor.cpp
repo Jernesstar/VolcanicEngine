@@ -2,7 +2,7 @@
 
 #include <VolcaniCore/Core/Log.h>
 #include <VolcaniCore/Event/Events.h>
-#include <VolcaniCore/Renderer/RendererAPI.h>
+#include <VolcaniCore/Graphics/RendererAPI.h>
 
 #include <UI/UI.h>
 
@@ -26,7 +26,7 @@ Editor::~Editor() {
 }
 
 void Editor::OnUpdate(TimeStep ts) {
-	RendererAPI::Get()->Clear();
+	// RendererAPI::Get()->Clear();
 
 	UI::UIRenderer::BeginFrame();
 	m_EditorLayer.Update(ts);

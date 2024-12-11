@@ -6,9 +6,9 @@
 
 #include "Event/Events.h"
 
-#include "Renderer/Renderer.h"
-#include "Renderer/RendererAPI.h"
-#include "Renderer/ShaderLibrary.h"
+#include "Graphics/Renderer.h"
+#include "Graphics/RendererAPI.h"
+#include "Graphics/ShaderLibrary.h"
 
 namespace fs = std::filesystem;
 
@@ -55,11 +55,13 @@ void Application::Run() {
 
 		Events::PollEvents();
 
+		RendererAPI::Get()->StartFrame();
 		Renderer::BeginFrame();
 		{
 			s_Instance->OnUpdate(ts);
 		}
 		Renderer::EndFrame();
+		RendererAPI::Get()->EndFrame();
 
 		s_Window->Update();
 	}

@@ -37,7 +37,8 @@ project "VolcaniCore"
 
     filter "toolset:gcc or toolset:clang"
         buildoptions {
-            "-Wno-format-security"
+            "-Wno-format-security",
+            "-Wno-pointer-arith"
         }
 
     filter "system:windows"

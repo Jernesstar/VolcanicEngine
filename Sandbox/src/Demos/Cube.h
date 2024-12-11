@@ -8,7 +8,7 @@ namespace Demo {
 
 class IsometricCamera : public Camera {
 public:
-	float R = 10.0f;
+	float R = 45.0f;
 
 public:
 	IsometricCamera()
@@ -69,6 +69,8 @@ private:
 
 	Ref<Camera> camera;
 	CameraController controller;
+
+	DrawBuffer* buffer;
 };
 
 Cube::Cube()
@@ -82,40 +84,40 @@ Cube::Cube()
 		});
 
 	shader = ShaderPipeline::Create("VolcaniCore/assets/shaders", "Mesh");
+	// color = Texture::Create(480, 270,
+	// 		Texture::InternalFormat::Normal, Texture::SamplingOption::Nearest);
+	// depth = Texture::Create(1920, 1080, Texture::InternalFormat::Depth);
+	// framebuffer = Framebuffer::Create({
+	// 		{ AttachmentTarget::Color, { { color } } },
+	// 		{ AttachmentTarget::Depth, { { depth } } },
+	// 	});
 
-	color = Texture::Create(480, 270,
-			Texture::InternalFormat::Normal, Texture::SamplingOption::Nearest);
-	depth = Texture::Create(1920, 1080, Texture::InternalFormat::Depth);
-	framebuffer = Framebuffer::Create({
-			{ AttachmentTarget::Color, { { color } } },
-			{ AttachmentTarget::Depth, { { depth } } },
-		});
-
-	drawPass = RenderPass::Create("Draw", shader);
-	drawPass->SetOutput(framebuffer);
+	// drawPass = RenderPass::Create("Draw", shader);
+	// drawPass->SetOutput(framebuffer);
 
 	cube = Mesh::Create(MeshPrimitive::Cube,
-		Material{
+		Material
+		{
 			.Diffuse = Texture::Create("Sandbox/assets/images/wood.png"),
 		});
 
-	camera = CreateRef<IsometricCamera>();
-	camera->Resize(480, 270);
-	controller =
-		CameraController(
-			MovementControls(
-				ControlMap{
-					{ Control::Up,   Key::W },
-					{ Control::Down, Key::S },
-					{ Control::Forward,  Key::Invalid },
-					{ Control::Backward, Key::Invalid },
-				}
-			)
-		);
+	// camera = CreateRef<IsometricCamera>();
+	// camera->Resize(480, 270);
+	// controller =
+	// 	CameraController(
+	// 		MovementControls(
+	// 			ControlMap
+	// 			{
+	// 				{ Control::Up,   Key::W },
+	// 				{ Control::Down, Key::S },
+	// 				{ Control::Forward,  Key::Invalid },
+	// 				{ Control::Backward, Key::Invalid },
+	// 			})
+	// 		);
 
-	controller.SetCamera(camera);
-	controller.RotationSpeed = 0.0f;
-	controller.TranslationSpeed = 20.0f;
+	// controller.SetCamera(camera);
+	// controller.RotationSpeed = 0.0f;
+	// controller.TranslationSpeed = 20.0f;
 
 	UI::UIRenderer::Init();
 }
@@ -129,40 +131,39 @@ void Cube::OnUpdate(TimeStep ts) {
 
 	controller.OnUpdate(ts);
 
-	ImGui::Begin("Lights");
-	{
-		float r = camera->As<IsometricCamera>()->R;
-		if(ImGui::SliderFloat("Light.R", &r, 10.0f, 100.0f))
-			camera->As<IsometricCamera>()->SetDistance(r);
-	}
-	ImGui::End();
+	// ImGui::Begin("Lights");
+	// {
+	// 	float r = camera->As<IsometricCamera>()->R;
+	// 	if(ImGui::SliderFloat("Light.R", &r, 10.0f, 100.0f))
+	// 		camera->As<IsometricCamera>()->SetDistance(r);
+	// }
+	// ImGui::End();
 
-	ImGui::Begin("Debug");
-	{
-		ImGui::Text("FPS: %0.1f", Renderer::GetDebugInfo().FPS);
-		ImGui::Text("Draw Calls: %i", Renderer::GetDebugInfo().DrawCalls);
-		ImGui::Text("Indices: %i", Renderer::GetDebugInfo().Indices);
-		ImGui::Text("Vertices: %i", Renderer::GetDebugInfo().Vertices);
-		ImGui::Text("Instances: %i", Renderer::GetDebugInfo().Instances);
-	}
-	ImGui::End();
+	// ImGui::Begin("Debug");
+	// {
+	// 	ImGui::Text("FPS: %0.1f", Renderer::GetDebugInfo().FPS);
+	// 	ImGui::Text("Draw Calls: %i", Renderer::GetDebugInfo().DrawCalls);
+	// 	ImGui::Text("Indices: %i", Renderer::GetDebugInfo().Indices);
+	// 	ImGui::Text("Vertices: %i", Renderer::GetDebugInfo().Vertices);
+	// 	ImGui::Text("Instances: %i", Renderer::GetDebugInfo().Instances);
+	// }
+	// ImGui::End();
 
-	Renderer::StartPass(drawPass);
-	{
-		Renderer::Clear();
+	// Renderer::StartPass(drawPass);
+	// {
+	// 	Renderer::Clear();
 
-		Renderer3D::Begin(camera);
+	// 	Renderer3D::Begin(camera);
 
-		for(int y = -10; y < 10; y++)
-			for(int x = -10; x < 10; x++)
-				Renderer3D::DrawMesh(cube, { .Translation = { x, 0.0f, y } });
+	// 	for(int y = -50; y < 50; y++)
+	// 		for(int x = -50; x < 50; x++)
+	// 			Renderer3D::DrawMesh(cube, { .Translation = { x, 0.0f, y } });
 
-		Renderer3D::End();
-	}
-	Renderer::EndPass();
-	Renderer::Flush();
+	// 	Renderer3D::End();
+	// }
+	// Renderer::EndPass();
 
-	RendererAPI::Get()->RenderFramebuffer(framebuffer, AttachmentTarget::Color);
+	// Renderer2D::DrawFullscreenQuad(framebuffer, AttachmentTarget::Color);
 
 	UI::UIRenderer::EndFrame();
 }

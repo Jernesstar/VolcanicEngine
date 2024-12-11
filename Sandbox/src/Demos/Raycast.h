@@ -117,7 +117,8 @@ Raycast::Raycast() {
 	controller = CameraController{ camera };
 
 	cube = Mesh::Create(MeshPrimitive::Cube,
-		Material{
+		Material
+		{
 			.Diffuse = Texture::Create("Sandbox/assets/images/wood.png")
 		});
 
@@ -171,18 +172,17 @@ void Raycast::OnUpdate(TimeStep ts) {
 		Renderer3D::End();
 	}
 	Renderer::EndPass();
-	Renderer::Flush();
 
-	// 4. Render full-screen quad that creates outline
+	// 3. Render full-screen quad that creates outline
 	Renderer::StartPass(outlinePass);
 	{
 		auto mask = maskPass->GetOutput();
 
-		RendererAPI::Get()->RenderFramebuffer(mask, AttachmentTarget::Color);
+		Renderer2D::DrawFullscreenQuad(mask, AttachmentTarget::Color);
 	}
 	Renderer::EndPass();
 
-	// 6. Draw selected object
+	// 4. Draw selected object
 	Renderer::StartPass(drawPass);
 	{
 		Renderer3D::Begin(camera);

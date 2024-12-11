@@ -2,9 +2,9 @@
 
 #include <glm/vec3.hpp>
 
-#include <VolcaniCore/Object/Mesh.h>
-#include <VolcaniCore/Object/Model.h>
-#include <VolcaniCore/Renderer/Camera.h>
+#include <VolcaniCore/Graphics/Mesh.h>
+#include <VolcaniCore/Graphics/Model.h>
+#include <VolcaniCore/Graphics/Camera.h>
 
 #include <Physics/RigidBody.h>
 

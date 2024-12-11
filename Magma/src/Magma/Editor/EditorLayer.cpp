@@ -10,7 +10,7 @@
 #include <VolcaniCore/Core/Application.h>
 #include <VolcaniCore/Core/Log.h>
 #include <VolcaniCore/Core/Input.h>
-#include <VolcaniCore/Renderer/RendererAPI.h>
+#include <VolcaniCore/Graphics/RendererAPI.h>
 
 #include "UI/UISerializer.h"
 
@@ -182,7 +182,6 @@ void EditorLayer::Render() {
 		ReopenTab();
 	if(menu.tab.closeTab)
 		CloseTab(m_CurrentTab);
-
 }
 
 void EditorLayer::NewTab(Ref<Tab> tab) {

@@ -1,22 +1,31 @@
 #pragma once
 
+#include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 
 #include "Core/Defines.h"
 
-#include "Object/Texture.h"
-#include "Object/Vertex.h"
+#include "Graphics/Texture.h"
 
 namespace VolcaniCore {
+
+struct Vertex {
+	glm::vec3 Position;
+	glm::vec3 Normal;
+	glm::vec2 TexCoord;
+};
 
 struct Material {
 	Ref<Texture> Diffuse = nullptr;
 	Ref<Texture> Specular = nullptr;
 	Ref<Texture> Emissive = nullptr;
+
+	glm::vec4 DiffuseColor = glm::vec4(0.0f);
+	glm::vec4 SpecularColor = glm::vec4(0.0f);
+	glm::vec4 EmissiveColor = glm::vec4(0.0f);
 };
 
-// TODO(Change): Make Point and Line a kind of Mesh
 enum class MeshPrimitive { Point, Line, Quad, Cube, Pyramid };
 
 class Mesh {

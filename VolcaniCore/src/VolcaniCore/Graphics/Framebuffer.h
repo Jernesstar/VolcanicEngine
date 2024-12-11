@@ -2,7 +2,7 @@
 
 #include "Core/Defines.h"
 
-#include <Object/Texture.h>
+#include <Graphics/Texture.h>
 
 namespace VolcaniCore {
 

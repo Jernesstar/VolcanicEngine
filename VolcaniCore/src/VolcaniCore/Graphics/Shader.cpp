@@ -5,7 +5,7 @@
 #include "Core/Assert.h"
 #include "Core/FileUtils.h"
 
-#include "Renderer/RendererAPI.h"
+#include "Graphics/RendererAPI.h"
 
 namespace VolcaniCore {
 
@@ -13,10 +13,6 @@ static ShaderFile TryGetShader(const std::string& path);
 static std::vector<ShaderFile> GetShaders(const std::vector<std::string>& paths);
 static std::vector<ShaderFile> GetShaders(const std::string& shaderFolder,
 										  const std::string& name);
-
-// void ShaderPipeline::Init() {
-
-// }
 
 // Ref<ShaderPipeline> ShaderPipeline::Get(Shader shader) {
 
@@ -79,7 +75,7 @@ bool StringContains(const std::string& str, const std::string& subStr) {
 std::vector<ShaderFile> GetShaders(const std::string& shaderFolder,
 									const std::string& name)
 {
-	// TODO(Fix): Find by name, then by extensions
+	// TODO(Change): Find by name, then by extensions
 	std::vector<std::string> paths;
 	for(auto path : FileUtils::GetFiles(shaderFolder,
 					{ ".vert", ".frag", ".geom", ".comp" }))

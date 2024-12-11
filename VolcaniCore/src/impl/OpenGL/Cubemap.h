@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Object/Cubemap.h"
+#include "Graphics/Cubemap.h"
 
 namespace VolcaniCore::OpenGL {
 
