@@ -49,7 +49,7 @@ void Renderer::Init() {
 	glEnable(GL_MULTISAMPLE);				// Smooth edges
 	glEnable(GL_FRAMEBUFFER_SRGB);			// Gamma correction
 	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS); // Smooth cubemap edges
-	glClearColor(1.0f, 0.0f, 0.0f, 0.0f);
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 }
 
 void Renderer::Close() {
@@ -71,8 +71,8 @@ void Renderer::StartFrame() {
 
 void Renderer::EndFrame() {
 	for(auto& [buffer, backend] : s_Data.Arrays) {
-		if(!buffer->Specs.MaxVertexCount) // Static buffer 
-			continue;
+		// if(!buffer->Specs.MaxVertexCount) // Static buffer 
+		// 	continue;
 
 		if(backend.Indices.GetCount())
 			backend.Array->GetIndexBuffer()->SetData(backend.Indices);
@@ -102,21 +102,22 @@ DrawBuffer* Renderer::NewDrawBuffer(DrawBufferSpecification& specs, void* data) 
 	}
 
 	if(specs.MaxIndexCount) {
-		array->SetIndexBuffer(CreateRef<IndexBuffer>(specs.MaxIndexCount));
+		array->SetIndexBuffer(
+			CreateRef<IndexBuffer>(specs.MaxIndexCount, true));
 		s_Data.Arrays[buffer].Indices = Buffer<uint32_t>(specs.MaxIndexCount);
 	}
 	if(specs.MaxVertexCount) {
 		array->AddVertexBuffer(
 			CreateRef<VertexBuffer>(specs.VertexLayout, specs.MaxVertexCount));
 		s_Data.Arrays[buffer].Vertices
-			= Buffer<void>(specs.MaxVertexCount, specs.VertexLayout.Stride);
+			= Buffer<void>(specs.VertexLayout.Stride, specs.MaxVertexCount);
 	}
 	if(specs.MaxInstanceCount) {
 		array->AddVertexBuffer(
 			CreateRef<VertexBuffer>(
 				specs.InstanceLayout, specs.MaxInstanceCount));
 		s_Data.Arrays[buffer].Instances
-			= Buffer<void>(specs.MaxInstanceCount, specs.InstanceLayout.Stride);
+			= Buffer<void>(specs.InstanceLayout.Stride, specs.MaxInstanceCount);
 	}
 
 	return buffer;

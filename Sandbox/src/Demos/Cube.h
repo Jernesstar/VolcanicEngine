@@ -84,15 +84,15 @@ Cube::Cube()
 		});
 
 	shader = ShaderPipeline::Create("VolcaniCore/assets/shaders", "Mesh");
-	// color = Texture::Create(480, 270,
-	// 		Texture::InternalFormat::Normal, Texture::SamplingOption::Nearest);
-	// depth = Texture::Create(1920, 1080, Texture::InternalFormat::Depth);
-	// framebuffer = Framebuffer::Create({
-	// 		{ AttachmentTarget::Color, { { color } } },
-	// 		{ AttachmentTarget::Depth, { { depth } } },
-	// 	});
+	color = Texture::Create(480, 270,
+			Texture::InternalFormat::Normal, Texture::SamplingOption::Nearest);
+	depth = Texture::Create(1920, 1080, Texture::InternalFormat::Depth);
+	framebuffer = Framebuffer::Create({
+			{ AttachmentTarget::Color, { { color } } },
+			{ AttachmentTarget::Depth, { { depth } } },
+		});
 
-	// drawPass = RenderPass::Create("Draw", shader);
+	drawPass = RenderPass::Create("Draw", shader);
 	// drawPass->SetOutput(framebuffer);
 
 	cube = Mesh::Create(MeshPrimitive::Cube,
@@ -101,28 +101,23 @@ Cube::Cube()
 			.Diffuse = Texture::Create("Sandbox/assets/images/wood.png"),
 		});
 
-	// camera = CreateRef<IsometricCamera>();
-	// camera->Resize(480, 270);
-	// controller =
-	// 	CameraController(
-	// 		MovementControls(
-	// 			ControlMap
-	// 			{
-	// 				{ Control::Up,   Key::W },
-	// 				{ Control::Down, Key::S },
-	// 				{ Control::Forward,  Key::Invalid },
-	// 				{ Control::Backward, Key::Invalid },
-	// 			})
-	// 		);
+	camera = CreateRef<IsometricCamera>();
+	camera->Resize(480, 270);
+	controller =
+		CameraController(
+			MovementControls(
+				ControlMap
+				{
+					{ Control::Up,   Key::W },
+					{ Control::Down, Key::S },
+					{ Control::Forward,  Key::Invalid },
+					{ Control::Backward, Key::Invalid },
+				})
+			);
 
-	// controller.SetCamera(camera);
-	// controller.RotationSpeed = 0.0f;
-	// controller.TranslationSpeed = 20.0f;
-
-	camera = CreateRef<StereographicCamera>(75.0f);
-	camera->SetPosition({ 0.0f, 0.5f, 3.0f });
-	controller = CameraController{ camera };
-	camera->Resize(1920, 1080);
+	controller.SetCamera(camera);
+	controller.RotationSpeed = 0.0f;
+	controller.TranslationSpeed = 20.0f;
 
 	BufferLayout vertexLayout =
 		{
@@ -207,10 +202,10 @@ void Cube::OnUpdate(TimeStep ts) {
 	auto* command = RendererAPI::Get()->NewDrawCommand(buffer);
 	command->Pipeline = shader;
 	command->Clear = true;
-	command->ViewportWidth = 100;
-	command->ViewportHeight = 100;
-	// command->UniformData
-	// .SetTexture("u_Diffuse", { cube->GetMaterial().Diffuse, 0 });
+	command->ViewportWidth = 1920;
+	command->ViewportHeight = 1080;
+	command->UniformData
+	.SetTexture("u_Diffuse", { cube->GetMaterial().Diffuse, 0 });
 	command->UniformData
 	.SetMat4("u_ViewProj", camera->GetViewProjection());
 
@@ -219,7 +214,6 @@ void Cube::OnUpdate(TimeStep ts) {
 	call.Partition = PartitionType::Instanced;
 	call.IndexStart = 0;
 	call.VertexStart = 0;
-	call.InstanceStart = 0;
 	call.IndexCount = cube->GetIndices().size();
 	call.VertexCount = cube->GetVertices().size();
 

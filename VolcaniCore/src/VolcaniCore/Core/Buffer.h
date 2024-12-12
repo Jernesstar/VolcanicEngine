@@ -121,6 +121,7 @@ public:
 
 	void Delete() {
 		delete m_Data;
+		m_Data = nullptr;
 		m_Count = 0;
 		m_MaxCount = 0;
 	}
@@ -157,19 +158,19 @@ class Buffer<void> {
 public:
 	Buffer() = default;
 
-	Buffer(uint64_t maxCount, uint64_t size)
-		: m_MaxCount(maxCount), m_Count(0), m_SizeT(size)
+	Buffer(uint64_t size, uint64_t maxCount)
+		: m_SizeT(size), m_MaxCount(maxCount), m_Count(0)
 	{
 		m_Data = malloc(GetMaxSize());
 	}
 	Buffer(Buffer&& other)
-		: m_MaxCount(other.GetMaxCount()), m_Count(other.GetCount()),
-			m_SizeT(other.m_SizeT)
+		: m_SizeT(other.m_SizeT),
+			m_MaxCount(other.GetMaxCount()), m_Count(other.GetCount())
 	{
 		std::swap(m_Data, other.m_Data);
 	}
 	Buffer(const Buffer& other)
-		: m_MaxCount(other.GetMaxCount()), m_SizeT(other.m_SizeT)
+		: m_SizeT(other.m_SizeT), m_MaxCount(other.GetMaxCount())
 	{
 		m_Data = malloc(GetMaxSize());
 		Set(other.Get(), other.GetCount());
@@ -177,14 +178,14 @@ public:
 
 	template<typename T>
 	Buffer(const List<T>& list)
-		: m_MaxCount(list.size()), m_SizeT(sizeof(T))
+		: m_SizeT(sizeof(T)), m_MaxCount(list.size())
 	{
 		m_Data = malloc(GetMaxSize());
 		Set(list.data(), list.size());
 	}
 
-	Buffer(void* buffer, uint64_t count, uint64_t size)
-		: m_MaxCount(count), m_Count(count), m_SizeT(size)
+	Buffer(void* buffer, uint64_t size, uint64_t count = 0)
+		: m_SizeT(size), m_MaxCount(count), m_Count(count)
 	{
 		m_Data = (void*)buffer;
 	}
@@ -198,12 +199,16 @@ public:
 
 	Buffer& operator =(Buffer&& other) {
 		std::swap(m_Data, other.m_Data);
+		m_SizeT = other.m_SizeT;
 		m_MaxCount = other.m_MaxCount;
 		m_Count = other.m_Count;
 		return *this;
 	}
 
 	void* Get() const { return m_Data; }
+
+	template<typename T>
+	T* Get() const { return (T*)m_Data; }
 
 	uint64_t GetCount()	   const { return m_Count; }
 	uint64_t GetMaxCount() const { return m_MaxCount; }
@@ -217,7 +222,7 @@ public:
 	Buffer<void> Partition(uint64_t count = 0) {
 		if(count == 0)
 			count = m_MaxCount;
-		return Buffer(m_Data + (m_Count += count), count, m_SizeT);
+		return Buffer(m_Data + (m_Count += count), m_SizeT, count);
 	}
 
 	// template<typename T>
@@ -249,7 +254,7 @@ public:
 		if(offset + count >= m_MaxCount)
 			count = m_MaxCount - offset;
 
-		memcpy(m_Data + offset, data, count * m_SizeT);
+		memcpy(m_Data + offset * m_SizeT, data, count * m_SizeT);
 
 		if(offset + count > m_Count)
 			m_Count = offset + count;
@@ -261,8 +266,10 @@ public:
 
 	void Delete() {
 		free(m_Data);
-		m_Count = 0;
+		m_Data = nullptr;
+		m_SizeT = 0;
 		m_MaxCount = 0;
+		m_Count = 0;
 	}
 
 	void Reallocate(uint64_t surplus) {

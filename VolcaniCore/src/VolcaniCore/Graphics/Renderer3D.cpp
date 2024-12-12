@@ -138,11 +138,11 @@ void Renderer3D::DrawMesh(Ref<Mesh> mesh, const glm::mat4& tr) {
 	if(!mesh)
 		return;
 
-	auto* command = Renderer::GetCommand();
-	command->BufferData = s_MeshBuffer;
+	auto* command = Renderer::NewCommand(s_MeshBuffer);
+	command->ViewportWidth = 1920;
+	command->ViewportHeight = 1080;
 
 	auto& call = command->NewDrawCall();
-
 	call.Primitive = PrimitiveType::Triangle;
 	call.Partition = PartitionType::Instanced;
 	call.IndexCount  = mesh->GetIndices().size();
@@ -175,7 +175,7 @@ void Renderer3D::DrawMesh(Ref<Mesh> mesh, const glm::mat4& tr) {
 	}
 
 	RendererAPI::Get()
-		->SetBufferData(command->BufferData, 2, glm::value_ptr(tr), 1);
+		->SetBufferData(command->BufferData, 2, glm::value_ptr(tr), 1, command->BufferData->InstancesCount);
 }
 
 void Renderer3D::DrawModel(Ref<Model> model, const glm::mat4& tr) {
