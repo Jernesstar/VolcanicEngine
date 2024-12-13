@@ -66,10 +66,13 @@ static void SetUniforms(DrawCommand& command);
 static void SetOptions(DrawCall& call);
 
 void Renderer::StartFrame() {
-	s_Data.Commands.clear();
+
 }
 
 void Renderer::EndFrame() {
+	if(!s_Data.Commands.size()) // EndFrame already called
+		return;
+
 	for(auto& [buffer, backend] : s_Data.Arrays) {
 		// if(!buffer->Specs.MaxVertexCount) // Static buffer 
 		// 	continue;
@@ -84,6 +87,8 @@ void Renderer::EndFrame() {
 
 	for(auto& command : s_Data.Commands)
 		FlushCommand(command);
+
+	s_Data.Commands.clear();
 }
 
 DrawBuffer* Renderer::NewDrawBuffer(DrawBufferSpecification& specs, void* data) {

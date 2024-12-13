@@ -11,9 +11,9 @@
 namespace VolcaniCore {
 
 const uint64_t Renderer::MaxTriangles = 1'000'000;
-const uint64_t Renderer::MaxIndices   = MaxVertices  * 3; /* (3.0f / 2.0f) */
-const uint64_t Renderer::MaxVertices  = MaxTriangles * 3;
-const uint64_t Renderer::MaxInstances = 200'000;
+const uint64_t Renderer::MaxIndices   = 300'000; /* (3.0f / 2.0f) */
+const uint64_t Renderer::MaxVertices  = 100'000;
+const uint64_t Renderer::MaxInstances = MaxTriangles * 4;
 
 static Ref<RenderPass> s_RenderPass;
 static DrawCommand* s_DrawCommand;
@@ -41,6 +41,9 @@ void Renderer::BeginFrame() {
 	IndexCount     = 0;
 	VertexCount    = 0;
 	InstanceCount  = 0;
+
+	Renderer2D::StartFrame();
+	Renderer3D::StartFrame();
 }
 
 void Renderer::EndFrame() {
@@ -48,6 +51,9 @@ void Renderer::EndFrame() {
 	s_Frame.Info.Indices   = IndexCount;
 	s_Frame.Info.Vertices  = VertexCount;
 	s_Frame.Info.Instances = InstanceCount;
+
+	Renderer3D::EndFrame();
+	Renderer2D::EndFrame();
 }
 
 void Renderer::StartPass(Ref<RenderPass> pass) {
