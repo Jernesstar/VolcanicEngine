@@ -17,6 +17,9 @@ namespace VolcaniCore {
 
 class Renderer3D {
 public:
+	static void StartFrame();
+	static void EndFrame();
+
 	static void Begin(Ref<Camera> camera);
 	static void End();
 

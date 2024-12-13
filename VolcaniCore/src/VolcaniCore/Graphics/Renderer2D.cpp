@@ -42,6 +42,14 @@ void Renderer2D::Close() {
 	RendererAPI::Get()->ReleaseBuffer(s_ScreenQuadBuffer);
 }
 
+void Renderer2D::StartFrame() {
+
+}
+
+void Renderer2D::EndFrame() {
+
+}
+
 void Renderer2D::Begin(Ref<OrthographicCamera> camera) {
 
 }

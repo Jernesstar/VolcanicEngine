@@ -79,22 +79,22 @@ struct DrawBuffer {
 
 	void AddIndices(const Buffer<uint32_t>& data) {
 		RendererAPI::Get()
-			->SetBufferData(this, DrawBufferIndex::Indices,
-							data.Get(), data.GetCount(), IndicesCount);
+		->SetBufferData(this, DrawBufferIndex::Indices,
+						data.Get(), data.GetCount(), IndicesCount);
 	}
 
 	template<typename T>
 	void AddVertices(const Buffer<T>& data) {
 		RendererAPI::Get()
-			->SetBufferData(this, DrawBufferIndex::Vertices,
-							data.Get(), data.GetCount(), VerticesCount);
+		->SetBufferData(this, DrawBufferIndex::Vertices,
+						data.Get(), data.GetCount(), VerticesCount);
 	}
 
 	template<typename T>
 	void AddInstances(const Buffer<T>& data) {
 		RendererAPI::Get()
-			->SetBufferData(this, DrawBufferIndex::Instances,
-							data.Get(), data.GetCount(), InstancesCount);
+		->SetBufferData(this, DrawBufferIndex::Instances,
+						data.Get(), data.GetCount(), InstancesCount);
 	}
 
 	void Clear(DrawBufferIndex idx) {
@@ -200,6 +200,12 @@ struct DrawCommand {
 	void AddInstances(const Buffer<T>& data) {
 		BufferData->AddInstances(data);
 		InstancesIndex += data.GetCount();
+	}
+
+	void AddInstance(const void* data) {
+		RendererAPI::Get()
+		->SetBufferData(BufferData, DrawBufferIndex::Instances, data, 1,
+						InstancesIndex++);
 	}
 
 	DrawCall& NewDrawCall() {

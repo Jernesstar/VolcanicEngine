@@ -12,6 +12,9 @@ namespace VolcaniCore {
 
 class Renderer2D {
 public:
+	static void StartFrame();
+	static void EndFrame();
+
 	static void Begin(Ref<OrthographicCamera> camera);
 	static void End();
 

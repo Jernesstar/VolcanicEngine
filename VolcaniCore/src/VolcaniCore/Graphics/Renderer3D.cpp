@@ -12,7 +12,7 @@ namespace VolcaniCore {
 static DrawBuffer* s_CubemapBuffer;
 static DrawBuffer* s_MeshBuffer;
 // static DrawBuffer* s_PointBuffer;
-static Map<Ref<Mesh>, std::pair<uint32_t, uint32_t>> s_Meshes;
+static Ref<Mesh> s_LastMesh = nullptr;
 
 void Renderer3D::Init() {
 	BufferLayout vertexLayout =
@@ -109,9 +109,15 @@ void Renderer3D::Close() {
 	RendererAPI::Get()->ReleaseBuffer(s_MeshBuffer);
 }
 
-void Renderer3D::Begin(Ref<Camera> camera) {
-	s_Meshes.clear();
+void Renderer3D::StartFrame() {
+	s_MeshBuffer->Clear();
+}
 
+void Renderer3D::EndFrame() {
+
+}
+
+void Renderer3D::Begin(Ref<Camera> camera) {
 	Renderer::GetPass()->GetUniforms()
 	.Set("u_ViewProj",
 		[camera]() -> glm::mat4
@@ -127,6 +133,8 @@ void Renderer3D::Begin(Ref<Camera> camera) {
 
 void Renderer3D::End() {
 	Renderer::EndCommand();
+
+	s_LastMesh = nullptr;
 }
 
 void Renderer3D::DrawSkybox(Ref<Cubemap> cubemap) {
@@ -138,19 +146,20 @@ void Renderer3D::DrawMesh(Ref<Mesh> mesh, const glm::mat4& tr) {
 	if(!mesh)
 		return;
 
-	auto* command = Renderer::GetCommand();
-	command->BufferData = s_MeshBuffer;
+	if(s_LastMesh != mesh) {
+		s_LastMesh = mesh;
 
-	auto& call = command->NewDrawCall();
+		auto* command = Renderer::NewCommand(s_MeshBuffer);
+		command->ViewportWidth = 1920;
+		command->ViewportHeight = 1080;
 
-	call.Primitive = PrimitiveType::Triangle;
-	call.Partition = PartitionType::Instanced;
-	call.IndexCount  = mesh->GetIndices().size();
-	call.VertexCount = mesh->GetVertices().size();
-	call.InstanceCount = 1;
-
-	if(!s_Meshes.count(mesh)) {
-		s_Meshes[mesh] = { command->VerticesIndex, command->IndicesIndex };
+		auto& call = command->NewDrawCall();
+		call.Primitive = PrimitiveType::Triangle;
+		call.Partition = PartitionType::Instanced;
+		call.IndexStart = 0;
+		call.VertexStart = 0;
+		call.IndexCount  = mesh->GetIndices().size();
+		call.VertexCount = mesh->GetVertices().size();
 
 		command->AddIndices(Buffer(mesh->GetIndices()));
 		command->AddVertices(Buffer(mesh->GetVertices()));
@@ -169,13 +178,10 @@ void Renderer3D::DrawMesh(Ref<Mesh> mesh, const glm::mat4& tr) {
 				return { mat.Specular, 1 };
 			});
 	}
-	else {
-		call.VertexStart = s_Meshes[mesh].first;
-		call.IndexStart = s_Meshes[mesh].second;
-	}
 
-	RendererAPI::Get()
-		->SetBufferData(command->BufferData, 2, glm::value_ptr(tr), 1);
+	auto* command = Renderer::GetCommand();
+	command->AddInstance(glm::value_ptr(tr));
+	command->Calls[0].InstanceCount++;
 }
 
 void Renderer3D::DrawModel(Ref<Model> model, const glm::mat4& tr) {
@@ -186,8 +192,8 @@ void Renderer3D::DrawModel(Ref<Model> model, const glm::mat4& tr) {
 void Renderer3D::DrawQuad(Ref<Quad> quad, const glm::mat4& tr) {
 	Ref<Mesh> mesh;
 	if(quad->IsTextured)
-		mesh = Mesh::Create(
-				MeshPrimitive::Quad, Material{ .Diffuse = quad->GetTexture() });
+		mesh = Mesh::Create(MeshPrimitive::Quad,
+			Material{ .Diffuse = quad->GetTexture() });
 	else
 		mesh = Mesh::Create(MeshPrimitive::Quad, quad->GetColor());
 
