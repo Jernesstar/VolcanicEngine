@@ -54,30 +54,32 @@ Bloom::Bloom()
 				Application::Close();
 		});
 
-	window = Application::GetWindow();
-
 	Ref<ShaderPipeline> shader;
-	shader = ShaderPipeline::Create({
-		{ "VolcaniCore/assets/shaders/Framebuffer.glsl.vert", ShaderType::Vertex },
-		{ "Sandbox/assets/shaders/Downsample.glsl.frag", ShaderType::Fragment }
-	});
+	shader = ShaderPipeline::Create(
+		{
+			{ "VolcaniCore/assets/shaders/Framebuffer.glsl.vert", ShaderType::Vertex },
+			{ "Sandbox/assets/shaders/Downsample.glsl.frag", ShaderType::Fragment }
+		});
 	downsamplePass = RenderPass::Create("Downsample", shader);
 
-	shader = ShaderPipeline::Create({
-		{ "VolcaniCore/assets/shaders/Framebuffer.glsl.vert", ShaderType::Vertex },
-		{ "Sandbox/assets/shaders/Upsample.glsl.frag", ShaderType::Fragment }
-	});
+	shader = ShaderPipeline::Create(
+		{
+			{ "VolcaniCore/assets/shaders/Framebuffer.glsl.vert", ShaderType::Vertex },
+			{ "Sandbox/assets/shaders/Upsample.glsl.frag", ShaderType::Fragment }
+		});
 	upsamplePass = RenderPass::Create("Upsample", shader);
 
-	shader = ShaderPipeline::Create({
-		{ "VolcaniCore/assets/shaders/Framebuffer.glsl.vert", ShaderType::Vertex },
-		{ "Sandbox/assets/shaders/Bloom.glsl.frag", ShaderType::Fragment }
-	});
+	shader = ShaderPipeline::Create(
+		{
+			{ "VolcaniCore/assets/shaders/Framebuffer.glsl.vert", ShaderType::Vertex },
+			{ "Sandbox/assets/shaders/Bloom.glsl.frag", ShaderType::Fragment }
+		});
 	bloomPass = RenderPass::Create("Bloom", shader);
 
 	shader = ShaderPipeline::Create("VolcaniCore/assets/shaders", "Mesh");
 	drawPass = RenderPass::Create("Draw", shader);
 
+	window = Application::GetWindow();
 	auto width = window->GetWidth();
 	auto height = window->GetHeight();
 	src = Framebuffer::Create(width, height);

@@ -95,7 +95,7 @@ Cube::Cube()
 		});
 
 	drawPass = RenderPass::Create("Draw", shader);
-	// drawPass->SetOutput(framebuffer);
+	drawPass->SetOutput(framebuffer);
 
 	cube = Mesh::Create(MeshPrimitive::Cube,
 		Material
@@ -165,7 +165,8 @@ void Cube::OnUpdate(TimeStep ts) {
 	}
 	Renderer::EndPass();
 
-	// Renderer2D::DrawFullscreenQuad(framebuffer, AttachmentTarget::Color);
+	RendererAPI::Get()->EndFrame();
+	Renderer2D::DrawFullscreenQuad(framebuffer, AttachmentTarget::Color);
 	RendererAPI::Get()->EndFrame();
 
 	UI::UIRenderer::EndFrame();

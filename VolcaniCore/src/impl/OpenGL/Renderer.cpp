@@ -74,14 +74,11 @@ void Renderer::EndFrame() {
 		return;
 
 	for(auto& [buffer, backend] : s_Data.Arrays) {
-		// if(!buffer->Specs.MaxVertexCount) // Static buffer 
-		// 	continue;
-
-		if(backend.Indices.GetCount())
+		if(backend.Indices.GetCount() && buffer->Specs.MaxIndexCount)
 			backend.Array->GetIndexBuffer()->SetData(backend.Indices);
-		if(backend.Vertices.GetCount())
+		if(backend.Vertices.GetCount() && buffer->Specs.MaxVertexCount)
 			backend.Array->GetVertexBuffer(0)->SetData(backend.Vertices);
-		if(backend.Instances.GetCount())
+		if(backend.Instances.GetCount() && buffer->Specs.MaxInstanceCount)
 			backend.Array->GetVertexBuffer(1)->SetData(backend.Instances);
 	}
 
@@ -93,7 +90,6 @@ void Renderer::EndFrame() {
 
 DrawBuffer* Renderer::NewDrawBuffer(DrawBufferSpecification& specs, void* data) {
 	auto* buffer = new DrawBuffer{ specs };
-
 	auto array = CreateRef<VertexArray>();
 	s_Data.Arrays[buffer] = BackendBuffer{ array };
 

@@ -67,36 +67,36 @@ Lighting::Lighting() {
 		});
 
 	Ref<ShaderPipeline> shader;
-	shader = ShaderPipeline::Create({
-		{ "Sandbox/assets/shaders/Lighting.glsl.vert", ShaderType::Vertex },
-		{ "Sandbox/assets/shaders/Lighting.glsl.frag", ShaderType::Fragment }
-	});
+	shader = ShaderPipeline::Create("Sandbox/assets/shaders", "Lighting");
 	lightingPass = RenderPass::Create("Lighting", shader);
 
-	light = PointLight{
-		.Constant  = 0.3f,
-		.Linear    = 0.0f,
-		.Quadratic = 0.032f,
-	};
+	light = PointLight
+		{
+			.Constant  = 0.3f,
+			.Linear    = 0.0f,
+			.Quadratic = 0.032f,
+		};
 	light.Position = { 0.0f, 0.001f, 0.0f };
 	light.Ambient  = { 0.002f, 0.002f, 0.002f };
 	light.Diffuse  = { 0.005f, 0.005f, 0.005f };
 	light.Specular = { 0.001f, 0.001f, 0.001f };
 
-	spot = SpotLight{
-		.Position = { 0.0f, 0.0f, 0.0f },
-		.CutoffAngle = 0.3f,
-		.Direction = { 0.0f, 0.0f, -1.0f },
-		.OuterCutoffAngle = 0.4f
-	};
+	spot = SpotLight
+		{
+			.Position = { 0.0f, 0.0f, 0.0f },
+			.CutoffAngle = 0.3f,
+			.Direction = { 0.0f, 0.0f, -1.0f },
+			.OuterCutoffAngle = 0.4f
+		};
 
 	buffer = CreateRef<OpenGL::UniformBuffer>(
-		BufferLayout{
-			{ "Position",    BufferDataType::Vec3 },
-			{ "CutoffAngle", BufferDataType::Float },
-			{ "Direction",   BufferDataType::Vec3 },
-			{ "OuterCutoffAngle", BufferDataType::Float },
-		}, 0);
+		BufferLayout
+			{
+				{ "Position",    BufferDataType::Vec3 },
+				{ "CutoffAngle", BufferDataType::Float },
+				{ "Direction",   BufferDataType::Vec3 },
+				{ "OuterCutoffAngle", BufferDataType::Float },
+			}, 0);
 
 	std::string assetPath = "Sandbox/assets/";
 	cube = Mesh::Create(MeshPrimitive::Cube,
@@ -182,9 +182,6 @@ void Lighting::OnUpdate(TimeStep ts) {
 				return 32.0f;
 			});
 
-		// Renderer3D::SetMeshUniforms(cube, cubeUniforms);
-		// Renderer3D::SetMeshUniforms(torch, torchUniforms);
-
 		Renderer::GetPass()->GetUniforms()
 		.Set("u_PointLightCount",
 			[&]() -> int32_t
@@ -192,51 +189,51 @@ void Lighting::OnUpdate(TimeStep ts) {
 				return 2 * width * 2 * length;
 			});
 
+		auto& uniforms = Renderer::GetPass()->GetUniforms();
 		for(int y = -length; y < length; y++) {
 			for(int x = -width; x < width; x++) {
+
 				int i = 2*width * (y + length) + (x + width);
+
 				std::string name = "u_PointLights[" + std::to_string(i) + "].";
-		
-				// auto& uniforms = Renderer::GetDrawCommand().GetUniforms();
+				uniforms
+				.Set(name + "Position",
+					[x=x, y=y]() -> glm::vec3
+					{
+						return { x, 1.5f, y };
+					})
+				.Set(name + "Ambient",
+					[&]() -> glm::vec3
+					{
+						return light.Ambient;
+					})
+				.Set(name + "Diffuse",
+					[&]() -> glm::vec3
+					{
+						return light.Diffuse;
+					})
+				.Set(name + "Specular",
+					[&]() -> glm::vec3
+					{
+						return light.Specular;
+					});
 
-				// uniforms
-				// .Set(name + "Position",
-				// 	[x=x, y=y]() -> glm::vec3
-				// 	{
-				// 		return { x, 1.5f, y };
-				// 	})
-				// .Set(name + "Ambient",
-				// 	[&]() -> glm::vec3
-				// 	{
-				// 		return light.Ambient;
-				// 	})
-				// .Set(name + "Diffuse",
-				// 	[&]() -> glm::vec3
-				// 	{
-				// 		return light.Diffuse;
-				// 	})
-				// .Set(name + "Specular",
-				// 	[&]() -> glm::vec3
-				// 	{
-				// 		return light.Specular;
-				// 	});
-
-				// uniforms
-				// .Set(name + "Constant",
-				// 	[&]() -> float
-				// 	{
-				// 		return light.Constant;
-				// 	})
-				// .Set(name + "Linear",
-				// 	[&]() -> float
-				// 	{
-				// 		return light.Linear;
-				// 	})
-				// .Set(name + "Quadratic",
-				// 	[&]() -> float
-				// 	{
-				// 		return light.Quadratic;
-				// 	});
+				uniforms
+				.Set(name + "Constant",
+					[&]() -> float
+					{
+						return light.Constant;
+					})
+				.Set(name + "Linear",
+					[&]() -> float
+					{
+						return light.Linear;
+					})
+				.Set(name + "Quadratic",
+					[&]() -> float
+					{
+						return light.Quadratic;
+					});
 
 				Renderer3D::DrawMesh(cube, { .Translation = { x, 0.0f, y } });
 				Renderer3D::DrawMesh(torch, { .Translation = { x, 1.0f, y } });

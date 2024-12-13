@@ -97,7 +97,11 @@ void Renderer3D::Init() {
 			true, // Dynamic
 			false // Structure of arrays
 		};
-	DrawBufferSpecification specsCubemap{ cubemapLayout };
+	DrawBufferSpecification specsCubemap
+		{
+			.VertexLayout = cubemapLayout,
+			.MaxVertexCount = 36
+		};
 
 	s_MeshBuffer = RendererAPI::Get()->NewDrawBuffer(specs);
 	s_CubemapBuffer =

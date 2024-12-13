@@ -7,14 +7,12 @@
 #include "Graphics/ShaderLibrary.h"
 #include "Graphics/OrthographicCamera.h"
 
-#include "Graphics/Shader.h"
-
 namespace VolcaniCore {
 
 static DrawBuffer* s_ScreenQuadBuffer;
 
 void Renderer2D::Init() {
-	float framebufferCoords[] =
+	float screenCoords[] =
 	{
 		0.0f, 1.0f,
 		0.0f, 0.0f,
@@ -31,11 +29,15 @@ void Renderer2D::Init() {
 				{ "Position", BufferDataType::Vec2 },
 			},
 			false, // Dynamic
-			false // Structure of arrays
+			false  // Structure of arrays
 		};
-	DrawBufferSpecification specs{ layout };
+	DrawBufferSpecification specs
+		{
+			.VertexLayout = layout,
+			.MaxVertexCount = 6
+		};
 
-	s_ScreenQuadBuffer = RendererAPI::Get()->NewDrawBuffer(specs);
+	s_ScreenQuadBuffer = RendererAPI::Get()->NewDrawBuffer(specs, screenCoords);
 }
 
 void Renderer2D::Close() {
@@ -86,49 +88,26 @@ void Renderer2D::DrawFullscreenQuad(Ref<Framebuffer> buffer,
 		return;
 	}
 
-	auto pass = Renderer::GetPass();
-	auto command = Renderer::GetCommand();
+	DrawCommand* command;
 	Ref<ShaderPipeline> pipeline = nullptr;
-	Ref<Framebuffer> output = nullptr;
-	if(pass) {
-		pipeline = pass->GetPipeline();
-		output = pass->GetOutput();
-	}
+
+	if(Renderer::GetPass())
+		command = Renderer::NewCommand(s_ScreenQuadBuffer);
 	else {
-		pipeline = ShaderLibrary::Get("Framebuffer");
 		command = RendererAPI::Get()->NewDrawCommand(s_ScreenQuadBuffer);
+		pipeline = ShaderLibrary::Get("Framebuffer");
 	}
 
 	command->Pipeline = pipeline;
-	command->Image = output;
-	// command->UniformData.SetTexture("u_ScreenTexture", { buffer->Get(target), 0 });
+	command->UniformData
+	.SetInt("u_ScreenTexture", 0);
+	buffer->Bind(target, 0);
 
 	auto& call = command->NewDrawCall();
 	call.DepthTest = DepthTestingMode::Off;
 	call.Primitive = PrimitiveType::Triangle;
 	call.Partition = PartitionType::Single;
 	call.VertexCount = 6;
-
-	// if(output) {
-	// 	output->Bind();
-	// 	Renderer::Resize(output->GetWidth(), output->GetHeight());
-	// }
-	// else
-	// 	buffer->Bind(target, 0);
-
-	// s_Data.FramebufferArray->Bind();
-	// glDisable(GL_DEPTH_TEST);
-
-	// glDrawArrays(GL_TRIANGLES, 0, 6);
-
-	// glEnable(GL_DEPTH_TEST);
-	// s_Data.FramebufferArray->Unbind();
-
-	// if(output) {
-	// 	auto window = Application::GetWindow();
-	// 	Resize(window->GetWidth(), window->GetHeight());
-	// 	output->Unbind();
-	// }
 }
 
 }
