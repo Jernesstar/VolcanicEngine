@@ -1,20 +1,23 @@
 #pragma once
 
-#include <filesystem>
-
 #include <VolcaniCore/Core/Defines.h>
+
+using namespace VolcaniCore;
 
 namespace Magma {
 
 class Project {
 public:
+	static Ref<Project> Create(const std::string& volcPath);
+
+public:
 	Project() = default;
-	Project(const std::filesystem::path& volcFilePath);
+	Project(const std::string& volcPath);
 	~Project();
 
 	std::string GetName() const { return m_Name; }
 
-	void Load(const std::filesystem::path& path);
+	void Load(const std::string& volcPath);
 	void Reload();
 	void Run();
 

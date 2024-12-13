@@ -1,13 +1,13 @@
-project "TestLib"
+project "TestProj"
     kind "SharedLib"
     language "C++"
     cppdialect "C++latest"
 
-    objdir ("%{RootPath}/build/TestLib/obj")
-    targetdir ("%{RootPath}/build/TestLib/lib")
+    objdir ("%{RootPath}/build/TestProj/obj")
+    targetdir ("%{RootPath}/build/TestProj/lib")
 
     files {
-        "func.cpp"
+        "**.cpp"
     }
 
     includedirs {

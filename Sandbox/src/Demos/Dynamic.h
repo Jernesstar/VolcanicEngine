@@ -2,7 +2,7 @@
 
 #include <Magma/Core/DLL.h>
 
-#include <TestLib/TestObject.h>
+#include <TestProj/TestProj/src/TestObject.h>
 
 using namespace TestLib;
 
@@ -26,7 +26,7 @@ DLL::DLL() {
 				Application::Close();
 		});
 
-	m_DLL = CreateRef<Magma::DLL>("build\\TestLib\\lib\\TestLib.dll");
+	m_DLL = CreateRef<Magma::DLL>("build\\TestProj\\lib\\TestProj.dll");
 
 	auto load = m_DLL->GetFunction<void>("Load");
 	auto get = m_DLL->GetFunction<TestObject*, std::string>("Get");
