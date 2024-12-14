@@ -42,7 +42,7 @@ struct DirectionalLight {
 
 layout(location = 0) in vec3 v_Position;
 layout(location = 1) in vec3 v_Normal;
-layout(location = 2) in vec4 v_TexCoords;
+layout(location = 2) in vec2 v_TexCoords;
 
 uniform vec3 u_CameraPosition;
 
@@ -129,9 +129,9 @@ vec3 CalcSpotLight(vec3 normal, vec3 viewDir)
     float epsilon = cutoff - outer;
     float intensity = clamp((theta - outer) / epsilon, 0.0, 1.0);
 
-    vec3 ambient  = vec3(1.0)  * 1.0  * vec3(texture(u_Material.Diffuse, v_TexCoords.xy));
-    vec3 diffuse  = vec3(1.0)  * diff * vec3(texture(u_Material.Diffuse, v_TexCoords.xy));
-    vec3 specular = vec3(1.0)  * spec * vec3(texture(u_Material.Specular, v_TexCoords.xy));
+    vec3 ambient  = vec3(1.0) * 1.0  * vec3(texture(u_Material.Diffuse, v_TexCoords.xy));
+    vec3 diffuse  = vec3(1.0) * diff * vec3(texture(u_Material.Diffuse, v_TexCoords.xy));
+    vec3 specular = vec3(1.0) * spec * vec3(texture(u_Material.Specular, v_TexCoords.xy));
 
     return (ambient + diffuse + specular) * intensity;
 }

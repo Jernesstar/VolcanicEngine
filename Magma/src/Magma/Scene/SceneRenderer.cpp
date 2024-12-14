@@ -32,7 +32,7 @@ DefaultSceneRenderer::DefaultSceneRenderer() {
 
 void DefaultSceneRenderer::SetContext(Scene* scene) {
 	m_Scene = scene;
-	// TODO(Change): Move to Scene::OnRender
+
 	auto& world = m_Scene->EntityWorld.GetNative();
 	m_RenderSystem = world
 	.system<const TransformComponent, const MeshComponent>("RenderSystem")
@@ -41,13 +41,13 @@ void DefaultSceneRenderer::SetContext(Scene* scene) {
 		[](const TransformComponent& tc, const MeshComponent& mc)
 		{
 			Transform tr
-			{
-				.Translation = tc.Translation,
-				.Rotation	 = tc.Rotation,
-				.Scale		 = tc.Scale
-			};
+				{
+					.Translation = tc.Translation,
+					.Rotation	 = tc.Rotation,
+					.Scale		 = tc.Scale
+				};
 
-			Renderer3D::DrawModel(mc.Mesh, tr);
+			Renderer3D::DrawMesh(mc.Mesh->GetMesh(0), tr);
 		});
 }
 
@@ -79,7 +79,6 @@ void DefaultSceneRenderer::Render() {
 		Renderer3D::End();
 	}
 	Renderer::EndPass();
-	Renderer::Flush();
 }
 
 }

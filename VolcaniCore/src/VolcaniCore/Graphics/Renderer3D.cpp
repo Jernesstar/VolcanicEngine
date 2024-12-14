@@ -32,7 +32,7 @@ void Renderer3D::Init() {
 				{ "Transform", BufferDataType::Mat4 }
 			},
 			true, // Dynamic
-			true // Structure of arrays
+			true  // Structure of arrays
 		};
 
 	DrawBufferSpecification specs

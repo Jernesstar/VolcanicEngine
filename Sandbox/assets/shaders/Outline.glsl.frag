@@ -7,7 +7,7 @@ uniform vec4 u_Color;
 // uniform flat int u_Width;
 uniform sampler2D u_Texture;
 
-in vec2 v_TexCoords;
+layout(location = 0) in vec2 v_TexCoords;
 
 out vec4 FragColor;
 

@@ -1,17 +1,17 @@
 #version 450 core
 
-layout(location = 0) in vec2 TexCoords;
+uniform float u_Exposure;
+uniform float u_BloomStrength;
 
 layout(binding = 0) uniform sampler2D u_BloomTexture;
 layout(binding = 1) uniform sampler2D u_SceneTexture;
 
-uniform float u_Exposure;
-uniform float u_BloomStrength;
+layout(location = 0) in vec2 v_TexCoords;
 
 vec3 bloom()
 {
-    vec3 bloomColor = texture(u_BloomTexture, TexCoords).rgb;
-    vec3 hdrColor = texture(u_SceneTexture, TexCoords).rgb;
+    vec3 bloomColor = texture(u_BloomTexture, v_TexCoords).rgb;
+    vec3 hdrColor = texture(u_SceneTexture, v_TexCoords).rgb;
     return mix(hdrColor, bloomColor, u_BloomStrength); // linear interpolation
 }
 

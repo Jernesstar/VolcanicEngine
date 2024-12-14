@@ -66,6 +66,7 @@ private:
 	Ref<Framebuffer> framebuffer;
 
 	Ref<Mesh> cube;
+	Ref<Mesh> torch;
 
 	Ref<Camera> camera;
 	CameraController controller;
@@ -102,6 +103,7 @@ Cube::Cube()
 		{
 			.Diffuse = Texture::Create("Sandbox/assets/images/wood.png"),
 		});
+	torch = Mesh::Create("Sandbox/assets/models/mc-torch/Torch.obj");
 
 	camera = CreateRef<IsometricCamera>();
 	camera->Resize(480, 270);
@@ -160,6 +162,9 @@ void Cube::OnUpdate(TimeStep ts) {
 		for(int y = -50; y < 50; y++)
 			for(int x = -50; x < 50; x++)
 				Renderer3D::DrawMesh(cube, { .Translation = { x, 0.0f, y } });
+		for(int y = -50; y < 50; y++)
+			for(int x = -50; x < 50; x++)
+				Renderer3D::DrawMesh(torch, { .Translation = { x, 1.0f, y } });
 
 		Renderer3D::End();
 	}
