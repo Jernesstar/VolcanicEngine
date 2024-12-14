@@ -26,9 +26,22 @@ void UIBrowser::Load(const std::string& folderPath) {
 }
 
 void UIBrowser::SetPage(const std::string& name) {
+	if(name == "")
+		return;
+
 	for(auto& page : s_Pages)
-		if(page.GetName() == name)
+		if(page.GetName() == name) {
 			s_CurrentPage = &page;
+			return;
+		}
+
+	if(s_CurrentPage) {
+		namespace fs = std::filesystem;
+		fs::path p(s_CurrentPage->GetPath());
+		auto path = p.parent_path() / name;
+
+		s_CurrentPage = &s_Pages.emplace_back(path.string() + ".magma.ui.json");
+	}
 }
 
 }

@@ -20,8 +20,8 @@ VolcanicEngineDir    = os.getenv("VOLC_PATH");
 VolcaniCoreVendorDir = "%{VolcanicEngineDir}/VolcaniCore/vendor"
 MagmaVendorDir       = "%{VolcanicEngineDir}/Magma/vendor"
 
-include "Project/premake5.lua"
-include "UI/premake5.lua"
+include "Project"
+include "UI"
 
 VendorPaths = {}
 Includes = {}

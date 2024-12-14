@@ -292,7 +292,7 @@ void CompileElement(const std::string& genPath, const std::string& funcPath,
 	auto funcFile = File(funcPath);
 
 	std::string id = docElement["ID"].Get<std::string>();
-	cppFile.Write("\tm_Elements[\"" + id + "\"] = new " + id + ";");
+	cppFile.Write("\tm_Objects[\"" + id + "\"] = new " + id + ";");
 	hFile
 	.Write("class " + id + " : public UIObject {")
 	.Write("public:");

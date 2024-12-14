@@ -13,7 +13,7 @@ project "Project"
     targetdir ("build/bin")
 
     files {
-        "%{ProjectSrcDir}/**.cpp"
+        "%{ProjectSrcDir}/**.cpp",
     }
 
     includedirs {

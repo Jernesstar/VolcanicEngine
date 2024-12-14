@@ -1,6 +1,7 @@
 #include "Project.h"
 
 #include <cstdlib>
+#include <filesystem>
 
 #include <VolcaniCore/Core/Log.h>
 #include <VolcaniCore/Core/FileUtils.h>
@@ -9,23 +10,25 @@
 
 namespace fs = std::filesystem;
 
-using namespace VolcaniCore;
-
 namespace Magma {
 
-Project::Project(const fs::path& volcFilePath) {
-	Load(volcFilePath);
+Ref<Project> Project::Create(const std::string& volcPath) {
+	return CreateRef<Project>(volcPath);
+}
+
+Project::Project(const std::string& volcPath) {
+	Load(volcPath);
 }
 
 Project::~Project() {
 
 }
 
-void Project::Load(const fs::path& volcFilePath) {
-	if(volcFilePath == "")
+void Project::Load(const std::string& volcPath) {
+	if(volcPath == "")
 		return;
 
-	auto fullPath = fs::canonical(volcFilePath).parent_path();
+	auto fullPath = fs::canonical(volcPath).parent_path();
 	m_Name = fullPath.stem().string();
 	m_RootPath = fullPath.string();
 	m_SrcPath   = (fullPath / m_Name / "src").string();
@@ -36,6 +39,7 @@ void Project::Load(const fs::path& volcFilePath) {
 
 void Project::Reload() {
 	UI::UIBrowser::Load(m_AssetPath + "/ui");
+	VOLCANICORE_LOG_INFO(m_AssetPath.c_str());
 
 	std::string command;
 	command = "powershell 'Creating Makefiles';";
@@ -51,7 +55,6 @@ void Project::Reload() {
 	command += " -Args 'gmake2 --file=Magma\\projects\\premake5.lua',";
 	command += " (' --src=' + '\"' + $ProjectPath + '\"');";
 	command += "'Finished creating Makefiles'";
-	// VOLCANICORE_LOG_INFO(command.c_str());
 	system(command.c_str());
 
 	command = "powershell Start-Process mingw32-make.exe -NoNewWindow";

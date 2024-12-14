@@ -5,7 +5,7 @@ namespace Magma::UI {
 class UIObject {
 public:
 	virtual void OnUpdate(TimeStep ts) {
-		// Updatep
+		// Update
 	}
 
 	virtual void OnClick() {

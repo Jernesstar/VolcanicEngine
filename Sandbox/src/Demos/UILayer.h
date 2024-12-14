@@ -10,7 +10,7 @@ public:
 	void OnUpdate(TimeStep ts);
 
 private:
-	UI::UIPage Root;
+	Ref<Project> project;
 };
 
 UILayer::UILayer()
@@ -25,8 +25,8 @@ UILayer::UILayer()
 				Application::Close();
 		});
 
-	Root.Load("Magma/assets/ui/test");
-	// Root.Reload();
+	project = Project::Create("TestProj/.volc");
+	project->Reload();
 
 	VOLCANICORE_LOG_INFO("UI project is now running");
 }
@@ -38,7 +38,8 @@ UILayer::~UILayer() {
 void UILayer::OnUpdate(TimeStep ts) {
 	UI::UIRenderer::BeginFrame();
 
-	Root.Render();
+	// UI::UIBrowser::OnUpdate(ts);
+	// UI::UIBrowser::OnRender();
 
 	UI::UIRenderer::EndFrame();
 }
