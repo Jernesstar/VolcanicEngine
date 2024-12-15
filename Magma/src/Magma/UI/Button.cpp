@@ -23,8 +23,6 @@ Button::Button(const std::string& imagePath)
 
 void Button::Draw() {
 	m_State = UIRenderer::DrawButton(*this);
-	if(m_Root)
-		m_Root->OnEvent(m_ID, m_State);
 }
 
 }

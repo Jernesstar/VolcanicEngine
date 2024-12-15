@@ -23,7 +23,7 @@ UILayer::UILayer()
 				Application::Close();
 		});
 
-	project = Project::Create("TestProj/.volc");
+	project = Project::Create("TestProj/.volc.proj");
 	project->Reload();
 
 	VOLCANICORE_LOG_INFO("UI project is now running");
@@ -39,7 +39,7 @@ UILayer::~UILayer() {
 void UILayer::OnUpdate(TimeStep ts) {
 	UI::UIRenderer::BeginFrame();
 
-	// UI::UIBrowser::OnUpdate(ts);
+	UI::UIBrowser::OnUpdate(ts);
 	UI::UIBrowser::OnRender();
 
 	UI::UIRenderer::EndFrame();

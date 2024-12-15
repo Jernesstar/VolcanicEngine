@@ -18,10 +18,10 @@ public:
 
 public:
 	UIPage() = default;
-	UIPage(const std::string& filePath);
+	UIPage(const std::string& filePathName);
 	~UIPage() = default;
 
-	void Load(const std::string& filePath);
+	void Load(const std::string& filePathName);
 	void Reload();
 
 	void Update(TimeStep ts);

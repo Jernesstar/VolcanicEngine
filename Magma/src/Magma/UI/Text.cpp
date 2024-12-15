@@ -14,8 +14,6 @@ Text::Text(const std::string& text, const glm::vec4& textColor)
 
 void Text::Draw() {
 	m_State = UIRenderer::DrawText(*this);
-	if(m_Root)
-		m_Root->OnEvent(m_ID, m_State);
 }
 
 }

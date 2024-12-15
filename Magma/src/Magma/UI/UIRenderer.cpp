@@ -270,7 +270,7 @@ void UIRenderer::BeginFrame() {
 }
 
 void UIRenderer::EndFrame() {
-	while(s_Stack.size() > 0) {
+	while(s_Stack.size()) {
 		auto type = s_Stack.back();
 		s_Stack.pop_back();
 
