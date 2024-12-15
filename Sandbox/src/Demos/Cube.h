@@ -85,18 +85,18 @@ Cube::Cube()
 		});
 
 	shader = ShaderPipeline::Create("VolcaniCore/assets/shaders", "Mesh");
-	color = Texture::Create(480, 270,
-				Texture::InternalFormat::Normal,
-				Texture::SamplingOption::Nearest);
-	depth = Texture::Create(1920, 1080, Texture::InternalFormat::Depth);
-	framebuffer = Framebuffer::Create(
-		{
-			{ AttachmentTarget::Color, { { color } } },
-			{ AttachmentTarget::Depth, { { depth } } },
-		});
+	// color = Texture::Create(480, 270,
+	// 			Texture::InternalFormat::Normal,
+	// 			Texture::SamplingOption::Nearest);
+	// depth = Texture::Create(1920, 1080, Texture::InternalFormat::Depth);
+	// framebuffer = Framebuffer::Create(
+	// 	{
+	// 		{ AttachmentTarget::Color, { { color } } },
+	// 		{ AttachmentTarget::Depth, { { depth } } },
+	// 	});
 
-	drawPass = RenderPass::Create("Draw", shader);
-	drawPass->SetOutput(framebuffer);
+	// drawPass = RenderPass::Create("Draw", shader);
+	// drawPass->SetOutput(framebuffer);
 
 	cube = Mesh::Create(MeshPrimitive::Cube,
 		Material
@@ -123,6 +123,42 @@ Cube::Cube()
 	controller.RotationSpeed = 0.0f;
 	controller.TranslationSpeed = 20.0f;
 
+	BufferLayout vertexLayout =
+		{
+			{
+				{ "Position", BufferDataType::Vec3 },
+				{ "Normal",	  BufferDataType::Vec3 },
+				{ "TexCoord", BufferDataType::Vec2 },
+			},
+			true, // Dynamic
+			false // Structure of arrays
+		};
+
+	BufferLayout instanceLayout =
+		{
+			{
+				{ "Transform", BufferDataType::Mat4 }
+			},
+			true, // Dynamic
+			true  // Structure of arrays
+		};
+
+	DrawBufferSpecification specs
+	{
+		vertexLayout,
+		instanceLayout,
+		1'000'000,
+		1'000'000,
+		100'000
+	};
+
+	buffer = RendererAPI::Get()->NewDrawBuffer(specs);
+	buffer->AddIndices(Buffer(cube->GetIndices()));
+	buffer->AddVertices(Buffer(cube->GetVertices()));
+
+	buffer->AddIndices(Buffer(torch->GetIndices()));
+	buffer->AddVertices(Buffer(torch->GetVertices()));
+
 	UI::UIRenderer::Init();
 }
 
@@ -135,42 +171,97 @@ void Cube::OnUpdate(TimeStep ts) {
 
 	controller.OnUpdate(ts);
 
-	ImGui::Begin("Lights");
-	{
-		float r = camera->As<IsometricCamera>()->R;
-		if(ImGui::SliderFloat("Light.R", &r, 10.0f, 100.0f))
-			camera->As<IsometricCamera>()->SetDistance(r);
-	}
-	ImGui::End();
+	buffer->Clear(DrawBufferIndex::Instances);
 
-	ImGui::Begin("Debug");
-	{
-		ImGui::Text("FPS: %0.1f", Renderer::GetDebugInfo().FPS);
-		ImGui::Text("Draw Calls: %i", Renderer::GetDebugInfo().DrawCalls);
-		ImGui::Text("Indices: %i", Renderer::GetDebugInfo().Indices);
-		ImGui::Text("Vertices: %i", Renderer::GetDebugInfo().Vertices);
-		ImGui::Text("Instances: %i", Renderer::GetDebugInfo().Instances);
-	}
-	ImGui::End();
+	auto* cubeCommand = RendererAPI::Get()->NewDrawCommand(buffer);
+	cubeCommand->Clear = true;
+	cubeCommand->Pipeline = shader;
+	cubeCommand->ViewportWidth = 1920;
+	cubeCommand->ViewportHeight = 1080;
+	cubeCommand->UniformData
+	.SetTexture("u_Diffuse", { cube->GetMaterial().Diffuse, 0 });
+	cubeCommand->UniformData
+	.SetMat4("u_ViewProj", camera->GetViewProjection());
 
-	Renderer::StartPass(drawPass);
-	{
-		Renderer::Clear();
+	auto& cubeCall = cubeCommand->NewDrawCall();
+	cubeCall.Primitive = PrimitiveType::Triangle;
+	cubeCall.Partition = PartitionType::Instanced;
+	cubeCall.IndexStart = 0;
+	cubeCall.VertexStart = 0;
+	cubeCall.IndexCount = cube->GetIndices().size();
+	cubeCall.VertexCount = cube->GetVertices().size();
 
-		Renderer3D::Begin(camera);
+	auto* torchCommand = RendererAPI::Get()->NewDrawCommand(buffer);
+	torchCommand->Pipeline = shader;
+	// torchCommand->Clear = true;
+	torchCommand->ViewportWidth = 1920;
+	torchCommand->ViewportHeight = 1080;
+	torchCommand->UniformData
+	.SetTexture("u_Diffuse", { torch->GetMaterial().Diffuse, 0 });
+	torchCommand->UniformData
+	.SetMat4("u_ViewProj", camera->GetViewProjection());
+	torchCommand->InstancesIndex = 10'000;
 
-		for(int y = -50; y < 50; y++)
-			for(int x = -50; x < 50; x++) {
-				Renderer3D::DrawMesh(cube, { .Translation = { x, 0.0f, y } });
-				// Renderer3D::DrawMesh(torch, { .Translation = { x, 1.0f, y } });
-			}
+	auto& torchCall = torchCommand->NewDrawCall();
+	torchCall.Primitive = PrimitiveType::Triangle;
+	torchCall.Partition = PartitionType::Instanced;
+	torchCall.IndexStart = cube->GetIndices().size();
+	torchCall.VertexStart = cube->GetVertices().size();
+	torchCall.IndexCount = torch->GetIndices().size();
+	torchCall.VertexCount = torch->GetVertices().size();
 
-		Renderer3D::End();
-	}
-	Renderer::EndPass();
+	for(int y = -50; y < 50; y++)
+		for(int x = -50; x < 50; x++) {
+			Transform cubeTransform = { .Translation = { x, 0.0f, y } };
+			Transform torchTransform = { .Translation = { x, 1.0f, y } };
+			glm::mat4 cubeMat = cubeTransform.GetTransform();
+			glm::mat4 torchMat = torchTransform.GetTransform();
+			RendererAPI::Get()
+			->SetBufferData(buffer, DrawBufferIndex::Instances,
+							glm::value_ptr(cubeMat), 1, cubeCall.InstanceCount++);
+			RendererAPI::Get()
+			->SetBufferData(buffer, DrawBufferIndex::Instances,
+							glm::value_ptr(torchMat), 1, 10'000 + torchCall.InstanceCount++);
+		}
 
-	RendererAPI::Get()->EndFrame();
-	Renderer2D::DrawFullscreenQuad(framebuffer, AttachmentTarget::Color);
+	// ImGui::Begin("Lights");
+	// {
+	// 	float r = camera->As<IsometricCamera>()->R;
+	// 	if(ImGui::SliderFloat("Light.R", &r, 10.0f, 100.0f))
+	// 		camera->As<IsometricCamera>()->SetDistance(r);
+	// }
+	// ImGui::End();
+
+	// ImGui::Begin("Debug");
+	// {
+	// 	ImGui::Text("FPS: %0.1f", Renderer::GetDebugInfo().FPS);
+	// 	ImGui::Text("Draw Calls: %i", Renderer::GetDebugInfo().DrawCalls);
+	// 	ImGui::Text("Indices: %i", Renderer::GetDebugInfo().Indices);
+	// 	ImGui::Text("Vertices: %i", Renderer::GetDebugInfo().Vertices);
+	// 	ImGui::Text("Instances: %i", Renderer::GetDebugInfo().Instances);
+	// }
+	// ImGui::End();
+
+	// Renderer::StartPass(drawPass);
+	// {
+	// 	Renderer::Clear();
+
+	// 	Renderer3D::Begin(camera);
+
+	// 	for(int y = -50; y < 50; y++)
+	// 		for(int x = -50; x < 50; x++) {
+	// 			Renderer3D::DrawMesh(cube, { .Translation = { x, 0.0f, y } });
+	// 			// Renderer3D::DrawMesh(torch, { .Translation = { x, 1.0f, y } });
+	// 		}
+
+	// 	Renderer3D::End();
+	// }
+	// Renderer::EndPass();
+
+	// RendererAPI::Get()->EndFrame();
+	// Renderer2D::DrawFullscreenQuad(framebuffer, AttachmentTarget::Color);
+	// RendererAPI::Get()->EndFrame();
+
 	RendererAPI::Get()->EndFrame();
 
 	UI::UIRenderer::EndFrame();
