@@ -1,5 +1,9 @@
 #pragma once
 
+#include <VolcaniCore/Core/Time.h>
+
+using namespace VolcaniCore;
+
 namespace Magma::UI {
 
 class UIObject {

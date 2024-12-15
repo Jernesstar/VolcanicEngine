@@ -160,11 +160,10 @@ void Cube::OnUpdate(TimeStep ts) {
 		Renderer3D::Begin(camera);
 
 		for(int y = -50; y < 50; y++)
-			for(int x = -50; x < 50; x++)
+			for(int x = -50; x < 50; x++) {
 				Renderer3D::DrawMesh(cube, { .Translation = { x, 0.0f, y } });
-		for(int y = -50; y < 50; y++)
-			for(int x = -50; x < 50; x++)
-				Renderer3D::DrawMesh(torch, { .Translation = { x, 1.0f, y } });
+				// Renderer3D::DrawMesh(torch, { .Translation = { x, 1.0f, y } });
+			}
 
 		Renderer3D::End();
 	}

@@ -51,8 +51,12 @@ UIPage::UIPage(const std::string& filePathName) {
 void UIPage::Load(const std::string& filePathName) {
 	auto jsonPath = filePathName + ".magma.ui.json";
 	auto funcPath = filePathName + ".magma.ui.func";
-	if(!FileUtils::FileExists(jsonPath))
+	if(!FileUtils::FileExists(jsonPath)) {
+		VOLCANICORE_LOG_INFO(
+			"Could not find .magma.ui.json file with name %s",
+			filePathName.c_str());
 		return;
+	}
 
 	using namespace rapidjson;
 	namespace fs = std::filesystem;
@@ -89,9 +93,9 @@ void UIPage::Load(const std::string& filePathName) {
 }
 
 void UIPage::Reload() {
-	auto genPath = "Magma/projects/UI/gen/" + m_Name;
+	std::string buildPath = "Magma/projects/UI/build/bin/";
 
-	m_GenFile = CreateRef<DLL>(genPath + ".dll");
+	m_GenFile = CreateRef<DLL>(buildPath + "UI.dll");
 	auto load = m_GenFile->GetFunction<void>("LoadObjects");
 	load();
 }
@@ -105,6 +109,9 @@ void UIPage::UpdateElement(UIElement* element, TimeStep ts) {
 	auto get = m_GenFile->GetFunction<UIObject*, std::string>("GetObject");
 	auto* object = get(element->GetID());
 
+	if(!object)
+		return;
+
 	object->OnUpdate(ts);
 
 	for(auto* child : element->GetChildren())
@@ -117,11 +124,11 @@ void UIPage::Render() {
 }
 
 void UIPage::OnEvent(const std::string& id, const UIState& state) {
-	if(!m_GenFile)
-		return;
-
 	auto get = m_GenFile->GetFunction<UIObject*, std::string>("GetObject");
 	auto* object = get(id);
+
+	if(!object)
+		return;
 
 	if(state.Clicked)
 		object->OnClick();
@@ -266,12 +273,14 @@ void LoadElement(UIPage* page, const rapidjson::Value& docElement) {
 	auto x = docElement["x"].Get<uint32_t>();
 	auto y = docElement["y"].Get<uint32_t>();
 	const auto& array = docElement["Color"];
-	auto color = glm::vec4{
-		array[0].Get<float>(),
-		array[1].Get<float>(),
-		array[2].Get<float>(),
-		array[3].Get<float>()
-	};
+	auto color =
+		glm::vec4
+		{
+			array[0].Get<float>(),
+			array[1].Get<float>(),
+			array[2].Get<float>(),
+			array[3].Get<float>()
+		};
 
 	element->Color = color;
 	element->SetSize(width, height);
@@ -300,8 +309,8 @@ void CompileElement(const std::string& genPath, const std::string& funcPath,
 	std::string funcFileStr = funcFile.Get();
 	auto elementIdx = funcFileStr.find(id);
 
-	for(auto func : { "OnClick", "OnHover", "OnMouseUp", "OnMouseDown" }) {
-		std::string name = func;
+	for(std::string name : { "OnClick", "OnHover", "OnMouseUp", "OnMouseDown" })
+	{
 		if(!docElement.HasMember(name))
 			continue;
 
@@ -315,10 +324,13 @@ void CompileElement(const std::string& genPath, const std::string& funcPath,
 		}
 		if(element.IsString()) {
 			auto string = element.Get<std::string>();
+
 			if(string.substr(0, 4) == "@cpp") {
 				uint32_t left = string.find_first_of('{');
 				uint32_t right = string.find_last_of('}');
-				hFile.Write("\t\t" + string.substr(left + 2, right - left - 3));
+				if(string.find_first_not_of(' ') != right)
+					hFile.Write("\t\t" +
+								string.substr(left + 2, right - left - 3));
 			}
 			else if(string == "Default") {
 				uint32_t funcIdx = funcFileStr.find(name, elementIdx);
@@ -343,7 +355,7 @@ void CompileElement(const std::string& genPath, const std::string& funcPath,
 					}
 				}
 
-				hFile.Write("\t\t" + funcFileStr.substr(start + 1, max - start - 2));
+				hFile.Write(funcFileStr.substr(start + 2, max - start - 5));
 			}
 		}
 
@@ -366,8 +378,10 @@ void GenFiles(const std::string& genPath, const std::string& funcPath) {
 	auto elementsIdx = funcFileStr.find("namespace UIObjects");
 
 	hFile
-	.Write(funcFileStr.substr(0, elementsIdx))
+	.Write(funcFileStr.substr(0, elementsIdx - 1))
 	.Write("#include <Magma/UI/UI.h>")
+	.Write("#include <VolcaniCore/Core/Log.h>")
+	.Write("")
 	.Write("namespace UIObjects {\n");
 
 	cppFile
@@ -375,7 +389,8 @@ void GenFiles(const std::string& genPath, const std::string& funcPath) {
 	.Write("namespace UIObjects {\n")
 	.Write("static Map<std::string, UIObject*> m_Objects;\n")
 	.Write("extern \"C\" EXPORT UIObject* GetObject(const std::string& id) {")
-	.Write(	"\treturn m_Objects[id];")
+	.Write("\tif(!m_Objects.count(id)) { return nullptr; }")
+	.Write("\treturn m_Objects[id];")
 	.Write("}\n")
 	.Write("extern \"C\" EXPORT void LoadObjects() {");
 }

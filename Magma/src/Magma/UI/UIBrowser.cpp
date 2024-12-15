@@ -2,6 +2,7 @@
 
 #include <filesystem>
 
+#include <VolcaniCore/Core/Log.h>
 #include <VolcaniCore/Core/FileUtils.h>
 
 namespace Magma::UI {
@@ -19,29 +20,43 @@ void UIBrowser::OnRender() {
 }
 
 void UIBrowser::Load(const std::string& folderPath) {
-	for(auto filePath : FileUtils::GetFiles(folderPath, { ".magma.ui.json" }))
-		s_Pages.emplace_back(filePath);
+	namespace fs = std::filesystem;
+
+	for(auto filePath : FileUtils::GetFiles(folderPath, { ".json" })) {
+		fs::path p(filePath);
+		auto filePathName = folderPath / p.stem().stem().stem();
+		s_Pages.emplace_back(filePathName.string());
+	}
 
 	s_CurrentPage = &s_Pages[0];
 }
 
+void UIBrowser::Reload() {
+	for(auto& page : s_Pages)
+		page.Reload();
+}
+
 void UIBrowser::SetPage(const std::string& name) {
+	s_CurrentPage = GetPage(name);
+
+	// if(s_CurrentPage) {
+	// 	namespace fs = std::filesystem;
+	// 	fs::path p(s_CurrentPage->GetPath());
+	// 	auto path = p.parent_path() / name;
+
+	// 	s_CurrentPage = &s_Pages.emplace_back(path.string() + ".magma.ui.json");
+	// }
+}
+
+UIPage* UIBrowser::GetPage(const std::string& name) {
 	if(name == "")
-		return;
+		return nullptr;
 
 	for(auto& page : s_Pages)
-		if(page.GetName() == name) {
-			s_CurrentPage = &page;
-			return;
-		}
+		if(page.GetName() == name)
+			return &page;
 
-	if(s_CurrentPage) {
-		namespace fs = std::filesystem;
-		fs::path p(s_CurrentPage->GetPath());
-		auto path = p.parent_path() / name;
-
-		s_CurrentPage = &s_Pages.emplace_back(path.string() + ".magma.ui.json");
-	}
+	return nullptr;
 }
 
 }

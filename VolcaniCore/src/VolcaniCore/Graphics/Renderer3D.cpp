@@ -12,7 +12,7 @@ namespace VolcaniCore {
 static DrawBuffer* s_CubemapBuffer;
 static DrawBuffer* s_MeshBuffer;
 // static DrawBuffer* s_PointBuffer;
-static Ref<Mesh> s_LastMesh = nullptr;
+static Map<Ref<Mesh>, DrawCommand*> s_Meshes;
 
 void Renderer3D::Init() {
 	BufferLayout vertexLayout =
@@ -138,11 +138,10 @@ void Renderer3D::Begin(Ref<Camera> camera) {
 void Renderer3D::End() {
 	Renderer::EndCommand();
 
-	s_LastMesh = nullptr;
+	s_Meshes.clear();
 }
 
 void Renderer3D::DrawSkybox(Ref<Cubemap> cubemap) {
-	Renderer::GetCommand();
 
 }
 
@@ -150,9 +149,9 @@ void Renderer3D::DrawMesh(Ref<Mesh> mesh, const glm::mat4& tr) {
 	if(!mesh)
 		return;
 
-	if(s_LastMesh != mesh) {
-		s_LastMesh = mesh;
-
+	if(!s_Meshes.count(mesh)
+	|| s_Meshes[mesh]->Calls[0].InstanceCount >= 10'000)
+	{
 		auto* command = Renderer::NewCommand(s_MeshBuffer);
 		command->ViewportWidth = 1920;
 		command->ViewportHeight = 1080;
@@ -160,8 +159,6 @@ void Renderer3D::DrawMesh(Ref<Mesh> mesh, const glm::mat4& tr) {
 		auto& call = command->NewDrawCall();
 		call.Primitive = PrimitiveType::Triangle;
 		call.Partition = PartitionType::Instanced;
-		call.IndexStart = 0;
-		call.VertexStart = 0;
 		call.IndexCount  = mesh->GetIndices().size();
 		call.VertexCount = mesh->GetVertices().size();
 
@@ -181,9 +178,11 @@ void Renderer3D::DrawMesh(Ref<Mesh> mesh, const glm::mat4& tr) {
 				Material& mat = mesh->GetMaterial();
 				return { mat.Specular, 1 };
 			});
+
+		s_Meshes[mesh] = command;
 	}
 
-	auto* command = Renderer::GetCommand();
+	auto command = s_Meshes[mesh];
 	command->AddInstance(glm::value_ptr(tr));
 	command->Calls[0].InstanceCount++;
 }

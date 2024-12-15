@@ -36,7 +36,7 @@
             "y": 20,
             "Color": [0.0, 0.0, 0.0, 1.0],
 
-            "OnClick": "@cpp{ UIBrowser::SetPage(\"some_other_page\"); }",
+            "OnClick": "@cpp{ VOLCANICORE_LOG_INFO(\"Coming from Button1\"); }",
             "OnHover": "Default",
             "OnMouseUp": {
                 "Speed": 0.4,

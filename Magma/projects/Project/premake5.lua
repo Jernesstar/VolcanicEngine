@@ -6,9 +6,6 @@ project "Project"
     -- rtti "Off"
     -- staticruntime "Off"
 
-    ProjectSrcDir = _OPTIONS["src"]
-    -- ProjectSrcDir = "C:/Users/Jercy Mukala/Code/TheMazeIsLava/TheMazeIsLava/src"
-
     objdir ("build/obj")
     targetdir ("build/bin")
 

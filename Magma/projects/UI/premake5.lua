@@ -7,10 +7,12 @@ project "UI"
     targetdir ("build/bin")
 
     files {
-        "gen/*.cpp"
+        "gen/**.cpp"
     }
 
     includedirs {
+        "gen",
+
         "%{ProjectSrcDir}/**",
 
         "%{VolcanicEngineDir}/VolcaniCore/src",
@@ -37,8 +39,13 @@ project "UI"
         "%{Includes.stb_image}",
     }
 
+    libdirs {
+        "%{VolcanicEngineDir}/build/VolcaniCore/lib",
+        "%{VolcanicEngineDir}/build/Magma/lib"
+    }
+
     links {
-        "Project"
+        "Project",
 
         "Magma",
         "VolcaniCore",
@@ -57,11 +64,47 @@ project "UI"
         -- "PhysX",
     }
 
-    filter "toolset:gcc or toolset:clang"
-        buildoptions {
-            "-fexceptions",
-            "-Wno-format-security"
+    filter "system:windows"
+        systemversion "latest"
+
+        filter "system:linux"
+        links {
+            "pthread",
+            "dl",
+            "GL",
+            "X11",
         }
 
     filter "system:windows"
         systemversion "latest"
+        links {
+            "gdi32",
+            "kernel32",
+            "psapi",
+            "Ws2_32",
+        }
+
+    filter "system:macosx"
+        links {
+            "QuartzCore.framework",
+            "Metal.framework",
+            "Cocoa.framework",
+            "IOKit.framework",
+            "CoreVideo.framework"
+        }
+
+    filter "configurations:Debug"
+        runtime "Debug"
+        symbols "on"
+
+    filter "toolset:gcc or toolset:clang"
+        buildoptions {
+            "-fexceptions",
+            "-Wno-format-security",
+            "-Wno-pointer-arith"
+        }
+
+    filter "toolset:msc"
+        buildoptions {
+            "/NODEFAULTLIB:library"
+        }

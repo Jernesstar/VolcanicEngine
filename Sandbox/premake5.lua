@@ -77,6 +77,7 @@ project "Sandbox"
             "psapi",
             "Ws2_32",
         }
+
     filter "system:macosx"
         links {
             "QuartzCore.framework",
@@ -86,9 +87,9 @@ project "Sandbox"
             "CoreVideo.framework"
         }
 
-	filter "configurations:Debug"
-		runtime "Debug"
-		symbols "on"
+    filter "configurations:Debug"
+        runtime "Debug"
+        symbols "on"
 
     filter "toolset:gcc or toolset:clang"
         buildoptions {

@@ -16,8 +16,6 @@ private:
 UILayer::UILayer()
 	: Application(1920, 1080)
 {
-	UI::UIRenderer::Init();
-
 	Events::RegisterListener<KeyPressedEvent>(
 		[](const KeyPressedEvent& event)
 		{
@@ -29,6 +27,9 @@ UILayer::UILayer()
 	project->Reload();
 
 	VOLCANICORE_LOG_INFO("UI project is now running");
+	UI::UIBrowser::SetPage("test");
+
+	UI::UIRenderer::Init();
 }
 
 UILayer::~UILayer() {
@@ -39,7 +40,7 @@ void UILayer::OnUpdate(TimeStep ts) {
 	UI::UIRenderer::BeginFrame();
 
 	// UI::UIBrowser::OnUpdate(ts);
-	// UI::UIBrowser::OnRender();
+	UI::UIBrowser::OnRender();
 
 	UI::UIRenderer::EndFrame();
 }

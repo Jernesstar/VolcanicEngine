@@ -30,15 +30,17 @@ DLL::~DLL() {
 
 FuncPtr<void> DLL::GetFuncPtr(void* handle, const std::string& name) {
 #if VOLCANICENGINE_WINDOWS
-	VOLCANICORE_ASSERT(GetProcAddress((HMODULE)handle, name.c_str()));
+	FARPROC funcPtr = GetProcAddress((HMODULE)handle, name.c_str());
 	DWORD lastError = GetLastError();
 	static char buf[1024];
-	FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, lastError, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), buf, sizeof(buf), NULL);
-	VOLCANICORE_LOG_ERROR(buf);
+	FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+				   NULL, lastError, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+				   buf, sizeof(buf), NULL);
+	VOLCANICORE_ASSERT_ARGS(funcPtr, "DLL Load function error: %s", buf);
 
-	return (FuncPtr<void>)GetProcAddress((HMODULE)handle, name.c_str());
+	return (FuncPtr<void>)funcPtr;
 #elif VOLCANICENGINE_LINUX
-	return (FuncPtr<void>)dlsym(handle, name);
+	return (FuncPtr<void>)dlsym(handle, name.c_str());
 #endif
 }
 

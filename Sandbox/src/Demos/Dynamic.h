@@ -26,7 +26,7 @@ DLL::DLL() {
 				Application::Close();
 		});
 
-	m_DLL = CreateRef<Magma::DLL>("build\\TestProj\\lib\\TestProj.dll");
+	m_DLL = CreateRef<Magma::DLL>("build/TestProj/lib/TestProj.dll");
 
 	auto load = m_DLL->GetFunction<void>("Load");
 	auto get = m_DLL->GetFunction<TestObject*, std::string>("Get");

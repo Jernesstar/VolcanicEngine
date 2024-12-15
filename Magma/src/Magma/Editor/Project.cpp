@@ -34,13 +34,10 @@ void Project::Load(const std::string& volcPath) {
 	m_SrcPath   = (fullPath / m_Name / "src").string();
 	m_AssetPath = (fullPath / m_Name / "assets").string();
 
-	// Reload();
+	UI::UIBrowser::Load((fs::path(m_AssetPath) / "ui").string());
 }
 
 void Project::Reload() {
-	UI::UIBrowser::Load(m_AssetPath + "/ui");
-	VOLCANICORE_LOG_INFO(m_AssetPath.c_str());
-
 	std::string command;
 	command = "powershell 'Creating Makefiles';";
 	command += "$ProjectPath = \'" + m_SrcPath + "\';";
@@ -57,10 +54,12 @@ void Project::Reload() {
 	command += "'Finished creating Makefiles'";
 	system(command.c_str());
 
-	command = "powershell Start-Process mingw32-make.exe -NoNewWindow";
+	command = "powershell Start-Process mingw32-make.exe -NoNewWindow -Wait";
 	command += " -WorkingDir Magma\\projects\\build";
 	command += " -ArgumentList '-f Makefile';";
 	system(command.c_str());
+
+	UI::UIBrowser::Reload();
 }
 
 void Project::Run() {

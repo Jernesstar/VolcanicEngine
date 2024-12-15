@@ -10,6 +10,7 @@ public:
 	static void OnRender();
 
 	static void Load(const std::string& folderPath);
+	static void Reload();
 	static void SetPage(const std::string& name);
 	static UIPage* GetPage(const std::string& name);
 };

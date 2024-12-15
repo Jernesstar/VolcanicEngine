@@ -1,7 +1,7 @@
 #pragma once
 
-#include <Magma/UI/UIRenderer.h>
 #include <Magma/UI/UIObject.h>
+#include <Magma/UI/UIRenderer.h>
 
 using namespace Magma::UI;
 
@@ -9,8 +9,12 @@ namespace UIObjects {
 
 class Button1 : public UIObject {
 public:
+	void OnUpdate(TimeStep ts) override {
+
+	}
+
 	void OnHover() override {
-		UIRenderer::ShowPopupLabel("This is Button1");
+		UIRenderer::ShowPopupLabel("This is the one and only Button1");
 	}
 };
 
