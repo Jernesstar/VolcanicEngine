@@ -14,19 +14,15 @@ void PhysicsSystem::Update(TimeStep ts) {
 
 void PhysicsSystem::Run(Phase phase) {
 	if(phase == Phase::PreUpdate) {
-		// m_EntityWorld->GetNative()
-		// .query_builder(m_EntityWorld->GetNative(), m_Query)
-		// .with<TransformComponent>()
-		// .build()
-		// .each(
-		// 	[this](flecs::entity id)
-		// 	{
-		// 		Entity entity{ id };
-		// 		auto [rc] = GetRequired(entity);
-		// 		auto t = entity.Get<TransformComponent>();
+		m_EntityWorld
+		->ForEach<RigidBodyComponent, TransformComponent>(
+			[this](Entity& entity)
+			{
+				auto [rc] = GetRequired(entity);
+				auto t = entity.Get<TransformComponent>();
 
-		// 		rc.Body->UpdateTransform({ t.Translation, t.Rotation, t.Scale });
-		// 	});
+				rc.Body->UpdateTransform({ t.Translation, t.Rotation, t.Scale });
+			});
 	}
 
 	if(phase == Phase::OnUpdate) {
@@ -34,21 +30,18 @@ void PhysicsSystem::Run(Phase phase) {
 	}
 
 	if(phase == Phase::PostUpdate) {
-		// m_EntityWorld->GetNative()
-		// .query_builder(m_EntityWorld->GetNative(), m_Query)
-		// .build()
-		// .each(
-		// [this](flecs::entity id)
-		// {
-		// 	Entity entity{ id };
-		// 	auto [rc] = GetRequired(entity);
-		// 	auto& tc = entity.Get<TransformComponent>();
+		m_EntityWorld
+		->ForEach<RigidBodyComponent, TransformComponent>(
+			[this](Entity& entity)
+			{
+				auto [rc] = GetRequired(entity);
+				auto& tc = entity.Get<TransformComponent>();
 
-		// 	Transform tr = rc.Body->GetTransform();
-		// 	tc.Translation = tr.Translation;
-		// 	tc.Rotation	   = tr.Rotation;
-		// 	tc.Scale	   = tr.Scale;
-		// });
+				Transform tr = rc.Body->GetTransform();
+				tc.Translation = tr.Translation;
+				tc.Rotation	   = tr.Rotation;
+				tc.Scale	   = tr.Scale;
+			});
 	}
 }
 
@@ -58,8 +51,7 @@ void PhysicsSystem::Register(Entity& entity) {
 	m_World.AddActor(actor);
 }
 
-void PhysicsSystem::Collides(Entity& e1, Entity& e2)
-{
+void PhysicsSystem::Collides(Entity& e1, Entity& e2) {
 	if(e1 == e2)
 		return;
 

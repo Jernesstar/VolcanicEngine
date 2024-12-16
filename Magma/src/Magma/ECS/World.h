@@ -9,22 +9,31 @@
 #include "Core/TypeID.h"
 
 #include "Entity.h"
+#include "EntityBuilder.h"
 #include "Component.h"
 #include "System.h"
-
-#include "EntityBuilder.h"
+#include "Events.h"
 
 using namespace VolcaniCore;
 
 namespace Magma::ECS {
 
 template<typename>
-struct strip;
+struct stripSystem;
 
 template<typename ...T>
-struct strip<std::tuple<T...>>
+struct stripSystem<std::tuple<T...>>
 {
 	using type = flecs::system_builder<T...>;
+};
+
+template<typename>
+struct stripObserver;
+
+template<typename ...T>
+struct stripObserver<std::tuple<T...>>
+{
+	using type = flecs::observer<T...>;
 };
 
 class World {
@@ -53,12 +62,16 @@ public:
 
 	template<typename TSystem>
 	void Add(const List<Phase>& phases) {
-		auto id = TypeIDGenerator<System<>>::GetID<TSystem>();
+		using SystemType =
+			stripSystem<typename TSystem::RequiredComponents>::type;
+		using ObserverType =
+			stripObserver<typename TSystem::RequiredComponents>::type;
+
+ 		auto id = TypeIDGenerator<System<>>::GetID<TSystem>();
 		if(!m_Systems.count(id))
 			m_Systems[id] = new TSystem(this);
 
 		auto sys = (TSystem*)m_Systems[id];
-		using SystemType = strip<typename TSystem::RequiredComponents>::type;
 
 		for(const auto& phase : phases)
 			SystemType(m_World)
@@ -71,6 +84,10 @@ public:
 					sys->Run(phase);
 				});
 
+		ObserverType(m_World)
+		.event(flecs::OnSet)
+		.each(
+			[&](flecs::entity e, RigidBodyComponent& r)
 	}
 
 	template<typename TSystem>
@@ -83,18 +100,6 @@ public:
 	}
 
 	void ForEach(const Func<void, Entity&>& func);
-
-	template<typename TComponent>
-	void ForEach(const Func<void, Entity&>& func) {
-		flecs::query<TComponent> query = GetQuery<TComponent>();
-
-		query.each(
-			[func](flecs::entity handle, TComponent& _)
-			{
-				Entity entity{ handle };
-				func(entity);
-			});
-	}
 
 	template<typename ...TComponents>
 	void ForEach(const Func<void, Entity&>& func) {

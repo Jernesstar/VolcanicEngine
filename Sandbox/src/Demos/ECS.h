@@ -24,7 +24,6 @@ ECS::ECS() {
 		});
 
 	scene = CreateRef<Scene>("Titled Scene");
-	renderer.SetContext(scene.get());
 	renderer.GetCameraController().TranslationSpeed = 20.0f;
 
 	auto& world = scene->EntityWorld;
@@ -78,14 +77,12 @@ ECS::ECS() {
 }
 
 void ECS::OnUpdate(TimeStep ts) {
-	// RendererAPI::Get()->Clear();
-
 	renderer.Update(ts);
 	scene->OnUpdate(ts);
 	scene->OnRender(renderer);
 
-	auto output = renderer.GetOutput();
-	// RendererAPI::Get()->RenderFramebuffer(output, AttachmentTarget::Color);
+	Ref<Framebuffer> output = renderer.GetOutput();
+	Renderer2D::DrawFullscreenQuad(output, AttachmentTarget::Color);
 }
 
 }

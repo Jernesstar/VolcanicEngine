@@ -52,6 +52,9 @@ void DefaultSceneRenderer::SetContext(Scene* scene) {
 }
 
 void DefaultSceneRenderer::Update(TimeStep ts) {
+	if(!m_Scene)
+		return;
+
 	auto cameraEntity = m_Scene->EntityWorld.GetEntity("MainCamera");
 	if(!cameraEntity.IsValid())
 		return;
