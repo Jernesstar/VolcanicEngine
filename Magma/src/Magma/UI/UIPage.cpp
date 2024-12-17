@@ -313,7 +313,8 @@ void LoadElement(UIPage* page, const rapidjson::Value& docElement) {
 void CompileElement(const std::string& genPath, const std::string& funcPath,
 					const rapidjson::Value& docElement)
 {
-	if(!docElement.HasMember("OnClick")
+	if(!docElement.HasMember("OnUpdate")
+	&& !docElement.HasMember("OnClick")
 	&& !docElement.HasMember("OnHover")
 	&& !docElement.HasMember("OnMouseUp")
 	&& !docElement.HasMember("OnMouseDown"))
@@ -332,15 +333,18 @@ void CompileElement(const std::string& genPath, const std::string& funcPath,
 	std::string funcFileStr = funcFile.Get();
 	auto elementIdx = funcFileStr.find(id);
 
-	for(std::string name : { "OnClick", "OnHover", "OnMouseUp", "OnMouseDown" })
+	for(std::string name :
+		{ "OnUpdate", "OnClick", "OnHover", "OnMouseUp", "OnMouseDown" })
 	{
 		if(!docElement.HasMember(name))
 			continue;
 
 		const auto& element = docElement[name];
 
-		hFile.Write("\tvoid " + name + "() override {");
-		hFile.Write("\t\tUIObject::" + name + "();");
+		hFile.Write("\tvoid " + name + "(" +
+					(name == "OnUpdate" ? "TimeStep ts" : "") + ") override {");
+		hFile.Write("\t\tUIObject::" + name + "(" +
+					(name == "OnUpdate" ? "ts" : "") + ");");
 
 		if(element.IsObject()) {
 			// Animation
@@ -397,8 +401,8 @@ void GenFiles(const std::string& genPath, const std::string& funcPath) {
 	auto hFile = File(genPath + ".h");
 	auto cppFile = File(genPath + ".cpp");
 	auto funcFile = File(funcPath);
-	auto funcFileStr = funcFile.Get();
-	auto elementsIdx = funcFileStr.find("namespace UIObjects");
+	std::string funcFileStr = funcFile.Get();
+	uint64_t elementsIdx = funcFileStr.find("namespace UIObjects");
 
 	hFile
 	.Write(funcFileStr.substr(0, elementsIdx - 1))
