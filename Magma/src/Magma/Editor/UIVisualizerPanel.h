@@ -2,22 +2,22 @@
 
 #include "Panel.h"
 
-#include "UI/UI.h"
+#include "UI/UIPage.h"
 
 namespace Magma {
 
 class UIVisualizerPanel : public Panel {
 public:
-	UIVisualizerPanel(Ref<UI::UIElement> scene);
+	UIVisualizerPanel(UI::UIPage* page);
 	~UIVisualizerPanel() = default;
 
-	void SetContext(Ref<UI::UIElement> scene);
+	void SetContext(UI::UIPage* page);
 
 	void Update(TimeStep ts) override;
 	void Draw() override;
 
 private:
-
+	UI::UIPage* m_Context;
 };
 
 }

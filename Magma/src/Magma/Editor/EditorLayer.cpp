@@ -12,9 +12,10 @@
 #include <VolcaniCore/Core/Input.h>
 #include <VolcaniCore/Graphics/RendererAPI.h>
 
-#include "UI/UISerializer.h"
+#include "UI/UIRenderer.h"
 
 using namespace VolcaniCore;
+using namespace Magma::UI;
 
 namespace Magma {
 
@@ -36,8 +37,8 @@ struct {
 
 EditorLayer::EditorLayer() {
 	NewProject();
-	m_Project->Load("../TheMazeIsLava/.volc.proj");
-	Application::GetWindow()->SetTitle("Magma Editor: " + m_Project->GetName());
+	// m_Project->Load("../TheMazeIsLava/.volc.proj");
+	// Application::GetWindow()->SetTitle("Magma Editor: " + m_Project->GetName());
 
 	auto tab = CreateRef<SceneTab>("Magma/assets/scenes/temp.magma.scene");
 	NewTab(tab);
@@ -121,33 +122,13 @@ void EditorLayer::Render() {
 
 				ImGui::EndTabItem();
 			}
-			
+
 			Ref<Tab> tabToDelete = nullptr;
-			uint32_t i = 0;
 			for(auto tab : m_Tabs) {
-				auto name = tab->GetName();
-				auto size = ImGui::CalcTextSize(name.c_str());
-				float padding{4.0f};
-				ImGui::SetNextItemWidth(size.x + 6.0f*padding);
-
-				auto strID = name + "##" + std::to_string(i++);
-				bool tabItem = ImGui::BeginTabItem(strID.c_str());
-
-				float tabHeight{6.5f};
-				float radius{ tabHeight * 0.5f - padding };
-				ImVec2 pos;
-				pos.x = ImGui::GetItemRectMax().x - radius - 5.0f*padding;
-				pos.y = ImGui::GetItemRectMin().y + radius + padding;
-
-				if(tabItem) {
-					if(ImGui::IsItemClicked(0))
-						m_CurrentTab = tab;
-
-					ImGui::EndTabItem();
-				}
-
-				auto closeButtonID = ImGui::GetID(("Close##" + strID).c_str());
-				if(ImGui::CloseButton(closeButtonID, pos))
+				TabState state = UIRenderer::DrawTab(tab->GetName());
+				if(state.Clicked)
+					m_CurrentTab = tab;
+				if(state.Closed)
 					tabToDelete = tab;
 			}
 
@@ -156,7 +137,6 @@ void EditorLayer::Render() {
 		}
 		ImGui::EndTabBar();
 
-		// DockSpace
 		ImGuiID dockspaceID = ImGui::GetID("DockSpace");
 		ImGui::DockSpace(dockspaceID, ImVec2(0.0f, 0.0f), dockspaceFlags);
 
@@ -194,8 +174,8 @@ void EditorLayer::NewTab(const Scene& scene) {
 	NewTab(newTab);
 }
 
-void EditorLayer::NewTab(Ref<UI::UIElement> element) {
-	Ref<Tab> newTab = CreateRef<UITab>(element);
+void EditorLayer::NewTab(const UI::UIPage& page) {
+	Ref<Tab> newTab = CreateRef<UITab>(page);
 	NewTab(newTab);
 }
 
@@ -217,8 +197,7 @@ void EditorLayer::OpenTab() {
 		if(instance->IsOk()) {
 			fs::path path = instance->GetFilePathName();
 			if(path.extension() == ".json")
-				;
-				// NewTab(UI::UISerializer::Load(path.string()));
+				NewTab(UI::UIPage(path.string()));
 			else
 				NewTab(Scene(path.string()));
 		}
@@ -244,13 +223,12 @@ void EditorLayer::CloseTab(Ref<Tab> tabToDelete) {
 		return;
 
 	auto it = std::find(m_Tabs.begin(), m_Tabs.end(), tabToDelete);
+	uint32_t index = std::distance(m_Tabs.begin(), it);
 	m_Tabs.erase(it);
 	m_ClosedTabs.push_back(tabToDelete);
 
-	uint32_t index = std::distance(m_Tabs.begin(), it);
 	if(tabToDelete == m_CurrentTab)
 		m_CurrentTab = (index > 0) ? m_Tabs[index - 1] : nullptr;
-
 }
 
 void EditorLayer::NewProject() {

@@ -49,6 +49,9 @@ UIPage::UIPage(const std::string& filePathName) {
 }
 
 void UIPage::Load(const std::string& filePathName) {
+	if(filePathName == "")
+		return;
+
 	auto jsonPath = filePathName + ".magma.ui.json";
 	auto funcPath = filePathName + ".magma.ui.func";
 	if(!FileUtils::FileExists(jsonPath)) {
@@ -183,6 +186,15 @@ UIElement* UIPage::Get(const UINode& node) const {
 	}
 
 	return nullptr;
+}
+
+void UIPage::Clear() {
+	Windows.clear();
+	Buttons.clear();
+	Dropdowns.clear();
+	Texts.clear();
+	TextInputs.clear();
+	Images.clear();
 }
 
 UIElement* UIPage::Get(const std::string& id) const {

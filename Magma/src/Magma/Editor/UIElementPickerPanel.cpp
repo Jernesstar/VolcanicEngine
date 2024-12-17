@@ -10,14 +10,14 @@
 
 namespace Magma {
 
-UIElementPickerPanel::UIElementPickerPanel(Ref<UI::UIElement> ui)
+UIElementPickerPanel::UIElementPickerPanel(UI::UIPage* page)
 	: Panel("UIElementPicker")
 {
-	SetContext(ui);
+	SetContext(page);
 }
 
-void UIElementPickerPanel::SetContext(Ref<UI::UIElement> ui) {
-
+void UIElementPickerPanel::SetContext(UI::UIPage* page) {
+	m_Context = page;
 }
 
 void UIElementPickerPanel::Update(TimeStep ts) {

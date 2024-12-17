@@ -167,8 +167,8 @@ DrawCommand* Renderer::NewDrawCommand(DrawBuffer* buffer) {
 }
 
 void FlushCommand(DrawCommand& command) {
-	command.Pipeline->As<OpenGL::ShaderProgram>()->Bind();
-
+	if(command.Pipeline)
+		command.Pipeline->As<OpenGL::ShaderProgram>()->Bind();
 	if(command.Image)
 		command.Image->As<OpenGL::Framebuffer>()->Bind();
 
@@ -192,8 +192,8 @@ void FlushCommand(DrawCommand& command) {
 
 	if(command.Image)
 		command.Image->As<OpenGL::Framebuffer>()->Unbind();
-
-	command.Pipeline->As<OpenGL::ShaderProgram>()->Unbind();
+	if(command.Pipeline)
+		command.Pipeline->As<OpenGL::ShaderProgram>()->Unbind();
 }
 
 void FlushCall(DrawCall& call) {

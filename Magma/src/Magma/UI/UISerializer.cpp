@@ -127,44 +127,4 @@ void UISerializer::Save(UIPage* page, const std::string& path) {
 	serializer.Finalize(path);
 }
 
-template<>
-Window* UISerializer::Deserialize(JSONParserNode& serializer) {
-	
-}
-
-template<>
-Button* UISerializer::Deserialize(JSONParserNode& serializer) {
-	
-}
-
-template<>
-Dropdown* UISerializer::Deserialize(JSONParserNode& serializer) {
-	
-}
-
-template<>
-Text* UISerializer::Deserialize(JSONParserNode& serializer) {
-	
-}
-
-template<>
-TextInput* UISerializer::Deserialize(JSONParserNode& serializer) {
-	
-}
-
-template<>
-Image* UISerializer::Deserialize(JSONParserNode& serializer) {
-	
-}
-
-template<>
-UIElement* UISerializer::Deserialize(JSONParserNode& serializer) {
-	
-}
-
-UIPage* UISerializer::Load(const std::string& path) {
-	// TODO(Implement):
-
-}
-
 }

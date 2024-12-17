@@ -27,17 +27,17 @@ struct {
 } menu;
 
 UITab::UITab() {
-	SetUI(CreateRef<UI::Empty>());
 	Setup();
 }
 
-UITab::UITab(Ref<UI::UIElement> root) {
-	SetUI(root);
+UITab::UITab(const UI::UIPage& page)
+	: m_Root(page)
+{
 	Setup();
 }
 
 UITab::~UITab() {
-	// UI::UISerializer::Save(m_Root, "Magma/assets/scenes/.magma.ui.json");
+	UI::UISerializer::Save(&m_Root, "Magma/assets/ui/.magma.ui.json");
 }
 
 void UITab::Update(TimeStep ts) {
@@ -100,30 +100,26 @@ void UITab::Render() {
 }
 
 void UITab::Setup() {
-	auto panel1 = CreateRef<UIElementPickerPanel>(m_Root);
+	auto panel1 = CreateRef<UIElementPickerPanel>(&m_Root);
 	panel1->Close();
-	auto panel2 = CreateRef<UIVisualizerPanel>(m_Root);
+	auto panel2 = CreateRef<UIVisualizerPanel>(&m_Root);
 	panel2->Close();
 
 	m_Panels.push_back(panel1);
 	m_Panels.push_back(panel2);
 }
 
-void UITab::SetUI(Ref<UI::UIElement> ui) {
-	m_Root = ui;
+void UITab::SetUI(const std::string& path) {
+	m_Root.Load(path);
 
 	auto picker = GetPanel("UIElementPicker")->As<UIElementPickerPanel>();
 	auto visual = GetPanel("UIVisualizer")->As<UIVisualizerPanel>();
-	picker->SetContext(m_Root);
-	visual->SetContext(m_Root);
-}
-
-void UITab::SetUI(const std::string& path) {
-	// SetUI(UI::UISerializer::Load(path));
+	picker->SetContext(&m_Root);
+	visual->SetContext(&m_Root);
 }
 
 void UITab::NewUI() {
-	m_Root = CreateRef<UI::Empty>();
+	m_Root.Clear();
 	menu.file.newUI = false;
 }
 
@@ -136,7 +132,8 @@ void UITab::OpenUI() {
 	if(instance->Display("ChooseFile")) {
 		if(instance->IsOk()) {
 			std::string path = instance->GetFilePathName();
-			// m_Root = UI::UISerializer::Load(path);
+			m_Root.Clear();
+			m_Root.Load(path);
 		}
 
 		instance->Close();
@@ -153,7 +150,7 @@ void UITab::SaveUI() {
 	if(instance->Display("ChooseFile")) {
 		if(instance->IsOk()) {
 			std::string path = instance->GetFilePathName();
-			// UI::UISerializer::Save(m_Root, path);
+			UI::UISerializer::Save(&m_Root, path);
 		}
 
 		instance->Close();

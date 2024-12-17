@@ -27,14 +27,14 @@ struct stripSystem<std::tuple<T...>>
 	using type = flecs::system_builder<T...>;
 };
 
-template<typename>
-struct stripObserver;
+// template<typename>
+// struct stripObserver;
 
-template<typename ...T>
-struct stripObserver<std::tuple<T...>>
-{
-	using type = flecs::observer<T...>;
-};
+// template<typename ...T>
+// struct stripObserver<std::tuple<T...>>
+// {
+// 	using type = flecs::observer<T...>;
+// };
 
 class World {
 public:
@@ -64,8 +64,8 @@ public:
 	void Add(const List<Phase>& phases) {
 		using SystemType =
 			stripSystem<typename TSystem::RequiredComponents>::type;
-		using ObserverType =
-			stripObserver<typename TSystem::RequiredComponents>::type;
+		// using ObserverType =
+		// 	stripObserver<typename TSystem::RequiredComponents>::type;
 
  		auto id = TypeIDGenerator<System<>>::GetID<TSystem>();
 		if(!m_Systems.count(id))
@@ -84,10 +84,10 @@ public:
 					sys->Run(phase);
 				});
 
-		ObserverType(m_World)
-		.event(flecs::OnSet)
-		.each(
-			[&](flecs::entity e, RigidBodyComponent& r)
+		// ObserverType(m_World)
+		// .event(flecs::OnSet)
+		// .each(
+		// 	[&](flecs::entity e, RigidBodyComponent& r)
 	}
 
 	template<typename TSystem>

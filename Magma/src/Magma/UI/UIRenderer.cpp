@@ -40,7 +40,8 @@ UIState UIRenderer::DrawWindow(UI::Window& window) {
 	s_Stack.push_back(UIElementType::Window);
 
 	ImGuiViewport* viewport = ImGui::GetMainViewport();
-	ImGui::SetNextWindowPos(ImVec2(viewport->Pos.x + window.x, viewport->Pos.y + window.y));
+	ImGui::SetNextWindowPos(
+		ImVec2(viewport->Pos.x + window.x, viewport->Pos.y + window.y));
 	ImGui::SetNextWindowSize(ImVec2(window.Width, window.Height));
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 1.0f);
@@ -128,8 +129,7 @@ UIState UIRenderer::DrawText(UI::Text& text) {
 	text.Width = size.x;
 	text.Height = size.y;
 
-	ImVec4 color{ text.Color.r, text.Color.g, text.Color.b, text.Color.a };
-	ImGui::PushStyleColor(ImGuiCol_Text, color);
+	ImGui::PushStyleColor(ImGuiCol_Text, text.Color);
 	ImGui::SetCursorPos(ImVec2(text.x, text.y));
 
 	ImGui::Text(text.Content.c_str());
@@ -227,34 +227,29 @@ UIState UIRenderer::DrawTabBar(const std::string& name) {
 }
 
 TabState UIRenderer::DrawTab(const std::string& name) {
-	s_Stack.push_back(UIElementType::Tab);
+	// s_Stack.push_back(UIElementType::Tab);
 
-	auto size = ImGui::CalcTextSize(name.c_str());
+	ImVec2 size = ImGui::CalcTextSize(name.c_str());
 	float padding{4.0f};
-	ImGui::SetNextItemWidth(size.x + 6.0f*padding);
-
-	auto strID = name + "##";
-	bool tabItem = ImGui::BeginTabItem(strID.c_str());
-
 	float tabHeight{6.5f};
 	float radius{ tabHeight * 0.5f - padding };
+
+	ImGui::SetNextItemWidth(size.x + 6.0f*padding);
+	bool tabItem = ImGui::BeginTabItem(name.c_str());
+
 	ImVec2 pos;
 	pos.x = ImGui::GetItemRectMax().x - radius - 5.0f*padding;
 	pos.y = ImGui::GetItemRectMin().y + radius + padding;
 
 	TabState state;
 	if(tabItem) {
-		if(ImGui::IsItemClicked(0))
-			state.Clicked = true;
-		if(ImGui::IsItemHovered())
-			state.Hovered = true;
-
+		state.Clicked = ImGui::IsItemClicked(0);
+		state.Hovered = ImGui::IsItemHovered();
 		ImGui::EndTabItem();
 	}
 
-	auto closeButtonID = ImGui::GetID(("Close##" + strID).c_str());
-	if(ImGui::CloseButton(closeButtonID, pos))
-		state.Closed = true;
+	auto closeButtonID = ImGui::GetID(("CloseButton##" + name).c_str());
+	state.Closed = ImGui::CloseButton(closeButtonID, pos);
 
 	return state;
 }

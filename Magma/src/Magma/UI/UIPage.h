@@ -12,6 +12,15 @@ namespace Magma::UI {
 
 using UINode = std::pair<UIElement::Type, uint32_t>;
 
+struct ThemeElement {
+	uint32_t Width;
+	uint32_t Height;
+	glm::vec4 Color;
+	glm::vec4 BorderColor;
+	Ref<Texture> BorderImage;
+	
+};
+
 class UIPage {
 public:
 	bool Visible = true;
@@ -50,6 +59,8 @@ public:
 		return { GetType<TUIElement>(), list.size() };
 	}
 
+	void Clear();
+
 	UIElement* Get(const UINode& node) const;
 	UIElement* Get(const std::string& id) const;
 	List<UIElement*> GetFirstOrderElements() const;
@@ -67,7 +78,8 @@ private:
 	List<Image> Images;
 
 	List<UINode> m_FirstOrders;
-	Map<std::string, UIState> m_States;
+
+	Map<UIElement::Type, ThemeElement> m_Theme;
 
 	std::string m_Path;
 	std::string m_Name;
