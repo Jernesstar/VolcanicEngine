@@ -38,23 +38,28 @@ static List<UIType> s_Stack;
 UIState UIRenderer::DrawWindow(UI::Window& window) {
 	s_Stack.push_back(UIType::Window);
 
-	ImGuiViewport* viewport = ImGui::GetMainViewport();
 	int32_t alignX = 0;
 	int32_t alignY = 0;
-	switch(window.xAlignment) {
-		case XAlignment::Center:
-			alignX = viewport->WorkSize.x / 2;
-			break;
-		case XAlignment::Right:
-			alignX = viewport->WorkSize.x;
+	ImGuiViewport* viewport = ImGui::GetMainViewport();
+
+	if(!window.GetParent()) {
+		switch(window.xAlignment) {
+			case XAlignment::Center:
+				alignX = viewport->Size.x / 2;
+				break;
+			case XAlignment::Right:
+				alignX = viewport->Size.x;
+		}
+		switch(window.yAlignment) {
+			case YAlignment::Center:
+				alignY = viewport->Size.y / 2;
+				break;
+			case YAlignment::Bottom:
+				alignY = viewport->Size.y;
+		}
 	}
-	switch(window.yAlignment) {
-		case YAlignment::Center:
-			alignY = viewport->WorkSize.y / 2;
-			break;
-		case YAlignment::Bottom:
-			alignY = viewport->WorkSize.y;
-	}
+	else
+		window.Align();
 
 	ImGui::SetNextWindowPos(
 		ImVec2

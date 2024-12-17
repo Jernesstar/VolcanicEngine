@@ -164,7 +164,7 @@ UINode UIPage::Add(UIElementType type, const std::string& id) {
 			return { type, Images.size() - 1 };
 	}
 
-	return { UIElementType::Window, Windows.size() };
+	return { UIElementType::None, 0 };
 }
 
 UIElement* UIPage::Get(const UINode& node) const {
@@ -279,23 +279,35 @@ void LoadElement(UIPage* page, const rapidjson::Value& docElement) {
 		page->Get(parent)->Add(node);
 
 	// TODO(Implement): Element alignement
-	auto width = docElement["Width"].Get<uint32_t>();
-	auto height = docElement["Height"].Get<uint32_t>();
-	auto x = docElement["x"].Get<uint32_t>();
-	auto y = docElement["y"].Get<uint32_t>();
-	const auto& array = docElement["Color"];
-	auto color =
+	element->Width = docElement["Width"].Get<uint32_t>();
+	element->Height = docElement["Height"].Get<uint32_t>();
+	element->xAlignment = XAlignment::Left;
+	if(docElement.HasMember("xAlignment")) {
+		const auto& xAlign = docElement["xAlignment"];
+		if(xAlign.Get<std::string>() == "Center")
+			element->xAlignment = XAlignment::Center;
+		else if(xAlign.Get<std::string>() == "Right")
+			element->xAlignment = XAlignment::Right;
+	}
+	element->yAlignment = YAlignment::Top;
+	if(docElement.HasMember("yAlignment")) {
+		const auto& yAlign = docElement["yAlignment"];
+		if(yAlign.Get<std::string>() == "Center")
+			element->yAlignment = YAlignment::Center;
+		else if(yAlign.Get<std::string>() == "Bottom")
+			element->yAlignment = YAlignment::Bottom;
+	}
+	element->x = docElement["x"].Get<int32_t>();
+	element->y = docElement["y"].Get<int32_t>();
+	element->Color =
 		glm::vec4
 		{
-			array[0].Get<float>(),
-			array[1].Get<float>(),
-			array[2].Get<float>(),
-			array[3].Get<float>()
+			docElement["Color"][0].Get<float>(),
+			docElement["Color"][1].Get<float>(),
+			docElement["Color"][2].Get<float>(),
+			docElement["Color"][3].Get<float>()
 		};
 
-	element->Color = color;
-	element->SetSize(width, height);
-	element->SetPosition(x, y);
 }
 
 void CompileElement(const std::string& genPath, const std::string& funcPath,

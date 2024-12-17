@@ -28,7 +28,8 @@ enum class UIElementType {
 	Dropdown,
 	Text,
 	TextInput,
-	Image
+	Image,
+	None
 };
 
 using UINode = std::pair<UIElementType, uint32_t>;
@@ -39,15 +40,16 @@ public:
 	uint32_t Height = 0;
 	XAlignment xAlignment = XAlignment::Left;
 	YAlignment yAlignment = YAlignment::Top;
-	float x = 0;
-	float y = 0;
+	int32_t x = 0;
+	int32_t y = 0;
 	glm::vec4 Color;
 
 public:
 	UIElement(UIElementType type, UIPage* root = nullptr);
 	UIElement(UIElementType type, const std::string& id, UIPage* root);
 	UIElement(UIElementType type, uint32_t width, uint32_t height,
-			  float x, float y, const glm::vec4& color, UIPage* root = nullptr);
+			  int32_t x, int32_t y, const glm::vec4& color,
+			  UIPage* root = nullptr);
 	// ~UIElement();
 	virtual ~UIElement() = default;
 
@@ -71,6 +73,7 @@ public:
 	UIElement& CenterX();
 	UIElement& CenterY();
 	UIElement& Center();
+	UIElement& Align();
 
 	void Clear();
 
@@ -78,6 +81,7 @@ public:
 	std::string GetID() const { return m_ID; }
 	UIPage* GetRoot() const { return m_Root; }
 
+	UIElement* GetParent();
 	UIElement* GetChild(const UINode& node) const;
 	UIElement* GetChild(const std::string& id) const;
 	List<UIElement*> GetChildren() const;

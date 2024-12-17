@@ -46,12 +46,12 @@ using namespace Magma::Physics;
 #include "Demos/Lighting.h"
 #include "Demos/Shadows.h"
 #include "Demos/Bloom.h"
-#include "Demos/UILayer.h"
+#include "Demos/UI.h"
 #include "Demos/ECS.h"
 #include "Demos/Raycast.h"
 #include "Demos/Collision.h"
 #include "Demos/Raytracing.h"
-#include "Demos/Dynamic.h"
+#include "Demos/DLL.h"
 #include "Demos/Template.h"
 
 Application* CreateApplication(const CommandLineArgs& args) {
