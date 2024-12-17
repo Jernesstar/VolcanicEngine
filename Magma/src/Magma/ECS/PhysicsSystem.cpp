@@ -2,6 +2,8 @@
 
 #include "World.h"
 
+#include <VolcaniCore/Core/Log.h>
+
 using namespace Magma::Physics;
 
 namespace Magma::ECS {
@@ -26,7 +28,7 @@ void PhysicsSystem::Run(Phase phase) {
 	}
 
 	if(phase == Phase::OnUpdate) {
-		
+		VOLCANICORE_LOG_INFO("Update");
 	}
 
 	if(phase == Phase::PostUpdate) {

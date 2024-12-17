@@ -5,6 +5,7 @@
 #include <VolcaniCore/Core/Time.h>
 #include <VolcaniCore/Core/Defines.h>
 #include <VolcaniCore/Core/UUID.h>
+#include <VolcaniCore/Core/Log.h>
 
 #include "Core/TypeID.h"
 
@@ -12,7 +13,6 @@
 #include "EntityBuilder.h"
 #include "Component.h"
 #include "System.h"
-#include "Events.h"
 
 using namespace VolcaniCore;
 
@@ -36,6 +36,8 @@ struct stripSystem<std::tuple<T...>>
 // 	using type = flecs::observer<T...>;
 // };
 
+struct Event { };
+
 class World {
 public:
 	World();
@@ -53,12 +55,49 @@ public:
 	EntityBuilder BuildEntity(const std::string& tag) {
 		return EntityBuilder{ *this, tag };
 	}
+
 	Entity AddEntity();
 	Entity AddEntity(VolcaniCore::UUID id);
 	Entity AddEntity(const std::string& tag);
 
 	void RemoveEntity(VolcaniCore::UUID id);
 	void RemoveEntity(const std::string& tag);
+
+	void ForEach(const Func<void, Entity&>& func);
+
+	template<typename ...TComponents>
+	void ForEach(const Func<void, Entity&>& func) {
+		flecs::query<TComponents...> query = GetQuery<TComponents...>();
+
+		query.each(
+			[func](flecs::entity handle, TComponents&...)
+			{
+				Entity entity{ handle };
+				func(entity);
+			});
+	}
+
+	// template<typename TEvent>
+	// void Register() {
+	// 	m_EventHandler.observe<TEvent>(
+	// 		[this](TEvent& event) {
+	// 			auto& list =
+	// 				m_Events[TypeIDGenerator<Event>::GetID<TEvent>()];
+	// 			for(auto& callback : list)
+	// 				((Func<void, const TEvent&>)callback)(event);
+	// 		});
+	// }
+
+	// template<typename TEvent>
+	// void Subscribe(const Func<void, const TEvent&>& callback) {
+	// 	m_Events[TypeIDGenerator<Event>::GetID<TEvent>()]
+	// 		.push_back((Func<void, const Event&>)callback);
+	// }
+
+	// template<typename TEvent, typename ...Args>
+	// void Emit(Args&&... args) {
+	// 	m_EventHandler.emit<TEvent>(TEvent{ std::forward<Args>(args)... });
+	// }
 
 	template<typename TSystem>
 	void Add(const List<Phase>& phases) {
@@ -67,7 +106,7 @@ public:
 		// using ObserverType =
 		// 	stripObserver<typename TSystem::RequiredComponents>::type;
 
- 		auto id = TypeIDGenerator<System<>>::GetID<TSystem>();
+ 		uint64_t id = TypeIDGenerator<System<>>::GetID<TSystem>();
 		if(!m_Systems.count(id))
 			m_Systems[id] = new TSystem(this);
 
@@ -99,20 +138,6 @@ public:
 		return Ref<TSystem>((TSystem*)m_Systems[id]);
 	}
 
-	void ForEach(const Func<void, Entity&>& func);
-
-	template<typename ...TComponents>
-	void ForEach(const Func<void, Entity&>& func) {
-		flecs::query<TComponents...> query = GetQuery<TComponents...>();
-
-		query.each(
-			[func](flecs::entity handle, TComponents&...)
-			{
-				Entity entity{ handle };
-				func(entity);
-			});
-	}
-
 	flecs::world& GetNative() { return m_World; }
 
 private:
@@ -127,7 +152,10 @@ private:
 	flecs::query<TransformComponent> m_TransformComponentQuery;
 	flecs::query<ScriptComponent>	 m_ScriptComponentQuery;
 
+	flecs::entity m_EventHandler;
+
 	Map<uint64_t, void*> m_Systems;
+	Map<uint64_t, List<Func<void, const Event&>>> m_Events;
 
 private:
 	template<typename ...TComponents>
