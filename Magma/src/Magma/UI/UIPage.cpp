@@ -2,11 +2,10 @@
 
 #include <filesystem>
 
-#include <rapidjson/rapidjson.h>
-
 #include <VolcaniCore/Core/Log.h>
 #include <VolcaniCore/Core/FileUtils.h>
 
+#include "UI.h"
 #include "UIObject.h"
 
 #define GET_LIST(TUIElement) \
@@ -17,8 +16,8 @@ List<TUIElement>& UIPage::GetList<TUIElement>() { \
 
 #define GET_TYPE(TUIElement) \
 template<> \
-UIElement::Type UIPage::GetType<TUIElement>() { \
-	return UIElement::Type::TUIElement; \
+UIElementType UIPage::GetType<TUIElement>() { \
+	return UIElementType::TUIElement; \
 }
 
 namespace Magma::UI {
@@ -143,45 +142,45 @@ void UIPage::OnEvent(const std::string& id, const UIState& state) {
 		object->OnMouseDown();
 }
 
-UINode UIPage::Add(UIElement::Type type, const std::string& id) {
+UINode UIPage::Add(UIElementType type, const std::string& id) {
 	switch(type) {
-		case UIElement::Type::Window:
+		case UIElementType::Window:
 			Windows.emplace_back(id, this);
 			return { type, Windows.size() - 1 };
-		case UIElement::Type::Button:
+		case UIElementType::Button:
 			Buttons.emplace_back(id, this);
 			return { type, Buttons.size() - 1 };
-		case UIElement::Type::Dropdown:
+		case UIElementType::Dropdown:
 			Dropdowns.emplace_back(id, this);
 			return { type, Dropdowns.size() - 1 };
-		case UIElement::Type::Text:
+		case UIElementType::Text:
 			Texts.emplace_back(id, this);
 			return { type, Texts.size() - 1 };
-		case UIElement::Type::TextInput:
+		case UIElementType::TextInput:
 			TextInputs.emplace_back(id, this);
 			return { type, TextInputs.size() - 1 };
-		case UIElement::Type::Image:
+		case UIElementType::Image:
 			Images.emplace_back(id, this);
 			return { type, Images.size() - 1 };
 	}
 
-	return { UIElement::Type::Window, Windows.size() };
+	return { UIElementType::Window, Windows.size() };
 }
 
 UIElement* UIPage::Get(const UINode& node) const {
 	// TODO(Fix): The pointers might become invalid if the map reallocates
 	switch(node.first) {
-		case UIElement::Type::Window:
+		case UIElementType::Window:
 			return (UIElement*)&Windows[node.second];
-		case UIElement::Type::Button:
+		case UIElementType::Button:
 			return (UIElement*)&Buttons[node.second];
-		case UIElement::Type::Dropdown:
+		case UIElementType::Dropdown:
 			return (UIElement*)&Dropdowns[node.second];
-		case UIElement::Type::Text:
+		case UIElementType::Text:
 			return (UIElement*)&Texts[node.second];
-		case UIElement::Type::TextInput:
+		case UIElementType::TextInput:
 			return (UIElement*)&TextInputs[node.second];
-		case UIElement::Type::Image:
+		case UIElementType::Image:
 			return (UIElement*)&Images[node.second];
 	}
 
@@ -240,11 +239,11 @@ void LoadElement(UIPage* page, const rapidjson::Value& docElement) {
 	UIElement* element;
 
 	if(typeStr == "Window") {
-		node = page->Add(UIElement::Type::Window, id);
+		node = page->Add(UIElementType::Window, id);
 		element = page->Get(node);
 	}
 	if(typeStr == "Button") {
-		node = page->Add(UIElement::Type::Button, id);
+		node = page->Add(UIElementType::Button, id);
 		element = page->Get(node);
 		auto* button = element->As<Button>();
 
@@ -258,19 +257,19 @@ void LoadElement(UIPage* page, const rapidjson::Value& docElement) {
 			button->Display = CreateRef<Text>(button->GetID());
 	}
 	if(typeStr == "Dropdown") {
-		node = page->Add(UIElement::Type::Dropdown, id);
+		node = page->Add(UIElementType::Dropdown, id);
 		element = page->Get(node);
 	}
 	if(typeStr == "Text") {
-		node = page->Add(UIElement::Type::Text, id);
+		node = page->Add(UIElementType::Text, id);
 		element = page->Get(node);
 	}
 	if(typeStr == "TextInput") {
-		node = page->Add(UIElement::Type::TextInput, id);
+		node = page->Add(UIElementType::TextInput, id);
 		element = page->Get(node);
 	}
 	if(typeStr == "Image") {
-		node = page->Add(UIElement::Type::Image, id);
+		node = page->Add(UIElementType::Image, id);
 		element = page->Get(node);
 	}
 

@@ -3,20 +3,20 @@
 #include <OpenGL/Framebuffer.h>
 #include <OpenGL/Texture2D.h>
 
-#include "UIPage.h"
+#include "UIRenderer.h"
 
 using namespace VolcaniCore;
 
 namespace Magma::UI {
 
 Image::Image(Ref<Texture> image)
-	: UIElement(UIElement::Type::Image)
+	: UIElement(UIElementType::Image)
 {
 	SetImage(image);
 }
 
 Image::Image(const std::string& imagePath)
-	: UIElement(UIElement::Type::Image)
+	: UIElement(UIElementType::Image)
 {
 	SetImage(imagePath);
 }

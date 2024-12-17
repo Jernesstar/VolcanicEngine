@@ -18,38 +18,42 @@ struct UIState {
 	bool MouseDown;
 };
 
+enum class XAlignment { Left, Center, Right };
+enum class YAlignment { Top, Center, Bottom };
+
+enum class UIElementType {
+	Empty,
+	Window,
+	Button,
+	Dropdown,
+	Text,
+	TextInput,
+	Image
+};
+
+using UINode = std::pair<UIElementType, uint32_t>;
+
 class UIElement {
-public:
-	enum class Type {
-		Empty,
-		Window,
-		Button,
-		Dropdown,
-		Text,
-		TextInput,
-		Image
-	};
-
-using UINode = std::pair<UIElement::Type, uint32_t>;
-
 public:
 	uint32_t Width = 0;
 	uint32_t Height = 0;
+	XAlignment xAlignment = XAlignment::Left;
+	YAlignment yAlignment = YAlignment::Top;
 	float x = 0;
 	float y = 0;
 	glm::vec4 Color;
 
 public:
-	UIElement(UIElement::Type type, UIPage* root = nullptr);
-	UIElement(UIElement::Type type, const std::string& id, UIPage* root);
-	UIElement(UIElement::Type type, uint32_t width, uint32_t height,
+	UIElement(UIElementType type, UIPage* root = nullptr);
+	UIElement(UIElementType type, const std::string& id, UIPage* root);
+	UIElement(UIElementType type, uint32_t width, uint32_t height,
 			  float x, float y, const glm::vec4& color, UIPage* root = nullptr);
 	// ~UIElement();
 	virtual ~UIElement() = default;
 
 	void Render();
 
-	UINode Add(UIElement::Type type, const std::string& id);
+	UINode Add(UIElementType type, const std::string& id);
 	void Add(const UINode& node);
 
 	template<typename TUIElement, typename ...Args>
@@ -70,7 +74,7 @@ public:
 
 	void Clear();
 
-	UIElement::Type GetType() const { return m_Type; }
+	UIElementType GetType() const { return m_Type; }
 	std::string GetID() const { return m_ID; }
 	UIPage* GetRoot() const { return m_Root; }
 
@@ -86,7 +90,7 @@ protected:
 	virtual void Draw() = 0;
 
 protected:
-	const Type m_Type;
+	const UIElementType m_Type;
 	std::string m_ID;
 
 	UIPage* m_Root;
@@ -95,9 +99,6 @@ protected:
 	std::vector<UINode> m_Children;
 
 	UIState m_State;
-
-	friend class UIRenderer;
-	friend class UISerializer;
 };
 
 }

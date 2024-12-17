@@ -12,7 +12,7 @@ public:
 public:
 	TextInput(uint32_t maxChars = 100);
 	TextInput(const std::string& id, UIPage* root)
-		: UIElement(UIElement::Type::TextInput, id, root), MaxCharCount(100) { }
+		: UIElement(UIElementType::TextInput, id, root), MaxCharCount(100) { }
 private:
 	void Draw() override;
 };

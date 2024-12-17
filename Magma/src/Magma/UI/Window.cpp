@@ -1,6 +1,6 @@
 #include "Window.h"
 
-#include "UIPage.h"
+#include "UIRenderer.h"
 
 namespace Magma::UI {
 

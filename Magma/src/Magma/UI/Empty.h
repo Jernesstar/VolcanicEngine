@@ -10,7 +10,7 @@ public:
 
 public:
 	Empty()
-		: UIElement(UIElement::Type::Empty) { }
+		: UIElement(UIElementType::Empty) { }
 
 private:
 	void Draw() override { }
