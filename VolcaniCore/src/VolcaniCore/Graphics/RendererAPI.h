@@ -130,31 +130,31 @@ struct DrawUniforms {
 	Map<std::string, glm::mat3> Mat3Uniforms;
 	Map<std::string, glm::mat4> Mat4Uniforms;
 
-	void SetInt(const std::string& name, int32_t data) {
+	void SetInput(const std::string& name, int32_t data) {
 		IntUniforms[name] = data;
 	}
-	void SetFloat(const std::string& name, float data) {
+	void SetInput(const std::string& name, float data) {
 		FloatUniforms[name] = data;
 	}
-	void SetTexture(const std::string& name, const TextureSlot& data) {
+	void SetInput(const std::string& name, const TextureSlot& data) {
 		TextureUniforms[name] = data;
 	}
-	void SetVec2(const std::string& name, const glm::vec2& data) {
+	void SetInput(const std::string& name, const glm::vec2& data) {
 		Vec2Uniforms[name] = data;
 	}
-	void SetVec3(const std::string& name, const glm::vec3& data) {
+	void SetInput(const std::string& name, const glm::vec3& data) {
 		Vec3Uniforms[name] = data;
 	}
-	void SetVec4(const std::string& name, const glm::vec4& data) {
+	void SetInput(const std::string& name, const glm::vec4& data) {
 		Vec4Uniforms[name] = data;
 	}
-	void SetMat2(const std::string& name, const glm::mat2& data) {
+	void SetInput(const std::string& name, const glm::mat2& data) {
 		Mat2Uniforms[name] = data;
 	}
-	void SetMat3(const std::string& name, const glm::mat3& data) {
+	void SetInput(const std::string& name, const glm::mat3& data) {
 		Mat3Uniforms[name] = data;
 	}
-	void SetMat4(const std::string& name, const glm::mat4& data) {
+	void SetInput(const std::string& name, const glm::mat4& data) {
 		Mat4Uniforms[name] = data;
 	}
 };

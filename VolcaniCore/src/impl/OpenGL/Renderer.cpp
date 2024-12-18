@@ -60,7 +60,7 @@ static void Clear();
 static void Resize(uint32_t width, uint32_t height);
 
 static void FlushCommand(DrawCommand& command);
-static void FlushCall(DrawCall& call);
+static void FlushCall(DrawCommand& command, DrawCall& call);
 
 static void SetUniforms(DrawCommand& command);
 static void SetOptions(DrawCall& call);
@@ -70,18 +70,6 @@ void Renderer::StartFrame() {
 }
 
 void Renderer::EndFrame() {
-	if(!s_Data.Commands.size()) // EndFrame already called
-		return;
-
-	for(auto& [buffer, backend] : s_Data.Arrays) {
-		if(backend.Indices.GetCount() && buffer->Specs.MaxIndexCount)
-			backend.Array->GetIndexBuffer()->SetData(backend.Indices);
-		if(backend.Vertices.GetCount() && buffer->Specs.MaxVertexCount)
-			backend.Array->GetVertexBuffer(0)->SetData(backend.Vertices);
-		if(backend.Instances.GetCount() && buffer->Specs.MaxInstanceCount)
-			backend.Array->GetVertexBuffer(1)->SetData(backend.Instances);
-	}
-
 	for(auto& command : s_Data.Commands)
 		FlushCommand(command);
 
@@ -181,11 +169,10 @@ void FlushCommand(DrawCommand& command) {
 
 	if(command.BufferData) {
 		auto array = s_Data.Arrays[command.BufferData].Array;
-
 		array->Bind();
 
 		for(auto& call : command.Calls)
-			FlushCall(call);
+			FlushCall(command, call);
 
 		array->Unbind();
 	}
@@ -196,9 +183,10 @@ void FlushCommand(DrawCommand& command) {
 		command.Pipeline->As<OpenGL::ShaderProgram>()->Unbind();
 }
 
-void FlushCall(DrawCall& call) {
+void FlushCall(DrawCommand& command, DrawCall& call) {
 	SetOptions(call);
 
+	auto& buffer = s_Data.Arrays[command.BufferData];
 	uint32_t primitive;
 	switch(call.Primitive) {
 		case PrimitiveType::Point:
@@ -212,6 +200,17 @@ void FlushCall(DrawCall& call) {
 			break;
 	}
 
+	if(call.Partition != PartitionType::MultiDraw) {
+		if(buffer.Indices.GetCount() && buffer->Specs.MaxIndexCount) {
+			uint32_t* data = buffer.Indices.Get() + call.IndicesIndex;
+			buffer.Array->GetIndexBuffer()->SetData(data);
+		}
+		if(buffer.Vertices.GetCount() && buffer->Specs.MaxVertexCount) {
+			uint64_t size = buffer.Vertices.GetSizeT();
+			void* data = buffer.Vertices.Get() + call.VerticesIndex * size;
+			buffer.Array->GetVertexBuffer(0)->SetData(data, call.VertexCount);
+		}
+	}
 	if(call.Partition == PartitionType::MultiDraw) {
 		// if(call.IndexCount == 0)
 		// 	glMultiDrawArraysIndirect();
@@ -226,6 +225,12 @@ void FlushCall(DrawCall& call) {
 									 GL_UNSIGNED_INT, 0, call.IndexStart);
 	}
 	else if(call.Partition == PartitionType::Instanced) {
+		if(buffer.Instances.GetCount() && buffer->Specs.MaxInstanceCount) {
+			uint64_t size = buffer.Instances.GetSizeT();
+			void* data = buffer.Instances.Get() + call.InstancesIndex * size;
+			buffer.Array->GetVertexBuffer(1)->SetData(data, call.InstanceCount);
+		}
+
 		if(call.IndexCount == 0)
 			glDrawArraysInstancedBaseInstance(
 				primitive, call.VertexStart, call.VertexCount,
@@ -250,23 +255,23 @@ void SetUniforms(DrawCommand& command) {
 	auto shader = command.Pipeline;
 
 	for(auto& [name, data] : uniforms.IntUniforms)
-		shader->SetInt(name, data);
+		shader->SetInput(name, data);
 	for(auto& [name, data] : uniforms.FloatUniforms)
-		shader->SetFloat(name, data);
+		shader->SetInput(name, data);
 	for(auto& [name, slot] : uniforms.TextureUniforms)
-		shader->SetTexture(name, slot.Sampler, slot.Index);
+		shader->SetInput(name, slot.Sampler, slot.Index);
 	for(auto& [name, data] : uniforms.Vec2Uniforms)
-		shader->SetVec2(name, data);
+		shader->SetInput(name, data);
 	for(auto& [name, data] : uniforms.Vec3Uniforms)
-		shader->SetVec3(name, data);
+		shader->SetInput(name, data);
 	for(auto& [name, data] : uniforms.Vec4Uniforms)
-		shader->SetVec4(name, data);
+		shader->SetInput(name, data);
 	for(auto& [name, data] : uniforms.Mat2Uniforms)
-		shader->SetMat2(name, data);
+		shader->SetInput(name, data);
 	for(auto& [name, data] : uniforms.Mat3Uniforms)
-		shader->SetMat3(name, data);
+		shader->SetInput(name, data);
 	for(auto& [name, data] : uniforms.Mat4Uniforms)
-		shader->SetMat4(name, data);
+		shader->SetInput(name, data);
 }
 
 void SetOptions(DrawCall& call) {
