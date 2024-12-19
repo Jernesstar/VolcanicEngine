@@ -12,7 +12,8 @@ out vec4 FragColor;
 void main()
 {
     vec3 color;
-    color = texture(u_Diffuse, v_TexCoords.xy).rgb;
+    color = texture(u_Diffuse, v_TexCoords).rgb;
 
     FragColor = vec4(color, 1.0);
+    // FragColor = vec4(1.0);
 }

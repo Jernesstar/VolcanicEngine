@@ -25,6 +25,15 @@ using namespace VolcaniCore;
 
 namespace VolcaniCore::OpenGL {
 
+static void Clear();
+static void Resize(uint32_t width, uint32_t height);
+
+static void FlushCommand(DrawCommand& command);
+static void FlushCall(DrawCommand& command, DrawCall& call);
+
+static void SetUniforms(DrawCommand& command);
+static void SetOptions(DrawCall& call);
+
 struct BackendBuffer {
 	Ref<VertexArray> Array;
 	Buffer<uint32_t> Indices;
@@ -49,21 +58,14 @@ void Renderer::Init() {
 	glEnable(GL_MULTISAMPLE);				// Smooth edges
 	glEnable(GL_FRAMEBUFFER_SRGB);			// Gamma correction
 	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS); // Smooth cubemap edges
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glClearColor(1.0f, 0.0f, 0.0f, 0.0f);
+
+	s_Data.Commands.reserve(20);
 }
 
 void Renderer::Close() {
 	s_Data.Arrays.clear();
 }
-
-static void Clear();
-static void Resize(uint32_t width, uint32_t height);
-
-static void FlushCommand(DrawCommand& command);
-static void FlushCall(DrawCommand& command, DrawCall& call);
-
-static void SetUniforms(DrawCommand& command);
-static void SetOptions(DrawCall& call);
 
 void Renderer::StartFrame() {
 
@@ -171,7 +173,7 @@ void FlushCommand(DrawCommand& command) {
 	SetUniforms(command);
 
 	if(command.BufferData) {
-		auto array = s_Data.Arrays[command.BufferData].Array;
+		Ref<VertexArray> array = s_Data.Arrays[command.BufferData].Array;
 		array->Bind();
 
 		for(auto& call : command.Calls)
@@ -189,11 +191,10 @@ void FlushCommand(DrawCommand& command) {
 void FlushCall(DrawCommand& command, DrawCall& call) {
 	SetOptions(call);
 
-	auto& buffer = s_Data.Arrays[command.BufferData];
 	uint32_t primitive;
 	switch(call.Primitive) {
 		case PrimitiveType::Point:
-			 primitive = GL_POINTS;
+			primitive = GL_POINTS;
 			break;
 		case PrimitiveType::Line:
 			primitive = GL_LINES;
@@ -203,12 +204,14 @@ void FlushCall(DrawCommand& command, DrawCall& call) {
 			break;
 	}
 
+	auto& buffer = s_Data.Arrays[command.BufferData];
+
 	if(call.Partition != PartitionType::MultiDraw) {
 		if(buffer.Indices.GetCount() && call.IndexCount
 		&& command.BufferData->Specs.MaxIndexCount)
 		{
 			uint32_t* data = buffer.Indices.Get() + call.IndexStart;
-			buffer.Array->GetIndexBuffer()->SetData(data);
+			buffer.Array->GetIndexBuffer()->SetData(data, call.IndexCount);
 		}
 		if(buffer.Vertices.GetCount() && call.VertexCount
 		&& command.BufferData->Specs.MaxVertexCount)
@@ -232,8 +235,10 @@ void FlushCall(DrawCommand& command, DrawCall& call) {
 									 GL_UNSIGNED_INT, 0, call.IndexStart);
 	}
 	else if(call.Partition == PartitionType::Instanced) {
-		if(buffer.Instances.GetCount() && command.BufferData->Specs.MaxInstanceCount) {
-			uint64_t size = buffer.Instances.GetSizeT();
+		if(buffer.Instances.GetCount() && call.InstanceCount
+		&& command.BufferData->Specs.MaxInstanceCount)
+		{
+			uint64_t size = command.BufferData->Specs.InstanceLayout.Stride;
 			void* data = buffer.Instances.Get() + call.InstanceStart * size;
 			buffer.Array->GetVertexBuffer(1)->SetData(data, call.InstanceCount);
 		}

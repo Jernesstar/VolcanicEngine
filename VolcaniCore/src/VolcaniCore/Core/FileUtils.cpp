@@ -74,13 +74,12 @@ std::vector<std::string> FileUtils::GetFiles(
 }
 
 unsigned char* FileUtils::ReadImage(const std::string& path,
-									int& width, int& height,
-									int& bitsPerPixel, int desiredChannels,
-									bool flip)
+	int& width, int& height, int& bitsPerPixel, int desiredChannels, bool flip)
 {
 	stbi_set_flip_vertically_on_load((int)flip);
-	unsigned char* pixelData = stbi_load(path.c_str(), &width, &height,
-										 &bitsPerPixel, desiredChannels);
+	unsigned char* pixelData =
+		stbi_load(path.c_str(), &width, &height, &bitsPerPixel, desiredChannels);
+
 	VOLCANICORE_ASSERT_ARGS(pixelData, "Could not load image from path '%s'",
 										path.c_str());
 
@@ -88,9 +87,7 @@ unsigned char* FileUtils::ReadImage(const std::string& path,
 }
 
 unsigned char* FileUtils::ReadImage(const std::string& path,
-									int& width, int& height,
-									int desiredChannels,
-									bool flip)
+	int& width, int& height, int desiredChannels, bool flip)
 {
 	int bitsPerPixel;
 	return FileUtils::ReadImage(path, width, height, bitsPerPixel,
@@ -98,8 +95,7 @@ unsigned char* FileUtils::ReadImage(const std::string& path,
 }
 
 unsigned char* FileUtils::ReadImage(const std::string& path,
-									int desiredChannels,
-									bool flip)
+	int desiredChannels, bool flip)
 {
 	int width, height, bitsPerPixel;
 	return FileUtils::ReadImage(path, width, height, bitsPerPixel,

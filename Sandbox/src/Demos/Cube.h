@@ -14,6 +14,7 @@ public:
 	IsometricCamera()
 		: Camera(Camera::Type::Ortho)
 	{
+		Near = -100.f;
 		SetDistance(R);
 	}
 	~IsometricCamera() = default;
@@ -33,10 +34,10 @@ public:
 
 private:
 	void CalculateProjection() override {
-		Projection = glm::ortho(-(float)ViewportWidth  / R,
-								 (float)ViewportWidth  / R,
-								-(float)ViewportHeight / R,
-								 (float)ViewportHeight / R, Near, Far);
+		Projection = glm::ortho(-(float)ViewportWidth  / (R),
+								 (float)ViewportWidth  / (R),
+								-(float)ViewportHeight / (R),
+								 (float)ViewportHeight / (R), Near, Far);
 		ViewProjection = Projection * View;
 	}
 	void CalculateView() override {
@@ -85,9 +86,8 @@ Cube::Cube()
 		});
 
 	shader = ShaderPipeline::Create("VolcaniCore/assets/shaders", "Mesh");
-	color = Texture::Create(480, 270,
-				Texture::Format::Normal,
-				Texture::Sampling::Nearest);
+	color = Texture::Create(480, 270, Texture::Format::Normal,
+							Texture::Sampling::Nearest);
 	depth = Texture::Create(1920, 1080, Texture::Format::Depth);
 	framebuffer = Framebuffer::Create(
 		{
@@ -96,7 +96,7 @@ Cube::Cube()
 		});
 
 	drawPass = RenderPass::Create("Draw", shader);
-	drawPass->SetOutput(framebuffer);
+	// drawPass->SetOutput(framebuffer);
 
 	cube = Mesh::Create(MeshPrimitive::Cube,
 		Material
@@ -123,6 +123,41 @@ Cube::Cube()
 	controller.RotationSpeed = 0.0f;
 	controller.TranslationSpeed = 20.0f;
 
+	BufferLayout vertexLayout =
+		{
+			{
+				{ "Position", BufferDataType::Vec3 },
+				{ "Normal",	  BufferDataType::Vec3 },
+				{ "TexCoord", BufferDataType::Vec2 },
+			},
+			true, // Dynamic
+			false // Structure of arrays
+		};
+
+	BufferLayout instanceLayout =
+		{
+			{
+				{ "Transform", BufferDataType::Mat4 }
+			},
+			true, // Dynamic
+			true  // Structure of arrays
+		};
+
+	DrawBufferSpecification specs
+		{
+			vertexLayout,
+			instanceLayout,
+			1'000'000,
+			1'000'000,
+			100'000
+		};
+
+	buffer = RendererAPI::Get()->NewDrawBuffer(specs);
+	// buffer->AddIndices(Buffer(cube->GetIndices()));
+	// buffer->AddVertices(Buffer(cube->GetVertices()));
+	buffer->AddIndices(Buffer(torch->GetIndices()));
+	buffer->AddVertices(Buffer(torch->GetVertices()));
+
 	UI::UIRenderer::Init();
 }
 
@@ -132,6 +167,8 @@ Cube::~Cube() {
 
 void Cube::OnUpdate(TimeStep ts) {
 	UI::UIRenderer::BeginFrame();
+
+	RendererAPI::Get()->StartFrame();
 
 	controller.OnUpdate(ts);
 
@@ -153,24 +190,77 @@ void Cube::OnUpdate(TimeStep ts) {
 	}
 	ImGui::End();
 
-	Renderer::StartPass(drawPass);
-	{
-		Renderer::Clear();
+	buffer->Clear(DrawBufferIndex::Instances);
 
-		Renderer3D::Begin(camera);
+	// auto* command = RendererAPI::Get()->NewDrawCommand(buffer);
+	// command->Pipeline = shader;
+	// command->Clear = true;
+	// command->ViewportWidth = 1920;
+	// command->ViewportHeight = 1080;
+	// command->UniformData
+	// 	.SetInput("u_Diffuse", TextureSlot{ cube->GetMaterial().Diffuse, 0 });
+	// command->UniformData
+	// 	.SetInput("u_ViewProj", camera->GetViewProjection());
+	// command->InstancesIndex = 0;
 
-		for(int y = -50; y < 50; y++)
-			for(int x = -50; x < 50; x++) {
-				Renderer3D::DrawMesh(cube, { .Translation = { x, 0.0f, y } });
-				// Renderer3D::DrawMesh(torch, { .Translation = { x, 1.0f, y } });
-			}
+	// auto& call = command->NewDrawCall();
+	// call.Primitive = PrimitiveType::Triangle;
+	// call.Partition = PartitionType::Instanced;
+	// call.IndexStart = 0;
+	// call.VertexStart = 0;
+	// call.IndexCount = cube->GetIndices().size();
+	// call.VertexCount = cube->GetVertices().size();
 
-		Renderer3D::End();
-	}
-	Renderer::EndPass();
+	auto* command2 = RendererAPI::Get()->NewDrawCommand(buffer);
+	command2->Pipeline = shader;
+	command2->Clear = true;
+	command2->ViewportWidth = 1920;
+	command2->ViewportHeight = 1080;
+	command2->UniformData
+		.SetInput("u_Diffuse", TextureSlot{ torch->GetMaterial().Diffuse, 0 });
+	command2->UniformData
+		.SetInput("u_ViewProj", camera->GetViewProjection());
+	command2->InstancesIndex = 10'000;
 
-	RendererAPI::Get()->EndFrame();
-	Renderer2D::DrawFullscreenQuad(framebuffer, AttachmentTarget::Color);
+	auto& call2 = command2->NewDrawCall();
+	call2.Primitive = PrimitiveType::Triangle;
+	call2.Partition = PartitionType::Instanced;
+	call2.IndexStart = 0;
+	call2.VertexStart = 0;
+	call2.IndexCount = torch->GetIndices().size();
+	call2.VertexCount = torch->GetVertices().size();
+
+	for(int y = -50; y < 50; y++)
+		for(int x = -50; x < 50; x++) {
+			Transform transform = { .Translation = { x, 0.0f, y } };
+			Transform transform2 = { .Translation = { x, 1.0f, y } };
+			auto tr = transform.GetTransform();
+			auto tr2 = transform2.GetTransform();
+
+			// command->AddInstance(glm::value_ptr(tr));
+			// command->Calls[0].InstanceCount++;
+
+			command2->AddInstance(glm::value_ptr(tr2));
+			command2->Calls[0].InstanceCount++;
+		}
+
+	// Renderer::StartPass(drawPass);
+	// {
+	// 	Renderer::Clear();
+
+	// 	Renderer3D::Begin(camera);
+
+	// 	for(int y = -50; y < 50; y++)
+	// 		for(int x = -50; x < 50; x++) {
+	// 			Renderer3D::DrawMesh(cube, { .Translation = { x, 0.0f, y } });
+	// 			Renderer3D::DrawMesh(torch, { .Translation = { x, 1.0f, y } });
+	// 		}
+
+	// 	Renderer3D::End();
+	// }
+	// Renderer::EndPass();
+
+	// Renderer2D::DrawFullscreenQuad(framebuffer, AttachmentTarget::Color);
 	RendererAPI::Get()->EndFrame();
 
 	UI::UIRenderer::EndFrame();

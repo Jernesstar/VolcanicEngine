@@ -69,7 +69,7 @@ struct DrawBufferSpecification {
 	uint64_t MaxInstanceCount = 0;
 };
 
-enum DrawBufferIndex : uint8_t { Indices , Vertices , Instances };
+enum DrawBufferIndex : uint8_t { Indices, Vertices, Instances };
 
 struct DrawBuffer {
 	DrawBufferSpecification Specs;
@@ -173,7 +173,7 @@ struct DrawCommand {
 	Ref<Framebuffer> Image;
 	List<DrawCall> Calls;
 
-	bool Clear = true;
+	bool Clear = false;
 	uint32_t ViewportWidth = 0;
 	uint32_t ViewportHeight = 0;
 

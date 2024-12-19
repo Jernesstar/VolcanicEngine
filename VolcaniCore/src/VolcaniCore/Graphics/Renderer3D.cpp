@@ -149,12 +149,11 @@ void Renderer3D::DrawMesh(Ref<Mesh> mesh, const glm::mat4& tr) {
 	if(!mesh)
 		return;
 
-	if(!s_Meshes.count(mesh)
-	|| s_Meshes[mesh]->Calls[0].InstanceCount >= 10'000)
-	{
+	if(!s_Meshes.count(mesh)) {
 		auto* command = Renderer::NewCommand(s_MeshBuffer);
 		command->ViewportWidth = 1920;
 		command->ViewportHeight = 1080;
+		command->InstancesIndex = s_Meshes.size() * 10'000;
 
 		auto& call = command->NewDrawCall();
 		call.Primitive = PrimitiveType::Triangle;
