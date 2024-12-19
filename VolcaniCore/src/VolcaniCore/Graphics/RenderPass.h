@@ -38,6 +38,18 @@ public:
 		return *this;
 	}
 
+	void Clear() {
+		IntHandles.clear();
+		FloatHandles.clear();
+		TextureHandles.clear();
+		Vec2Handles.clear();
+		Vec3Handles.clear();
+		Vec4Handles.clear();
+		Mat2Handles.clear();
+		Mat3Handles.clear();
+		Mat4Handles.clear();
+	}
+
 	template<typename TUniform>
 	HandleMap<TUniform>& GetHandles();
 

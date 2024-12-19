@@ -22,7 +22,7 @@ public:
 	}
 	void OnHover() override {
 		UIObject::OnHover();
-		VOLCANICORE_LOG_INFO("This is the one and only Button1");
+		UIRenderer::ShowPopupLabel("This is the one and only Button1");
 	}
 	void OnMouseUp() override {
 		UIObject::OnMouseUp();

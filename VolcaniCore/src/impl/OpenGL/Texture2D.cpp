@@ -8,15 +8,24 @@
 
 namespace VolcaniCore::OpenGL {
 
+static constexpr uint32_t GetFormat(Texture::Format);
+
+Texture2D::Texture2D(uint32_t id, uint32_t width, uint32_t height)
+	: Texture(width, height), m_TextureID(id)
+{
+	m_Owns = false;
+}
+
 Texture2D::Texture2D(uint32_t width, uint32_t height,
-					 InternalFormat format, SamplingOption sampling)
-	: Texture(width, height), m_DataFormat(GL_RGBA)
+					 Format format, Sampling sampling)
+	: Texture(width, height), m_DataFormat(GetFormat(format))
 {
 	m_TextureID = CreateTexture(width, height, format, sampling);
+	m_Owns = true;
 }
 
 Texture2D::Texture2D(const std::string& path)
-	: Texture(path), m_DataFormat(GL_RGBA)
+	: Texture(path), m_DataFormat(GetFormat(Texture::Format::Normal))
 {
 	int32_t width, height;
 	unsigned char* pixelData = FileUtils::ReadImage(path, width, height, 4);
@@ -31,18 +40,12 @@ Texture2D::Texture2D(const std::string& path)
 }
 
 Texture2D::~Texture2D() {
-	if(m_TextureID != 0)
+	if(m_Owns)
 		glDeleteTextures(1, &m_TextureID);
 }
 
 void Texture2D::Bind(uint32_t slot) {
 	glBindTextureUnit(slot, m_TextureID);
-}
-
-void Texture2D::SetID(uint32_t id) {
-	if(id != 0)
-		glDeleteTextures(1, &m_TextureID);
-	m_TextureID = id;
 }
 
 void Texture2D::SetData(const void* data) {
@@ -71,13 +74,13 @@ void Texture2D::SetData(const glm::ivec2& pos, const glm::ivec2& size,
 // 	}
 // }
 
-constexpr uint32_t GetInternalFormat(Texture::InternalFormat format) {
+constexpr uint32_t GetFormat(Texture::Format format) {
 	switch(format) {
-		case Texture::InternalFormat::Normal:
+		case Texture::Format::Normal:
 			return GL_RGBA8;
-		case Texture::InternalFormat::Float:
+		case Texture::Format::Float:
 			return GL_RGBA16F; // GL_R11F_G11F_B10F
-		case Texture::InternalFormat::Depth:
+		case Texture::Format::Depth:
 			return GL_DEPTH_COMPONENT32F;
 	}
 
@@ -85,15 +88,15 @@ constexpr uint32_t GetInternalFormat(Texture::InternalFormat format) {
 }
 
 uint32_t Texture2D::CreateTexture(uint32_t width, uint32_t height,
-									InternalFormat internal,
-									SamplingOption sampling)
+									Format internal,
+									Sampling sampling)
 {
 	uint32_t textureID;
-	auto internalFormat = GetInternalFormat(internal);
-	auto filter = sampling == SamplingOption::Linear ? GL_LINEAR : GL_NEAREST;
+	auto Format = GetFormat(internal);
+	auto filter = sampling == Sampling::Linear ? GL_LINEAR : GL_NEAREST;
 
 	glCreateTextures(GL_TEXTURE_2D, 1, &textureID);
-	glTextureStorage2D(textureID, 1, internalFormat, width, height);
+	glTextureStorage2D(textureID, 1, Format, width, height);
 	glTextureParameteri(textureID, GL_TEXTURE_MIN_FILTER, filter);
 	glTextureParameteri(textureID, GL_TEXTURE_MAG_FILTER, filter);
 	glTextureParameteri(textureID, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);

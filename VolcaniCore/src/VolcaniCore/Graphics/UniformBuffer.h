@@ -1,21 +1,21 @@
 #pragma once
 
-#include <functional>
-
 #include "Core/Defines.h"
 #include "Core/Buffer.h"
-#include "Core/BufferLayout.h"
+
+#include "Graphics/BufferLayout.h"
 
 namespace VolcaniCore {
 
 class UniformBuffer {
 public:
-	const uint32_t BindingPoint;
 	const BufferLayout Layout;
 
+	static Ref<UniformBuffer> Create(const BufferLayout& layout);
+
 public:
-	UniformBuffer(uint32_t binding)
-		: BindingPoint(binding) { }
+	UniformBuffer(const BufferLayout& layout)
+		: Layout(layout) { }
 	virtual ~UniformBuffer() = default;
 
 	template<typename T>

@@ -40,6 +40,9 @@ public:
 	static void Clear();
 	static void Resize(uint32_t width, uint32_t height);
 
+	static void SetOptions(const DrawCall& options);
+	static DrawCall GetOptions();
+
 	static void Flush();
 
 	static FrameDebugInfo GetDebugInfo();

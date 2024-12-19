@@ -100,8 +100,7 @@ void Renderer2D::DrawFullscreenQuad(Ref<Framebuffer> buffer,
 
 	command->Pipeline = pipeline;
 	command->UniformData
-	.SetInt("u_ScreenTexture", 0);
-	buffer->Bind(target, 0);
+	.SetInput("u_ScreenTexture", TextureSlot{ buffer->Get(target, 0), 0 });
 
 	auto& call = command->NewDrawCall();
 	call.DepthTest = DepthTestingMode::Off;

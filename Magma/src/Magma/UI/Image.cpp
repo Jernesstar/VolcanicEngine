@@ -38,11 +38,9 @@ void Image::SetImage(const std::string& imagePath) {
 }
 
 void Image::SetImage(Ref<Framebuffer> framebuffer, AttachmentTarget target) {
-	// TODO(Change): Move to texture
-	auto& attachment = framebuffer->As<OpenGL::Framebuffer>()->Get(target);
-	Content->As<OpenGL::Texture2D>()->SetID(attachment.GetRendererID());
-	Width = attachment.GetWidth();
-	Height = attachment.GetHeight();
+	Content = framebuffer->Get(target);
+	Width = Content->GetWidth();
+	Height = Content->GetHeight();
 }
 
 void Image::Draw() {

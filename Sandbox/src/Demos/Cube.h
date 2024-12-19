@@ -86,9 +86,9 @@ Cube::Cube()
 
 	shader = ShaderPipeline::Create("VolcaniCore/assets/shaders", "Mesh");
 	color = Texture::Create(480, 270,
-				Texture::InternalFormat::Normal,
-				Texture::SamplingOption::Nearest);
-	depth = Texture::Create(1920, 1080, Texture::InternalFormat::Depth);
+				Texture::Format::Normal,
+				Texture::Sampling::Nearest);
+	depth = Texture::Create(1920, 1080, Texture::Format::Depth);
 	framebuffer = Framebuffer::Create(
 		{
 			{ AttachmentTarget::Color, { { color } } },

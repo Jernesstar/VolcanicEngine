@@ -4,6 +4,7 @@
 
 #include "Graphics/Shader.h"
 #include "Graphics/Texture.h"
+#include "Graphics/UniformBuffer.h"
 #include "Graphics/Framebuffer.h"
 
 #include "BufferLayout.h"
@@ -130,6 +131,8 @@ struct DrawUniforms {
 	Map<std::string, glm::mat3> Mat3Uniforms;
 	Map<std::string, glm::mat4> Mat4Uniforms;
 
+	Map<std::string, Ref<UniformBuffer>> UniformBuffers;
+
 	void SetInput(const std::string& name, int32_t data) {
 		IntUniforms[name] = data;
 	}
@@ -157,12 +160,16 @@ struct DrawUniforms {
 	void SetInput(const std::string& name, const glm::mat4& data) {
 		Mat4Uniforms[name] = data;
 	}
+	void SetInput(const std::string& name, Ref<UniformBuffer> data) {
+		UniformBuffers[name] = data;
+	}
 };
 
 struct DrawCommand {
 	DrawBuffer* BufferData;
 	DrawUniforms UniformData;
 	Ref<ShaderPipeline> Pipeline;
+	List<Pair<AttachmentTarget, uint32_t>> Attachments;
 	Ref<Framebuffer> Image;
 	List<DrawCall> Calls;
 

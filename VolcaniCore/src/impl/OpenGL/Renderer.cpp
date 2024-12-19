@@ -157,8 +157,11 @@ DrawCommand* Renderer::NewDrawCommand(DrawBuffer* buffer) {
 void FlushCommand(DrawCommand& command) {
 	if(command.Pipeline)
 		command.Pipeline->As<OpenGL::ShaderProgram>()->Bind();
-	if(command.Image)
-		command.Image->As<OpenGL::Framebuffer>()->Bind();
+	if(command.Image) {
+		auto frame = command.Image->As<OpenGL::Framebuffer>();
+		frame->Bind();
+		// frame->Set(command.Attachments);
+	}
 
 	if(command.ViewportWidth != 0 && command.ViewportHeight != 0)
 		Resize(command.ViewportWidth, command.ViewportHeight);
@@ -201,13 +204,17 @@ void FlushCall(DrawCommand& command, DrawCall& call) {
 	}
 
 	if(call.Partition != PartitionType::MultiDraw) {
-		if(buffer.Indices.GetCount() && buffer->Specs.MaxIndexCount) {
-			uint32_t* data = buffer.Indices.Get() + call.IndicesIndex;
+		if(buffer.Indices.GetCount() && call.IndexCount
+		&& command.BufferData->Specs.MaxIndexCount)
+		{
+			uint32_t* data = buffer.Indices.Get() + call.IndexStart;
 			buffer.Array->GetIndexBuffer()->SetData(data);
 		}
-		if(buffer.Vertices.GetCount() && buffer->Specs.MaxVertexCount) {
+		if(buffer.Vertices.GetCount() && call.VertexCount
+		&& command.BufferData->Specs.MaxVertexCount)
+		{
 			uint64_t size = buffer.Vertices.GetSizeT();
-			void* data = buffer.Vertices.Get() + call.VerticesIndex * size;
+			void* data = buffer.Vertices.Get() + call.VertexStart * size;
 			buffer.Array->GetVertexBuffer(0)->SetData(data, call.VertexCount);
 		}
 	}
@@ -225,9 +232,9 @@ void FlushCall(DrawCommand& command, DrawCall& call) {
 									 GL_UNSIGNED_INT, 0, call.IndexStart);
 	}
 	else if(call.Partition == PartitionType::Instanced) {
-		if(buffer.Instances.GetCount() && buffer->Specs.MaxInstanceCount) {
+		if(buffer.Instances.GetCount() && command.BufferData->Specs.MaxInstanceCount) {
 			uint64_t size = buffer.Instances.GetSizeT();
-			void* data = buffer.Instances.Get() + call.InstancesIndex * size;
+			void* data = buffer.Instances.Get() + call.InstanceStart * size;
 			buffer.Array->GetVertexBuffer(1)->SetData(data, call.InstanceCount);
 		}
 
@@ -255,23 +262,23 @@ void SetUniforms(DrawCommand& command) {
 	auto shader = command.Pipeline;
 
 	for(auto& [name, data] : uniforms.IntUniforms)
-		shader->SetInput(name, data);
+		shader->SetInt(name, data);
 	for(auto& [name, data] : uniforms.FloatUniforms)
-		shader->SetInput(name, data);
+		shader->SetFloat(name, data);
 	for(auto& [name, slot] : uniforms.TextureUniforms)
-		shader->SetInput(name, slot.Sampler, slot.Index);
+		shader->SetTexture(name, slot.Sampler, slot.Index);
 	for(auto& [name, data] : uniforms.Vec2Uniforms)
-		shader->SetInput(name, data);
+		shader->SetVec2(name, data);
 	for(auto& [name, data] : uniforms.Vec3Uniforms)
-		shader->SetInput(name, data);
+		shader->SetVec3(name, data);
 	for(auto& [name, data] : uniforms.Vec4Uniforms)
-		shader->SetInput(name, data);
+		shader->SetVec4(name, data);
 	for(auto& [name, data] : uniforms.Mat2Uniforms)
-		shader->SetInput(name, data);
+		shader->SetMat2(name, data);
 	for(auto& [name, data] : uniforms.Mat3Uniforms)
-		shader->SetInput(name, data);
+		shader->SetMat3(name, data);
 	for(auto& [name, data] : uniforms.Mat4Uniforms)
-		shader->SetInput(name, data);
+		shader->SetMat4(name, data);
 }
 
 void SetOptions(DrawCall& call) {

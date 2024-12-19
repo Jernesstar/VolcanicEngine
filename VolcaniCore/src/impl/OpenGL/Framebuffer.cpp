@@ -108,7 +108,7 @@ Framebuffer::Framebuffer(const Map<AttachmentTarget, List<Attachment>>& map,
 }
 
 Framebuffer::~Framebuffer() {
-	for(const auto& [target, attachments] : m_AttachmentMap)
+	for(const auto& [_, attachments] : m_AttachmentMap)
 		for(const auto& att : attachments)
 			att.Delete();
 
@@ -123,15 +123,9 @@ void Framebuffer::Unbind() const {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void Framebuffer::Set(AttachmentTarget target, Ref<Texture> texture,
-						uint32_t index)
-{
-	if(!this->Has(target)) {
-		VOLCANICORE_LOG_WARNING("Need attachemnt not found");
-		return;
-	}
-
+void Framebuffer::Add(AttachmentTarget target, Ref<Texture> texture) {
 	uint32_t id = texture->As<OpenGL::Texture2D>()->GetID();
+	uint32_t index = m_AttachmentMap[target].size();
 	uint32_t type;
 	switch(target) {
 		case AttachmentTarget::Color:
@@ -149,20 +143,28 @@ void Framebuffer::Set(AttachmentTarget target, Ref<Texture> texture,
 
 	glBindFramebuffer(GL_FRAMEBUFFER, m_BufferID);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, type + index, GL_TEXTURE_2D, id, 0);
-	// glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	auto& att = m_AttachmentMap[target][index];
-	att.m_RendererID = id;
-	att.m_Width = texture->GetWidth();
-	att.m_Height = texture->GetHeight();
+	auto& att =
+		m_AttachmentMap[target]
+			.emplace_back(Attachment::Type::Texture,
+						  texture->GetWidth(), texture->GetHeight(), id);
 	m_Width = att.m_Width;
 	m_Height = att.m_Height;
+}
+
+Ref<Texture> Framebuffer::Get(AttachmentTarget target, uint32_t idx) const {
+	const Attachment& attachment = GetAttachment(target, idx);
+	auto id = attachment.GetRendererID();
+	auto width = attachment.GetWidth();
+	auto height = attachment.GetHeight();
+	return CreateRef<Texture2D>(id, width, height);
 }
 
 void Framebuffer::Bind(AttachmentTarget target, uint32_t slot,
 						uint32_t index) const
 {
-	Get(target, index).Bind(slot);
+	GetAttachment(target, index).Bind(slot);
 }
 
 void Framebuffer::CreateColorAttachment(uint32_t index) {
@@ -174,7 +176,7 @@ void Framebuffer::CreateColorAttachment(uint32_t index) {
 
 	if(attachment.GetType() == Attachment::Type::Texture) {
 		if(attachment.m_RendererID == 0) {
-			Texture::InternalFormat format = Texture::InternalFormat::Float;
+			Texture::Format format = Texture::Format::Float;
 			uint32_t id = Texture2D::CreateTexture(width, height, format);
 			attachment.m_RendererID = id;
 		}
@@ -200,7 +202,7 @@ void Framebuffer::CreateDepthAttachment() {
 
 	if(attachment.GetType() == Attachment::Type::Texture) {
 		if(attachment.m_RendererID == 0) {
-			Texture::InternalFormat format = Texture::InternalFormat::Depth;
+			Texture::Format format = Texture::Format::Depth;
 			uint32_t id = Texture2D::CreateTexture(width, height, format);
 			attachment.m_RendererID = id;
 		}
@@ -211,7 +213,7 @@ void Framebuffer::CreateDepthAttachment() {
 	}
 	else if(attachment.GetType() == Attachment::Type::RenderBuffer) {
 		if(this->Has(AttachmentTarget::Stencil)) {
-			auto& stencilAttachment = this->Get(AttachmentTarget::Stencil);
+			auto& stencilAttachment = GetAttachment(AttachmentTarget::Stencil);
 
 			if(stencilAttachment.GetType() == Attachment::Type::RenderBuffer) {
 				CreateDepthStencilAttachment();

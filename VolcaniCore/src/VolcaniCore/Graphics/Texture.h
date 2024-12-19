@@ -7,13 +7,13 @@ namespace VolcaniCore {
 class Texture {
 public:
 	// enum class Type { Depth, RGB, RGBA };
-	enum class InternalFormat { Normal, Float, Depth };
-	enum class SamplingOption { Nearest, Linear };
+	enum class Format { Normal, Float, Depth };
+	enum class Sampling { Nearest, Linear };
 
 public:
 	static Ref<Texture> Create(uint32_t width, uint32_t height,
-		InternalFormat format = InternalFormat::Normal,
-		SamplingOption sampling = SamplingOption::Linear);
+		Format format = Format::Normal,
+		Sampling sampling = Sampling::Linear);
 	static Ref<Texture> Create(const std::string& path);
 
 public:
