@@ -118,7 +118,7 @@ void Renderer3D::StartFrame() {
 }
 
 void Renderer3D::EndFrame() {
-
+	s_Meshes.clear();
 }
 
 void Renderer3D::Begin(Ref<Camera> camera) {
@@ -137,19 +137,27 @@ void Renderer3D::Begin(Ref<Camera> camera) {
 
 void Renderer3D::End() {
 	Renderer::EndCommand();
-
-	s_Meshes.clear();
 }
 
 void Renderer3D::DrawSkybox(Ref<Cubemap> cubemap) {
+	auto* command = Renderer::NewCommand(s_CubemapBuffer);
+	auto& call = command->NewDrawCall();
 
+	Renderer::GetPass()->GetUniforms()
+	.Set("u_Diffuse",
+		[cubemap]() -> TextureSlot
+		{
+			// return { mat.Diffuse, 0 };
+		});
 }
 
 void Renderer3D::DrawMesh(Ref<Mesh> mesh, const glm::mat4& tr) {
 	if(!mesh)
 		return;
 
-	if(!s_Meshes.count(mesh)) {
+	if(!s_Meshes.count(mesh)
+	|| s_Meshes[mesh]->Calls[0].InstanceCount >= 10'000)
+	{
 		auto* command = Renderer::NewCommand(s_MeshBuffer);
 		command->ViewportWidth = 1920;
 		command->ViewportHeight = 1080;

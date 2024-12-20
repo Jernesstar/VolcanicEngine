@@ -72,6 +72,18 @@ void Renderer::StartFrame() {
 }
 
 void Renderer::EndFrame() {
+	if(!s_Data.Commands.size()) // EndFrame already called
+		return;
+
+	for(auto& [buffer, backend] : s_Data.Arrays) {
+		if(backend.Indices.GetCount() && buffer->Specs.MaxIndexCount)
+			backend.Array->GetIndexBuffer()->SetData(backend.Indices);
+		if(backend.Vertices.GetCount() && buffer->Specs.MaxVertexCount)
+			backend.Array->GetVertexBuffer(0)->SetData(backend.Vertices);
+		if(backend.Instances.GetCount() && buffer->Specs.MaxInstanceCount)
+			backend.Array->GetVertexBuffer(1)->SetData(backend.Instances);
+	}
+
 	for(auto& command : s_Data.Commands)
 		FlushCommand(command);
 
@@ -174,11 +186,10 @@ void FlushCommand(DrawCommand& command) {
 
 	if(command.BufferData) {
 		Ref<VertexArray> array = s_Data.Arrays[command.BufferData].Array;
-		array->Bind();
 
+		array->Bind();
 		for(auto& call : command.Calls)
 			FlushCall(command, call);
-
 		array->Unbind();
 	}
 
@@ -205,52 +216,34 @@ void FlushCall(DrawCommand& command, DrawCall& call) {
 	}
 
 	auto& buffer = s_Data.Arrays[command.BufferData];
-
-	if(call.Partition != PartitionType::MultiDraw) {
-		if(buffer.Indices.GetCount() && call.IndexCount
-		&& command.BufferData->Specs.MaxIndexCount)
-		{
-			uint32_t* data = buffer.Indices.Get() + call.IndexStart;
-			buffer.Array->GetIndexBuffer()->SetData(data, call.IndexCount);
-		}
-		if(buffer.Vertices.GetCount() && call.VertexCount
-		&& command.BufferData->Specs.MaxVertexCount)
-		{
-			uint64_t size = buffer.Vertices.GetSizeT();
-			void* data = buffer.Vertices.Get() + call.VertexStart * size;
-			buffer.Array->GetVertexBuffer(0)->SetData(data, call.VertexCount);
-		}
-	}
 	if(call.Partition == PartitionType::MultiDraw) {
 		// if(call.IndexCount == 0)
 		// 	glMultiDrawArraysIndirect();
 		// else
 		// 	glMultiDrawElementsIndirect();
+
+		// Add indirect objects. If full, make draw call and clear
+		return;
 	}
-	else if(call.Partition == PartitionType::Single) {
+
+	if(call.Partition == PartitionType::Single) {
 		if(call.IndexCount == 0)
 			glDrawArrays(primitive, call.VertexStart, call.VertexCount);
 		else
-			glDrawElementsBaseVertex(primitive, call.IndexCount,
-									 GL_UNSIGNED_INT, 0, call.IndexStart);
+			glDrawElementsBaseVertex(
+				primitive, call.IndexCount, GL_UNSIGNED_INT,
+				(void*)(sizeof(uint32_t) * call.IndexStart), call.VertexStart);
 	}
 	else if(call.Partition == PartitionType::Instanced) {
-		if(buffer.Instances.GetCount() && call.InstanceCount
-		&& command.BufferData->Specs.MaxInstanceCount)
-		{
-			uint64_t size = command.BufferData->Specs.InstanceLayout.Stride;
-			void* data = buffer.Instances.Get() + call.InstanceStart * size;
-			buffer.Array->GetVertexBuffer(1)->SetData(data, call.InstanceCount);
-		}
-
 		if(call.IndexCount == 0)
 			glDrawArraysInstancedBaseInstance(
 				primitive, call.VertexStart, call.VertexCount,
 				call.InstanceCount, call.InstanceStart);
 		else
 			glDrawElementsInstancedBaseVertexBaseInstance(
-				primitive, call.IndexCount, GL_UNSIGNED_INT, 0,
-				call.InstanceCount, call.IndexStart, call.InstanceStart);
+				primitive, call.IndexCount, GL_UNSIGNED_INT,
+				(void*)(sizeof(uint32_t) * call.IndexStart),
+				call.InstanceCount, call.VertexStart, call.InstanceStart);
 	}
 }
 
