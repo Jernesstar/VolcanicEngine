@@ -103,31 +103,37 @@ void UIPage::Reload() {
 }
 
 void UIPage::Update(TimeStep ts) {
-	for(auto* element : GetFirstOrderElements())
+	if(!m_GenFile)
+		return;
+
+	for(UIElement* element : GetFirstOrderElements())
 		UpdateElement(element, ts);
 }
 
 void UIPage::UpdateElement(UIElement* element, TimeStep ts) {
 	auto get = m_GenFile->GetFunction<UIObject*, std::string>("GetObject");
-	auto* object = get(element->GetID());
+	UIObject* object = get(element->GetID());
 
 	if(!object)
 		return;
 
 	object->OnUpdate(ts);
 
-	for(auto* child : element->GetChildren())
+	for(UIElement* child : element->GetChildren())
 		UpdateElement(child, ts);
 }
 
 void UIPage::Render() {
-	for(auto* element : GetFirstOrderElements())
+	for(UIElement* element : GetFirstOrderElements())
 		element->Render();
 }
 
 void UIPage::OnEvent(const std::string& id, const UIState& state) {
+	if(!m_GenFile)
+		return;
+
 	auto get = m_GenFile->GetFunction<UIObject*, std::string>("GetObject");
-	auto* object = get(id);
+	UIObject* object = get(id);
 
 	if(!object)
 		return;

@@ -233,7 +233,7 @@ void EditorLayer::CloseTab(Ref<Tab> tabToDelete) {
 
 void EditorLayer::NewProject() {
 	menu.project.newProject = false;
-	m_Project = CreateRef<Project>();
+	m_Project = CreateRef<Lava::Project>();
 }
 
 void EditorLayer::OpenProject() {

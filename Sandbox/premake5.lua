@@ -44,6 +44,7 @@ project "Sandbox"
     }
 
     links {
+        "Lava",
         "Magma",
         "VolcaniCore",
 

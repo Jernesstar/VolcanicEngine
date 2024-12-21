@@ -4,7 +4,7 @@
 
 using namespace VolcaniCore;
 
-namespace Magma {
+namespace Lava {
 
 class Project {
 public:
@@ -21,7 +21,7 @@ public:
 	void Reload();
 	void Run();
 
-	// void AddDependency(const std::string& pathUrl);
+	// void AddClass(const std::string& name);
 
 private:
 	std::string m_Name;

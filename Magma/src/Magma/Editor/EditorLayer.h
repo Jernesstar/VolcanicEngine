@@ -1,6 +1,7 @@
 #pragma once
 
-#include "Project.h"
+#include <Lava/Core/Project.h>
+
 #include "Tab.h"
 #include "SceneTab.h"
 #include "UITab.h"
@@ -19,7 +20,7 @@ public:
 	void Render();
 
 private:
-	Ref<Project> m_Project;
+	Ref<Lava::Project> m_Project;
 	Ref<Tab> m_CurrentTab;
 	List<Ref<Tab>> m_Tabs;
 	List<Ref<Tab>> m_ClosedTabs;

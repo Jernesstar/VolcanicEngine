@@ -19,6 +19,9 @@ project "Magma"
         "%{RootPath}/VolcaniCore/src/VolcaniCore",
         "%{RootPath}/VolcaniCore/src/impl",
 
+        "%{RootPath}/Lava/src",
+        "%{RootPath}/Lava/src/Lava",
+
         "%{Includes.imgui}/imgui",
         "%{Includes.yaml_cpp}",
         "%{Includes.ImGuiFileDialog}",
@@ -33,6 +36,7 @@ project "Magma"
     }
 
     links {
+        "Lava",
         "VolcaniCore",
 
         "imgui",

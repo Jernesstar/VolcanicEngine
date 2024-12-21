@@ -100,6 +100,8 @@ private:
 	UIElementType GetType();
 
 	void UpdateElement(UIElement* element, TimeStep ts);
+
+	friend class UICompiler;
 };
 
 }

@@ -6,11 +6,13 @@
 #include <VolcaniCore/Core/Log.h>
 #include <VolcaniCore/Core/FileUtils.h>
 
-#include "UI/UIBrowser.h"
+#include "Magma/UI/UIBrowser.h"
 
-namespace fs = std::filesystem;
+#include "AssetManager.h"
 
-namespace Magma {
+using namespace Magma::UI;
+
+namespace Lava {
 
 Ref<Project> Project::Create(const std::string& volcPath) {
 	return CreateRef<Project>(volcPath);
@@ -25,6 +27,8 @@ Project::~Project() {
 }
 
 void Project::Load(const std::string& volcPath) {
+	namespace fs = std::filesystem;
+
 	if(volcPath == "")
 		return;
 
@@ -32,9 +36,14 @@ void Project::Load(const std::string& volcPath) {
 	m_Name = fullPath.stem().string();
 	m_RootPath = fullPath.string();
 	m_SrcPath   = (fullPath / m_Name / "src").string();
-	m_AssetPath = (fullPath / m_Name / "assets").string();
+	m_AssetPath = (fullPath / m_Name / "asset").string();
 
-	UI::UIBrowser::Load((fs::path(m_AssetPath) / "ui").string());
+	auto uiPath = (fs::path(m_AssetPath) / "ui").string();
+	auto modelPath = (fs::path(m_AssetPath) / "model").string();
+
+	// for(auto path : FileUtils::GetFiles(modelPath)) {
+	// 	AssetManager::GetOrCreate<Mesh>(path);
+	// }
 }
 
 void Project::Reload() {
@@ -59,7 +68,7 @@ void Project::Reload() {
 	command += " -ArgumentList '-f Makefile';";
 	system(command.c_str());
 
-	UI::UIBrowser::Reload();
+	UIBrowser::Reload();
 }
 
 void Project::Run() {

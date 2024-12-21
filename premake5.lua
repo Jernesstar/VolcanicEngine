@@ -24,8 +24,9 @@ workspace "VolcanicEngine"
 
 include "VolcaniCore"
 include "Magma"
+include "Lava"
+
 include "Sandbox"
-include "TestProj"
 
 RootPath = _MAIN_SCRIPT_DIR;
 VolcaniCoreVendorDir = "%{RootPath}/VolcaniCore/vendor"

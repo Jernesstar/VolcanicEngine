@@ -3,6 +3,6 @@
 
 using namespace VolcaniCore;
 
-Application* CreateApplication(const CommandLineArgs& args) {
-	return new Application;
-}
+// Application* CreateApplication(const CommandLineArgs& args) {
+// 	return new Application;
+// }
