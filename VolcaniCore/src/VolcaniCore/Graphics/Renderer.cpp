@@ -120,7 +120,7 @@ DrawCall Renderer::GetOptions() {
 }
 
 void Renderer::Flush() {
-
+	RendererAPI::Get()->EndFrame();
 }
 
 FrameDebugInfo Renderer::GetDebugInfo() {

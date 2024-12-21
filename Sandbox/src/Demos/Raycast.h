@@ -1,15 +1,7 @@
 #pragma once
 
 static void createActors(Physics::World& world) {
-	Ref<Shape> box = Shape::Create(Shape::Type::Box);
 
-	for(uint32_t x = 0; x < 10; x++) {
-		Ref<RigidBody> body =
-			RigidBody::Create(RigidBody::Type::Static, box,
-				Transform{ .Translation = { x * 2.0f, 0.0f, 0.0f } });
-
-		world.AddActor(body);
-	}
 }
 
 namespace Demo {
@@ -22,6 +14,8 @@ public:
 	void OnUpdate(TimeStep ts);
 
 private:
+	void CreateActors();
+
 	Ref<Physics::World> world;
 
 	// Ref<RigidBody> selected{ nullptr };
@@ -125,7 +119,7 @@ Raycast::Raycast() {
 	Physics::Init();
 
 	world = CreateRef<Physics::World>();
-	createActors(*world);
+	CreateActors();
 
 	// auto scene = world->Get();
 	// scene->setVisualizationParameter(PxVisualizationParameter::eSCALE, 1.0f);
@@ -134,6 +128,20 @@ Raycast::Raycast() {
 
 Raycast::~Raycast() {
 	// Physics::Close();
+}
+
+void Raycast::CreateActors() {
+	Ref<Shape> box = Shape::Create(Shape::Type::Box);
+
+	for(uint32_t x = 0; x < 10; x++) {
+		Ref<RigidBody> body =
+			RigidBody::Create(RigidBody::Type::Static, box,
+				Transform{ .Translation = { x * 2.0f, 0.0f, 0.0f } });
+
+		if(x == 3)
+			selected = body.get();
+		world->AddActor(body);
+	}
 }
 
 void Raycast::OnUpdate(TimeStep ts) {
@@ -172,6 +180,7 @@ void Raycast::OnUpdate(TimeStep ts) {
 		Renderer3D::End();
 	}
 	Renderer::EndPass();
+	Renderer::Flush();
 
 	// 3. Render full-screen quad that creates outline
 	Renderer::StartPass(outlinePass);

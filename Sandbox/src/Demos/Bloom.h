@@ -146,9 +146,7 @@ void Bloom::OnUpdate(TimeStep ts) {
 		.Set("u_SrcTexture",
 			[&]() -> TextureSlot
 			{
-				// src->Bind(AttachmentTarget::Color, 0);
-				// return { src->Get(AttachmentTarget::Color), 0 };
-				return { };
+				return { src->Get(AttachmentTarget::Color), 0 };
 			});
 
 		Downsample();
