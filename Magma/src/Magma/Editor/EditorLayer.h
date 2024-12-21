@@ -26,7 +26,7 @@ private:
 
 	void NewTab(Ref<Tab> tab);
 	void NewTab(const Scene& scene);
-	void NewTab(Ref<UI::UIElement> ui);
+	void NewTab(const UI::UIPage& page);
 	void NewTab();
 	void OpenTab();
 	void ReopenTab();

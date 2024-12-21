@@ -12,6 +12,10 @@ namespace UIObjects {
 
 class Button1 : public UIObject {
 public:
+	void OnUpdate(TimeStep ts) override {
+		UIObject::OnUpdate(ts);
+
+	}
 	void OnClick() override {
 		UIObject::OnClick();
 		VOLCANICORE_LOG_INFO("Coming from Button1");

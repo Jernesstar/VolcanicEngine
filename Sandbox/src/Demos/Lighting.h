@@ -1,6 +1,6 @@
 #pragma once
 
-#include <OpenGL/UniformBuffer.h>
+#include <Graphics/UniformBuffer.h>
 
 namespace Demo {
 
@@ -43,7 +43,7 @@ public:
 
 private:
 	Ref<RenderPass> lightingPass;
-	Ref<OpenGL::UniformBuffer> buffer;
+	Ref<UniformBuffer> buffer;
 
 	Ref<Mesh> cube;
 	Ref<Mesh> torch;
@@ -89,14 +89,14 @@ Lighting::Lighting() {
 			.OuterCutoffAngle = 0.4f
 		};
 
-	buffer = CreateRef<OpenGL::UniformBuffer>(
+	buffer = UniformBuffer::Create(
 		BufferLayout
 			{
 				{ "Position",    BufferDataType::Vec3 },
 				{ "CutoffAngle", BufferDataType::Float },
 				{ "Direction",   BufferDataType::Vec3 },
 				{ "OuterCutoffAngle", BufferDataType::Float },
-			}, 0);
+			});
 
 	std::string assetPath = "Sandbox/assets/";
 	cube = Mesh::Create(MeshPrimitive::Cube,
@@ -140,7 +140,7 @@ void Lighting::OnUpdate(TimeStep ts) {
 	}
 	ImGui::End();
 
-	buffer->SetData(&spot);
+	// buffer->SetData(&spot);
 
 	Renderer::StartPass(lightingPass);
 	{

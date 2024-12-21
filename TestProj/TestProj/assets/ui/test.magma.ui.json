@@ -36,6 +36,7 @@
             "y": 20,
             "Color": [0.0, 0.0, 0.0, 1.0],
 
+            "OnUpdate": "Default",
             "OnClick": "@cpp{ VOLCANICORE_LOG_INFO(\"Coming from Button1\"); }",
             "OnHover": "Default",
             "OnMouseUp": {

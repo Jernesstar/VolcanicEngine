@@ -1,6 +1,6 @@
 #include "Text.h"
 
-#include "UIPage.h"
+#include "UIRenderer.h"
 
 namespace Magma::UI {
 
@@ -9,13 +9,11 @@ Ref<UI::Text> UI::Text::Create(const UI::Text::Specification& specs) {
 }
 
 Text::Text(const std::string& text, const glm::vec4& textColor)
-	: UIElement(UIElement::Type::Text, 0, 0, 0.0f, 0.0f, textColor),
+	: UIElement(UIElementType::Text, 0, 0, 0.0f, 0.0f, textColor),
 		Content(text) { }
 
 void Text::Draw() {
 	m_State = UIRenderer::DrawText(*this);
-	if(m_Root)
-		m_Root->OnEvent(m_ID, m_State);
 }
 
 }

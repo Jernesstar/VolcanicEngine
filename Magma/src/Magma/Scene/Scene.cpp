@@ -24,7 +24,7 @@ void Scene::OnUpdate(TimeStep ts) {
 }
 
 void Scene::OnRender(SceneRenderer& renderer) {
-	// renderer.SetContext(this);
+	renderer.SetContext(this);
 	renderer.Render();
 }
 
@@ -37,10 +37,10 @@ void Scene::Save(const std::string& path) {
 }
 
 void Scene::RegisterSystems() {
-	// EntityWorld.Add<ScriptSystem>({ Phase::PreUpdate });
-	// EntityWorld.Add<PhysicsSystem>({ Phase::PreUpdate, Phase::OnUpdate, Phase::PostUpdate });
-	// EntityWorld.Add<TransformSystem>({ Phase::OnUpdate });
-	// EntityWorld.Add<RenderSystem>({ Phase::OnUpdate });
+	EntityWorld.Add<ScriptSystem>({ Phase::PreUpdate });
+	EntityWorld.Add<PhysicsSystem>(
+		{ Phase::PreUpdate, Phase::OnUpdate, Phase::PostUpdate });
+	EntityWorld.Add<TransformSystem>({ Phase::OnUpdate });
 }
 
 }

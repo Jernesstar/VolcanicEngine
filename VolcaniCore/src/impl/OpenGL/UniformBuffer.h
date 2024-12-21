@@ -2,47 +2,34 @@
 
 #include <glad/glad.h>
 
-#include <VolcaniCore/Core/Buffer.h>
 #include <VolcaniCore/Core/Assert.h>
 
-// #include "Graphics/UniformBuffer.h"
-
-#include "Graphics/BufferLayout.h"
+#include "Graphics/UniformBuffer.h"
 
 using namespace VolcaniCore;
 
 namespace VolcaniCore::OpenGL {
 
-class UniformBuffer /* : public UniformBuffer */ {
+class UniformBuffer : public VolcaniCore::UniformBuffer {
 public:
-	// const std::string Name;
-	const BufferLayout Layout;
-	const uint32_t Count;
-	const uint32_t Size;
-	const uint32_t Binding;
+	const uint64_t Size;
 
 public:
-	UniformBuffer(const BufferLayout& layout, uint32_t binding,
-				  uint32_t count = 1, const void* data = nullptr)
-		: Layout(layout), Binding(binding),
-			Count(count), Size(count * layout.Stride)
+	UniformBuffer(const BufferLayout& layout, const void* data = nullptr)
+		: VolcaniCore::UniformBuffer(layout), Size(layout.Stride)
 	{
 		glCreateBuffers(1, &m_BufferID);
 		glNamedBufferData(m_BufferID, Size, data, GL_DYNAMIC_DRAW);
-		glBindBufferBase(GL_UNIFORM_BUFFER, binding, m_BufferID);
 	}
 
 	template<typename T>
-	UniformBuffer(const BufferLayout& layout, uint32_t binding,
-				  const Buffer<T>& buffer)
-		: Layout(layout), Binding(binding),
-			Count(buffer.GetCount()), Size(buffer.GetSize())
+	UniformBuffer(const BufferLayout& layout, const Buffer<T>& buffer)
+		: VolcaniCore::UniformBuffer(layout), Size(layout.Stride)
 	{
 		VOLCANICORE_ASSERT(layout.Stride == sizeof(T));
 
 		glCreateBuffers(1, &m_BufferID);
 		glNamedBufferData(m_BufferID, Size, buffer.Get(), GL_DYNAMIC_DRAW);
-		glBindBufferBase(GL_UNIFORM_BUFFER, binding, m_BufferID);
 	}
 
 	~UniformBuffer() {
@@ -52,6 +39,10 @@ public:
 	void SetData(const void* data, uint32_t count = 1, uint32_t offset = 0) {
 		glNamedBufferSubData(m_BufferID, offset * Layout.Stride,
 							 count == 0 ? Size : count * Layout.Stride, data);
+	}
+
+	void Bind(uint32_t binding) {
+		glBindBufferBase(GL_UNIFORM_BUFFER, binding, m_BufferID);
 	}
 
 private:

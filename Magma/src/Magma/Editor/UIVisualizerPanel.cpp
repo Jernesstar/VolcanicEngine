@@ -10,14 +10,14 @@
 
 namespace Magma {
 
-UIVisualizerPanel::UIVisualizerPanel(Ref<UI::UIElement> ui)
+UIVisualizerPanel::UIVisualizerPanel(UI::UIPage* page)
 	: Panel("UIVisualizer")
 {
-	SetContext(ui);
+	SetContext(page);
 }
 
-void UIVisualizerPanel::SetContext(Ref<UI::UIElement> ui) {
-
+void UIVisualizerPanel::SetContext(UI::UIPage* page) {
+	m_Context = page;
 }
 
 void UIVisualizerPanel::Update(TimeStep ts) {
@@ -27,7 +27,7 @@ void UIVisualizerPanel::Update(TimeStep ts) {
 void UIVisualizerPanel::Draw() {
 	ImGui::Begin("UI Visualizer", &m_Open);
 	{
-
+		m_Context->Render();
 	}
 	ImGui::End();
 }

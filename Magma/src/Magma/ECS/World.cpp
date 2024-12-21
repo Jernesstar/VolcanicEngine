@@ -51,6 +51,8 @@ World::World() {
 	.with<ScriptComponent>()
 	.cached()
 	.build();
+
+	m_EventHandler = m_World.entity("WorldEventHandler");
 }
 
 void World::OnUpdate(TimeStep ts) {

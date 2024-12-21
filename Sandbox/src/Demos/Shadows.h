@@ -42,7 +42,7 @@ Shadows::Shadows()
 	depthShader = ShaderPipeline::Create("Sandbox/assets/shaders", "Depth");
 	shadowShader = ShaderPipeline::Create("Sandbox/assets/shaders", "Shadow");
 
-	depthTexture = Texture::Create(2048, 2048, Texture::InternalFormat::Depth);
+	depthTexture = Texture::Create(2048, 2048, Texture::Format::Depth);
 	depthMap = Framebuffer::Create({
 			{ AttachmentTarget::Depth, { { depthTexture } } }
 		});
@@ -136,8 +136,7 @@ void Shadows::OnUpdate(TimeStep ts) {
 		.Set("u_ShadowMap",
 			[&]() -> TextureSlot
 			{
-				depthMap->Bind(AttachmentTarget::Depth, 1);
-				return { };
+				return { depthMap->Get(AttachmentTarget::Depth), 1 };
 			});
 
 		RenderScene();

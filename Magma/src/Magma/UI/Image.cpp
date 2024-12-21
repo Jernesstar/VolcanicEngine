@@ -3,20 +3,20 @@
 #include <OpenGL/Framebuffer.h>
 #include <OpenGL/Texture2D.h>
 
-#include "UIPage.h"
+#include "UIRenderer.h"
 
 using namespace VolcaniCore;
 
 namespace Magma::UI {
 
 Image::Image(Ref<Texture> image)
-	: UIElement(UIElement::Type::Image)
+	: UIElement(UIElementType::Image)
 {
 	SetImage(image);
 }
 
 Image::Image(const std::string& imagePath)
-	: UIElement(UIElement::Type::Image)
+	: UIElement(UIElementType::Image)
 {
 	SetImage(imagePath);
 }
@@ -38,17 +38,13 @@ void Image::SetImage(const std::string& imagePath) {
 }
 
 void Image::SetImage(Ref<Framebuffer> framebuffer, AttachmentTarget target) {
-	// TODO(Change): Move to texture
-	auto& attachment = framebuffer->As<OpenGL::Framebuffer>()->Get(target);
-	Content->As<OpenGL::Texture2D>()->SetID(attachment.GetRendererID());
-	Width = attachment.GetWidth();
-	Height = attachment.GetHeight();
+	Content = framebuffer->Get(target);
+	Width = Content->GetWidth();
+	Height = Content->GetHeight();
 }
 
 void Image::Draw() {
 	m_State = UIRenderer::DrawImage(*this);
-	if(m_Root)
-		m_Root->OnEvent(m_ID, m_State);
 }
 
 }

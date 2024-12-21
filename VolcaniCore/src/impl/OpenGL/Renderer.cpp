@@ -25,6 +25,15 @@ using namespace VolcaniCore;
 
 namespace VolcaniCore::OpenGL {
 
+static void Clear();
+static void Resize(uint32_t width, uint32_t height);
+
+static void FlushCommand(DrawCommand& command);
+static void FlushCall(DrawCommand& command, DrawCall& call);
+
+static void SetUniforms(DrawCommand& command);
+static void SetOptions(DrawCall& call);
+
 struct BackendBuffer {
 	Ref<VertexArray> Array;
 	Buffer<uint32_t> Indices;
@@ -49,21 +58,14 @@ void Renderer::Init() {
 	glEnable(GL_MULTISAMPLE);				// Smooth edges
 	glEnable(GL_FRAMEBUFFER_SRGB);			// Gamma correction
 	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS); // Smooth cubemap edges
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glClearColor(1.0f, 0.0f, 0.0f, 0.0f);
+
+	s_Data.Commands.reserve(20);
 }
 
 void Renderer::Close() {
 	s_Data.Arrays.clear();
 }
-
-static void Clear();
-static void Resize(uint32_t width, uint32_t height);
-
-static void FlushCommand(DrawCommand& command);
-static void FlushCall(DrawCall& call);
-
-static void SetUniforms(DrawCommand& command);
-static void SetOptions(DrawCall& call);
 
 void Renderer::StartFrame() {
 
@@ -167,10 +169,13 @@ DrawCommand* Renderer::NewDrawCommand(DrawBuffer* buffer) {
 }
 
 void FlushCommand(DrawCommand& command) {
-	command.Pipeline->As<OpenGL::ShaderProgram>()->Bind();
-
-	if(command.Image)
-		command.Image->As<OpenGL::Framebuffer>()->Bind();
+	if(command.Pipeline)
+		command.Pipeline->As<OpenGL::ShaderProgram>()->Bind();
+	if(command.Image) {
+		auto frame = command.Image->As<OpenGL::Framebuffer>();
+		frame->Bind();
+		// frame->Set(command.Attachments);
+	}
 
 	if(command.ViewportWidth != 0 && command.ViewportHeight != 0)
 		Resize(command.ViewportWidth, command.ViewportHeight);
@@ -180,29 +185,27 @@ void FlushCommand(DrawCommand& command) {
 	SetUniforms(command);
 
 	if(command.BufferData) {
-		auto array = s_Data.Arrays[command.BufferData].Array;
+		Ref<VertexArray> array = s_Data.Arrays[command.BufferData].Array;
 
 		array->Bind();
-
 		for(auto& call : command.Calls)
-			FlushCall(call);
-
+			FlushCall(command, call);
 		array->Unbind();
 	}
 
 	if(command.Image)
 		command.Image->As<OpenGL::Framebuffer>()->Unbind();
-
-	command.Pipeline->As<OpenGL::ShaderProgram>()->Unbind();
+	if(command.Pipeline)
+		command.Pipeline->As<OpenGL::ShaderProgram>()->Unbind();
 }
 
-void FlushCall(DrawCall& call) {
+void FlushCall(DrawCommand& command, DrawCall& call) {
 	SetOptions(call);
 
 	uint32_t primitive;
 	switch(call.Primitive) {
 		case PrimitiveType::Point:
-			 primitive = GL_POINTS;
+			primitive = GL_POINTS;
 			break;
 		case PrimitiveType::Line:
 			primitive = GL_LINES;
@@ -212,18 +215,24 @@ void FlushCall(DrawCall& call) {
 			break;
 	}
 
+	auto& buffer = s_Data.Arrays[command.BufferData];
 	if(call.Partition == PartitionType::MultiDraw) {
 		// if(call.IndexCount == 0)
 		// 	glMultiDrawArraysIndirect();
 		// else
 		// 	glMultiDrawElementsIndirect();
+
+		// Add indirect objects. If full, make draw call and clear
+		return;
 	}
-	else if(call.Partition == PartitionType::Single) {
+
+	if(call.Partition == PartitionType::Single) {
 		if(call.IndexCount == 0)
 			glDrawArrays(primitive, call.VertexStart, call.VertexCount);
 		else
-			glDrawElementsBaseVertex(primitive, call.IndexCount,
-									 GL_UNSIGNED_INT, 0, call.IndexStart);
+			glDrawElementsBaseVertex(
+				primitive, call.IndexCount, GL_UNSIGNED_INT,
+				(void*)(sizeof(uint32_t) * call.IndexStart), call.VertexStart);
 	}
 	else if(call.Partition == PartitionType::Instanced) {
 		if(call.IndexCount == 0)
@@ -232,8 +241,9 @@ void FlushCall(DrawCall& call) {
 				call.InstanceCount, call.InstanceStart);
 		else
 			glDrawElementsInstancedBaseVertexBaseInstance(
-				primitive, call.IndexCount, GL_UNSIGNED_INT, 0,
-				call.InstanceCount, call.IndexStart, call.InstanceStart);
+				primitive, call.IndexCount, GL_UNSIGNED_INT,
+				(void*)(sizeof(uint32_t) * call.IndexStart),
+				call.InstanceCount, call.VertexStart, call.InstanceStart);
 	}
 }
 

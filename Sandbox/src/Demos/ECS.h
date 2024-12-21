@@ -2,6 +2,8 @@
 
 using namespace Magma;
 
+struct PlayerDiedEvent : public ECS::Event { };
+
 namespace Demo {
 
 class ECS : public Application {
@@ -24,10 +26,17 @@ ECS::ECS() {
 		});
 
 	scene = CreateRef<Scene>("Titled Scene");
-	renderer.SetContext(scene.get());
 	renderer.GetCameraController().TranslationSpeed = 20.0f;
 
 	auto& world = scene->EntityWorld;
+
+	// world.Register<PlayerDiedEvent>();
+	// world.Subscribe<PlayerDiedEvent>(
+	// 	[](const PlayerDiedEvent& event)
+	// 	{
+
+	// 	});
+	// world.Emit<PlayerDiedEvent>();
 
 	EntityBuilder(world, "MainCamera")
 	.Add<CameraComponent>(CreateRef<StereographicCamera>())
@@ -44,48 +53,17 @@ ECS::ECS() {
 	// .Add<RigidBodyComponent>(RigidBody::Type::Static)
 	.Finalize();
 
-	auto cube = Mesh::Create(MeshPrimitive::Cube,
-		Material
-		{
-			.Diffuse = Texture::Create("Sandbox/assets/images/wood.png")
-		});
-	for(uint32_t i = 0; i < 20; i++)
-		world.BuildEntity("Cube" + std::to_string(i + 1))
-		.Add<TransformComponent>(
-			Transform
-			{
-				.Translation = { (float)Random::RandInt(-10, 10), (float)Random::RandInt(-10, 10), (float)Random::RandInt(-10, 10) }
-			})
-		.Add<MeshComponent>(cube)
-		// .Add<RigidBodyComponent>(RigidBody::Type::Static)
-		.Finalize();
-
-	auto ball = Mesh::Create("Sandbox/assets/models/sphere/wooden_sphere.obj");
-	for(uint32_t i = 0; i < 20; i++)
-		world.BuildEntity("Ball" + std::to_string(i + 1))
-		.Add<TransformComponent>(
-			Transform
-			{
-				.Translation = { (float)Random::RandInt(-10, 10), (float)Random::RandInt(-10, 10), (float)Random::RandInt(-10, 10) },
-				.Scale = glm::vec3(0.1f)
-			})
-		.Add<MeshComponent>(ball)
-		// .Add<RigidBodyComponent>(RigidBody::Type::Static)
-		.Finalize();
-
 	scene->Save("Magma/assets/scenes/temp.magma.scene");
 	VOLCANICORE_LOG_INFO("Success");
 }
 
 void ECS::OnUpdate(TimeStep ts) {
-	// RendererAPI::Get()->Clear();
-
-	renderer.Update(ts);
+	// renderer.Update(ts);
 	scene->OnUpdate(ts);
-	scene->OnRender(renderer);
+	// scene->OnRender(renderer);
 
-	auto output = renderer.GetOutput();
-	// RendererAPI::Get()->RenderFramebuffer(output, AttachmentTarget::Color);
+	// Ref<Framebuffer> output = renderer.GetOutput();
+	// Renderer2D::DrawFullscreenQuad(output, AttachmentTarget::Color);
 }
 
 }

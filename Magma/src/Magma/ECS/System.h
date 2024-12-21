@@ -28,7 +28,7 @@ class World;
 template<typename ...TComponents>
 class System {
 public:
-	using RequiredComponents = TypeList<TComponents&...>;
+	using RequiredComponents = TypeList<TComponents...>;
 
 public:
 	System(World* world)
@@ -38,8 +38,8 @@ public:
 	virtual void Update(TimeStep ts) = 0;
 	virtual void Run(Phase phase) = 0;
 
-	RequiredComponents GetRequired(Entity& entity) {
-		return { entity.Get<TComponents>()... }; // Weird, isn't it?
+	TypeList<TComponents&...> GetRequired(Entity& entity) {
+		return { entity.Get<TComponents>()... };
 	}
 
 protected:

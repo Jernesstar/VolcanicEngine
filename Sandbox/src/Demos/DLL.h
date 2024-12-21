@@ -2,7 +2,7 @@
 
 #include <Magma/Core/DLL.h>
 
-#include <TestProj/TestProj/src/TestObject.h>
+#include <TestProj/TestObject.h>
 
 using namespace TestLib;
 

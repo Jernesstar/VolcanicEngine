@@ -2,7 +2,7 @@
 
 #include "Tab.h"
 
-#include "UI/UIElement.h"
+#include "UI/UIPage.h"
 
 using namespace VolcaniCore;
 
@@ -11,20 +11,20 @@ namespace Magma {
 class UITab : public Tab {
 public:
 	UITab();
-	UITab(Ref<UI::UIElement> scene);
+	UITab(const UI::UIPage& page);
 	~UITab();
 
 	void Update(TimeStep ts) override;
 	void Render() override;
 
-	void SetUI(Ref<UI::UIElement> element);
 	void SetUI(const std::string& path);
 
 private:
-	Ref<UI::UIElement> m_Root;
+	UI::UIPage m_Root;
 
 private:
 	void Setup();
+	void Save(const std::string& path);
 
 	void NewUI();
 	void OpenUI();

@@ -11,7 +11,7 @@ public:
 public:
 	Dropdown();
 	Dropdown(const std::string& id, UIPage* root)
-		: UIElement(UIElement::Type::Dropdown, id, root) { }
+		: UIElement(UIElementType::Dropdown, id, root) { }
 
 	std::string GetSelection() const { return std::string(m_CurrentItem); }
 

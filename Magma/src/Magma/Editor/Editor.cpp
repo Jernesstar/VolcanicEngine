@@ -26,7 +26,8 @@ Editor::~Editor() {
 }
 
 void Editor::OnUpdate(TimeStep ts) {
-	// RendererAPI::Get()->Clear();
+	RendererAPI::Get()->NewDrawCommand()->Clear = true;
+	RendererAPI::Get()->EndFrame();
 
 	UI::UIRenderer::BeginFrame();
 	m_EditorLayer.Update(ts);

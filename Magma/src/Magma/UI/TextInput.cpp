@@ -1,17 +1,15 @@
 #include "TextInput.h"
 
-#include "UIPage.h"
+#include "UIRenderer.h"
 
 namespace Magma::UI {
 
 TextInput::TextInput(uint32_t maxChars)
-	: UIElement(UIElement::Type::TextInput),
+	: UIElement(UIElementType::TextInput),
 		MaxCharCount(maxChars), Text("") { }
 
 void TextInput::Draw() {
 	m_State = UIRenderer::DrawTextInput(*this);
-	if(m_Root)
-		m_Root->OnEvent(m_ID, m_State);
 }
 
 }

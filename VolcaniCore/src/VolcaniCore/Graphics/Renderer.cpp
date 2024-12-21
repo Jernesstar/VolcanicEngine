@@ -17,6 +17,8 @@ const uint64_t Renderer::MaxInstances = MaxTriangles * 4;
 
 static Ref<RenderPass> s_RenderPass;
 static DrawCommand* s_DrawCommand;
+static DrawCall s_Options;
+static bool s_OptionsValid = false;
 static FrameData s_Frame;
 
 static uint64_t DrawCallCount;
@@ -105,6 +107,16 @@ void Renderer::Resize(uint32_t width, uint32_t height) {
 	VOLCANICORE_ASSERT(s_DrawCommand, "Did you forget to call StartPass?");
 	s_DrawCommand->ViewportWidth = width;
 	s_DrawCommand->ViewportHeight = height;
+}
+
+void Renderer::SetOptions(const DrawCall& options) {
+	s_Options = options;
+	s_OptionsValid = true;
+}
+
+DrawCall Renderer::GetOptions() {
+	s_OptionsValid = false;
+	return s_Options;
 }
 
 void Renderer::Flush() {

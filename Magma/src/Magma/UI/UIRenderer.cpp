@@ -32,15 +32,41 @@ using namespace VolcaniCore;
 
 namespace Magma::UI {
 
-enum class UIElementType { Window, MenuBar, Menu, TabBar, Tab };
-
-static List<UIElementType> s_Stack; // Elements that need ImGui::End to be called
+enum class UIType { Window, MenuBar, Menu, TabBar, Tab };
+static List<UIType> s_Stack;
 
 UIState UIRenderer::DrawWindow(UI::Window& window) {
-	s_Stack.push_back(UIElementType::Window);
+	s_Stack.push_back(UIType::Window);
 
+	int32_t alignX = 0;
+	int32_t alignY = 0;
 	ImGuiViewport* viewport = ImGui::GetMainViewport();
-	ImGui::SetNextWindowPos(ImVec2(viewport->Pos.x + window.x, viewport->Pos.y + window.y));
+
+	if(!window.GetParent()) {
+		switch(window.xAlignment) {
+			case XAlignment::Center:
+				alignX = viewport->Size.x / 2;
+				break;
+			case XAlignment::Right:
+				alignX = viewport->Size.x;
+		}
+		switch(window.yAlignment) {
+			case YAlignment::Center:
+				alignY = viewport->Size.y / 2;
+				break;
+			case YAlignment::Bottom:
+				alignY = viewport->Size.y;
+		}
+	}
+	else
+		window.Align();
+
+	ImGui::SetNextWindowPos(
+		ImVec2
+		{
+			viewport->Pos.x + alignX + window.x,
+			viewport->Pos.y + alignY + window.y
+		});
 	ImGui::SetNextWindowSize(ImVec2(window.Width, window.Height));
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 1.0f);
@@ -85,7 +111,7 @@ static void ButtonImage(Ref<UIElement> element, ImVec2 dim) {
 }
 
 UIState UIRenderer::DrawButton(UI::Button& button) {
-	if(button.Display->GetType() == UIElement::Type::Image)
+	if(button.Display->GetType() == UIElementType::Image)
 		ButtonFunction = ButtonImage;
 	else
 		ButtonFunction = ButtonText;
@@ -128,8 +154,7 @@ UIState UIRenderer::DrawText(UI::Text& text) {
 	text.Width = size.x;
 	text.Height = size.y;
 
-	ImVec4 color{ text.Color.r, text.Color.g, text.Color.b, text.Color.a };
-	ImGui::PushStyleColor(ImGuiCol_Text, color);
+	ImGui::PushStyleColor(ImGuiCol_Text, text.Color);
 	ImGui::SetCursorPos(ImVec2(text.x, text.y));
 
 	ImGui::Text(text.Content.c_str());
@@ -190,7 +215,7 @@ UIState UIRenderer::DrawDropdown(Dropdown& dropdown) {
 UIState UIRenderer::DrawMenuBar(const std::string& name) {
 	ImGui::BeginMainMenuBar();
 
-	s_Stack.push_back(UIElementType::MenuBar);
+	s_Stack.push_back(UIType::MenuBar);
 
 	return {
 		ImGui::IsItemClicked(),
@@ -203,7 +228,7 @@ UIState UIRenderer::DrawMenuBar(const std::string& name) {
 UIState UIRenderer::DrawMenu(const std::string& name) {
 	ImGui::BeginMenu(name.c_str());
 
-	s_Stack.push_back(UIElementType::Menu);
+	s_Stack.push_back(UIType::Menu);
 
 	return {
 		ImGui::IsItemClicked(),
@@ -214,7 +239,7 @@ UIState UIRenderer::DrawMenu(const std::string& name) {
 }
 
 UIState UIRenderer::DrawTabBar(const std::string& name) {
-	s_Stack.push_back(UIElementType::TabBar);
+	s_Stack.push_back(UIType::TabBar);
 
 	ImGui::BeginTabBar(name.c_str(), ImGuiTabBarFlags_Reorderable);
 
@@ -227,34 +252,29 @@ UIState UIRenderer::DrawTabBar(const std::string& name) {
 }
 
 TabState UIRenderer::DrawTab(const std::string& name) {
-	s_Stack.push_back(UIElementType::Tab);
+	// s_Stack.push_back(UIType::Tab);
 
-	auto size = ImGui::CalcTextSize(name.c_str());
+	ImVec2 size = ImGui::CalcTextSize(name.c_str());
 	float padding{4.0f};
-	ImGui::SetNextItemWidth(size.x + 6.0f*padding);
-
-	auto strID = name + "##";
-	bool tabItem = ImGui::BeginTabItem(strID.c_str());
-
 	float tabHeight{6.5f};
 	float radius{ tabHeight * 0.5f - padding };
+
+	ImGui::SetNextItemWidth(size.x + 6.0f*padding);
+	bool tabItem = ImGui::BeginTabItem(name.c_str());
+
 	ImVec2 pos;
 	pos.x = ImGui::GetItemRectMax().x - radius - 5.0f*padding;
 	pos.y = ImGui::GetItemRectMin().y + radius + padding;
 
 	TabState state;
 	if(tabItem) {
-		if(ImGui::IsItemClicked(0))
-			state.Clicked = true;
-		if(ImGui::IsItemHovered())
-			state.Hovered = true;
-
+		state.Clicked = ImGui::IsItemClicked(0);
+		state.Hovered = ImGui::IsItemHovered();
 		ImGui::EndTabItem();
 	}
 
-	auto closeButtonID = ImGui::GetID(("Close##" + strID).c_str());
-	if(ImGui::CloseButton(closeButtonID, pos))
-		state.Closed = true;
+	auto closeButtonID = ImGui::GetID(("CloseButton##" + name).c_str());
+	state.Closed = ImGui::CloseButton(closeButtonID, pos);
 
 	return state;
 }
@@ -270,24 +290,24 @@ void UIRenderer::BeginFrame() {
 }
 
 void UIRenderer::EndFrame() {
-	while(s_Stack.size() > 0) {
+	while(s_Stack.size()) {
 		auto type = s_Stack.back();
 		s_Stack.pop_back();
 
 		switch(type) {
-			case UIElementType::Window:
+			case UIType::Window:
 				ImGui::End();
 				break;
-			case UIElementType::MenuBar:
+			case UIType::MenuBar:
 				ImGui::EndMainMenuBar();
 				break;
-			case UIElementType::Menu:
+			case UIType::Menu:
 				ImGui::EndMenu();
 				break;
-			case UIElementType::TabBar:
+			case UIType::TabBar:
 				ImGui::EndTabBar();
 				break;
-			case UIElementType::Tab:
+			case UIType::Tab:
 				ImGui::EndTabItem();
 		}
 	}

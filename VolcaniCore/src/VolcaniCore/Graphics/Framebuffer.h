@@ -20,14 +20,9 @@ public:
 		: m_Width(width), m_Height(height) { }
 	virtual ~Framebuffer() = default;
 
-	virtual void Bind() const = 0;
-	virtual void Unbind() const = 0;
-
 	virtual bool Has(AttachmentTarget target) const = 0;
-	virtual void Set(AttachmentTarget target, Ref<Texture> texture,
-					 uint32_t index = 0) = 0;
-	virtual void Bind(AttachmentTarget target, uint32_t slot,
-					  uint32_t index = 0) const = 0;
+	virtual void Add(AttachmentTarget target, Ref<Texture> texture) = 0;
+	virtual Ref<Texture> Get(AttachmentTarget target, uint32_t idx = 0) const = 0;
 
 	uint32_t GetWidth() const { return m_Width; }
 	uint32_t GetHeight() const { return m_Height; }

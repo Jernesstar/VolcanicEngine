@@ -7,7 +7,7 @@
 namespace VolcaniCore {
 
 Ref<Texture> Texture::Create(uint32_t width, uint32_t height,
-							 InternalFormat format, SamplingOption sampling)
+							 Format format, Sampling sampling)
 {
 	RendererAPI::Backend backend = RendererAPI::Get()->GetBackend();
 

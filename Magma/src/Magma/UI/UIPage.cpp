@@ -2,11 +2,10 @@
 
 #include <filesystem>
 
-#include <rapidjson/rapidjson.h>
-
 #include <VolcaniCore/Core/Log.h>
 #include <VolcaniCore/Core/FileUtils.h>
 
+#include "UI.h"
 #include "UIObject.h"
 
 #define GET_LIST(TUIElement) \
@@ -17,8 +16,8 @@ List<TUIElement>& UIPage::GetList<TUIElement>() { \
 
 #define GET_TYPE(TUIElement) \
 template<> \
-UIElement::Type UIPage::GetType<TUIElement>() { \
-	return UIElement::Type::TUIElement; \
+UIElementType UIPage::GetType<TUIElement>() { \
+	return UIElementType::TUIElement; \
 }
 
 namespace Magma::UI {
@@ -49,6 +48,9 @@ UIPage::UIPage(const std::string& filePathName) {
 }
 
 void UIPage::Load(const std::string& filePathName) {
+	if(filePathName == "")
+		return;
+
 	auto jsonPath = filePathName + ".magma.ui.json";
 	auto funcPath = filePathName + ".magma.ui.func";
 	if(!FileUtils::FileExists(jsonPath)) {
@@ -140,49 +142,58 @@ void UIPage::OnEvent(const std::string& id, const UIState& state) {
 		object->OnMouseDown();
 }
 
-UINode UIPage::Add(UIElement::Type type, const std::string& id) {
+UINode UIPage::Add(UIElementType type, const std::string& id) {
 	switch(type) {
-		case UIElement::Type::Window:
+		case UIElementType::Window:
 			Windows.emplace_back(id, this);
 			return { type, Windows.size() - 1 };
-		case UIElement::Type::Button:
+		case UIElementType::Button:
 			Buttons.emplace_back(id, this);
 			return { type, Buttons.size() - 1 };
-		case UIElement::Type::Dropdown:
+		case UIElementType::Dropdown:
 			Dropdowns.emplace_back(id, this);
 			return { type, Dropdowns.size() - 1 };
-		case UIElement::Type::Text:
+		case UIElementType::Text:
 			Texts.emplace_back(id, this);
 			return { type, Texts.size() - 1 };
-		case UIElement::Type::TextInput:
+		case UIElementType::TextInput:
 			TextInputs.emplace_back(id, this);
 			return { type, TextInputs.size() - 1 };
-		case UIElement::Type::Image:
+		case UIElementType::Image:
 			Images.emplace_back(id, this);
 			return { type, Images.size() - 1 };
 	}
 
-	return { UIElement::Type::Window, Windows.size() };
+	return { UIElementType::None, 0 };
 }
 
 UIElement* UIPage::Get(const UINode& node) const {
 	// TODO(Fix): The pointers might become invalid if the map reallocates
 	switch(node.first) {
-		case UIElement::Type::Window:
+		case UIElementType::Window:
 			return (UIElement*)&Windows[node.second];
-		case UIElement::Type::Button:
+		case UIElementType::Button:
 			return (UIElement*)&Buttons[node.second];
-		case UIElement::Type::Dropdown:
+		case UIElementType::Dropdown:
 			return (UIElement*)&Dropdowns[node.second];
-		case UIElement::Type::Text:
+		case UIElementType::Text:
 			return (UIElement*)&Texts[node.second];
-		case UIElement::Type::TextInput:
+		case UIElementType::TextInput:
 			return (UIElement*)&TextInputs[node.second];
-		case UIElement::Type::Image:
+		case UIElementType::Image:
 			return (UIElement*)&Images[node.second];
 	}
 
 	return nullptr;
+}
+
+void UIPage::Clear() {
+	Windows.clear();
+	Buttons.clear();
+	Dropdowns.clear();
+	Texts.clear();
+	TextInputs.clear();
+	Images.clear();
 }
 
 UIElement* UIPage::Get(const std::string& id) const {
@@ -228,11 +239,11 @@ void LoadElement(UIPage* page, const rapidjson::Value& docElement) {
 	UIElement* element;
 
 	if(typeStr == "Window") {
-		node = page->Add(UIElement::Type::Window, id);
+		node = page->Add(UIElementType::Window, id);
 		element = page->Get(node);
 	}
 	if(typeStr == "Button") {
-		node = page->Add(UIElement::Type::Button, id);
+		node = page->Add(UIElementType::Button, id);
 		element = page->Get(node);
 		auto* button = element->As<Button>();
 
@@ -246,19 +257,19 @@ void LoadElement(UIPage* page, const rapidjson::Value& docElement) {
 			button->Display = CreateRef<Text>(button->GetID());
 	}
 	if(typeStr == "Dropdown") {
-		node = page->Add(UIElement::Type::Dropdown, id);
+		node = page->Add(UIElementType::Dropdown, id);
 		element = page->Get(node);
 	}
 	if(typeStr == "Text") {
-		node = page->Add(UIElement::Type::Text, id);
+		node = page->Add(UIElementType::Text, id);
 		element = page->Get(node);
 	}
 	if(typeStr == "TextInput") {
-		node = page->Add(UIElement::Type::TextInput, id);
+		node = page->Add(UIElementType::TextInput, id);
 		element = page->Get(node);
 	}
 	if(typeStr == "Image") {
-		node = page->Add(UIElement::Type::Image, id);
+		node = page->Add(UIElementType::Image, id);
 		element = page->Get(node);
 	}
 
@@ -268,29 +279,42 @@ void LoadElement(UIPage* page, const rapidjson::Value& docElement) {
 		page->Get(parent)->Add(node);
 
 	// TODO(Implement): Element alignement
-	auto width = docElement["Width"].Get<uint32_t>();
-	auto height = docElement["Height"].Get<uint32_t>();
-	auto x = docElement["x"].Get<uint32_t>();
-	auto y = docElement["y"].Get<uint32_t>();
-	const auto& array = docElement["Color"];
-	auto color =
+	element->Width = docElement["Width"].Get<uint32_t>();
+	element->Height = docElement["Height"].Get<uint32_t>();
+	element->xAlignment = XAlignment::Left;
+	if(docElement.HasMember("xAlignment")) {
+		const auto& xAlign = docElement["xAlignment"];
+		if(xAlign.Get<std::string>() == "Center")
+			element->xAlignment = XAlignment::Center;
+		else if(xAlign.Get<std::string>() == "Right")
+			element->xAlignment = XAlignment::Right;
+	}
+	element->yAlignment = YAlignment::Top;
+	if(docElement.HasMember("yAlignment")) {
+		const auto& yAlign = docElement["yAlignment"];
+		if(yAlign.Get<std::string>() == "Center")
+			element->yAlignment = YAlignment::Center;
+		else if(yAlign.Get<std::string>() == "Bottom")
+			element->yAlignment = YAlignment::Bottom;
+	}
+	element->x = docElement["x"].Get<int32_t>();
+	element->y = docElement["y"].Get<int32_t>();
+	element->Color =
 		glm::vec4
 		{
-			array[0].Get<float>(),
-			array[1].Get<float>(),
-			array[2].Get<float>(),
-			array[3].Get<float>()
+			docElement["Color"][0].Get<float>(),
+			docElement["Color"][1].Get<float>(),
+			docElement["Color"][2].Get<float>(),
+			docElement["Color"][3].Get<float>()
 		};
 
-	element->Color = color;
-	element->SetSize(width, height);
-	element->SetPosition(x, y);
 }
 
 void CompileElement(const std::string& genPath, const std::string& funcPath,
 					const rapidjson::Value& docElement)
 {
-	if(!docElement.HasMember("OnClick")
+	if(!docElement.HasMember("OnUpdate")
+	&& !docElement.HasMember("OnClick")
 	&& !docElement.HasMember("OnHover")
 	&& !docElement.HasMember("OnMouseUp")
 	&& !docElement.HasMember("OnMouseDown"))
@@ -309,15 +333,18 @@ void CompileElement(const std::string& genPath, const std::string& funcPath,
 	std::string funcFileStr = funcFile.Get();
 	auto elementIdx = funcFileStr.find(id);
 
-	for(std::string name : { "OnClick", "OnHover", "OnMouseUp", "OnMouseDown" })
+	for(std::string name :
+		{ "OnUpdate", "OnClick", "OnHover", "OnMouseUp", "OnMouseDown" })
 	{
 		if(!docElement.HasMember(name))
 			continue;
 
 		const auto& element = docElement[name];
 
-		hFile.Write("\tvoid " + name + "() override {");
-		hFile.Write("\t\tUIObject::" + name + "();");
+		hFile.Write("\tvoid " + name + "(" +
+					(name == "OnUpdate" ? "TimeStep ts" : "") + ") override {");
+		hFile.Write("\t\tUIObject::" + name + "(" +
+					(name == "OnUpdate" ? "ts" : "") + ");");
 
 		if(element.IsObject()) {
 			// Animation
@@ -374,8 +401,8 @@ void GenFiles(const std::string& genPath, const std::string& funcPath) {
 	auto hFile = File(genPath + ".h");
 	auto cppFile = File(genPath + ".cpp");
 	auto funcFile = File(funcPath);
-	auto funcFileStr = funcFile.Get();
-	auto elementsIdx = funcFileStr.find("namespace UIObjects");
+	std::string funcFileStr = funcFile.Get();
+	uint64_t elementsIdx = funcFileStr.find("namespace UIObjects");
 
 	hFile
 	.Write(funcFileStr.substr(0, elementsIdx - 1))

@@ -29,7 +29,7 @@ public:
 public:
 	Window() = default;
 	Window(const std::string& id, UIPage* root)
-		: UIElement(UIElement::Type::Window, id, root) { }
+		: UIElement(UIElementType::Window, id, root) { }
 
 protected:
 	void Draw() override;

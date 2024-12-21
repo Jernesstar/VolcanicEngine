@@ -40,19 +40,18 @@ public:
 				uint32_t width = 0, uint32_t height = 0);
 	~Framebuffer();
 
-	void Bind() const override;
-	void Unbind() const override;
+	void Bind() const;
+	void Unbind() const;
 
 	bool Has(AttachmentTarget target) const override {
 		return m_AttachmentMap.count(target) == 1;
 	}
-	void Set(AttachmentTarget target,
-			 Ref<Texture> texture, uint32_t index = 0) override;
+	void Add(AttachmentTarget target, Ref<Texture> texture) override;
+	Ref<Texture> Get(AttachmentTarget target, uint32_t idx = 0) const override;
 
-	void Bind(AttachmentTarget target, uint32_t slot,
-			  uint32_t index = 0) const override;
+	void Bind(AttachmentTarget target, uint32_t slot, uint32_t index = 0) const;
 
-	const Attachment& Get(AttachmentTarget target, uint32_t index = 0) const {
+	const Attachment& GetAttachment(AttachmentTarget target, uint32_t index = 0) const {
 		return m_AttachmentMap.at(target).at(index);
 	}
 

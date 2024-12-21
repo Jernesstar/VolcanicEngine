@@ -214,6 +214,7 @@ public:
 	uint64_t GetMaxCount() const { return m_MaxCount; }
 	uint64_t GetSize()	   const { return m_Count	 * m_SizeT; }
 	uint64_t GetMaxSize()  const { return m_MaxCount * m_SizeT; }
+	uint64_t GetSizeT() const { return m_SizeT; }
 
 	Buffer<void> Copy() {
 		return Buffer<void>(*this);

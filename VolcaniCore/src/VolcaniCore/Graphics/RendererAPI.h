@@ -4,6 +4,7 @@
 
 #include "Graphics/Shader.h"
 #include "Graphics/Texture.h"
+#include "Graphics/UniformBuffer.h"
 #include "Graphics/Framebuffer.h"
 
 #include "BufferLayout.h"
@@ -68,7 +69,7 @@ struct DrawBufferSpecification {
 	uint64_t MaxInstanceCount = 0;
 };
 
-enum DrawBufferIndex : uint8_t { Indices , Vertices , Instances };
+enum DrawBufferIndex : uint8_t { Indices, Vertices, Instances };
 
 struct DrawBuffer {
 	DrawBufferSpecification Specs;
@@ -130,32 +131,37 @@ struct DrawUniforms {
 	Map<std::string, glm::mat3> Mat3Uniforms;
 	Map<std::string, glm::mat4> Mat4Uniforms;
 
-	void SetInt(const std::string& name, int32_t data) {
+	Map<std::string, Ref<UniformBuffer>> UniformBuffers;
+
+	void SetInput(const std::string& name, int32_t data) {
 		IntUniforms[name] = data;
 	}
-	void SetFloat(const std::string& name, float data) {
+	void SetInput(const std::string& name, float data) {
 		FloatUniforms[name] = data;
 	}
-	void SetTexture(const std::string& name, const TextureSlot& data) {
+	void SetInput(const std::string& name, const TextureSlot& data) {
 		TextureUniforms[name] = data;
 	}
-	void SetVec2(const std::string& name, const glm::vec2& data) {
+	void SetInput(const std::string& name, const glm::vec2& data) {
 		Vec2Uniforms[name] = data;
 	}
-	void SetVec3(const std::string& name, const glm::vec3& data) {
+	void SetInput(const std::string& name, const glm::vec3& data) {
 		Vec3Uniforms[name] = data;
 	}
-	void SetVec4(const std::string& name, const glm::vec4& data) {
+	void SetInput(const std::string& name, const glm::vec4& data) {
 		Vec4Uniforms[name] = data;
 	}
-	void SetMat2(const std::string& name, const glm::mat2& data) {
+	void SetInput(const std::string& name, const glm::mat2& data) {
 		Mat2Uniforms[name] = data;
 	}
-	void SetMat3(const std::string& name, const glm::mat3& data) {
+	void SetInput(const std::string& name, const glm::mat3& data) {
 		Mat3Uniforms[name] = data;
 	}
-	void SetMat4(const std::string& name, const glm::mat4& data) {
+	void SetInput(const std::string& name, const glm::mat4& data) {
 		Mat4Uniforms[name] = data;
+	}
+	void SetInput(const std::string& name, Ref<UniformBuffer> data) {
+		UniformBuffers[name] = data;
 	}
 };
 
@@ -163,10 +169,11 @@ struct DrawCommand {
 	DrawBuffer* BufferData;
 	DrawUniforms UniformData;
 	Ref<ShaderPipeline> Pipeline;
+	List<Pair<AttachmentTarget, uint32_t>> Attachments;
 	Ref<Framebuffer> Image;
 	List<DrawCall> Calls;
 
-	bool Clear = true;
+	bool Clear = false;
 	uint32_t ViewportWidth = 0;
 	uint32_t ViewportHeight = 0;
 

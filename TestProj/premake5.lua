@@ -7,7 +7,7 @@ project "TestProj"
     targetdir ("%{RootPath}/build/TestProj/lib")
 
     files {
-        "**.cpp"
+        "func.cpp"
     }
 
     includedirs {

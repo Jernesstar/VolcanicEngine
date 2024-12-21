@@ -4,13 +4,32 @@
 
 #include "Core/DLL.h"
 
-#include "UI.h"
+#include "UIElement.h"
+#include "Window.h"
+#include "Button.h"
+#include "Dropdown.h"
+#include "Text.h"
+#include "TextInput.h"
+#include "Image.h"
 
 using namespace VolcaniCore;
 
 namespace Magma::UI {
 
-using UINode = std::pair<UIElement::Type, uint32_t>;
+struct ThemeElement {
+	uint32_t Width = 0;
+	uint32_t Height = 0;
+	int32_t x = 0, y = 0; // Could be more accurately named xOffset and yOffset
+	XAlignment xAlignment;
+	YAlignment yAlignment;
+	glm::vec4 Color = glm::vec4(0.0f);
+	glm::vec4 TextColor = glm::vec4(0.0f);
+	Ref<Texture> Image = nullptr;
+	uint32_t BorderWidth = 0;
+	uint32_t BorderHeight = 0;
+	glm::vec4 BorderColor = glm::vec4(0.0f);
+	Ref<Texture> BorderImage = nullptr;
+};
 
 class UIPage {
 public:
@@ -18,10 +37,10 @@ public:
 
 public:
 	UIPage() = default;
-	UIPage(const std::string& filePath);
+	UIPage(const std::string& filePathName);
 	~UIPage() = default;
 
-	void Load(const std::string& filePath);
+	void Load(const std::string& filePathName);
 	void Reload();
 
 	void Update(TimeStep ts);
@@ -29,7 +48,7 @@ public:
 
 	void OnEvent(const std::string& id, const UIState& state);
 
-	UINode Add(UIElement::Type type, const std::string& id);
+	UINode Add(UIElementType type, const std::string& id);
 	void Add(const UINode& node) {
 		m_FirstOrders.push_back(node);
 	}
@@ -50,13 +69,13 @@ public:
 		return { GetType<TUIElement>(), list.size() };
 	}
 
+	void Clear();
+
 	UIElement* Get(const UINode& node) const;
 	UIElement* Get(const std::string& id) const;
 	List<UIElement*> GetFirstOrderElements() const;
 	std::string GetPath() const { return m_Path; }
 	std::string GetName() const { return m_Name; }
-
-	// void SetTheme();
 
 private:
 	List<Window> Windows;
@@ -67,7 +86,8 @@ private:
 	List<Image> Images;
 
 	List<UINode> m_FirstOrders;
-	Map<std::string, UIState> m_States;
+
+	Map<UIElementType, ThemeElement> m_Theme;
 
 	std::string m_Path;
 	std::string m_Name;
@@ -77,7 +97,7 @@ private:
 	template<typename TUIType>
 	List<TUIType>& GetList();
 	template<typename TUIType>
-	UIElement::Type GetType();
+	UIElementType GetType();
 
 	void UpdateElement(UIElement* element, TimeStep ts);
 };

@@ -47,25 +47,25 @@ void UISerializer::Serialize(UIElement* ui, JSONSerializer& serializer) {
 		.WriteKey("Type");
 
 	switch(ui->GetType()) {
-		case UIElement::Type::Empty:
+		case UIElementType::Empty:
 			serializer.Write("Empty");
 			break;
-		case UIElement::Type::Window:
+		case UIElementType::Window:
 			serializer.Write("Window");
 			break;
-		case UIElement::Type::Button:
+		case UIElementType::Button:
 			serializer.Write("Button");
 			break;
-		case UIElement::Type::Dropdown:
+		case UIElementType::Dropdown:
 			serializer.Write("Dropdown");
 			break;
-		case UIElement::Type::Text:
+		case UIElementType::Text:
 			serializer.Write("Text");
 			break;
-		case UIElement::Type::TextInput:
+		case UIElementType::TextInput:
 			serializer.Write("TextInput");
 			break;
-		case UIElement::Type::Image:
+		case UIElementType::Image:
 			serializer.Write("Image");
 			break;
 	}
@@ -78,25 +78,25 @@ void UISerializer::Serialize(UIElement* ui, JSONSerializer& serializer) {
 		.WriteKey("Color").Write(ui->Color);
 
 	switch(ui->GetType()) {
-		case UIElement::Type::Empty:
+		case UIElementType::Empty:
 			Serialize(ui->As<Empty>(), serializer);
 			break;
-		case UIElement::Type::Window:
+		case UIElementType::Window:
 			Serialize(ui->As<Window>(), serializer);
 			break;
-		case UIElement::Type::Button:
+		case UIElementType::Button:
 			Serialize(ui->As<Button>(), serializer);
 			break;
-		case UIElement::Type::Dropdown:
+		case UIElementType::Dropdown:
 			Serialize(ui->As<Dropdown>(), serializer);
 			break;
-		case UIElement::Type::Text:
+		case UIElementType::Text:
 			Serialize(ui->As<Text>(), serializer);
 			break;
-		case UIElement::Type::TextInput:
+		case UIElementType::TextInput:
 			Serialize(ui->As<TextInput>(), serializer);
 			break;
-		case UIElement::Type::Image:
+		case UIElementType::Image:
 			Serialize(ui->As<Image>(), serializer);
 			break;
 	}
@@ -125,46 +125,6 @@ void UISerializer::Save(UIPage* page, const std::string& path) {
 
 	serializer.EndMapping(); // File
 	serializer.Finalize(path);
-}
-
-template<>
-Window* UISerializer::Deserialize(JSONParserNode& serializer) {
-	
-}
-
-template<>
-Button* UISerializer::Deserialize(JSONParserNode& serializer) {
-	
-}
-
-template<>
-Dropdown* UISerializer::Deserialize(JSONParserNode& serializer) {
-	
-}
-
-template<>
-Text* UISerializer::Deserialize(JSONParserNode& serializer) {
-	
-}
-
-template<>
-TextInput* UISerializer::Deserialize(JSONParserNode& serializer) {
-	
-}
-
-template<>
-Image* UISerializer::Deserialize(JSONParserNode& serializer) {
-	
-}
-
-template<>
-UIElement* UISerializer::Deserialize(JSONParserNode& serializer) {
-	
-}
-
-UIPage* UISerializer::Load(const std::string& path) {
-	// TODO(Implement):
-
 }
 
 }
