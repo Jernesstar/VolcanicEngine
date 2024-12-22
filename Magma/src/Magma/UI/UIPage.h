@@ -34,19 +34,16 @@ struct ThemeElement {
 class UIPage {
 public:
 	bool Visible = true;
+	const std::string Name;
 
 public:
-	UIPage() = default;
-	UIPage(const std::string& filePathName);
+	UIPage(const std::string& name)
+		: Name(name) { }
 	~UIPage() = default;
 
-	void Load(const std::string& filePathName);
-	void Reload();
-
-	void Update(TimeStep ts);
 	void Render();
 
-	void OnEvent(const std::string& id, const UIState& state);
+	void Traverse(const Func<void, UIElement*>& func);
 
 	UINode Add(UIElementType type, const std::string& id);
 	void Add(const UINode& node) {
@@ -74,8 +71,6 @@ public:
 	UIElement* Get(const UINode& node) const;
 	UIElement* Get(const std::string& id) const;
 	List<UIElement*> GetFirstOrderElements() const;
-	std::string GetPath() const { return m_Path; }
-	std::string GetName() const { return m_Name; }
 
 private:
 	List<Window> Windows;
@@ -88,10 +83,6 @@ private:
 	List<UINode> m_FirstOrders;
 
 	Map<UIElementType, ThemeElement> m_Theme;
-
-	std::string m_Path;
-	std::string m_Name;
-	Ref<DLL> m_GenFile;
 
 private:
 	template<typename TUIType>

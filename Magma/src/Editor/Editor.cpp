@@ -4,7 +4,9 @@
 #include <VolcaniCore/Event/Events.h>
 #include <VolcaniCore/Graphics/RendererAPI.h>
 
-#include <UI/UI.h>
+#include <Magma/UI/UI.h>
+
+using namespace Magma::UI;
 
 namespace Magma {
 
@@ -18,21 +20,21 @@ Editor::Editor()
 				Application::Close();
 		});
 
-	UI::UIRenderer::Init();
+	UIRenderer::Init();
 }
 
 Editor::~Editor() {
-	UI::UIRenderer::Close();
+	UIRenderer::Close();
 }
 
 void Editor::OnUpdate(TimeStep ts) {
 	RendererAPI::Get()->NewDrawCommand()->Clear = true;
 	RendererAPI::Get()->EndFrame();
 
-	UI::UIRenderer::BeginFrame();
+	UIRenderer::BeginFrame();
 	m_EditorLayer.Update(ts);
 	m_EditorLayer.Render();
-	UI::UIRenderer::EndFrame();
+	UIRenderer::EndFrame();
 }
 
 }

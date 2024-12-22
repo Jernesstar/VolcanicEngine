@@ -12,7 +12,7 @@ public:
 	void OnUpdate(TimeStep ts);
 
 private:
-	Ref<Project> project;
+
 };
 
 UI::UI()
@@ -25,12 +25,6 @@ UI::UI()
 				Application::Close();
 		});
 
-	project = Project::Create("TestProj/.volc.proj");
-	project->Reload();
-
-	VOLCANICORE_LOG_INFO("UI project is now running");
-	UIBrowser::SetPage("test");
-
 	UIRenderer::Init();
 }
 
@@ -40,9 +34,6 @@ UI::~UI() {
 
 void UI::OnUpdate(TimeStep ts) {
 	UIRenderer::BeginFrame();
-
-	UIBrowser::OnUpdate(ts);
-	UIBrowser::OnRender();
 
 	UIRenderer::EndFrame();
 }

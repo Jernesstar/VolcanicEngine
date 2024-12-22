@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Lava/Core/Project.h>
+#include <Magma/Core/Project.h>
 
 #include "Tab.h"
 #include "SceneTab.h"
@@ -20,7 +20,7 @@ public:
 	void Render();
 
 private:
-	Ref<Lava::Project> m_Project;
+	Ref<Project> m_Project;
 	Ref<Tab> m_CurrentTab;
 	List<Ref<Tab>> m_Tabs;
 	List<Ref<Tab>> m_ClosedTabs;

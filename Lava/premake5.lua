@@ -37,7 +37,7 @@ project "Lava"
 
     links {
         "Magma",
-        -- "VolcaniCore",
+        "VolcaniCore",
 
         "imgui",
         "yaml-cpp",
@@ -67,7 +67,7 @@ project "Runtime"
     targetdir ("%{RootPath}/build/Lava/lib")
 
     files {
-        "main.cpp"
+        "src/main.cpp"
     }
 
     includedirs {
@@ -76,6 +76,9 @@ project "Runtime"
         "%{RootPath}/VolcaniCore/src",
         "%{RootPath}/VolcaniCore/src/VolcaniCore",
         "%{RootPath}/VolcaniCore/src/impl",
+
+        "%{RootPath}/Magma/src",
+        "%{RootPath}/Magma/src/Magma",
 
         "%{Includes.imgui}/imgui",
         "%{Includes.yaml_cpp}",
@@ -95,13 +98,35 @@ project "Runtime"
         "Magma",
         "VolcaniCore",
 
+        "glfw",
+        "glad",
+        "assimp",
+        "freetype",
+        "stb_image",
+
         "imgui",
         "yaml-cpp",
         "ImGuiFileDialog",
         "flecs",
         "rapidjson",
-        -- "PhysX",
     }
+
+    filter "system:linux"
+        links {
+            "pthread",
+            "dl",
+            "GL",
+            "X11",
+        }
+
+    filter "system:windows"
+        systemversion "latest"
+        links {
+            "gdi32",
+            "kernel32",
+            "psapi",
+            "Ws2_32",
+        }
 
     filter "toolset:gcc or toolset:clang"
         buildoptions {
@@ -109,9 +134,6 @@ project "Runtime"
             "-Wno-format-security",
             "-Wno-pointer-arith"
         }
-
-    filter "system:windows"
-        systemversion "latest"
 
 include "Magma/.builddeps/imgui"
 include "Magma/.builddeps/yaml-cpp"

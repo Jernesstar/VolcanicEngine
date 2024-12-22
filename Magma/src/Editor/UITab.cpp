@@ -26,7 +26,9 @@ struct {
 	} edit;
 } menu;
 
-UITab::UITab() {
+UITab::UITab()
+	: m_Root("")
+{
 	Setup();
 }
 
@@ -110,7 +112,7 @@ void UITab::Setup() {
 }
 
 void UITab::SetUI(const std::string& path) {
-	m_Root.Load(path);
+	// m_Root.Load(path);
 
 	auto picker = GetPanel("UIElementPicker")->As<UIElementPickerPanel>();
 	auto visual = GetPanel("UIVisualizer")->As<UIVisualizerPanel>();
@@ -133,7 +135,7 @@ void UITab::OpenUI() {
 		if(instance->IsOk()) {
 			std::string path = instance->GetFilePathName();
 			m_Root.Clear();
-			m_Root.Load(path);
+			// m_Root.Load(path);
 		}
 
 		instance->Close();

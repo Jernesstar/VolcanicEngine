@@ -25,7 +25,7 @@ workspace "VolcanicEngine"
 include "VolcaniCore"
 include "Magma"
 include "Lava"
-
+include "Ash"
 include "Sandbox"
 
 RootPath = _MAIN_SCRIPT_DIR;

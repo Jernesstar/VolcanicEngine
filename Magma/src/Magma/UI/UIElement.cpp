@@ -41,12 +41,9 @@ void UIElement::Add(const UINode& node) {
 void UIElement::Render() {
 	Draw();
 
-	if(m_Root) {
-		m_Root->OnEvent(m_ID, m_State);
-
+	if(m_Root)
 		for(auto* child : GetChildren())
 			child->Render();
-	}
 }
 
 UIElement& UIElement::SetSize(uint32_t width, uint32_t height) {

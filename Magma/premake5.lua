@@ -19,8 +19,8 @@ project "Magma"
         "%{RootPath}/VolcaniCore/src/VolcaniCore",
         "%{RootPath}/VolcaniCore/src/impl",
 
-        "%{RootPath}/Lava/src",
-        "%{RootPath}/Lava/src/Lava",
+        "%{RootPath}/Magma/src",
+        "%{RootPath}/Magma/src/Magma",
 
         "%{Includes.imgui}/imgui",
         "%{Includes.yaml_cpp}",
@@ -36,7 +36,6 @@ project "Magma"
     }
 
     links {
-        "Lava",
         "VolcaniCore",
 
         "imgui",
@@ -56,6 +55,88 @@ project "Magma"
 
     filter "system:windows"
         systemversion "latest"
+
+
+project "Editor"
+    kind "ConsoleApp"
+    language "C++"
+    cppdialect "C++latest"
+    staticruntime "Off"
+
+    objdir ("%{RootPath}/build/Magma/obj")
+    targetdir ("%{RootPath}/build/Magma/lib")
+
+    files {
+        "src/Editor/**.h",
+        "src/Editor/**.cpp",
+        "src/main.cpp"
+    }
+
+    includedirs {
+        "src/Editor",
+        "src/Magma",
+
+        "%{RootPath}/VolcaniCore/src",
+        "%{RootPath}/VolcaniCore/src/VolcaniCore",
+        "%{RootPath}/VolcaniCore/src/impl",
+
+        "%{RootPath}/Magma/src",
+        "%{RootPath}/Magma/src/Magma",
+
+        "%{Includes.imgui}/imgui",
+        "%{Includes.yaml_cpp}",
+        "%{Includes.ImGuiFileDialog}",
+        "%{Includes.flecs}",
+        "%{Includes.rapidjson}",
+        "%{Includes.PhysX}",
+
+        "%{Includes.glm}",
+        "%{Includes.glad}",
+        "%{Includes.glfw}",
+        "%{Includes.imgui}",
+    }
+
+    links {
+        -- "Lava",
+        "Magma",
+        "VolcaniCore",
+
+        "glfw",
+        "glad",
+        "assimp",
+        "freetype",
+        "stb_image",
+
+        "imgui",
+        "yaml-cpp",
+        "ImGuiFileDialog",
+        "flecs",
+        "rapidjson",
+    }
+
+    filter "system:linux"
+        links {
+            "pthread",
+            "dl",
+            "GL",
+            "X11",
+        }
+
+    filter "system:windows"
+        systemversion "latest"
+        links {
+            "gdi32",
+            "kernel32",
+            "psapi",
+            "Ws2_32",
+        }
+
+    filter "toolset:gcc or toolset:clang"
+        buildoptions {
+            "-fexceptions",
+            "-Wno-format-security",
+            "-Wno-pointer-arith"
+        }
 
 
 include "Magma/.builddeps/imgui"

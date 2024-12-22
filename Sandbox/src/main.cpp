@@ -26,8 +26,6 @@
 #include <Magma/Scene/Scene.h>
 #include <Magma/Scene/SceneSerializer.h>
 
-#include <Magma/Editor/Editor.h>
-
 #include <Magma/ECS/World.h>
 #include <Magma/ECS/Entity.h>
 #include <Magma/ECS/EntityBuilder.h>
@@ -37,13 +35,10 @@
 #include <Magma/Physics/Shape.h>
 #include <Magma/Physics/World.h>
 
-#include <Lava/Core/Project.h>
-
 using namespace VolcaniCore;
 using namespace Magma;
 using namespace Magma::ECS;
 using namespace Magma::Physics;
-using namespace Lava;
 
 #include "Demos/Cube.h"
 #include "Demos/Lighting.h"
@@ -80,8 +75,6 @@ Application* CreateApplication(const CommandLineArgs& args) {
 	if(project == "Collision") return new Demo::Collision();
 	// PBR
 	if(project == "Raytracing") return new Demo::Raytracing();
-	// Magma Editor
-	if(project == "Editor") return new Magma::Editor();
 
 	return new Demo::Template();
 }

@@ -1,0 +1,8 @@
+Project:
+  Name: TestProj
+  Class: TestGame
+  ECS:
+    Entities:
+      -
+    Components:
+      -

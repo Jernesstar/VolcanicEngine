@@ -2,7 +2,6 @@
 
 #include "UIRenderer.h"
 #include "UIPage.h"
-#include "UIBrowser.h"
 #include "UIElement.h"
 #include "UIBuilder.h"
 #include "UISerializer.h"
