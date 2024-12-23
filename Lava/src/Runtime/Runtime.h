@@ -4,7 +4,7 @@
 
 #include <Magma/Core/DLL.h>
 
-#include <Lava/Game.h>
+#include <Lava/App.h>
 
 using namespace VolcaniCore;
 using namespace Magma;
@@ -18,10 +18,10 @@ public:
 
 	void OnUpdate(TimeStep ts) override;
 
-	Game* Get();
+	App* Get();
 
 private:
-	Ref<DLL> m_GameDLL;
+	Ref<DLL> m_AppDLL;
 };
 
 }

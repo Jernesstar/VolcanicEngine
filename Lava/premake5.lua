@@ -64,7 +64,7 @@ project "Runtime"
     staticruntime "Off"
 
     objdir ("%{RootPath}/build/Lava/obj")
-    targetdir ("%{RootPath}/build/Lava/lib")
+    targetdir ("%{RootPath}/build/Lava/bin")
 
     files {
         "src/Runtime/**.cpp"

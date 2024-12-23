@@ -6,10 +6,10 @@ using namespace VolcaniCore;
 
 namespace Lava {
 
-class Game {
+class App {
 public:
-	Game();
-	virtual ~Game() = default;
+	App();
+	virtual ~App() = default;
 
 	virtual void OnLoad();
 	virtual void OnClose();

@@ -19,35 +19,36 @@ Runtime::Runtime(const std::string& volcPath)
 		});
 
 	Project project;
-	// ProjectLoader::Load(project, volcPath);
+	ProjectLoader::Load(project, volcPath);
 	ProjectLoader::Compile(volcPath);
 
 	Application::GetWindow()->SetTitle(project.Name);
 
-	m_GameDLL = CreateRef<DLL>("Lava/projects/Project/build/bin/Project.dll");
+	m_AppDLL = CreateRef<DLL>("Lava/projects/Project/build/lib/Loader.dll");
+	m_AppDLL->GetFunction<void>("LoadApp")();
 
-	Game* game = Get();
-	game->Game::OnLoad();
-	game->OnLoad();
+	// App* app = Get();
+	// app->App::OnLoad();
+	// app->OnLoad();
 }
 
 Runtime::~Runtime() {
-	Game* game = Get();
-	game->OnClose();
-	game->Game::OnClose();
+	App* app = Get();
+	app->OnClose();
+	app->App::OnClose();
 }
 
 void Runtime::OnUpdate(TimeStep ts) {
 	RendererAPI::Get()->NewDrawCommand()->Clear = true;
 	RendererAPI::Get()->EndFrame();
 
-	Game* game = Get();
-	game->OnUpdate(ts);
-	game->Game::OnUpdate(ts);
+	// App* app = Get();
+	// app->OnUpdate(ts);
+	// app->App::OnUpdate(ts);
 }
 
-Game* Runtime::Get() {
-	auto get = m_GameDLL->GetFunction<Game*>("GetGameClass");
+App* Runtime::Get() {
+	auto get = m_AppDLL->GetFunction<App*>("GetApp");
 	return get();
 }
 

@@ -16,15 +16,15 @@ workspace "Projects"
         description = "The path to the directory of a the source files"
     }
 
+
+include "Project"
+include "UI"
+
 VolcanicEngineDir    = os.getenv("VOLC_PATH");
 VolcaniCoreVendorDir = "%{VolcanicEngineDir}/VolcaniCore/vendor"
 MagmaVendorDir       = "%{VolcanicEngineDir}/Magma/vendor"
 
 ProjectSrcDir = _OPTIONS["src"]
--- ProjectSrcDir = "C:/Users/Jercy Mukala/Code/TheMazeIsLava/TheMazeIsLava/src"
-
-include "Project"
-include "UI"
 
 VendorPaths = {}
 Includes = {}

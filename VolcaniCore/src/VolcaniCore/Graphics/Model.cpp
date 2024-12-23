@@ -92,27 +92,29 @@ Ref<Mesh> LoadMesh(const std::string& path,
 	else
 		dir = path.substr(0, slashIndex);
 
-	auto material = scene->mMaterials[mesh->mMaterialIndex];
-	aiColor3D color;
-	aiReturn res;
+	glm::vec4 diffuse = glm::vec4(0.0f);
+	glm::vec4 specular = glm::vec4(0.0f);
+	glm::vec4 emissive = glm::vec4(0.0f);
 
-	res = material->Get(AI_MATKEY_COLOR_DIFFUSE, color);
-	glm::vec4 diffuse = glm::vec4(color.r, color.g, color.b, 1.0);
-	res = material->Get(AI_MATKEY_COLOR_SPECULAR, color);
-	glm::vec4 specular = glm::vec4(color.r, color.g, color.b, 1.0);
-	res = material->Get(AI_MATKEY_COLOR_EMISSIVE, color);
-	glm::vec4 emissive = glm::vec4(color.r, color.g, color.b, 1.0);
+	auto material = scene->mMaterials[mesh->mMaterialIndex];
+	aiColor4D color;
+	if(material->Get(AI_MATKEY_COLOR_DIFFUSE, color) == AI_SUCCESS)
+		diffuse = glm::vec4(color.r, color.g, color.b, color.a);
+	if(material->Get(AI_MATKEY_COLOR_SPECULAR, color) == AI_SUCCESS)
+		specular = glm::vec4(color.r, color.g, color.b, color.a);
+	if(material->Get(AI_MATKEY_COLOR_EMISSIVE, color) == AI_SUCCESS)
+		emissive = glm::vec4(color.r, color.g, color.b, color.a);
 
 	Ref<Mesh> newMesh = Mesh::Create(vertices, indices,
 		Material{
 			.Diffuse  = LoadTexture(dir, mat, aiTextureType_DIFFUSE),
 			.Specular = LoadTexture(dir, mat, aiTextureType_SPECULAR),
 			.Emissive = LoadTexture(dir, mat, aiTextureType_EMISSIVE),
+			// .Roughness = LoadTexture(dir, mat, aiTextureType_DIFFUSE_ROUGHNESS)
 
 			.DiffuseColor  = diffuse,
 			.SpecularColor = specular,
 			.EmissiveColor = emissive
-			// .Roughness = LoadTexture(dir, mat, aiTextureType_DIFFUSE_ROUGHNESS)
 		});
 
 	return newMesh;
@@ -127,8 +129,8 @@ Ref<Texture> LoadTexture(const std::string& dir,
 	aiString path;
 	if(material->GetTexture(type, 0, &path) == AI_FAILURE)
 		return nullptr;
-	std::string p(path.data);
 
+	std::string p(path.data);
 	std::string fullPath = dir + "/" + p;
 	return Texture::Create(fullPath);
 }

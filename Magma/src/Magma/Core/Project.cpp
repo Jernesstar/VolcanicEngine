@@ -10,10 +10,6 @@ Project::~Project() {
 
 }
 
-void Project::SetGameClass(const std::string& name) {
-
-}
-
 void Project::AddClass(const std::string& name) {
 
 }

@@ -1,94 +1,19 @@
-project "Project"
-    kind "StaticLib"
-    language "C++"
-    cppdialect "C++latest"
-
-    objdir ("build/obj")
-    targetdir ("build/lib")
-
-    files {
-        "%{ProjectSrcDir}/**.cpp",
-    }
-
-    includedirs {
-        "%{ProjectSrcDir}/**",
-
-        "%{VolcanicEngineDir}/VolcaniCore/src",
-        "%{VolcanicEngineDir}/VolcaniCore/src/VolcaniCore",
-        "%{VolcanicEngineDir}/VolcaniCore/src/impl",
-
-        "%{VolcanicEngineDir}/Magma/src",
-        "%{VolcanicEngineDir}/Magma/src/Magma",
-
-        "%{VolcanicEngineDir}/Lava/src",
-        "%{VolcanicEngineDir}/Lava/src/Lava",
-
-        "%{Includes.imgui}",
-        "%{Includes.imgui}/imgui",
-        "%{Includes.yaml_cpp}",
-        "%{Includes.ImGuiFileDialog}",
-        "%{Includes.flecs}",
-        "%{Includes.rapidjson}",
-        "%{Includes.PhysX}",
-
-        "%{Includes.glfw}",
-        "%{Includes.glad}",
-        "%{Includes.glm}",
-        "%{Includes.freetype}",
-        "%{Includes.assimp}",
-        "%{Includes.stb_image}",
-    }
-
-    libdirs {
-        "%{VolcanicEngineDir}/build/VolcaniCore/lib",
-        "%{VolcanicEngineDir}/build/Magma/lib",
-        "%{VolcanicEngineDir}/build/Lava/lib"
-    }
-
-    links {
-        "Lava",
-        "Magma",
-        "VolcaniCore",
-
-        "glfw",
-        "glad",
-        "assimp",
-        "freetype",
-        "stb_image",
-
-        "imgui",
-        "yaml-cpp",
-        "ImGuiFileDialog",
-        "flecs",
-        "rapidjson",
-        -- "PhysX",
-    }
-
-    filter "toolset:gcc or toolset:clang"
-        buildoptions {
-            "-fexceptions",
-            "-Wno-format-security"
-        }
-
-    filter "toolset:msc"
-        buildoptions {
-            "/NODEFAULTLIB:library"
-        }
-
-
-project "Loader"
+project "UIPage-{name}"
     kind "SharedLib"
     language "C++"
     cppdialect "C++latest"
 
-    objdir ("build/obj")
-    targetdir ("build/lib")
+    objdir ("build/{name}/obj")
+    targetdir ("build/{name}/bin")
 
     files {
-        "gen/AppLoader.cpp"
+        "gen/{name}.h"
+        "gen/{name}.cpp"
     }
 
     includedirs {
+        "gen",
+
         "%{ProjectSrcDir}/**",
 
         "%{VolcanicEngineDir}/VolcaniCore/src",
@@ -125,9 +50,10 @@ project "Loader"
 
     links {
         "Project",
-        -- "Lava",
-        -- "Magma",
-        -- "VolcaniCore",
+
+        "Lava"
+        "Magma",
+        "VolcaniCore",
 
         "glfw",
         "glad",
@@ -169,10 +95,15 @@ project "Loader"
             "CoreVideo.framework"
         }
 
+    filter "configurations:Debug"
+        runtime "Debug"
+        symbols "on"
+
     filter "toolset:gcc or toolset:clang"
         buildoptions {
             "-fexceptions",
-            "-Wno-format-security"
+            "-Wno-format-security",
+            "-Wno-pointer-arith"
         }
 
     filter "toolset:msc"

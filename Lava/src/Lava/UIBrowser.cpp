@@ -34,9 +34,7 @@ void UIBrowser::Load(const std::string& folderPath) {
 		auto name = p.stem().stem().stem().string();
 		auto filePathName = (fs::path(folderPath) / name).string();
 
-		if(name == "theme")
-			continue;
-		else {
+		if(name != "theme") {
 			UILoader::Load(s_Pages.emplace_back(name), filePathName);
 			UILoader::Compile(filePathName);
 		}
@@ -46,9 +44,8 @@ void UIBrowser::Load(const std::string& folderPath) {
 }
 
 void UIBrowser::Reload() {
-	for(auto& page : s_Pages) {
-		auto path = fs::path("Lava") / "projects" / "UI" / "build" / page.Name;
-		s_DLLs[page.Name] = CreateRef<DLL>((path / "UI.dll").string());
+	for(auto& page : s_Pages) {;
+		s_DLLs[page.Name] = UILoader::GetDLL(page.Name);
 
 		if(&page == s_CurrentPage) {
 			auto load = s_DLLs[page.Name]->GetFunction<void>("LoadObjects");
@@ -92,12 +89,10 @@ void UIBrowser::SetPage(const std::string& name) {
 }
 
 UIPage* UIBrowser::GetPage(const std::string& name) {
-	if(name == "")
-		return nullptr;
-
-	for(auto& page : s_Pages)
-		if(page.Name == name)
-			return &page;
+	if(name != "")
+		for(auto& page : s_Pages)
+			if(page.Name == name)
+				return &page;
 
 	return nullptr;
 }

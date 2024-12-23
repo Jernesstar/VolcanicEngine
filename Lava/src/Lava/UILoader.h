@@ -13,6 +13,7 @@ public:
 	static void Save(const UIPage& page, const std::string& path);
 	static Map<UIElementType, ThemeElement> LoadTheme(const std::string& path);
 	static void Compile(const std::string& path);
+	static Ref<DLL> GetDLL(const std::string& pageName);
 };
 
 }

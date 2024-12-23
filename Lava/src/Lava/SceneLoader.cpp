@@ -11,21 +11,25 @@
 using namespace Magma::ECS;
 using namespace Magma::Physics;
 
+namespace Magma {
+
+template<>
+Serializer& Serializer::Write(const VolcaniCore::Vertex& value) {
+	SetOptions(Serializer::Options::ArrayOneLine);
+	BeginSequence();
+		Write(value.Position);
+		Write(value.Normal);
+		Write(value.TexCoord);
+	EndSequence();
+	return *this;
+}
+
+}
+
 namespace Lava {
 
 static void DeserializeEntity(YAML::Node entityNode, Scene& scene);
 static void SerializeEntity(YAMLSerializer& out, const Entity& entity);
-
-// template<>
-// Serializer& Serializer::Write(const VolcaniCore::Vertex& value) {
-// 	SetOptions(Serializer::Options::ArrayOneLine);
-// 	BeginSequence();
-// 		Write(value.Position);
-// 		Write(value.Normal);
-// 		Write(value.TexCoord);
-// 	EndSequence();
-// 	return *this;
-// }
 
 void SceneLoader::Load(Scene& scene, const std::string& path) {
 	YAML::Node file;

@@ -129,10 +129,9 @@ Map<UIElementType, ThemeElement> UILoader::LoadTheme(const std::string& path) {
 	return res;
 }
 
-static void GenFiles(const std::string& genPath, const std::string& funcPath);
-static void CompleteFiles(const std::string& genPath);
-static void CompileElement(const std::string& genPath,
-						   const std::string& funcPath,
+static void GenFiles(const std::string& name, const std::string& funcPath);
+static void CompleteFiles(const std::string& name);
+static void CompileElement(const std::string& name, const std::string& funcPath,
 						   const rapidjson::Value& docElement);
 
 void UILoader::Compile(const std::string& filePathName) {
@@ -163,15 +162,19 @@ void UILoader::Compile(const std::string& filePathName) {
 		return;
 
 	if(doc.HasMember("Elements")) {
-		auto genPath = fs::path("Lava") / "projects" / "UI" / "gen" / name;
-		GenFiles(genPath.string(), funcPath);
+		GenFiles(name, funcPath);
 
 		const auto& elements = doc["Elements"];
 		for(const auto& element : elements.GetArray())
-			CompileElement(genPath.string(), funcPath, element);
+			CompileElement(name, funcPath, element);
 
-		CompleteFiles(genPath.string());
+		CompleteFiles(name);
 	}
+}
+
+Ref<DLL> UILoader::GetDLL(const std::string& pageName) {
+	auto path = fs::path("Lava") / "projects" / "UI" / "build" / pageName;
+	return CreateRef<DLL>((path / "bin" / "UI.dll").string());
 }
 
 void LoadElement(UIPage& page, const rapidjson::Value& docElement) {
@@ -258,7 +261,7 @@ void LoadElement(UIPage& page, const rapidjson::Value& docElement) {
 		};
 }
 
-void CompileElement(const std::string& genPath, const std::string& funcPath,
+void CompileElement(const std::string& name, const std::string& funcPath,
 					const rapidjson::Value& docElement)
 {
 	if(!docElement.HasMember("OnUpdate")
@@ -268,12 +271,15 @@ void CompileElement(const std::string& genPath, const std::string& funcPath,
 	&& !docElement.HasMember("OnMouseDown"))
 		return;
 
-	auto hFile = File(genPath + ".h");
-	auto cppFile = File(genPath + ".cpp");
+	auto genPath = fs::path("Lava") / "projects" / "UI" / "gen";
+	auto hFile = File((genPath / name).string() + ".h");
+	auto cppFile = File((genPath / name).string() + ".cpp");
 	auto funcFile = File(funcPath);
 
 	std::string id = docElement["ID"].Get<std::string>();
+
 	cppFile.Write("\tm_Objects[\"" + id + "\"] = new " + id + ";");
+
 	hFile
 	.Write("class " + id + " : public UIObject {")
 	.Write("public:");
@@ -295,7 +301,7 @@ void CompileElement(const std::string& genPath, const std::string& funcPath,
 					(name == "OnUpdate" ? "ts" : "") + ");");
 
 		if(element.IsObject()) {
-			// Animation
+			// TODO(Implement): Animation
 		}
 		if(element.IsString()) {
 			auto string = element.Get<std::string>();
@@ -340,13 +346,19 @@ void CompileElement(const std::string& genPath, const std::string& funcPath,
 	hFile.Write("};");
 }
 
-void GenFiles(const std::string& genPath, const std::string& funcPath) {
-	FileUtils::CreateFile(genPath + ".h");
-	FileUtils::CreateFile(genPath + ".cpp");
+void GenFiles(const std::string& name, const std::string& funcPath) {
+	auto genPath = fs::path("Lava") / "projects" / "UI" / "gen";
 
-	auto hFile = File(genPath + ".h");
-	auto cppFile = File(genPath + ".cpp");
+	fs::remove_all(genPath);
+	fs::create_directory(genPath);
+
+	FileUtils::CreateFile((genPath / name).string() + ".h");
+	FileUtils::CreateFile((genPath / name).string() + ".cpp");
+
+	auto hFile = File((genPath / name).string() + ".h");
+	auto cppFile = File((genPath / name).string() + ".cpp");
 	auto funcFile = File(funcPath);
+
 	std::string funcFileStr = funcFile.Get();
 	uint64_t elementsIdx = funcFileStr.find("namespace UIObjects");
 
@@ -368,9 +380,10 @@ void GenFiles(const std::string& genPath, const std::string& funcPath) {
 	.Write("extern \"C\" EXPORT void LoadObjects() {");
 }
 
-void CompleteFiles(const std::string& genPath) {
-	auto hFile = File(genPath + ".h");
-	auto cppFile = File(genPath + ".cpp");
+void CompleteFiles(const std::string& name) {
+	auto genPath = fs::path("Lava") / "projects" / "UI" / "gen";
+	auto hFile = File((genPath / name).string() + ".h");
+	auto cppFile = File((genPath / name).string() + ".cpp");
 
 	cppFile.Write("}"); // LoadObjects
 	cppFile.Write("\n}"); // namespace UIElements

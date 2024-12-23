@@ -6,3 +6,6 @@
 
 # Exes, intermediates, and GNU Makefiles
 build/
+
+# Generated files
+gen/

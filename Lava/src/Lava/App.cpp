@@ -1,4 +1,4 @@
-#include "Game.h"
+#include "App.h"
 
 #include <Magma/UI/UI.h>
 
@@ -8,15 +8,15 @@ using namespace Magma::UI;
 
 namespace Lava {
 
-void Game::OnLoad() {
+void App::OnLoad() {
 	UIRenderer::Init();
 }
 
-void Game::OnClose() {
+void App::OnClose() {
 	UIRenderer::Close();
 }
 
-void Game::OnUpdate(TimeStep ts) {
+void App::OnUpdate(TimeStep ts) {
 	UIRenderer::BeginFrame();
 	UIBrowser::OnUpdate(ts);
 	UIRenderer::EndFrame();

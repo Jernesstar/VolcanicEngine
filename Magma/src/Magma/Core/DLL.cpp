@@ -36,7 +36,7 @@ FuncPtr<void> DLL::GetFuncPtr(void* handle, const std::string& name) {
 	FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
 				   NULL, lastError, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
 				   buf, sizeof(buf), NULL);
-	VOLCANICORE_ASSERT_ARGS(funcPtr, "DLL Load function error: %s", buf);
+	VOLCANICORE_ASSERT_ARGS(funcPtr, "GetFuncPtr: %s", buf);
 
 	return (FuncPtr<void>)funcPtr;
 #elif VOLCANICENGINE_LINUX

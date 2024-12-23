@@ -64,7 +64,7 @@ project "Editor"
     staticruntime "Off"
 
     objdir ("%{RootPath}/build/Magma/obj")
-    targetdir ("%{RootPath}/build/Magma/lib")
+    targetdir ("%{RootPath}/build/Magma/bin")
 
     files {
         "src/Editor/**.h",

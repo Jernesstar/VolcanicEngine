@@ -94,13 +94,10 @@ void Application::PopDir() {
 void Application::SetCurrentDir(const char* path) {
 	auto env = getenv("VOLC_PATH");
 	VOLCANICORE_ASSERT(env != nullptr);
+
 	s_LibraryPath = env;
 
-	fs::path p(path);
-	if(p.stem() == "Sandbox")
-		s_Path = s_LibraryPath;
-	else
-		s_Path = fs::current_path().string();
+	s_Path = fs::current_path().string();
 	s_OldPath = s_Path;
 }
 
