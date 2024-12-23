@@ -15,6 +15,12 @@ public:
 	virtual void OnClose();
 	virtual void OnUpdate(TimeStep ts);
 
+	// template<typename TComponent>
+	// void OnSerialize(const TComponent& component, YAMLSerializer& serializer);
+
+	// template<typename TComponent>
+	// TComponent& OnDeserialize();
+
 private:
 	
 };

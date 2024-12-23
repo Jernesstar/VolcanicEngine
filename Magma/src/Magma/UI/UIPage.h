@@ -34,7 +34,8 @@ struct ThemeElement {
 class UIPage {
 public:
 	bool Visible = true;
-	const std::string Name;
+	std::string Name;
+	Map<UIElementType, ThemeElement> Theme;
 
 public:
 	UIPage(const std::string& name)

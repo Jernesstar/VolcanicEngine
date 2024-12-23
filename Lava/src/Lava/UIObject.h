@@ -4,7 +4,7 @@
 
 using namespace VolcaniCore;
 
-namespace Magma::UI {
+namespace Lava {
 
 class UIObject {
 public:

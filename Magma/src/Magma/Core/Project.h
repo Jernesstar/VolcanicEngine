@@ -2,6 +2,8 @@
 
 #include <VolcaniCore/Core/Defines.h>
 
+#include "YAMLSerializer.h"
+
 using namespace VolcaniCore;
 
 namespace Magma {
@@ -17,6 +19,9 @@ public:
 	void SetGameClass(const std::string& name);
 	void AddClass(const std::string& name);
 	void AddComponent(const std::string& name);
+
+public:
+	std::string m_GameClass;
 };
 
 }

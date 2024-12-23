@@ -67,7 +67,7 @@ project "Runtime"
     targetdir ("%{RootPath}/build/Lava/lib")
 
     files {
-        "src/main.cpp"
+        "src/Runtime/**.cpp"
     }
 
     includedirs {

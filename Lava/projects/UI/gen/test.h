@@ -1,9 +1,11 @@
 #pragma once
 
-#include <Magma/UI/UIObject.h>
 #include <Magma/UI/UIRenderer.h>
 
+#include <Lava/UIObject.h>
+
 using namespace Magma::UI;
+using namespace Lava;
 
 #include <Magma/UI/UI.h>
 #include <VolcaniCore/Core/Log.h>

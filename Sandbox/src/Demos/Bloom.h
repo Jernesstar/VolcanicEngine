@@ -40,8 +40,6 @@ private:
 	float bloomStrength = 0.04f;
 
 	float rotation = 0.0f;
-
-	Ref<Window> window;
 };
 
 Bloom::Bloom()
@@ -79,9 +77,8 @@ Bloom::Bloom()
 	shader = ShaderPipeline::Create("VolcaniCore/assets/shaders", "Mesh");
 	drawPass = RenderPass::Create("Draw", shader);
 
-	window = Application::GetWindow();
-	auto width = window->GetWidth();
-	auto height = window->GetHeight();
+	auto width = Application::GetWindow()->GetWidth();
+	auto height = Application::GetWindow()->GetHeight();
 	src = Framebuffer::Create(width, height);
 	InitMips();
 
@@ -99,15 +96,15 @@ Bloom::Bloom()
 	controller = CameraController{ camera };
 	controller.TranslationSpeed = 5.0f;
 
-	UI::UIRenderer::Init();
+	UIRenderer::Init();
 }
 
 Bloom::~Bloom() {
-	UI::UIRenderer::Close();
+	UIRenderer::Close();
 }
 
 void Bloom::OnUpdate(TimeStep ts) {
-	UI::UIRenderer::BeginFrame();
+	UIRenderer::BeginFrame();
 
 	controller.OnUpdate(ts);
 
@@ -141,7 +138,7 @@ void Bloom::OnUpdate(TimeStep ts) {
 		.Set("u_SrcResolution",
 			[&]() -> glm::vec2
 			{
-				return { window->GetWidth(), window->GetHeight() };
+				return { Application::GetWindow()->GetWidth(), Application::GetWindow()->GetHeight() };
 			})
 		.Set("u_SrcTexture",
 			[&]() -> TextureSlot
@@ -198,17 +195,17 @@ void Bloom::OnUpdate(TimeStep ts) {
 				return { src->Get(AttachmentTarget::Color), 1 };
 			});
 
-		Renderer::Resize(window->GetWidth(), window->GetHeight());
+		Renderer::Resize(Application::GetWindow()->GetWidth(), Application::GetWindow()->GetHeight());
 		Renderer2D::DrawFullscreenQuad(mips, AttachmentTarget::Color);
 	}
 	Renderer::EndPass();
 
-	UI::UIRenderer::EndFrame();
+	UIRenderer::EndFrame();
 }
 
 void Bloom::InitMips() {
-	uint32_t windowWidth = window->GetWidth();
-	uint32_t windowHeight = window->GetHeight();
+	uint32_t windowWidth = Application::GetWindow()->GetWidth();
+	uint32_t windowHeight = Application::GetWindow()->GetHeight();
 
 	glm::vec2 mipSize((float)windowWidth, (float)windowHeight);
 	glm::ivec2 mipIntSize((uint32_t)windowWidth, (uint32_t)windowHeight);

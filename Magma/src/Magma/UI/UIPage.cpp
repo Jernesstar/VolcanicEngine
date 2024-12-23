@@ -43,7 +43,8 @@ static void TraverseElement(UIElement* element,
 		TraverseElement(child, func);
 }
 
-void UIPage::Traverse(const Func<void, UIElement*>& func) {
+void UIPage::Traverse(const Func<void, UIElement *> &func)
+{
 	for(UIElement* element : GetFirstOrderElements())
 		TraverseElement(element, func);
 }
@@ -94,6 +95,7 @@ UIElement* UIPage::Get(const UINode& node) const {
 }
 
 void UIPage::Clear() {
+	m_FirstOrders.clear();
 	Windows.clear();
 	Buttons.clear();
 	Dropdowns.clear();

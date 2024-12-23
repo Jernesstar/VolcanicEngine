@@ -7,7 +7,7 @@ project "UI"
     targetdir ("build/bin")
 
     files {
-        "gen/**.cpp"
+
     }
 
     includedirs {
@@ -108,3 +108,5 @@ project "UI"
         buildoptions {
             "/NODEFAULTLIB:library"
         }
+
+include "pages.lua"

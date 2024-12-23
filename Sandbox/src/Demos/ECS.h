@@ -53,7 +53,7 @@ ECS::ECS() {
 	// .Add<RigidBodyComponent>(RigidBody::Type::Static)
 	.Finalize();
 
-	scene->Save("Magma/assets/scenes/temp.magma.scene");
+	SceneLoader::Save(*scene, "Magma/assets/scenes/temp.magma.scene");
 	VOLCANICORE_LOG_INFO("Success");
 }
 

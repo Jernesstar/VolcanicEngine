@@ -28,14 +28,6 @@ void Scene::OnRender(SceneRenderer& renderer) {
 	renderer.Render();
 }
 
-void Scene::Load(const std::string& path) {
-	SceneSerializer(this).Deserialize(path);
-}
-
-void Scene::Save(const std::string& path) {
-	SceneSerializer(this).Serialize(path);
-}
-
 void Scene::RegisterSystems() {
 	EntityWorld.Add<ScriptSystem>({ Phase::PreUpdate });
 	EntityWorld.Add<PhysicsSystem>(

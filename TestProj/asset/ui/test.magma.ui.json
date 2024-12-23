@@ -4,8 +4,8 @@
         "Window":
         {
             "Border": {
-                "Width": 0.0,
-                "Height": 0.0,
+                "Width": 0,
+                "Height": 0,
                 "Image": "assets/image/aesthetic_window_border.png"
             },
             "Color": [0.3, 0.4, 0.2, 0.6]

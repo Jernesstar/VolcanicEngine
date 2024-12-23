@@ -22,10 +22,15 @@ project "Sandbox"
         "%{RootPath}/VolcaniCore/src",
         "%{RootPath}/VolcaniCore/src/VolcaniCore",
         "%{RootPath}/VolcaniCore/src/impl",
+
         "%{RootPath}/Magma/src",
         "%{RootPath}/Magma/src/Magma",
+
         "%{RootPath}/Ash/src",
-        "%{RootPath}/Ash/src/Magma",
+        "%{RootPath}/Ash/src/Ash",
+
+        "%{RootPath}/Lava/src",
+        "%{RootPath}/Lava/src/Lava",
 
         "%{Includes.imgui}",
         "%{Includes.imgui}/imgui",
@@ -44,6 +49,7 @@ project "Sandbox"
     }
 
     links {
+        -- "Ash",
         "Lava",
         "Magma",
         "VolcaniCore",

@@ -108,4 +108,17 @@ void World::ForEach(const Func<void, Entity&>& func) {
 	m_World.defer_end();
 }
 
+void World::ForEach(const Func<void, const Entity&>& func) const {
+	m_World.defer_begin();
+
+	m_AllEntitiesQuery.each(
+		[&func](flecs::entity handle)
+		{
+			Entity entity{ handle };
+			func(entity);
+		});
+
+	m_World.defer_end();
+}
+
 }

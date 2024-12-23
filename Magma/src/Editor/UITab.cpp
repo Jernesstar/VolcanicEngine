@@ -5,11 +5,12 @@
 #include <imgui/misc/cpp/imgui_stdlib.h>
 #include <ImGuiFileDialog/ImGuiFileDialog.h>
 
-#include "UI/Empty.h"
-#include "UI/UISerializer.h"
+// #include <Magma/UI/UIPage.h>
 
 #include "UIElementPickerPanel.h"
 #include "UIVisualizerPanel.h"
+
+#include <Lava/UILoader.h>
 
 namespace Magma {
 
@@ -39,7 +40,8 @@ UITab::UITab(const UI::UIPage& page)
 }
 
 UITab::~UITab() {
-	UI::UISerializer::Save(&m_Root, "Magma/assets/ui/.magma.ui.json");
+	Lava::UILoader::Save(
+		m_Root, "Magma/assets/ui/" + m_Root.Name + ".magma.ui.json");
 }
 
 void UITab::Update(TimeStep ts) {
@@ -112,12 +114,7 @@ void UITab::Setup() {
 }
 
 void UITab::SetUI(const std::string& path) {
-	// m_Root.Load(path);
-
-	auto picker = GetPanel("UIElementPicker")->As<UIElementPickerPanel>();
-	auto visual = GetPanel("UIVisualizer")->As<UIVisualizerPanel>();
-	picker->SetContext(&m_Root);
-	visual->SetContext(&m_Root);
+	Lava::UILoader::Load(m_Root, path);
 }
 
 void UITab::NewUI() {
@@ -152,7 +149,7 @@ void UITab::SaveUI() {
 	if(instance->Display("ChooseFile")) {
 		if(instance->IsOk()) {
 			std::string path = instance->GetFilePathName();
-			UI::UISerializer::Save(&m_Root, path);
+			Lava::UILoader::Save(m_Root, path);
 		}
 
 		instance->Close();

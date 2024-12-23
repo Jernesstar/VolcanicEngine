@@ -40,6 +40,12 @@ public:
 
 	template<typename TComponent>
 	requires std::derived_from<TComponent, Component>
+	const TComponent& Get() const {
+		return *m_Handle.get<TComponent>();
+	}
+
+	template<typename TComponent>
+	requires std::derived_from<TComponent, Component>
 	void Remove() {
 		m_Handle.remove<TComponent>();
 	}

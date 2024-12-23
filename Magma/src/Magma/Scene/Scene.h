@@ -6,7 +6,6 @@
 #include "Physics/World.h"
 
 #include "SceneRenderer.h"
-#include "SceneSerializer.h"
 
 using namespace VolcaniCore;
 
@@ -24,9 +23,6 @@ public:
 
 	void OnUpdate(TimeStep ts);
 	void OnRender(SceneRenderer& renderer);
-
-	void Load(const std::string& path);
-	void Save(const std::string& path);
 
 private:
 	void RegisterSystems();

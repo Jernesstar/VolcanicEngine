@@ -24,7 +24,6 @@
 #include <Magma/UI/UI.h>
 
 #include <Magma/Scene/Scene.h>
-#include <Magma/Scene/SceneSerializer.h>
 
 #include <Magma/ECS/World.h>
 #include <Magma/ECS/Entity.h>
@@ -35,10 +34,15 @@
 #include <Magma/Physics/Shape.h>
 #include <Magma/Physics/World.h>
 
+#include <Lava/ProjectLoader.h>
+#include <Lava/UILoader.h>
+#include <Lava/SceneLoader.h>
+
 using namespace VolcaniCore;
 using namespace Magma;
 using namespace Magma::ECS;
 using namespace Magma::Physics;
+using namespace Lava;
 
 #include "Demos/Cube.h"
 #include "Demos/Lighting.h"

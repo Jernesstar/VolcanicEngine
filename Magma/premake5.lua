@@ -69,7 +69,6 @@ project "Editor"
     files {
         "src/Editor/**.h",
         "src/Editor/**.cpp",
-        "src/main.cpp"
     }
 
     includedirs {
@@ -82,6 +81,8 @@ project "Editor"
 
         "%{RootPath}/Magma/src",
         "%{RootPath}/Magma/src/Magma",
+
+        "%{RootPath}/Lava/src",
 
         "%{Includes.imgui}/imgui",
         "%{Includes.yaml_cpp}",
@@ -97,7 +98,7 @@ project "Editor"
     }
 
     links {
-        -- "Lava",
+        "Lava",
         "Magma",
         "VolcaniCore",
 

@@ -8,19 +8,24 @@ using namespace VolcaniCore;
 
 namespace Magma {
 
+struct Asset {
+	// Type;
+	// Handler;
+};
+
 class AssetManager {
 public:
-	AssetManager() = delete;
-	~AssetManager() = delete;
+	AssetManager() = default;
+	~AssetManager() = default;
 
-	static void Init();
-	static void Close();
+	void Init();
+	void Close();
 
 	// template<typename T, typename ...Args>
-	// static Ref<T> Create(Args&&... args);
+	// Ref<T> Create(Args&&... args);
 
 	template<typename T, typename ...Args>
-	static Ref<T> GetOrCreate(const Args&... args);
+	Ref<T> GetOrCreate(const Args&... args);
 };
 
 }

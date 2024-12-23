@@ -5,6 +5,8 @@
 #include <imgui/misc/cpp/imgui_stdlib.h>
 #include <ImGuiFileDialog/ImGuiFileDialog.h>
 
+#include <Lava/SceneLoader.h>
+
 #include "SceneHierarchyPanel.h"
 #include "SceneVisualizerPanel.h"
 // #include "ComponentPanel.h"
@@ -34,12 +36,13 @@ SceneTab::SceneTab(const Scene& scene) {
 }
 
 SceneTab::SceneTab(const std::string& path) {
-	m_Scene.Load(path);
+	Lava::SceneLoader::Load(m_Scene, path);
 	Setup();
 }
 
 SceneTab::~SceneTab() {
-	m_Scene.Save("Magma/assets/scenes/" + m_Scene.Name + ".magma.scene");
+	Lava::SceneLoader::Save(
+		m_Scene, "Magma/assets/scenes/" + m_Scene.Name + ".magma.scene");
 }
 
 void SceneTab::Setup() {
@@ -83,9 +86,7 @@ void SceneTab::SetScene(const Scene& scene) {
 }
 
 void SceneTab::SetScene(const std::string& path) {
-	auto scene = Scene();
-	scene.Load(path);
-	SetScene(scene);
+	Lava::SceneLoader::Load(m_Scene, path);
 }
 
 void SceneTab::Update(TimeStep ts) {
@@ -165,7 +166,7 @@ void SceneTab::OpenScene() {
 	if(instance->Display("ChooseFile")) {
 		if(instance->IsOk()) {
 			std::string path = instance->GetFilePathName();
-			m_Scene.Load(path);
+			Lava::SceneLoader::Load(m_Scene, path);
 		}
 
 		instance->Close();
@@ -182,7 +183,7 @@ void SceneTab::SaveScene() {
 	if(instance->Display("ChooseFile")) {
 		if(instance->IsOk()) {
 			std::string path = instance->GetFilePathName();
-			m_Scene.Save(path);
+			Lava::SceneLoader::Save(m_Scene, path);
 		}
 
 		instance->Close();

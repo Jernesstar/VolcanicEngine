@@ -4,6 +4,8 @@
 
 #include <Magma/Core/DLL.h>
 
+#include <Lava/Game.h>
+
 using namespace VolcaniCore;
 using namespace Magma;
 
@@ -16,15 +18,9 @@ public:
 
 	void OnUpdate(TimeStep ts) override;
 
-private:
-	void Load();
-	void Reload();
+	Game* Get();
 
-	std::string m_Name;
-	std::string m_RootPath;
-	std::string m_SrcPath;
-	std::string m_AssetPath;
- 
+private:
 	Ref<DLL> m_GameDLL;
 };
 
