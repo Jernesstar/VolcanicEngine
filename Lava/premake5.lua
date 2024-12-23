@@ -1,19 +1,19 @@
-project "Magma"
+project "Lava"
     kind "StaticLib"
     language "C++"
     cppdialect "C++latest"
     staticruntime "Off"
 
-    objdir ("%{RootPath}/build/Magma/obj")
-    targetdir ("%{RootPath}/build/Magma/lib")
+    objdir ("%{RootPath}/build/Lava/obj")
+    targetdir ("%{RootPath}/build/Lava/lib")
 
     files {
-        "src/Magma/**.h",
-        "src/Magma/**.cpp"
+        "src/Lava/**.h",
+        "src/Lava/**.cpp"
     }
 
     includedirs {
-        "src/Magma",
+        "src/Lava",
 
         "%{RootPath}/VolcaniCore/src",
         "%{RootPath}/VolcaniCore/src/VolcaniCore",
@@ -36,6 +36,7 @@ project "Magma"
     }
 
     links {
+        "Magma",
         "VolcaniCore",
 
         "imgui",
@@ -56,24 +57,21 @@ project "Magma"
     filter "system:windows"
         systemversion "latest"
 
-
-project "Editor"
+project "Runtime"
     kind "ConsoleApp"
     language "C++"
     cppdialect "C++latest"
     staticruntime "Off"
 
-    objdir ("%{RootPath}/build/Magma/obj")
-    targetdir ("%{RootPath}/build/Magma/lib")
+    objdir ("%{RootPath}/build/Lava/obj")
+    targetdir ("%{RootPath}/build/Lava/lib")
 
     files {
-        "src/Editor/**.h",
-        "src/Editor/**.cpp",
+        "src/Runtime/**.cpp"
     }
 
     includedirs {
-        "src/Editor",
-        "src/Magma",
+        "src",
 
         "%{RootPath}/VolcaniCore/src",
         "%{RootPath}/VolcaniCore/src/VolcaniCore",
@@ -81,8 +79,6 @@ project "Editor"
 
         "%{RootPath}/Magma/src",
         "%{RootPath}/Magma/src/Magma",
-
-        "%{RootPath}/Lava/src",
 
         "%{Includes.imgui}/imgui",
         "%{Includes.yaml_cpp}",
@@ -138,7 +134,6 @@ project "Editor"
             "-Wno-format-security",
             "-Wno-pointer-arith"
         }
-
 
 include "Magma/.builddeps/imgui"
 include "Magma/.builddeps/yaml-cpp"

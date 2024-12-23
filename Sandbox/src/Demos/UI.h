@@ -1,19 +1,21 @@
 #pragma once
 
+using namespace Magma::UI;
+
 namespace Demo {
 
-class UILayer : public Application {
+class UI : public Application {
 public:
-	UILayer();
-	~UILayer();
+	UI();
+	~UI();
 
 	void OnUpdate(TimeStep ts);
 
 private:
-	Ref<Project> project;
+
 };
 
-UILayer::UILayer()
+UI::UI()
 	: Application(1920, 1080)
 {
 	Events::RegisterListener<KeyPressedEvent>(
@@ -23,26 +25,17 @@ UILayer::UILayer()
 				Application::Close();
 		});
 
-	project = Project::Create("TestProj/.volc.proj");
-	project->Reload();
-
-	VOLCANICORE_LOG_INFO("UI project is now running");
-	UI::UIBrowser::SetPage("test");
-
-	UI::UIRenderer::Init();
+	UIRenderer::Init();
 }
 
-UILayer::~UILayer() {
-	UI::UIRenderer::Close();
+UI::~UI() {
+	UIRenderer::Close();
 }
 
-void UILayer::OnUpdate(TimeStep ts) {
-	UI::UIRenderer::BeginFrame();
+void UI::OnUpdate(TimeStep ts) {
+	UIRenderer::BeginFrame();
 
-	UI::UIBrowser::OnUpdate(ts);
-	UI::UIBrowser::OnRender();
-
-	UI::UIRenderer::EndFrame();
+	UIRenderer::EndFrame();
 }
 
 }

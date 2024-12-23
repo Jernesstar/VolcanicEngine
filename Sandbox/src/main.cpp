@@ -5,8 +5,8 @@
 
 #include <VolcaniCore/Event/Events.h>
 
-#include <VolcaniCore/Graphics/Renderer.h>
 #include <VolcaniCore/Graphics/RendererAPI.h>
+#include <VolcaniCore/Graphics/Renderer.h>
 #include <VolcaniCore/Graphics/Renderer2D.h>
 #include <VolcaniCore/Graphics/Renderer3D.h>
 #include <VolcaniCore/Graphics/Camera.h>
@@ -24,9 +24,6 @@
 #include <Magma/UI/UI.h>
 
 #include <Magma/Scene/Scene.h>
-#include <Magma/Scene/SceneSerializer.h>
-
-#include <Magma/Editor/Editor.h>
 
 #include <Magma/ECS/World.h>
 #include <Magma/ECS/Entity.h>
@@ -37,10 +34,15 @@
 #include <Magma/Physics/Shape.h>
 #include <Magma/Physics/World.h>
 
+#include <Lava/ProjectLoader.h>
+#include <Lava/UILoader.h>
+#include <Lava/SceneLoader.h>
+
 using namespace VolcaniCore;
 using namespace Magma;
 using namespace Magma::ECS;
 using namespace Magma::Physics;
+using namespace Lava;
 
 #include "Demos/Cube.h"
 #include "Demos/Lighting.h"
@@ -52,7 +54,6 @@ using namespace Magma::Physics;
 #include "Demos/Raycast.h"
 #include "Demos/Collision.h"
 #include "Demos/Raytracing.h"
-#include "Demos/DLL.h"
 #include "Demos/Template.h"
 
 Application* CreateApplication(const CommandLineArgs& args) {
@@ -69,7 +70,7 @@ Application* CreateApplication(const CommandLineArgs& args) {
 	// Text rendering
 	if(project == "Text") return new Demo::Text();
 	// UI
-	if(project == "UI") return new Demo::UILayer();
+	if(project == "UI") return new Demo::UI();
 	// Entity component system
 	if(project == "ECS") return new Demo::ECS();
 	// Raycasting, object outlining
@@ -78,10 +79,6 @@ Application* CreateApplication(const CommandLineArgs& args) {
 	if(project == "Collision") return new Demo::Collision();
 	// PBR
 	if(project == "Raytracing") return new Demo::Raytracing();
-	// DLL
-	if(project == "DLL") return new Demo::DLL();
-	// Magma Editor
-	if(project == "Editor") return new Magma::Editor();
 
 	return new Demo::Template();
 }

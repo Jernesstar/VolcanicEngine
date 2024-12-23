@@ -65,6 +65,8 @@ public:
 
 	void ForEach(const Func<void, Entity&>& func);
 
+	void ForEach(const Func<void, const Entity&>& func) const;
+
 	template<typename ...TComponents>
 	void ForEach(const Func<void, Entity&>& func) {
 		flecs::query<TComponents...> query = GetQuery<TComponents...>();

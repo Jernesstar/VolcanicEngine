@@ -1,36 +1,27 @@
-project "Sandbox"
-    kind "ConsoleApp"
+project "UI"
+    kind "SharedLib"
     language "C++"
     cppdialect "C++latest"
-    exceptionhandling "On"
-    rtti "Off"
-    staticruntime "Off"
 
-    objdir ("%{RootPath}/build/Sandbox/obj")
-    targetdir ("%{RootPath}/build/Sandbox/bin")
+    objdir ("build/obj")
+    targetdir ("build/bin")
 
     files {
-        "src/**.h",
-        "src/**.cpp",
+
     }
 
     includedirs {
-        "src",
+        "gen",
 
-        "%{RootPath}",
+        "%{ProjectSrcDir}/**",
 
-        "%{RootPath}/VolcaniCore/src",
-        "%{RootPath}/VolcaniCore/src/VolcaniCore",
-        "%{RootPath}/VolcaniCore/src/impl",
-
-        "%{RootPath}/Magma/src",
-        "%{RootPath}/Magma/src/Magma",
-
-        "%{RootPath}/Ash/src",
-        "%{RootPath}/Ash/src/Ash",
-
-        "%{RootPath}/Lava/src",
-        "%{RootPath}/Lava/src/Lava",
+        "%{VolcanicEngineDir}/VolcaniCore/src",
+        "%{VolcanicEngineDir}/VolcaniCore/src/VolcaniCore",
+        "%{VolcanicEngineDir}/VolcaniCore/src/impl",
+        "%{VolcanicEngineDir}/Magma/src",
+        "%{VolcanicEngineDir}/Magma/src/Magma",
+        "%{VolcanicEngineDir}/Ash/src",
+        "%{VolcanicEngineDir}/Ash/src/Magma",
 
         "%{Includes.imgui}",
         "%{Includes.imgui}/imgui",
@@ -48,9 +39,14 @@ project "Sandbox"
         "%{Includes.stb_image}",
     }
 
+    libdirs {
+        "%{VolcanicEngineDir}/build/VolcaniCore/lib",
+        "%{VolcanicEngineDir}/build/Magma/lib"
+    }
+
     links {
-        -- "Ash",
-        "Lava",
+        "Project",
+
         "Magma",
         "VolcaniCore",
 
@@ -68,7 +64,10 @@ project "Sandbox"
         -- "PhysX",
     }
 
-    filter "system:linux"
+    filter "system:windows"
+        systemversion "latest"
+
+        filter "system:linux"
         links {
             "pthread",
             "dl",
@@ -109,3 +108,5 @@ project "Sandbox"
         buildoptions {
             "/NODEFAULTLIB:library"
         }
+
+include "pages.lua"

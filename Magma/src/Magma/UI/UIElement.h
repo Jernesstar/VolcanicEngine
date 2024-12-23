@@ -66,7 +66,7 @@ public:
 		// *((TUIElement*)element) = TUIElement(std::forward<Args>(args)...);
 	}
 
-	UIState& GetState() { return m_State; }
+	UIState GetState() { return m_State; }
 
 	UIElement& SetSize(uint32_t width, uint32_t height);
 	UIElement& SetPosition(float x, float y);
