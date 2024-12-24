@@ -24,6 +24,10 @@ std::string File::Get() const {
 	return FileUtils::ReadFile(Path);
 }
 
+void File::Close() {
+	m_Data.close();
+}
+
 bool FileUtils::FileExists(const std::string& path) {
 	return std::filesystem::exists(path.c_str());
 }

@@ -27,9 +27,9 @@ Runtime::Runtime(const std::string& volcPath)
 	m_AppDLL = CreateRef<DLL>("Lava/projects/Project/build/lib/Loader.dll");
 	m_AppDLL->GetFunction<void>("LoadApp")();
 
-	// App* app = Get();
-	// app->App::OnLoad();
-	// app->OnLoad();
+	App* app = Get();
+	app->App::OnLoad();
+	app->OnLoad();
 }
 
 Runtime::~Runtime() {
@@ -42,9 +42,9 @@ void Runtime::OnUpdate(TimeStep ts) {
 	RendererAPI::Get()->NewDrawCommand()->Clear = true;
 	RendererAPI::Get()->EndFrame();
 
-	// App* app = Get();
-	// app->OnUpdate(ts);
-	// app->App::OnUpdate(ts);
+	App* app = Get();
+	app->OnUpdate(ts);
+	app->App::OnUpdate(ts);
 }
 
 App* Runtime::Get() {

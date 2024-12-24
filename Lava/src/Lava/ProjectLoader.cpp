@@ -78,13 +78,18 @@ void ProjectLoader::Compile(const std::string& volcPath) {
 
 void LoadSource(YAML::Node& node, const std::string& srcPath) {
 	auto genPath = fs::path("Lava") / "projects" / "Project" / "gen";
-	fs::remove_all(genPath);
-	fs::create_directory(genPath);
+
+	if(!fs::is_directory(genPath) || !fs::exists(genPath))
+		fs::create_directory(genPath);
+	else
+		for(auto path : FileUtils::GetFiles(genPath.string()))
+			std::remove(path.c_str());
 
 	auto namespaceName = node["Name"].as<std::string>();
 	auto appName = node["App"].as<std::string>();
 
-	auto cppFile = File((genPath / "AppLoader").string() + ".cpp");
+	FileUtils::CreateFile((genPath / "AppLoader.cpp").string());
+	auto cppFile = File((genPath / "AppLoader.cpp").string());
 
 	std::string templateStr =
 		"#include <VolcaniCore/Core/Defines.h>\n\n"
@@ -101,6 +106,8 @@ void LoadSource(YAML::Node& node, const std::string& srcPath) {
 
 	Replace(templateStr, "{appName}", appName);
 	cppFile.Write(templateStr);
+
+	cppFile.Close();
 
 	std::string command;
 #ifdef VOLCANICENGINE_LINUX

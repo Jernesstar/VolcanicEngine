@@ -16,6 +16,7 @@ workspace "Projects"
         description = "The path to the directory of a the source files"
     }
 
+ProjectSrcDir = _OPTIONS["src"]
 
 include "Project"
 include "UI"
@@ -23,8 +24,6 @@ include "UI"
 VolcanicEngineDir    = os.getenv("VOLC_PATH");
 VolcaniCoreVendorDir = "%{VolcanicEngineDir}/VolcaniCore/vendor"
 MagmaVendorDir       = "%{VolcanicEngineDir}/Magma/vendor"
-
-ProjectSrcDir = _OPTIONS["src"]
 
 VendorPaths = {}
 Includes = {}

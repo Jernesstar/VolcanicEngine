@@ -7,7 +7,6 @@ project "UIPage-{name}"
     targetdir ("build/{name}/bin")
 
     files {
-        "gen/{name}.h"
         "gen/{name}.cpp"
     }
 

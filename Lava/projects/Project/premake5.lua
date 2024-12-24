@@ -11,6 +11,7 @@ project "Project"
     }
 
     includedirs {
+        "%{ProjectSrcDir}",
         "%{ProjectSrcDir}/**",
 
         "%{VolcanicEngineDir}/VolcaniCore/src",
@@ -89,6 +90,7 @@ project "Loader"
     }
 
     includedirs {
+        "%{ProjectSrcDir}/",
         "%{ProjectSrcDir}/**",
 
         "%{VolcanicEngineDir}/VolcaniCore/src",
@@ -125,9 +127,10 @@ project "Loader"
 
     links {
         "Project",
-        -- "Lava",
-        -- "Magma",
-        -- "VolcaniCore",
+
+        "Lava",
+        "Magma",
+        "VolcaniCore",
 
         "glfw",
         "glad",
@@ -171,7 +174,7 @@ project "Loader"
 
     filter "toolset:gcc or toolset:clang"
         buildoptions {
-            "-fexceptions",
+            -- "-fexceptions",
             "-Wno-format-security"
         }
 

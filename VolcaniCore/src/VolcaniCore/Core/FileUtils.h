@@ -18,6 +18,8 @@ public:
 
 	std::string Get() const;
 
+	void Close();
+
 private:
 	std::ofstream m_Data;
 };

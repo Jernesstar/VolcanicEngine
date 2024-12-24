@@ -8,7 +8,7 @@ namespace Lava {
 
 class App {
 public:
-	App();
+	App() = default;
 	virtual ~App() = default;
 
 	virtual void OnLoad();
