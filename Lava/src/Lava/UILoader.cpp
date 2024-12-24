@@ -1,6 +1,9 @@
 #include "UILoader.h"
 
+#include <fstream>
+
 #include <VolcaniCore/Core/Log.h>
+#include <VolcaniCore/Core/Algo.h>
 #include <VolcaniCore/Core/FileUtils.h>
 
 #include <Magma/Core/JSONSerializer.h>
@@ -162,6 +165,7 @@ void UILoader::Compile(const std::string& filePathName) {
 		return;
 
 	if(doc.HasMember("Elements")) {
+		auto premakeFile = std::ofstream("Lava/projects/UI/pages.lua"); // Deletes file contents
 		GenFiles(name, funcPath);
 
 		const auto& elements = doc["Elements"];
@@ -173,8 +177,8 @@ void UILoader::Compile(const std::string& filePathName) {
 }
 
 Ref<DLL> UILoader::GetDLL(const std::string& pageName) {
-	auto path = fs::path("Lava") / "projects" / "UI" / "build" / pageName;
-	return CreateRef<DLL>((path / "bin" / "UI.dll").string());
+	auto path = fs::path("Lava") / "projects" / "UI" / "build" / "lib";
+	return CreateRef<DLL>((path / pageName / "UI.dll").string());
 }
 
 void LoadElement(UIPage& page, const rapidjson::Value& docElement) {
@@ -358,6 +362,8 @@ void GenFiles(const std::string& name, const std::string& funcPath) {
 	auto hFile = File((genPath / name).string() + ".h");
 	auto cppFile = File((genPath / name).string() + ".cpp");
 	auto funcFile = File(funcPath);
+	auto templateFile = File("Lava/projects/UI/template.lua");
+	auto premakeFile = File("Lava/projects/UI/pages.lua");
 
 	std::string funcFileStr = funcFile.Get();
 	uint64_t elementsIdx = funcFileStr.find("namespace UIObjects");
@@ -378,6 +384,10 @@ void GenFiles(const std::string& name, const std::string& funcPath) {
 	.Write("\treturn m_Objects[id];")
 	.Write("}\n")
 	.Write("extern \"C\" EXPORT void LoadObjects() {");
+
+	std::string templateStr = templateFile.Get();
+	Replace(templateStr, "{name}", name);
+	premakeFile.Write(templateStr);
 }
 
 void CompleteFiles(const std::string& name) {

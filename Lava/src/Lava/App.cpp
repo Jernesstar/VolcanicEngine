@@ -18,7 +18,7 @@ void App::OnClose() {
 
 void App::OnUpdate(TimeStep ts) {
 	UIRenderer::BeginFrame();
-	// UIBrowser::OnUpdate(ts);
+	UIBrowser::OnUpdate(ts);
 	UIRenderer::EndFrame();
 }
 

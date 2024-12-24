@@ -1,10 +1,10 @@
-project "UIPage-{name}"
+project "UI"
     kind "SharedLib"
     language "C++"
     cppdialect "C++latest"
 
-    objdir ("build/{name}/obj")
-    targetdir ("build/{name}/bin")
+    objdir ("build/obj")
+    targetdir ("build/lib/{name}")
 
     files {
         "gen/{name}.cpp"
@@ -13,6 +13,7 @@ project "UIPage-{name}"
     includedirs {
         "gen",
 
+        "%{ProjectSrcDir}",
         "%{ProjectSrcDir}/**",
 
         "%{VolcanicEngineDir}/VolcaniCore/src",
@@ -50,7 +51,7 @@ project "UIPage-{name}"
     links {
         "Project",
 
-        "Lava"
+        "Lava",
         "Magma",
         "VolcaniCore",
 

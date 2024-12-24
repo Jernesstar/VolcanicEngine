@@ -3,7 +3,7 @@
 namespace VolcaniCore {
 
 template<typename TInput, class TPredicate>
-auto Apply(const List<TInput>& in, TPredicate&& func) {
+static auto Apply(const List<TInput>& in, TPredicate&& func) {
 	bool empty = in.size() == 0;
 	if(empty)
 		in.emplace();
@@ -18,7 +18,7 @@ auto Apply(const List<TInput>& in, TPredicate&& func) {
 	return out;
 }
 
-void Replace(std::string& subject, const std::string& search,
+static void Replace(std::string& subject, const std::string& search,
 			 const std::string& replace)
 {
 	size_t pos = 0;

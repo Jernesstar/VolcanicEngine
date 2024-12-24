@@ -71,7 +71,7 @@ void ProjectLoader::Compile(const std::string& volcPath) {
 
 	UIBrowser::Load((fs::path(srcPath) / "UI").string());
 	LoadSource(projNode, srcPath);
-	// UIBrowser::Reload();
+	UIBrowser::Reload();
 
 	// LoadAssets(projNode, assetPath);
 }
