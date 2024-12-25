@@ -5,6 +5,7 @@
 #include <VolcaniCore/Graphics/RendererAPI.h>
 
 #include <Lava/ProjectLoader.h>
+#include <Lava/UIBrowser.h>
 
 namespace Lava {
 
@@ -22,9 +23,11 @@ Runtime::Runtime(const std::string& volcPath)
 	ProjectLoader::Load(project, volcPath);
 	ProjectLoader::Compile(volcPath);
 
-	Application::GetWindow()->SetTitle(project.Name);
-
 	m_AppDLL = CreateRef<DLL>("Lava/projects/Project/build/lib/Loader.dll");
+
+	Application::GetWindow()->SetTitle(project.Name);
+	Application::PushDir(project.Path);
+
 	m_AppDLL->GetFunction<void>("LoadApp")();
 
 	App* app = Get();

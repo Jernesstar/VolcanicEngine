@@ -67,8 +67,6 @@ Map<UIElementType, ThemeElement> UILoader::LoadTheme(const std::string& path) {
 	const auto& themeNode = doc["Theme"];
 
 	if(themeNode.HasMember("Window")) {
-		VOLCANICORE_LOG_INFO("Loading Window Theme");
-
 		const auto& windowTheme = themeNode["Window"];
 		auto& theme =
 			res.emplace(UIElementType::Window, ThemeElement{ }).first->second;

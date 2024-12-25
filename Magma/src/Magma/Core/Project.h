@@ -10,6 +10,7 @@ namespace Magma {
 
 class Project {
 public:
+	std::string Path;
 	std::string Name;
 	std::string App;
 

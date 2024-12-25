@@ -15,7 +15,6 @@ public:
 
 	static void SetPage(const std::string& name);
 	static UIPage* GetPage(const std::string& name);
-
 };
 
 }

@@ -8,6 +8,8 @@ namespace TestProj {
 
 class TestGame : public Lava::App {
 public:
+	TestGame() = default;
+
 	void OnLoad() override;
 	void OnClose() override;
 	void OnUpdate(TimeStep ts) override;
