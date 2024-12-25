@@ -67,8 +67,9 @@ project "Project"
 
     filter "toolset:gcc or toolset:clang"
         buildoptions {
-            "-fexceptions",
-            "-Wno-format-security"
+            -- "-fexceptions",
+            "-Wno-format-security",
+            "-Wno-pointer-arith"
         }
 
     filter "toolset:msc"
@@ -175,7 +176,8 @@ project "Loader"
     filter "toolset:gcc or toolset:clang"
         buildoptions {
             -- "-fexceptions",
-            "-Wno-format-security"
+            "-Wno-format-security",
+            "-Wno-pointer-arith"
         }
 
     filter "toolset:msc"

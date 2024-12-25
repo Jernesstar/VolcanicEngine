@@ -31,13 +31,15 @@ struct ThemeElement {
 	Ref<Texture> BorderImage = nullptr;
 };
 
+using Theme = Map<UIElementType, ThemeElement>;
+
 class UIPage {
 public:
 	bool Visible = true;
 	std::string Name;
-	Map<UIElementType, ThemeElement> Theme;
 
 public:
+	UIPage() = default;
 	UIPage(const std::string& name)
 		: Name(name) { }
 	~UIPage() = default;
@@ -73,6 +75,9 @@ public:
 	UIElement* Get(const std::string& id) const;
 	List<UIElement*> GetFirstOrderElements() const;
 
+	void SetTheme(const Theme& theme);
+	Theme& GetTheme() { return m_Theme; }
+
 private:
 	List<Window> Windows;
 	List<Button> Buttons;
@@ -83,7 +88,7 @@ private:
 
 	List<UINode> m_FirstOrders;
 
-	Map<UIElementType, ThemeElement> m_Theme;
+	Theme m_Theme;
 
 private:
 	template<typename TUIType>

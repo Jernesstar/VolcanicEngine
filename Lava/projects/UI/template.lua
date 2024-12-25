@@ -1,4 +1,4 @@
-project "UI"
+project "{name}"
     kind "SharedLib"
     language "C++"
     cppdialect "C++latest"

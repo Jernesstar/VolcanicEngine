@@ -1,29 +1,11 @@
 {
-    "Theme":
-    {
-        "Window":
-        {
-            "Border": {
-                "Width": 0,
-                "Height": 0,
-                "Image": "assets/image/aesthetic_window_border.png"
-            },
-            "Color": [0.3, 0.4, 0.2, 0.6]
-        },
-
-        "Button": {}
-    },
-
     "Elements":
     [
         {
             "ID": "Window1",
             "Type": "Window",
-            "Width": 200,
-            "Height": 400,
             "x": 20,
-            "y": 20,
-            "Color": [0.3, 0.3, 0.3, 1.0]
+            "y": 20
         },
         {
             "Parent": "Window1",

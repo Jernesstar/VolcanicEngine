@@ -11,7 +11,7 @@ void TestGame::OnClose() {
 }
 
 void TestGame::OnUpdate(TimeStep ts) {
-	VOLCANICORE_LOG_INFO("OnUpdate");
+	// VOLCANICORE_LOG_INFO("OnUpdate");
 }
 
 }

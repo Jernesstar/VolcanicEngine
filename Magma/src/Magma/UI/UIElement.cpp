@@ -58,14 +58,14 @@ UIElement& UIElement::SetPosition(float x, float y) {
 }
 
 UIElement& UIElement::CenterX() {
-	auto parent = m_Root->Get(m_Parent);
+	UIElement* parent = m_Root->Get(m_Parent);
 	if(parent)
 		x = parent->x + float(parent->Width - Width)/ 2.0f;
 	return *this;
 }
 
 UIElement& UIElement::CenterY() {
-	auto parent = m_Root->Get(m_Parent);
+	UIElement* parent = m_Root->Get(m_Parent);
 	if(parent)
 		y = parent->y - float(parent->Height - Height) / 2.0f;
 	return *this;
@@ -82,8 +82,8 @@ UIElement& UIElement::Align() {
 		return *this;
 
 	UIElement* parent = GetParent();
-
 	int32_t alignX = 0, alignY = 0;
+
 	switch(parent->xAlignment) {
 		case XAlignment::Center:
 			alignX = parent->Width / 2;
@@ -98,6 +98,8 @@ UIElement& UIElement::Align() {
 		case YAlignment::Bottom:
 			alignY = parent->Height;
 	}
+
+	return *this;
 }
 
 void UIElement::Clear() {

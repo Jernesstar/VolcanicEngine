@@ -30,11 +30,6 @@ GET_TYPE(Text)
 GET_TYPE(TextInput)
 GET_TYPE(Image)
 
-void UIPage::Render() {
-	for(UIElement* element : GetFirstOrderElements())
-		element->Render();
-}
-
 static void TraverseElement(UIElement* element,
 							const Func<void, UIElement*>& func)
 {
@@ -43,7 +38,12 @@ static void TraverseElement(UIElement* element,
 		TraverseElement(child, func);
 }
 
-void UIPage::Traverse(const Func<void, UIElement *> &func)
+void UIPage::Render() {
+	for(UIElement* element : GetFirstOrderElements())
+		element->Render();
+}
+
+void UIPage::Traverse(const Func<void, UIElement*> &func)
 {
 	for(UIElement* element : GetFirstOrderElements())
 		TraverseElement(element, func);
@@ -133,6 +133,10 @@ List<UIElement*> UIPage::GetFirstOrderElements() const {
 		res.push_back(Get(node));
 
 	return res;
+}
+
+void UIPage::SetTheme(const Theme& theme) {
+	m_Theme = theme;
 }
 
 }

@@ -2,7 +2,10 @@
 
 #include <VolcaniCore/Core/Time.h>
 
+#include <Magma/UI/UIPage.h>
+
 using namespace VolcaniCore;
+using namespace Magma::UI;
 
 namespace Lava {
 
@@ -27,6 +30,13 @@ public:
 	virtual void OnMouseDown() {
 		// Creates OnMouseDownEvent(ID)
 	}
+
+	void SetPage(UIPage* page) {
+		Page = page;
+	}
+
+protected:
+	UIPage* Page;
 };
 
 }

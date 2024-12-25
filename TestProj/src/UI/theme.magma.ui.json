@@ -1,0 +1,19 @@
+{
+    "Theme":
+    {
+        "Window":
+        {
+            "Width": 600,
+            "Height": 300,
+            "xAlignment": "Center",
+            "yAlignment": "Center",
+            "Color": [0.859375, 0.76171875, 0.5859375, 1.0],
+
+            "Border": {
+                "Width": 10,
+                "Height": 20,
+                "Color": [0.3125, 0.234375, 0.078125, 1.0]
+            }
+        }
+    }
+}

@@ -1,5 +1,6 @@
 #include "UIBrowser.h"
 
+#include <VolcaniCore/Core/Log.h>
 #include <VolcaniCore/Core/FileUtils.h>
 
 #include <Magma/Core/DLL.h>
@@ -20,10 +21,45 @@ static Map<std::string, Ref<DLL>> s_DLLs;
 static List<UIPage> s_Pages;
 static UIPage* s_CurrentPage;
 
-static Map<UIElementType, ThemeElement> s_Theme;
+static Theme s_Theme;
 
 void UIBrowser::Load(const std::string& folderPath) {
 	s_UIFolderPath = folderPath;
+
+	auto genPath = fs::path("Lava") / "projects" / "UI" / "gen";
+	fs::remove_all(genPath);
+	fs::create_directory(genPath);
+
+	auto contextIncludes = File("Lava/projects/UI/gen/Context.h");
+	contextIncludes
+	.Write("#pragma once")
+	.Write("#include <Magma/UI/UI.h>")
+	.Write("#include <Lava/UIObject.h>")
+	.Write("#include <Lava/UIBrowser.h>")
+	.Write("#include <VolcaniCore/Core/Log.h>")
+	.Write("#include <VolcaniCore/Core/Input.h>")
+	.Write("")
+	.Write("using namespace Lava;")
+	.Write("");
+
+	auto srcPath = fs::path(folderPath).parent_path();
+
+	auto app = srcPath / "App";
+	auto _class = srcPath / "Class";
+	auto common = srcPath / "Common";
+	auto script = srcPath / "Script";
+
+	for(auto dir : { app, _class, common, script })
+		for(auto path : FileUtils::GetFiles(dir.string(), { ".h" }))
+			contextIncludes.Write("#include \"" + path + "\"");
+
+	auto projName = srcPath.parent_path().stem().string();
+	contextIncludes
+	.Write("")
+	.Write("using namespace " + projName + ";")
+	.Write("");
+
+	auto premakeFile = std::ofstream("Lava/projects/UI/pages.lua"); // Deletes file contents
 
 	auto themePath = (fs::path(folderPath) / "theme.magma.ui.json").string();
 	if(FileUtils::FileExists(themePath))
@@ -35,7 +71,9 @@ void UIBrowser::Load(const std::string& folderPath) {
 		auto filePathName = (fs::path(folderPath) / name).string();
 
 		if(name != "theme") {
-			UILoader::Load(s_Pages.emplace_back(name), filePathName);
+			auto& page = s_Pages.emplace_back(name);
+			page.SetTheme(s_Theme);
+			UILoader::Load(page, filePathName);
 			UILoader::Compile(filePathName);
 		}
 	}
@@ -48,8 +86,9 @@ void UIBrowser::Reload() {
 		s_DLLs[page.Name] = UILoader::GetDLL(page.Name);
 
 		if(&page == s_CurrentPage) {
-			auto load = s_DLLs[page.Name]->GetFunction<void>("LoadObjects");
-			load();
+			auto load =
+				s_DLLs[page.Name]->GetFunction<void, UIPage*>("LoadObjects");
+			load(&page);
 		}
 	}
 }

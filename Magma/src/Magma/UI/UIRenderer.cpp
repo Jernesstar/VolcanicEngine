@@ -75,6 +75,7 @@ UIState UIRenderer::DrawWindow(UI::Window& window) {
 						ImVec2(window.BorderWidth, window.BorderHeight));
 
 	ImGui::PushStyleColor(ImGuiCol_WindowBg, window.Color);
+	ImGui::PushStyleColor(ImGuiCol_Border, window.BorderColor);
 
 	ImGuiWindowFlags windowFlags;
 	windowFlags |= ImGuiWindowFlags_NoDocking
@@ -86,7 +87,7 @@ UIState UIRenderer::DrawWindow(UI::Window& window) {
 				 | ImGuiWindowFlags_NoNavFocus;
 
 	ImGui::Begin(window.GetID().c_str(), &window.Open, windowFlags);
-	ImGui::PopStyleColor();
+	ImGui::PopStyleColor(2);
 	ImGui::PopStyleVar(3);
 
 	return {

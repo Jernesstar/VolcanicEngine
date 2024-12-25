@@ -12,10 +12,10 @@ namespace Magma::UI {
 class UIPage;
 
 struct UIState {
-	bool Clicked;
-	bool Hovered;
-	bool MouseUp;
-	bool MouseDown;
+	bool Clicked = false;
+	bool Hovered = false;
+	bool MouseUp = false;
+	bool MouseDown = false;
 };
 
 enum class XAlignment { Left, Center, Right };

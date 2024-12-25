@@ -12,7 +12,7 @@ namespace fs = std::filesystem;
 
 namespace Lava {
 
-static void LoadElement(UIPage& page, const rapidjson::Value& docElement);
+static void LoadElement(UIPage& page, const rapidjson::Value& elementNode);
 
 void UILoader::Load(UIPage& page, const std::string& filePathName) {
 	using namespace rapidjson;
@@ -42,7 +42,7 @@ void UILoader::Load(UIPage& page, const std::string& filePathName) {
 		return;
 
 	if(doc.HasMember("Theme"))
-		page.Theme = LoadTheme(jsonPath);
+		page.SetTheme(LoadTheme(jsonPath));
 
 	if(doc.HasMember("Elements")) {
 		const auto& elements = doc["Elements"];
@@ -64,10 +64,12 @@ Map<UIElementType, ThemeElement> UILoader::LoadTheme(const std::string& path) {
 	if(!doc.HasMember("Theme"))
 		return res;
 
-	const auto& themeDocElement = doc["Theme"];
+	const auto& themeNode = doc["Theme"];
 
-	if(themeDocElement.HasMember("Window")) {
-		const auto& windowTheme = themeDocElement["Window"];
+	if(themeNode.HasMember("Window")) {
+		VOLCANICORE_LOG_INFO("Loading Window Theme");
+
+		const auto& windowTheme = themeNode["Window"];
 		auto& theme =
 			res.emplace(UIElementType::Window, ThemeElement{ }).first->second;
 
@@ -135,15 +137,19 @@ Map<UIElementType, ThemeElement> UILoader::LoadTheme(const std::string& path) {
 static void GenFiles(const std::string& name, const std::string& funcPath);
 static void CompleteFiles(const std::string& name);
 static void CompileElement(const std::string& name, const std::string& funcPath,
-						   const rapidjson::Value& docElement);
+						   const rapidjson::Value& elementNode);
 
 void UILoader::Compile(const std::string& filePathName) {
 	using namespace rapidjson;
 
-	if(filePathName == "")
+	if(filePathName == "") {
+		VOLCANICORE_LOG_ERROR("Filename was empty");
 		return;
+	}
 
 	auto name = fs::path(filePathName).stem().string();
+	auto projPath = fs::path(filePathName)
+					.parent_path().parent_path().parent_path().string();
 	auto jsonPath = filePathName + ".magma.ui.json";
 	auto funcPath = filePathName + ".magma.ui.func";
 	if(!FileUtils::FileExists(jsonPath)) {
@@ -161,11 +167,12 @@ void UILoader::Compile(const std::string& filePathName) {
 		VOLCANICORE_LOG_INFO("%i", (uint32_t)doc.GetParseError());
 		return;
 	}
-	if(!doc.IsObject())
+	if(!doc.IsObject()) {
+		VOLCANICORE_LOG_ERROR("File did not have root object");
 		return;
+	}
 
 	if(doc.HasMember("Elements")) {
-		auto premakeFile = std::ofstream("Lava/projects/UI/pages.lua"); // Deletes file contents
 		GenFiles(name, funcPath);
 
 		const auto& elements = doc["Elements"];
@@ -178,53 +185,89 @@ void UILoader::Compile(const std::string& filePathName) {
 
 Ref<DLL> UILoader::GetDLL(const std::string& pageName) {
 	auto path = fs::path("Lava") / "projects" / "UI" / "build" / "lib";
-	return CreateRef<DLL>((path / pageName / "UI.dll").string());
+	return CreateRef<DLL>((path / pageName / pageName).string() + ".dll");
 }
 
-void LoadElement(UIPage& page, const rapidjson::Value& docElement) {
-	std::string id = docElement["ID"].GetString();
-	std::string typeStr = docElement["Type"].GetString();
+template<typename T>
+T TryGet(const rapidjson::Value& node, const std::string& name, const T& alt)
+{
+	if(node.HasMember(name))
+		return node[name].Get<T>();
+	return alt;
+}
+
+void LoadElement(UIPage& page, const rapidjson::Value& elementNode) {
+	std::string id = elementNode["ID"].GetString();
+	std::string typeStr = elementNode["Type"].GetString();
 	std::string parent = "";
 
-	if(docElement.HasMember("Parent"))
-		parent = docElement["Parent"].Get<std::string>();
+	if(elementNode.HasMember("Parent"))
+		parent = elementNode["Parent"].Get<std::string>();
 
 	UINode node;
 	UIElement* element;
+	ThemeElement* theme;
 
 	if(typeStr == "Window") {
 		node = page.Add(UIElementType::Window, id);
 		element = page.Get(node);
+		theme = &page.GetTheme()[element->GetType()];
+		auto* window = element->As<Window>();
+
+		if(elementNode.HasMember("Border")) {
+			const auto& borderNode = elementNode["Border"];
+			window->BorderWidth
+				= TryGet<uint32_t>(borderNode, "Width", theme->BorderWidth);
+			window->BorderHeight
+				= TryGet<uint32_t>(borderNode, "Height", theme->BorderHeight);
+
+			window->BorderColor = theme->BorderColor;
+			if(borderNode.HasMember("Color"))
+				window->BorderColor =
+				glm::vec4
+				{
+					borderNode["Color"][0].Get<float>(),
+					borderNode["Color"][1].Get<float>(),
+					borderNode["Color"][2].Get<float>(),
+					borderNode["Color"][3].Get<float>()
+				};
+		}
 	}
 	if(typeStr == "Button") {
 		node = page.Add(UIElementType::Button, id);
 		element = page.Get(node);
+		theme = &page.GetTheme()[element->GetType()];
+
 		auto* button = element->As<Button>();
 
-		if(docElement.HasMember("Image"))
+		if(elementNode.HasMember("Image"))
 			button->Display
-				= CreateRef<Image>(docElement["Image"].Get<std::string>());
-		else if(docElement.HasMember("Text"))
+				= CreateRef<Image>(elementNode["Image"].Get<std::string>());
+		else if(elementNode.HasMember("Text"))
 			button->Display
-				= CreateRef<Text>(docElement["Text"].Get<std::string>());
+				= CreateRef<Text>(elementNode["Text"].Get<std::string>());
 		else
 			button->Display = CreateRef<Text>(button->GetID());
 	}
 	if(typeStr == "Dropdown") {
 		node = page.Add(UIElementType::Dropdown, id);
 		element = page.Get(node);
+		theme = &page.GetTheme()[element->GetType()];
 	}
 	if(typeStr == "Text") {
 		node = page.Add(UIElementType::Text, id);
 		element = page.Get(node);
+		theme = &page.GetTheme()[element->GetType()];
 	}
 	if(typeStr == "TextInput") {
 		node = page.Add(UIElementType::TextInput, id);
 		element = page.Get(node);
+		theme = &page.GetTheme()[element->GetType()];
 	}
 	if(typeStr == "Image") {
 		node = page.Add(UIElementType::Image, id);
 		element = page.Get(node);
+		theme = &page.GetTheme()[element->GetType()];
 	}
 
 	if(parent == "")
@@ -232,72 +275,80 @@ void LoadElement(UIPage& page, const rapidjson::Value& docElement) {
 	else
 		page.Get(parent)->Add(node);
 
-	element->Width = docElement["Width"].Get<uint32_t>();
-	element->Height = docElement["Height"].Get<uint32_t>();
+	element->Width = TryGet<uint32_t>(elementNode, "Width", theme->Width);
+	element->Height = TryGet<uint32_t>(elementNode, "Height", theme->Height);
 
-	element->xAlignment = XAlignment::Left;
-	if(docElement.HasMember("xAlignment")) {
-		const auto& xAlign = docElement["xAlignment"];
-		if(xAlign.Get<std::string>() == "Center")
+	element->xAlignment = theme->xAlignment;
+	if(elementNode.HasMember("xAlignment")) {
+		std::string xAlign = elementNode["xAlignment"].Get<std::string>();
+		if(xAlign == "Left")
+			element->xAlignment = XAlignment::Left;
+		else if(xAlign == "Center")
 			element->xAlignment = XAlignment::Center;
-		else if(xAlign.Get<std::string>() == "Right")
+		else if(xAlign == "Right")
 			element->xAlignment = XAlignment::Right;
 	}
 
-	element->yAlignment = YAlignment::Top;
-	if(docElement.HasMember("yAlignment")) {
-		const auto& yAlign = docElement["yAlignment"];
-		if(yAlign.Get<std::string>() == "Center")
+	element->yAlignment = theme->yAlignment;
+	if(elementNode.HasMember("yAlignment")) {
+		std::string xAlign = elementNode["yAlignment"].Get<std::string>();
+		if(xAlign == "Top")
+			element->yAlignment = YAlignment::Top;
+		else if(xAlign == "Center")
 			element->yAlignment = YAlignment::Center;
-		else if(yAlign.Get<std::string>() == "Bottom")
+		else if(xAlign == "Bottom")
 			element->yAlignment = YAlignment::Bottom;
 	}
 
-	element->x = docElement["x"].Get<int32_t>();
-	element->y = docElement["y"].Get<int32_t>();
-	element->Color =
-		glm::vec4
-		{
-			docElement["Color"][0].Get<float>(),
-			docElement["Color"][1].Get<float>(),
-			docElement["Color"][2].Get<float>(),
-			docElement["Color"][3].Get<float>()
-		};
+	element->x = TryGet<int32_t>(elementNode, "x", theme->x);
+	element->y = TryGet<int32_t>(elementNode, "y", theme->y);
+
+	element->Color = theme->Color;
+	if(elementNode.HasMember("Color"))
+		element->Color =
+			glm::vec4
+			{
+				elementNode["Color"][0].Get<float>(),
+				elementNode["Color"][1].Get<float>(),
+				elementNode["Color"][2].Get<float>(),
+				elementNode["Color"][3].Get<float>()
+			};
 }
 
 void CompileElement(const std::string& name, const std::string& funcPath,
-					const rapidjson::Value& docElement)
+					const rapidjson::Value& elementNode)
 {
-	if(!docElement.HasMember("OnUpdate")
-	&& !docElement.HasMember("OnClick")
-	&& !docElement.HasMember("OnHover")
-	&& !docElement.HasMember("OnMouseUp")
-	&& !docElement.HasMember("OnMouseDown"))
+	if(!elementNode.HasMember("OnUpdate")
+	&& !elementNode.HasMember("OnClick")
+	&& !elementNode.HasMember("OnHover")
+	&& !elementNode.HasMember("OnMouseUp")
+	&& !elementNode.HasMember("OnMouseDown"))
 		return;
 
 	auto genPath = fs::path("Lava") / "projects" / "UI" / "gen";
 	auto hFile = File((genPath / name).string() + ".h");
 	auto cppFile = File((genPath / name).string() + ".cpp");
-	auto funcFile = File(funcPath);
 
-	std::string id = docElement["ID"].Get<std::string>();
+	std::string funcFileStr = "";
+	if(FileUtils::FileExists(funcPath));
+		funcFileStr = File(funcPath).Get();
+
+	std::string id = elementNode["ID"].Get<std::string>();
 
 	cppFile.Write("\tm_Objects[\"" + id + "\"] = new " + id + ";");
+	cppFile.Write("\tm_Objects[\"" + id + "\"]->SetPage(page);");
 
 	hFile
 	.Write("class " + id + " : public UIObject {")
 	.Write("public:");
 
-	std::string funcFileStr = funcFile.Get();
-	auto elementIdx = funcFileStr.find(id);
-
 	for(std::string name :
 		{ "OnUpdate", "OnClick", "OnHover", "OnMouseUp", "OnMouseDown" })
 	{
-		if(!docElement.HasMember(name))
+		if(!elementNode.HasMember(name))
 			continue;
 
-		const auto& element = docElement[name];
+		const auto& element = elementNode[name];
 
 		hFile.Write("\tvoid " + name + "(" +
 					(name == "OnUpdate" ? "TimeStep ts" : "") + ") override {");
@@ -317,7 +368,8 @@ void CompileElement(const std::string& name, const std::string& funcPath,
 					hFile.Write("\t\t" +
 								string.substr(left + 2, right - left - 3));
 			}
-			else if(string == "Default") {
+			else if(string == "Default" && funcFileStr != "") {
+				auto elementIdx = funcFileStr.find(id);
 				uint32_t funcIdx = funcFileStr.find(name, elementIdx);
 				uint32_t start = funcFileStr.find_first_of('{', funcIdx);
 				uint32_t left = start;
@@ -353,26 +405,22 @@ void CompileElement(const std::string& name, const std::string& funcPath,
 void GenFiles(const std::string& name, const std::string& funcPath) {
 	auto genPath = fs::path("Lava") / "projects" / "UI" / "gen";
 
-	fs::remove_all(genPath);
-	fs::create_directory(genPath);
-
-	FileUtils::CreateFile((genPath / name).string() + ".h");
-	FileUtils::CreateFile((genPath / name).string() + ".cpp");
-
 	auto hFile = File((genPath / name).string() + ".h");
 	auto cppFile = File((genPath / name).string() + ".cpp");
-	auto funcFile = File(funcPath);
 	auto templateFile = File("Lava/projects/UI/template.lua");
 	auto premakeFile = File("Lava/projects/UI/pages.lua");
+	auto contextIncludes = File("Lava/projects/UI/gen/Context.h");
 
-	std::string funcFileStr = funcFile.Get();
-	uint64_t elementsIdx = funcFileStr.find("namespace UIObjects");
+	if(FileUtils::FileExists(funcPath)) {
+		auto funcFileStr = File(funcPath).Get();
+		uint64_t elementsIdx = funcFileStr.find("namespace UIObjects");
+		std::string includes = funcFileStr.substr(0, elementsIdx - 1);
+		contextIncludes.Write(includes);
+	}
 
 	hFile
-	.Write(funcFileStr.substr(0, elementsIdx - 1))
-	.Write("#include <Magma/UI/UI.h>")
-	.Write("#include <VolcaniCore/Core/Log.h>")
-	.Write("")
+	.Write("#include \"Context.h\"")
+	.Write("\n")
 	.Write("namespace UIObjects {\n");
 
 	cppFile
@@ -383,7 +431,7 @@ void GenFiles(const std::string& name, const std::string& funcPath) {
 	.Write("\tif(!m_Objects.count(id)) { return nullptr; }")
 	.Write("\treturn m_Objects[id];")
 	.Write("}\n")
-	.Write("extern \"C\" EXPORT void LoadObjects() {");
+	.Write("extern \"C\" EXPORT void LoadObjects(UIPage* page) {");
 
 	std::string templateStr = templateFile.Get();
 	Replace(templateStr, "{name}", name);
