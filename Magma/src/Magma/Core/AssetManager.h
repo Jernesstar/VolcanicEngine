@@ -2,15 +2,18 @@
 
 #include <VolcaniCore/Core/Defines.h>
 
-#include "Graphics/Mesh.h"
-
 using namespace VolcaniCore;
 
 namespace Magma {
 
+enum class AssetType { Image2D, Image3D, Mesh, Font };
+
 struct Asset {
-	// Type;
-	// Handler;
+	const AssetType Type;
+	const std::string Path;
+
+	template<typename T>
+	Ref<T> Get();
 };
 
 class AssetManager {
@@ -21,9 +24,8 @@ public:
 	void Init();
 	void Close();
 
-	// template<typename T, typename ...Args>
-	// Ref<T> Create(Args&&... args);
-
+	template<typename T, typename ...Args>
+	Asset GetOrCreate(const Args&... args);
 	template<typename T, typename ...Args>
 	Ref<T> GetOrCreate(const Args&... args);
 };
