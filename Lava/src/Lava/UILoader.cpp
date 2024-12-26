@@ -328,7 +328,7 @@ void CompileElement(const std::string& name, const std::string& funcPath,
 	auto cppFile = File((genPath / name).string() + ".cpp");
 
 	std::string funcFileStr = "";
-	if(FileUtils::FileExists(funcPath));
+	if(FileUtils::FileExists(funcPath))
 		funcFileStr = File(funcPath).Get();
 
 	std::string id = elementNode["ID"].Get<std::string>();

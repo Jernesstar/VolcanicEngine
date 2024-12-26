@@ -15,9 +15,10 @@ using namespace Magma::UI;
 
 namespace Lava {
 
+static Map<std::string, Ref<DLL>> s_DLLs;
+
 static List<UIPage> s_Pages;
 static UIPage* s_CurrentPage = nullptr;
-static Ref<DLL> s_CurrentDLL = nullptr;
 
 static Theme s_Theme;
 
@@ -61,7 +62,9 @@ void UIBrowser::Load(const std::string& folderPath) {
 	if(FileUtils::FileExists(themePath))
 		s_Theme = UILoader::LoadTheme(themePath);
 
-	for(auto filePath : FileUtils::GetFiles(folderPath, { ".json" })) {
+	auto filePaths = FileUtils::GetFiles(folderPath, { ".json" });
+	s_Pages.reserve(filePaths.size());
+	for(auto filePath : filePaths) {
 		fs::path p(filePath);
 		auto name = p.stem().stem().stem().string();
 		auto filePathName = (fs::path(folderPath) / name).string();
@@ -71,52 +74,53 @@ void UIBrowser::Load(const std::string& folderPath) {
 			page.SetTheme(s_Theme);
 			UILoader::Load(page, filePathName);
 			UILoader::Compile(filePathName);
+			break;
 		}
 	}
+
+	s_CurrentPage = &s_Pages[0];
 }
 
 void UIBrowser::Reload() {
-
+	// for(auto& page : s_Pages) {
+	// 	s_DLLs[page.Name] = UILoader::GetDLL(page.Name);
+	// 	auto load = s_DLLs[page.Name]->GetFunction<void, UIPage*>("LoadObjects");
+	// 	load(&page);
+	// }
 }
 
 void UIBrowser::OnUpdate(TimeStep ts) {
-	if(!s_CurrentPage) {
-		VOLCANICORE_LOG_INFO("Null");
+	if(!s_CurrentPage)
 		return;
-	}
 
-	auto get = s_CurrentDLL->GetFunction<UIObject*, std::string>("GetObject");
+	// auto gen = s_DLLs[s_CurrentPage->Name];
+	// auto get = gen->GetFunction<UIObject*, std::string>("GetObject");
 
-	s_CurrentPage->Traverse(
-		[&](UIElement* element)
-		{
-			UIObject* object = get(element->GetID());
-			if(!object)
-				return;
+	// s_CurrentPage->Traverse(
+	// 	[&](UIElement* element)
+	// 	{
+	// 		UIObject* object = get(element->GetID());
+	// 		if(!object)
+	// 			return;
 
-			object->OnUpdate(ts);
+	// 		object->OnUpdate(ts);
 
-			UIState state = element->GetState();
-			if(state.Clicked)
-				object->OnClick();
-			if(state.Hovered)
-				object->OnHover();
-			if(state.MouseUp)
-				object->OnMouseUp();
-			if(state.MouseDown)
-				object->OnMouseDown();
-		});
+	// 		UIState state = element->GetState();
+	// 		if(state.Clicked)
+	// 			object->OnClick();
+	// 		if(state.Hovered)
+	// 			object->OnHover();
+	// 		if(state.MouseUp)
+	// 			object->OnMouseUp();
+	// 		if(state.MouseDown)
+	// 			object->OnMouseDown();
+	// 	});
 
-	// TODO(Fix): Crash, the UIElements are somehow null
 	s_CurrentPage->Render();
 }
 
 void UIBrowser::SetPage(const std::string& name) {
 	s_CurrentPage = GetPage(name);
-	s_CurrentDLL = UILoader::GetDLL(name);
-
-	auto load = s_CurrentDLL->GetFunction<void, UIPage*>("LoadObjects");
-	load(s_CurrentPage);
 }
 
 UIPage* UIBrowser::GetPage(const std::string& name) {
