@@ -2,8 +2,6 @@
 
 #include "UIElement.h"
 
-#include "UISerializer.h"
-
 namespace Magma::UI {
 
 template<typename TUIElement>

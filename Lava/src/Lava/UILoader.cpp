@@ -51,16 +51,157 @@ void UILoader::Load(UIPage& page, const std::string& filePathName) {
 	}
 }
 
-void UILoader::Save(const UIPage& page, const std::string& path) {
+template<typename TUIElement>
+static void Serialize(TUIElement* ui, JSONSerializer& serializer)
+
+template<>
+void Serialize(Window* ui, JSONSerializer& serializer) {
+	serializer
+		.WriteKey("BorderWidth").Write(ui->BorderWidth)
+		.WriteKey("BorderHeight").Write(ui->BorderHeight)
+		.WriteKey("BorderColor").Write(ui->BorderColor);
+}
+
+template<>
+void Serialize(Button* ui, JSONSerializer& serializer) {
 
 }
 
-Map<UIElementType, ThemeElement> UILoader::LoadTheme(const std::string& path) {
+template<>
+void Serialize(Dropdown* ui, JSONSerializer& serializer) {
+
+}
+
+template<>
+void Serialize(Text* ui, JSONSerializer& serializer) {
+	serializer
+		.WriteKey("Text").Write(ui->Content);
+}
+
+template<>
+void Serialize(TextInput* ui, JSONSerializer& serializer) {
+	serializer
+		.WriteKey("Text").Write(ui->Text);
+}
+
+template<>
+void Serialize(Image* ui, JSONSerializer& serializer) {
+	serializer.WriteKey("Path").Write(ui->Content->GetPath());
+}
+
+template<>
+void Serialize(UIElement* ui, JSONSerializer& serializer) {
+	serializer
+	.BeginMapping()
+		.WriteKey("Type");
+
+	switch(ui->GetType()) {
+		case UIElementType::Window:
+			serializer.Write("Window");
+			break;
+		case UIElementType::Button:
+			serializer.Write("Button");
+			break;
+		case UIElementType::Dropdown:
+			serializer.Write("Dropdown");
+			break;
+		case UIElementType::Text:
+			serializer.Write("Text");
+			break;
+		case UIElementType::TextInput:
+			serializer.Write("TextInput");
+			break;
+		case UIElementType::Image:
+			serializer.Write("Image");
+			break;
+	}
+
+	serializer
+		.WriteKey("Width").Write(ui->Width)
+		.WriteKey("Height").Write(ui->Height)
+		.WriteKey("x").Write(ui->x)
+		.WriteKey("y").Write(ui->y)
+		.WriteKey("xAlignment")
+			.Write(
+				[&]() -> std::string
+				{
+					switch(ui->xAlignment) {
+						case XAlignment::Left:
+							return "Left";
+						case XAlignment::Center:
+							return "Center";
+						case XAlignment::Right:
+							return "Right";
+					}
+				}())
+		.WriteKey("yAlignment")
+			.Write(
+				[&]() -> std::string
+				{
+					switch(ui->yAlignment) {
+						case YAlignment::Top:
+							return "Top";
+						case YAlignment::Center:
+							return "Center";
+						case YAlignment::Bottom:
+							return "Bottom";
+					}
+				}())
+		.WriteKey("Color").Write(ui->Color);
+
+	switch(ui->GetType()) {
+		case UIElementType::Window:
+			Serialize(ui->As<Window>(), serializer);
+			break;
+		case UIElementType::Button:
+			Serialize(ui->As<Button>(), serializer);
+			break;
+		case UIElementType::Dropdown:
+			Serialize(ui->As<Dropdown>(), serializer);
+			break;
+		case UIElementType::Text:
+			Serialize(ui->As<Text>(), serializer);
+			break;
+		case UIElementType::TextInput:
+			Serialize(ui->As<TextInput>(), serializer);
+			break;
+		case UIElementType::Image:
+			Serialize(ui->As<Image>(), serializer);
+			break;
+	}
+
+	serializer.WriteKey("Children").BeginSequence();
+	for(auto child : ui->GetChildren())
+		Serialize(child, serializer);
+	serializer.EndSequence();
+
+	serializer.EndMapping();
+}
+
+void UILoader::Save(const UIPage& page, const std::string& path) {
+	JSONSerializer serializer;
+	serializer.BeginMapping(); // File
+
+	// TODO(Implement): Serialize theme
+
+	serializer.WriteKey("Elements")
+	.BeginSequence();
+
+	for(UIElement* element : page.GetFirstOrderElements())
+		Serialize(element, serializer);
+
+	serializer.EndSequence();
+
+	serializer.EndMapping(); // File
+	serializer.Finalize(path);
+}
+
+Theme UILoader::LoadTheme(const std::string& path) {
 	std::string file = FileUtils::ReadFile(path);
 	Document doc;
 	doc.Parse(file);
 
-	Map<UIElementType, ThemeElement> res;
+	Theme res;
 	if(!doc.HasMember("Theme"))
 		return res;
 
@@ -276,6 +417,9 @@ void LoadElement(UIPage& page, const rapidjson::Value& elementNode) {
 	element->Width = TryGet<uint32_t>(elementNode, "Width", theme->Width);
 	element->Height = TryGet<uint32_t>(elementNode, "Height", theme->Height);
 
+	element->x = TryGet<int32_t>(elementNode, "x", theme->x);
+	element->y = TryGet<int32_t>(elementNode, "y", theme->y);
+
 	element->xAlignment = theme->xAlignment;
 	if(elementNode.HasMember("xAlignment")) {
 		std::string xAlign = elementNode["xAlignment"].Get<std::string>();
@@ -297,9 +441,6 @@ void LoadElement(UIPage& page, const rapidjson::Value& elementNode) {
 		else if(xAlign == "Bottom")
 			element->yAlignment = YAlignment::Bottom;
 	}
-
-	element->x = TryGet<int32_t>(elementNode, "x", theme->x);
-	element->y = TryGet<int32_t>(elementNode, "y", theme->y);
 
 	element->Color = theme->Color;
 	if(elementNode.HasMember("Color"))

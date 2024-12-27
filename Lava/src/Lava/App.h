@@ -8,7 +8,13 @@ namespace Lava {
 
 class App {
 public:
-	App() = default;
+	template<typename TApp>
+	static TApp* As() { return (TApp*)s_Instance; }
+
+public:
+	App() {
+		s_Instance = this;
+	}
 	virtual ~App() = default;
 
 	virtual void OnLoad();
@@ -22,7 +28,7 @@ public:
 	// TComponent& OnDeserialize();
 
 private:
-	
+	inline static s_Instance;
 };
 
 }

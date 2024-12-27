@@ -20,7 +20,6 @@ struct Component {
 };
 
 struct CameraComponent : public Component {
-	// TODO(Change): AssetID
 	Ref<Camera> Cam;
 
 	CameraComponent() = default;
@@ -49,7 +48,6 @@ struct MeshComponent : public Component {
 };
 
 struct RigidBodyComponent : public Component {
-	// TODO(Change): AssetID
 	Ref<RigidBody> Body;
 
 	RigidBodyComponent() = default;
@@ -80,7 +78,9 @@ struct TransformComponent : public Component {
 	glm::vec3 Scale		  = { 1.0f, 1.0f, 1.0f };
 
 	TransformComponent() = default;
-	TransformComponent(const glm::vec3& t, const glm::vec3& r, const glm::vec3& s)
+	TransformComponent(const glm::vec3& t,
+					   const glm::vec3& r,
+					   const glm::vec3& s)
 		: Translation(t), Rotation(r), Scale(s) { }
 	TransformComponent(const Transform& t)
 		: Translation(t.Translation), Rotation(t.Rotation), Scale(t.Scale) { }
@@ -89,7 +89,7 @@ struct TransformComponent : public Component {
 
 struct ScriptComponent : public Component {
 	// std::string Path;
-	
+
 	Func<void, TransformComponent&> OnInput;
 
 	ScriptComponent() = default;
