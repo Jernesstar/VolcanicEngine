@@ -4,7 +4,7 @@ project "{name}"
     cppdialect "C++latest"
 
     objdir ("build/obj")
-    targetdir ("build/lib/{name}")
+    targetdir ("build/lib")
 
     files {
         "gen/{name}.cpp"
@@ -68,32 +68,6 @@ project "{name}"
         "rapidjson",
         -- "PhysX",
     }
-
-    filter "system:linux"
-        links {
-            "pthread",
-            "dl",
-            "GL",
-            "X11",
-        }
-
-    filter "system:windows"
-        systemversion "latest"
-        links {
-            "gdi32",
-            "kernel32",
-            "psapi",
-            "Ws2_32",
-        }
-
-    filter "system:macosx"
-        links {
-            "QuartzCore.framework",
-            "Metal.framework",
-            "Cocoa.framework",
-            "IOKit.framework",
-            "CoreVideo.framework"
-        }
 
     filter "configurations:Debug"
         runtime "Debug"

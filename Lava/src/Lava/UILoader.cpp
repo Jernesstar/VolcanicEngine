@@ -52,7 +52,7 @@ void UILoader::Load(UIPage& page, const std::string& filePathName) {
 }
 
 template<typename TUIElement>
-static void Serialize(TUIElement* ui, JSONSerializer& serializer)
+static void Serialize(TUIElement* ui, JSONSerializer& serializer);
 
 template<>
 void Serialize(Window* ui, JSONSerializer& serializer) {
@@ -323,8 +323,13 @@ void UILoader::Compile(const std::string& filePathName) {
 }
 
 Ref<DLL> UILoader::GetDLL(const std::string& pageName) {
-	auto path = fs::path("Lava") / "projects" / "UI" / "build" / "lib";
-	return CreateRef<DLL>((path / pageName / pageName).string() + ".dll");
+	std::string path = "Lava/projects/UI/build/lib/";
+#ifdef VOLCANICENGINE_WINDOWS
+	path += pageName + ".dll";
+#elif VOLCANICENGINE_LINUX
+	path = "./" + path + "lib" + pageName + ".so";
+#endif
+	return CreateRef<DLL>(path);
 }
 
 template<typename T>

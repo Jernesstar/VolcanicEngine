@@ -111,12 +111,9 @@ void LoadSource(YAML::Node& node, const std::string& srcPath) {
 	cppFile.Close();
 
 	std::string command;
-#ifdef VOLCANICENGINE_LINUX
-	command += "vendor/premake/bin/Linux/premake5.exe";
-
-#elif VOLCANICENGINE_WINDOWS
-	command += "vendor\\premake\\bin\\Windows\\premake5.exe";
-	command += " gmake2 --file=Lava\\projects\\premake5.lua";
+#ifdef VOLCANICENGINE_WINDOWS
+	command = "vendor\\premake\\bin\\Windows\\premake5.exe gmake2";
+	command += " --file=Lava\\projects\\premake5.lua";
 	command += " --src=\"" + srcPath + "\"";
 	system(command.c_str());
 
@@ -124,8 +121,15 @@ void LoadSource(YAML::Node& node, const std::string& srcPath) {
 	command += " -WorkingDir Lava\\projects\\build";
 	command += " -ArgumentList '-f Makefile';";
 	system(command.c_str());
-#endif
+#elif VOLCANICENGINE_LINUX
+	command = "vendor/premake/bin/Linux/premake5.exe gmake2";
+	command += " --file=Lava/projects/premake5.lua";
+	command += " --src=\"" + srcPath + "\"";
+	system(command.c_str());
 
+	command = "cd Lava/projects/build; make -f Makefile;";
+	system(command.c_str());
+#endif
 }
 
 void LoadAssets(YAML::Node& node, const std::string& assetPath) {
@@ -134,6 +138,16 @@ void LoadAssets(YAML::Node& node, const std::string& assetPath) {
 	// for(auto path : FileUtils::GetFiles(modelPath)) {
 	// 	AssetManager::GetOrCreate<Mesh>(path);
 	// }
+}
+
+Ref<DLL> ProjectLoader::GetDLL() {
+	std::string path = "Lava/projects/Project/build/lib/";
+#ifdef VOLCANICENGINE_WINDOWS
+	path += "Loader.dll";
+#elif VOLCANICENGINE_LINUX
+	path = "./" + path + "libLoader.so";
+#endif
+	return CreateRef<DLL>(path);
 }
 
 }

@@ -29,5 +29,9 @@
 		}
 	},
 
+	"remoteEnv": {
+		"VOLC_PATH": "/workspaces/VolcanicEngine"
+	},
+
 	"remoteUser": "root"
 }

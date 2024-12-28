@@ -80,7 +80,7 @@ void Renderer2D::DrawFullscreenQuad(Ref<Framebuffer> buffer,
 									AttachmentTarget target)
 {
 	if(!buffer) {
-		VOLCANICORE_LOG_INFO("Buffer is null");
+		VOLCANICORE_LOG_INFO("Framebuffer is null");
 		return;
 	}
 	if(!buffer->Has(target)) {

@@ -28,7 +28,7 @@ public:
 	// TComponent& OnDeserialize();
 
 private:
-	inline static s_Instance;
+	inline static App* s_Instance;
 };
 
 }

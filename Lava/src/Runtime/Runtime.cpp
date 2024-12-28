@@ -23,7 +23,7 @@ Runtime::Runtime(const std::string& volcPath)
 	ProjectLoader::Load(project, volcPath);
 	ProjectLoader::Compile(volcPath);
 
-	m_AppDLL = CreateRef<DLL>("Lava/projects/Project/build/lib/Loader.dll");
+	m_AppDLL = ProjectLoader::GetDLL();
 
 	Application::GetWindow()->SetTitle(project.Name);
 	Application::PushDir(project.Path);

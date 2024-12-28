@@ -47,6 +47,12 @@ project "Lava"
         -- "PhysX",
     }
 
+    filter "system:linux"
+        buildoptions {
+            "-fPIC",
+            "-Wl,-Bsymbolic"
+        }
+
     filter "toolset:gcc or toolset:clang"
         buildoptions {
             "-fexceptions",
@@ -56,6 +62,7 @@ project "Lava"
 
     filter "system:windows"
         systemversion "latest"
+
 
 project "Runtime"
     kind "ConsoleApp"

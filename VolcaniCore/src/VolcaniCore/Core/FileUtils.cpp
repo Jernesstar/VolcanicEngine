@@ -7,6 +7,8 @@
 
 #include "Core/Assert.h"
 
+namespace fs = std::filesystem;
+
 namespace VolcaniCore {
 
 File::File(const std::string& path)
@@ -29,7 +31,7 @@ void File::Close() {
 }
 
 bool FileUtils::FileExists(const std::string& path) {
-	return std::filesystem::exists(path.c_str());
+	return fs::exists(path.c_str());
 }
 
 void FileUtils::CreateFile(const std::string& path) {
@@ -59,8 +61,10 @@ void FileUtils::WriteToFile(const std::string& path, const std::string& info) {
 
 std::vector<std::string> FileUtils::GetFiles(const std::string& dir) {
 	std::vector<std::string> files;
-	for(auto p : std::filesystem::directory_iterator(dir.c_str()))
-		files.push_back(p.path().string());
+
+	if(fs::is_directory(dir))
+		for(auto p : fs::directory_iterator(dir))
+			files.push_back(p.path().string());
 
 	return files;
 }
@@ -69,11 +73,12 @@ std::vector<std::string> FileUtils::GetFiles(
 	const std::string& dir, const std::vector<std::string>& extensions)
 {
 	std::vector<std::string> files;
-	for(auto p : std::filesystem::directory_iterator(dir.c_str())) {
-		for(auto& ext : extensions)
-			if(p.path().extension().string() == ext)
-				files.push_back(p.path().string());
-	}
+	if(fs::is_directory(dir))
+		for(auto p : fs::directory_iterator(dir))
+			for(auto& ext : extensions)
+				if(p.path().extension().string() == ext)
+					files.push_back(p.path().string());
+
 	return files;
 }
 

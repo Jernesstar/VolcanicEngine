@@ -46,6 +46,12 @@ project "Magma"
         -- "PhysX",
     }
 
+    filter "system:linux"
+        buildoptions {
+            "-fPIC",
+            "-Wl,-Bsymbolic"
+        }
+
     filter "toolset:gcc or toolset:clang"
         buildoptions {
             "-fexceptions",

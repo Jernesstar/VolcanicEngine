@@ -1,5 +1,7 @@
 #include "AssetManager.h"
 
+#include <VolcaniCore/Core/Assert.h>
+
 #include "Graphics/Mesh.h"
 
 namespace Magma {

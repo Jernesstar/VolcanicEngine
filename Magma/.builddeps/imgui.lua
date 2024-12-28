@@ -21,3 +21,9 @@ project "imgui"
         "%{Includes.imgui}",
         "%{Includes.imgui}/imgui",
     }
+
+    filter "system:linux"
+        buildoptions {
+            "-fPIC",
+            "-Wl,-Bsymbolic"
+        }

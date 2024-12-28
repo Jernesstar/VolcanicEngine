@@ -86,7 +86,8 @@ UIState UIRenderer::DrawWindow(UI::Window& window) {
 				 | ImGuiWindowFlags_NoBringToFrontOnFocus
 				 | ImGuiWindowFlags_NoNavFocus;
 
-	ImGui::Begin(window.GetID().c_str(), &window.Open, windowFlags);
+	// TODO(Implement): Window state
+	ImGui::Begin(window.GetID().c_str(), nullptr, windowFlags);
 	ImGui::PopStyleColor(2);
 	ImGui::PopStyleVar(3);
 

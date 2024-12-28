@@ -77,6 +77,12 @@ project "Project"
             "/NODEFAULTLIB:library"
         }
 
+    filter "system:linux"
+        buildoptions {
+            "-fPIC",
+            "-Wl,-Bsymbolic"
+        }
+
 
 project "Loader"
     kind "SharedLib"
@@ -147,35 +153,8 @@ project "Loader"
         -- "PhysX",
     }
 
-    filter "system:linux"
-        links {
-            "pthread",
-            "dl",
-            "GL",
-            "X11",
-        }
-
-    filter "system:windows"
-        systemversion "latest"
-        links {
-            "gdi32",
-            "kernel32",
-            "psapi",
-            "Ws2_32",
-        }
-
-    filter "system:macosx"
-        links {
-            "QuartzCore.framework",
-            "Metal.framework",
-            "Cocoa.framework",
-            "IOKit.framework",
-            "CoreVideo.framework"
-        }
-
     filter "toolset:gcc or toolset:clang"
         buildoptions {
-            -- "-fexceptions",
             "-Wno-format-security",
             "-Wno-pointer-arith"
         }

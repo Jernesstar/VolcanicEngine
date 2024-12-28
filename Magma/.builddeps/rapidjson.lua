@@ -14,3 +14,9 @@ project "rapidjson"
     includedirs {
         "%{Includes.rapidjson}",
     }
+
+    filter "system:linux"
+        buildoptions {
+            "-fPIC",
+            "-Wl,-Bsymbolic"
+        }

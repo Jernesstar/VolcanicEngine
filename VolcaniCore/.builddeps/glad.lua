@@ -24,3 +24,8 @@ project "glad"
         files {
             "%{VendorPaths.glad}/src/glad_glx.c"
         }
+
+        buildoptions {
+            "-fPIC",
+            "-Wl,-Bsymbolic"
+        }

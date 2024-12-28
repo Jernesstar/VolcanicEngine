@@ -74,7 +74,6 @@ void UIBrowser::Load(const std::string& folderPath) {
 			page.SetTheme(s_Theme);
 			UILoader::Load(page, filePathName);
 			UILoader::Compile(filePathName);
-			break;
 		}
 	}
 
@@ -82,39 +81,39 @@ void UIBrowser::Load(const std::string& folderPath) {
 }
 
 void UIBrowser::Reload() {
-	// for(auto& page : s_Pages) {
-	// 	s_DLLs[page.Name] = UILoader::GetDLL(page.Name);
-	// 	auto load = s_DLLs[page.Name]->GetFunction<void, UIPage*>("LoadObjects");
-	// 	load(&page);
-	// }
+	for(auto& page : s_Pages) {
+		s_DLLs[page.Name] = UILoader::GetDLL(page.Name);
+		auto load = s_DLLs[page.Name]->GetFunction<void, UIPage*>("LoadObjects");
+		load(&page);
+	}
 }
 
 void UIBrowser::OnUpdate(TimeStep ts) {
 	if(!s_CurrentPage)
 		return;
 
-	// auto gen = s_DLLs[s_CurrentPage->Name];
-	// auto get = gen->GetFunction<UIObject*, std::string>("GetObject");
+	auto gen = s_DLLs[s_CurrentPage->Name];
+	auto get = gen->GetFunction<UIObject*, std::string>("GetObject");
 
-	// s_CurrentPage->Traverse(
-	// 	[&](UIElement* element)
-	// 	{
-	// 		UIObject* object = get(element->GetID());
-	// 		if(!object)
-	// 			return;
+	s_CurrentPage->Traverse(
+		[&](UIElement* element)
+		{
+			UIObject* object = get(element->GetID());
+			if(!object)
+				return;
 
-	// 		object->OnUpdate(ts);
+			object->OnUpdate(ts);
 
-	// 		UIState state = element->GetState();
-	// 		if(state.Clicked)
-	// 			object->OnClick();
-	// 		if(state.Hovered)
-	// 			object->OnHover();
-	// 		if(state.MouseUp)
-	// 			object->OnMouseUp();
-	// 		if(state.MouseDown)
-	// 			object->OnMouseDown();
-	// 	});
+			UIState state = element->GetState();
+			if(state.Clicked)
+				object->OnClick();
+			if(state.Hovered)
+				object->OnHover();
+			if(state.MouseUp)
+				object->OnMouseUp();
+			if(state.MouseDown)
+				object->OnMouseDown();
+		});
 
 	s_CurrentPage->Render();
 }

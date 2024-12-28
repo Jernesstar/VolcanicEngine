@@ -13,3 +13,9 @@ project "stb_image"
     includedirs {
         "%{Includes.stb_image}"
     }
+
+    filter "system:linux"
+        buildoptions {
+            "-fPIC",
+            "-Wl,-Bsymbolic"
+        }
