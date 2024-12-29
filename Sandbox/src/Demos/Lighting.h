@@ -118,15 +118,15 @@ Lighting::Lighting() {
 	width = 5;
 	length = 5;
 
-	UI::UIRenderer::Init();
+	UIRenderer::Init();
 }
 
 Lighting::~Lighting() {
-	UI::UIRenderer::Close();
+	UIRenderer::Close();
 }
 
 void Lighting::OnUpdate(TimeStep ts) {
-	UI::UIRenderer::BeginFrame();
+	UIRenderer::BeginFrame();
 
 	controller.OnUpdate(ts);
 
@@ -192,7 +192,6 @@ void Lighting::OnUpdate(TimeStep ts) {
 		auto& uniforms = Renderer::GetPass()->GetUniforms();
 		for(int y = -length; y < length; y++) {
 			for(int x = -width; x < width; x++) {
-
 				int i = 2*width * (y + length) + (x + width);
 
 				std::string name = "u_PointLights[" + std::to_string(i) + "].";
@@ -247,7 +246,7 @@ void Lighting::OnUpdate(TimeStep ts) {
 
 	Renderer::Flush();
 
-	UI::UIRenderer::EndFrame();
+	UIRenderer::EndFrame();
 }
 
 }

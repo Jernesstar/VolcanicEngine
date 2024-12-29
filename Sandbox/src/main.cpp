@@ -48,6 +48,7 @@ using namespace Lava;
 #include "Demos/Lighting.h"
 #include "Demos/Shadows.h"
 #include "Demos/Bloom.h"
+#include "Demos/Deferred.h"
 #include "Demos/Text.h"
 #include "Demos/UI.h"
 #include "Demos/ECS.h"
@@ -67,6 +68,8 @@ Application* CreateApplication(const CommandLineArgs& args) {
 	if(project == "Shadows") return new Demo::Shadows();
 	// Bloom
 	if(project == "Bloom") return new Demo::Bloom();
+	// Deferred
+	if(project == "Deferred") return new Demo::Deferred();
 	// Text rendering
 	if(project == "Text") return new Demo::Text();
 	// UI

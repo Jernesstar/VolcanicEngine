@@ -163,11 +163,11 @@ Cube::Cube()
 }
 
 Cube::~Cube() {
-	UI::UIRenderer::Close();
+	UIRenderer::Close();
 }
 
 void Cube::OnUpdate(TimeStep ts) {
-	UI::UIRenderer::BeginFrame();
+	UIRenderer::BeginFrame();
 
 	RendererAPI::Get()->StartFrame();
 
@@ -264,7 +264,7 @@ void Cube::OnUpdate(TimeStep ts) {
 	// Renderer2D::DrawFullscreenQuad(framebuffer, AttachmentTarget::Color);
 	RendererAPI::Get()->EndFrame();
 
-	UI::UIRenderer::EndFrame();
+	UIRenderer::EndFrame();
 }
 
 }
