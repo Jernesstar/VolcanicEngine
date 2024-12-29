@@ -13,16 +13,14 @@ namespace VolcaniCore {
 
 struct DrawBufferSpecification;
 struct DrawBuffer;
-struct DrawPass;
 struct DrawUniforms;
+struct DrawPass;
 struct DrawCommand;
 struct DrawCall;
 
 class RendererAPI {
 public:
 	enum class Backend { OpenGL, Vulkan, DirectX };
-
-	static const uint32_t MaxTextureSlots;
 
 public:
 	static void Create(RendererAPI::Backend backend);
@@ -110,13 +108,21 @@ struct DrawBuffer {
 };
 
 struct DrawPass {
+	const std::string Name;
 	Ref<Framebuffer> Output;
+	Ref<ShaderPipeline> Pipeline;
+	DrawBuffer* BufferData;
 };
 
 struct TextureSlot {
 	Ref<Texture> Sampler = nullptr;
 	uint32_t Index = 0;
 };
+
+struct UniformSlot {
+	Ref<UniformBuffer> Buffer = nullptr;
+	uint32_t Binding = 0;
+}
 
 struct DrawUniforms {
 	Map<std::string, int32_t> IntUniforms;
@@ -131,7 +137,7 @@ struct DrawUniforms {
 	Map<std::string, glm::mat3> Mat3Uniforms;
 	Map<std::string, glm::mat4> Mat4Uniforms;
 
-	Map<std::string, Ref<UniformBuffer>> UniformBuffers;
+	Map<std::string, UniformSlot> UniformBuffers;
 
 	void SetInput(const std::string& name, int32_t data) {
 		IntUniforms[name] = data;
@@ -160,17 +166,16 @@ struct DrawUniforms {
 	void SetInput(const std::string& name, const glm::mat4& data) {
 		Mat4Uniforms[name] = data;
 	}
-	void SetInput(const std::string& name, Ref<UniformBuffer> data) {
+	void SetInput(const std::string& name, const UniformSlot& data) {
 		UniformBuffers[name] = data;
 	}
 };
 
 struct DrawCommand {
-	DrawBuffer* BufferData;
+	DrawPass* Pass;
+
 	DrawUniforms UniformData;
-	Ref<ShaderPipeline> Pipeline;
-	List<Pair<AttachmentTarget, uint32_t>> Attachments;
-	Ref<Framebuffer> Image;
+	List<Pair<AttachmentTarget, uint32_t>> Outputs;
 	List<DrawCall> Calls;
 
 	bool Clear = false;

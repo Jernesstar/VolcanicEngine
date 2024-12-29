@@ -44,6 +44,7 @@ struct BackendBuffer {
 struct RendererData {
 	Map<DrawBuffer*, BackendBuffer> Arrays;
 	List<DrawCommand> Commands;
+	DrawPass* LastPass;
 };
 
 static RendererData s_Data;
@@ -169,12 +170,22 @@ DrawCommand* Renderer::NewDrawCommand(DrawBuffer* buffer) {
 }
 
 void FlushCommand(DrawCommand& command) {
-	if(command.Pipeline)
-		command.Pipeline->As<OpenGL::ShaderProgram>()->Bind();
-	if(command.Image) {
-		auto frame = command.Image->As<OpenGL::Framebuffer>();
-		frame->Bind();
-		// frame->Set(command.Attachments);
+	if(command.Pass != s_Data.LastPass) {
+		if(s_Data.LastPass && s_Data.LastPass->Output)
+			s_Data.LastPass->Output->As<OpenGL::Framebuffer>()->Unbind();
+		if(s_Data.LastPass && s_Data.LastPass->Pipeline)
+			s_Data.LastPass->Pipeline->As<OpenGL::ShaderProgram>()->Unbind();
+
+		s_Data.LastPass = command.Pass;
+
+		if(command.Pass->Pipeline)
+			command.Pass->Pipeline->As<OpenGL::ShaderProgram>()->Bind();
+		if(command.Pass->Output)
+			command.Image->As<OpenGL::Framebuffer>()->Bind();
+	}
+
+	if(command.Outputs.size()) {
+		
 	}
 
 	if(command.ViewportWidth != 0 && command.ViewportHeight != 0)
@@ -192,11 +203,6 @@ void FlushCommand(DrawCommand& command) {
 			FlushCall(command, call);
 		array->Unbind();
 	}
-
-	if(command.Image)
-		command.Image->As<OpenGL::Framebuffer>()->Unbind();
-	if(command.Pipeline)
-		command.Pipeline->As<OpenGL::ShaderProgram>()->Unbind();
 }
 
 void FlushCall(DrawCommand& command, DrawCall& call) {
