@@ -21,10 +21,10 @@ static DrawCall s_Options;
 static bool s_OptionsValid = false;
 static FrameData s_Frame;
 
-static uint64_t DrawCallCount;
-static uint64_t IndexCount;
-static uint64_t VertexCount;
-static uint64_t InstanceCount;
+static uint64_t DrawCallCount = 0;
+static uint64_t IndexCount = 0;
+static uint64_t VertexCount = 0;
+static uint64_t InstanceCount = 0;
 
 void Renderer::Init() {
 	s_Frame = { };

@@ -69,6 +69,23 @@ project "{name}"
         -- "PhysX",
     }
 
+    filter "system:linux"
+        links {
+            "pthread",
+            "dl",
+            "GL",
+            "X11",
+        }
+
+    filter "system:windows"
+        systemversion "latest"
+        links {
+            "gdi32",
+            "kernel32",
+            "psapi",
+            "Ws2_32",
+        }
+
     filter "configurations:Debug"
         runtime "Debug"
         symbols "on"
