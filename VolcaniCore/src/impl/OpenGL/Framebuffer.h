@@ -47,6 +47,7 @@ public:
 		return m_AttachmentMap.count(target) == 1;
 	}
 	void Add(AttachmentTarget target, Ref<Texture> texture) override;
+	void Attach(AttachmentTarget target, uint32_t idx, uint32_t dst) override;
 	Ref<Texture> Get(AttachmentTarget target, uint32_t idx = 0) const override;
 
 	void Bind(AttachmentTarget target, uint32_t slot, uint32_t index = 0) const;

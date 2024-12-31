@@ -43,7 +43,8 @@ public:
 		const void* data, uint64_t count, uint64_t offset = 0) = 0;
 	virtual void ReleaseBuffer(DrawBuffer* buffer) = 0;
 
-	virtual DrawCommand* NewDrawCommand(DrawBuffer* buffer = nullptr) = 0;
+	// TODO(Change): NewDrawCommand(DrawPass* pass)
+	virtual DrawCommand* NewDrawCommand(DrawBuffer* buffer) = 0;
 
 	RendererAPI::Backend GetBackend() const { return m_Backend; }
 
@@ -108,7 +109,6 @@ struct DrawBuffer {
 };
 
 struct DrawPass {
-	const std::string Name;
 	Ref<Framebuffer> Output;
 	Ref<ShaderPipeline> Pipeline;
 	DrawBuffer* BufferData;
@@ -121,6 +121,7 @@ struct TextureSlot {
 
 struct UniformSlot {
 	Ref<UniformBuffer> Buffer = nullptr;
+	std::string Name = "";
 	uint32_t Binding = 0;
 }
 
@@ -137,7 +138,7 @@ struct DrawUniforms {
 	Map<std::string, glm::mat3> Mat3Uniforms;
 	Map<std::string, glm::mat4> Mat4Uniforms;
 
-	Map<std::string, UniformSlot> UniformBuffers;
+	List<UniformSlot> UniformBuffers;
 
 	void SetInput(const std::string& name, int32_t data) {
 		IntUniforms[name] = data;
@@ -167,7 +168,7 @@ struct DrawUniforms {
 		Mat4Uniforms[name] = data;
 	}
 	void SetInput(const std::string& name, const UniformSlot& data) {
-		UniformBuffers[name] = data;
+		UniformBuffers.push_back(data);
 	}
 };
 

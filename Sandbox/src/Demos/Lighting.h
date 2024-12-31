@@ -27,12 +27,6 @@ struct SpotLight {
 	glm::vec3 Direction;
 	float OuterCutoffAngle;
 };
-// struct SpotLight : public Light {
-// 	glm::vec3 Direction;
-
-// 	float CutoffAngle;
-// 	float OuterCutoffAngle;
-// };
 
 class Lighting : public Application {
 public:
@@ -148,7 +142,8 @@ void Lighting::OnUpdate(TimeStep ts) {
 
 		Renderer3D::Begin(camera);
 
-		auto cubeUniforms = Uniforms{ }
+		auto* cubeCommand = Renderer::GetCommand();
+		cubeCommand.Uniforms
 		.Set("u_Material.Diffuse",
 			[&]() -> TextureSlot
 			{
@@ -165,7 +160,8 @@ void Lighting::OnUpdate(TimeStep ts) {
 				return 32.0f;
 			});
 
-		auto torchUniforms = Uniforms{ }
+		auto* torchCommand = Renderer::GetCommand();
+		torchCommand.Uniforms
 		.Set("u_Material.Diffuse",
 			[&]() -> TextureSlot
 			{

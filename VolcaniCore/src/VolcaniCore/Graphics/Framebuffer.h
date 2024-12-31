@@ -22,6 +22,7 @@ public:
 
 	virtual bool Has(AttachmentTarget target) const = 0;
 	virtual void Add(AttachmentTarget target, Ref<Texture> texture) = 0;
+	virtual void Attach(AttachmentTarget target, uint32_t idx, uint32_t dst) = 0;
 	virtual Ref<Texture> Get(AttachmentTarget target, uint32_t idx = 0) const = 0;
 
 	uint32_t GetWidth() const { return m_Width; }

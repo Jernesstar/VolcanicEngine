@@ -86,14 +86,11 @@ public:
 
 	void SetUniforms(DrawUniforms& uniformData);
 
-	Ref<ShaderPipeline> GetPipeline() const { return m_Pipeline; }
-	Ref<Framebuffer> GetOutput() const { return m_Output; }
-	Uniforms& GetUniforms() { return m_Uniforms; }
+	Ref<ShaderPipeline> GetPipeline() const { return m_Pass.Pipeline; }
+	Ref<Framebuffer> GetOutput() const { return m_Pass.Output; }
 
 private:
-	Uniforms m_Uniforms;
-	Ref<Framebuffer> m_Output;
-	Ref<ShaderPipeline> m_Pipeline;
+	DrawPass m_Pass;
 };
 
 }

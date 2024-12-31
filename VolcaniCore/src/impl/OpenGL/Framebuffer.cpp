@@ -125,7 +125,19 @@ void Framebuffer::Unbind() const {
 
 void Framebuffer::Add(AttachmentTarget target, Ref<Texture> texture) {
 	uint32_t id = texture->As<OpenGL::Texture2D>()->GetID();
-	uint32_t index = m_AttachmentMap[target].size();
+	uint32_t idx = m_AttachmentMap[target].size();
+	auto& att =
+		m_AttachmentMap[target]
+			.emplace_back(Attachment::Type::Texture,
+						  texture->GetWidth(), texture->GetHeight(), id);
+
+	Attach(target, idx, idx);
+
+	m_Width = att.m_Width;
+	m_Height = att.m_Height;
+}
+
+void Framebuffer::Attach(AttachmentTarget target, uint32_t idx, uint32_t dst) {
 	uint32_t type;
 	switch(target) {
 		case AttachmentTarget::Color:
@@ -141,16 +153,12 @@ void Framebuffer::Add(AttachmentTarget target, Ref<Texture> texture) {
 			break;
 	}
 
-	glBindFramebuffer(GL_FRAMEBUFFER, m_BufferID);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, type + index, GL_TEXTURE_2D, id, 0);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	auto& att = m_AttachmentMap[target][idx];
+	uint32_t id = att.m_RendererID;
 
-	auto& att =
-		m_AttachmentMap[target]
-			.emplace_back(Attachment::Type::Texture,
-						  texture->GetWidth(), texture->GetHeight(), id);
-	m_Width = att.m_Width;
-	m_Height = att.m_Height;
+	glBindFramebuffer(GL_FRAMEBUFFER, m_BufferID);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, type + idx, GL_TEXTURE_2D, id, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 Ref<Texture> Framebuffer::Get(AttachmentTarget target, uint32_t idx) const {

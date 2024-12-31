@@ -91,7 +91,8 @@ void Renderer::EndFrame() {
 	s_Data.Commands.clear();
 }
 
-DrawBuffer* Renderer::NewDrawBuffer(DrawBufferSpecification& specs, void* data) {
+DrawBuffer* Renderer::NewDrawBuffer(DrawBufferSpecification& specs, void* data)
+{
 	auto* buffer = new DrawBuffer{ specs };
 	auto array = CreateRef<VertexArray>();
 	s_Data.Arrays[buffer] = BackendBuffer{ array };
@@ -185,7 +186,9 @@ void FlushCommand(DrawCommand& command) {
 	}
 
 	if(command.Outputs.size()) {
-		
+		uint32_t i = 0;
+		for(auto& [target, idx] : command.Outputs)
+			command.Pass->Output->Attach(target, idx, i++);
 	}
 
 	if(command.ViewportWidth != 0 && command.ViewportHeight != 0)
@@ -269,8 +272,10 @@ void SetUniforms(DrawCommand& command) {
 		shader->SetInt(name, data);
 	for(auto& [name, data] : uniforms.FloatUniforms)
 		shader->SetFloat(name, data);
-	for(auto& [name, slot] : uniforms.TextureUniforms)
-		shader->SetTexture(name, slot.Sampler, slot.Index);
+	for(auto& [name, slot] : uniforms.TextureUniforms) {
+		slot.Sampler->As<OpenGL::Texture2D>()->Bind(slot.Index);
+		shader->SetTexture(name, slot.Sampler);
+	}
 	for(auto& [name, data] : uniforms.Vec2Uniforms)
 		shader->SetVec2(name, data);
 	for(auto& [name, data] : uniforms.Vec3Uniforms)
@@ -283,6 +288,13 @@ void SetUniforms(DrawCommand& command) {
 		shader->SetMat3(name, data);
 	for(auto& [name, data] : uniforms.Mat4Uniforms)
 		shader->SetMat4(name, data);
+
+	for(auto& [buffer, name, binding] : uniforms.UniformBuffers) {
+		if(name == "")
+			buffer->As<OpenGL::UniformBuffer>()->Bind(binding);
+		else
+			shader->SetBuffer(name, buffer);
+	}
 }
 
 void SetOptions(DrawCall& call) {
