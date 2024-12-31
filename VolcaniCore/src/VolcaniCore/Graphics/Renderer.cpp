@@ -4,9 +4,9 @@
 #include "Core/Assert.h"
 #include "Core/Defines.h"
 
-#include "Graphics/RendererAPI.h"
-#include "Graphics/Renderer2D.h"
-#include "Graphics/Renderer3D.h"
+#include "RenderPass.h"
+#include "Renderer2D.h"
+#include "Renderer3D.h"
 
 namespace VolcaniCore {
 
@@ -76,12 +76,12 @@ DrawCommand* Renderer::GetCommand() {
 	return s_DrawCommand;
 }
 
-DrawCommand* Renderer::NewCommand(DrawBuffer* buffer) {
-	EndCommand();
+DrawCommand* Renderer::NewCommand(bool usePrevious) {
+	if(usePrevious && s_DrawCommand && !s_DrawCommand->Calls.size())
+		return s_DrawCommand;
 
-	s_DrawCommand = RendererAPI::Get()->NewDrawCommand(buffer);
-	s_DrawCommand->Pipeline = s_RenderPass->GetPipeline();
-	s_DrawCommand->Image = s_RenderPass->GetOutput();
+	EndCommand();
+	s_DrawCommand = RendererAPI::Get()->NewDrawCommand(s_RenderPass->Get());
 	return s_DrawCommand;
 }
 
@@ -94,12 +94,13 @@ void Renderer::EndCommand() {
 	VertexCount   += s_DrawCommand->VerticesIndex;
 	InstanceCount += s_DrawCommand->InstancesIndex;
 
-	s_RenderPass->SetUniforms(s_DrawCommand->UniformData);
 	s_DrawCommand = nullptr;
 }
 
 void Renderer::Clear() {
-	VOLCANICORE_ASSERT(s_DrawCommand, "Did you forget to call StartPass?");
+	if(!s_DrawCommand)
+		s_DrawCommand = RendererAPI::Get()->NewDrawCommand(nullptr);
+
 	s_DrawCommand->Clear = true;
 }
 

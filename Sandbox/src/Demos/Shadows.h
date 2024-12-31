@@ -43,7 +43,8 @@ Shadows::Shadows()
 	shadowShader = ShaderPipeline::Create("Sandbox/assets/shaders", "Shadow");
 
 	depthTexture = Texture::Create(2048, 2048, Texture::Format::Depth);
-	depthMap = Framebuffer::Create({
+	depthMap = Framebuffer::Create(
+		{
 			{ AttachmentTarget::Depth, { { depthTexture } } }
 		});
 	depthPass = RenderPass::Create("Depth", depthShader);
@@ -66,17 +67,17 @@ Shadows::Shadows()
 	controller = CameraController{ sceneCamera };
 	controller.TranslationSpeed = 5.0f;
 
-	UI::UIRenderer::Init();
+	UIRenderer::Init();
 }
 
 Shadows::~Shadows() {
-	UI::UIRenderer::Close();
+	UIRenderer::Close();
 }
 
 void Shadows::OnUpdate(TimeStep ts) {
 	controller.OnUpdate(ts);
 
-	UI::UIRenderer::BeginFrame();
+	UIRenderer::BeginFrame();
 	ImGui::Begin("Light");
 	{
 		glm::vec3 position = depthCamera->GetPosition();
@@ -155,7 +156,7 @@ void Shadows::OnUpdate(TimeStep ts) {
 	Renderer::EndPass();
 	Renderer::Flush();
 
-	UI::UIRenderer::EndFrame();
+	UIRenderer::EndFrame();
 }
 
 void Shadows::RenderScene() {

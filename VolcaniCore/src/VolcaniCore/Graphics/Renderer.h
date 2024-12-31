@@ -11,10 +11,10 @@ namespace VolcaniCore {
 struct FrameDebugInfo {
 	float FPS;
 
-	uint32_t DrawCalls = 0;
-	uint32_t Indices   = 0;
-	uint32_t Vertices  = 0;
-	uint32_t Instances = 0;
+	uint64_t DrawCalls = 0;
+	uint64_t Indices   = 0;
+	uint64_t Vertices  = 0;
+	uint64_t Instances = 0;
 };
 
 struct FrameData {
@@ -34,7 +34,7 @@ public:
 	static Ref<RenderPass> GetPass();
 
 	static DrawCommand* GetCommand();
-	static DrawCommand* NewCommand(DrawBuffer* buffer = nullptr);
+	static DrawCommand* NewCommand(bool usePrevious = false);
 	static void EndCommand();
 
 	static void Clear();

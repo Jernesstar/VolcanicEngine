@@ -73,11 +73,6 @@ void ShaderProgram::SetFloat(const std::string& name, float _float) {
 	glUniform1f(location, _float);
 }
 
-void ShaderProgram::SetTexture(const std::string& name, Ref<Texture> texture) {
-	// TODO(What are we going to do?)
-	// SetInt(name, (int32_t)slot);
-}
-
 void ShaderProgram::SetVec2(const std::string& name, const glm::vec2& vec) {
 	GLint location = glGetUniformLocation(m_ProgramID, name.c_str());
 	glUniform2f(location, vec.x, vec.y);
@@ -108,11 +103,9 @@ void ShaderProgram::SetMat4(const std::string& name, const glm::mat4& mat) {
 	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(mat));
 }
 
-void ShaderProgram::SetBuffer(const std::string& name,
-							  Ref<UniformBuffer> buffer)
-{
-	GLint location = glGetUniformLocation(m_ProgramID, name.c_str());
-	buffer->As<OpenGL::UniformBuffer>()->Bind(location);
+void ShaderProgram::SetBuffer(const std::string& name, uint32_t binding) {
+	GLint location = glGetUniformBlockIndex(m_ProgramID, name.c_str());
+	glUniformBlockBinding(m_ProgramID, location, binding);
 }
 
 uint32_t GetShaderType(ShaderType type) {

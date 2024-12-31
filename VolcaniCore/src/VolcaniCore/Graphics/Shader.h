@@ -41,7 +41,6 @@ public:
 
 	virtual void SetInt(const std::string& name, int32_t _int) = 0;
 	virtual void SetFloat(const std::string& name, float _float) = 0;
-	virtual void SetTexture(const std::string& name, Ref<Texture> texture) = 0;
 
 	virtual void SetVec2(const std::string& name, const glm::vec2& vec) = 0;
 	virtual void SetVec3(const std::string& name, const glm::vec3& vec) = 0;
@@ -51,7 +50,7 @@ public:
 	virtual void SetMat3(const std::string& name, const glm::mat3& mat) = 0;
 	virtual void SetMat4(const std::string& name, const glm::mat4& mat) = 0;
 
-	virtual void SetBuffer(const std::string& name, Ref<UniformBuffer> buffer) = 0;
+	virtual void SetBuffer(const std::string& name, uint32_t binding) = 0;
 
 	template<typename TDerived>
 	requires std::derived_from<TDerived, ShaderPipeline>

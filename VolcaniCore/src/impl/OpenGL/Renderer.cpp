@@ -18,6 +18,7 @@
 #include "Cubemap.h"
 #include "Texture2D.h"
 #include "Framebuffer.h"
+#include "UniformBuffer.h"
 
 #include "VertexArray.h"
 
@@ -44,6 +45,7 @@ struct BackendBuffer {
 struct RendererData {
 	Map<DrawBuffer*, BackendBuffer> Arrays;
 	List<DrawCommand> Commands;
+	List<DrawPass> Passes;
 	DrawPass* LastPass;
 };
 
@@ -62,6 +64,7 @@ void Renderer::Init() {
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
 	s_Data.Commands.reserve(20);
+	s_Data.Passes.reserve(20);
 }
 
 void Renderer::Close() {
@@ -166,8 +169,24 @@ void Renderer::ReleaseBuffer(DrawBuffer* buffer) {
 	s_Data.Arrays.erase(buffer);
 }
 
-DrawCommand* Renderer::NewDrawCommand(DrawBuffer* buffer) {
-	return &s_Data.Commands.emplace_back(buffer);
+DrawPass* Renderer::NewDrawPass(DrawBuffer* buffer,
+	Ref<ShaderPipeline> pipeline, Ref<VolcaniCore::Framebuffer> output)
+{
+	return &s_Data.Passes.emplace_back(buffer, pipeline, output);
+}
+
+DrawCommand* Renderer::NewDrawCommand(DrawPass* pass) {
+	if(pass) {
+		auto* command = &s_Data.Commands.emplace_back();
+		
+		command->IndicesIndex = pass->BufferData->IndicesCount;
+		command->VerticesIndex = pass->BufferData->VerticesCount;
+		command->InstancesIndex = pass->BufferData->InstancesCount;
+
+		return command;
+	}
+
+	return &s_Data.Commands.emplace_back();
 }
 
 void FlushCommand(DrawCommand& command) {
@@ -179,10 +198,10 @@ void FlushCommand(DrawCommand& command) {
 
 		s_Data.LastPass = command.Pass;
 
-		if(command.Pass->Pipeline)
+		if(command.Pass && command.Pass->Pipeline)
 			command.Pass->Pipeline->As<OpenGL::ShaderProgram>()->Bind();
-		if(command.Pass->Output)
-			command.Image->As<OpenGL::Framebuffer>()->Bind();
+		if(command.Pass && command.Pass->Output)
+			command.Pass->Output->As<OpenGL::Framebuffer>()->Bind();
 	}
 
 	if(command.Outputs.size()) {
@@ -198,8 +217,8 @@ void FlushCommand(DrawCommand& command) {
 
 	SetUniforms(command);
 
-	if(command.BufferData) {
-		Ref<VertexArray> array = s_Data.Arrays[command.BufferData].Array;
+	if(command.Pass && command.Pass->BufferData) {
+		Ref<VertexArray> array = s_Data.Arrays[command.Pass->BufferData].Array;
 
 		array->Bind();
 		for(auto& call : command.Calls)
@@ -224,7 +243,7 @@ void FlushCall(DrawCommand& command, DrawCall& call) {
 			break;
 	}
 
-	auto& buffer = s_Data.Arrays[command.BufferData];
+	auto& buffer = s_Data.Arrays[command.Pass->BufferData];
 	if(call.Partition == PartitionType::MultiDraw) {
 		// if(call.IndexCount == 0)
 		// 	glMultiDrawArraysIndirect();
@@ -266,7 +285,7 @@ void Resize(uint32_t width, uint32_t height) {
 
 void SetUniforms(DrawCommand& command) {
 	auto& uniforms = command.UniformData;
-	auto shader = command.Pipeline;
+	auto shader = command.Pass->Pipeline;
 
 	for(auto& [name, data] : uniforms.IntUniforms)
 		shader->SetInt(name, data);
@@ -274,7 +293,7 @@ void SetUniforms(DrawCommand& command) {
 		shader->SetFloat(name, data);
 	for(auto& [name, slot] : uniforms.TextureUniforms) {
 		slot.Sampler->As<OpenGL::Texture2D>()->Bind(slot.Index);
-		shader->SetTexture(name, slot.Sampler);
+		shader->SetInt(name, slot.Index);
 	}
 	for(auto& [name, data] : uniforms.Vec2Uniforms)
 		shader->SetVec2(name, data);
@@ -291,9 +310,8 @@ void SetUniforms(DrawCommand& command) {
 
 	for(auto& [buffer, name, binding] : uniforms.UniformBuffers) {
 		if(name == "")
-			buffer->As<OpenGL::UniformBuffer>()->Bind(binding);
-		else
-			shader->SetBuffer(name, buffer);
+			shader->SetBuffer(name, binding);
+		buffer->As<OpenGL::UniformBuffer>()->Bind(binding);
 	}
 }
 

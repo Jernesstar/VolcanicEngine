@@ -20,30 +20,4 @@ GET_HANDLES(glm::mat2, Mat2)
 GET_HANDLES(glm::mat3, Mat3)
 GET_HANDLES(glm::mat4, Mat4)
 
-void RenderPass::SetUniforms(DrawUniforms& uniformData) {
-	for(auto& [uniformName, valueCallback] : m_Uniforms.IntHandles)
-		uniformData.SetInput(uniformName, valueCallback());
-	for(auto& [uniformName, valueCallback] : m_Uniforms.FloatHandles)
-		uniformData.SetInput(uniformName, valueCallback());
-	for(auto& [uniformName, valueCallback] : m_Uniforms.TextureHandles) {
-		auto slot = valueCallback();
-		if(slot.Sampler)
-			uniformData.SetInput(uniformName, slot);
-	}
-
-	for(auto& [uniformName, valueCallback] : m_Uniforms.Vec2Handles)
-		uniformData.SetInput(uniformName, valueCallback());
-	for(auto& [uniformName, valueCallback] : m_Uniforms.Vec3Handles)
-		uniformData.SetInput(uniformName, valueCallback());
-	for(auto& [uniformName, valueCallback] : m_Uniforms.Vec4Handles)
-		uniformData.SetInput(uniformName, valueCallback());
-
-	for(auto& [uniformName, valueCallback] : m_Uniforms.Mat2Handles)
-		uniformData.SetInput(uniformName, valueCallback());
-	for(auto& [uniformName, valueCallback] : m_Uniforms.Mat3Handles)
-		uniformData.SetInput(uniformName, valueCallback());
-	for(auto& [uniformName, valueCallback] : m_Uniforms.Mat4Handles)
-		uniformData.SetInput(uniformName, valueCallback());
-}
-
 }

@@ -2,6 +2,7 @@
 
 #include <VolcaniCore/Core/Log.h>
 #include <VolcaniCore/Event/Events.h>
+#include <VolcaniCore/Graphics/Renderer.h>
 #include <VolcaniCore/Graphics/RendererAPI.h>
 
 #include <Magma/UI/UI.h>
@@ -28,8 +29,7 @@ Editor::~Editor() {
 }
 
 void Editor::OnUpdate(TimeStep ts) {
-	RendererAPI::Get()->NewDrawCommand()->Clear = true;
-	RendererAPI::Get()->EndFrame();
+	Renderer::Clear();
 
 	UIRenderer::BeginFrame();
 	m_EditorLayer.Update(ts);

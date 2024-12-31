@@ -145,11 +145,11 @@ void Framebuffer::Attach(AttachmentTarget target, uint32_t idx, uint32_t dst) {
 			break;
 		case AttachmentTarget::Depth:
 			type = GL_DEPTH_ATTACHMENT;
-			index = 0;
+			idx = 0;
 			break;
 		case AttachmentTarget::Stencil:
 			type = GL_STENCIL_ATTACHMENT;
-			index = 0;
+			idx = 0;
 			break;
 	}
 

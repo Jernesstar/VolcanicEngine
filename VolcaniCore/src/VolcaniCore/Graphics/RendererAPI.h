@@ -43,8 +43,11 @@ public:
 		const void* data, uint64_t count, uint64_t offset = 0) = 0;
 	virtual void ReleaseBuffer(DrawBuffer* buffer) = 0;
 
-	// TODO(Change): NewDrawCommand(DrawPass* pass)
-	virtual DrawCommand* NewDrawCommand(DrawBuffer* buffer) = 0;
+	virtual DrawPass* NewDrawPass(
+		DrawBuffer* buffer, Ref<ShaderPipeline> pipeline,
+		Ref<Framebuffer> output = nullptr) = 0;
+
+	virtual DrawCommand* NewDrawCommand(DrawPass* pass) = 0;
 
 	RendererAPI::Backend GetBackend() const { return m_Backend; }
 
@@ -109,9 +112,9 @@ struct DrawBuffer {
 };
 
 struct DrawPass {
-	Ref<Framebuffer> Output;
-	Ref<ShaderPipeline> Pipeline;
 	DrawBuffer* BufferData;
+	Ref<ShaderPipeline> Pipeline;
+	Ref<Framebuffer> Output;
 };
 
 struct TextureSlot {
@@ -123,7 +126,7 @@ struct UniformSlot {
 	Ref<UniformBuffer> Buffer = nullptr;
 	std::string Name = "";
 	uint32_t Binding = 0;
-}
+};
 
 struct DrawUniforms {
 	Map<std::string, int32_t> IntUniforms;
@@ -187,37 +190,26 @@ struct DrawCommand {
 	uint64_t VerticesIndex	= 0;
 	uint64_t InstancesIndex = 0;
 
-	DrawCommand(DrawBuffer* buffer)
-		: BufferData(buffer)
-	{
-		if(!buffer)
-			return;
-
-		IndicesIndex = BufferData->IndicesCount;
-		VerticesIndex = BufferData->VerticesCount;
-		InstancesIndex = BufferData->InstancesCount;
-	}
-
 	void AddIndices(const Buffer<uint32_t>& data) {
-		BufferData->AddIndices(data);
+		Pass->BufferData->AddIndices(data);
 		IndicesIndex += data.GetCount();
 	}
 
 	template<typename T>
 	void AddVertices(const Buffer<T>& data) {
-		BufferData->AddVertices(data);
+		Pass->BufferData->AddVertices(data);
 		VerticesIndex += data.GetCount();
 	}
 
 	template<typename T>
 	void AddInstances(const Buffer<T>& data) {
-		BufferData->AddInstances(data);
+		Pass->BufferData->AddInstances(data);
 		InstancesIndex += data.GetCount();
 	}
 
 	void AddInstance(const void* data) {
 		RendererAPI::Get()
-		->SetBufferData(BufferData, DrawBufferIndex::Instances, data, 1,
+		->SetBufferData(Pass->BufferData, DrawBufferIndex::Instances, data, 1,
 						InstancesIndex++);
 	}
 

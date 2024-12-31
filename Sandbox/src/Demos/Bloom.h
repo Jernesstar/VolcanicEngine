@@ -134,17 +134,17 @@ void Bloom::OnUpdate(TimeStep ts) {
 
 	Renderer::StartPass(downsamplePass);
 	{
-		Renderer::GetPass()->GetUniforms()
-		.Set("u_SrcResolution",
-			[&]() -> glm::vec2
-			{
-				return { Application::GetWindow()->GetWidth(), Application::GetWindow()->GetHeight() };
-			})
-		.Set("u_SrcTexture",
-			[&]() -> TextureSlot
-			{
-				return { src->Get(AttachmentTarget::Color), 0 };
-			});
+		// Renderer::GetCommand()->GetUniforms()
+		// .Set("u_SrcResolution",
+		// 	[&]() -> glm::vec2
+		// 	{
+		// 		return { Application::GetWindow()->GetWidth(), Application::GetWindow()->GetHeight() };
+		// 	})
+		// .Set("u_SrcTexture",
+		// 	[&]() -> TextureSlot
+		// 	{
+		// 		return { src->Get(AttachmentTarget::Color), 0 };
+		// 	});
 
 		Downsample();
 	}
@@ -154,12 +154,12 @@ void Bloom::OnUpdate(TimeStep ts) {
 
 	Renderer::StartPass(upsamplePass);
 	{
-		Renderer::GetPass()->GetUniforms()
-		.Set("u_FilterRadius",
-			[&]() -> float
-			{
-				return filterRadius;
-			});
+		// Renderer::GetPass()->GetUniforms()
+		// .Set("u_FilterRadius",
+		// 	[&]() -> float
+		// 	{
+		// 		return filterRadius;
+		// 	});
 
 		Upsample();
 	}

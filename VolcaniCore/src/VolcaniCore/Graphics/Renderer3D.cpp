@@ -122,17 +122,11 @@ void Renderer3D::EndFrame() {
 }
 
 void Renderer3D::Begin(Ref<Camera> camera) {
-	Renderer::GetPass()->GetUniforms()
-	.Set("u_ViewProj",
-		[camera]() -> glm::mat4
-		{
-			return camera->GetViewProjection();
-		})
-	.Set("u_CameraPosition",
-		[camera]() -> glm::vec3
-		{
-			return camera->GetPosition();
-		});
+	auto* command = Renderer::GetCommand();
+	command->UniformData
+	.SetInput("u_ViewProj", camera->GetViewProjection());
+	command->UniformData
+	.SetInput("u_CameraPosition", camera->GetPosition());
 }
 
 void Renderer3D::End() {
@@ -140,15 +134,15 @@ void Renderer3D::End() {
 }
 
 void Renderer3D::DrawSkybox(Ref<Cubemap> cubemap) {
-	auto* command = Renderer::NewCommand(s_CubemapBuffer);
+	auto* command = Renderer::NewCommand();
 	auto& call = command->NewDrawCall();
 
-	Renderer::GetPass()->GetUniforms()
-	.Set("u_Diffuse",
-		[cubemap]() -> TextureSlot
-		{
-			// return { mat.Diffuse, 0 };
-		});
+	// call.DepthMask = false;
+	call.Partition = PartitionType::Single;
+	call.VertexCount = 36;
+
+	// command->UniformData
+	// .SetInput("u_Skybox", TextureSlot{ cubemap, 0 });
 }
 
 void Renderer3D::DrawMesh(Ref<Mesh> mesh, const glm::mat4& tr) {
@@ -158,7 +152,10 @@ void Renderer3D::DrawMesh(Ref<Mesh> mesh, const glm::mat4& tr) {
 	if(!s_Meshes.count(mesh)
 	|| s_Meshes[mesh]->Calls[0].InstanceCount >= 10'000)
 	{
-		auto* command = Renderer::NewCommand(s_MeshBuffer);
+		auto pass = Renderer::GetPass();
+		pass->SetData(s_MeshBuffer);
+
+		auto* command = Renderer::NewCommand();
 		command->ViewportWidth = 1920;
 		command->ViewportHeight = 1080;
 		command->InstancesIndex = s_Meshes.size() * 10'000;
@@ -172,24 +169,16 @@ void Renderer3D::DrawMesh(Ref<Mesh> mesh, const glm::mat4& tr) {
 		command->AddIndices(Buffer(mesh->GetIndices()));
 		command->AddVertices(Buffer(mesh->GetVertices()));
 
-		Renderer::GetPass()->GetUniforms()
-		.Set("u_Diffuse",
-			[mesh]() -> TextureSlot
-			{
-				Material& mat = mesh->GetMaterial();
-				return { mat.Diffuse, 0 };
-			})
-		.Set("u_Specular",
-			[mesh]() -> TextureSlot
-			{
-				Material& mat = mesh->GetMaterial();
-				return { mat.Specular, 1 };
-			});
+		Material& mat = mesh->GetMaterial();
+		command->UniformData
+		.SetInput("u_Diffuse", TextureSlot{ mat.Diffuse, 0 });
+		command->UniformData
+		.SetInput("u_Specular", TextureSlot{ mat.Specular, 1 });
 
 		s_Meshes[mesh] = command;
 	}
 
-	auto command = s_Meshes[mesh];
+	auto* command = s_Meshes[mesh];
 	command->AddInstance(glm::value_ptr(tr));
 	command->Calls[0].InstanceCount++;
 }

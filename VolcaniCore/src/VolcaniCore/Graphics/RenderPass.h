@@ -62,30 +62,37 @@ public:
 
 class RenderPass {
 public:
-	static Ref<RenderPass> Create(const std::string& name,
-								  Ref<ShaderPipeline> pipeline,
-								  const Uniforms& uniforms = { })
+	static Ref<RenderPass> Create(
+		const std::string& name, Ref<ShaderPipeline> pipeline,
+		Ref<Framebuffer> output = nullptr)
 	{
-		return CreateRef<RenderPass>(name, pipeline, uniforms);
+		return CreateRef<RenderPass>(name, pipeline, output);
 	}
 
 public:
 	const std::string Name;
 
 public:
-	RenderPass(const std::string& name,
-				Ref<ShaderPipeline> pipeline,
-				const Uniforms& uniforms = { })
-		: Name(name), m_Pipeline(pipeline), m_Uniforms(uniforms) { }
+	RenderPass(const std::string& name, Ref<ShaderPipeline> pipeline,
+		Ref<Framebuffer> output)
+		: Name(name)
+	{
+		m_Pass =
+		{
+			.Pipeline = pipeline, .Output = output
+		};
+	}
 
 	~RenderPass() = default;
 
 	void SetOutput(Ref<Framebuffer> output) {
-		m_Output = output;
+		m_Pass.Output = output;
+	}
+	void SetData(DrawBuffer* buffer) {
+		m_Pass.BufferData = buffer;
 	}
 
-	void SetUniforms(DrawUniforms& uniformData);
-
+	DrawPass* Get() { return &m_Pass; }
 	Ref<ShaderPipeline> GetPipeline() const { return m_Pass.Pipeline; }
 	Ref<Framebuffer> GetOutput() const { return m_Pass.Output; }
 

@@ -159,7 +159,7 @@ Cube::Cube()
 	// buffer->AddIndices(Buffer(torch->GetIndices()));
 	// buffer->AddVertices(Buffer(torch->GetVertices()));
 
-	UI::UIRenderer::Init();
+	UIRenderer::Init();
 }
 
 Cube::~Cube() {

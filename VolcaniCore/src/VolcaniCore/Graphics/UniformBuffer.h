@@ -24,6 +24,10 @@ public:
 	}
 
 	virtual void SetData(const void* data, uint32_t count, uint32_t offset) = 0;
+
+	template<typename TDerived>
+	requires std::derived_from<TDerived, UniformBuffer>
+	TDerived* As() const { return (TDerived*)(this); }
 };
 
 }
