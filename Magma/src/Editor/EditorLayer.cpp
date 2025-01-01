@@ -14,8 +14,11 @@
 
 #include <Magma/UI/UIRenderer.h>
 
+#include <Lava/ProjectLoader.h>
+
 using namespace VolcaniCore;
 using namespace Magma::UI;
+using namespace Lava;
 
 namespace Magma {
 
@@ -37,8 +40,8 @@ struct {
 
 EditorLayer::EditorLayer() {
 	NewProject();
-	// m_Project->Load("../TheMazeIsLava/.volc.proj");
-	// Application::GetWindow()->SetTitle("Magma Editor: " + m_Project->GetName);
+	ProjectLoader::Load(m_Project, "./TestProj/.volc.proj");
+	Application::GetWindow()->SetTitle("Magma Editor: " + m_Project.Name);
 
 	auto tab = CreateRef<SceneTab>("Magma/assets/scenes/temp.magma.scene");
 	NewTab(tab);
@@ -233,7 +236,7 @@ void EditorLayer::CloseTab(Ref<Tab> tabToDelete) {
 
 void EditorLayer::NewProject() {
 	menu.project.newProject = false;
-	m_Project = CreateRef<Project>();
+	m_Project = Project();
 }
 
 void EditorLayer::OpenProject() {
@@ -245,24 +248,26 @@ void EditorLayer::OpenProject() {
 	if(instance->Display("ChooseFile")) {
 		if(instance->IsOk()) {
 			std::string path = instance->GetFilePathName();
-			// m_Project->Load(path);
+			ProjectLoader::Load(m_Project, path);
 		}
 
 		instance->Close();
 		menu.project.openProject = false;
 	}
 
-	Application::GetWindow()->SetTitle("Magma Editor: " + m_Project->Name);
+	Application::GetWindow()->SetTitle("Magma Editor: " + m_Project.Name);
 }
 
 void EditorLayer::ReloadProject() {
 	menu.project.reloadProject = false;
-	// m_Project->Reload();
+	// Reload
 }
 
 void EditorLayer::RunProject() {
 	menu.project.runProject = false;
-	// m_Project->Run();
+
+	std::string command = "./build/Lava/bin/Runtime " + m_Project.Path;
+	system(command.c_str());
 }
 
 }
