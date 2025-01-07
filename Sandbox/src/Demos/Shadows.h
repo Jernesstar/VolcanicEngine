@@ -51,10 +51,12 @@ Shadows::Shadows()
 	depthPass->SetOutput(depthMap);
 	shadowPass = RenderPass::Create("Shadow", shadowShader);
 
-	cube = Mesh::Create(MeshPrimitive::Cube,
-		Material{
-			.Diffuse = Texture::Create("Sandbox/assets/images/wood.png")
-		});
+	cube =
+		Mesh::Create(MeshPrimitive::Cube,
+			Material
+			{
+				.Diffuse = Texture::Create("Sandbox/assets/images/wood.png")
+			});
 	torch = Mesh::Create("Sandbox/assets/models/mc-torch/Torch.obj");
 
 	depthCamera = CreateRef<OrthographicCamera>(20.0f, 20.0f, 1.0f, 17.5f);
@@ -62,7 +64,6 @@ Shadows::Shadows()
 	sceneCamera->Resize(1920, 1080);
 	depthCamera->SetPosition({ 6.0f, 4.f, 5.0f });
 	depthCamera->SetDirection({ -1.0f, -0.5f, -1.0f });
-	// depthCamera->Resize(1920, 1080);
 
 	controller = CameraController{ sceneCamera };
 	controller.TranslationSpeed = 5.0f;
@@ -78,6 +79,7 @@ void Shadows::OnUpdate(TimeStep ts) {
 	controller.OnUpdate(ts);
 
 	UIRenderer::BeginFrame();
+
 	ImGui::Begin("Light");
 	{
 		glm::vec3 position = depthCamera->GetPosition();
@@ -97,10 +99,10 @@ void Shadows::OnUpdate(TimeStep ts) {
 				return depthCamera->GetViewProjection();
 			});
 
-		// Renderer::PushOptions(
-		// 	{
-		// 		.Cull = RendererAPI::Options::CullingMode::Front
-		// 	});
+		Renderer::PushOptions(
+			{
+				.Cull = CullingMode::Front
+			});
 
 		RenderScene();
 	}

@@ -11,6 +11,10 @@ public:
 private:
 	Ref<Camera> camera;
 	CameraController controller;
+
+	Ref<Framebuffer> gBuffer;
+	Ref<RenderPass> geometryPass;
+	Ref<RenderPass> deferredPass;
 };
 
 Deferred::Deferred() {
@@ -21,11 +25,26 @@ Deferred::Deferred() {
 				Application::Close();
 		});
 
+	Ref<ShaderPipeline> geom;
+	Ref<ShaderPipeline> deferred;
+	geom = ShaderPipeline::Create("Sandbox/assets/shaders", "Geometry");
+	deferred = ShaderPipeline::Create("Sandbox/assets/shaders", "Deferred");
+
+	Ref<Texture> position = Texture::Create(1920, 1080, Texture::Format::Float);
+	Ref<Texture> normal = Texture::Create(1920, 1080, Texture::Format::Float);
+	Ref<Texture> color = Texture::Create(1920, 1080, Texture::Format::Float);
+	gBuffer = Framebuffer::Create(
+		{
+			{ AttachmentTarget::Color, { position, normal, color } },
+		});
+	geometryPass = RenderPass::Create("Geometry", geom);
+	geometryPass->SetOutput(gBuffer);
+	deferredPass = RenderPass::Create("Deferred", deferred);
+
 	camera = CreateRef<StereographicCamera>(75.0f);
 	camera->SetPosition({ 2.5f, 2.5f, 2.5f });
 	camera->SetDirection({ -0.5f, -0.5f, -0.5f });
 	controller = CameraController{ camera };
-
 }
 
 void Deferred::OnUpdate(TimeStep ts) {

@@ -176,17 +176,15 @@ DrawPass* Renderer::NewDrawPass(DrawBuffer* buffer,
 }
 
 DrawCommand* Renderer::NewDrawCommand(DrawPass* pass) {
+	auto* command = &s_Data.Commands.emplace_back();
+
 	if(pass) {
-		auto* command = &s_Data.Commands.emplace_back();
-		
 		command->IndicesIndex = pass->BufferData->IndicesCount;
 		command->VerticesIndex = pass->BufferData->VerticesCount;
 		command->InstancesIndex = pass->BufferData->InstancesCount;
-
-		return command;
 	}
 
-	return &s_Data.Commands.emplace_back();
+	return command;
 }
 
 void FlushCommand(DrawCommand& command) {
@@ -197,14 +195,13 @@ void FlushCommand(DrawCommand& command) {
 			s_Data.LastPass->Pipeline->As<OpenGL::ShaderProgram>()->Unbind();
 
 		s_Data.LastPass = command.Pass;
-
 		if(command.Pass && command.Pass->Pipeline)
 			command.Pass->Pipeline->As<OpenGL::ShaderProgram>()->Bind();
 		if(command.Pass && command.Pass->Output)
 			command.Pass->Output->As<OpenGL::Framebuffer>()->Bind();
 	}
 
-	if(command.Outputs.size()) {
+	if(command.Outputs.size() && command.Pass && command.Pass.Output) {
 		uint32_t i = 0;
 		for(auto& [target, idx] : command.Outputs)
 			command.Pass->Output->Attach(target, idx, i++);
@@ -217,7 +214,7 @@ void FlushCommand(DrawCommand& command) {
 
 	SetUniforms(command);
 
-	if(command.Pass && command.Pass->BufferData) {
+	if(command.Pass && command.Pass->BufferData && command.Calls.size()) {
 		Ref<VertexArray> array = s_Data.Arrays[command.Pass->BufferData].Array;
 
 		array->Bind();
