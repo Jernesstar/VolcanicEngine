@@ -179,9 +179,7 @@ void Bloom::OnUpdate(TimeStep ts) {
 			[&]() -> float
 			{
 				return bloomStrength;
-			});
-
-		auto& uniforms = Renderer::GetPass()->GetUniforms()
+			})
 		.Set("u_BloomTexture",
 			[&]() -> TextureSlot
 			{
@@ -208,6 +206,7 @@ void Bloom::InitMips() {
 	glm::vec2 mipSize((float)windowWidth, (float)windowHeight);
 	glm::ivec2 mipIntSize((uint32_t)windowWidth, (uint32_t)windowHeight);
 
+	List<Ref<Texture>> textures;
 	for(uint32_t i = 0; i < mipChainLength; i++) {
 		BloomMip mip;
 
@@ -220,37 +219,33 @@ void Bloom::InitMips() {
 			Texture::Create(mipIntSize.x, mipIntSize.y, Texture::Format::Float);
 
 		mipChain.push_back(mip);
+		textures.push_back(mip.Sampler);
 	}
 
-// decltype(auto)
-// using value_type = decltype( std::declval<Lambda>()(*std::declval<Iterator>()) )
-	// mips = Framebuffer::Create(
-	// 	{
-	// 		{
-	// 			AttachmentTarget::Color,
-	// 			Apply(mipChain,
-	// 				[](BloomMip& mip) -> Ref<Texture>
-	// 				{
-	// 					return mip.Sampler;
-	// 				})
-	// 		}
-	// 	});
+	mips = Framebuffer::Create(
+		{
+			{ AttachmentTarget::Color, textures }
+		});
+
+			// Apply(mipChain,
+			// 		[](BloomMip& mip) -> Ref<Texture>
+			// 		{
+			// 			return mip.Sampler;
+			// 		})
 }
 
 void Bloom::Downsample() {
 	uint32_t i = 0;
 	for(const auto& mip : mipChain) {
 		auto* command = Renderer::GetCommand();
-		auto& uniforms = Renderer::GetPass()->GetUniforms();
 
-		command->Image = mips;
-		command->Attachments = { { AttachmentTarget::Color, i } };
+		command->Outputs = { { AttachmentTarget::Color, i } };
 
 		Renderer2D::DrawFullscreenQuad(mips, AttachmentTarget::Color);
 
 		Renderer::NewCommand();
-		uniforms.Clear();
-		uniforms
+		auto& uniforms = Renderer::GetPass()->GetUniforms()
+		.Clear()
 		.Set("u_SrcResolution",
 			[mip]() -> glm::vec2
 			{
@@ -269,21 +264,20 @@ void Bloom::Upsample() {
 		const BloomMip& mip = mipChain[i];
 		const BloomMip& nextMip = mipChain[i - 1];
 
-		Renderer::SetOptions(
+		Renderer::PushOptions(
 			{
 				.Blending = BlendingMode::Additive
 			});
 
 		auto command = Renderer::GetCommand();
-		auto& uniforms = Renderer::GetPass()->GetUniforms()
+		Renderer::GetPass()->GetUniforms()
 		.Set("u_SrcTexture",
 			[mip]() -> TextureSlot
 			{
 				return { mip.Sampler, 0 };
 			});
 		
-		command->Image = mips;
-		command->Attachments = { { AttachmentTarget::Color, i - 1 } };
+		command->Outputs = { { AttachmentTarget::Color, i - 1 } };
 
 		Renderer2D::DrawFullscreenQuad(mips, AttachmentTarget::Color);
 

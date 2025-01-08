@@ -26,8 +26,6 @@ public:
 
 	void SetInt(const std::string& name, int32_t _int) override;
 	void SetFloat(const std::string& name, float _float) override;
-	void SetTexture(const std::string& name, Ref<Texture> texture,
-					uint32_t slot) override;
 
 	void SetVec2(const std::string& name, const glm::vec2& vec) override;
 	void SetVec3(const std::string& name, const glm::vec3& vec) override;
@@ -36,6 +34,8 @@ public:
 	void SetMat2(const std::string& name, const glm::mat2& mat) override;
 	void SetMat3(const std::string& name, const glm::mat3& mat) override;
 	void SetMat4(const std::string& name, const glm::mat4& mat) override;
+
+	void SetBuffer(const std::string& name, uint32_t binding) override;
 
 	void Bind() const;
 	void Unbind() const;

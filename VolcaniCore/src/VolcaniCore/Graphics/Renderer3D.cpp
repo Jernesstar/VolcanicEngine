@@ -13,6 +13,7 @@ static DrawBuffer* s_CubemapBuffer;
 static DrawBuffer* s_MeshBuffer;
 // static DrawBuffer* s_PointBuffer;
 static Map<Ref<Mesh>, DrawCommand*> s_Meshes;
+uint64_t s_InstanceEnd;
 
 void Renderer3D::Init() {
 	BufferLayout vertexLayout =
@@ -115,6 +116,7 @@ void Renderer3D::Close() {
 
 void Renderer3D::StartFrame() {
 	s_MeshBuffer->Clear();
+	s_InstanceEnd = 0;
 }
 
 void Renderer3D::EndFrame() {
@@ -122,17 +124,14 @@ void Renderer3D::EndFrame() {
 }
 
 void Renderer3D::Begin(Ref<Camera> camera) {
-	Renderer::GetPass()->GetUniforms()
-	.Set("u_ViewProj",
-		[camera]() -> glm::mat4
-		{
-			return camera->GetViewProjection();
-		})
-	.Set("u_CameraPosition",
-		[camera]() -> glm::vec3
-		{
-			return camera->GetPosition();
-		});
+	auto pass = Renderer::GetPass();
+	pass->SetData(s_MeshBuffer);
+
+	auto* command = Renderer::GetCommand();
+	command->UniformData
+	.SetInput("u_ViewProj", camera->GetViewProjection());
+	command->UniformData
+	.SetInput("u_CameraPosition", camera->GetPosition());
 }
 
 void Renderer3D::End() {
@@ -140,66 +139,70 @@ void Renderer3D::End() {
 }
 
 void Renderer3D::DrawSkybox(Ref<Cubemap> cubemap) {
-	auto* command = Renderer::NewCommand(s_CubemapBuffer);
+	auto* command = Renderer::NewCommand();
 	auto& call = command->NewDrawCall();
 
-	Renderer::GetPass()->GetUniforms()
-	.Set("u_Diffuse",
-		[cubemap]() -> TextureSlot
-		{
-			// return { mat.Diffuse, 0 };
-		});
+	// call.DepthMask = false;
+	call.Partition = PartitionType::Single;
+	call.VertexCount = 36;
+
+	// command->UniformData
+	// .SetInput("u_Skybox", TextureSlot{ cubemap, 0 });
 }
 
-void Renderer3D::DrawMesh(Ref<Mesh> mesh, const glm::mat4& tr) {
+void Renderer3D::DrawMesh(Ref<Mesh> mesh, const glm::mat4& tr,
+						  DrawCommand* cmd)
+{
 	if(!mesh)
 		return;
 
-	if(!s_Meshes.count(mesh)
-	|| s_Meshes[mesh]->Calls[0].InstanceCount >= 10'000)
-	{
-		auto* command = Renderer::NewCommand(s_MeshBuffer);
-		command->ViewportWidth = 1920;
-		command->ViewportHeight = 1080;
-		command->InstancesIndex = s_Meshes.size() * 10'000;
+	if(!s_Meshes.count(mesh)) {
+		auto* command = Renderer::NewCommand();
+		command->AddIndices(Buffer(mesh->GetIndices()));
+		command->AddVertices(Buffer(mesh->GetVertices()));
 
+		Material& mat = mesh->GetMaterial();
+		command->UniformData
+		.SetInput("u_Diffuse", TextureSlot{ mat.Diffuse, 0 });
+		command->UniformData
+		.SetInput("u_Specular", TextureSlot{ mat.Specular, 1 });
+
+		s_Meshes[mesh] = command;
+	}
+
+	auto* command = s_Meshes[mesh];
+	auto* buffer = Renderer::GetPass()->Get()->BufferData;
+
+	if(!command->Calls.size()
+	|| command->Calls[command->Calls.size() - 1].InstanceCount >= 10'000)
+	{
 		auto& call = command->NewDrawCall();
 		call.Primitive = PrimitiveType::Triangle;
 		call.Partition = PartitionType::Instanced;
 		call.IndexCount  = mesh->GetIndices().size();
 		call.VertexCount = mesh->GetVertices().size();
-
-		command->AddIndices(Buffer(mesh->GetIndices()));
-		command->AddVertices(Buffer(mesh->GetVertices()));
-
-		Renderer::GetPass()->GetUniforms()
-		.Set("u_Diffuse",
-			[mesh]() -> TextureSlot
-			{
-				Material& mat = mesh->GetMaterial();
-				return { mat.Diffuse, 0 };
-			})
-		.Set("u_Specular",
-			[mesh]() -> TextureSlot
-			{
-				Material& mat = mesh->GetMaterial();
-				return { mat.Specular, 1 };
-			});
-
-		s_Meshes[mesh] = command;
+		call.IndexStart -= mesh->GetIndices().size();
+		call.VertexStart -= mesh->GetVertices().size();
+		call.InstanceStart = s_InstanceEnd;
+		s_InstanceEnd += 10'000;
 	}
 
-	auto command = s_Meshes[mesh];
-	command->AddInstance(glm::value_ptr(tr));
-	command->Calls[0].InstanceCount++;
+	auto& call = command->Calls[command->Calls.size() - 1];
+	RendererAPI::Get()
+	->SetBufferData(buffer, DrawBufferIndex::Instances, glm::value_ptr(tr),
+					1, call.InstanceStart + call.InstanceCount++);
 }
 
-void Renderer3D::DrawModel(Ref<Model> model, const glm::mat4& tr) {
+void Renderer3D::DrawModel(Ref<Model> model, const glm::mat4& tr,
+						   DrawCommand* command)
+{
 	for(auto& mesh : *model)
 		DrawMesh(mesh, tr);
 }
 
-void Renderer3D::DrawQuad(Ref<Quad> quad, const glm::mat4& tr) {
+void Renderer3D::DrawQuad(Ref<Quad> quad, const glm::mat4& tr,
+						  DrawCommand* command)
+{
 	Ref<Mesh> mesh;
 	if(quad->IsTextured)
 		mesh = Mesh::Create(MeshPrimitive::Quad,
@@ -210,26 +213,34 @@ void Renderer3D::DrawQuad(Ref<Quad> quad, const glm::mat4& tr) {
 	DrawMesh(mesh, tr);
 }
 
-void Renderer3D::DrawQuad(Ref<Texture> texture, const glm::mat4& tr) {
+void Renderer3D::DrawQuad(Ref<Texture> texture, const glm::mat4& tr,
+						  DrawCommand* command)
+{
 	DrawQuad(Quad::Create(texture), tr);
 }
 
-void Renderer3D::DrawQuad(const glm::vec4& color, const glm::mat4& tr) {
+void Renderer3D::DrawQuad(const glm::vec4& color, const glm::mat4& tr,
+						  DrawCommand* command)
+{
 	DrawQuad(Quad::Create(1, 1, color), tr);
 }
 
-void Renderer3D::DrawPoint(const Point& point, const glm::mat4& tr) {
-	auto* command = Renderer::GetCommand();
-
+void Renderer3D::DrawPoint(const Point& point, const glm::mat4& tr,
+						   DrawCommand* command)
+{
+	// TODO(Implement):
 }
 
-void Renderer3D::DrawLine(const Line& line, const glm::mat4& tr) {
-	// auto* command = Renderer::GetCommand();
-
+void Renderer3D::DrawLine(const Line& line, const glm::mat4& tr,
+						  DrawCommand* comand)
+{
+	// TODO(Implement):
 }
 
-void Renderer3D::DrawText(Ref<Text> text, const glm::mat4& tr) {
-	// TODO(Implement)
+void Renderer3D::DrawText(Ref<Text> text, const glm::mat4& tr,
+						  DrawCommand* command)
+{
+	// TODO(Implement):
 }
 
 }

@@ -11,6 +11,7 @@ public:
 
 	void StartFrame() override;
 	void EndFrame() override;
+	DebugInfo GetDebugInfo() override;
 
 	DrawBuffer* NewDrawBuffer(DrawBufferSpecification& specs,
 							  void* data = nullptr) override;
@@ -19,7 +20,11 @@ public:
 		const void* data, uint64_t count, uint64_t offset = 0) override;
 	void ReleaseBuffer(DrawBuffer* buffer) override;
 
-	DrawCommand* NewDrawCommand(DrawBuffer* buffer = nullptr) override;
+	DrawPass* NewDrawPass(DrawBuffer* buffer,
+		Ref<ShaderPipeline> pipeline = nullptr,
+		Ref<VolcaniCore::Framebuffer> framebuffer = nullptr) override;
+
+	DrawCommand* NewDrawCommand(DrawPass* pass) override;
 
 private:
 	void Init() override;

@@ -2,7 +2,7 @@
 
 #include <VolcaniCore/Event/Events.h>
 
-#include <VolcaniCore/Graphics/RendererAPI.h>
+#include <VolcaniCore/Graphics/Renderer.h>
 
 #include <Lava/ProjectLoader.h>
 #include <Lava/UIBrowser.h>
@@ -42,8 +42,7 @@ Runtime::~Runtime() {
 }
 
 void Runtime::OnUpdate(TimeStep ts) {
-	RendererAPI::Get()->NewDrawCommand()->Clear = true;
-	RendererAPI::Get()->EndFrame();
+	Renderer::Clear();
 
 	App* app = Get();
 	app->OnUpdate(ts);

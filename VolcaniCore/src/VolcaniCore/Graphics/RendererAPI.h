@@ -13,16 +13,21 @@ namespace VolcaniCore {
 
 struct DrawBufferSpecification;
 struct DrawBuffer;
-struct DrawPass;
 struct DrawUniforms;
+struct DrawPass;
 struct DrawCommand;
 struct DrawCall;
+
+struct DebugInfo {
+	uint64_t DrawCallCount = 0;
+	uint64_t IndexCount    = 0;
+	uint64_t VertexCount   = 0;
+	uint64_t InstanceCount = 0;
+};
 
 class RendererAPI {
 public:
 	enum class Backend { OpenGL, Vulkan, DirectX };
-
-	static const uint32_t MaxTextureSlots;
 
 public:
 	static void Create(RendererAPI::Backend backend);
@@ -37,6 +42,7 @@ public:
 
 	virtual void StartFrame() = 0;
 	virtual void EndFrame() = 0;
+	virtual DebugInfo GetDebugInfo() = 0;
 
 	virtual DrawBuffer* NewDrawBuffer(DrawBufferSpecification& specs,
 									  void* data = nullptr) = 0;
@@ -45,7 +51,11 @@ public:
 		const void* data, uint64_t count, uint64_t offset = 0) = 0;
 	virtual void ReleaseBuffer(DrawBuffer* buffer) = 0;
 
-	virtual DrawCommand* NewDrawCommand(DrawBuffer* buffer = nullptr) = 0;
+	virtual DrawPass* NewDrawPass(
+		DrawBuffer* buffer, Ref<ShaderPipeline> pipeline,
+		Ref<Framebuffer> output = nullptr) = 0;
+
+	virtual DrawCommand* NewDrawCommand(DrawPass* pass) = 0;
 
 	RendererAPI::Backend GetBackend() const { return m_Backend; }
 
@@ -110,12 +120,20 @@ struct DrawBuffer {
 };
 
 struct DrawPass {
+	DrawBuffer* BufferData;
+	Ref<ShaderPipeline> Pipeline;
 	Ref<Framebuffer> Output;
 };
 
 struct TextureSlot {
 	Ref<Texture> Sampler = nullptr;
 	uint32_t Index = 0;
+};
+
+struct UniformSlot {
+	Ref<UniformBuffer> Buffer = nullptr;
+	std::string Name = "";
+	uint32_t Binding = 0;
 };
 
 struct DrawUniforms {
@@ -131,7 +149,7 @@ struct DrawUniforms {
 	Map<std::string, glm::mat3> Mat3Uniforms;
 	Map<std::string, glm::mat4> Mat4Uniforms;
 
-	Map<std::string, Ref<UniformBuffer>> UniformBuffers;
+	List<UniformSlot> UniformBuffers;
 
 	void SetInput(const std::string& name, int32_t data) {
 		IntUniforms[name] = data;
@@ -160,17 +178,16 @@ struct DrawUniforms {
 	void SetInput(const std::string& name, const glm::mat4& data) {
 		Mat4Uniforms[name] = data;
 	}
-	void SetInput(const std::string& name, Ref<UniformBuffer> data) {
-		UniformBuffers[name] = data;
+	void SetInput(const UniformSlot& data) {
+		UniformBuffers.push_back(data);
 	}
 };
 
 struct DrawCommand {
-	DrawBuffer* BufferData;
+	DrawPass* Pass;
+
 	DrawUniforms UniformData;
-	Ref<ShaderPipeline> Pipeline;
-	List<Pair<AttachmentTarget, uint32_t>> Attachments;
-	Ref<Framebuffer> Image;
+	List<Pair<AttachmentTarget, uint32_t>> Outputs;
 	List<DrawCall> Calls;
 
 	bool Clear = false;
@@ -181,37 +198,26 @@ struct DrawCommand {
 	uint64_t VerticesIndex	= 0;
 	uint64_t InstancesIndex = 0;
 
-	DrawCommand(DrawBuffer* buffer)
-		: BufferData(buffer)
-	{
-		if(!buffer)
-			return;
-
-		IndicesIndex = BufferData->IndicesCount;
-		VerticesIndex = BufferData->VerticesCount;
-		InstancesIndex = BufferData->InstancesCount;
-	}
-
 	void AddIndices(const Buffer<uint32_t>& data) {
-		BufferData->AddIndices(data);
+		Pass->BufferData->AddIndices(data);
 		IndicesIndex += data.GetCount();
 	}
 
 	template<typename T>
 	void AddVertices(const Buffer<T>& data) {
-		BufferData->AddVertices(data);
+		Pass->BufferData->AddVertices(data);
 		VerticesIndex += data.GetCount();
 	}
 
 	template<typename T>
 	void AddInstances(const Buffer<T>& data) {
-		BufferData->AddInstances(data);
+		Pass->BufferData->AddInstances(data);
 		InstancesIndex += data.GetCount();
 	}
 
 	void AddInstance(const void* data) {
 		RendererAPI::Get()
-		->SetBufferData(BufferData, DrawBufferIndex::Instances, data, 1,
+		->SetBufferData(Pass->BufferData, DrawBufferIndex::Instances, data, 1,
 						InstancesIndex++);
 	}
 

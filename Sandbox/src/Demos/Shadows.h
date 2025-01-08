@@ -43,17 +43,20 @@ Shadows::Shadows()
 	shadowShader = ShaderPipeline::Create("Sandbox/assets/shaders", "Shadow");
 
 	depthTexture = Texture::Create(2048, 2048, Texture::Format::Depth);
-	depthMap = Framebuffer::Create({
+	depthMap = Framebuffer::Create(
+		{
 			{ AttachmentTarget::Depth, { { depthTexture } } }
 		});
 	depthPass = RenderPass::Create("Depth", depthShader);
 	depthPass->SetOutput(depthMap);
 	shadowPass = RenderPass::Create("Shadow", shadowShader);
 
-	cube = Mesh::Create(MeshPrimitive::Cube,
-		Material{
-			.Diffuse = Texture::Create("Sandbox/assets/images/wood.png")
-		});
+	cube =
+		Mesh::Create(MeshPrimitive::Cube,
+			Material
+			{
+				.Diffuse = Texture::Create("Sandbox/assets/images/wood.png")
+			});
 	torch = Mesh::Create("Sandbox/assets/models/mc-torch/Torch.obj");
 
 	depthCamera = CreateRef<OrthographicCamera>(20.0f, 20.0f, 1.0f, 17.5f);
@@ -61,22 +64,22 @@ Shadows::Shadows()
 	sceneCamera->Resize(1920, 1080);
 	depthCamera->SetPosition({ 6.0f, 4.f, 5.0f });
 	depthCamera->SetDirection({ -1.0f, -0.5f, -1.0f });
-	// depthCamera->Resize(1920, 1080);
 
 	controller = CameraController{ sceneCamera };
 	controller.TranslationSpeed = 5.0f;
 
-	UI::UIRenderer::Init();
+	UIRenderer::Init();
 }
 
 Shadows::~Shadows() {
-	UI::UIRenderer::Close();
+	UIRenderer::Close();
 }
 
 void Shadows::OnUpdate(TimeStep ts) {
 	controller.OnUpdate(ts);
 
-	UI::UIRenderer::BeginFrame();
+	UIRenderer::BeginFrame();
+
 	ImGui::Begin("Light");
 	{
 		glm::vec3 position = depthCamera->GetPosition();
@@ -96,10 +99,10 @@ void Shadows::OnUpdate(TimeStep ts) {
 				return depthCamera->GetViewProjection();
 			});
 
-		// Renderer::PushOptions(
-		// 	{
-		// 		.Cull = RendererAPI::Options::CullingMode::Front
-		// 	});
+		Renderer::PushOptions(
+			{
+				.Culling = CullingMode::Front
+			});
 
 		RenderScene();
 	}
@@ -155,7 +158,7 @@ void Shadows::OnUpdate(TimeStep ts) {
 	Renderer::EndPass();
 	Renderer::Flush();
 
-	UI::UIRenderer::EndFrame();
+	UIRenderer::EndFrame();
 }
 
 void Shadows::RenderScene() {

@@ -20,7 +20,7 @@ public:
 	void Render();
 
 private:
-	Ref<Project> m_Project;
+	Project m_Project;
 	Ref<Tab> m_CurrentTab;
 	List<Ref<Tab>> m_Tabs;
 	List<Ref<Tab>> m_ClosedTabs;
