@@ -134,7 +134,7 @@ void Lighting::OnUpdate(TimeStep ts) {
 	}
 	ImGui::End();
 
-	// buffer->SetData(&spot);
+	buffer->SetData(&spot);
 
 	Renderer::StartPass(lightingPass);
 	{
@@ -142,8 +142,15 @@ void Lighting::OnUpdate(TimeStep ts) {
 
 		Renderer3D::Begin(camera);
 
-		auto* cubeCommand = Renderer::GetCommand();
-		cubeCommand.Uniforms
+		auto* command = Renderer::GetCommand();
+		command->UniformData
+			.SetInput(UniformSlot{ buffer, "", 0 });
+		command->UniformData
+			.SetInput("u_PointLightCount", 2 * width * 2 * length);
+
+		auto* cubeCommand = Renderer::NewCommand();
+		Renderer::GetPass()->GetUniforms()
+		.Clear()
 		.Set("u_Material.Diffuse",
 			[&]() -> TextureSlot
 			{
@@ -159,9 +166,11 @@ void Lighting::OnUpdate(TimeStep ts) {
 			{
 				return 32.0f;
 			});
+		Renderer::GetPass()->SetUniforms(cubeCommand);
 
-		auto* torchCommand = Renderer::GetCommand();
-		torchCommand.Uniforms
+		auto* torchCommand = Renderer::NewCommand();
+		Renderer::GetPass()->GetUniforms()
+		.Clear()
 		.Set("u_Material.Diffuse",
 			[&]() -> TextureSlot
 			{
@@ -177,20 +186,15 @@ void Lighting::OnUpdate(TimeStep ts) {
 			{
 				return 32.0f;
 			});
+		Renderer::GetPass()->SetUniforms(torchCommand);
 
-		Renderer::GetPass()->GetUniforms()
-		.Set("u_PointLightCount",
-			[&]() -> int32_t
-			{
-				return 2 * width * 2 * length;
-			});
+		auto& uniforms = Renderer::GetPass()->GetUniforms().Clear();
 
-		auto& uniforms = Renderer::GetPass()->GetUniforms();
 		for(int y = -length; y < length; y++) {
 			for(int x = -width; x < width; x++) {
 				int i = 2*width * (y + length) + (x + width);
-
 				std::string name = "u_PointLights[" + std::to_string(i) + "].";
+
 				uniforms
 				.Set(name + "Position",
 					[x=x, y=y]() -> glm::vec3
@@ -211,9 +215,7 @@ void Lighting::OnUpdate(TimeStep ts) {
 					[&]() -> glm::vec3
 					{
 						return light.Specular;
-					});
-
-				uniforms
+					})
 				.Set(name + "Constant",
 					[&]() -> float
 					{
@@ -229,6 +231,7 @@ void Lighting::OnUpdate(TimeStep ts) {
 					{
 						return light.Quadratic;
 					});
+				Renderer::GetPass()->SetUniforms(command);
 
 				Renderer3D::DrawMesh(cube, { .Translation = { x, 0.0f, y } });
 				Renderer3D::DrawMesh(torch, { .Translation = { x, 1.0f, y } });

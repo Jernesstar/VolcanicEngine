@@ -44,15 +44,15 @@ using namespace Magma::ECS;
 using namespace Magma::Physics;
 using namespace Lava;
 
-// #include "Demos/Cube.h"
-// #include "Demos/Lighting.h"
-// #include "Demos/Shadows.h"
-// #include "Demos/Bloom.h"
-// #include "Demos/Deferred.h"
+#include "Demos/Cube.h"
+#include "Demos/Lighting.h"
+#include "Demos/Shadows.h"
+#include "Demos/Bloom.h"
+#include "Demos/Deferred.h"
 #include "Demos/UI.h"
 #include "Demos/Text.h"
 #include "Demos/ECS.h"
-// #include "Demos/Raycast.h"
+#include "Demos/Raycast.h"
 #include "Demos/Collision.h"
 #include "Demos/Raytracing.h"
 #include "Demos/Template.h"
@@ -60,28 +60,28 @@ using namespace Lava;
 Application* CreateApplication(const CommandLineArgs& args) {
 	std::string project = args[1];
 
-	// // Isometric Camera, smooth scroll pixels, instancing
-	// if(project == "Cube") return new Demo::Cube();
-	// // PointLights, Spotlights, uniform buffers
-	// if(project == "Lighting") return new Demo::Lighting();
-	// // Shadows
-	// if(project == "Shadows") return new Demo::Shadows();
-	// // Bloom
-	// if(project == "Bloom") return new Demo::Bloom();
-	// // Deferred
-	// if(project == "Deferred") return new Demo::Deferred();
+	// Isometric Camera, smooth scroll pixels, instancing
+	if(project == "Cube") return new Demo::Cube();
+	// PointLights, Spotlights, uniform buffers
+	else if(project == "Lighting") return new Demo::Lighting();
+	// Shadows
+	else if(project == "Shadows") return new Demo::Shadows();
+	// Bloom
+	else if(project == "Bloom") return new Demo::Bloom();
+	// Deferred
+	else if(project == "Deferred") return new Demo::Deferred();
 	// Text rendering
-	if(project == "Text") return new Demo::Text();
+	else if(project == "Text") return new Demo::Text();
 	// UI
-	if(project == "UI") return new Demo::UI();
+	else if(project == "UI") return new Demo::UI();
 	// Entity component system
-	if(project == "ECS") return new Demo::ECS();
-	// // Raycasting, object outlining
-	// if(project == "Raycast") return new Demo::Raycast();
+	else if(project == "ECS") return new Demo::ECS();
+	// Raycasting, object outlining
+	else if(project == "Raycast") return new Demo::Raycast();
 	// Collision detection
-	if(project == "Collision") return new Demo::Collision();
+	else if(project == "Collision") return new Demo::Collision();
 	// PBR
-	if(project == "Raytracing") return new Demo::Raytracing();
+	else if(project == "Raytracing") return new Demo::Raytracing();
 
 	return new Demo::Template();
 }

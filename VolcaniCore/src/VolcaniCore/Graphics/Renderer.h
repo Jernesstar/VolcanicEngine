@@ -41,7 +41,7 @@ public:
 	static void Resize(uint32_t width, uint32_t height);
 
 	static void PushOptions(const DrawCall& options);
-	static void PopOptions();
+	static void PopOptions(uint32_t count = 1);
 
 	static void Flush();
 

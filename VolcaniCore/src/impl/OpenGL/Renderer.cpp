@@ -30,7 +30,7 @@ static void Clear();
 static void Resize(uint32_t width, uint32_t height);
 
 static void FlushCommand(DrawCommand& command);
-static void FlushCall(DrawCommand& command, DrawCall& call);
+static void FlushCall(DrawCall& call);
 
 static void SetUniforms(DrawCommand& command);
 static void SetOptions(DrawCall& call);
@@ -46,7 +46,7 @@ struct RendererData {
 	Map<DrawBuffer*, BackendBuffer> Arrays;
 	List<DrawCommand> Commands;
 	List<DrawPass> Passes;
-	DrawPass* LastPass;
+	DrawPass* LastPass = nullptr;
 };
 
 static RendererData s_Data;
@@ -64,7 +64,7 @@ void Renderer::Init() {
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
 	s_Data.Commands.reserve(20);
-	s_Data.Passes.reserve(20);
+	s_Data.Passes.reserve(10);
 }
 
 void Renderer::Close() {
@@ -92,6 +92,7 @@ void Renderer::EndFrame() {
 		FlushCommand(command);
 
 	s_Data.Commands.clear();
+	// s_Data.Passes.clear();
 }
 
 DrawBuffer* Renderer::NewDrawBuffer(DrawBufferSpecification& specs, void* data)
@@ -167,6 +168,7 @@ void Renderer::SetBufferData(DrawBuffer* buffer, uint8_t bufferIndex,
 
 void Renderer::ReleaseBuffer(DrawBuffer* buffer) {
 	s_Data.Arrays.erase(buffer);
+	delete buffer;
 }
 
 DrawPass* Renderer::NewDrawPass(DrawBuffer* buffer,
@@ -176,7 +178,7 @@ DrawPass* Renderer::NewDrawPass(DrawBuffer* buffer,
 }
 
 DrawCommand* Renderer::NewDrawCommand(DrawPass* pass) {
-	auto* command = &s_Data.Commands.emplace_back();
+	auto* command = &s_Data.Commands.emplace_back(pass);
 
 	if(pass) {
 		command->IndicesIndex = pass->BufferData->IndicesCount;
@@ -201,7 +203,7 @@ void FlushCommand(DrawCommand& command) {
 			command.Pass->Output->As<OpenGL::Framebuffer>()->Bind();
 	}
 
-	if(command.Outputs.size() && command.Pass && command.Pass.Output) {
+	if(command.Pass && command.Pass->Output) {
 		uint32_t i = 0;
 		for(auto& [target, idx] : command.Outputs)
 			command.Pass->Output->Attach(target, idx, i++);
@@ -212,19 +214,20 @@ void FlushCommand(DrawCommand& command) {
 	if(command.Clear)
 		Clear();
 
-	SetUniforms(command);
+	if(command.Pass)
+		SetUniforms(command);
 
 	if(command.Pass && command.Pass->BufferData && command.Calls.size()) {
 		Ref<VertexArray> array = s_Data.Arrays[command.Pass->BufferData].Array;
 
 		array->Bind();
 		for(auto& call : command.Calls)
-			FlushCall(command, call);
+			FlushCall(call);
 		array->Unbind();
 	}
 }
 
-void FlushCall(DrawCommand& command, DrawCall& call) {
+void FlushCall(DrawCall& call) {
 	SetOptions(call);
 
 	uint32_t primitive;
@@ -240,7 +243,6 @@ void FlushCall(DrawCommand& command, DrawCall& call) {
 			break;
 	}
 
-	auto& buffer = s_Data.Arrays[command.Pass->BufferData];
 	if(call.Partition == PartitionType::MultiDraw) {
 		// if(call.IndexCount == 0)
 		// 	glMultiDrawArraysIndirect();
@@ -289,8 +291,8 @@ void SetUniforms(DrawCommand& command) {
 	for(auto& [name, data] : uniforms.FloatUniforms)
 		shader->SetFloat(name, data);
 	for(auto& [name, slot] : uniforms.TextureUniforms) {
-		slot.Sampler->As<OpenGL::Texture2D>()->Bind(slot.Index);
 		shader->SetInt(name, slot.Index);
+		slot.Sampler->As<OpenGL::Texture2D>()->Bind(slot.Index);
 	}
 	for(auto& [name, data] : uniforms.Vec2Uniforms)
 		shader->SetVec2(name, data);

@@ -134,17 +134,17 @@ void Bloom::OnUpdate(TimeStep ts) {
 
 	Renderer::StartPass(downsamplePass);
 	{
-		// Renderer::GetCommand()->GetUniforms()
-		// .Set("u_SrcResolution",
-		// 	[&]() -> glm::vec2
-		// 	{
-		// 		return { Application::GetWindow()->GetWidth(), Application::GetWindow()->GetHeight() };
-		// 	})
-		// .Set("u_SrcTexture",
-		// 	[&]() -> TextureSlot
-		// 	{
-		// 		return { src->Get(AttachmentTarget::Color), 0 };
-		// 	});
+		Renderer::GetPass()->GetUniforms()
+		.Set("u_SrcResolution",
+			[&]() -> glm::vec2
+			{
+				return { Application::GetWindow()->GetWidth(), Application::GetWindow()->GetHeight() };
+			})
+		.Set("u_SrcTexture",
+			[&]() -> TextureSlot
+			{
+				return { src->Get(AttachmentTarget::Color), 0 };
+			});
 
 		Downsample();
 	}
@@ -154,12 +154,12 @@ void Bloom::OnUpdate(TimeStep ts) {
 
 	Renderer::StartPass(upsamplePass);
 	{
-		// Renderer::GetPass()->GetUniforms()
-		// .Set("u_FilterRadius",
-		// 	[&]() -> float
-		// 	{
-		// 		return filterRadius;
-		// 	});
+		Renderer::GetPass()->GetUniforms()
+		.Set("u_FilterRadius",
+			[&]() -> float
+			{
+				return filterRadius;
+			});
 
 		Upsample();
 	}
@@ -179,9 +179,7 @@ void Bloom::OnUpdate(TimeStep ts) {
 			[&]() -> float
 			{
 				return bloomStrength;
-			});
-
-		auto& uniforms = Renderer::GetPass()->GetUniforms()
+			})
 		.Set("u_BloomTexture",
 			[&]() -> TextureSlot
 			{
@@ -223,7 +221,7 @@ void Bloom::InitMips() {
 	}
 
 // decltype(auto)
-// using value_type = decltype( std::declval<Lambda>()(*std::declval<Iterator>()) )
+// using value_type = decltype(std::declval<Lambda>()(*std::declval<Iterator>()))
 	// mips = Framebuffer::Create(
 	// 	{
 	// 		{
@@ -243,8 +241,7 @@ void Bloom::Downsample() {
 		auto* command = Renderer::GetCommand();
 		auto& uniforms = Renderer::GetPass()->GetUniforms();
 
-		command->Image = mips;
-		command->Attachments = { { AttachmentTarget::Color, i } };
+		command->Outputs = { { AttachmentTarget::Color, i } };
 
 		Renderer2D::DrawFullscreenQuad(mips, AttachmentTarget::Color);
 
@@ -269,21 +266,20 @@ void Bloom::Upsample() {
 		const BloomMip& mip = mipChain[i];
 		const BloomMip& nextMip = mipChain[i - 1];
 
-		Renderer::SetOptions(
+		Renderer::PushOptions(
 			{
 				.Blending = BlendingMode::Additive
 			});
 
 		auto command = Renderer::GetCommand();
-		auto& uniforms = Renderer::GetPass()->GetUniforms()
+		Renderer::GetPass()->GetUniforms()
 		.Set("u_SrcTexture",
 			[mip]() -> TextureSlot
 			{
 				return { mip.Sampler, 0 };
 			});
 		
-		command->Image = mips;
-		command->Attachments = { { AttachmentTarget::Color, i - 1 } };
+		command->Outputs = { { AttachmentTarget::Color, i - 1 } };
 
 		Renderer2D::DrawFullscreenQuad(mips, AttachmentTarget::Color);
 

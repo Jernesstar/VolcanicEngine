@@ -170,7 +170,7 @@ struct DrawUniforms {
 	void SetInput(const std::string& name, const glm::mat4& data) {
 		Mat4Uniforms[name] = data;
 	}
-	void SetInput(const std::string& name, const UniformSlot& data) {
+	void SetInput(const UniformSlot& data) {
 		UniformBuffers.push_back(data);
 	}
 };

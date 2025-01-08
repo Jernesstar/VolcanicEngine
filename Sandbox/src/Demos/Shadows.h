@@ -101,7 +101,7 @@ void Shadows::OnUpdate(TimeStep ts) {
 
 		Renderer::PushOptions(
 			{
-				.Cull = CullingMode::Front
+				.Culling = CullingMode::Front
 			});
 
 		RenderScene();

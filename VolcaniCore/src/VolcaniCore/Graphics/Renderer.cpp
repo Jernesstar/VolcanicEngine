@@ -94,6 +94,7 @@ void Renderer::EndCommand() {
 	VertexCount   += s_DrawCommand->VerticesIndex;
 	InstanceCount += s_DrawCommand->InstancesIndex;
 
+	s_RenderPass->SetUniforms(s_DrawCommand);
 	s_DrawCommand = nullptr;
 }
 
@@ -110,14 +111,14 @@ void Renderer::Resize(uint32_t width, uint32_t height) {
 	s_DrawCommand->ViewportHeight = height;
 }
 
-void Renderer::SetOptions(const DrawCall& options) {
+void Renderer::PushOptions(const DrawCall& options) {
 	s_Options = options;
 	s_OptionsValid = true;
 }
 
-DrawCall Renderer::GetOptions() {
+// TODO(Implement)
+void Renderer::PopOptions(uint32_t count) {
 	s_OptionsValid = false;
-	return s_Options;
 }
 
 void Renderer::Flush() {

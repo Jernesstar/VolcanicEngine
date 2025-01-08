@@ -20,10 +20,11 @@ public:
 
 	template<typename T>
 	void SetData(const Buffer<T>& buffer, uint32_t offset = 0) {
-		SetData(buffer.Get(), buffer.GetSize(), offset);
+		VOLCANICORE_ASSERT(sizeof(T) == Layout.Stride);
+		SetData(buffer.Get(), buffer.GetCount(), offset);
 	}
 
-	virtual void SetData(const void* data, uint32_t count, uint32_t offset) = 0;
+	virtual void SetData(const void* data, uint32_t count = 1, uint32_t offset = 0) = 0;
 
 	template<typename TDerived>
 	requires std::derived_from<TDerived, UniformBuffer>
