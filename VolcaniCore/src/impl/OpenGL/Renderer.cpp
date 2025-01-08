@@ -50,6 +50,7 @@ struct RendererData {
 };
 
 static RendererData s_Data;
+static DebugInfo s_Info;
 
 Renderer::Renderer()
 	: RendererAPI(RendererAPI::Backend::OpenGL)
@@ -72,7 +73,10 @@ void Renderer::Close() {
 }
 
 void Renderer::StartFrame() {
-
+	s_Info.DrawCallCount  = 0;
+	s_Info.IndexCount     = 0;
+	s_Info.VertexCount    = 0;
+	s_Info.InstanceCount  = 0;
 }
 
 void Renderer::EndFrame() {
@@ -93,6 +97,10 @@ void Renderer::EndFrame() {
 
 	s_Data.Commands.clear();
 	// s_Data.Passes.clear();
+}
+
+DebugInfo Renderer::GetDebugInfo() {
+	return s_Info;
 }
 
 DrawBuffer* Renderer::NewDrawBuffer(DrawBufferSpecification& specs, void* data)
@@ -174,13 +182,17 @@ void Renderer::ReleaseBuffer(DrawBuffer* buffer) {
 DrawPass* Renderer::NewDrawPass(DrawBuffer* buffer,
 	Ref<ShaderPipeline> pipeline, Ref<VolcaniCore::Framebuffer> output)
 {
+	for(auto& pass : s_Data.Passes)
+		if(pass.BufferData == buffer && pass.Pipeline == pipeline)
+			return &pass;
+
 	return &s_Data.Passes.emplace_back(buffer, pipeline, output);
 }
 
 DrawCommand* Renderer::NewDrawCommand(DrawPass* pass) {
 	auto* command = &s_Data.Commands.emplace_back(pass);
 
-	if(pass) {
+	if(pass && pass->BufferData) {
 		command->IndicesIndex = pass->BufferData->IndicesCount;
 		command->VerticesIndex = pass->BufferData->VerticesCount;
 		command->InstancesIndex = pass->BufferData->InstancesCount;
@@ -221,10 +233,16 @@ void FlushCommand(DrawCommand& command) {
 		Ref<VertexArray> array = s_Data.Arrays[command.Pass->BufferData].Array;
 
 		array->Bind();
-		for(auto& call : command.Calls)
+		for(auto& call : command.Calls) {
 			FlushCall(call);
+			s_Info.InstanceCount += call.InstanceCount;
+			s_Info.DrawCallCount++;
+		}
 		array->Unbind();
 	}
+
+	s_Info.IndexCount += command.IndicesIndex;
+	s_Info.VertexCount += command.VerticesIndex;
 }
 
 void FlushCall(DrawCall& call) {
@@ -291,6 +309,7 @@ void SetUniforms(DrawCommand& command) {
 	for(auto& [name, data] : uniforms.FloatUniforms)
 		shader->SetFloat(name, data);
 	for(auto& [name, slot] : uniforms.TextureUniforms) {
+		if(!slot.Sampler) continue;
 		shader->SetInt(name, slot.Index);
 		slot.Sampler->As<OpenGL::Texture2D>()->Bind(slot.Index);
 	}

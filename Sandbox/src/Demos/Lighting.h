@@ -64,16 +64,17 @@ Lighting::Lighting() {
 	shader = ShaderPipeline::Create("Sandbox/assets/shaders", "Lighting");
 	lightingPass = RenderPass::Create("Lighting", shader);
 
-	light = PointLight
-		{
-			.Constant  = 0.3f,
-			.Linear    = 0.0f,
-			.Quadratic = 0.032f,
-		};
-	light.Position = { 0.0f, 0.001f, 0.0f };
-	light.Ambient  = { 0.002f, 0.002f, 0.002f };
-	light.Diffuse  = { 0.005f, 0.005f, 0.005f };
-	light.Specular = { 0.001f, 0.001f, 0.001f };
+	// light = 
+	// 	PointLight
+	// 	{
+	// 		.Constant  = 0.3f,
+	// 		.Linear    = 0.0f,
+	// 		.Quadratic = 0.032f,
+	// 	};
+	// light.Position = { 0.0f, 0.001f, 0.0f };
+	// light.Ambient  = { 0.002f, 0.002f, 0.002f };
+	// light.Diffuse  = { 0.005f, 0.005f, 0.005f };
+	// light.Specular = { 0.001f, 0.001f, 0.001f };
 
 	spot = SpotLight
 		{
@@ -83,8 +84,9 @@ Lighting::Lighting() {
 			.OuterCutoffAngle = 0.4f
 		};
 
-	buffer = UniformBuffer::Create(
-		BufferLayout
+	buffer =
+		UniformBuffer::Create(
+			BufferLayout
 			{
 				{ "Position",    BufferDataType::Vec3 },
 				{ "CutoffAngle", BufferDataType::Float },
@@ -93,12 +95,13 @@ Lighting::Lighting() {
 			});
 
 	std::string assetPath = "Sandbox/assets/";
-	cube = Mesh::Create(MeshPrimitive::Cube,
-		Material
-		{
-			.Diffuse = Texture::Create(assetPath + "images/wood.png"),
-			.Specular = Texture::Create(assetPath + "images/wood_specular.png"),
-		});
+	cube =
+		Mesh::Create(MeshPrimitive::Cube,
+			Material
+			{
+				.Diffuse = Texture::Create(assetPath + "images/wood.png"),
+				.Specular = Texture::Create(assetPath + "images/wood_specular.png"),
+			});
 	torch = Mesh::Create(assetPath + "models/mc-torch/Torch.obj");
 	player = Model::Create(assetPath + "models/player/Knight_Golden_Male.obj");
 
@@ -144,11 +147,10 @@ void Lighting::OnUpdate(TimeStep ts) {
 
 		auto* command = Renderer::GetCommand();
 		command->UniformData
-			.SetInput(UniformSlot{ buffer, "", 0 });
+		.SetInput(UniformSlot{ buffer, "", 0 });
 		command->UniformData
-			.SetInput("u_PointLightCount", 2 * width * 2 * length);
+		.SetInput("u_PointLightCount", 2 * width * 2 * length);
 
-		auto* cubeCommand = Renderer::NewCommand();
 		Renderer::GetPass()->GetUniforms()
 		.Clear()
 		.Set("u_Material.Diffuse",
@@ -166,9 +168,9 @@ void Lighting::OnUpdate(TimeStep ts) {
 			{
 				return 32.0f;
 			});
+		auto* cubeCommand = Renderer::NewCommand();
 		Renderer::GetPass()->SetUniforms(cubeCommand);
 
-		auto* torchCommand = Renderer::NewCommand();
 		Renderer::GetPass()->GetUniforms()
 		.Clear()
 		.Set("u_Material.Diffuse",
@@ -186,52 +188,53 @@ void Lighting::OnUpdate(TimeStep ts) {
 			{
 				return 32.0f;
 			});
+		auto* torchCommand = Renderer::NewCommand();
 		Renderer::GetPass()->SetUniforms(torchCommand);
 
 		auto& uniforms = Renderer::GetPass()->GetUniforms().Clear();
 
 		for(int y = -length; y < length; y++) {
 			for(int x = -width; x < width; x++) {
-				int i = 2*width * (y + length) + (x + width);
-				std::string name = "u_PointLights[" + std::to_string(i) + "].";
+				// int i = 2*width * (y + length) + (x + width);
+				// std::string name = "u_PointLights[" + std::to_string(i) + "].";
 
-				uniforms
-				.Set(name + "Position",
-					[x=x, y=y]() -> glm::vec3
-					{
-						return { x, 1.5f, y };
-					})
-				.Set(name + "Ambient",
-					[&]() -> glm::vec3
-					{
-						return light.Ambient;
-					})
-				.Set(name + "Diffuse",
-					[&]() -> glm::vec3
-					{
-						return light.Diffuse;
-					})
-				.Set(name + "Specular",
-					[&]() -> glm::vec3
-					{
-						return light.Specular;
-					})
-				.Set(name + "Constant",
-					[&]() -> float
-					{
-						return light.Constant;
-					})
-				.Set(name + "Linear",
-					[&]() -> float
-					{
-						return light.Linear;
-					})
-				.Set(name + "Quadratic",
-					[&]() -> float
-					{
-						return light.Quadratic;
-					});
-				Renderer::GetPass()->SetUniforms(command);
+				// uniforms
+				// .Set(name + "Position",
+				// 	[x=x, y=y]() -> glm::vec3
+				// 	{
+				// 		return { x, 1.5f, y };
+				// 	})
+				// .Set(name + "Ambient",
+				// 	[&]() -> glm::vec3
+				// 	{
+				// 		return light.Ambient;
+				// 	})
+				// .Set(name + "Diffuse",
+				// 	[&]() -> glm::vec3
+				// 	{
+				// 		return light.Diffuse;
+				// 	})
+				// .Set(name + "Specular",
+				// 	[&]() -> glm::vec3
+				// 	{
+				// 		return light.Specular;
+				// 	})
+				// .Set(name + "Constant",
+				// 	[&]() -> float
+				// 	{
+				// 		return light.Constant;
+				// 	})
+				// .Set(name + "Linear",
+				// 	[&]() -> float
+				// 	{
+				// 		return light.Linear;
+				// 	})
+				// .Set(name + "Quadratic",
+				// 	[&]() -> float
+				// 	{
+				// 		return light.Quadratic;
+				// 	});
+				// Renderer::GetPass()->SetUniforms(command);
 
 				Renderer3D::DrawMesh(cube, { .Translation = { x, 0.0f, y } });
 				Renderer3D::DrawMesh(torch, { .Translation = { x, 1.0f, y } });

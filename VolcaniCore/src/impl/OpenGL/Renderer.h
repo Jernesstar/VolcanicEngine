@@ -11,6 +11,7 @@ public:
 
 	void StartFrame() override;
 	void EndFrame() override;
+	DebugInfo GetDebugInfo() override;
 
 	DrawBuffer* NewDrawBuffer(DrawBufferSpecification& specs,
 							  void* data = nullptr) override;

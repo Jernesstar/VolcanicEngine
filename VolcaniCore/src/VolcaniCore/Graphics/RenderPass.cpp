@@ -14,16 +14,6 @@ for(auto& [uniformName, valueCallback] : m_Uniforms.TUniform##Callbacks) \
 
 namespace VolcaniCore {
 
-GET_HANDLES(int32_t, Int)
-GET_HANDLES(float, Float)
-GET_HANDLES(TextureSlot, Texture)
-GET_HANDLES(glm::vec2, Vec2)
-GET_HANDLES(glm::vec3, Vec3)
-GET_HANDLES(glm::vec4, Vec4)
-GET_HANDLES(glm::mat2, Mat2)
-GET_HANDLES(glm::mat3, Mat3)
-GET_HANDLES(glm::mat4, Mat4)
-
 void RenderPass::SetUniforms(DrawCommand* command) {
 	auto& uniforms = command->UniformData;
 
@@ -43,5 +33,15 @@ void RenderPass::SetUniforms(DrawCommand* command) {
 	SET_UNIFORM(Mat3);
 	SET_UNIFORM(Mat4);
 }
+
+GET_HANDLES(int32_t, Int)
+GET_HANDLES(float, Float)
+GET_HANDLES(TextureSlot, Texture)
+GET_HANDLES(glm::vec2, Vec2)
+GET_HANDLES(glm::vec3, Vec3)
+GET_HANDLES(glm::vec4, Vec4)
+GET_HANDLES(glm::mat2, Mat2)
+GET_HANDLES(glm::mat3, Mat3)
+GET_HANDLES(glm::mat4, Mat4)
 
 }

@@ -9,7 +9,7 @@
 
 namespace VolcaniCore {
 
-static DrawBuffer* s_ScreenQuadBuffer;
+static DrawBuffer* s_ScreenBuffer;
 
 void Renderer2D::Init() {
 	float screenCoords[] =
@@ -37,11 +37,11 @@ void Renderer2D::Init() {
 			.MaxVertexCount = 6
 		};
 
-	s_ScreenQuadBuffer = RendererAPI::Get()->NewDrawBuffer(specs, screenCoords);
+	s_ScreenBuffer = RendererAPI::Get()->NewDrawBuffer(specs, screenCoords);
 }
 
 void Renderer2D::Close() {
-	RendererAPI::Get()->ReleaseBuffer(s_ScreenQuadBuffer);
+	RendererAPI::Get()->ReleaseBuffer(s_ScreenBuffer);
 }
 
 void Renderer2D::StartFrame() {
@@ -90,13 +90,12 @@ void Renderer2D::DrawFullscreenQuad(Ref<Framebuffer> buffer,
 
 	DrawCommand* command;
 	if(Renderer::GetPass()) {
-		command = Renderer::NewCommand();
-		Renderer::GetPass()->Get()->BufferData = s_ScreenQuadBuffer;
+		command = Renderer::NewCommand(true);
+		Renderer::GetPass()->SetData(s_ScreenBuffer);
 	}
 	else {
 		auto pipeline = ShaderLibrary::Get("Framebuffer");
-		auto* pass =
-			RendererAPI::Get()->NewDrawPass(s_ScreenQuadBuffer, pipeline);
+		auto* pass = RendererAPI::Get()->NewDrawPass(s_ScreenBuffer, pipeline);
 		command = RendererAPI::Get()->NewDrawCommand(pass);
 	}
 

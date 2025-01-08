@@ -98,9 +98,9 @@ public:
 	Ref<ShaderPipeline> GetPipeline() const { return m_Pass->Pipeline; }
 	Ref<Framebuffer> GetOutput() const { return m_Pass->Output; }
 
+	void SetUniforms(DrawCommand* command);
 	Uniforms& GetUniforms() { return m_Uniforms; }
 
-	void SetUniforms(DrawCommand* command);
 
 private:
 	DrawPass* m_Pass;

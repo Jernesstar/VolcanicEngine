@@ -18,6 +18,13 @@ struct DrawPass;
 struct DrawCommand;
 struct DrawCall;
 
+struct DebugInfo {
+	uint64_t DrawCallCount = 0;
+	uint64_t IndexCount    = 0;
+	uint64_t VertexCount   = 0;
+	uint64_t InstanceCount = 0;
+};
+
 class RendererAPI {
 public:
 	enum class Backend { OpenGL, Vulkan, DirectX };
@@ -35,6 +42,7 @@ public:
 
 	virtual void StartFrame() = 0;
 	virtual void EndFrame() = 0;
+	virtual DebugInfo GetDebugInfo() = 0;
 
 	virtual DrawBuffer* NewDrawBuffer(DrawBufferSpecification& specs,
 									  void* data = nullptr) = 0;
