@@ -114,6 +114,7 @@ void UITab::Setup() {
 }
 
 void UITab::SetUI(const std::string& path) {
+	m_Root.Clear();
 	Lava::UILoader::Load(m_Root, path);
 }
 
@@ -131,8 +132,7 @@ void UITab::OpenUI() {
 	if(instance->Display("ChooseFile")) {
 		if(instance->IsOk()) {
 			std::string path = instance->GetFilePathName();
-			m_Root.Clear();
-			// m_Root.Load(path);
+			SetUI(path);
 		}
 
 		instance->Close();
