@@ -115,16 +115,18 @@ static void ButtonImage(Ref<UIElement> element, ImVec2 dim) {
 UIState UIRenderer::DrawButton(UI::Button& button) {
 	if(button.Display->GetType() == UIElementType::Image)
 		ButtonFunction = ButtonImage;
-	else
+	else {
+		ImGui::PushStyleColor(ImGuiCol_Button, button.Color);
 		ButtonFunction = ButtonText;
+	}
 
 	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 0, 0 });
-	ImGui::PushStyleColor(ImGuiCol_Button, button.Color);
 	ImGui::SetCursorPos(ImVec2(button.x, button.y));
-
 	ButtonFunction(button.Display, ImVec2(button.Width, button.Height));
-	ImGui::PopStyleColor();
 	ImGui::PopStyleVar();
+
+	if(button.Display->GetType() == UIElementType::Text)
+		ImGui::PopStyleColor();
 
 	return {
 		ImGui::IsItemClicked(),

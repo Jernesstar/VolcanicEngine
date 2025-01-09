@@ -18,11 +18,12 @@ struct {
 		bool newScene = false;
 		bool openScene = false;
 		bool saveScene = false;
+		bool saveAsScene = false;
 	} file;
 	struct {
 		bool addEntity = false;
 	} edit;
-} menu;
+} static menu;
 
 SceneTab::SceneTab()
 	: m_Scene("New Scene")
@@ -36,13 +37,14 @@ SceneTab::SceneTab(const Scene& scene) {
 }
 
 SceneTab::SceneTab(const std::string& path) {
-	Lava::SceneLoader::Load(m_Scene, path);
+	SetScene(path);
 	Setup();
 }
 
 SceneTab::~SceneTab() {
-	Lava::SceneLoader::Save(
-		m_Scene, "Magma/assets/scenes/" + m_Scene.Name + ".magma.scene");
+	if(m_ScenePath == "")
+		m_ScenePath = "Magma/assets/scenes/" + m_Scene.Name + ".magma.scene";
+	Lava::SceneLoader::Save(m_Scene, m_ScenePath);
 }
 
 void SceneTab::Setup() {
@@ -61,17 +63,17 @@ void SceneTab::Setup() {
 	m_PlayButton->Width = 20;
 	m_PlayButton->Height = 20;
 
-	m_PlayButton = CreateRef<UI::Button>();
-	m_PlayButton->Display =
+	m_PauseButton = CreateRef<UI::Button>();
+	m_PauseButton->Display =
 		CreateRef<UI::Image>("Magma/assets/icons/PauseButton.png");
-	m_PlayButton->Width = 20;
-	m_PlayButton->Height = 20;
+	m_PauseButton->Width = 20;
+	m_PauseButton->Height = 20;
 
-	m_PlayButton = CreateRef<UI::Button>();
-	m_PlayButton->Display =
+	m_StopButton = CreateRef<UI::Button>();
+	m_StopButton->Display =
 		CreateRef<UI::Image>("Magma/assets/icons/StopButton.png");
-	m_PlayButton->Width = 20;
-	m_PlayButton->Height = 20;
+	m_StopButton->Width = 20;
+	m_StopButton->Height = 20;
 }
 
 void SceneTab::SetScene(const Scene& scene) {
@@ -85,6 +87,7 @@ void SceneTab::SetScene(const Scene& scene) {
 
 void SceneTab::SetScene(const std::string& path) {
 	Lava::SceneLoader::Load(m_Scene, path);
+	m_ScenePath = path;
 }
 
 void SceneTab::Update(TimeStep ts) {
@@ -96,7 +99,8 @@ void SceneTab::Update(TimeStep ts) {
 	visual->Select(hierarchy->GetSelected());
 
 	for(auto panel : m_Panels)
-		panel->Update(ts);
+		if(panel->IsOpen())
+			panel->Update(ts);
 
 	hierarchy->Select(visual->GetSelected());
 }
@@ -111,6 +115,8 @@ void SceneTab::Render() {
 				menu.file.openScene = true;
 			if(ImGui::MenuItem("Save", "Ctrl+S"))
 				menu.file.saveScene = true;
+			if(ImGui::MenuItem("Save As", "Ctrl+Shift+S"))
+				menu.file.saveAsScene = true;
 
 			ImGui::EndMenu();
 		}
@@ -140,8 +146,15 @@ void SceneTab::Render() {
 		NewScene();
 	if(menu.file.openScene)
 		OpenScene();
-	if(menu.file.saveScene)
+	if(menu.file.saveScene) {
+		if(m_ScenePath == "")
+			SaveScene();
+		else
+			Lava::SceneLoader::Save(m_Scene, m_ScenePath);
+	}
+	if(menu.file.saveAsScene)
 		SaveScene();
+
 	if(menu.edit.addEntity)
 		AddEntity();
 
@@ -152,6 +165,7 @@ void SceneTab::Render() {
 
 void SceneTab::NewScene() {
 	SetScene(Scene("New Scene"));
+	m_ScenePath = "";
 	menu.file.newScene = false;
 }
 
@@ -165,6 +179,7 @@ void SceneTab::OpenScene() {
 		if(instance->IsOk()) {
 			std::string path = instance->GetFilePathName();
 			Lava::SceneLoader::Load(m_Scene, path);
+			m_ScenePath = path;
 		}
 
 		instance->Close();
@@ -182,6 +197,7 @@ void SceneTab::SaveScene() {
 		if(instance->IsOk()) {
 			std::string path = instance->GetFilePathName();
 			Lava::SceneLoader::Save(m_Scene, path);
+			m_ScenePath = path;
 		}
 
 		instance->Close();
@@ -194,34 +210,34 @@ void SceneTab::AddEntity() {
 }
 
 void SceneTab::OnScenePlay() {
-
+	m_SceneState = SceneState::Play;
 }
 
 void SceneTab::OnScenePause() {
+	m_SceneState = SceneState::Pause;
 
 }
 
 void SceneTab::OnSceneStop() {
+	m_SceneState = SceneState::Edit;
 
 }
 
 void SceneTab::ToolbarUI() {
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 2));
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(0, 0));
-	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
 
-	auto& colors = ImGui::GetStyle().Colors;
-	const auto& buttonHovered = colors[ImGuiCol_ButtonHovered];
-	const auto& buttonActive = colors[ImGuiCol_ButtonActive];
-
-	ImGui::PushStyleColor(ImGuiCol_ButtonHovered,
-		ImVec4(buttonHovered.x, buttonHovered.y, buttonHovered.z, 0.5f));
-	ImGui::PushStyleColor(ImGuiCol_ButtonActive,
-		ImVec4(buttonActive.x, buttonActive.y, buttonActive.z, 0.5f));
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.f, 0.f, 0.f, 0.f));
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.f, 0.f, 0.f, 0.f));
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.f, 0.f, 0.f, 0.f));
 
 	auto flags = ImGuiWindowFlags_NoDecoration
 			   | ImGuiWindowFlags_NoScrollbar
-			   | ImGuiWindowFlags_NoScrollWithMouse;
+			   | ImGuiWindowFlags_NoScrollWithMouse
+			   | ImGuiWindowFlags_NoResize
+			   | ImGuiWindowFlags_NoScrollbar
+			   | ImGuiWindowFlags_NoMove
+			   | ImGuiWindowFlags_NoTitleBar;
 	ImGui::Begin("##toolbar", nullptr, flags);
 	{
 		float size = ImGui::GetWindowHeight() - 2.0f;

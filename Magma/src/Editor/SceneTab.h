@@ -25,6 +25,7 @@ public:
 
 private:
 	Scene m_Scene;
+	std::string m_ScenePath;
 	Ref<UI::Button> m_PlayButton, m_PauseButton, m_StopButton;
 
 	enum class SceneState { Edit, Play, Pause };

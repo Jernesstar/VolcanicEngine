@@ -97,9 +97,9 @@ void Renderer::EndCommand() {
 
 void Renderer::Clear() {
 	if(!s_DrawCommand)
-		s_DrawCommand = RendererAPI::Get()->NewDrawCommand(nullptr);
-
-	s_DrawCommand->Clear = true;
+		RendererAPI::Get()->NewDrawCommand(nullptr)->Clear = true;
+	else
+		s_DrawCommand->Clear = true;
 }
 
 void Renderer::Resize(uint32_t width, uint32_t height) {

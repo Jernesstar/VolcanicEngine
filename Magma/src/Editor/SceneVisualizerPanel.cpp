@@ -6,6 +6,7 @@
 
 #include <VolcaniCore/Core/Application.h>
 #include <VolcaniCore/Core/Input.h>
+#include <VolcaniCore/Graphics/Renderer.h>
 #include <VolcaniCore/Graphics/RendererAPI.h>
 
 #include "ECS/Component.h"
@@ -41,6 +42,7 @@ void SceneVisualizerPanel::Update(TimeStep ts) {
 
 void SceneVisualizerPanel::Draw() {
 	m_Context->OnRender(m_Renderer);
+	VolcaniCore::Renderer::Flush();
 
 	auto flags = ImGuiWindowFlags_NoScrollbar
 			   | ImGuiWindowFlags_NoScrollWithMouse;

@@ -30,6 +30,7 @@ Editor::~Editor() {
 
 void Editor::OnUpdate(TimeStep ts) {
 	Renderer::Clear();
+	Renderer::Flush();
 
 	UIRenderer::BeginFrame();
 	m_EditorLayer.Update(ts);
