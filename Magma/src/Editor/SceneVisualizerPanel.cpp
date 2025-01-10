@@ -32,17 +32,17 @@ void SceneVisualizerPanel::SetContext(Scene* context) {
 	m_Selected.Handle = Entity{ };
 	// m_Selected.Collider = CreateRef<Physics::RigidBody>();
 
-	m_Renderer.SetContext(context);
-	m_Image->SetImage(m_Renderer.GetOutput(), AttachmentTarget::Color);
+	// m_Renderer.SetContext(context);
+	// m_Image->SetImage(m_Renderer.GetOutput(), AttachmentTarget::Color);
 }
 
 void SceneVisualizerPanel::Update(TimeStep ts) {
-	m_Renderer.Update(ts);
+	// m_Renderer.Update(ts);
 }
 
 void SceneVisualizerPanel::Draw() {
-	m_Context->OnRender(m_Renderer);
-	VolcaniCore::Renderer::Flush();
+	// m_Context->OnRender(m_Renderer);
+	// VolcaniCore::Renderer::Flush();
 
 	auto flags = ImGuiWindowFlags_NoScrollbar
 			   | ImGuiWindowFlags_NoScrollWithMouse;

@@ -151,6 +151,7 @@ void SceneTab::Render() {
 			SaveScene();
 		else
 			Lava::SceneLoader::Save(m_Scene, m_ScenePath);
+		menu.file.saveScene = false;
 	}
 	if(menu.file.saveAsScene)
 		SaveScene();
@@ -201,7 +202,7 @@ void SceneTab::SaveScene() {
 		}
 
 		instance->Close();
-		menu.file.saveScene = false;
+		menu.file.saveAsScene = false;
 	}
 }
 

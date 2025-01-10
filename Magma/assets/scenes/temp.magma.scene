@@ -649,3 +649,13 @@ Scene:
           MeshComponent:
             Meshes:
               []
+    - Entity:
+        ID: 598
+        Components:
+          TagComponent:
+            Tag: Entity1
+          TransformComponent:
+            Transform:
+              Translation: [0, 0, 0]
+              Rotation: [0, 0, 0]
+              Scale: [1, 1, 1]

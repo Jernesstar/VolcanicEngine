@@ -14,8 +14,8 @@ public:
 	Tab() = default;
 	~Tab() = default;
 
-	virtual void Update(VolcaniCore::TimeStep ts) = 0;
-	virtual void Render() = 0;
+	virtual void Update(TimeStep ts) { }
+	virtual void Render();
 
 	std::string GetName() const { return m_Name; }
 

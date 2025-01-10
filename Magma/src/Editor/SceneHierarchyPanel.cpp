@@ -131,6 +131,25 @@ void SceneHierarchyPanel::DrawEntityNode(Entity& entity) {
 		if(ImGui::IsMouseClicked(1) && ImGui::IsItemHovered())
 			ImGui::OpenPopup("Properties");
 
+		if(entity.Has<CameraComponent>())
+			if(ImGui::MenuItem("CameraComponent"))
+				;
+		if(entity.Has<MeshComponent>())
+			if(ImGui::MenuItem("MeshComponent"))
+				;
+		if(entity.Has<RigidBodyComponent>())
+			if(ImGui::MenuItem("RigidBodyComponent"))
+				;
+		if(entity.Has<TagComponent>())
+			if(ImGui::MenuItem("TagComponent"))
+				;
+		if(entity.Has<TransformComponent>())
+			if(ImGui::MenuItem("TransformComponent"))
+				;
+		if(entity.Has<ScriptComponent>())
+			if(ImGui::MenuItem("ScriptComponent"))
+				;
+
 		if(ImGui::BeginPopup("Properties"))
 		{
 			if(ImGui::BeginMenu("Component"))

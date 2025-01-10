@@ -120,7 +120,7 @@ void EditorLayer::Render() {
 		ImGui::BeginTabBar("Tabs", ImGuiTabBarFlags_Reorderable);
 		{
 			if(ImGui::BeginTabItem("+", nullptr, ImGuiTabItemFlags_NoReorder)) {
-				if(ImGui::IsItemActivated())
+				if(ImGui::IsItemClicked())
 					menu.tab.newTab = true;
 
 				ImGui::EndTabItem();
@@ -184,8 +184,8 @@ void EditorLayer::NewTab(const UI::UIPage& page) {
 
 void EditorLayer::NewTab() {
 	menu.tab.newTab = false;
-	// TODO(Implement): Dialog box to pick which kind of new tab to create:
-	// Scene, UI, or Level
+	Ref<Tab> newTab = CreateRef<Tab>();
+	NewTab(newTab);
 }
 
 void EditorLayer::OpenTab() {

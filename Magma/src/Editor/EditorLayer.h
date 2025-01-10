@@ -5,7 +5,6 @@
 #include "Tab.h"
 #include "SceneTab.h"
 #include "UITab.h"
-// #include "TilemapTab.h"
 
 using namespace VolcaniCore;
 
@@ -16,7 +15,7 @@ public:
 	EditorLayer();
 	~EditorLayer();
 
-	void Update(VolcaniCore::TimeStep ts);
+	void Update(TimeStep ts);
 	void Render();
 
 private:
@@ -24,6 +23,7 @@ private:
 	Ref<Tab> m_CurrentTab;
 	List<Ref<Tab>> m_Tabs;
 	List<Ref<Tab>> m_ClosedTabs;
+	List<Ref<Panel>> m_Panels;
 
 	void NewTab(Ref<Tab> tab);
 	void NewTab(const Scene& scene);
