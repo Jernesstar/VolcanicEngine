@@ -244,6 +244,7 @@ void EditorLayer::CloseTab(Ref<Tab> tabToDelete) {
 void EditorLayer::NewProject() {
 	menu.project.newProject = false;
 	m_Project = Project();
+	Application::GetWindow()->SetTitle("Magma Editor");
 }
 
 void EditorLayer::OpenProject() {
@@ -260,21 +261,21 @@ void EditorLayer::OpenProject() {
 
 		instance->Close();
 		menu.project.openProject = false;
+		Application::GetWindow()->SetTitle("Magma Editor: " + m_Project.Name);
 	}
-
-	Application::GetWindow()->SetTitle("Magma Editor: " + m_Project.Name);
 }
 
 void EditorLayer::ReloadProject() {
 	menu.project.reloadProject = false;
 	
-	Lava::ProjectLoader::Compile(m_Project.Path);
+	Lava::ProjectLoader::Compile(m_Project.Path + "/.volc.proj");
 }
 
 void EditorLayer::RunProject() {
 	menu.project.runProject = false;
 
-	std::string command = "./build/Lava/bin/Runtime " + m_Project.Path + " -c";
+	std::string command = ".\\build\\Lava\\bin\\Runtime -c --project ";
+	command += m_Project.Path + "\\.volc.proj";
 	system(command.c_str());
 }
 
