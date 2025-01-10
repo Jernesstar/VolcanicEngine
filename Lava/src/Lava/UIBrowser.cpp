@@ -23,7 +23,30 @@ static UIPage* s_CurrentPage = nullptr;
 static Theme s_Theme;
 
 void UIBrowser::Load(const std::string& folderPath) {
-	auto genPath = fs::path("Lava") / "projects" / "UI" / "gen";
+	auto themePath = (fs::path(folderPath) / "theme.magma.ui.json").string();
+	if(FileUtils::FileExists(themePath))
+		s_Theme = UILoader::LoadTheme(themePath);
+
+	auto filePaths = FileUtils::GetFiles(folderPath, { ".json" });
+	s_Pages.reserve(filePaths.size());
+	for(auto filePath : filePaths) {
+		fs::path p(filePath);
+		auto name = p.stem().stem().stem().string();
+		auto filePathName = (fs::path(folderPath) / name).string();
+
+		if(name != "theme") {
+			auto& page = s_Pages.emplace_back(name);
+			page.SetTheme(s_Theme);
+			UILoader::Load(page, filePathName);
+		}
+	}
+
+	s_CurrentPage = &s_Pages[0];
+}
+
+void UIBrowser::Compile(const std::string& folderPath,
+						const std::string& genPath)
+{
 	fs::remove_all(genPath);
 	fs::create_directory(genPath);
 
@@ -58,10 +81,6 @@ void UIBrowser::Load(const std::string& folderPath) {
 
 	auto premakeFile = std::ofstream("Lava/projects/UI/pages.lua"); // Deletes file contents
 
-	auto themePath = (fs::path(folderPath) / "theme.magma.ui.json").string();
-	if(FileUtils::FileExists(themePath))
-		s_Theme = UILoader::LoadTheme(themePath);
-
 	auto filePaths = FileUtils::GetFiles(folderPath, { ".json" });
 	s_Pages.reserve(filePaths.size());
 	for(auto filePath : filePaths) {
@@ -69,12 +88,8 @@ void UIBrowser::Load(const std::string& folderPath) {
 		auto name = p.stem().stem().stem().string();
 		auto filePathName = (fs::path(folderPath) / name).string();
 
-		if(name != "theme") {
-			auto& page = s_Pages.emplace_back(name);
-			page.SetTheme(s_Theme);
-			UILoader::Load(page, filePathName);
+		if(name != "theme")
 			UILoader::Compile(filePathName);
-		}
 	}
 
 	s_CurrentPage = &s_Pages[0];
@@ -82,9 +97,16 @@ void UIBrowser::Load(const std::string& folderPath) {
 
 void UIBrowser::Reload() {
 	for(auto& page : s_Pages) {
-		s_DLLs[page.Name] = UILoader::GetDLL(page.Name);
-		auto load = s_DLLs[page.Name]->GetFunction<void, UIPage*>("LoadObjects");
+		auto dll = UILoader::GetDLL(page.Name);
+		if(!dll) {
+			VOLCANICORE_LOG_WARNING(
+				"DLL Functions not found for page: %s", page.Name);
+			continue;
+		}
+
+		auto load = dll->GetFunction<void, UIPage*>("LoadObjects");
 		load(&page);
+		s_DLLs[page.Name] = dll;
 	}
 }
 
@@ -92,8 +114,11 @@ void UIBrowser::OnUpdate(TimeStep ts) {
 	if(!s_CurrentPage)
 		return;
 
-	auto gen = s_DLLs[s_CurrentPage->Name];
-	auto get = gen->GetFunction<UIObject*, std::string>("GetObject");
+	auto dll = s_DLLs[s_CurrentPage->Name];
+	if(!dll)
+		return;
+
+	auto get = dll->GetFunction<UIObject*, std::string>("GetObject");
 
 	s_CurrentPage->Traverse(
 		[&](UIElement* element)

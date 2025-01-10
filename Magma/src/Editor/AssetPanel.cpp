@@ -1,4 +1,4 @@
-#include "ContentBrowserPanel.h"
+#include "AssetPanel.h"
 
 #include <imgui/imgui.h>
 #include <imgui/imgui_internal.h>
@@ -6,16 +6,20 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
+#include <VolcaniCore/Core/Log.h>
+
 namespace Magma {
 
-ContentBrowserPanel::ContentBrowserPanel(const std::string& path)
-	: Panel("ContentBrowser"), m_Path(path) { }
+AssetPanel::AssetPanel(const std::string& path)
+	: Panel("Asset"), m_Path(path)
+{
+}
 
-void ContentBrowserPanel::Update(TimeStep ts) {
+void AssetPanel::Update(TimeStep ts) {
 
 }
 
-void ContentBrowserPanel::Render() {
+void AssetPanel::Draw() {
 	ImGui::Begin("Assets", &m_Open);
 	{
 

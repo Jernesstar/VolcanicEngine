@@ -33,6 +33,11 @@ UITab::UITab()
 	Setup();
 }
 
+UITab::UITab(const std::string& path) {
+	Lava::UILoader::Load(m_Root, path);
+	Setup();
+}
+
 UITab::UITab(const UI::UIPage& page)
 	: m_Root(page)
 {

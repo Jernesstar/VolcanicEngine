@@ -58,7 +58,7 @@ using namespace Lava;
 #include "Demos/Template.h"
 
 Application* CreateApplication(const CommandLineArgs& args) {
-	std::string project = args[1];
+	std::string project = args["--project"];
 
 	// Isometric Camera, smooth scroll pixels, instancing
 	if(project == "Cube") return new Demo::Cube();

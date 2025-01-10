@@ -1,5 +1,7 @@
 #pragma once
 
+#include <VolcaniCore/Core/CommandLineArgs.h>
+
 #include <Magma/Core/Project.h>
 
 #include "Tab.h"
@@ -12,7 +14,7 @@ namespace Magma {
 
 class EditorLayer {
 public:
-	EditorLayer();
+	EditorLayer(const CommandLineArgs& args);
 	~EditorLayer();
 
 	void Update(TimeStep ts);

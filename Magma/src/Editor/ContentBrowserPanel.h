@@ -8,14 +8,14 @@ namespace Magma {
 
 class ContentBrowserPanel : public Panel  {
 public:
-	ContentBrowserPanel();
+	ContentBrowserPanel(const std::string& path);
 	~ContentBrowserPanel() = default;
 
 	void Update(TimeStep ts);
 	void Render();
 
 private:
-	
+	std::string m_Path;
 };
 
 }

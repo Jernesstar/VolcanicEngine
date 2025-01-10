@@ -93,7 +93,7 @@ Cube::Cube()
 		});
 
 	drawPass = RenderPass::Create("Draw", shader);
-	// drawPass->SetOutput(framebuffer);
+	drawPass->SetOutput(framebuffer);
 
 	cube = Mesh::Create(MeshPrimitive::Cube,
 		Material
@@ -119,41 +119,6 @@ Cube::Cube()
 	controller.SetCamera(camera);
 	controller.RotationSpeed = 0.0f;
 	controller.TranslationSpeed = 20.0f;
-
-	// BufferLayout vertexLayout =
-	// 	{
-	// 		{
-	// 			{ "Position", BufferDataType::Vec3 },
-	// 			{ "Normal",	  BufferDataType::Vec3 },
-	// 			{ "TexCoord", BufferDataType::Vec2 },
-	// 		},
-	// 		true, // Dynamic
-	// 		false // Structure of arrays
-	// 	};
-
-	// BufferLayout instanceLayout =
-	// 	{
-	// 		{
-	// 			{ "Transform", BufferDataType::Mat4 }
-	// 		},
-	// 		true, // Dynamic
-	// 		true  // Structure of arrays
-	// 	};
-
-	// DrawBufferSpecification specs
-	// 	{
-	// 		vertexLayout,
-	// 		instanceLayout,
-	// 		1'000'000,
-	// 		1'000'000,
-	// 		100'000
-	// 	};
-
-	// buffer = RendererAPI::Get()->NewDrawBuffer(specs);
-	// buffer->AddIndices(Buffer(cube->GetIndices()));
-	// buffer->AddVertices(Buffer(cube->GetVertices()));
-	// buffer->AddIndices(Buffer(torch->GetIndices()));
-	// buffer->AddVertices(Buffer(torch->GetVertices()));
 
 	UIRenderer::Init();
 }
@@ -205,7 +170,7 @@ void Cube::OnUpdate(TimeStep ts) {
 	}
 	Renderer::EndPass();
 
-	// Renderer2D::DrawFullscreenQuad(framebuffer, AttachmentTarget::Color);
+	Renderer2D::DrawFullscreenQuad(drawPass->GetOutput(), AttachmentTarget::Color);
 	Renderer::Flush();
 
 	UIRenderer::EndFrame();

@@ -70,9 +70,9 @@ void ProjectLoader::Compile(const std::string& volcPath) {
 	auto srcPath   = (parentPath / "src").string();
 	auto assetPath = (parentPath / "asset").string();
 
-	UIBrowser::Load((fs::path(srcPath) / "UI").string());
+	auto genPath = fs::path("Lava") / "projects" / "UI" / "gen";
+	UIBrowser::Compile((fs::path(srcPath) / "UI").string(), genPath.string());
 	LoadSource(projNode, srcPath);
-	UIBrowser::Reload();
 
 	// LoadAssets(projNode, assetPath);
 }

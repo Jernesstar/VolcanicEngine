@@ -47,6 +47,7 @@ void SceneVisualizerPanel::Draw() {
 	auto flags = ImGuiWindowFlags_NoScrollbar
 			   | ImGuiWindowFlags_NoScrollWithMouse;
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0, 0 });
+	ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4{ 0.0f, 0.0f, 0.0f, 1.0f });
 	ImGui::Begin("Scene Visualizer", &m_Open, flags);
 	{
 		ImGui::PopStyleVar();
@@ -90,6 +91,7 @@ void SceneVisualizerPanel::Draw() {
 		}
 	}
 	ImGui::End();
+	ImGui::PopStyleColor();
 }
 
 void SceneVisualizerPanel::Renderer::Update(TimeStep ts) {

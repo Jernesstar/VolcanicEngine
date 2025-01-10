@@ -3,5 +3,5 @@
 #include <Editor/Editor.h>
 
 Application* CreateApplication(const CommandLineArgs& args) {
-	return new Magma::Editor();
+	return new Magma::Editor(args);
 }

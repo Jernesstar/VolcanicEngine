@@ -69,10 +69,10 @@ UIState UIRenderer::DrawWindow(UI::Window& window) {
 		});
 	ImGui::SetNextWindowSize(ImVec2(window.Width, window.Height));
 
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 1.0f);
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 1.0f);
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 10.0f);
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 10.0f);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding,
-						ImVec2(window.BorderWidth, window.BorderHeight));
+						ImVec2(0, 0));
 
 	ImGui::PushStyleColor(ImGuiCol_WindowBg, window.Color);
 	ImGui::PushStyleColor(ImGuiCol_Border, window.BorderColor);
@@ -86,7 +86,7 @@ UIState UIRenderer::DrawWindow(UI::Window& window) {
 				 | ImGuiWindowFlags_NoBringToFrontOnFocus
 				 | ImGuiWindowFlags_NoNavFocus;
 
-	// TODO(Implement): Window state
+	// TODO(Implement): WindowState
 	ImGui::Begin(window.GetID().c_str(), nullptr, windowFlags);
 	ImGui::PopStyleColor(2);
 	ImGui::PopStyleVar(3);
@@ -256,7 +256,7 @@ UIState UIRenderer::DrawTabBar(const std::string& name) {
 }
 
 TabState UIRenderer::DrawTab(const std::string& name) {
-	// s_Stack.push_back(UIType::Tab);
+	s_Stack.push_back(UIType::Tab);
 
 	ImVec2 size = ImGui::CalcTextSize(name.c_str());
 	float padding{4.0f};
@@ -264,6 +264,8 @@ TabState UIRenderer::DrawTab(const std::string& name) {
 	float radius{ tabHeight * 0.5f - padding };
 
 	ImGui::SetNextItemWidth(size.x + 6.0f*padding);
+
+	ImGui::PushID(s_Stack.size());
 	bool tabItem = ImGui::BeginTabItem(name.c_str());
 
 	ImVec2 pos;
@@ -276,6 +278,7 @@ TabState UIRenderer::DrawTab(const std::string& name) {
 		state.Hovered = ImGui::IsItemHovered();
 		ImGui::EndTabItem();
 	}
+	ImGui::PopID();
 
 	auto closeButtonID = ImGui::GetID(("CloseButton##" + name).c_str());
 	state.Closed = ImGui::CloseButton(closeButtonID, pos);
@@ -311,8 +314,8 @@ void UIRenderer::EndFrame() {
 			case UIType::TabBar:
 				ImGui::EndTabBar();
 				break;
-			case UIType::Tab:
-				ImGui::EndTabItem();
+			// case UIType::Tab:
+			// 	ImGui::EndTabItem();
 		}
 	}
 

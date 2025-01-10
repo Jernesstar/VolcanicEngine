@@ -11,6 +11,7 @@ namespace Magma {
 class UITab : public Tab {
 public:
 	UITab();
+	UITab(const std::string& path);
 	UITab(const UI::UIPage& page);
 	~UITab();
 

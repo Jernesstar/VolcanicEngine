@@ -1,6 +1,7 @@
 #pragma once
 
 #include <VolcaniCore/Core/Application.h>
+#include <VolcaniCore/Core/CommandLineArgs.h>
 
 #include "EditorLayer.h"
 
@@ -10,7 +11,7 @@ namespace Magma {
 
 class Editor : public Application {
 public:
-	Editor();
+	Editor(const CommandLineArgs& args);
 	~Editor();
 
 	void OnUpdate(TimeStep ts);

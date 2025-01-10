@@ -96,8 +96,10 @@ void Renderer::EndCommand() {
 }
 
 void Renderer::Clear() {
-	if(!s_DrawCommand)
+	if(!s_DrawCommand) {
 		RendererAPI::Get()->NewDrawCommand(nullptr)->Clear = true;
+		Renderer::Flush();
+	}
 	else
 		s_DrawCommand->Clear = true;
 }

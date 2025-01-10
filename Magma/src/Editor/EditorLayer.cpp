@@ -38,17 +38,24 @@ struct {
 	} tab;
 } menu;
 
-EditorLayer::EditorLayer() {
-	NewProject();
-	ProjectLoader::Load(m_Project, "./TestProj/.volc.proj");
-	Application::GetWindow()->SetTitle("Magma Editor: " + m_Project.Name);
-
-	auto tab = CreateRef<SceneTab>("Magma/assets/scenes/temp.magma.scene");
-	NewTab(tab);
+EditorLayer::EditorLayer(const CommandLineArgs& args) {
+	if(args["--project"]) {
+		ProjectLoader::Load(m_Project, args["--project"]);
+		Application::GetWindow()->SetTitle("Magma Editor: " + m_Project.Name);
+	}
+	for(auto& path : args["--scene"]) {
+		auto tab = CreateRef<SceneTab>(path);
+		NewTab(tab);
+	}
+	for(auto& path : args["--ui"]) {
+		auto tab = CreateRef<UITab>(path);
+		NewTab(tab);
+	}
 }
 
 EditorLayer::~EditorLayer() {
-
+	m_Tabs.clear();
+	m_Panels.clear();
 }
 
 void EditorLayer::Update(TimeStep ts) {
@@ -200,9 +207,9 @@ void EditorLayer::OpenTab() {
 		if(instance->IsOk()) {
 			fs::path path = instance->GetFilePathName();
 			if(path.extension() == ".json")
-				NewTab(UI::UIPage(path.string()));
+				NewTab(CreateRef<UITab>(path.string()));
 			else
-				NewTab(Scene(path.string()));
+				NewTab(CreateRef<SceneTab>(path.string()));
 		}
 
 		instance->Close();
@@ -260,13 +267,14 @@ void EditorLayer::OpenProject() {
 
 void EditorLayer::ReloadProject() {
 	menu.project.reloadProject = false;
-	// Reload
+	
+	Lava::ProjectLoader::Compile(m_Project.Path);
 }
 
 void EditorLayer::RunProject() {
 	menu.project.runProject = false;
 
-	std::string command = "./build/Lava/bin/Runtime " + m_Project.Path;
+	std::string command = "./build/Lava/bin/Runtime " + m_Project.Path + " -c";
 	system(command.c_str());
 }
 

@@ -1,5 +1,7 @@
 #include "Runtime.h"
 
+#include <filesystem>
+
 #include <VolcaniCore/Event/Events.h>
 
 #include <VolcaniCore/Graphics/Renderer.h>
@@ -7,9 +9,11 @@
 #include <Lava/ProjectLoader.h>
 #include <Lava/UIBrowser.h>
 
+namespace fs = std::filesystem;
+
 namespace Lava {
 
-Runtime::Runtime(const std::string& volcPath)
+Runtime::Runtime(const CommandLineArgs& args)
 	: Application(1920, 1080)
 {
 	Events::RegisterListener<KeyPressedEvent>(
@@ -19,16 +23,33 @@ Runtime::Runtime(const std::string& volcPath)
 				Application::Close();
 		});
 
+	if(!args["--project"]) {
+		VOLCANICORE_LOG_ERROR("No project specified");
+		Application::Close();
+	}
+
+	std::string volcPath = args["--project"];
 	Project project;
 	ProjectLoader::Load(project, volcPath);
-	ProjectLoader::Compile(volcPath);
+
+	auto path = (fs::path(volcPath).parent_path() / "src" / "UI");
+	UIBrowser::Load(path.string());
+
+	if(!args.Has("-c"))
+		ProjectLoader::Compile(volcPath);
 
 	m_AppDLL = ProjectLoader::GetDLL();
+	if(!m_AppDLL)
+		VOLCANICORE_LOG_ERROR(
+			"-c Flag used, though no DLLs could be found. \
+			Make sure to have previously called ProjectLoader::Compile");
+
+	UIBrowser::Reload();
+
+	m_AppDLL->GetFunction<void>("LoadApp")();
 
 	Application::GetWindow()->SetTitle(project.Name);
 	Application::PushDir(project.Path);
-
-	m_AppDLL->GetFunction<void>("LoadApp")();
 
 	App* app = Get();
 	app->App::OnLoad();

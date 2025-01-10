@@ -9,6 +9,8 @@ namespace Lava {
 class UIBrowser {
 public:
 	static void Load(const std::string& folderPath);
+	static void Compile(const std::string& folderPath,
+						const std::string& genPath);
 	static void Reload();
 
 	static void OnUpdate(TimeStep ts);

@@ -212,6 +212,7 @@ void SceneTab::AddEntity() {
 
 void SceneTab::OnScenePlay() {
 	m_SceneState = SceneState::Play;
+
 }
 
 void SceneTab::OnScenePause() {

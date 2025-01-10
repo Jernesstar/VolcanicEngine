@@ -1,6 +1,7 @@
 #pragma once
 
 #include <VolcaniCore/Core/Application.h>
+#include <VolcaniCore/Core/CommandLineArgs.h>
 
 #include <Magma/Core/DLL.h>
 
@@ -13,7 +14,7 @@ namespace Lava {
 
 class Runtime : public Application {
 public:
-	Runtime(const std::string& volcPath);
+	Runtime(const CommandLineArgs& args);
 	~Runtime();
 
 	void OnUpdate(TimeStep ts) override;

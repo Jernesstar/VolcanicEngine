@@ -11,8 +11,8 @@ using namespace Magma::UI;
 
 namespace Magma {
 
-Editor::Editor()
-	: Application(1920, 1080, "Magma Editor")
+Editor::Editor(const CommandLineArgs& args)
+	: Application(1920, 1080, "Magma Editor"), m_EditorLayer(args)
 {
 	Events::RegisterListener<KeyPressedEvent>(
 		[](const KeyPressedEvent& event)
@@ -30,7 +30,6 @@ Editor::~Editor() {
 
 void Editor::OnUpdate(TimeStep ts) {
 	Renderer::Clear();
-	Renderer::Flush();
 
 	UIRenderer::BeginFrame();
 	m_EditorLayer.Update(ts);
