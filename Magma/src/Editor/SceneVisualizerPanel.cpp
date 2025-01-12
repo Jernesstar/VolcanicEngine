@@ -13,6 +13,9 @@
 
 #include "UI/UIRenderer.h"
 
+#include "Tab.h"
+#include "SceneHierarchyPanel.h"
+
 using namespace Magma::ECS;
 
 namespace Magma {
@@ -51,6 +54,7 @@ void SceneVisualizerPanel::Draw() {
 	ImGui::Begin("Scene Visualizer", &m_Open, flags);
 	{
 		ImGui::PopStyleVar();
+		ImGui::PopStyleColor();
 
 		auto size = ImGui::GetWindowContentRegionMin();
 		auto offset = ImGui::GetWindowPos();
@@ -58,6 +62,19 @@ void SceneVisualizerPanel::Draw() {
 		auto height = size.y;
 
 		m_Image->Render();
+
+		if(ImGui::BeginDragDropTarget())
+		{
+			auto flags = ImGuiDragDropFlags_None
+					//    | ImGuiDragDropFlags_AcceptBeforeDelivery
+					//    | ImGuiDragDropFlags_AcceptNoPreviewTooltip
+					   ;
+			if(auto payload = ImGui::AcceptDragDropPayload("Image", flags))
+			{
+				
+			}
+			ImGui::EndDragDropTarget();
+		}
 
 		if(ImGui::IsMouseClicked(0) && ImGui::IsWindowHovered()) {
 			// auto& cameraController = m_Renderer.GetCameraController();
@@ -88,10 +105,11 @@ void SceneVisualizerPanel::Draw() {
 
 			// auto hitInfo = world.Raycast(worldStart, rayDir, maxDist);
 			// m_Selected.Collider = hitInfo.Actor;
+			auto hierarchy = m_Tab->GetPanel("SceneVisualizer")->As<SceneVisualizerPanel>();
+			// hierarchy->Select(entity);
 		}
 	}
 	ImGui::End();
-	ImGui::PopStyleColor();
 }
 
 void SceneVisualizerPanel::Renderer::Update(TimeStep ts) {

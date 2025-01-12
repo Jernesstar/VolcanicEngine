@@ -33,8 +33,10 @@ UI::~UI() {
 }
 
 void UI::OnUpdate(TimeStep ts) {
-	UIRenderer::BeginFrame();
+	Renderer::Clear();
 
+	UIRenderer::BeginFrame();
+	ImGui::ShowDemoWindow();
 	UIRenderer::EndFrame();
 }
 

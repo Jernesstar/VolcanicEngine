@@ -10,6 +10,11 @@
 
 #include "ECS/Component.h"
 
+#include "Tab.h"
+
+#include "SceneVisualizerPanel.h"
+#include "ComponentEditorPanel.h"
+
 using namespace Magma::ECS;
 
 namespace Magma {
@@ -71,8 +76,8 @@ void SceneHierarchyPanel::Draw() {
 
 			ImGui::OpenPopup(type);
 			if(ImGui::BeginPopup(type)) {
-				static std::string str = "Entity1";
-				ImGui::InputText("##Input", &str);
+				static std::string str;
+				ImGui::InputTextWithHint("##Input", "Enter entity name", &str);
 
 				if(ImGui::Button("Cancel"))
 					option = false;
@@ -107,14 +112,6 @@ void SceneHierarchyPanel::Draw() {
 	ImGui::End();
 }
 
-template<typename TComponent>
-static void DrawComponent(Entity& entity);
-
-template<>
-void DrawComponent<CameraComponent>(Entity& entity) {
-
-}
-
 void SceneHierarchyPanel::DrawEntityNode(Entity& entity) {
 	auto flags = ImGuiTreeNodeFlags_SpanAvailWidth
 			   | ImGuiTreeNodeFlags_OpenOnDoubleClick
@@ -131,24 +128,54 @@ void SceneHierarchyPanel::DrawEntityNode(Entity& entity) {
 		if(ImGui::IsMouseClicked(1) && ImGui::IsItemHovered())
 			ImGui::OpenPopup("Properties");
 
-		if(entity.Has<CameraComponent>())
-			if(ImGui::MenuItem("CameraComponent"))
-				;
-		if(entity.Has<MeshComponent>())
-			if(ImGui::MenuItem("MeshComponent"))
-				;
-		if(entity.Has<RigidBodyComponent>())
-			if(ImGui::MenuItem("RigidBodyComponent"))
-				;
-		if(entity.Has<TagComponent>())
-			if(ImGui::MenuItem("TagComponent"))
-				;
-		if(entity.Has<TransformComponent>())
-			if(ImGui::MenuItem("TransformComponent"))
-				;
-		if(entity.Has<ScriptComponent>())
-			if(ImGui::MenuItem("ScriptComponent"))
-				;
+		auto flags = ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Bullet;
+
+		auto editor = m_Tab->GetPanel("ComponentEditor")->As<ComponentEditorPanel>();
+		auto visual = m_Tab->GetPanel("SceneVisualizer")->As<SceneVisualizerPanel>();
+		visual->Select(entity);
+
+		if(entity.Has<CameraComponent>()) {
+			if(ImGui::TreeNodeEx("Component", flags, "CameraComponent")) {
+				editor->SetContext(entity);
+				// editor->SetFocus<CameraComponent>();
+				ImGui::TreePop();
+			}
+		}
+		if(entity.Has<MeshComponent>()){
+			if(ImGui::TreeNodeEx("Component", flags, "MeshComponent")) {
+				editor->SetContext(entity);
+				// editor->SetFocus<MeshComponent>();
+				ImGui::TreePop();
+			}
+		}
+		if(entity.Has<RigidBodyComponent>()){
+			if(ImGui::TreeNodeEx("Component", flags, "RigidBodyComponent")) {
+				editor->SetContext(entity);
+				// editor->SetFocus<RigidBodyComponent>();
+				ImGui::TreePop();
+			}
+		}
+		if(entity.Has<TagComponent>()){
+			if(ImGui::TreeNodeEx("Component", flags, "TagComponent")) {
+				editor->SetContext(entity);
+				// editor->SetFocus<TagComponent>();
+				ImGui::TreePop();
+			}
+		}
+		if(entity.Has<TransformComponent>()){
+			if(ImGui::TreeNodeEx("Component", flags, "TransformComponent")) {
+				editor->SetContext(entity);
+				// editor->SetFocus<TransformComponent>();
+				ImGui::TreePop();
+			}
+		}
+		if(entity.Has<ScriptComponent>()){
+			if(ImGui::TreeNodeEx("Component", flags, "ScriptComponent")) {
+				editor->SetContext(entity);
+				// editor->SetFocus<ScriptComponent>();
+				ImGui::TreePop();
+			}
+		}
 
 		if(ImGui::BeginPopup("Properties"))
 		{

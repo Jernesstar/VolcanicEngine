@@ -16,12 +16,14 @@
 
 #include <Lava/ProjectLoader.h>
 
+#include "AssetEditorPanel.h"
+#include "ContentBrowserPanel.h"
+
 using namespace VolcaniCore;
 using namespace Magma::UI;
 using namespace Lava;
 
 namespace Magma {
-
 struct {
 	struct {
 		bool newProject    = false;
@@ -36,12 +38,21 @@ struct {
 		bool reopenTab = false;
 		bool closeTab  = false;
 	} tab;
-} menu;
+} static menu;
 
 EditorLayer::EditorLayer(const CommandLineArgs& args) {
 	if(args["--project"]) {
 		ProjectLoader::Load(m_Project, args["--project"]);
 		Application::GetWindow()->SetTitle("Magma Editor: " + m_Project.Name);
+
+		namespace fs = std::filesystem;
+		auto path = fs::path(m_Project.Path);
+		auto panel1 = CreateRef<AssetEditorPanel>("");
+		auto panel2 = CreateRef<ContentBrowserPanel>(path.string());
+		panel1->Open();
+		panel2->Open();
+		m_Panels.push_back(panel1);
+		m_Panels.push_back(panel2);
 	}
 	for(auto& path : args["--scene"]) {
 		auto tab = CreateRef<SceneTab>(path);
@@ -61,6 +72,9 @@ EditorLayer::~EditorLayer() {
 void EditorLayer::Update(TimeStep ts) {
 	for(auto tab : m_Tabs)
 		tab->Update(ts);
+
+	for(auto panel : m_Panels)
+		panel->Update(ts);
 }
 
 void EditorLayer::Render() {
@@ -129,7 +143,6 @@ void EditorLayer::Render() {
 			if(ImGui::BeginTabItem("+", nullptr, ImGuiTabItemFlags_NoReorder)) {
 				if(ImGui::IsItemClicked())
 					menu.tab.newTab = true;
-
 				ImGui::EndTabItem();
 			}
 
@@ -149,6 +162,9 @@ void EditorLayer::Render() {
 
 		ImGuiID dockspaceID = ImGui::GetID("DockSpace");
 		ImGui::DockSpace(dockspaceID, ImVec2(0.0f, 0.0f), dockspaceFlags);
+
+		for(auto panel : m_Panels)
+			panel->Draw();
 
 		if(m_CurrentTab)
 			m_CurrentTab->Render();
@@ -192,6 +208,7 @@ void EditorLayer::NewTab(const UI::UIPage& page) {
 void EditorLayer::NewTab() {
 	menu.tab.newTab = false;
 	Ref<Tab> newTab = CreateRef<Tab>();
+	newTab->SetName("New Tab");
 	NewTab(newTab);
 }
 

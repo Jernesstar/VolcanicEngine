@@ -6,10 +6,10 @@
 
 namespace Magma {
 
-class AssetPanel : public Panel {
+class AssetEditorPanel : public Panel {
 public:
-	AssetPanel(const std::string& path);
-	~AssetPanel() = default;
+	AssetEditorPanel(const std::string& path);
+	~AssetEditorPanel() = default;
 
 	void Update(TimeStep ts) override;
 	void Draw() override;

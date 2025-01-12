@@ -26,7 +26,7 @@ void UILoader::Load(UIPage& page, const std::string& filePathName) {
 	if(!FileUtils::FileExists(jsonPath)) {
 		VOLCANICORE_LOG_ERROR(
 			"Could not find .magma.ui.json file with name %s",
-			filePathName.c_str());
+			name.c_str());
 		return;
 	}
 

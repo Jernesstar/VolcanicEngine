@@ -1,15 +1,14 @@
 #include "Panel.h"
 
+#include "Tab.h"
+
 namespace Magma {
 
 Panel::Panel(const std::string& name)
-	: Name(name)
-{
-	
-}
+	: Name(name) { }
 
-Panel::~Panel() {
-	
+void Panel::SetTab(Tab* tab) {
+	m_Tab = tab;
 }
 
 }

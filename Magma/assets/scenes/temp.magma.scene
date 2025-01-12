@@ -636,13 +636,3 @@ Scene:
               Translation: [0, 0, 0]
               Rotation: [0, 0, 0]
               Scale: [1, 1, 1]
-    - Entity:
-        ID: 598
-        Components:
-          TagComponent:
-            Tag: Cube10
-          TransformComponent:
-            Transform:
-              Translation: [-6, 9, 3]
-              Rotation: [0, 0, 0]
-              Scale: [1, 1, 1]

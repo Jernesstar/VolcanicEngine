@@ -13,6 +13,8 @@ Button::Button(const glm::vec4& color, const std::string& text,
 {
 	Color = color;
 	Display = CreateRef<Text>(text, textColor);
+	x = -1;
+	y = -1;
 }
 
 Button::Button(const std::string& imagePath)

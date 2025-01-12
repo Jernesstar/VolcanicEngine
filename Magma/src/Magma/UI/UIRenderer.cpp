@@ -121,7 +121,8 @@ UIState UIRenderer::DrawButton(UI::Button& button) {
 	}
 
 	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 0, 0 });
-	ImGui::SetCursorPos(ImVec2(button.x, button.y));
+	if(button.x >= 0 && button.y >= 0)
+		ImGui::SetCursorPos(ImVec2(button.x, button.y));
 	ButtonFunction(button.Display, ImVec2(button.Width, button.Height));
 	ImGui::PopStyleVar();
 
@@ -267,6 +268,7 @@ TabState UIRenderer::DrawTab(const std::string& name) {
 
 	ImGui::PushID(s_Stack.size());
 	bool tabItem = ImGui::BeginTabItem(name.c_str());
+	ImGui::PopID();
 
 	ImVec2 pos;
 	pos.x = ImGui::GetItemRectMax().x - radius - 5.0f*padding;
@@ -278,16 +280,15 @@ TabState UIRenderer::DrawTab(const std::string& name) {
 		state.Hovered = ImGui::IsItemHovered();
 		ImGui::EndTabItem();
 	}
-	ImGui::PopID();
 
-	auto closeButtonID = ImGui::GetID(("CloseButton##" + name).c_str());
+	auto closeButtonID = ImGui::GetID((int*)s_Stack.size());
 	state.Closed = ImGui::CloseButton(closeButtonID, pos);
 
 	return state;
 }
 
 void UIRenderer::ShowPopupLabel(const std::string& str) {
-
+	ImGui::SetItemTooltip(str.c_str());
 }
 
 void UIRenderer::BeginFrame() {

@@ -7,9 +7,10 @@
 
 #include <Lava/SceneLoader.h>
 
+#include "Tab.h"
 #include "SceneHierarchyPanel.h"
 #include "SceneVisualizerPanel.h"
-// #include "ComponentPanel.h"
+#include "ComponentEditorPanel.h"
 
 namespace Magma {
 
@@ -26,17 +27,21 @@ struct {
 } static menu;
 
 SceneTab::SceneTab()
-	: m_Scene("New Scene")
+	: Tab(TabType::Scene), m_Scene("New Scene")
 {
 	Setup();
 }
 
-SceneTab::SceneTab(const Scene& scene) {
+SceneTab::SceneTab(const Scene& scene)
+	: Tab(TabType::Scene)
+{
 	m_Scene = scene;
 	Setup();
 }
 
-SceneTab::SceneTab(const std::string& path) {
+SceneTab::SceneTab(const std::string& path)
+	: Tab(TabType::Scene)
+{
 	SetScene(path);
 	Setup();
 }
@@ -48,14 +53,9 @@ SceneTab::~SceneTab() {
 }
 
 void SceneTab::Setup() {
-	auto panel1 = CreateRef<SceneHierarchyPanel>(&m_Scene);
-	panel1->Close();
-	auto panel2 = CreateRef<SceneVisualizerPanel>(&m_Scene);
-	panel2->Close();
-
-	m_Panels.push_back(panel1);
-	m_Panels.push_back(panel2);
-	// TODO(Implement): ComponentPanel
+	AddPanel<SceneHierarchyPanel>(&m_Scene)->SetTab(this);
+	AddPanel<SceneVisualizerPanel>(&m_Scene)->SetTab(this);
+	AddPanel<ComponentEditorPanel>()->SetTab(this);
 
 	m_PlayButton = CreateRef<UI::Button>();
 	m_PlayButton->Display =
@@ -87,22 +87,14 @@ void SceneTab::SetScene(const Scene& scene) {
 
 void SceneTab::SetScene(const std::string& path) {
 	Lava::SceneLoader::Load(m_Scene, path);
+	m_Name = "Scene: " + m_Scene.Name;
 	m_ScenePath = path;
 }
 
 void SceneTab::Update(TimeStep ts) {
-	m_Name = "Scene: " + m_Scene.Name;
-
-	auto hierarchy = GetPanel("SceneHierarchy")->As<SceneHierarchyPanel>();
-	auto visual = GetPanel("SceneVisualizer")->As<SceneVisualizerPanel>();
-
-	visual->Select(hierarchy->GetSelected());
-
 	for(auto panel : m_Panels)
 		if(panel->IsOpen())
 			panel->Update(ts);
-
-	hierarchy->Select(visual->GetSelected());
 }
 
 void SceneTab::Render() {
@@ -179,8 +171,7 @@ void SceneTab::OpenScene() {
 	if(instance->Display("ChooseFile")) {
 		if(instance->IsOk()) {
 			std::string path = instance->GetFilePathName();
-			Lava::SceneLoader::Load(m_Scene, path);
-			m_ScenePath = path;
+			SetScene(path);
 		}
 
 		instance->Close();
@@ -234,16 +225,15 @@ void SceneTab::ToolbarUI() {
 	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.f, 0.f, 0.f, 0.f));
 
 	auto flags = ImGuiWindowFlags_NoDecoration
-			   | ImGuiWindowFlags_NoScrollbar
 			   | ImGuiWindowFlags_NoScrollWithMouse
-			   | ImGuiWindowFlags_NoResize
 			   | ImGuiWindowFlags_NoScrollbar
+			   | ImGuiWindowFlags_NoResize
 			   | ImGuiWindowFlags_NoMove
 			   | ImGuiWindowFlags_NoTitleBar;
 	ImGui::Begin("##toolbar", nullptr, flags);
 	{
 		float size = ImGui::GetWindowHeight() - 2.0f;
-		auto x = 0.5f*ImGui::GetWindowContentRegionMax().x - 0.5f*size;
+		auto x = 0.5f * (ImGui::GetWindowContentRegionMax().x - size);
 		auto button = m_PlayButton;
 		if(m_SceneState == SceneState::Play)
 			button = m_PauseButton;

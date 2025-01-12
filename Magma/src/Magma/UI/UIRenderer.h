@@ -10,9 +10,9 @@
 namespace Magma::UI {
 
 struct TabState {
-	bool Clicked;
-	bool Hovered;
-	bool Closed;
+	bool Clicked = false;
+	bool Hovered = false;
+	bool Closed = false;
 };
 
 class UIRenderer {

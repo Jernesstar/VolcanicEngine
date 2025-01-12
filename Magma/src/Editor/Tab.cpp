@@ -7,12 +7,6 @@
 
 namespace Magma {
 
-void Tab::Render() {
-	// TODO(Implement): Dialog box to pick which kind of new tab to create:
-	// Scene, UI, or Level
-	// Allow drag and drop from AssetPanel to turn into appropriate tab
-}
-
 void Tab::AddPanel(Ref<Panel> panel) {
 	m_Panels.push_back(panel);
 }

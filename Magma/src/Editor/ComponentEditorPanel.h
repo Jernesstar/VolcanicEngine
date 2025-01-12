@@ -2,24 +2,28 @@
 
 #include "Panel.h"
 
-#include "Entity.h"
+#include <Magma/ECS/Entity.h>
 
 using namespace Magma::ECS;
 
 namespace Magma {
 
-class ComponentPanel : public Panel {
+class ComponentEditorPanel : public Panel {
 public:
-	ComponentPanel();
-	~ComponentPanel() = default;
+	ComponentEditorPanel();
+	~ComponentEditorPanel() = default;
 
 	void SetContext(Entity& entity);
+
+	template<typename TComponent>
+	void SetFocus();
 
 	void Update(TimeStep ts) override;
 	void Draw() override;
 
 private:
 	Entity m_Context;
+	uint32_t m_ComponentFocus;
 };
 
 }

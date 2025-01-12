@@ -5,7 +5,8 @@
 #include <imgui/misc/cpp/imgui_stdlib.h>
 #include <ImGuiFileDialog/ImGuiFileDialog.h>
 
-// #include <Magma/UI/UIPage.h>
+#include <VolcaniCore/Core/Application.h>
+#include <VolcaniCore/Core/FileUtils.h>
 
 #include "UIElementPickerPanel.h"
 #include "UIVisualizerPanel.h"
@@ -25,21 +26,23 @@ struct {
 		bool addButton = false;
 		bool addImage = false;
 	} edit;
-} menu;
+} static menu;
 
 UITab::UITab()
-	: m_Root("")
+	: Tab(TabType::UI), m_Root("")
 {
 	Setup();
 }
 
-UITab::UITab(const std::string& path) {
-	Lava::UILoader::Load(m_Root, path);
+UITab::UITab(const std::string& path)
+	: Tab(TabType::UI)
+{
+	SetUI(path);
 	Setup();
 }
 
 UITab::UITab(const UI::UIPage& page)
-	: m_Root(page)
+	: Tab(TabType::UI), m_Root(page)
 {
 	Setup();
 }
@@ -84,7 +87,6 @@ void UITab::Render() {
 			if(ImGui::BeginMenu("View")) {
 				if(ImGui::MenuItem(panel->Name.c_str()))
 					panel->Open();
-
 				ImGui::EndMenu();
 			}
 		}
@@ -109,26 +111,28 @@ void UITab::Render() {
 }
 
 void UITab::Setup() {
-	auto panel1 = CreateRef<UIElementPickerPanel>(&m_Root);
-	panel1->Close();
-	auto panel2 = CreateRef<UIVisualizerPanel>(&m_Root);
-	panel2->Close();
-
-	m_Panels.push_back(panel1);
-	m_Panels.push_back(panel2);
+	AddPanel<UIElementPickerPanel>(&m_Root);
+	AddPanel<UIVisualizerPanel>(&m_Root);
 }
 
 void UITab::SetUI(const std::string& path) {
+	namespace fs = std::filesystem;
+
 	m_Root.Clear();
 	Lava::UILoader::Load(m_Root, path);
+	Application::GetWindow()->SetTitle("UI: " +
+										fs::path(path).filename().string());
 }
 
 void UITab::NewUI() {
 	m_Root.Clear();
 	menu.file.newUI = false;
+	Application::GetWindow()->SetTitle("UI");
 }
 
 void UITab::OpenUI() {
+	namespace fs = std::filesystem;
+
 	IGFD::FileDialogConfig config;
 	config.path = ".";
 	auto instance = ImGuiFileDialog::Instance();
@@ -136,8 +140,8 @@ void UITab::OpenUI() {
 
 	if(instance->Display("ChooseFile")) {
 		if(instance->IsOk()) {
-			std::string path = instance->GetFilePathName();
-			SetUI(path);
+			fs::path path = instance->GetFilePathName();
+			SetUI(path.stem().stem().stem().string());
 		}
 
 		instance->Close();
@@ -163,18 +167,18 @@ void UITab::SaveUI() {
 }
 
 void UITab::AddWindow() {
-
 	menu.edit.addWindow = false;
+
 }
 
 void UITab::AddButton() {
-
 	menu.edit.addButton = false;
+
 }
 
 void UITab::AddImage() {
-
 	menu.edit.addImage = false;
+
 }
 
 }
