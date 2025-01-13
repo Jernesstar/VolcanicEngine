@@ -25,9 +25,10 @@ void ContentBrowserPanel::Update(TimeStep ts) {
 }
 
 static bool HasExtension(fs::path path, const List<std::string>& extensions) {
-	for(const auto& ext : extensions)
-		if(path.extension() == ext)
-			return true;
+	if(path.string() != "")
+		for(const auto& ext : extensions)
+			if(path.extension() == ext)
+				return true;
 
 	return false;
 }
@@ -39,30 +40,49 @@ void ContentBrowserPanel::Draw() {
 		auto childFlags = ImGuiChildFlags_Border;
 		ImVec2 size = { 200, ImGui::GetContentRegionAvail().y };
 
-		ImGui::BeginChild("##File-Hierarchy", size, childFlags, windowFlags);
+		ImGui::BeginChild("File-Hierarchy-View", size, childFlags, windowFlags);
 		{
 			ImVec2 windowStart = ImGui::GetCursorPos();
 			ImGuiStyle& style = ImGui::GetStyle();
 			const ImGuiWindow* window = ImGui::GetCurrentWindow();
-			const ImRect titleBarRect = window->TitleBarRect();
+			ImRect rect = window->MenuBarRect();
 
-			ImGui::PushClipRect(titleBarRect.Min, titleBarRect.Max, false);
+			ImGui::PushClipRect(rect.Min, rect.Max, false);
 			{
 				float x = style.FramePadding.x
 						+ ImGui::GetCurrentContext()->FontSize
 						+ style.ItemInnerSpacing.x;
-				ImGui::SetCursorPos({ x, style.FramePadding.y });
+				float y = style.FramePadding.y;
+				ImGui::SetCursorPos({ x, y });
 				ImGui::Text("File Hierarchy");
 			}
 			ImGui::PopClipRect();
 			ImGui::SetCursorPos(windowStart);
+
 		}
 		ImGui::EndChild();
 
 		ImGui::SameLine();
 
-		ImGui::BeginChild("##Assets", { }, childFlags, windowFlags);
+		ImGui::BeginChild("Assets-View", { }, childFlags, windowFlags);
 		{
+			ImVec2 windowStart = ImGui::GetCursorPos();
+			ImGuiStyle& style = ImGui::GetStyle();
+			const ImGuiWindow* window = ImGui::GetCurrentWindow();
+			ImRect rect = window->MenuBarRect();
+
+			ImGui::PushClipRect(rect.Min, rect.Max, false);
+			{
+				float x = style.FramePadding.x
+						+ ImGui::GetCurrentContext()->FontSize
+						+ style.ItemInnerSpacing.x;
+				float y = style.FramePadding.y;
+				ImGui::SetCursorPos({ x, y });
+				ImGui::Text("Assets");
+			}
+			ImGui::PopClipRect();
+			ImGui::SetCursorPos(windowStart);
+
 			static float padding = 16.0f;
 			static float thumbnailSize = 128.0f;
 			static float cellSize = thumbnailSize + padding;
@@ -71,15 +91,17 @@ void ContentBrowserPanel::Draw() {
 			int32_t columnCount = (int32_t)(panelWidth / cellSize);
 			columnCount = columnCount ? columnCount : 1;
 
-			static int32_t change = 0;
-			fs::path newPath;
-			if(change)
+			static fs::path m_CurrentAssetPath = m_AssetPath;
+
+			int32_t delta = 0;
+			static fs::path newPath;
+			if(m_CurrentAssetPath != m_AssetPath)
 				if(ImGui::Button("<-"))
-					change--;
+					m_CurrentAssetPath = m_CurrentAssetPath.parent_path();
 
 			if(ImGui::BeginTable("AssetsTable", columnCount))
 			{
-				for(auto p : FileUtils::GetFiles(m_CurrentPath.string())) {
+				for(auto p : FileUtils::GetFiles(m_CurrentAssetPath.string())) {
 					fs::path path(p);
 					UI::Button button;
 					button.Width = thumbnailSize;
@@ -89,39 +111,43 @@ void ContentBrowserPanel::Draw() {
 					if(fs::is_directory(path)) {
 						button.Display = m_FolderIcon;
 						if(UI::UIRenderer::DrawButton(button).Clicked) {
-							change++;
+							delta++;
 							newPath = path;
 						}
 					}
 					else {
 						button.Display = m_FileIcon;
-						UI::UIRenderer::DrawButton(button);
+						if(UI::UIRenderer::DrawButton(button).Clicked)
+							newPath = path;
 					}
-					ImGui::Text(path.stem().string().c_str());
 
-					// std::string type;
-					// if(HasExtension(path, { ".png", ".jpeg", ".jpg", ".webp" })) {
-					// 	type = "Image";
-					// }
-					// if(ImGui::BeginDragDropSource())
-					// {
-					// 	ImGui::SetDragDropPayload("Image",
-					// 		(void*)p.c_str(), p.size() * sizeof(const char*),
-					// 		ImGuiCond_Once);
+					std::string type = "";
+					if(HasExtension(newPath, { ".png", ".jpeg", ".jpg", ".webp" })) {
+						type = "Image";
+					}
+					else if(HasExtension(newPath, { ".obj", ".gltf" })) {
+						type = "Model";
+					}
 
-					// 	ImGui::EndDragDropSource();
-					// }
+					if(type != "" && newPath.string() != "")
+						if(ImGui::BeginDragDropSource())
+						{
+							ImGui::SetDragDropPayload(type.c_str(),
+								newPath.string().c_str(),
+								(newPath.string().size() + 1) * sizeof(char),
+								ImGuiCond_Once);
+
+							ImGui::Text(newPath.filename().string().c_str());
+							ImGui::EndDragDropSource();
+						}
+					ImGui::TextWrapped(path.filename().string().c_str());
 				}
 
 				ImGui::EndTable();
 			}
 
-			if(change < 0) {
-				m_CurrentPath = m_CurrentPath.parent_path();
-			}
-			else if(change > 0) {
-				m_CurrentPath /= newPath;
-			}
+			if(delta > 0)
+				m_CurrentAssetPath = newPath;
 		}
 		ImGui::EndChild();
 

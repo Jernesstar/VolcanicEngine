@@ -43,6 +43,12 @@ void SceneVisualizerPanel::Update(TimeStep ts) {
 	// m_Renderer.Update(ts);
 }
 
+struct {
+	struct {
+		std::string mesh;
+	} add;
+} static options;
+
 void SceneVisualizerPanel::Draw() {
 	// m_Context->OnRender(m_Renderer);
 	// VolcaniCore::Renderer::Flush();
@@ -63,17 +69,67 @@ void SceneVisualizerPanel::Draw() {
 
 		m_Image->Render();
 
+		auto& world = m_Context->EntityWorld;
+
 		if(ImGui::BeginDragDropTarget())
 		{
 			auto flags = ImGuiDragDropFlags_None
-					//    | ImGuiDragDropFlags_AcceptBeforeDelivery
+					   | ImGuiDragDropFlags_AcceptBeforeDelivery
 					//    | ImGuiDragDropFlags_AcceptNoPreviewTooltip
 					   ;
 			if(auto payload = ImGui::AcceptDragDropPayload("Image", flags))
 			{
-				
+				if(!payload->IsDelivery()) {
+					ImGui::SetMouseCursor(ImGuiMouseCursor_NotAllowed);
+					ImGui::SetTooltip("Can't drop here yet!");
+				}
+				else {
+					VOLCANICORE_LOG_INFO("Delivered");
+				}
+			}
+			if(auto payload = ImGui::AcceptDragDropPayload("Model", flags))
+			{
+				if(payload->IsDelivery()) {
+					ImGui::OpenPopup("Create Entity with MeshComponent");
+					options.add.mesh = std::string((const char*)payload->Data);
+				}
 			}
 			ImGui::EndDragDropTarget();
+		}
+
+		if(ImGui::BeginPopupModal("Create Entity with MeshComponent")) {
+			static std::string str;
+			static std::string hint = "Enter entity name";
+			ImGui::InputTextWithHint("##Input", hint.c_str(), &str);
+
+			if(ImGui::Button("Cancel"))
+				ImGui::CloseCurrentPopup();
+			else {
+				ImGui::SameLine();
+				if(ImGui::Button("Create")
+				|| ImGui::IsKeyPressed(ImGuiKey_Enter, false))
+				{
+					Entity newEntity;
+					bool exit = true;
+					if(str != "") {
+						if(world.GetEntity(str).IsValid()) {
+							exit = false;
+							str = "";
+							hint = "Entity name must be unique";
+						}
+						else
+							newEntity = world.AddEntity(str);
+					}
+					else
+						newEntity = world.AddEntity();
+
+					if(exit) {
+						newEntity.Add<MeshComponent>(options.add.mesh);
+						ImGui::CloseCurrentPopup();
+					}
+				}
+			}
+			ImGui::EndPopup();
 		}
 
 		if(ImGui::IsMouseClicked(0) && ImGui::IsWindowHovered()) {

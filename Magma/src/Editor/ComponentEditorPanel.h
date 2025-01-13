@@ -18,6 +18,9 @@ public:
 	template<typename TComponent>
 	void SetFocus();
 
+	template<typename TComponent>
+	bool IsFocused();
+
 	void Update(TimeStep ts) override;
 	void Draw() override;
 

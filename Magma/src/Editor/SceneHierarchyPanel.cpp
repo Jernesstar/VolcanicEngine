@@ -116,63 +116,78 @@ void SceneHierarchyPanel::DrawEntityNode(Entity& entity) {
 	auto flags = ImGuiTreeNodeFlags_SpanAvailWidth
 			   | ImGuiTreeNodeFlags_OpenOnDoubleClick
 			   | ImGuiTreeNodeFlags_OpenOnArrow;
-	if(m_Selected && entity == m_Selected)
+	if(entity == m_Selected)
 		flags |= ImGuiTreeNodeFlags_Selected;
 
-	auto tag = entity.Get<TagComponent>().Tag.c_str();
 	auto id = (void*)(uint64_t)(uint32_t)entity.GetHandle();
+	std::string tag;
+	if(entity.Has<TagComponent>()) {
+		tag = entity.Get<TagComponent>().Tag.c_str();
+	}
+	else
+		tag = std::to_string(entity.GetHandle());
 
-	if(ImGui::TreeNodeEx(id, flags, tag)) {
+	if(ImGui::TreeNodeEx(id, flags, tag.c_str())) {
 		if(ImGui::IsMouseClicked(0) && ImGui::IsItemHovered())
 			m_Selected = entity;
 		if(ImGui::IsMouseClicked(1) && ImGui::IsItemHovered())
 			ImGui::OpenPopup("Properties");
 
-		auto flags = ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Bullet;
+		auto editor =
+			m_Tab->GetPanel("ComponentEditor")->As<ComponentEditorPanel>();
+		auto visual =
+			m_Tab->GetPanel("SceneVisualizer")->As<SceneVisualizerPanel>();
 
-		auto editor = m_Tab->GetPanel("ComponentEditor")->As<ComponentEditorPanel>();
-		auto visual = m_Tab->GetPanel("SceneVisualizer")->As<SceneVisualizerPanel>();
+		editor->SetContext(entity);
 		visual->Select(entity);
 
+		auto flags = ImGuiTreeNodeFlags_Bullet
+					| ImGuiTreeNodeFlags_OpenOnDoubleClick;
 		if(entity.Has<CameraComponent>()) {
-			if(ImGui::TreeNodeEx("Component", flags, "CameraComponent")) {
-				editor->SetContext(entity);
-				// editor->SetFocus<CameraComponent>();
+			auto addFlags = editor->IsFocused<CameraComponent>() ?
+				ImGuiTreeNodeFlags_Selected : 0;
+			if(ImGui::TreeNodeEx("Component", flags | addFlags, "CameraComponent")) {
+				editor->SetFocus<CameraComponent>();
 				ImGui::TreePop();
 			}
 		}
-		if(entity.Has<MeshComponent>()){
-			if(ImGui::TreeNodeEx("Component", flags, "MeshComponent")) {
-				editor->SetContext(entity);
-				// editor->SetFocus<MeshComponent>();
+		if(entity.Has<MeshComponent>()) {
+			auto addFlags = editor->IsFocused<MeshComponent>() ?
+				ImGuiTreeNodeFlags_Selected : 0;
+			if(ImGui::TreeNodeEx("Component", flags | addFlags, "MeshComponent")) {
+				editor->SetFocus<MeshComponent>();
 				ImGui::TreePop();
 			}
 		}
-		if(entity.Has<RigidBodyComponent>()){
-			if(ImGui::TreeNodeEx("Component", flags, "RigidBodyComponent")) {
-				editor->SetContext(entity);
-				// editor->SetFocus<RigidBodyComponent>();
+		if(entity.Has<RigidBodyComponent>()) {
+			auto addFlags = editor->IsFocused<RigidBodyComponent>() ?
+				ImGuiTreeNodeFlags_Selected : 0;
+			if(ImGui::TreeNodeEx("Component", flags | addFlags, "RigidBodyComponent")) {
+				editor->SetFocus<RigidBodyComponent>();
 				ImGui::TreePop();
 			}
 		}
-		if(entity.Has<TagComponent>()){
-			if(ImGui::TreeNodeEx("Component", flags, "TagComponent")) {
-				editor->SetContext(entity);
-				// editor->SetFocus<TagComponent>();
+		if(entity.Has<TagComponent>()) {
+			auto addFlags = editor->IsFocused<TagComponent>() ?
+				ImGuiTreeNodeFlags_Selected : 0;
+			if(ImGui::TreeNodeEx("Component", flags | addFlags, "TagComponent")) {
+				editor->SetFocus<TagComponent>();
 				ImGui::TreePop();
 			}
 		}
-		if(entity.Has<TransformComponent>()){
-			if(ImGui::TreeNodeEx("Component", flags, "TransformComponent")) {
-				editor->SetContext(entity);
-				// editor->SetFocus<TransformComponent>();
+		if(entity.Has<TransformComponent>()) {
+			auto addFlags = editor->IsFocused<TransformComponent>() ?
+				ImGuiTreeNodeFlags_Selected : 0;
+			if(ImGui::TreeNodeEx("Component", flags | addFlags, "TransformComponent")) {
+				editor->SetFocus<TransformComponent>();
 				ImGui::TreePop();
 			}
 		}
-		if(entity.Has<ScriptComponent>()){
-			if(ImGui::TreeNodeEx("Component", flags, "ScriptComponent")) {
-				editor->SetContext(entity);
-				// editor->SetFocus<ScriptComponent>();
+		if(entity.Has<ScriptComponent>()) {
+			auto addFlags = editor->IsFocused<ScriptComponent>() ?
+				ImGuiTreeNodeFlags_Selected : 0;
+			if(ImGui::TreeNodeEx("Component", flags | addFlags, "ScriptComponent")) {
+				editor->SetFocus<ScriptComponent>();
 				ImGui::TreePop();
 			}
 		}
