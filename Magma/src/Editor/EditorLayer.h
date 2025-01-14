@@ -20,6 +20,10 @@ public:
 	void Update(TimeStep ts);
 	void Render();
 
+	void NewTab(Ref<Tab> tab);
+	void NewTab(const Scene& scene);
+	void NewTab(const UI::UIPage& page);
+
 private:
 	Project m_Project;
 	Ref<Tab> m_CurrentTab;
@@ -27,9 +31,6 @@ private:
 	List<Ref<Tab>> m_ClosedTabs;
 	List<Ref<Panel>> m_Panels;
 
-	void NewTab(Ref<Tab> tab);
-	void NewTab(const Scene& scene);
-	void NewTab(const UI::UIPage& page);
 	void NewTab();
 	void OpenTab();
 	void ReopenTab();

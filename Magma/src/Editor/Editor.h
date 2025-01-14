@@ -16,6 +16,8 @@ public:
 
 	void OnUpdate(TimeStep ts);
 
+	EditorLayer& GetEditor() { return m_EditorLayer; }
+
 private:
 	EditorLayer m_EditorLayer;
 };

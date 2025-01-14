@@ -14,19 +14,28 @@ namespace Lava {
 
 static void LoadElement(UIPage& page, const rapidjson::Value& elementNode);
 
-void UILoader::Load(UIPage& page, const std::string& filePathName) {
+void UILoader::Load(UIPage& page, const std::string& path) {
 	using namespace rapidjson;
 
-	if(filePathName == "")
+	if(path == "")
 		return;
 
-	auto name = fs::path(filePathName).stem().string();
-	auto jsonPath = filePathName + ".magma.ui.json";
+	std::string name;
+	std::string jsonPath;
+	fs::path filePathName = path;
+	if(fs::path(filePathName).has_extension()) {
+		name = filePathName.stem().stem().stem().string();
+		jsonPath = filePathName.string() + ".magma.ui.json";
+	}
+	else {
+		name = filePathName.stem().string();
+		jsonPath = path;
+	}
 
 	if(!FileUtils::FileExists(jsonPath)) {
 		VOLCANICORE_LOG_ERROR(
 			"Could not find .magma.ui.json file with name %s",
-			name.c_str());
+			filePathName.string().c_str());
 		return;
 	}
 

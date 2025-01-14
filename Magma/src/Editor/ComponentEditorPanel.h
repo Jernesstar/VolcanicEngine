@@ -18,8 +18,10 @@ public:
 	template<typename TComponent>
 	void SetFocus();
 
+	void ClearFocus();
+
 	template<typename TComponent>
-	bool IsFocused();
+	bool IsFocused(Entity& entity);
 
 	void Update(TimeStep ts) override;
 	void Draw() override;
