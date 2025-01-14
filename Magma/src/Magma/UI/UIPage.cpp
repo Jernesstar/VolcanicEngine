@@ -74,21 +74,46 @@ UINode UIPage::Add(UIElementType type, const std::string& id) {
 	return { UIElementType::None, 0 };
 }
 
+void UIPage::Add(const UINode& node) {
+	m_FirstOrders.push_back(node);
+}
+
+void UIPage::Parent(const UINode& node, const UINode& parent) {
+	if(!Get(node))
+		return;
+
+	bool firstOrder = !Get(node)->GetParent();
+	Get(node)->SetParent(parent);
+
+	if(!firstOrder)
+		return;
+
+	auto it = std::find(m_FirstOrders.begin(), m_FirstOrders.end(), node);
+	uint32_t index = std::distance(m_FirstOrders.begin(), it);
+	m_FirstOrders.erase(it);
+}
+
 UIElement* UIPage::Get(const UINode& node) const {
 	// TODO(Fix): The pointers might become invalid if the map reallocates
 	switch(node.first) {
 		case UIElementType::Window:
-			return (UIElement*)&Windows[node.second];
+			if(node.second < Windows.size())
+				return (UIElement*)&Windows[node.second];
 		case UIElementType::Button:
-			return (UIElement*)&Buttons[node.second];
+			if(node.second < Buttons.size())
+				return (UIElement*)&Buttons[node.second];
 		case UIElementType::Dropdown:
-			return (UIElement*)&Dropdowns[node.second];
+			if(node.second < Dropdowns.size())
+				return (UIElement*)&Dropdowns[node.second];
 		case UIElementType::Text:
-			return (UIElement*)&Texts[node.second];
+			if(node.second < Texts.size())
+				return (UIElement*)&Texts[node.second];
 		case UIElementType::TextInput:
-			return (UIElement*)&TextInputs[node.second];
+			if(node.second < TextInputs.size())
+				return (UIElement*)&TextInputs[node.second];
 		case UIElementType::Image:
-			return (UIElement*)&Images[node.second];
+			if(node.second < Images.size())
+				return (UIElement*)&Images[node.second];
 	}
 
 	return nullptr;

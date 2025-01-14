@@ -138,21 +138,22 @@ void EditorLayer::Render() {
 		}
 		ImGui::EndMainMenuBar();
 
-		ImGui::BeginTabBar("Tabs", ImGuiTabBarFlags_Reorderable);
+		auto tabBarFlags = ImGuiTabBarFlags_Reorderable
+						 | ImGuiTabBarFlags_TabListPopupButton;
+		ImGui::BeginTabBar("Tabs", tabBarFlags);
 		{
-			if(ImGui::BeginTabItem("+", nullptr, ImGuiTabItemFlags_NoReorder)) {
-				if(ImGui::IsItemClicked())
-					menu.tab.newTab = true;
-				ImGui::EndTabItem();
-			}
+			auto leadingFlags = ImGuiTabItemFlags_Leading
+							  | ImGuiTabItemFlags_NoReorder;
+			if(ImGui::TabItemButton("+", leadingFlags))
+				menu.tab.newTab = true;
 
 			Ref<Tab> tabToDelete = nullptr;
 			for(auto tab : m_Tabs) {
 				TabState state = UIRenderer::DrawTab(tab->GetName());
-				if(state.Clicked)
-					m_CurrentTab = tab;
 				if(state.Closed)
 					tabToDelete = tab;
+				else if(state.Clicked)
+					m_CurrentTab = tab;
 			}
 
 			if(tabToDelete != nullptr)

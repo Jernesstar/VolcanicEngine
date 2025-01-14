@@ -33,17 +33,16 @@ SceneTab::SceneTab()
 }
 
 SceneTab::SceneTab(const Scene& scene)
-	: Tab(TabType::Scene)
+	: Tab(TabType::Scene), m_Scene(scene)
 {
-	m_Scene = scene;
 	Setup();
 }
 
 SceneTab::SceneTab(const std::string& path)
 	: Tab(TabType::Scene)
 {
-	SetScene(path);
 	Setup();
+	SetScene(path);
 }
 
 SceneTab::~SceneTab() {
@@ -78,11 +77,6 @@ void SceneTab::Setup() {
 
 void SceneTab::SetScene(const Scene& scene) {
 	m_Scene = scene;
-
-	auto hierarchy = GetPanel("SceneHierarchy")->As<SceneHierarchyPanel>();
-	auto visual = GetPanel("SceneVisualizer")->As<SceneVisualizerPanel>();
-	hierarchy->SetContext(&m_Scene);
-	visual->SetContext(&m_Scene);
 }
 
 void SceneTab::SetScene(const std::string& path) {

@@ -2,15 +2,7 @@
     "Elements":
     [
         {
-            "ID": "Window1",
-            "Type": "Window",
-            "x": 20,
-            "y": 20
-        },
-        {
-            "Parent": "Window1",
-
-            "ID": "Button1",
+            "ID": "Button2",
             "Type": "Button",
             "Width": 70,
             "Height": 40,
@@ -19,7 +11,7 @@
             "Color": [0.0, 0.0, 0.0, 1.0],
 
             "OnUpdate": "Default",
-            "OnClick": "@cpp{ VOLCANICORE_LOG_INFO(\"Coming from Button1\"); }",
+            "OnClick": "@cpp{ VOLCANICORE_LOG_INFO(\"Coming from Button2\"); }",
             "OnHover": "Default",
             "OnMouseUp": {
                 "Speed": 0.4,

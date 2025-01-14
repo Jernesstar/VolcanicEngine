@@ -60,7 +60,7 @@ public:
 	UIState GetState() const { return m_State; }
 
 	UIElement& SetSize(uint32_t width, uint32_t height);
-	UIElement& SetPosition(float x, float y);
+	UIElement& SetPosition(int32_t x, int32_t y);
 	UIElement& CenterX();
 	UIElement& CenterY();
 	UIElement& Center();
@@ -71,7 +71,9 @@ public:
 	UIElementType GetType() const { return m_Type; }
 	std::string GetID() const { return m_ID; }
 	UIPage* GetRoot() const { return m_Root; }
+	UINode GetNode() const { return m_Node; }
 
+	void SetParent(const UINode& node);
 	UIElement* GetParent();
 	UIElement* GetChild(const UINode& node) const;
 	UIElement* GetChild(const std::string& id) const;
@@ -85,7 +87,7 @@ protected:
 	virtual void Draw() = 0;
 
 protected:
-	const UIElementType m_Type;
+	UIElementType m_Type;
 	std::string m_ID;
 
 	UIPage* m_Root;

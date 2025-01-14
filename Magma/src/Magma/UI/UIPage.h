@@ -49,9 +49,8 @@ public:
 	void Traverse(const Func<void, UIElement*>& func);
 
 	UINode Add(UIElementType type, const std::string& id);
-	void Add(const UINode& node) {
-		m_FirstOrders.push_back(node);
-	}
+	void Add(const UINode& node);
+	void Parent(const UINode& node, const UINode& parent);
 
 	template<typename TUIElement, typename ...Args>
 	requires std::derived_from<TUIElement, UIElement>

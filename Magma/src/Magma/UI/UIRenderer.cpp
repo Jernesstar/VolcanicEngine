@@ -36,13 +36,13 @@ enum class UIType { Window, MenuBar, Menu, TabBar, Tab };
 static List<UIType> s_Stack;
 
 UIState UIRenderer::DrawWindow(UI::Window& window) {
-	s_Stack.push_back(UIType::Window);
-
 	int32_t alignX = 0;
 	int32_t alignY = 0;
 	ImGuiViewport* viewport = ImGui::GetMainViewport();
 
-	if(!window.GetParent()) {
+	if(window.GetParent())
+		window.Align();
+	else {
 		switch(window.xAlignment) {
 			case XAlignment::Center:
 				alignX = viewport->Size.x / 2;
@@ -58,42 +58,49 @@ UIState UIRenderer::DrawWindow(UI::Window& window) {
 				alignY = viewport->Size.y;
 		}
 	}
-	else
-		window.Align();
 
-	ImGui::SetNextWindowPos(
-		ImVec2
-		{
-			viewport->Pos.x + alignX + window.x,
-			viewport->Pos.y + alignY + window.y
-		});
-	ImGui::SetNextWindowSize(ImVec2(window.Width, window.Height));
+	if(s_Stack.size() && s_Stack.back() == UIType::Window) {
+		auto childFlags = ImGuiChildFlags_Border | ImGuiChildFlags_FrameStyle;
+		ImVec2 size(window.Width, window.Height);
 
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 10.0f);
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 10.0f);
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding,
-						ImVec2(0, 0));
+		ImGui::PushStyleColor(ImGuiCol_FrameBg, window.Color);
+		ImGui::BeginChild(window.GetID().c_str(), size, childFlags);
+		ImGui::PopStyleColor();
+	}
+	else {
+		ImGui::SetNextWindowPos(
+			ImVec2
+			{
+				viewport->Pos.x + alignX + window.x,
+				viewport->Pos.y + alignY + window.y
+			});
 
-	ImGui::PushStyleColor(ImGuiCol_WindowBg, window.Color);
-	ImGui::PushStyleColor(ImGuiCol_Border, window.BorderColor);
+		ImGui::SetNextWindowSize(ImVec2(window.Width, window.Height));
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 10.0f);
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 10.0f);
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
 
-	ImGuiWindowFlags windowFlags;
-	windowFlags |= ImGuiWindowFlags_NoDocking
-				 | ImGuiWindowFlags_NoTitleBar
-				 | ImGuiWindowFlags_NoCollapse
-				 | ImGuiWindowFlags_NoResize
-				 | ImGuiWindowFlags_NoMove
-				 | ImGuiWindowFlags_NoBringToFrontOnFocus
-				 | ImGuiWindowFlags_NoNavFocus;
+		ImGui::PushStyleColor(ImGuiCol_WindowBg, window.Color);
+		ImGui::PushStyleColor(ImGuiCol_Border, window.BorderColor);
+
+		auto windowFlags = ImGuiWindowFlags_NoDocking
+						 | ImGuiWindowFlags_NoTitleBar
+						 | ImGuiWindowFlags_NoCollapse
+						 | ImGuiWindowFlags_NoResize
+						 | ImGuiWindowFlags_NoMove
+						 | ImGuiWindowFlags_NoBringToFrontOnFocus
+						 | ImGuiWindowFlags_NoNavFocus;
+		ImGui::Begin(window.GetID().c_str(), nullptr, windowFlags);
+		ImGui::PopStyleColor(2);
+		ImGui::PopStyleVar(3);
+	}
+
+	s_Stack.push_back(UIType::Window);
 
 	// TODO(Implement): WindowState
-	ImGui::Begin(window.GetID().c_str(), nullptr, windowFlags);
-	ImGui::PopStyleColor(2);
-	ImGui::PopStyleVar(3);
-
 	return {
 		ImGui::IsItemClicked(),
-		ImGui::IsItemHovered(),
+		ImGui::IsWindowHovered(),
 		ImGui::IsMouseReleased(0),
 		ImGui::IsMouseDown(0),
 	};
@@ -174,8 +181,8 @@ UIState UIRenderer::DrawText(UI::Text& text) {
 }
 
 UIState UIRenderer::DrawTextInput(TextInput& textInput) {
-	char input[textInput.MaxCharCount]{""};
-	// char input[255]{ "" };
+	// char input[textInput.GetMaxCharCount()]{""};
+	char input[255]{ "" };
 
 	ImGui::InputText(textInput.GetID().c_str(), input, sizeof(input));
 	textInput.Text = std::string(input);
@@ -260,18 +267,19 @@ TabState UIRenderer::DrawTab(const std::string& name) {
 	s_Stack.push_back(UIType::Tab);
 
 	ImVec2 size = ImGui::CalcTextSize(name.c_str());
-	float padding{4.0f};
-	float tabHeight{6.5f};
-	float radius{ tabHeight * 0.5f - padding };
+	float padding = 14.0f;
+	float tabHeight = 6.5f;
+	float radius = tabHeight * 0.5f - padding;
 
-	ImGui::SetNextItemWidth(size.x + 6.0f*padding);
+	ImGui::SetNextItemWidth(size.x + 2.0f*padding);
 
 	ImGui::PushID(s_Stack.size());
 	bool tabItem = ImGui::BeginTabItem(name.c_str());
 	ImGui::PopID();
+	// ImGui::Dummy({ 0.0f, 0.0f });
 
 	ImVec2 pos;
-	pos.x = ImGui::GetItemRectMax().x - radius - 5.0f*padding;
+	pos.x = ImGui::GetItemRectMax().x - radius - 2.2f*padding;
 	pos.y = ImGui::GetItemRectMin().y + radius + padding;
 
 	TabState state;
@@ -304,7 +312,10 @@ void UIRenderer::EndFrame() {
 
 		switch(type) {
 			case UIType::Window:
-				ImGui::End();
+				if(s_Stack.size() && s_Stack.back() == UIType::Window)
+					ImGui::EndChild();
+				else
+					ImGui::End();
 				break;
 			case UIType::MenuBar:
 				ImGui::EndMainMenuBar();

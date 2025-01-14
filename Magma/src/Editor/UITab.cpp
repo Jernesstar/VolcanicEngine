@@ -37,7 +37,7 @@ UITab::UITab()
 UITab::UITab(const std::string& path)
 	: Tab(TabType::UI)
 {
-	SetUI(path);
+	Load(path);
 	Setup();
 }
 
@@ -48,15 +48,14 @@ UITab::UITab(const UI::UIPage& page)
 }
 
 UITab::~UITab() {
-	Lava::UILoader::Save(
-		m_Root, "Magma/assets/ui/" + m_Root.Name + ".magma.ui.json");
+	// Lava::UILoader::Save(
+	// 	m_Root, "Magma/assets/ui/" + m_Root.Name + ".magma.ui.json");
 }
 
 void UITab::Update(TimeStep ts) {
-	m_Name = "UI";
-
 	for(auto panel : m_Panels)
-		panel->Update(ts);
+		if(panel->IsOpen())
+			panel->Update(ts);
 }
 
 void UITab::Render() {
@@ -115,19 +114,21 @@ void UITab::Setup() {
 	AddPanel<UIVisualizerPanel>(&m_Root);
 }
 
-void UITab::SetUI(const std::string& path) {
-	namespace fs = std::filesystem;
-
+void UITab::Load(const std::string& path) {
 	m_Root.Clear();
 	Lava::UILoader::Load(m_Root, path);
-	Application::GetWindow()->SetTitle("UI: " +
-										fs::path(path).filename().string());
+	m_Name = "UI: " + m_Root.Name;
+}
+
+void UITab::Save(const std::string& path) {
+	Lava::UILoader::Save(m_Root, path);
+	m_Name = "UI: " + m_Root.Name;
 }
 
 void UITab::NewUI() {
 	m_Root.Clear();
 	menu.file.newUI = false;
-	Application::GetWindow()->SetTitle("UI");
+	m_Name = "UI";
 }
 
 void UITab::OpenUI() {
@@ -141,7 +142,7 @@ void UITab::OpenUI() {
 	if(instance->Display("ChooseFile")) {
 		if(instance->IsOk()) {
 			fs::path path = instance->GetFilePathName();
-			SetUI(path.stem().stem().stem().string());
+			Load(path.stem().stem().stem().string());
 		}
 
 		instance->Close();
@@ -158,7 +159,7 @@ void UITab::SaveUI() {
 	if(instance->Display("ChooseFile")) {
 		if(instance->IsOk()) {
 			std::string path = instance->GetFilePathName();
-			Lava::UILoader::Save(m_Root, path);
+			Save(path);
 		}
 
 		instance->Close();

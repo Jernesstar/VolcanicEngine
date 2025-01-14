@@ -9,7 +9,7 @@ namespace Magma {
 class UIVisualizerPanel : public Panel {
 public:
 	UIVisualizerPanel(UI::UIPage* page);
-	~UIVisualizerPanel() = default;
+	~UIVisualizerPanel();
 
 	void SetContext(UI::UIPage* page);
 
@@ -18,6 +18,8 @@ public:
 
 private:
 	UI::UIPage* m_Context;
+	UI::UIPage* m_Running;
+	UI::UINode m_Node;
 };
 
 }

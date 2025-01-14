@@ -7,13 +7,14 @@ namespace Magma::UI {
 class TextInput : public UIElement {
 public:
 	std::string Text;
-	const uint32_t MaxCharCount;
 
 public:
 	TextInput(uint32_t maxChars = 100);
 	TextInput(const std::string& id, UIPage* root)
-		: UIElement(UIElementType::TextInput, id, root), MaxCharCount(100) { }
+		: UIElement(UIElementType::TextInput, id, root), m_MaxCharCount(100) { }
 private:
+	uint32_t m_MaxCharCount;
+
 	void Draw() override;
 };
 

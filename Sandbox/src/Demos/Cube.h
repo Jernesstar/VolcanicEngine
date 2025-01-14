@@ -93,7 +93,7 @@ Cube::Cube()
 		});
 
 	drawPass = RenderPass::Create("Draw", shader);
-	drawPass->SetOutput(framebuffer);
+	// drawPass->SetOutput(framebuffer);
 
 	cube = Mesh::Create(MeshPrimitive::Cube,
 		Material
@@ -160,8 +160,8 @@ void Cube::OnUpdate(TimeStep ts) {
 
 		Renderer3D::Begin(camera);
 
-		for(int y = -100; y < 100; y++)
-			for(int x = -100; x < 100; x++) {
+		for(int y = -10; y < 10; y++)
+			for(int x = -10; x < 10; x++) {
 				Renderer3D::DrawMesh(cube, { .Translation = { x, 0.0f, y } });
 				Renderer3D::DrawMesh(torch, { .Translation = { x, 1.0f, y } });
 			}
@@ -170,7 +170,7 @@ void Cube::OnUpdate(TimeStep ts) {
 	}
 	Renderer::EndPass();
 
-	Renderer2D::DrawFullscreenQuad(drawPass->GetOutput(), AttachmentTarget::Color);
+	// Renderer2D::DrawFullscreenQuad(drawPass->GetOutput(), AttachmentTarget::Color);
 	Renderer::Flush();
 
 	UIRenderer::EndFrame();

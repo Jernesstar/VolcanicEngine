@@ -18,14 +18,14 @@ public:
 	void Update(TimeStep ts) override;
 	void Render() override;
 
-	void SetUI(const std::string& path);
+	void Load(const std::string& path);
+	void Save(const std::string& path);
 
 private:
 	UI::UIPage m_Root;
 
 private:
 	void Setup();
-	void Save(const std::string& path);
 
 	void NewUI();
 	void OpenUI();

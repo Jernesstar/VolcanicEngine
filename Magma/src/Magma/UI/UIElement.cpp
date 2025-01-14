@@ -51,7 +51,7 @@ UIElement& UIElement::SetSize(uint32_t width, uint32_t height) {
 	this->Height = height;
 	return *this;
 }
-UIElement& UIElement::SetPosition(float x, float y) {
+UIElement& UIElement::SetPosition(int32_t x, int32_t y) {
 	this->x = x;
 	this->y = y;
 	return *this;
@@ -104,6 +104,10 @@ UIElement& UIElement::Align() {
 
 void UIElement::Clear() {
 	m_Children.clear();
+}
+
+void UIElement::SetParent(const UINode& node) {
+	m_Parent = node;
 }
 
 UIElement* UIElement::GetParent() {

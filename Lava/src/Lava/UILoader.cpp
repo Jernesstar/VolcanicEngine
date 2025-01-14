@@ -25,11 +25,11 @@ void UILoader::Load(UIPage& page, const std::string& path) {
 	fs::path filePathName = path;
 	if(fs::path(filePathName).has_extension()) {
 		name = filePathName.stem().stem().stem().string();
-		jsonPath = filePathName.string() + ".magma.ui.json";
+		jsonPath = filePathName.string();
 	}
 	else {
 		name = filePathName.stem().string();
-		jsonPath = path;
+		jsonPath = path + ".magma.ui.json";
 	}
 
 	if(!FileUtils::FileExists(jsonPath)) {
@@ -58,6 +58,9 @@ void UILoader::Load(UIPage& page, const std::string& path) {
 		for(const auto& element : elements.GetArray())
 			LoadElement(page, element);
 	}
+
+	if(page.Name == "")
+		page.Name = name;
 }
 
 template<typename TUIElement>
