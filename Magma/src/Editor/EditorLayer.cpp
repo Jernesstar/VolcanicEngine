@@ -43,7 +43,7 @@ struct {
 EditorLayer::EditorLayer(const CommandLineArgs& args) {
 	if(args["--project"]) {
 		ProjectLoader::Load(m_Project, args["--project"]);
-		Application::GetWindow()->SetTitle("Magma Editor: " + m_Project.Name);
+		SetTab(nullptr);
 
 		namespace fs = std::filesystem;
 		auto path = fs::path(m_Project.Path);
@@ -152,8 +152,9 @@ void EditorLayer::Render() {
 				TabState state = UIRenderer::DrawTab(tab->GetName());
 				if(state.Closed)
 					tabToDelete = tab;
-				else if(state.Clicked)
-					m_CurrentTab = tab;
+				else if(state.Clicked) {
+					SetTab(tab);
+				}
 			}
 
 			if(tabToDelete != nullptr)
@@ -191,9 +192,18 @@ void EditorLayer::Render() {
 		CloseTab(m_CurrentTab);
 }
 
+void EditorLayer::SetTab(Ref<Tab> tab) {
+	m_CurrentTab = tab;
+	auto title = "Magma Editor: " + m_Project.Name;
+	if(tab)
+		title += " - " + tab->GetName();
+
+	Application::GetWindow()->SetTitle(title);
+}
+
 void EditorLayer::NewTab(Ref<Tab> tab) {
 	m_Tabs.push_back(tab);
-	m_CurrentTab = tab;
+	SetTab(tab);
 }
 
 void EditorLayer::NewTab(const Scene& scene) {
@@ -256,7 +266,7 @@ void EditorLayer::CloseTab(Ref<Tab> tabToDelete) {
 	m_ClosedTabs.push_back(tabToDelete);
 
 	if(tabToDelete == m_CurrentTab)
-		m_CurrentTab = (index > 0) ? m_Tabs[index - 1] : nullptr;
+		SetTab((index > 0) ? m_Tabs[index - 1] : nullptr);
 }
 
 void EditorLayer::NewProject() {

@@ -22,6 +22,8 @@ public:
 	static void BeginFrame();
 	static void EndFrame();
 
+	static void Pop(uint32_t count = 1);
+
 	static UIState DrawWindow(Window& window);
 	static UIState DrawButton(Button& button);
 	static UIState DrawImage(Image& image);

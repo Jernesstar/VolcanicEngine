@@ -31,6 +31,7 @@ private:
 	List<Ref<Tab>> m_ClosedTabs;
 	List<Ref<Panel>> m_Panels;
 
+	void SetTab(Ref<Tab> tab);
 	void NewTab();
 	void OpenTab();
 	void ReopenTab();

@@ -36,7 +36,7 @@ static bool HasExtension(fs::path path, const List<std::string>& extensions) {
 	return false;
 }
 
-static void TraverseFolder(fs::path folder);
+static ImRect Traverse(fs::path folder);
 
 void ContentBrowserPanel::Draw() {
 	ImGui::Begin("Content Browser", &m_Open);
@@ -64,7 +64,7 @@ void ContentBrowserPanel::Draw() {
 			ImGui::PopClipRect();
 			ImGui::SetCursorPos(windowStart);
 
-			TraverseFolder(m_Path);
+			Traverse(m_Path);
 		}
 		ImGui::EndChild();
 
@@ -161,80 +161,48 @@ void ContentBrowserPanel::Draw() {
 	ImGui::End();
 }
 
-struct Node {
-
-};
-
-// ImRect RenderTree(Node* n)
-// {
-// 	bool open = ImGui::TreeNodeEx();
-// 	ImRect nodeRect = ImRect(ImGui::GetItemRectMin(), ImGui::GetItemRectMax());
-
-// 	if(open) {
-// 		ImColor TreeLineColor = ImGui::GetColorU32(ImGuiCol_Text);
-// 		float SmallOffsetX = 11.0f; // for now, a hardcoded value; should take into account tree indent size
-// 		ImDrawList* drawList = ImGui::GetWindowDrawList();
-
-// 		ImVec2 verticalLineStart = ImGui::GetCursorScreenPos();
-// 		verticalLineStart.x += SmallOffsetX; // to nicely line up with the arrow symbol
-// 		ImVec2 verticalLineEnd = verticalLineStart;
-
-// 		for (Node* child : *n)
-// 		{
-// 			float horizontalLineSize = 8.0f; //chosen arbitrarily
-// 			ImRect childRect = RenderTree(child);
-// 			float midpoint = (childRect.Min.y + childRect.Max.y) / 2.0f;
-// 			auto p0 = ImVec2(verticalLineStart.x, midpoint);
-// 			auto p1 = ImVec2(verticalLineStart.x + horizontalLineSize, midpoint);
-// 			drawList->AddLine(p0, p1, TreeLineColor);
-// 			verticalLineEnd.y = midpoint;
-// 		}
-
-// 		drawList->AddLine(verticalLineStart, verticalLineEnd, TreeLineColor);
-
-// 		ImGui::TreePop();
-// 	}
-
-// 	return nodeRect;
-// }
-
-void TraverseFolder(fs::path folder) {
+ImRect Traverse(fs::path path) {
 	List<fs::path> folders;
 	List<fs::path> files;
 
-	auto flags = ImGuiTreeNodeFlags_SpanAvailWidth;
-	auto tag = folder.stem().string();
-	bool open = ImGui::TreeNodeEx(tag.c_str(), flags, tag.c_str());
-	if(!open)
-		return;
+	ImRect nodeRect;
+	if(fs::is_directory(path)) {
+		auto flags = ImGuiTreeNodeFlags_SpanAvailWidth;
+		auto tag = path.stem().string();
+		bool open = ImGui::TreeNodeEx(tag.c_str(), flags, tag.c_str());
+		nodeRect = ImRect(ImGui::GetItemRectMin(), ImGui::GetItemRectMax());
 
-	for(auto p : FileUtils::GetFiles(folder.string())) {
-		fs::path path(p);
-		if(fs::is_directory(path))
-			folders.push_back(path);
-		else
-			files.push_back(path);
+		if(!open)
+			return nodeRect;
+
+		for(auto p : FileUtils::GetFiles(path.string())) {
+			fs::path path(p);
+			if(fs::is_directory(path))
+				folders.push_back(path);
+			else
+				files.push_back(path);
+		}
 	}
+	else {
+		static std::string selected = "";
+		static std::string type = "";
 
-	for(auto folder : folders)
-		TraverseFolder(folder);
+		auto flags = ImGuiTreeNodeFlags_SpanAvailWidth
+					| ImGuiTreeNodeFlags_Bullet
+					| ImGuiTreeNodeFlags_DefaultOpen;
+		bool open = ImGui::TreeNodeEx(path.filename().string().c_str(), flags);
+		{
+			nodeRect = ImRect(ImGui::GetItemRectMin(), ImGui::GetItemRectMax());
 
-	static std::string selected = "";
-	static std::string type = "";
-	for(auto file : files) {
-		auto fileFlags =
-			flags | ImGuiTreeNodeFlags_Bullet
-				  | ImGuiTreeNodeFlags_DefaultOpen;
-		if(ImGui::TreeNodeEx(file.filename().string().c_str(), fileFlags)) {
 			if(ImGui::IsMouseClicked(1) && ImGui::IsItemHovered()) {
-				if(file.extension().string() == ".scene")
+				if(path.extension().string() == ".scene")
 					type = "Scene";
-				else if(file.extension().string() == ".json")
+				else if(path.extension().string() == ".json")
 					type = "UI";
 
 				if(type != "") {
 					ImGui::OpenPopup("NewTab");
-					selected = file.string();
+					selected = path.string();
 				}
 			}
 
@@ -254,11 +222,45 @@ void TraverseFolder(fs::path folder) {
 				ImGui::EndPopup();
 			}
 
-			ImGui::TreePop();
 		}
+
+		if(open)
+			ImGui::TreePop();
 	}
 
-	ImGui::TreePop();
+	ImColor TreeLineColor = ImGui::GetColorU32(ImGuiCol_Text);
+	float SmallOffsetX = -8.5f; // TODO: Take tree indent into account
+	ImVec2 verticalLineStart = ImGui::GetCursorScreenPos();
+	verticalLineStart.x += SmallOffsetX; // Line up with the arrow
+	ImVec2 verticalLineEnd = verticalLineStart;
+
+	ImDrawList* drawList = ImGui::GetWindowDrawList();
+
+	for(auto folder : folders) {
+		ImRect childRect = Traverse(folder);
+		float horizontalLineSize = 8.0f; // Arbitrary
+		float midpoint = (childRect.Min.y + childRect.Max.y) / 2.0f;
+		auto p0 = ImVec2(verticalLineStart.x, midpoint);
+		auto p1 = ImVec2(verticalLineStart.x + horizontalLineSize, midpoint);
+		drawList->AddLine(p0, p1, TreeLineColor);
+		verticalLineEnd.y = midpoint;
+	}
+	for(auto file : files) {
+		ImRect childRect = Traverse(file);
+		float horizontalLineSize = 8.0f; // Arbitrary
+		float midpoint = (childRect.Min.y + childRect.Max.y) / 2.0f;
+		auto p0 = ImVec2(verticalLineStart.x, midpoint);
+		auto p1 = ImVec2(verticalLineStart.x + horizontalLineSize, midpoint);
+		drawList->AddLine(p0, p1, TreeLineColor);
+		verticalLineEnd.y = midpoint;
+	}
+
+	drawList->AddLine(verticalLineStart, verticalLineEnd, TreeLineColor);
+
+	if(fs::is_directory(path))
+		ImGui::TreePop();
+
+	return nodeRect;
 }
 
 }

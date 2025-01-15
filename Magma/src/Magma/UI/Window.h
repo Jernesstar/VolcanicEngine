@@ -26,7 +26,8 @@ public:
 	glm::vec4 BorderColor = glm::vec4(0.0f);
 
 public:
-	Window() = default;
+	Window()
+		: UIElement(UIElementType::Window, nullptr) { }
 	Window(const std::string& id, UIPage* root)
 		: UIElement(UIElementType::Window, id, root) { }
 

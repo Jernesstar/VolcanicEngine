@@ -8,6 +8,8 @@
 
 #include <VolcaniCore/Core/Log.h>
 
+#include <Magma/UI/UIRenderer.h>
+
 namespace Magma {
 
 UIVisualizerPanel::UIVisualizerPanel(UI::UIPage* page)
@@ -47,27 +49,46 @@ void UIVisualizerPanel::Draw() {
 	{
 		ImGui::PopStyleColor();
 
-		ImVec2 pos = ImGui::GetWindowContentRegionMin();
+		ImVec2 min = ImGui::GetWindowContentRegionMin();
 		ImVec2 max = ImGui::GetWindowContentRegionMax();
-		ImVec2 size = ImGui::GetContentRegionAvail();
+		min.x += ImGui::GetWindowPos().x - ImGui::GetStyle().WindowPadding.x;
+		min.y += ImGui::GetWindowPos().y - ImGui::GetStyle().WindowPadding.y;
+		max.x += ImGui::GetWindowPos().x + ImGui::GetStyle().WindowPadding.x;
+		max.y += ImGui::GetWindowPos().y + ImGui::GetStyle().WindowPadding.y;
+		ImVec2 size = { max.x - min.x, max.y - min.y };
 
-		UI::UIElement* window = m_Running->Get(m_Node);
-		// window->SetPosition(pos.x, pos.y);
-		window->SetSize(size.x, size.y);
+		static uint32_t gridSpace = 50;
+		uint32_t count =
+			(uint32_t)(std::max(size.x, size.y) / (float)gridSpace);
 
+		ImDrawList* drawList = ImGui::GetWindowDrawList();
+		for(uint32_t i = 0; i < count + 13; i++) {
+			ImVec2 p0 = { (float)min.x, (float)(i * gridSpace) + 25.0f };
+			ImVec2 p1 = { (float)max.x, (float)(i * gridSpace) + 25.0f };
+			ImVec2 p2 = { (float)(i * gridSpace) + 25.0f, (float)min.y };
+			ImVec2 p3 = { (float)(i * gridSpace) + 25.0f, (float)max.y };
+
+			drawList->AddLine(p0, p1, ImColor(1.0f, 1.0f, 1.0f, 0.5f), 0.2f);
+			drawList->AddLine(p2, p3, ImColor(1.0f, 1.0f, 1.0f, 0.5f), 0.2f);
+		}
+
+		// UI::UIElement* window = m_Running->Get(m_Node);
+		// window->SetPosition(min.x, min.y);
+		// window->SetSize(size.x, size.y);
+
+		// UI::Window dummy;
+		// dummy.Width = 0;
+		// dummy.Height = 0;
+
+		// // Push a non-child window so the rest with be children
+		// UI::UIRenderer::DrawWindow(dummy);
 		// m_Running->Traverse(
 		// 	[&](UI::UIElement* element)
 		// 	{
 		// 		if(element != window)
 		// 			element->Render();
 		// 	});
-
-		
-		ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4{ 0.0f, 1.0f, 0.0f, 1.0f });
-		ImGui::BeginChild("TEST", size,
-						  ImGuiChildFlags_Border | ImGuiChildFlags_FrameStyle);
-		ImGui::EndChild();
-		ImGui::PopStyleColor();
+		// UI::UIRenderer::Pop();
 	}
 	ImGui::End();
 }

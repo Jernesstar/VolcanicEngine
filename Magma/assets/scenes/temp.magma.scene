@@ -46,6 +46,14 @@ Scene:
             Model:
               Path: ..\TheMazeIsLava\asset\model\player\Knight_Golden_Male.obj
     - Entity:
+        ID: 599
+        Components:
+          TagComponent:
+            Tag: SomeRocks
+          MeshComponent:
+            Model:
+              Path: ..\TheMazeIsLava\asset\model\rocks\rocks.obj
+    - Entity:
         ID: 560
         Components:
           TagComponent:
