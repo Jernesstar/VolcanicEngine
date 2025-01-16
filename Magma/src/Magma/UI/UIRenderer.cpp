@@ -36,11 +36,6 @@ enum class UIType { Window, MenuBar, Menu, TabBar, Tab };
 static List<UIType> s_Stack;
 
 UIState UIRenderer::DrawWindow(UI::Window& window) {
-	// if(window.Width == 0 || window.Height == 0) {
-	// 	s_Stack.push_back(UIType::Window);
-	// 	return { };
-	// }
-
 	int32_t alignX = 0;
 	int32_t alignY = 0;
 	ImGuiViewport* viewport = ImGui::GetMainViewport();
@@ -71,34 +66,34 @@ UIState UIRenderer::DrawWindow(UI::Window& window) {
 			viewport->Pos.y + alignY + window.y
 		});
 
-	ImGui::SetNextWindowSize(ImVec2(window.Width, window.Height));
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 10.0f);
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 10.0f);
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-
-	if(s_Stack.size() && s_Stack.back() == UIType::Window) {
-		auto childFlags = ImGuiChildFlags_Border;
+	// if(s_Stack.size() && s_Stack.back() == UIType::Window) {
+		auto childFlags = ImGuiChildFlags_Border | ImGuiChildFlags_FrameStyle;
 		ImVec2 size(window.Width, window.Height);
 
-		ImGui::PushStyleColor(ImGuiCol_ChildBg, window.Color);
+		ImGui::PushStyleColor(ImGuiCol_FrameBg, window.Color);
 		ImGui::BeginChild(window.GetID().c_str(), size, childFlags);
 		ImGui::PopStyleColor();
-	}
-	else {
-		auto windowFlags = ImGuiWindowFlags_NoDocking
-						 | ImGuiWindowFlags_NoTitleBar
-						 | ImGuiWindowFlags_NoCollapse
-						 | ImGuiWindowFlags_NoResize
-						 | ImGuiWindowFlags_NoMove
-						 | ImGuiWindowFlags_NoBringToFrontOnFocus
-						 | ImGuiWindowFlags_NoNavFocus;
+	// }
+	// else {
+	// 	auto windowFlags = ImGuiWindowFlags_NoDocking
+	// 					 | ImGuiWindowFlags_NoTitleBar
+	// 					 | ImGuiWindowFlags_NoCollapse
+	// 					 | ImGuiWindowFlags_NoResize
+	// 					 | ImGuiWindowFlags_NoMove
+	// 					 | ImGuiWindowFlags_NoBringToFrontOnFocus
+	// 					 | ImGuiWindowFlags_NoNavFocus;
 
-		ImGui::PushStyleColor(ImGuiCol_WindowBg, window.Color);
-		ImGui::PushStyleColor(ImGuiCol_Border, window.BorderColor);
-		ImGui::Begin(window.GetID().c_str(), nullptr, windowFlags);
-		ImGui::PopStyleColor(2);
-	}
-	ImGui::PopStyleVar(3);
+	// 	ImGui::SetNextWindowSize(ImVec2(window.Width, window.Height));
+	// 	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 10.0f);
+	// 	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 10.0f);
+	// 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+
+	// 	ImGui::PushStyleColor(ImGuiCol_WindowBg, window.Color);
+	// 	ImGui::PushStyleColor(ImGuiCol_Border, window.BorderColor);
+	// 	ImGui::Begin(window.GetID().c_str(), nullptr, windowFlags);
+	// 	ImGui::PopStyleColor(2);
+	// 	ImGui::PopStyleVar(3);
+	// }
 
 	s_Stack.push_back(UIType::Window);
 
@@ -281,7 +276,6 @@ TabState UIRenderer::DrawTab(const std::string& name) {
 	ImGui::PushID(s_Stack.size());
 	bool tabItem = ImGui::BeginTabItem(name.c_str());
 	ImGui::PopID();
-	// ImGui::Dummy({ 0.0f, 0.0f });
 
 	ImVec2 pos;
 	pos.x = ImGui::GetItemRectMax().x - radius - 2.2f*padding;
@@ -312,10 +306,10 @@ void UIRenderer::Pop(uint32_t count) {
 
 		switch(type) {
 			case UIType::Window:
-				if(s_Stack.size() && s_Stack.back() == UIType::Window)
+				// if(s_Stack.size() && s_Stack.back() == UIType::Window)
 					ImGui::EndChild();
-				else
-					ImGui::End();
+				// else
+				// 	ImGui::End();
 				break;
 			case UIType::MenuBar:
 				ImGui::EndMainMenuBar();
