@@ -96,7 +96,7 @@ void Renderer::EndFrame() {
 		FlushCommand(command);
 
 	s_Data.Commands.clear();
-	// s_Data.Passes.clear();
+	s_Data.Passes.clear();
 }
 
 DebugInfo Renderer::GetDebugInfo() {

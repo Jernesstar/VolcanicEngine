@@ -88,19 +88,19 @@ Cube::Cube()
 	auto depth = Texture::Create(1920, 1080, Texture::Format::Depth);
 	auto framebuffer = Framebuffer::Create(
 		{
-			{ AttachmentTarget::Color, { { color } } },
-			{ AttachmentTarget::Depth, { { depth } } },
+			{ AttachmentTarget::Color, { color } },
+			{ AttachmentTarget::Depth, { depth } },
 		});
 
 	drawPass = RenderPass::Create("Draw", shader);
-	// drawPass->SetOutput(framebuffer);
+	drawPass->SetOutput(framebuffer);
 
 	cube = Mesh::Create(MeshPrimitive::Cube,
 		Material
 		{
 			.Diffuse = Texture::Create("Sandbox/assets/images/wood.png"),
 		});
-	torch = Mesh::Create("Sandbox/assets/models/mc-torch/Torch.obj");
+	// torch = Mesh::Create("Sandbox/assets/models/mc-torch/Torch.obj");
 
 	camera = CreateRef<IsometricCamera>();
 	camera->Resize(480, 270);
@@ -163,14 +163,14 @@ void Cube::OnUpdate(TimeStep ts) {
 		for(int y = -10; y < 10; y++)
 			for(int x = -10; x < 10; x++) {
 				Renderer3D::DrawMesh(cube, { .Translation = { x, 0.0f, y } });
-				Renderer3D::DrawMesh(torch, { .Translation = { x, 1.0f, y } });
+				// Renderer3D::DrawMesh(torch, { .Translation = { x, 1.0f, y } });
 			}
 
 		Renderer3D::End();
 	}
 	Renderer::EndPass();
 
-	// Renderer2D::DrawFullscreenQuad(drawPass->GetOutput(), AttachmentTarget::Color);
+	Renderer2D::DrawFullscreenQuad(drawPass->GetOutput(), AttachmentTarget::Depth);
 	Renderer::Flush();
 
 	UIRenderer::EndFrame();

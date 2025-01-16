@@ -229,7 +229,8 @@ void EditorLayer::OpenTab() {
 	IGFD::FileDialogConfig config;
 	config.path = ".";
 	auto instance = ImGuiFileDialog::Instance();
-	instance->OpenDialog("ChooseFile", "Choose File", ".magma.scene, .magma.ui.json", config);
+	instance->OpenDialog("ChooseFile", "Choose File",
+						 ".magma.scene, .magma.ui.json", config);
 
 	if(instance->Display("ChooseFile")) {
 		if(instance->IsOk()) {

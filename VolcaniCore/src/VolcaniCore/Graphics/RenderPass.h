@@ -82,28 +82,28 @@ public:
 				Ref<ShaderPipeline> pipeline, Ref<Framebuffer> output)
 		: Name(name)
 	{
-		m_Pass = RendererAPI::Get()->NewDrawPass(nullptr, pipeline, output);
+		m_Pass = DrawPass{ nullptr, pipeline, output };
 	}
 
 	~RenderPass() = default;
 
 	void SetOutput(Ref<Framebuffer> output) {
-		m_Pass->Output = output;
+		m_Pass.Output = output;
 	}
 	void SetData(DrawBuffer* buffer) {
-		m_Pass->BufferData = buffer;
+		m_Pass.BufferData = buffer;
 	}
 
-	DrawPass* Get() { return m_Pass; }
-	Ref<ShaderPipeline> GetPipeline() const { return m_Pass->Pipeline; }
-	Ref<Framebuffer> GetOutput() const { return m_Pass->Output; }
+	DrawPass* Get() { return &m_Pass; }
+	Ref<ShaderPipeline> GetPipeline() const { return m_Pass.Pipeline; }
+	Ref<Framebuffer> GetOutput() const { return m_Pass.Output; }
 
 	void SetUniforms(DrawCommand* command);
 	Uniforms& GetUniforms() { return m_Uniforms; }
 
 
 private:
-	DrawPass* m_Pass;
+	DrawPass m_Pass;
 	Uniforms m_Uniforms;
 };
 
