@@ -77,31 +77,6 @@ UIElement& UIElement::Center() {
 	return *this;
 }
 
-UIElement& UIElement::Align() {
-	if(!m_Root)
-		return *this;
-
-	UIElement* parent = GetParent();
-	int32_t alignX = 0, alignY = 0;
-
-	switch(parent->xAlignment) {
-		case XAlignment::Center:
-			alignX = parent->Width / 2;
-			break;
-		case XAlignment::Right:
-			alignX = parent->Width;
-	}
-	switch(parent->yAlignment) {
-		case YAlignment::Center:
-			alignY = parent->Height / 2;
-			break;
-		case YAlignment::Bottom:
-			alignY = parent->Height;
-	}
-
-	return *this;
-}
-
 void UIElement::Clear() {
 	m_Children.clear();
 }

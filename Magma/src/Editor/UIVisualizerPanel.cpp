@@ -31,11 +31,13 @@ void UIVisualizerPanel::SetContext(UI::UIPage* page) {
 	m_Running->Clear();
 	*m_Running = *page;
 
-	m_Node =
-		m_Running->Add(UI::UIElementType::Window, "UI_VISUALIZER_PANEL_WINDOW");
-	for(auto* element : page->GetFirstOrderElements())
-		m_Running->Parent(element->GetNode(), m_Node);
+	m_Node = m_Running->Add(UI::UIElementType::Window, "UI_VISUALIZER_PANEL");
 
+	UI::UIElement* window = m_Running->Get(m_Node);
+	for(auto* element : page->GetFirstOrderElements())
+		window->Add(element->GetNode());
+
+	m_Running->ClearFirstOrders();
 	m_Running->Add(m_Node);
 }
 
@@ -78,12 +80,15 @@ void UIVisualizerPanel::Draw() {
 		// This will catch our interactions
 		auto buttonFlags = ImGuiButtonFlags_MouseButtonLeft
 						 | ImGuiButtonFlags_MouseButtonRight;
+
+		ImGui::SetNextItemAllowOverlap();
+
 		ImGui::InvisibleButton("canvas", size, buttonFlags);
 		const bool isHovered = ImGui::IsItemHovered(); // Hovered
 		const bool isActive = ImGui::IsItemActive(); // Held
 		// Lock scrolled origin
 		const ImVec2 origin = { p0.x + scrolling.x, p0.y + scrolling.y };
-		const ImVec2 mouse_pos_in_canvas =
+		const ImVec2 mousePosCanvas =
 			{ io.MousePos.x - origin.x, io.MousePos.y - origin.y };
 
 		// Pan (we use a zero mouse threshold when there's no context menu)
@@ -94,9 +99,9 @@ void UIVisualizerPanel::Draw() {
 			scrolling.y += io.MouseDelta.y;
 		}
 		if(isHovered) {
-			gridStep += 10.0f*io.MouseWheel;
-			if(gridStep < 50.0f)
-				gridStep = 50.0f;
+			gridStep += 10.0f * io.MouseWheel;
+			if(gridStep < 25.0f)
+				gridStep = 25.0f;
 			if(gridStep > 150.0f)
 				gridStep = 150.0f;
 		}
@@ -117,35 +122,40 @@ void UIVisualizerPanel::Draw() {
 			float y = fmodf(scrolling.y, gridStep);
 			for(; x < size.x; x += gridStep)
 				drawList->AddLine(
-					ImVec2(p0.x + x, p0.y),
-					ImVec2(p0.x + x, p1.y),
+					ImVec2(p0.x + x, p0.y), ImVec2(p0.x + x, p1.y),
 					ImColor(200, 200, 200, 40));
 			for (; y < size.y; y += gridStep)
 				drawList->AddLine(
-					ImVec2(p0.x, p0.y + y),
-					ImVec2(p1.x, p0.y + y),
+					ImVec2(p0.x, p0.y + y), ImVec2(p1.x, p0.y + y),
 					ImColor(200, 200, 200, 40));
 		}
 		drawList->PopClipRect();
 
-		// UI::UIElement* window = m_Running->Get(m_Node);
-		// window->Color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
-		// window->SetPosition(min.x, min.y);
-		// window->SetSize(size.x, size.y);
+		UI::UIElement* window = m_Running->Get(m_Node);
+		window->Color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+		window->SetPosition(scrolling.x, scrolling.y);
+		window->SetSize(size.x, size.y);
 
-		// UI::Window dummy;
-		// dummy.Width = 0;
-		// dummy.Height = 0;
+		UI::Window dummy;
+		dummy.Width = 0;
+		dummy.Height = 0;
 
-		// Push a non-child window so the rest with be children
-		// UI::UIRenderer::DrawWindow(dummy);
-		// m_Running->Traverse(
-		// 	[&](UI::UIElement* element)
-		// 	{
-		// 		if(element != window)
-		// 			element->Render();
-		// 	});
-		// UI::UIRenderer::Pop(0);
+		// Push a dummy window so the rest will be children
+		UI::UIRenderer::DrawWindow(dummy);
+		m_Running->Traverse(
+			[&](UI::UIElement* element)
+			{
+				if(element == window)
+					return;
+
+				element->Draw();
+
+				UI::UIState state = element->GetState();
+				if(state.Clicked)
+					VOLCANICORE_LOG_INFO("Clicked");
+			});
+
+		UI::UIRenderer::Pop(0);
 	}
 	ImGui::End();
 }

@@ -1,6 +1,6 @@
 #include "App.h"
 
-#include <Magma/UI/UI.h>
+#include <Magma/UI/UIRenderer.h>
 
 #include "UIBrowser.h"
 
@@ -17,9 +17,7 @@ void App::OnClose() {
 }
 
 void App::OnUpdate(TimeStep ts) {
-	UIRenderer::BeginFrame();
 	UIBrowser::OnUpdate(ts);
-	UIRenderer::EndFrame();
 }
 
 }

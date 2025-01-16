@@ -52,6 +52,7 @@ public:
 			  UIPage* root = nullptr);
 	virtual ~UIElement() = default;
 
+	virtual void Draw() = 0;
 	void Render();
 
 	UINode Add(UIElementType type, const std::string& id);
@@ -64,7 +65,6 @@ public:
 	UIElement& CenterX();
 	UIElement& CenterY();
 	UIElement& Center();
-	UIElement& Align();
 
 	void Clear();
 
@@ -84,9 +84,6 @@ public:
 	TUIElement* As() const { return (TUIElement*)(this); }
 
 protected:
-	virtual void Draw() = 0;
-
-protected:
 	UIElementType m_Type;
 	std::string m_ID;
 
@@ -96,6 +93,8 @@ protected:
 	std::vector<UINode> m_Children;
 
 	UIState m_State;
+
+	friend class UIPage;
 };
 
 }

@@ -24,8 +24,7 @@ void Scene::OnUpdate(TimeStep ts) {
 }
 
 void Scene::OnRender(SceneRenderer& renderer) {
-	renderer.SetContext(this);
-	renderer.Render();
+	// renderer.Submit();
 }
 
 void Scene::RegisterSystems() {

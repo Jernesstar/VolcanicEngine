@@ -90,7 +90,7 @@ void ContentBrowserPanel::Draw() {
 			ImGui::SetCursorPos(windowStart);
 
 			static float padding = 16.0f;
-			static float thumbnailSize = 128.0f;
+			static float thumbnailSize = 110.0f;
 			static float cellSize = thumbnailSize + padding;
 
 			float panelWidth = ImGui::GetContentRegionAvail().x;

@@ -39,9 +39,8 @@ public:
 	std::string Name;
 
 public:
-	UIPage() = default;
-	UIPage(const std::string& name)
-		: Name(name) { }
+	UIPage();
+	UIPage(const std::string& name);
 	~UIPage() = default;
 
 	void Render();
@@ -69,10 +68,14 @@ public:
 	}
 
 	void Clear();
+	void ClearFirstOrders();
+	List<UIElement*> GetFirstOrderElements();
+	List<const UIElement*> GetFirstOrderElements() const;
 
-	UIElement* Get(const UINode& node) const;
-	UIElement* Get(const std::string& id) const;
-	List<UIElement*> GetFirstOrderElements() const;
+	UIElement* Get(const UINode& node);
+	const UIElement* Get(const UINode& node) const;
+	UIElement* Get(const std::string& id);
+	const UIElement* Get(const std::string& id) const;
 
 	void SetTheme(const Theme& theme);
 	Theme& GetTheme() { return m_Theme; }

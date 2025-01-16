@@ -2,6 +2,8 @@
 
 #include "UI.h"
 
+#include <VolcaniCore/Core/Log.h>
+
 #define GET_LIST(TUIElement) \
 template<> \
 List<TUIElement>& UIPage::GetList<TUIElement>() { \
@@ -38,9 +40,31 @@ static void TraverseElement(UIElement* element,
 		TraverseElement(child, func);
 }
 
+UIPage::UIPage() {
+	Windows.reserve(10);
+	Buttons.reserve(10);
+	Dropdowns.reserve(10);
+	Texts.reserve(10);
+	TextInputs.reserve(10);
+	Images.reserve(10);
+}
+
+UIPage::UIPage(const std::string &name)
+    : Name(name)
+{
+	Windows.reserve(10);
+	Buttons.reserve(10);
+	Dropdowns.reserve(10);
+	Texts.reserve(10);
+	TextInputs.reserve(10);
+	Images.reserve(10);
+}
+
 void UIPage::Render() {
 	for(UIElement* element : GetFirstOrderElements())
 		element->Render();
+
+	UIRenderer::Pop(0);
 }
 
 void UIPage::Traverse(const Func<void, UIElement*> &func)
@@ -52,23 +76,47 @@ void UIPage::Traverse(const Func<void, UIElement*> &func)
 UINode UIPage::Add(UIElementType type, const std::string& id) {
 	switch(type) {
 		case UIElementType::Window:
-			Windows.emplace_back(id, this);
-			return { type, Windows.size() - 1 };
+		{
+			auto& element = Windows.emplace_back(id, this);
+			element.m_Node = { type, Windows.size() - 1 };
+			return element.m_Node;
+			break;
+		}
 		case UIElementType::Button:
-			Buttons.emplace_back(id, this);
-			return { type, Buttons.size() - 1 };
+		{
+			auto& element = Buttons.emplace_back(id, this);
+			element.m_Node = { type, Buttons.size() - 1 };
+			return element.m_Node;
+			break;
+		}
 		case UIElementType::Dropdown:
-			Dropdowns.emplace_back(id, this);
-			return { type, Dropdowns.size() - 1 };
+		{
+			auto& element = Dropdowns.emplace_back(id, this);
+			element.m_Node = { type, Dropdowns.size() - 1 };
+			return element.m_Node;
+			break;
+		}
 		case UIElementType::Text:
-			Texts.emplace_back(id, this);
-			return { type, Texts.size() - 1 };
+		{
+			auto& element = Texts.emplace_back(id, this);
+			element.m_Node = { type, Texts.size() - 1 };
+			return element.m_Node;
+			break;
+		}
 		case UIElementType::TextInput:
-			TextInputs.emplace_back(id, this);
-			return { type, TextInputs.size() - 1 };
+		{
+			auto& element = TextInputs.emplace_back(id, this);
+			element.m_Node = { type, TextInputs.size() - 1 };
+			return element.m_Node;
+			break;
+		}
 		case UIElementType::Image:
-			Images.emplace_back(id, this);
-			return { type, Images.size() - 1 };
+		{
+			auto& element = Images.emplace_back(id, this);
+			element.m_Node = { type, Images.size() - 1 };
+			return element.m_Node;
+			break;
+		}
 	}
 
 	return { UIElementType::None, 0 };
@@ -82,8 +130,9 @@ void UIPage::Parent(const UINode& node, const UINode& parent) {
 	if(!Get(node))
 		return;
 
-	bool firstOrder = !Get(node)->GetParent();
-	Get(node)->SetParent(parent);
+	UIElement* element = Get(node);
+	bool firstOrder = !element->GetParent();
+	element->SetParent(parent);
 
 	if(!firstOrder)
 		return;
@@ -93,8 +142,21 @@ void UIPage::Parent(const UINode& node, const UINode& parent) {
 	m_FirstOrders.erase(it);
 }
 
-UIElement* UIPage::Get(const UINode& node) const {
-	// TODO(Fix): The pointers might become invalid if the map reallocates
+void UIPage::Clear() {
+	m_FirstOrders.clear();
+	Windows.clear();
+	Buttons.clear();
+	Dropdowns.clear();
+	Texts.clear();
+	TextInputs.clear();
+	Images.clear();
+}
+
+void UIPage::ClearFirstOrders() {
+	m_FirstOrders.clear();
+}
+
+UIElement* UIPage::Get(const UINode& node) {
 	switch(node.first) {
 		case UIElementType::Window:
 			if(node.second < Windows.size())
@@ -119,17 +181,59 @@ UIElement* UIPage::Get(const UINode& node) const {
 	return nullptr;
 }
 
-void UIPage::Clear() {
-	m_FirstOrders.clear();
-	Windows.clear();
-	Buttons.clear();
-	Dropdowns.clear();
-	Texts.clear();
-	TextInputs.clear();
-	Images.clear();
+const UIElement* UIPage::Get(const UINode& node) const {
+	VOLCANICORE_LOG_INFO("Size: %i", Windows.size());
+	switch(node.first) {
+		case UIElementType::Window:
+			if(node.second < Windows.size())
+				return (UIElement*)&Windows[node.second];
+			else
+				VOLCANICORE_LOG_ERROR("Too high of a number");
+		case UIElementType::Button:
+			if(node.second < Buttons.size())
+				return (UIElement*)&Buttons[node.second];
+		case UIElementType::Dropdown:
+			if(node.second < Dropdowns.size())
+				return (UIElement*)&Dropdowns[node.second];
+		case UIElementType::Text:
+			if(node.second < Texts.size())
+				return (UIElement*)&Texts[node.second];
+		case UIElementType::TextInput:
+			if(node.second < TextInputs.size())
+				return (UIElement*)&TextInputs[node.second];
+		case UIElementType::Image:
+			if(node.second < Images.size())
+				return (UIElement*)&Images[node.second];
+	}
+
+	return nullptr;
 }
 
-UIElement* UIPage::Get(const std::string& id) const {
+UIElement* UIPage::Get(const std::string& id) {
+	uint32_t i = 0;
+	for(; i < Windows.size(); i++)
+		if(Windows[i].GetID() == id)
+			return (UIElement*)(Windows.data() + i);
+	for(; i < Buttons.size(); i++)
+		if(Buttons[i].GetID() == id)
+			return (UIElement*)(Buttons.data() + i);
+	for(; i < Dropdowns.size(); i++)
+		if(Dropdowns[i].GetID() == id)
+			return (UIElement*)(Dropdowns.data() + i);
+	for(; i < Texts.size(); i++)
+		if(Texts[i].GetID() == id)
+			return (UIElement*)(Texts.data() + i);
+	for(; i < TextInputs.size(); i++)
+		if(TextInputs[i].GetID() == id)
+			return (UIElement*)(TextInputs.data() + i);
+	for(; i < Images.size(); i++)
+		if(Images[i].GetID() == id)
+			return (UIElement*)(Images.data() + i);
+
+	return nullptr;
+}
+
+const UIElement* UIPage::Get(const std::string& id) const {
 	for(auto& element : Windows)
 		if(element.GetID() == id)
 			return (UIElement*)&element;
@@ -152,7 +256,7 @@ UIElement* UIPage::Get(const std::string& id) const {
 	return nullptr;
 }
 
-List<UIElement*> UIPage::GetFirstOrderElements() const {
+List<UIElement*> UIPage::GetFirstOrderElements() {
 	List<UIElement*> res;
 	for(auto node : m_FirstOrders)
 		res.push_back(Get(node));
@@ -160,7 +264,16 @@ List<UIElement*> UIPage::GetFirstOrderElements() const {
 	return res;
 }
 
+List<const UIElement*> UIPage::GetFirstOrderElements() const {
+	List<const UIElement*> res;
+	for(auto node : m_FirstOrders)
+		res.push_back(Get(node));
+
+	return res;
+}
+
 void UIPage::SetTheme(const Theme& theme) {
+	// TODO(Implement): Apply new theme on top of the old one
 	m_Theme = theme;
 }
 

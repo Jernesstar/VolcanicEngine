@@ -35,12 +35,12 @@ void SceneVisualizerPanel::SetContext(Scene* context) {
 	m_Selected.Handle = Entity{ };
 	// m_Selected.Collider = CreateRef<Physics::RigidBody>();
 
-	// m_Renderer.SetContext(context);
-	// m_Image->SetImage(m_Renderer.GetOutput(), AttachmentTarget::Color);
+	m_Image->SetImage(m_Renderer.GetOutput(), AttachmentTarget::Color);
 }
 
 void SceneVisualizerPanel::Update(TimeStep ts) {
-	// m_Renderer.Update(ts);
+	m_Context->OnUpdate(ts);
+	m_Renderer.Update(ts);
 }
 
 struct {
@@ -50,8 +50,7 @@ struct {
 } static options;
 
 void SceneVisualizerPanel::Draw() {
-	// m_Context->OnRender(m_Renderer);
-	// VolcaniCore::Renderer::Flush();
+	m_Context->OnRender(m_Renderer);
 
 	auto flags = ImGuiWindowFlags_NoScrollbar
 			   | ImGuiWindowFlags_NoScrollWithMouse;
@@ -73,12 +72,8 @@ void SceneVisualizerPanel::Draw() {
 
 		if(ImGui::BeginDragDropTarget())
 		{
-			auto flags = ImGuiDragDropFlags_None
-					   | ImGuiDragDropFlags_AcceptBeforeDelivery
-					//    | ImGuiDragDropFlags_AcceptNoPreviewTooltip
-					   ;
-			if(auto payload = ImGui::AcceptDragDropPayload("Image", flags))
-			{
+			auto flags = ImGuiDragDropFlags_AcceptBeforeDelivery;
+			if(auto payload = ImGui::AcceptDragDropPayload("Image", flags)) {
 				if(!payload->IsDelivery()) {
 					ImGui::SetMouseCursor(ImGuiMouseCursor_NotAllowed);
 					ImGui::SetTooltip("Can't drop here yet!");
@@ -87,8 +82,7 @@ void SceneVisualizerPanel::Draw() {
 					VOLCANICORE_LOG_INFO("Delivered");
 				}
 			}
-			if(auto payload = ImGui::AcceptDragDropPayload("Model", flags))
-			{
+			if(auto payload = ImGui::AcceptDragDropPayload("Model", flags)) {
 				if(payload->IsDelivery()) {
 					ImGui::OpenPopup("Create Entity with MeshComponent");
 					options.add.mesh = std::string((const char*)payload->Data);

@@ -28,6 +28,8 @@ struct {
 	} edit;
 } static menu;
 
+static Theme s_Theme;
+
 UITab::UITab()
 	: Tab(TabType::UI), m_Root("")
 {
@@ -115,7 +117,16 @@ void UITab::Setup() {
 }
 
 void UITab::Load(const std::string& path) {
+	namespace fs = std::filesystem;
+
 	m_Root.Clear();
+
+	auto themePath = fs::path(path).parent_path() / "theme.magma.ui.json";
+	if(fs::exists(themePath)) {
+		s_Theme = Lava::UILoader::LoadTheme(themePath.string());
+		m_Root.SetTheme(s_Theme);
+	}
+
 	Lava::UILoader::Load(m_Root, path);
 	m_Name = "UI: " + m_Root.Name;
 }

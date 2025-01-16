@@ -3,8 +3,9 @@
 #include <filesystem>
 
 #include <VolcaniCore/Event/Events.h>
-
 #include <VolcaniCore/Graphics/Renderer.h>
+
+#include <Magma/UI/UIRenderer.h>
 
 #include <Lava/ProjectLoader.h>
 #include <Lava/UIBrowser.h>
@@ -65,9 +66,13 @@ Runtime::~Runtime() {
 void Runtime::OnUpdate(TimeStep ts) {
 	Renderer::Clear();
 
+	UIRenderer::BeginFrame();
+
 	App* app = Get();
-	app->OnUpdate(ts);
 	app->App::OnUpdate(ts);
+	app->OnUpdate(ts);
+
+	UIRenderer::EndFrame();
 }
 
 App* Runtime::Get() {

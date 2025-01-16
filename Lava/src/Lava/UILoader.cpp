@@ -64,10 +64,10 @@ void UILoader::Load(UIPage& page, const std::string& path) {
 }
 
 template<typename TUIElement>
-static void Serialize(TUIElement* ui, JSONSerializer& serializer);
+static void Serialize(const TUIElement* ui, JSONSerializer& serializer);
 
 template<>
-void Serialize(Window* ui, JSONSerializer& serializer) {
+void Serialize(const Window* ui, JSONSerializer& serializer) {
 	serializer
 		.WriteKey("BorderWidth").Write(ui->BorderWidth)
 		.WriteKey("BorderHeight").Write(ui->BorderHeight)
@@ -75,34 +75,34 @@ void Serialize(Window* ui, JSONSerializer& serializer) {
 }
 
 template<>
-void Serialize(Button* ui, JSONSerializer& serializer) {
+void Serialize(const Button* ui, JSONSerializer& serializer) {
 
 }
 
 template<>
-void Serialize(Dropdown* ui, JSONSerializer& serializer) {
+void Serialize(const Dropdown* ui, JSONSerializer& serializer) {
 
 }
 
 template<>
-void Serialize(Text* ui, JSONSerializer& serializer) {
+void Serialize(const Text* ui, JSONSerializer& serializer) {
 	serializer
 		.WriteKey("Text").Write(ui->Content);
 }
 
 template<>
-void Serialize(TextInput* ui, JSONSerializer& serializer) {
+void Serialize(const TextInput* ui, JSONSerializer& serializer) {
 	serializer
 		.WriteKey("Text").Write(ui->Text);
 }
 
 template<>
-void Serialize(Image* ui, JSONSerializer& serializer) {
+void Serialize(const Image* ui, JSONSerializer& serializer) {
 	serializer.WriteKey("Path").Write(ui->Content->GetPath());
 }
 
 template<>
-void Serialize(UIElement* ui, JSONSerializer& serializer) {
+void Serialize(const UIElement* ui, JSONSerializer& serializer) {
 	serializer
 	.BeginMapping()
 		.WriteKey("Type");
@@ -199,7 +199,7 @@ void UILoader::Save(const UIPage& page, const std::string& path) {
 	serializer.WriteKey("Elements")
 	.BeginSequence();
 
-	for(UIElement* element : page.GetFirstOrderElements())
+	for(auto* element : page.GetFirstOrderElements())
 		Serialize(element, serializer);
 
 	serializer.EndSequence();

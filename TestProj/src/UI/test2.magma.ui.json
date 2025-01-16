@@ -2,21 +2,13 @@
     "Elements":
     [
         {
-            "ID": "Button2",
-            "Type": "Button",
-            "Width": 70,
-            "Height": 40,
-            "x": 20,
-            "y": 20,
-            "Color": [0.0, 0.0, 0.0, 1.0],
-
-            "OnUpdate": "Default",
-            "OnClick": "@cpp{ VOLCANICORE_LOG_INFO(\"Coming from Button2\"); }",
-            "OnHover": "Default",
-            "OnMouseUp": {
-                "Speed": 0.4,
-                "Translate": -2
-            }
+            "ID": "Window2",
+            "Type": "Window",
+            "Width": 250,
+            "Height": 250,
+            "x": 100,
+            "y": 100,
+            "Color": [0.0, 0.0, 0.0, 1.0]
         }
     ]
 }
