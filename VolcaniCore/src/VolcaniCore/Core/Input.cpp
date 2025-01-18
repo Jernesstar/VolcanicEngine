@@ -26,6 +26,11 @@ void Input::SetCursorMode(CursorMode mode) {
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL + (int)mode);
 }
 
+CursorMode Input::GetCursorMode() {
+	GLFWwindow* window = Application::GetWindow()->GetNativeWindow();
+	return (CursorMode)glfwGetInputMode(window, GLFW_CURSOR);
+}
+
 bool Input::MouseButtonPressed(Mouse mouse_button) {
 	auto window = Application::GetWindow()->GetNativeWindow();
 	auto state = glfwGetMouseButton(window, (int)(mouse_button));

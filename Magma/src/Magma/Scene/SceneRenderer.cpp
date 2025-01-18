@@ -20,9 +20,7 @@ DefaultSceneRenderer::DefaultSceneRenderer() {
 	Application::PopDir();
 
 	auto window = Application::GetWindow();
-	auto width = window->GetWidth();
-	auto height = window->GetHeight();
-	m_Output = Framebuffer::Create(width, height);
+	m_Output = Framebuffer::Create(window->GetWidth(), window->GetHeight());
 	m_DrawPass->SetOutput(m_Output);
 
 	auto camera = CreateRef<StereographicCamera>(75.0f);
@@ -47,7 +45,7 @@ void DefaultSceneRenderer::SetContext(Scene* scene) {
 					.Scale		 = tc.Scale
 				};
 
-			Renderer3D::DrawMesh(mc.Mesh->GetMesh(0), tr);
+			Renderer3D::DrawModel(mc.Mesh, tr);
 		});
 }
 
@@ -82,6 +80,7 @@ void DefaultSceneRenderer::Render() {
 		Renderer3D::End();
 	}
 	Renderer::EndPass();
+	Renderer::Flush();
 }
 
 }

@@ -30,7 +30,6 @@ Framebuffer::Framebuffer(uint32_t width, uint32_t height)
 	glGenFramebuffers(1, &m_BufferID);
 	glBindFramebuffer(GL_FRAMEBUFFER, m_BufferID);
 
-	// TODO(Change): Renderbuffer
 	m_AttachmentMap.insert(
 	{
 		AttachmentTarget::Color, { { Attachment::Type::Texture } }
@@ -116,7 +115,7 @@ Framebuffer::~Framebuffer() {
 }
 
 void Framebuffer::Bind() const {
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_BufferID);
+	glBindFramebuffer(GL_FRAMEBUFFER, m_BufferID);
 }
 
 void Framebuffer::Unbind() const {
@@ -156,17 +155,14 @@ void Framebuffer::Attach(AttachmentTarget target, uint32_t idx, uint32_t dst) {
 	auto& att = m_AttachmentMap[target][idx];
 	uint32_t id = att.m_RendererID;
 
-	glBindFramebuffer(GL_FRAMEBUFFER, m_BufferID);
+	// glBindFramebuffer(GL_FRAMEBUFFER, m_BufferID);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, type + idx, GL_TEXTURE_2D, id, 0);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	// glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 Ref<Texture> Framebuffer::Get(AttachmentTarget target, uint32_t idx) const {
 	const Attachment& attachment = GetAttachment(target, idx);
-	auto id = attachment.GetRendererID();
-	auto width = attachment.GetWidth();
-	auto height = attachment.GetHeight();
-	return CreateRef<Texture2D>(id, width, height);
+	return attachment.m_Texture;
 }
 
 void Framebuffer::Bind(AttachmentTarget target, uint32_t slot,
@@ -192,7 +188,8 @@ void Framebuffer::CreateColorAttachment(uint32_t index) {
 		// uint32_t samples = 4;
 		// glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, GL_RGB, m_Width, m_Height, GL_TRUE);
 		// glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, GL_TEXTURE_2D_MULTISAMPLE, attachment.m_RendererID, 0);
-
+		attachment.m_Texture =
+			CreateRef<Texture2D>(attachment.m_RendererID, width, height);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index,
 								GL_TEXTURE_2D, attachment.m_RendererID, 0);
 	}
@@ -215,7 +212,6 @@ void Framebuffer::CreateDepthAttachment() {
 			attachment.m_RendererID = id;
 		}
 
-		glBindTexture(GL_TEXTURE_2D, 0);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
 								GL_TEXTURE_2D, attachment.m_RendererID, 0);
 	}

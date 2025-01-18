@@ -1,5 +1,6 @@
 #include "Renderer2D.h"
 
+#include "Core/Application.h"
 #include "Core/Assert.h"
 
 #include "Graphics/Renderer.h"
@@ -99,14 +100,20 @@ void Renderer2D::DrawFullscreenQuad(Ref<Framebuffer> buffer,
 		command = RendererAPI::Get()->NewDrawCommand(pass);
 	}
 
+	command->Clear = true;
+	command->ViewportWidth = Application::GetWindow()->GetWidth();
+	command->ViewportHeight = Application::GetWindow()->GetHeight();
+
 	command->UniformData
 	.SetInput("u_ScreenTexture", TextureSlot{ buffer->Get(target), 0 });
 
 	auto& call = command->NewDrawCall();
-	call.DepthTest = DepthTestingMode::Off;
+	call.VertexCount = 6;
 	call.Primitive = PrimitiveType::Triangle;
 	call.Partition = PartitionType::Single;
-	call.VertexCount = 6;
+	call.DepthTest = DepthTestingMode::Off;
+	call.Culling = CullingMode::Off;
+	call.Blending = BlendingMode::Off;
 }
 
 }

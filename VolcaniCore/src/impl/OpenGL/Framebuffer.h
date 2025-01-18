@@ -4,6 +4,8 @@
 
 #include <Graphics/Framebuffer.h>
 
+#include <OpenGL/Texture2D.h>
+
 namespace VolcaniCore::OpenGL {
 
 class Attachment {
@@ -29,6 +31,8 @@ private:
 	Attachment::Type m_Type;
 	uint32_t m_Width, m_Height;
 	uint32_t m_RendererID;
+
+	Ref<Texture2D> m_Texture;
 
 	friend class Framebuffer;
 };

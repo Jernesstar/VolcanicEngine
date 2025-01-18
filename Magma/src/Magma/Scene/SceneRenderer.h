@@ -40,10 +40,6 @@ protected:
 
 class DefaultSceneRenderer : public SceneRenderer {
 public:
-	// TODO(Change): Replace with map of string values
-	// JSONParserNode Options;
-
-public:
 	DefaultSceneRenderer();
 	~DefaultSceneRenderer() = default;
 

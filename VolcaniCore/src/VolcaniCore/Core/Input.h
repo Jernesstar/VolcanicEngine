@@ -14,6 +14,8 @@ public:
 	static bool KeysPressed(Key key1, Key key2, Key key3, Key key4);
 
 	static void SetCursorMode(CursorMode mode);
+	static CursorMode GetCursorMode();
+
 	static bool MouseButtonPressed(Mouse mouse_button);
 
 	static void SetMousePosition(float x, float y);

@@ -1,8 +1,5 @@
 #include "Image.h"
 
-#include <OpenGL/Framebuffer.h>
-#include <OpenGL/Texture2D.h>
-
 #include "UIRenderer.h"
 
 using namespace VolcaniCore;

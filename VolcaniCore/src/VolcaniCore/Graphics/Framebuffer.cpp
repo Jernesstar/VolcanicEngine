@@ -27,14 +27,16 @@ Ref<Framebuffer> Framebuffer::Create(
 			Map<AttachmentTarget, List<OpenGL::Attachment>> attachments;
 			attachments.reserve(textureAttachments.size());
 
-			for(const auto& [target, textures] : textureAttachments)
-				for(const auto& texture : textures) {
+			for(auto& [target, textures] : textureAttachments)
+				for(auto& texture : textures) {
 					attachments[target].push_back(
 					{
 						OpenGL::Attachment::Type::Texture,
 						texture->GetWidth(), texture->GetHeight(),
 						texture->As<OpenGL::Texture2D>()->GetID()
 					});
+
+					texture->As<OpenGL::Texture2D>()->m_Owns = false;
 
 					// Only need one depth or stencil attachment
 					if(target != AttachmentTarget::Color)

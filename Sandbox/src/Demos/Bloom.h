@@ -195,6 +195,7 @@ void Bloom::OnUpdate(TimeStep ts) {
 		Renderer2D::DrawFullscreenQuad(mips, AttachmentTarget::Color);
 	}
 	Renderer::EndPass();
+	Renderer::Flush();
 
 	UIRenderer::EndFrame();
 }

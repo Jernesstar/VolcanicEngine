@@ -182,9 +182,9 @@ void Renderer::ReleaseBuffer(DrawBuffer* buffer) {
 DrawPass* Renderer::NewDrawPass(DrawBuffer* buffer,
 	Ref<ShaderPipeline> pipeline, Ref<VolcaniCore::Framebuffer> output)
 {
-	for(auto& pass : s_Data.Passes)
-		if(pass.BufferData == buffer && pass.Pipeline == pipeline)
-			return &pass;
+	// for(auto& pass : s_Data.Passes)
+	// 	if(pass.BufferData == buffer && pass.Pipeline == pipeline)
+	// 		return &pass;
 
 	return &s_Data.Passes.emplace_back(buffer, pipeline, output);
 }
@@ -202,18 +202,18 @@ DrawCommand* Renderer::NewDrawCommand(DrawPass* pass) {
 }
 
 void FlushCommand(DrawCommand& command) {
-	if(command.Pass != s_Data.LastPass) {
-		if(s_Data.LastPass && s_Data.LastPass->Output)
-			s_Data.LastPass->Output->As<OpenGL::Framebuffer>()->Unbind();
-		if(s_Data.LastPass && s_Data.LastPass->Pipeline)
-			s_Data.LastPass->Pipeline->As<OpenGL::ShaderProgram>()->Unbind();
+	// if(command.Pass != s_Data.LastPass) {
+		// if(s_Data.LastPass && s_Data.LastPass->Output)
+		// 	s_Data.LastPass->Output->As<OpenGL::Framebuffer>()->Unbind();
+		// if(s_Data.LastPass && s_Data.LastPass->Pipeline)
+		// 	s_Data.LastPass->Pipeline->As<OpenGL::ShaderProgram>()->Unbind();
 
-		s_Data.LastPass = command.Pass;
+		// s_Data.LastPass = command.Pass;
 		if(command.Pass && command.Pass->Pipeline)
 			command.Pass->Pipeline->As<OpenGL::ShaderProgram>()->Bind();
 		if(command.Pass && command.Pass->Output)
 			command.Pass->Output->As<OpenGL::Framebuffer>()->Bind();
-	}
+	// }
 
 	if(command.Pass && command.Pass->Output) {
 		uint32_t i = 0;
@@ -221,8 +221,11 @@ void FlushCommand(DrawCommand& command) {
 			command.Pass->Output->Attach(target, idx, i++);
 	}
 
-	if(command.ViewportWidth != 0 && command.ViewportHeight != 0)
+	if(command.Pass && command.Pass->Output)
+		Resize(command.Pass->Output->GetWidth(), command.Pass->Output->GetHeight());
+	else if(command.ViewportWidth != 0 && command.ViewportHeight != 0)
 		Resize(command.ViewportWidth, command.ViewportHeight);
+
 	if(command.Clear)
 		Clear();
 
@@ -243,6 +246,11 @@ void FlushCommand(DrawCommand& command) {
 
 	s_Info.IndexCount += command.IndicesIndex;
 	s_Info.VertexCount += command.VerticesIndex;
+
+	if(command.Pass && command.Pass->Output)
+		command.Pass->Output->As<OpenGL::Framebuffer>()->Unbind();
+	if(command.Pass && command.Pass->Pipeline)
+		command.Pass->Pipeline->As<OpenGL::ShaderProgram>()->Unbind();
 }
 
 void FlushCall(DrawCall& call) {
@@ -309,9 +317,10 @@ void SetUniforms(DrawCommand& command) {
 	for(auto& [name, data] : uniforms.FloatUniforms)
 		shader->SetFloat(name, data);
 	for(auto& [name, slot] : uniforms.TextureUniforms) {
-		if(!slot.Sampler) continue;
-		shader->SetInt(name, slot.Index);
+		if(!slot.Sampler)
+			continue;
 		slot.Sampler->As<OpenGL::Texture2D>()->Bind(slot.Index);
+		shader->SetInt(name, slot.Index);
 	}
 	for(auto& [name, data] : uniforms.Vec2Uniforms)
 		shader->SetVec2(name, data);

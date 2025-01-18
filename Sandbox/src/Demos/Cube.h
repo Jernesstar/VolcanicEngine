@@ -68,8 +68,6 @@ private:
 
 	Ref<Camera> camera;
 	CameraController controller;
-
-	DrawBuffer* buffer;
 };
 
 Cube::Cube()
@@ -84,7 +82,7 @@ Cube::Cube()
 
 	auto shader = ShaderPipeline::Create("VolcaniCore/assets/shaders", "Mesh");
 	auto color = Texture::Create(480, 270, Texture::Format::Normal,
-							Texture::Sampling::Nearest);
+								 Texture::Sampling::Nearest);
 	auto depth = Texture::Create(1920, 1080, Texture::Format::Depth);
 	auto framebuffer = Framebuffer::Create(
 		{
@@ -100,7 +98,7 @@ Cube::Cube()
 		{
 			.Diffuse = Texture::Create("Sandbox/assets/images/wood.png"),
 		});
-	// torch = Mesh::Create("Sandbox/assets/models/mc-torch/Torch.obj");
+	torch = Mesh::Create("Sandbox/assets/models/mc-torch/Torch.obj");
 
 	camera = CreateRef<IsometricCamera>();
 	camera->Resize(480, 270);
@@ -129,8 +127,6 @@ Cube::~Cube() {
 
 void Cube::OnUpdate(TimeStep ts) {
 	UIRenderer::BeginFrame();
-
-	RendererAPI::Get()->StartFrame();
 
 	controller.OnUpdate(ts);
 
@@ -163,14 +159,14 @@ void Cube::OnUpdate(TimeStep ts) {
 		for(int y = -10; y < 10; y++)
 			for(int x = -10; x < 10; x++) {
 				Renderer3D::DrawMesh(cube, { .Translation = { x, 0.0f, y } });
-				// Renderer3D::DrawMesh(torch, { .Translation = { x, 1.0f, y } });
+				Renderer3D::DrawMesh(torch, { .Translation = { x, 1.0f, y } });
 			}
 
 		Renderer3D::End();
 	}
 	Renderer::EndPass();
 
-	Renderer2D::DrawFullscreenQuad(drawPass->GetOutput(), AttachmentTarget::Depth);
+	Renderer2D::DrawFullscreenQuad(drawPass->GetOutput(), AttachmentTarget::Color);
 	Renderer::Flush();
 
 	UIRenderer::EndFrame();

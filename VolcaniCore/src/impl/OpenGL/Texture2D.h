@@ -5,6 +5,7 @@
 #include <glm/vec2.hpp>
 
 #include "Graphics/Texture.h"
+#include "Graphics/Framebuffer.h"
 
 namespace VolcaniCore::OpenGL {
 
@@ -37,6 +38,8 @@ private:
 	bool m_Owns;
 	uint32_t m_TextureID;
 	uint32_t m_DataFormat;
+
+	friend class VolcaniCore::Framebuffer;
 };
 
 }

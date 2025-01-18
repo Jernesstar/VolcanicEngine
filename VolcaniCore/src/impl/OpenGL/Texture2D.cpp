@@ -17,7 +17,7 @@ Texture2D::Texture2D(uint32_t id, uint32_t width, uint32_t height)
 	m_TextureID = id;
 	m_Owns = false;
 }
-
+  
 Texture2D::Texture2D(uint32_t width, uint32_t height,
 					 Format format, Sampling sampling)
 	: Texture(width, height), m_DataFormat(GL_RGBA)
@@ -80,8 +80,7 @@ constexpr uint32_t GetFormat(Texture::Format format) {
 		case Texture::Format::Normal:
 			return GL_RGBA8;
 		case Texture::Format::Float:
-			return GL_RGBA16F; // GL_R11F_G11F_B10F
-		// TODO(Fix): This shouldn't be here
+			return GL_RGBA16F;
 		case Texture::Format::Depth:
 			return GL_DEPTH_COMPONENT32F;
 	}

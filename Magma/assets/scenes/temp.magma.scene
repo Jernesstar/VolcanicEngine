@@ -10,8 +10,8 @@ Scene:
             Camera:
               Type: Stereographic
               VerticalFOV: 45
-              Position: [0, 0, 0]
-              Direction: [0, 0, -1]
+              Position: [-12.6736059, 6.13548708, 16.4013233]
+              Direction: [0.735963821, -0.428990662, -0.523758948]
               ViewportWidth: 800
               ViewportHeight: 600
               Near: 0.00100000005
@@ -30,7 +30,7 @@ Scene:
                     Diffuse:
                       Path: Sandbox/assets/images/wood.png
     - Entity:
-        ID: 600
+        ID: 558
         Components:
           TagComponent:
             Tag: Ball18
@@ -43,7 +43,7 @@ Scene:
             Meshes:
               []
     - Entity:
-        ID: 563
+        ID: 559
         Components:
           TagComponent:
             Tag: Cube1
@@ -61,7 +61,7 @@ Scene:
                     Diffuse:
                       Path: Sandbox/assets/images/wood.png
     - Entity:
-        ID: 564
+        ID: 560
         Components:
           TagComponent:
             Tag: Cube2
@@ -79,7 +79,7 @@ Scene:
                     Diffuse:
                       Path: Sandbox/assets/images/wood.png
     - Entity:
-        ID: 565
+        ID: 561
         Components:
           TagComponent:
             Tag: Cube3
@@ -97,7 +97,7 @@ Scene:
                     Diffuse:
                       Path: Sandbox/assets/images/wood.png
     - Entity:
-        ID: 566
+        ID: 562
         Components:
           TagComponent:
             Tag: Cube4
@@ -115,7 +115,7 @@ Scene:
                     Diffuse:
                       Path: Sandbox/assets/images/wood.png
     - Entity:
-        ID: 567
+        ID: 563
         Components:
           TagComponent:
             Tag: Cube5
@@ -133,7 +133,7 @@ Scene:
                     Diffuse:
                       Path: Sandbox/assets/images/wood.png
     - Entity:
-        ID: 568
+        ID: 564
         Components:
           TagComponent:
             Tag: Cube6
@@ -151,7 +151,7 @@ Scene:
                     Diffuse:
                       Path: Sandbox/assets/images/wood.png
     - Entity:
-        ID: 569
+        ID: 565
         Components:
           TagComponent:
             Tag: Cube7
@@ -169,7 +169,7 @@ Scene:
                     Diffuse:
                       Path: Sandbox/assets/images/wood.png
     - Entity:
-        ID: 570
+        ID: 566
         Components:
           TagComponent:
             Tag: Cube8
@@ -187,7 +187,7 @@ Scene:
                     Diffuse:
                       Path: Sandbox/assets/images/wood.png
     - Entity:
-        ID: 571
+        ID: 567
         Components:
           TagComponent:
             Tag: Ball20
@@ -200,7 +200,7 @@ Scene:
             Meshes:
               []
     - Entity:
-        ID: 572
+        ID: 568
         Components:
           TagComponent:
             Tag: Ball19
@@ -213,7 +213,7 @@ Scene:
             Meshes:
               []
     - Entity:
-        ID: 573
+        ID: 569
         Components:
           TagComponent:
             Tag: Cube11
@@ -231,7 +231,7 @@ Scene:
                     Diffuse:
                       Path: Sandbox/assets/images/wood.png
     - Entity:
-        ID: 574
+        ID: 570
         Components:
           TagComponent:
             Tag: Cube12
@@ -249,7 +249,7 @@ Scene:
                     Diffuse:
                       Path: Sandbox/assets/images/wood.png
     - Entity:
-        ID: 575
+        ID: 571
         Components:
           TagComponent:
             Tag: Cube13
@@ -267,7 +267,7 @@ Scene:
                     Diffuse:
                       Path: Sandbox/assets/images/wood.png
     - Entity:
-        ID: 576
+        ID: 572
         Components:
           TagComponent:
             Tag: Cube14
@@ -285,7 +285,7 @@ Scene:
                     Diffuse:
                       Path: Sandbox/assets/images/wood.png
     - Entity:
-        ID: 577
+        ID: 573
         Components:
           TagComponent:
             Tag: Cube15
@@ -303,7 +303,7 @@ Scene:
                     Diffuse:
                       Path: Sandbox/assets/images/wood.png
     - Entity:
-        ID: 578
+        ID: 574
         Components:
           TagComponent:
             Tag: Cube16
@@ -321,7 +321,7 @@ Scene:
                     Diffuse:
                       Path: Sandbox/assets/images/wood.png
     - Entity:
-        ID: 579
+        ID: 575
         Components:
           TagComponent:
             Tag: Cube17
@@ -339,7 +339,7 @@ Scene:
                     Diffuse:
                       Path: Sandbox/assets/images/wood.png
     - Entity:
-        ID: 580
+        ID: 576
         Components:
           TagComponent:
             Tag: Cube18
@@ -357,7 +357,7 @@ Scene:
                     Diffuse:
                       Path: Sandbox/assets/images/wood.png
     - Entity:
-        ID: 581
+        ID: 577
         Components:
           TagComponent:
             Tag: Cube19
@@ -375,7 +375,7 @@ Scene:
                     Diffuse:
                       Path: Sandbox/assets/images/wood.png
     - Entity:
-        ID: 582
+        ID: 578
         Components:
           TagComponent:
             Tag: Cube20
@@ -393,7 +393,7 @@ Scene:
                     Diffuse:
                       Path: Sandbox/assets/images/wood.png
     - Entity:
-        ID: 583
+        ID: 579
         Components:
           TagComponent:
             Tag: Ball1
@@ -406,7 +406,7 @@ Scene:
             Model:
               Path: ..\TheMazeIsLava\asset\model\player\Knight_Golden_Male.obj
     - Entity:
-        ID: 584
+        ID: 580
         Components:
           TagComponent:
             Tag: Ball2
@@ -419,7 +419,7 @@ Scene:
             Meshes:
               []
     - Entity:
-        ID: 585
+        ID: 581
         Components:
           TagComponent:
             Tag: Ball3
@@ -432,7 +432,7 @@ Scene:
             Meshes:
               []
     - Entity:
-        ID: 586
+        ID: 582
         Components:
           TagComponent:
             Tag: Ball4
@@ -445,7 +445,7 @@ Scene:
             Meshes:
               []
     - Entity:
-        ID: 587
+        ID: 583
         Components:
           TagComponent:
             Tag: Ball5
@@ -458,7 +458,7 @@ Scene:
             Meshes:
               []
     - Entity:
-        ID: 588
+        ID: 584
         Components:
           TagComponent:
             Tag: Ball6
@@ -471,7 +471,7 @@ Scene:
             Meshes:
               []
     - Entity:
-        ID: 589
+        ID: 585
         Components:
           TagComponent:
             Tag: Ball7
@@ -484,7 +484,7 @@ Scene:
             Meshes:
               []
     - Entity:
-        ID: 590
+        ID: 586
         Components:
           TagComponent:
             Tag: Ball8
@@ -497,7 +497,7 @@ Scene:
             Meshes:
               []
     - Entity:
-        ID: 591
+        ID: 587
         Components:
           TagComponent:
             Tag: Ball9
@@ -510,7 +510,7 @@ Scene:
             Meshes:
               []
     - Entity:
-        ID: 592
+        ID: 588
         Components:
           TagComponent:
             Tag: Ball10
@@ -523,7 +523,7 @@ Scene:
             Meshes:
               []
     - Entity:
-        ID: 593
+        ID: 589
         Components:
           TagComponent:
             Tag: Ball11
@@ -536,7 +536,7 @@ Scene:
             Meshes:
               []
     - Entity:
-        ID: 594
+        ID: 590
         Components:
           TagComponent:
             Tag: Ball12
@@ -549,7 +549,7 @@ Scene:
             Meshes:
               []
     - Entity:
-        ID: 595
+        ID: 591
         Components:
           TagComponent:
             Tag: Ball13
@@ -562,7 +562,7 @@ Scene:
             Meshes:
               []
     - Entity:
-        ID: 596
+        ID: 592
         Components:
           TagComponent:
             Tag: Ball14
@@ -575,7 +575,7 @@ Scene:
             Meshes:
               []
     - Entity:
-        ID: 597
+        ID: 593
         Components:
           TagComponent:
             Tag: Ball15
@@ -588,7 +588,7 @@ Scene:
             Meshes:
               []
     - Entity:
-        ID: 598
+        ID: 594
         Components:
           TagComponent:
             Tag: Ball16
@@ -601,7 +601,7 @@ Scene:
             Meshes:
               []
     - Entity:
-        ID: 599
+        ID: 595
         Components:
           TagComponent:
             Tag: Ball17
@@ -613,3 +613,16 @@ Scene:
           MeshComponent:
             Meshes:
               []
+    - Entity:
+        ID: 596
+        Components:
+          TagComponent:
+            Tag: NewPlayerEntity
+          TransformComponent:
+            Transform:
+              Translation: [-0.899999976, -0.100000001, -2.29999995]
+              Rotation: [0, 4.71238899, 0]
+              Scale: [1, 0.699999988, 0.800000012]
+          MeshComponent:
+            Model:
+              Path: ..\TheMazeIsLava\asset\model\player\Knight_Golden_Male.obj

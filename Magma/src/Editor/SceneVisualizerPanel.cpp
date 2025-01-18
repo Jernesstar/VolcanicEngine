@@ -38,9 +38,13 @@ void SceneVisualizerPanel::SetContext(Scene* context) {
 	m_Image->SetImage(m_Renderer.GetOutput(), AttachmentTarget::Color);
 }
 
+static bool s_Hovered = false;
+
 void SceneVisualizerPanel::Update(TimeStep ts) {
 	m_Context->OnUpdate(ts);
-	m_Renderer.Update(ts);
+
+	if(s_Hovered)
+		m_Renderer.Update(ts);
 }
 
 struct {
@@ -60,6 +64,9 @@ void SceneVisualizerPanel::Draw() {
 	{
 		ImGui::PopStyleVar();
 		ImGui::PopStyleColor();
+
+		s_Hovered = ImGui::IsWindowHovered()
+				 || Input::GetCursorMode() == CursorMode::Locked;
 
 		auto size = ImGui::GetWindowContentRegionMin();
 		auto offset = ImGui::GetWindowPos();

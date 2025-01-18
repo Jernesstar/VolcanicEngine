@@ -16,10 +16,16 @@ public:
 
 	operator bool() const { return m_Buffer.GetCount(); }
 
-	T& operator[](int64_t index) {
-		if(index < 0)
-			return m_Buffer[(int64_t)m_Buffer.GetCount() + index];
-		return m_Buffer[index];
+	T& operator[](int64_t idx) {
+		if(idx < 0)
+			return m_Buffer[(uint32_t)((int64_t)m_Buffer.GetCount() + idx)];
+		return m_Buffer[idx];
+	}
+
+	T* At(int32_t idx) {
+		if(idx < 0)
+			return m_Buffer.Get() + (uint32_t)((int32_t)Count() + idx);
+		return m_Buffer.Get() + (uint32_t)(idx);
 	}
 
 	template<typename ...Args>

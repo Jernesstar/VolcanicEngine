@@ -133,14 +133,17 @@ void DrawComponent<TransformComponent>(Entity& entity) {
 	ImGui::Text("Camera Component");
 
 	auto tr = glm::value_ptr(component.Translation);
-	auto ro = glm::value_ptr(component.Rotation);
+	glm::vec3 roD = glm::degrees(component.Rotation);
+	auto ro = glm::value_ptr(roD);
 	auto sc = glm::value_ptr(component.Scale);
 	ImGui::Text("Translation"); ImGui::SameLine();
-	ImGui::DragFloat3("", tr, 0.1f, -FLT_MAX, +FLT_MAX, "%.4f");
+	ImGui::DragFloat3("##Translation", tr, 0.1f, -FLT_MAX, +FLT_MAX, "%.4f");
 	ImGui::Text("Rotation"); ImGui::SameLine();
-	ImGui::DragFloat3("", ro, 0.1f, 0.0f, 360.0f, "%.4f");
+	ImGui::DragFloat3("##Rotation", ro, 1.0f, 0.0f, 360.0f, "%.4f");
 	ImGui::Text("Scale"); ImGui::SameLine();
-	ImGui::DragFloat3("", sc, 0.1f, 0.0f, +FLT_MAX, "%.4f");
+	ImGui::DragFloat3("##Scale", sc, 0.1f, 0.0f, +FLT_MAX, "%.4f");
+
+	component.Rotation = glm::radians(roD);
 }
 
 template<>
