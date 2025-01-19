@@ -65,8 +65,10 @@ project "Sandbox"
         "ImGuiFileDialog",
         "flecs",
         "rapidjson",
-        -- "PhysX",
     }
+
+    filter "toolset:msc or system:linux"
+        links "PhysX"
 
     filter "system:linux"
         links {

@@ -43,8 +43,10 @@ project "Magma"
         "ImGuiFileDialog",
         "flecs",
         "rapidjson",
-        -- "PhysX",
     }
+
+    filter "toolset:msc or system:linux"
+        links "PhysX"
 
     filter "system:linux"
         buildoptions {
@@ -121,6 +123,9 @@ project "Editor"
         "rapidjson",
     }
 
+    filter "toolset:msc or system:linux"
+        links "PhysX"
+
     filter "system:linux"
         links {
             "pthread",
@@ -151,4 +156,4 @@ include "Magma/.builddeps/yaml-cpp"
 include "Magma/.builddeps/ImGuiFileDialog"
 include "Magma/.builddeps/flecs"
 include "Magma/.builddeps/rapidjson"
--- include "Magma/.builddeps/PhysX"
+include "Magma/.builddeps/PhysX"

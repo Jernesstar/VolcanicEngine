@@ -68,10 +68,11 @@ project "PhysX"
     filter "system:linux"
         files {
             "%{VendorPaths.PhysX}/physx/source/foundation/unix/*.cpp",
+            "%{VendorPaths.PhysX}/physx/source/physx/src/device/linux/PhysXIndicatorLinux.cpp"
         }
 
         defines {
-            -- "PX_LINUX",
+            "PX_LINUX",
         }
 
         buildoptions {

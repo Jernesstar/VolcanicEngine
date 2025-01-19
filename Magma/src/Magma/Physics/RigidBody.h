@@ -4,7 +4,9 @@
 
 #include "Shape.h"
 
-// using namespace physx;
+#ifdef MAGMA_PHYSICS
+using namespace physx;
+#endif
 
 namespace Magma::Physics {
 
@@ -20,12 +22,14 @@ public:
 	RigidBody(RigidBody::Type type, Ref<Shape> shape, const Transform& t = { });
 	~RigidBody();
 
-	// bool operator ==(const RigidBody& other) const {
-	// 	// return m_Actor == other.m_Actor;
-	// }
-	// bool operator !=(const RigidBody& other) const {
-	// 	// return m_Actor != other.m_Actor;
-	// }
+#ifdef MAGMA_PHYSICS
+	bool operator ==(const RigidBody& other) const {
+		return m_Actor == other.m_Actor;
+	}
+	bool operator !=(const RigidBody& other) const {
+		return m_Actor != other.m_Actor;
+	}
+#endif
 
 	RigidBody::Type GetType() const { return m_Type; }
 
@@ -42,7 +46,9 @@ public:
 	TDerived* As() const { return (TDerived*)(this); }
 
 protected:
-	// PxRigidActor* m_Actor;
+#ifdef MAGMA_PHYSICS
+	PxRigidActor* m_Actor;
+#endif
 
 	RigidBody::Type m_Type;
 	Transform m_Transform;

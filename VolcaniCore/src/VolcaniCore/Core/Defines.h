@@ -19,6 +19,10 @@
 	#pragma warning Unknown dynamic link import/export semantics.
 #endif
 
+#if defined(_MSC_VER) || defined(__linux__)
+	#define MAGMA_PHYSICS
+#endif
+
 namespace VolcaniCore {
 
 template<typename T>

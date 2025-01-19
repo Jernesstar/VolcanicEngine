@@ -109,9 +109,9 @@ void UIVisualizerPanel::Draw() {
 		// Context menu (under default mouse threshold)
 		ImVec2 drag_delta = ImGui::GetMouseDragDelta(1);
 		if(drag_delta.x == 0.0f && drag_delta.y == 0.0f)
-			ImGui::OpenPopupOnItemClick("context", 1);
-		if(ImGui::BeginPopup("context")) {
-			ImGui::Text("Popup");
+			ImGui::OpenPopupOnItemClick("Options", 1);
+		if(ImGui::BeginPopup("Options")) {
+			ImGui::Checkbox("Enable Grid", &enableGrid);
 			ImGui::EndPopup();
 		}
 
@@ -132,16 +132,15 @@ void UIVisualizerPanel::Draw() {
 		drawList->PopClipRect();
 
 		UI::UIElement* window = m_Running->Get(m_Node);
-		window->Color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
 		window->SetPosition(scrolling.x, scrolling.y);
 		window->SetSize(size.x, size.y);
 
+		// Push a dummy window so the rest will be children
 		UI::Window dummy;
 		dummy.Width = 0;
 		dummy.Height = 0;
-
-		// Push a dummy window so the rest will be children
 		UI::UIRenderer::DrawWindow(dummy);
+
 		m_Running->Traverse(
 			[&](UI::UIElement* element)
 			{

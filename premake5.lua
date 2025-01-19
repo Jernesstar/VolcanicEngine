@@ -22,7 +22,6 @@ workspace "VolcanicEngine"
     filter "action:vs*"
         startproject "Sandbox"
 
-
 include "VolcaniCore"
 include "Magma"
 include "Lava"

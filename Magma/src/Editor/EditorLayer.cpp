@@ -303,8 +303,14 @@ void EditorLayer::ReloadProject() {
 void EditorLayer::RunProject() {
 	menu.project.runProject = false;
 
-	std::string command = ".\\build\\Lava\\bin\\Runtime -c --project ";
+	std::string command;
+#ifdef VOLCANICENGINE_WINDOWS
+	command = ".\\build\\Lava\\bin\\Runtime -c --project ";
 	command += m_Project.Path + "\\.volc.proj";
+#elif VOLCANICENGINE_LINUX
+	command = "./build/Lava/bin/Runtime -c --project ";
+	command += m_Project.Path + "/.volc.proj";
+#endif
 	system(command.c_str());
 }
 

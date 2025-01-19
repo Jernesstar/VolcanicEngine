@@ -1,11 +1,15 @@
 #pragma once
 
+#include <VolcaniCore/Core/Defines.h>
+
+#ifdef MAGMA_PHYSICS
+
 #define PX_PHYSX_STATIC_LIB
+#include <PxPhysics.h>
+#include <PxPhysicsAPI.h>
+using namespace physx;
 
-// #include <PxPhysics.h>
-// #include <PxPhysicsAPI.h>
-
-// using namespace physx;
+#endif
 
 #include <VolcaniCore/Graphics/Transform.h>
 #include <VolcaniCore/Graphics/Mesh.h>
@@ -43,9 +47,13 @@ public:
 protected:
 	Type m_Type;
 
-	// PxShape* m_Shape;
+#ifdef MAGMA_PHYSICS
+	PxShape* m_Shape;
 
 	friend class RigidBody;
+	friend class StaticBody;
+	friend class DynamicBody;
+#endif
 };
 
 }

@@ -10,6 +10,7 @@
 #include <VolcaniCore/Graphics/RendererAPI.h>
 
 #include "ECS/Component.h"
+#include "ECS/PhysicsSystem.h"
 
 #include "UI/UIRenderer.h"
 
@@ -134,35 +135,37 @@ void SceneVisualizerPanel::Draw() {
 		}
 
 		if(ImGui::IsMouseClicked(0) && ImGui::IsWindowHovered()) {
-			// auto& cameraController = m_Renderer.GetCameraController();
-			// auto& world = m_Context->PhysicsWorld;
-			// auto camera = cameraController.GetCamera();
+			auto& cameraController = m_Renderer.GetCameraController();
+			auto& world = m_Context->EntityWorld.Get<PhysicsSystem>()->Get();
+			auto camera = cameraController.GetCamera();
 
-			// glm::vec2 pos = { ImGui::GetMousePos().x, ImGui::GetMousePos().y };
-			// glm::vec4 originNDC
-			// {
-			// 	(pos.x/width - 0.5f) * 2.0f,
-			// 	(pos.y/height - 0.5f) * 2.0f,
-			// 	-1.0f, 1.0f
-			// };
-			// glm::vec4 endNDC
-			// {
-			// 	(pos.x/width - 0.5f) * 2.0f,
-			// 	(pos.y/height - 0.5f) * 2.0f,
-			// 	1.0f, 1.0f
-			// };
+			glm::vec2 pos = { ImGui::GetMousePos().x, ImGui::GetMousePos().y };
+			glm::vec4 originNDC
+			{
+				(pos.x/width - 0.5f) * 2.0f,
+				(pos.y/height - 0.5f) * 2.0f,
+				-1.0f, 1.0f
+			};
+			glm::vec4 endNDC
+			{
+				(pos.x/width - 0.5f) * 2.0f,
+				(pos.y/height - 0.5f) * 2.0f,
+				1.0f, 1.0f
+			};
 
-			// glm::mat4 invViewProj = glm::inverse(camera->GetViewProjection());
-			// glm::vec4 worldStart = invViewProj * originNDC;
-			// glm::vec4 worldEnd   = invViewProj * endNDC;
-			// worldStart /= worldStart.w;
-			// worldEnd   /= worldEnd.w;
-			// glm::vec3 rayDir = glm::vec3(worldEnd - worldStart);
-			// float maxDist = 10000.0f;
+			glm::mat4 invViewProj = glm::inverse(camera->GetViewProjection());
+			glm::vec4 worldStart = invViewProj * originNDC;
+			glm::vec4 worldEnd   = invViewProj * endNDC;
+			worldStart /= worldStart.w;
+			worldEnd   /= worldEnd.w;
+			glm::vec3 rayDir = glm::vec3(worldEnd - worldStart);
+			float maxDist = 10000.0f;
 
-			// auto hitInfo = world.Raycast(worldStart, rayDir, maxDist);
-			// m_Selected.Collider = hitInfo.Actor;
-			auto hierarchy = m_Tab->GetPanel("SceneVisualizer")->As<SceneVisualizerPanel>();
+			auto hitInfo = world.Raycast(worldStart, rayDir, maxDist);
+			m_Selected.Collider = Ref<RigidBody>(hitInfo.Actor);
+
+			auto hierarchy =
+				m_Tab->GetPanel("SceneVisualizer")->As<SceneVisualizerPanel>();
 			// hierarchy->Select(entity);
 		}
 	}
