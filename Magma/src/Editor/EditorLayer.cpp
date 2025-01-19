@@ -51,8 +51,8 @@ EditorLayer::EditorLayer(const CommandLineArgs& args) {
 		auto panel2 = CreateRef<ContentBrowserPanel>(path.string());
 		panel1->Open();
 		panel2->Open();
-		m_Panels.push_back(panel1);
-		m_Panels.push_back(panel2);
+		m_Panels.Add(panel1);
+		m_Panels.Add(panel2);
 	}
 	for(auto& path : args["--scene"]) {
 		auto tab = CreateRef<SceneTab>(path);
@@ -65,8 +65,8 @@ EditorLayer::EditorLayer(const CommandLineArgs& args) {
 }
 
 EditorLayer::~EditorLayer() {
-	m_Tabs.clear();
-	m_Panels.clear();
+	m_Tabs.Clear();
+	m_Panels.Clear();
 }
 
 void EditorLayer::Update(TimeStep ts) {
@@ -202,7 +202,7 @@ void EditorLayer::SetTab(Ref<Tab> tab) {
 }
 
 void EditorLayer::NewTab(Ref<Tab> tab) {
-	m_Tabs.push_back(tab);
+	m_Tabs.Add(tab);
 	SetTab(tab);
 }
 
@@ -249,10 +249,8 @@ void EditorLayer::OpenTab() {
 void EditorLayer::ReopenTab() {
 	menu.tab.reopenTab = false;
 
-	if(m_ClosedTabs.size()) {
-		NewTab(m_ClosedTabs.back());
-		m_ClosedTabs.pop_back();
-	}
+	if(m_ClosedTabs)
+		NewTab(m_ClosedTabs.Pop());
 }
 
 void EditorLayer::CloseTab(Ref<Tab> tabToDelete) {
@@ -263,8 +261,8 @@ void EditorLayer::CloseTab(Ref<Tab> tabToDelete) {
 
 	auto it = std::find(m_Tabs.begin(), m_Tabs.end(), tabToDelete);
 	uint32_t index = std::distance(m_Tabs.begin(), it);
-	m_Tabs.erase(it);
-	m_ClosedTabs.push_back(tabToDelete);
+	m_Tabs.Remove(index);
+	m_ClosedTabs.Add(tabToDelete);
 
 	if(tabToDelete == m_CurrentTab)
 		SetTab((index > 0) ? m_Tabs[index - 1] : nullptr);

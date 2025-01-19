@@ -2,14 +2,16 @@
 
 #include "Assert.h"
 
+#include "List.h"
+
 namespace VolcaniCore {
 
 struct ArgList {
 	bool Valid = false;
 	List<std::string> Args;
 
-	operator std::string() const { return Args.at(0); }
-	operator bool() const { return Valid && bool(Args.size()); }
+	operator std::string() const { return Args[0]; }
+	operator bool() const { return Valid && Args; }
 
 	List<std::string>::iterator begin() { return Args.begin(); }
 	List<std::string>::iterator end() { return Args.end(); }
@@ -33,7 +35,7 @@ public:
 				m_ArgMap[m_Args[lastOption]] = ArgList(true);
 			}
 			else if(lastOption != -1)
-				m_ArgMap[m_Args[lastOption]].Args.push_back(m_Args[i]);
+				m_ArgMap[m_Args[lastOption]].Args.Add(m_Args[i]);
 		}
 	}
 
@@ -53,7 +55,7 @@ public:
 	}
 
 private:
-	std::vector<std::string> m_Args;
+	List<std::string> m_Args;
 	std::unordered_map<std::string, ArgList> m_ArgMap;
 };
 

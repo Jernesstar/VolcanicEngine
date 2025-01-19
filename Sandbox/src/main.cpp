@@ -1,5 +1,6 @@
 #include <VolcaniCore/Core/Application.h>
 #include <VolcaniCore/Core/Log.h>
+#include <VolcaniCore/Core/List.h>
 #include <VolcaniCore/Core/Defines.h>
 #include <VolcaniCore/Core/CommandLineArgs.h>
 

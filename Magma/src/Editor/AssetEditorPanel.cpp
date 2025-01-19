@@ -1,5 +1,6 @@
 #include "AssetEditorPanel.h"
 
+#include <VolcaniCore/Core/List.h>
 #include <VolcaniCore/Core/FileUtils.h>
 
 #include <imgui/imgui.h>

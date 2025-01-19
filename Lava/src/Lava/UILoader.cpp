@@ -3,6 +3,7 @@
 #include <fstream>
 
 #include <VolcaniCore/Core/Log.h>
+#include <VolcaniCore/Core/List.h>
 #include <VolcaniCore/Core/Algo.h>
 #include <VolcaniCore/Core/FileUtils.h>
 
@@ -532,18 +533,18 @@ void CompileElement(const std::string& name, const std::string& funcPath,
 				uint32_t right = start;
 				uint32_t max = left + 1;
 				List<uint32_t> scopeStack;
-				scopeStack.push_back(left);
+				scopeStack.Push(left);
 
-				while(scopeStack.size()) {
+				while(scopeStack) {
 					left = funcFileStr.find_first_of('{', max);
 					right = funcFileStr.find_first_of('}', max);
 
 					if(left < right) {
-						scopeStack.push_back(left);
-						max = scopeStack.back() + 1;
+						scopeStack.Push(left);
+						max = scopeStack[-1] + 1;
 					}
 					else {
-						scopeStack.pop_back();
+						scopeStack.Pop();
 						max = right + 1;
 					}
 				}

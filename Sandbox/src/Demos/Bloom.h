@@ -219,8 +219,8 @@ void Bloom::InitMips() {
 		mip.Sampler =
 			Texture::Create(mipIntSize.x, mipIntSize.y, Texture::Format::Float);
 
-		mipChain.push_back(mip);
-		textures.push_back(mip.Sampler);
+		mipChain.Add(mip);
+		textures.Add(mip.Sampler);
 	}
 
 	mips = Framebuffer::Create(

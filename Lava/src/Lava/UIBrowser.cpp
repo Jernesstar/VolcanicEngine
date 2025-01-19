@@ -1,6 +1,7 @@
 #include "UIBrowser.h"
 
 #include <VolcaniCore/Core/Log.h>
+#include <VolcaniCore/Core/List.h>
 #include <VolcaniCore/Core/FileUtils.h>
 
 #include <Magma/Core/DLL.h>
@@ -28,20 +29,20 @@ void UIBrowser::Load(const std::string& folderPath) {
 		s_Theme = UILoader::LoadTheme(themePath);
 
 	auto filePaths = FileUtils::GetFiles(folderPath, { ".json" });
-	s_Pages.reserve(filePaths.size());
+
 	for(auto filePath : filePaths) {
 		fs::path p(filePath);
 		auto name = p.stem().stem().stem().string();
 		auto filePathName = (fs::path(folderPath) / name).string();
 
 		if(name != "theme") {
-			auto& page = s_Pages.emplace_back(name);
+			auto& page = s_Pages.Emplace(name);
 			page.SetTheme(s_Theme);
 			UILoader::Load(page, filePathName);
 		}
 	}
 
-	s_CurrentPage = &s_Pages[0];
+	s_CurrentPage = s_Pages.At(0);
 }
 
 void UIBrowser::Compile(const std::string& folderPath,
@@ -82,7 +83,6 @@ void UIBrowser::Compile(const std::string& folderPath,
 	auto premakeFile = std::ofstream("Lava/projects/UI/pages.lua"); // Deletes file contents
 
 	auto filePaths = FileUtils::GetFiles(folderPath, { ".json" });
-	s_Pages.reserve(filePaths.size());
 	for(auto filePath : filePaths) {
 		fs::path p(filePath);
 		auto name = p.stem().stem().stem().string();

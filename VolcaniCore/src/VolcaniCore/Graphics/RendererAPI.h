@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Core/Buffer.h"
+#include "Core/List.h"
 
 #include "Graphics/Shader.h"
 #include "Graphics/Texture.h"
@@ -179,7 +180,7 @@ struct DrawUniforms {
 		Mat4Uniforms[name] = data;
 	}
 	void SetInput(const UniformSlot& data) {
-		UniformBuffers.push_back(data);
+		UniformBuffers.Add(data);
 	}
 };
 
@@ -222,8 +223,8 @@ struct DrawCommand {
 	}
 
 	DrawCall& NewDrawCall() {
-		return Calls.emplace_back(IndicesIndex, 0, VerticesIndex, 0,
-								  InstancesIndex, 0);
+		return
+			Calls.Emplace(IndicesIndex, 0, VerticesIndex, 0, InstancesIndex, 0);
 	}
 };
 

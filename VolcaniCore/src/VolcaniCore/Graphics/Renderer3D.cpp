@@ -158,8 +158,8 @@ void Renderer3D::DrawMesh(Ref<Mesh> mesh, const glm::mat4& tr,
 
 	if(!s_Meshes.count(mesh)) {
 		auto* command = Renderer::NewCommand();
-		command->AddIndices(Buffer(mesh->GetIndices()));
-		command->AddVertices(Buffer(mesh->GetVertices()));
+		command->AddIndices(mesh->GetIndices().GetBuffer());
+		command->AddVertices(mesh->GetVertices().GetBuffer());
 
 		Material& mat = mesh->GetMaterial();
 		command->UniformData
@@ -173,21 +173,19 @@ void Renderer3D::DrawMesh(Ref<Mesh> mesh, const glm::mat4& tr,
 	auto* command = s_Meshes[mesh];
 	auto* buffer = Renderer::GetPass()->Get()->BufferData;
 
-	if(!command->Calls.size()
-	|| command->Calls[command->Calls.size() - 1].InstanceCount >= 10'000)
-	{
+	if(!command->Calls || command->Calls[-1].InstanceCount >= 10'000) {
 		auto& call = command->NewDrawCall();
 		call.Primitive = PrimitiveType::Triangle;
 		call.Partition = PartitionType::Instanced;
-		call.IndexCount  = mesh->GetIndices().size();
-		call.VertexCount = mesh->GetVertices().size();
-		call.IndexStart -= mesh->GetIndices().size();
-		call.VertexStart -= mesh->GetVertices().size();
+		call.IndexCount  = mesh->GetIndices().Count();
+		call.VertexCount = mesh->GetVertices().Count();
+		call.IndexStart -= mesh->GetIndices().Count();
+		call.VertexStart -= mesh->GetVertices().Count();
 		call.InstanceStart = s_InstanceEnd;
 		s_InstanceEnd += 10'000;
 	}
 
-	auto& call = command->Calls[command->Calls.size() - 1];
+	auto& call = command->Calls[-1];
 	RendererAPI::Get()
 	->SetBufferData(buffer, DrawBufferIndex::Instances, glm::value_ptr(tr),
 					1, call.InstanceStart + call.InstanceCount++);

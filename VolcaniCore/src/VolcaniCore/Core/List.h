@@ -4,46 +4,100 @@
 
 namespace VolcaniCore {
 
+struct SearchResult {
+	bool Found;
+	uint64_t Index;
+
+	operator bool() const { return Found; }
+};
+
 template<typename T>
 class List {
 public:
 	List()
-		: m_Buffer(5)
+		: m_Buffer(50) { }
+	List(uint64_t size)
+		: m_Buffer(size) { }
+	List(const std::initializer_list<T>& list)
+		: m_Buffer(list.size()), m_Back(list.size())
 	{
-
+		m_Buffer.Set(list.begin(), list.size());
 	}
+	List(List&& other) = default;
+	List(const List& other) {
+		m_Buffer = other.m_Buffer.Copy();
+		m_Front = other.m_Front;
+		m_Back = other.m_Back;
+	}
+
 	~List() = default;
 
-	operator bool() const { return m_Buffer.GetCount(); }
+	List& operator =(const List& other) {
+		m_Buffer = other.m_Buffer.Copy();
+		m_Front = other.m_Front;
+		m_Back = other.m_Back;
+		return *this;
+	}
+	List& operator =(List&& other) = default;
 
-	T& operator[](int64_t idx) {
+	operator bool() const { return Count(); }
+
+	T& operator[](int64_t idx) { return *At(idx); }
+	const T& operator[](int64_t idx) const { return *At(idx); }
+
+	T* At(int64_t idx) const {
 		if(idx < 0)
-			return m_Buffer[(uint32_t)((int64_t)m_Buffer.GetCount() + idx)];
-		return m_Buffer[idx];
+			return m_Buffer.Get() + (uint64_t)((int64_t)m_Back + idx);
+
+		return m_Buffer.Get() + m_Front + (uint64_t)idx;
 	}
 
-	T* At(int32_t idx) {
-		if(idx < 0)
-			return m_Buffer.Get() + (uint32_t)((int32_t)Count() + idx);
-		return m_Buffer.Get() + (uint32_t)(idx);
-	}
+	uint64_t Count() const { return m_Back - m_Front; }
 
 	template<typename ...Args>
-	void Emplace(Args&&... args) {
+	T& Emplace(Args&&... args) {
 		m_Buffer.Add(T(std::forward<Args>(args)...));
+		return *At(-1);
 	}
 
 	void Add(const T& element) {
+		if(Count() >= m_Buffer.GetMaxCount())
+			Reallocate(10);
+
 		m_Buffer.Add(element);
+		m_Back++;
 	}
-	void Push() {
+
+	void Add(const std::vector<T>& list) {
+		if(Count() + list.size() >= m_Buffer.GetMaxCount())
+			Reallocate(list.size());
+
+		m_Buffer.Add(list);
+	}
+
+	void Add(const List& list) {
+		if(Count() + list.size() >= m_Buffer.GetMaxCount())
+			Reallocate(list.size());
+
+		m_Buffer.Add(list.m_Buffer);
+	}
+
+	void Push(const T& element, bool back = true) {
+		if(back) {
+			Add(element);
+			return;
+		}
+
+		// TODO(Implement): Push front
+	}
+
+	T Pop(bool back = true) {
+		return back ? *At(m_Back--) : *At(m_Front++);
+	}
+
+	void Remove(int64_t idx) {
 		
 	}
-	void Pop() {
-
-	}
-
-	uint64_t Count() { return m_Buffer.GetCount(); }
 
 	template<typename TOut, class TPredicate>
 	void For(TPredicate&& func) {
@@ -62,6 +116,26 @@ public:
 		return out;
 	}
 
+	SearchResult Find(Func<bool, const T&> func) const {
+		for(uint64_t i = 0; i < Count(); i++)
+			if(func(*At(i)))
+				return { true, i };
+
+		return { false, 0 };
+	}
+
+	void Reallocate(uint64_t additional) {
+		m_Buffer.Reallocate(additional);
+	}
+
+	void Clear() {
+		m_Buffer.Clear();
+		m_Front = 0;
+		m_Back = 0;
+	}
+
+	const Buffer<T>& GetBuffer() const { return m_Buffer; }
+
 	using iterator = T*;
 	using const_iterator = const T*;
 	iterator begin() { return m_Buffer.begin(); }
@@ -73,6 +147,8 @@ public:
 
 private:
 	Buffer<T> m_Buffer;
+
+	uint64_t m_Front = 0, m_Back = 0;
 };
 
 }

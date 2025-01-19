@@ -25,6 +25,8 @@
 #include <OpenGL/Texture2D.h>
 
 #include <VolcaniCore/Core/Application.h>
+#include <VolcaniCore/Core/List.h>
+
 #include <VolcaniCore/Event/Events.h>
 #include <VolcaniCore/Graphics/RendererAPI.h>
 
@@ -46,7 +48,7 @@ static List<UIType> s_Stack;
 
 UIState UIRenderer::DrawWindow(UI::Window& window) {
 	if(window.Width == 0 || window.Height == 0) {
-		s_Stack.push_back(UIType::DummyWindow);
+		s_Stack.Add(UIType::DummyWindow);
 		return { };
 	}
 
@@ -87,9 +89,8 @@ UIState UIRenderer::DrawWindow(UI::Window& window) {
 	ImGui::SetNextWindowPos(
 		ImVec2{ x + alignX + window.x, y + alignY + window.y });
 
-	if(s_Stack.size()
-	&& (s_Stack.back() == UIType::Window
-	 || s_Stack.back() == UIType::DummyWindow))
+	if(s_Stack
+	&& (s_Stack[-1] == UIType::Window || s_Stack[-1] == UIType::DummyWindow))
 	{
 		auto childFlags = ImGuiChildFlags_Border | ImGuiChildFlags_FrameStyle;
 		ImVec2 size(window.Width, window.Height);
@@ -98,7 +99,7 @@ UIState UIRenderer::DrawWindow(UI::Window& window) {
 		ImGui::BeginChild(window.GetID().c_str(), size, childFlags);
 		ImGui::PopStyleColor();
 
-		s_Stack.push_back(UIType::ChildWindow);
+		s_Stack.Add(UIType::ChildWindow);
 	}
 	else {
 		auto windowFlags = ImGuiWindowFlags_NoDocking
@@ -120,7 +121,7 @@ UIState UIRenderer::DrawWindow(UI::Window& window) {
 		ImGui::PopStyleColor(2);
 		ImGui::PopStyleVar(3);
 
-		s_Stack.push_back(UIType::Window);
+		s_Stack.Add(UIType::Window);
 	}
 
 	// TODO(Implement): WindowState
@@ -222,7 +223,7 @@ UIState UIRenderer::DrawTextInput(TextInput& textInput) {
 }
 
 UIState UIRenderer::DrawDropdown(Dropdown& dropdown) {
-	uint32_t n = dropdown.Options.size();
+	uint32_t n = dropdown.Options.Count();
 	//const char* items[n];
 	const char** items = new const char*[255];
 	// TODO(Implement): Images
@@ -253,7 +254,7 @@ UIState UIRenderer::DrawDropdown(Dropdown& dropdown) {
 UIState UIRenderer::DrawMenuBar(const std::string& name) {
 	ImGui::BeginMainMenuBar();
 
-	s_Stack.push_back(UIType::MenuBar);
+	s_Stack.Add(UIType::MenuBar);
 
 	return {
 		ImGui::IsItemClicked(),
@@ -266,7 +267,7 @@ UIState UIRenderer::DrawMenuBar(const std::string& name) {
 UIState UIRenderer::DrawMenu(const std::string& name) {
 	ImGui::BeginMenu(name.c_str());
 
-	s_Stack.push_back(UIType::Menu);
+	s_Stack.Add(UIType::Menu);
 
 	return {
 		ImGui::IsItemClicked(),
@@ -277,7 +278,7 @@ UIState UIRenderer::DrawMenu(const std::string& name) {
 }
 
 UIState UIRenderer::DrawTabBar(const std::string& name) {
-	s_Stack.push_back(UIType::TabBar);
+	s_Stack.Add(UIType::TabBar);
 
 	ImGui::BeginTabBar(name.c_str(), ImGuiTabBarFlags_Reorderable);
 
@@ -290,7 +291,7 @@ UIState UIRenderer::DrawTabBar(const std::string& name) {
 }
 
 TabState UIRenderer::DrawTab(const std::string& name) {
-	s_Stack.push_back(UIType::Tab);
+	s_Stack.Add(UIType::Tab);
 
 	ImVec2 size = ImGui::CalcTextSize(name.c_str());
 	float padding = 14.0f;
@@ -299,7 +300,7 @@ TabState UIRenderer::DrawTab(const std::string& name) {
 
 	ImGui::SetNextItemWidth(size.x + 2.0f*padding);
 
-	ImGui::PushID(s_Stack.size());
+	ImGui::PushID(s_Stack.Count());
 	bool tabItem = ImGui::BeginTabItem(name.c_str());
 	ImGui::PopID();
 
@@ -316,7 +317,7 @@ TabState UIRenderer::DrawTab(const std::string& name) {
 		ImGui::EndTabItem();
 	}
 
-	auto closeButtonID = ImGui::GetID((int*)s_Stack.size());
+	auto closeButtonID = ImGui::GetID((int*)s_Stack.Count());
 	state.Closed = ImGui::CloseButton(closeButtonID, pos);
 
 	return state;
@@ -327,10 +328,9 @@ void UIRenderer::ShowPopupLabel(const std::string& str) {
 }
 
 void UIRenderer::Pop(uint32_t count) {
-	count = count ? count : s_Stack.size();
+	count = count ? count : s_Stack.Count();
 	while(count--) {
-		auto type = s_Stack.back();
-		s_Stack.pop_back();
+		auto type = s_Stack.Pop();
 
 		switch(type) {
 			case UIType::Window:

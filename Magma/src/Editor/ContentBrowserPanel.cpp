@@ -4,10 +4,11 @@
 #include <imgui/imgui_internal.h>
 #include <imgui/misc/cpp/imgui_stdlib.h>
 
-#include <Magma/UI/UIRenderer.h>
-
 #include <VolcaniCore/Core/Application.h>
 #include <VolcaniCore/Core/Log.h>
+#include <VolcaniCore/Core/List.h>
+
+#include <Magma/UI/UIRenderer.h>
 
 #include "Editor.h"
 
@@ -178,9 +179,9 @@ ImRect Traverse(fs::path path) {
 		for(auto p : FileUtils::GetFiles(path.string())) {
 			fs::path path(p);
 			if(fs::is_directory(path))
-				folders.push_back(path);
+				folders.Add(path);
 			else
-				files.push_back(path);
+				files.Add(path);
 		}
 	}
 	else {

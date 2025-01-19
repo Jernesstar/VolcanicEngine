@@ -1,6 +1,7 @@
 #include "SceneLoader.h"
 
 #include <VolcaniCore/Core/Assert.h>
+#include <VolcaniCore/Core/List.h>
 #include <VolcaniCore/Core/UUID.h>
 #include <VolcaniCore/Graphics/StereographicCamera.h>
 #include <VolcaniCore/Graphics/OrthographicCamera.h>
@@ -396,6 +397,25 @@ void DeserializeEntity(YAML::Node entityNode, Scene& scene) {
 }
 
 namespace YAML {
+
+template<typename T>
+struct convert<List<T>> {
+	static Node encode(const List<T>& list) {
+		Node node;
+		for(auto& val : list)
+			node.push_back(val);
+		node.SetStyle(EmitterStyle::Flow);
+		return node;
+	}
+
+	static bool decode(const Node& node, List<T>& v) {
+		if(!node.IsSequence())
+			return false;
+		for(uint64_t i = 0; i < node.size(); i++)
+			v.Add(node[i].as<T>());
+		return true;
+	}
+};
 
 template<>
 struct convert<glm::vec2> {

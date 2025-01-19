@@ -34,7 +34,7 @@ void UIElement::Add(const UINode& node) {
 	if(!m_Root)
 		return;
 
-	m_Children.push_back(node);
+	m_Children.Add(node);
 	m_Root->Get(node)->m_Parent = m_Node;
 }
 
@@ -78,7 +78,7 @@ UIElement& UIElement::Center() {
 }
 
 void UIElement::Clear() {
-	m_Children.clear();
+	m_Children.Clear();
 }
 
 void UIElement::SetParent(const UINode& node) {
@@ -106,7 +106,7 @@ UIElement* UIElement::GetChild(const std::string& id) const {
 List<UIElement*> UIElement::GetChildren() const {
 	List<UIElement*> res;
 	for(auto node : m_Children)
-		res.push_back(GetChild(node));
+		res.Add(GetChild(node));
 
 	return res;
 }

@@ -8,7 +8,7 @@
 namespace Magma {
 
 void Tab::AddPanel(Ref<Panel> panel) {
-	m_Panels.push_back(panel);
+	m_Panels.Add(panel);
 }
 
 Ref<Panel> Tab::GetPanel(const std::string& name) {

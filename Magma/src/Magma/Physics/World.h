@@ -7,6 +7,7 @@
 using namespace physx;
 #endif
 
+#include <VolcaniCore/Core/List.h>
 #include <VolcaniCore/Core/Time.h>
 
 using namespace VolcaniCore;
@@ -75,10 +76,10 @@ public:
 	void AddContactCallback(Ref<RigidBody> actor1, Ref<RigidBody> actor2,
 		const std::function<void(Ref<RigidBody>, Ref<RigidBody>)>& callback);
 
-	const List<Ref<RigidBody>>& GetActors() const { return m_Actors; }
+	const std::vector<Ref<RigidBody>>& GetActors() const { return m_Actors; }
 
-	List<Ref<RigidBody>>::const_iterator begin() { return m_Actors.begin(); }
-	List<Ref<RigidBody>>::const_iterator end() { return m_Actors.end(); }
+	std::vector<Ref<RigidBody>>::const_iterator begin() { return m_Actors.begin(); }
+	std::vector<Ref<RigidBody>>::const_iterator end() { return m_Actors.end(); }
 
 #ifdef MAGMA_PHYSICS
 	PxScene* Get() { return m_Scene; }
@@ -93,7 +94,7 @@ private:
 
 	uint64_t m_ActorCount = 0;
 	uint64_t m_MaxActorCount = 0;
-	List<Ref<RigidBody>> m_Actors;
+	std::vector<Ref<RigidBody>> m_Actors;
 
 	float m_Accumulator = 0.0f;
 };

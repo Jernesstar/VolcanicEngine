@@ -1,6 +1,7 @@
 #pragma once
 
 #include <VolcaniCore/Core/Time.h>
+#include <VolcaniCore/Core/List.h>
 
 #include "Core/DLL.h"
 
@@ -55,7 +56,7 @@ public:
 	requires std::derived_from<TUIElement, UIElement>
 	UINode Add(Args&&... args) {
 		auto node = AddNew(std::forward<Args>(args)...);
-		m_FirstOrders.push_back(node);
+		m_FirstOrders.Add(node);
 		return node;
 	}
 
@@ -69,13 +70,10 @@ public:
 
 	void Clear();
 	void ClearFirstOrders();
-	List<UIElement*> GetFirstOrderElements();
-	List<const UIElement*> GetFirstOrderElements() const;
+	List<UIElement*> GetFirstOrderElements() const;
 
-	UIElement* Get(const UINode& node);
-	const UIElement* Get(const UINode& node) const;
-	UIElement* Get(const std::string& id);
-	const UIElement* Get(const std::string& id) const;
+	UIElement* Get(const UINode& node) const;
+	UIElement* Get(const std::string& id) const;
 
 	void SetTheme(const Theme& theme);
 	Theme& GetTheme() { return m_Theme; }

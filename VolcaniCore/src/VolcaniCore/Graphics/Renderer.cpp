@@ -71,7 +71,7 @@ DrawCommand* Renderer::GetCommand() {
 }
 
 DrawCommand* Renderer::NewCommand(bool usePrevious) {
-	if(usePrevious && s_DrawCommand && !s_DrawCommand->Calls.size())
+	if(usePrevious && s_DrawCommand && !s_DrawCommand->Calls)
 		return s_DrawCommand;
 
 	EndCommand();

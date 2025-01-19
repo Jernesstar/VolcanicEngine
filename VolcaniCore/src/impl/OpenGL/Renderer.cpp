@@ -64,8 +64,8 @@ void Renderer::Init() {
 	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS); // Smooth cubemap edges
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
-	s_Data.Commands.reserve(20);
-	s_Data.Passes.reserve(10);
+	s_Data.Commands.Reallocate(20);
+	s_Data.Passes.Reallocate(10);
 }
 
 void Renderer::Close() {
@@ -80,7 +80,7 @@ void Renderer::StartFrame() {
 }
 
 void Renderer::EndFrame() {
-	if(!s_Data.Commands.size()) // EndFrame already called
+	if(!s_Data.Commands) // EndFrame already called
 		return;
 
 	for(auto& [buffer, backend] : s_Data.Arrays) {
@@ -95,8 +95,8 @@ void Renderer::EndFrame() {
 	for(auto& command : s_Data.Commands)
 		FlushCommand(command);
 
-	s_Data.Commands.clear();
-	s_Data.Passes.clear();
+	s_Data.Commands.Clear();
+	s_Data.Passes.Clear();
 }
 
 DebugInfo Renderer::GetDebugInfo() {
@@ -186,11 +186,11 @@ DrawPass* Renderer::NewDrawPass(DrawBuffer* buffer,
 	// 	if(pass.BufferData == buffer && pass.Pipeline == pipeline)
 	// 		return &pass;
 
-	return &s_Data.Passes.emplace_back(buffer, pipeline, output);
+	return &s_Data.Passes.Emplace(buffer, pipeline, output);
 }
 
 DrawCommand* Renderer::NewDrawCommand(DrawPass* pass) {
-	auto* command = &s_Data.Commands.emplace_back(pass);
+	auto* command = &s_Data.Commands.Emplace(pass);
 
 	if(pass && pass->BufferData) {
 		command->IndicesIndex = pass->BufferData->IndicesCount;
@@ -232,7 +232,7 @@ void FlushCommand(DrawCommand& command) {
 	if(command.Pass)
 		SetUniforms(command);
 
-	if(command.Pass && command.Pass->BufferData && command.Calls.size()) {
+	if(command.Pass && command.Pass->BufferData && command.Calls) {
 		Ref<VertexArray> array = s_Data.Arrays[command.Pass->BufferData].Array;
 
 		array->Bind();

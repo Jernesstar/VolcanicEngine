@@ -3,6 +3,7 @@
 #include <glm/vec4.hpp>
 
 #include <Core/Defines.h>
+#include <Core/List.h>
 #include <Core/UUID.h>
 
 using namespace VolcaniCore;
@@ -90,7 +91,7 @@ protected:
 	UIPage* m_Root;
 	UINode m_Node;
 	UINode m_Parent;
-	std::vector<UINode> m_Children;
+	List<UINode> m_Children;
 
 	UIState m_State;
 

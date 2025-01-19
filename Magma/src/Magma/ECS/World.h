@@ -4,6 +4,7 @@
 
 #include <VolcaniCore/Core/Time.h>
 #include <VolcaniCore/Core/Defines.h>
+#include <VolcaniCore/Core/List.h>
 #include <VolcaniCore/Core/UUID.h>
 #include <VolcaniCore/Core/Log.h>
 

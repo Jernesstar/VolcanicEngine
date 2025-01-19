@@ -54,11 +54,11 @@ Ref<Mesh> LoadMesh(const std::string& path,
 	auto mesh = scene->mMeshes[meshIndex];
 	auto mat = scene->mMaterials[mesh->mMaterialIndex];
 
-	std::vector<Vertex> vertices;
-	std::vector<uint32_t> indices;
+	List<Vertex> vertices;
+	List<uint32_t> indices;
 
-	vertices.reserve(mesh->mNumVertices);
-	indices.reserve(mesh->mNumFaces * 3);
+	vertices.Reallocate(mesh->mNumVertices);
+	indices.Reallocate(mesh->mNumFaces * 3);
 
 	for(uint32_t i = 0; i < mesh->mNumVertices; i++) {
 		const aiVector3D& pos	   = mesh->mVertices[i];
@@ -72,14 +72,14 @@ Ref<Mesh> LoadMesh(const std::string& path,
 			.Normal			= glm::vec3(normal.x, normal.y, normal.z),
 			.TexCoord		= glm::vec2(texCoord.x, texCoord.y)
 		};
-		vertices.push_back(v);
+		vertices.Add(v);
 	}
 
 	for(uint32_t i = 0; i < mesh->mNumFaces; i++) {
 		const aiFace& face = mesh->mFaces[i];
-		indices.push_back(face.mIndices[0]);
-		indices.push_back(face.mIndices[1]);
-		indices.push_back(face.mIndices[2]);
+		indices.Add(face.mIndices[0]);
+		indices.Add(face.mIndices[1]);
+		indices.Add(face.mIndices[2]);
 	}
 
 	std::size_t slashIndex = path.find("textures");

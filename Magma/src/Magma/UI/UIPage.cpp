@@ -41,23 +41,23 @@ static void TraverseElement(UIElement* element,
 }
 
 UIPage::UIPage() {
-	Windows.reserve(10);
-	Buttons.reserve(10);
-	Dropdowns.reserve(10);
-	Texts.reserve(10);
-	TextInputs.reserve(10);
-	Images.reserve(10);
+	Windows.Reallocate(10);
+	Buttons.Reallocate(10);
+	Dropdowns.Reallocate(10);
+	Texts.Reallocate(10);
+	TextInputs.Reallocate(10);
+	Images.Reallocate(10);
 }
 
 UIPage::UIPage(const std::string &name)
     : Name(name)
 {
-	Windows.reserve(10);
-	Buttons.reserve(10);
-	Dropdowns.reserve(10);
-	Texts.reserve(10);
-	TextInputs.reserve(10);
-	Images.reserve(10);
+	Windows.Reallocate(10);
+	Buttons.Reallocate(10);
+	Dropdowns.Reallocate(10);
+	Texts.Reallocate(10);
+	TextInputs.Reallocate(10);
+	Images.Reallocate(10);
 }
 
 void UIPage::Render() {
@@ -77,43 +77,43 @@ UINode UIPage::Add(UIElementType type, const std::string& id) {
 	switch(type) {
 		case UIElementType::Window:
 		{
-			auto& element = Windows.emplace_back(id, this);
-			element.m_Node = { type, Windows.size() - 1 };
+			auto& element = Windows.Emplace(id, this);
+			element.m_Node = { type, Windows.Count() - 1 };
 			return element.m_Node;
 			break;
 		}
 		case UIElementType::Button:
 		{
-			auto& element = Buttons.emplace_back(id, this);
-			element.m_Node = { type, Buttons.size() - 1 };
+			auto& element = Buttons.Emplace(id, this);
+			element.m_Node = { type, Buttons.Count() - 1 };
 			return element.m_Node;
 			break;
 		}
 		case UIElementType::Dropdown:
 		{
-			auto& element = Dropdowns.emplace_back(id, this);
-			element.m_Node = { type, Dropdowns.size() - 1 };
+			auto& element = Dropdowns.Emplace(id, this);
+			element.m_Node = { type, Dropdowns.Count() - 1 };
 			return element.m_Node;
 			break;
 		}
 		case UIElementType::Text:
 		{
-			auto& element = Texts.emplace_back(id, this);
-			element.m_Node = { type, Texts.size() - 1 };
+			auto& element = Texts.Emplace(id, this);
+			element.m_Node = { type, Texts.Count() - 1 };
 			return element.m_Node;
 			break;
 		}
 		case UIElementType::TextInput:
 		{
-			auto& element = TextInputs.emplace_back(id, this);
-			element.m_Node = { type, TextInputs.size() - 1 };
+			auto& element = TextInputs.Emplace(id, this);
+			element.m_Node = { type, TextInputs.Count() - 1 };
 			return element.m_Node;
 			break;
 		}
 		case UIElementType::Image:
 		{
-			auto& element = Images.emplace_back(id, this);
-			element.m_Node = { type, Images.size() - 1 };
+			auto& element = Images.Emplace(id, this);
+			element.m_Node = { type, Images.Count() - 1 };
 			return element.m_Node;
 			break;
 		}
@@ -123,151 +123,91 @@ UINode UIPage::Add(UIElementType type, const std::string& id) {
 }
 
 void UIPage::Add(const UINode& node) {
-	m_FirstOrders.push_back(node);
+	m_FirstOrders.Add(node);
 }
 
 void UIPage::Parent(const UINode& node, const UINode& parent) {
-	if(!Get(node))
-		return;
+	// if(!Get(node))
+	// 	return;
 
-	UIElement* element = Get(node);
-	bool firstOrder = !element->GetParent();
-	element->SetParent(parent);
+	// UIElement* element = Get(node);
+	// bool firstOrder = !element->GetParent();
+	// element->SetParent(parent);
 
-	if(!firstOrder)
-		return;
+	// if(!firstOrder)
+	// 	return;
 
-	auto it = std::find(m_FirstOrders.begin(), m_FirstOrders.end(), node);
-	uint32_t index = std::distance(m_FirstOrders.begin(), it);
-	m_FirstOrders.erase(it);
+	// auto it = std::find(m_FirstOrders.begin(), m_FirstOrders.end(), node);
+	// uint32_t index = std::distance(m_FirstOrders.begin(), it);
+	// m_FirstOrders.erase(it);
 }
 
 void UIPage::Clear() {
-	m_FirstOrders.clear();
-	Windows.clear();
-	Buttons.clear();
-	Dropdowns.clear();
-	Texts.clear();
-	TextInputs.clear();
-	Images.clear();
+	m_FirstOrders.Clear();
+	Windows.Clear();
+	Buttons.Clear();
+	Dropdowns.Clear();
+	Texts.Clear();
+	TextInputs.Clear();
+	Images.Clear();
 }
 
 void UIPage::ClearFirstOrders() {
-	m_FirstOrders.clear();
+	m_FirstOrders.Clear();
 }
 
-UIElement* UIPage::Get(const UINode& node) {
+UIElement* UIPage::Get(const UINode& node) const {
 	switch(node.first) {
 		case UIElementType::Window:
-			if(node.second < Windows.size())
-				return (UIElement*)&Windows[node.second];
+			if(node.second < Windows.Count())
+				return (UIElement*)Windows.At(node.second);
 		case UIElementType::Button:
-			if(node.second < Buttons.size())
-				return (UIElement*)&Buttons[node.second];
+			if(node.second < Buttons.Count())
+				return (UIElement*)Buttons.At(node.second);
 		case UIElementType::Dropdown:
-			if(node.second < Dropdowns.size())
-				return (UIElement*)&Dropdowns[node.second];
+			if(node.second < Dropdowns.Count())
+				return (UIElement*)Dropdowns.At(node.second);
 		case UIElementType::Text:
-			if(node.second < Texts.size())
-				return (UIElement*)&Texts[node.second];
+			if(node.second < Texts.Count())
+				return (UIElement*)Texts.At(node.second);
 		case UIElementType::TextInput:
-			if(node.second < TextInputs.size())
-				return (UIElement*)&TextInputs[node.second];
+			if(node.second < TextInputs.Count())
+				return (UIElement*)TextInputs.At(node.second);
 		case UIElementType::Image:
-			if(node.second < Images.size())
-				return (UIElement*)&Images[node.second];
+			if(node.second < Images.Count())
+				return (UIElement*)Images.At(node.second);
 	}
 
 	return nullptr;
 }
 
-const UIElement* UIPage::Get(const UINode& node) const {
-	VOLCANICORE_LOG_INFO("Size: %i", Windows.size());
-	switch(node.first) {
-		case UIElementType::Window:
-			if(node.second < Windows.size())
-				return (UIElement*)&Windows[node.second];
-			else
-				VOLCANICORE_LOG_ERROR("Too high of a number");
-		case UIElementType::Button:
-			if(node.second < Buttons.size())
-				return (UIElement*)&Buttons[node.second];
-		case UIElementType::Dropdown:
-			if(node.second < Dropdowns.size())
-				return (UIElement*)&Dropdowns[node.second];
-		case UIElementType::Text:
-			if(node.second < Texts.size())
-				return (UIElement*)&Texts[node.second];
-		case UIElementType::TextInput:
-			if(node.second < TextInputs.size())
-				return (UIElement*)&TextInputs[node.second];
-		case UIElementType::Image:
-			if(node.second < Images.size())
-				return (UIElement*)&Images[node.second];
-	}
+UIElement* UIPage::Get(const std::string& id) const {
+	if(auto res =
+		Windows.Find([&](auto& element) { return element.GetID() == id; }))
+		return (UIElement*)Windows.At(res.Index);
+	if(auto res =
+		Buttons.Find([&](auto& element) { return element.GetID() == id; }))
+		return (UIElement*)Buttons.At(res.Index);
+	if(auto res =
+		Dropdowns.Find([&](auto& element) { return element.GetID() == id; }))
+		return (UIElement*)Dropdowns.At(res.Index);
+	if(auto res =
+		Texts.Find([&](auto& element) { return element.GetID() == id; }))
+		return (UIElement*)Texts.At(res.Index);
+	if(auto res =
+		TextInputs.Find([&](auto& element) { return element.GetID() == id; }))
+		return (UIElement*)TextInputs.At(res.Index);
+	if(auto res =
+		Images.Find([&](auto& element) { return element.GetID() == id; }))
+		return (UIElement*)Images.At(res.Index);
 
 	return nullptr;
 }
 
-UIElement* UIPage::Get(const std::string& id) {
-	uint32_t i = 0;
-	for(; i < Windows.size(); i++)
-		if(Windows[i].GetID() == id)
-			return (UIElement*)(Windows.data() + i);
-	for(; i < Buttons.size(); i++)
-		if(Buttons[i].GetID() == id)
-			return (UIElement*)(Buttons.data() + i);
-	for(; i < Dropdowns.size(); i++)
-		if(Dropdowns[i].GetID() == id)
-			return (UIElement*)(Dropdowns.data() + i);
-	for(; i < Texts.size(); i++)
-		if(Texts[i].GetID() == id)
-			return (UIElement*)(Texts.data() + i);
-	for(; i < TextInputs.size(); i++)
-		if(TextInputs[i].GetID() == id)
-			return (UIElement*)(TextInputs.data() + i);
-	for(; i < Images.size(); i++)
-		if(Images[i].GetID() == id)
-			return (UIElement*)(Images.data() + i);
-
-	return nullptr;
-}
-
-const UIElement* UIPage::Get(const std::string& id) const {
-	for(auto& element : Windows)
-		if(element.GetID() == id)
-			return (UIElement*)&element;
-	for(auto& element : Buttons)
-		if(element.GetID() == id)
-			return (UIElement*)&element;
-	for(auto& element : Dropdowns)
-		if(element.GetID() == id)
-			return (UIElement*)&element;
-	for(auto& element : Texts)
-		if(element.GetID() == id)
-			return (UIElement*)&element;
-	for(auto& element : TextInputs)
-		if(element.GetID() == id)
-			return (UIElement*)&element;
-	for(auto& element : Images)
-		if(element.GetID() == id)
-			return (UIElement*)&element;
-
-	return nullptr;
-}
-
-List<UIElement*> UIPage::GetFirstOrderElements() {
+List<UIElement*> UIPage::GetFirstOrderElements() const {
 	List<UIElement*> res;
 	for(auto node : m_FirstOrders)
-		res.push_back(Get(node));
-
-	return res;
-}
-
-List<const UIElement*> UIPage::GetFirstOrderElements() const {
-	List<const UIElement*> res;
-	for(auto node : m_FirstOrders)
-		res.push_back(Get(node));
+		res.Add(Get(node));
 
 	return res;
 }

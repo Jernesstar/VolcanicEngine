@@ -5,6 +5,7 @@
 #include <glm/vec4.hpp>
 
 #include "Core/Defines.h"
+#include "Core/List.h"
 
 #include "Graphics/Texture.h"
 

@@ -2,6 +2,8 @@
 
 #include "UIElement.h"
 
+#include <VolcaniCore/Core/List.h>
+
 namespace Magma::UI {
 
 class Dropdown : public UIElement {

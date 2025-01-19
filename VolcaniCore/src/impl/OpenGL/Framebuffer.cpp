@@ -124,11 +124,11 @@ void Framebuffer::Unbind() const {
 
 void Framebuffer::Add(AttachmentTarget target, Ref<Texture> texture) {
 	uint32_t id = texture->As<OpenGL::Texture2D>()->GetID();
-	uint32_t idx = m_AttachmentMap[target].size();
+	uint32_t idx = m_AttachmentMap[target].Count();
 	auto& att =
 		m_AttachmentMap[target]
-			.emplace_back(Attachment::Type::Texture,
-						  texture->GetWidth(), texture->GetHeight(), id);
+			.Emplace(Attachment::Type::Texture,
+					 texture->GetWidth(), texture->GetHeight(), id);
 
 	Attach(target, idx, idx);
 

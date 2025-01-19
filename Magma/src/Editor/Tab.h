@@ -1,6 +1,7 @@
 #pragma once
 
 #include <VolcaniCore/Core/Defines.h>
+#include <VolcaniCore/Core/List.h>
 #include <VolcaniCore/Core/Time.h>
 
 #include "Panel.h"
@@ -34,7 +35,7 @@ public:
 	requires std::derived_from<TPanel, Panel>
 	Ref<Panel> AddPanel(Args&&... args) {
 		auto panel = CreateRef<TPanel>(std::forward<Args>(args)...);
-		m_Panels.push_back(panel);
+		m_Panels.Add(panel);
 		return panel;
 	}
 

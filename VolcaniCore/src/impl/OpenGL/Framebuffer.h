@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Core/Defines.h>
+#include <Core/List.h>
 
 #include <Graphics/Framebuffer.h>
 
@@ -56,8 +57,10 @@ public:
 
 	void Bind(AttachmentTarget target, uint32_t slot, uint32_t index = 0) const;
 
-	const Attachment& GetAttachment(AttachmentTarget target, uint32_t index = 0) const {
-		return m_AttachmentMap.at(target).at(index);
+	const Attachment& GetAttachment(AttachmentTarget target,
+									uint32_t index = 0) const
+	{
+		return m_AttachmentMap.at(target)[index];
 	}
 
 private:

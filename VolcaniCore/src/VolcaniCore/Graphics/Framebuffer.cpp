@@ -29,12 +29,13 @@ Ref<Framebuffer> Framebuffer::Create(
 
 			for(auto& [target, textures] : textureAttachments)
 				for(auto& texture : textures) {
-					attachments[target].push_back(
-					{
-						OpenGL::Attachment::Type::Texture,
-						texture->GetWidth(), texture->GetHeight(),
-						texture->As<OpenGL::Texture2D>()->GetID()
-					});
+					attachments[target]
+					.Add(
+						{
+							OpenGL::Attachment::Type::Texture,
+							texture->GetWidth(), texture->GetHeight(),
+							texture->As<OpenGL::Texture2D>()->GetID()
+						});
 
 					texture->As<OpenGL::Texture2D>()->m_Owns = false;
 

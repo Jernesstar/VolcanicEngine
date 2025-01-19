@@ -16,7 +16,7 @@ public:
 		: m_MaxCount(maxCount), m_Count(0)
 	{
 		if(maxCount != 0)
-			m_Data = new T[m_MaxCount];
+			m_Data = (T*)malloc(m_MaxCount * sizeof(T));
 	}
 	Buffer(Buffer&& other)
 		: m_MaxCount(other.GetMaxCount()), m_Count(other.GetCount())
@@ -26,13 +26,13 @@ public:
 	Buffer(const Buffer& other)
 		: m_MaxCount(other.GetMaxCount())
 	{
-		m_Data = new T[m_MaxCount];
+		m_Data = (T*)malloc(m_MaxCount * sizeof(T));
 		Set(other.Get(), other.GetCount());
 	}
-	Buffer(const List<T>& list)
+	Buffer(const std::vector<T>& list)
 		: m_MaxCount(list.size())
 	{
-		m_Data = new T[m_MaxCount];
+		m_Data = (T*)malloc(m_MaxCount * sizeof(T));
 		Set(list.data(), list.size());
 	}
 	Buffer(T* buffer, uint64_t count, uint64_t maxCount = 0)
@@ -57,11 +57,11 @@ public:
 
 	T* Get() const { return m_Data; }
 
-	List<T> GetList() const {
-		return List<T>(m_Data, m_Data + m_Count);
+	std::vector<T> GetList() const {
+		return std::vector<T>(m_Data, m_Data + m_Count);
 	}
 
-	T& operator [](uint64_t index) const {
+	T& operator [](uint64_t index) {
 		VOLCANICORE_ASSERT(index < m_Count);
 		return m_Data[index];
 	}
@@ -71,9 +71,7 @@ public:
 	uint64_t GetSize()	   const { return m_Count	 * sizeof(T); }
 	uint64_t GetMaxSize()  const { return m_MaxCount * sizeof(T); }
 
-	Buffer<T> Copy() {
-		return Buffer<T>(*this);
-	}
+	Buffer<T> Copy() const { return Buffer<T>(*this); }
 
 	Buffer<T> Partition(uint64_t count = 0) {
 		if(count == 0)
@@ -83,19 +81,19 @@ public:
 
 	void Add(const T& element) {
 		if(m_MaxCount != 0 && m_Count >= m_MaxCount)
-			Reallocate(100);
+			return;
 
 		m_Data[m_Count++] = element;
 	}
 	void Add(const Buffer& buffer) {
 		if(m_MaxCount != 0 && m_Count + buffer.GetCount() >= m_MaxCount)
-			Reallocate(buffer.GetCount());
+			return;
 
 		Set(buffer.Get(), buffer.GetCount(), m_Count);
 	}
-	void Add(const List<T>& list) {
+	void Add(const std::vector<T>& list) {
 		if(m_MaxCount != 0 && m_Count + list.size() >= m_MaxCount)
-			Reallocate(list.size());
+			return;
 
 		Set(list.data(), list.size(), m_Count);
 	}
@@ -120,7 +118,7 @@ public:
 	}
 
 	void Delete() {
-		delete m_Data;
+		free(m_Data);
 		m_Data = nullptr;
 		m_Count = 0;
 		m_MaxCount = 0;
@@ -129,9 +127,9 @@ public:
 	void Reallocate(uint64_t surplus) {
 		m_MaxCount += surplus;
 
-		T* newData = new T[m_MaxCount];
+		T* newData = (T*)malloc(m_MaxCount * sizeof(T));
 		memcpy(newData, m_Data, GetSize());
-		delete m_Data;
+		free(m_Data);
 		m_Data = newData;
 	}
 
@@ -177,7 +175,7 @@ public:
 	}
 
 	template<typename T>
-	Buffer(const List<T>& list)
+	Buffer(const std::vector<T>& list)
 		: m_SizeT(sizeof(T)), m_MaxCount(list.size())
 	{
 		m_Data = malloc(GetMaxSize());
@@ -226,29 +224,17 @@ public:
 		return Buffer(m_Data + (m_Count += count), m_SizeT, count);
 	}
 
-	// template<typename T>
-	// void Add(const T& element) {
-	// 	if(m_MaxCount != 0 && m_Count >= m_MaxCount)
-	// 		Reallocate(100);
-
-	// 	memset(m_Data, element, sizeof(T));
-	// }
 	void Add(const Buffer& buffer) {
 		if(m_MaxCount != 0 && m_Count + buffer.GetCount() >= m_MaxCount)
-			Reallocate(buffer.GetCount());
+			return;
 
 		Set(buffer.Get(), buffer.GetCount(), m_Count);
 	}
-	// void Add(const List<T>& list) {
-	// 	if(m_MaxCount != 0 && m_Count + list.size() >= m_MaxCount)
-	// 		Reallocate(list.size());
 
-	// 	memcpy(m_Data + m_Count, list.data(), list.size() * m_SizeT);
-	// 	m_Count += list.size();
-	// }
 	void Add(const void* data, uint64_t count) {
 		Set(data, count, m_Count);
 	}
+
 	void Set(const void* data, uint64_t count, uint64_t offset = 0) {
 		if(offset >= m_MaxCount)
 			return;

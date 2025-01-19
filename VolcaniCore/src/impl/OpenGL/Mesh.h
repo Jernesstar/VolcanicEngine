@@ -13,8 +13,8 @@ class Mesh : public VolcaniCore::Mesh {
 public:
 	Mesh(const std::string& path);
 
-	Mesh(const std::vector<Vertex>& vertices,
-		 const std::vector<uint32_t>& indices, const Material& material = { });
+	Mesh(const List<Vertex>& vertices,
+		 const List<uint32_t>& indices, const Material& material = { });
 
 	Ref<VertexArray> GetVertexArray() { return m_VertexArray; }
 

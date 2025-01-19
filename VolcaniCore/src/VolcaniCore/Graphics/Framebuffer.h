@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Core/Defines.h"
+#include "Core/List.h"
 
 #include <Graphics/Texture.h>
 
