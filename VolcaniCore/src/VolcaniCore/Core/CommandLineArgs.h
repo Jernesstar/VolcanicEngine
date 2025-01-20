@@ -29,7 +29,7 @@ public:
 		int32_t lastOption = -1;
 		// Skip the first command line argument, which is the executable itself
 		for(uint32_t i = 0; i < argc - 1; i++) {
-			m_Args[i] = std::string(argv[i + 1]);
+			m_Args.Add(std::string(argv[i + 1]));
 			if(m_Args[i][0] == '-') {
 				lastOption = i;
 				m_ArgMap[m_Args[lastOption]] = ArgList(true);
@@ -37,6 +37,8 @@ public:
 			else if(lastOption != -1)
 				m_ArgMap[m_Args[lastOption]].Args.Add(m_Args[i]);
 		}
+
+		VOLCANICORE_LOG_INFO("Here");
 	}
 
 	std::string operator [](uint32_t index) const {

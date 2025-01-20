@@ -16,7 +16,7 @@ public:
 		: m_MaxCount(maxCount), m_Count(0)
 	{
 		if(maxCount != 0)
-			m_Data = (T*)malloc(m_MaxCount * sizeof(T));
+			m_Data = (T*)malloc(GetMaxSize());
 	}
 	Buffer(Buffer&& other)
 		: m_MaxCount(other.GetMaxCount()), m_Count(other.GetCount())
@@ -26,13 +26,13 @@ public:
 	Buffer(const Buffer& other)
 		: m_MaxCount(other.GetMaxCount())
 	{
-		m_Data = (T*)malloc(m_MaxCount * sizeof(T));
+		m_Data = (T*)malloc(GetMaxSize());
 		Set(other.Get(), other.GetCount());
 	}
 	Buffer(const std::vector<T>& list)
 		: m_MaxCount(list.size())
 	{
-		m_Data = (T*)malloc(m_MaxCount * sizeof(T));
+		m_Data = (T*)malloc(GetMaxSize());
 		Set(list.data(), list.size());
 	}
 	Buffer(T* buffer, uint64_t count, uint64_t maxCount = 0)
@@ -59,11 +59,6 @@ public:
 
 	std::vector<T> GetList() const {
 		return std::vector<T>(m_Data, m_Data + m_Count);
-	}
-
-	T& operator [](uint64_t index) {
-		VOLCANICORE_ASSERT(index < m_Count);
-		return m_Data[index];
 	}
 
 	uint64_t GetCount()	   const { return m_Count; }
@@ -113,6 +108,14 @@ public:
 			m_Count = offset + count;
 	}
 
+	void Add() {
+		m_Count++;
+	}
+
+	void Remove() {
+		m_Count--;
+	}
+
 	void Clear() {
 		m_Count = 0;
 	}
@@ -127,20 +130,11 @@ public:
 	void Reallocate(uint64_t surplus) {
 		m_MaxCount += surplus;
 
-		T* newData = (T*)malloc(m_MaxCount * sizeof(T));
+		T* newData = (T*)malloc(GetMaxSize());
 		memcpy(newData, m_Data, GetSize());
 		free(m_Data);
 		m_Data = newData;
 	}
-
-	using iterator = T*;
-	using const_iterator = const T*;
-	iterator begin() { return m_Data; }
-	iterator end() { return m_Data + m_Count; }
-	const_iterator cbegin() const { return m_Data; }
-	const_iterator cend()	const { return m_Data + m_Count; }
-	const_iterator begin()	const { return cbegin(); }
-	const_iterator end()	const { return cend(); }
 
 private:
 	T* m_Data = nullptr;

@@ -63,9 +63,6 @@ void Renderer::Init() {
 	glEnable(GL_FRAMEBUFFER_SRGB);			// Gamma correction
 	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS); // Smooth cubemap edges
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-
-	s_Data.Commands.Reallocate(20);
-	s_Data.Passes.Reallocate(10);
 }
 
 void Renderer::Close() {

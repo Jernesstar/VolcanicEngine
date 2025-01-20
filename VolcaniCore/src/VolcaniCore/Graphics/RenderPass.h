@@ -101,7 +101,6 @@ public:
 	void SetUniforms(DrawCommand* command);
 	Uniforms& GetUniforms() { return m_Uniforms; }
 
-
 private:
 	DrawPass m_Pass;
 	Uniforms m_Uniforms;

@@ -15,30 +15,59 @@ template<typename T>
 class List {
 public:
 	List()
-		: m_Buffer(50) { }
+		: m_Buffer(10) { }
 	List(uint64_t size)
-		: m_Buffer(size) { }
-	List(const std::initializer_list<T>& list)
-		: m_Buffer(list.size()), m_Back(list.size())
+		: m_Buffer(size)
 	{
-		m_Buffer.Set(list.begin(), list.size());
+		VOLCANICORE_LOG_INFO("Alloc");
 	}
-	List(List&& other) = default;
-	List(const List& other) {
-		m_Buffer = other.m_Buffer.Copy();
+	List(const std::initializer_list<T>& list)
+		: m_Buffer(list.size())
+	{
+		for(auto& element : list)
+			Add(element);
+	}
+	List(List&& other)
+		: m_Buffer(other.m_Buffer.GetMaxCount())
+	{
 		m_Front = other.m_Front;
 		m_Back = other.m_Back;
+		for(uint64_t i = 0; i < other.Count(); i++)
+			Add(*other.At(i));
+	}
+	List(const List& other)
+		: m_Buffer(other.m_Buffer.GetMaxCount())
+	{
+		m_Front = other.m_Front;
+		m_Back = other.m_Back;
+		for(uint64_t i = 0; i < other.Count(); i++)
+			Add(*other.At(i));
 	}
 
-	~List() = default;
+	~List() {
+		Clear();
+		m_Buffer.Delete();
+	}
 
 	List& operator =(const List& other) {
-		m_Buffer = other.m_Buffer.Copy();
+		m_Buffer = Buffer<T>(other.m_Buffer.GetMaxCount());
 		m_Front = other.m_Front;
 		m_Back = other.m_Back;
+		for(uint64_t i = 0; i < other.Count(); i++)
+			Add(*other.At(i));
+
 		return *this;
 	}
-	List& operator =(List&& other) = default;
+
+	List& operator =(List&& other) {
+		m_Buffer = Buffer<T>(other.m_Buffer.GetMaxCount());
+		m_Front = other.m_Front;
+		m_Back = other.m_Back;
+		for(uint64_t i = 0; i < other.Count(); i++)
+			Add(*other.At(i));
+
+		return *this;
+	}
 
 	operator bool() const { return Count(); }
 
@@ -56,16 +85,22 @@ public:
 
 	template<typename ...Args>
 	T& Emplace(Args&&... args) {
-		Add(T(std::forward<Args>(args)...));
-		return *At(-1);
+		m_Buffer.Add();
+		T* t = new (m_Buffer.Get() + m_Back++) T(std::forward<Args>(args)...);
+		return *t;
 	}
 
 	void Add(const T& element, int32_t pos = -1) {
 		if(Count() >= m_Buffer.GetMaxCount())
 			Reallocate(10);
 
-		m_Buffer.Add(element);
-		m_Back++;
+		if(pos < 0)
+			pos += ++m_Back;
+		else
+			pos += --m_Front;
+
+		new (m_Buffer.Get() + (uint64_t)pos) T(element);
+		m_Buffer.Add();
 	}
 
 	void Add(const std::vector<T>& list) {
@@ -83,20 +118,22 @@ public:
 	}
 
 	void Push(const T& element, bool back = true) {
-		if(back) {
+		if(back)
 			Add(element);
-			return;
-		}
-
-		// TODO(Implement): Push front
+		else
+			Add(element, 0);
 	}
 
 	T Pop(bool back = true) {
-		return back ? *At(m_Back--) : *At(m_Front++);
+		auto idx = back ? --m_Back : m_Front++;
+		T val = *At(idx);
+		Remove(idx);
+		return val;
 	}
 
 	void Remove(int64_t idx) {
-		
+		At(idx)->~T();
+		m_Buffer.Remove();
 	}
 
 	template<typename TOut, class TPredicate>
@@ -105,9 +142,6 @@ public:
 			func(val);
 	}
 
-	// TODO(Implement): auto deduction
-// decltype(auto)
-// using value_type = decltype(std::declval<Lambda>()(*std::declval<Iterator>()))
 	template<typename TOut, class TPredicate>
 	List<TOut> Apply(TPredicate&& func) {
 		List<TOut> out;
@@ -125,23 +159,34 @@ public:
 	}
 
 	void Reallocate(uint64_t additional) {
-		m_Buffer.Reallocate(additional);
+		auto maxCount = m_Buffer.GetMaxCount() + additional;
+		T* newData = (T*)malloc(maxCount * sizeof(T));
+
+		for(uint64_t i = 0; i < Count(); i++) {
+			new (newData + m_Front + i) T(*At(i));
+			Remove(i);
+		}
+
+		m_Buffer.Delete();
+		m_Buffer = Buffer<T>(newData, Count(), maxCount);
 	}
 
 	void Clear() {
-		m_Buffer.Clear();
+		for(uint64_t i = 0; i < Count(); i++)
+			Remove(i);
+
 		m_Front = 0;
 		m_Back = 0;
 	}
 
-	const Buffer<T>& GetBuffer() const { return m_Buffer; }
+	const Buffer<T>& Get() const { return m_Buffer; }
 
 	using iterator = T*;
 	using const_iterator = const T*;
-	iterator begin() { return m_Buffer.begin(); }
-	iterator end() { return m_Buffer.end(); }
-	const_iterator cbegin() const { return m_Buffer.cbegin(); }
-	const_iterator cend()	const { return m_Buffer.cend(); }
+	iterator begin() { return m_Buffer.Get() + m_Front; }
+	iterator end() { return m_Buffer.Get() + m_Back; }
+	const_iterator cbegin() const { return m_Buffer.Get() + m_Front; }
+	const_iterator cend()	const { return m_Buffer.Get() + m_Back; }
 	const_iterator begin()	const { return cbegin(); }
 	const_iterator end()	const { return cend(); }
 

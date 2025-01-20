@@ -4,6 +4,7 @@
 #include "Core/Assert.h"
 #include "Core/Defines.h"
 
+#include "RendererAPI.h"
 #include "RenderPass.h"
 #include "Renderer2D.h"
 #include "Renderer3D.h"

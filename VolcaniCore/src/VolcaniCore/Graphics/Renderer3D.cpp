@@ -158,8 +158,8 @@ void Renderer3D::DrawMesh(Ref<Mesh> mesh, const glm::mat4& tr,
 
 	if(!s_Meshes.count(mesh)) {
 		auto* command = Renderer::NewCommand();
-		command->AddIndices(mesh->GetIndices().GetBuffer());
-		command->AddVertices(mesh->GetVertices().GetBuffer());
+		command->AddIndices(mesh->GetIndices().Get());
+		command->AddVertices(mesh->GetVertices().Get());
 
 		Material& mat = mesh->GetMaterial();
 		command->UniformData

@@ -10,8 +10,8 @@ Scene:
             Camera:
               Type: Stereographic
               VerticalFOV: 45
-              Position: [-12.6736059, 6.13548708, 16.4013233]
-              Direction: [0.735963821, -0.428990662, -0.523758948]
+              Position: [-14.7762337, 4.71722698, 8.91693401]
+              Direction: [0.774798453, -0.484155267, -0.406545848]
               ViewportWidth: 800
               ViewportHeight: 600
               Near: 0.00100000005
@@ -620,8 +620,8 @@ Scene:
             Tag: NewPlayerEntity
           TransformComponent:
             Transform:
-              Translation: [-0.899999976, -0.100000001, -2.29999995]
-              Rotation: [0, 4.71238899, 0]
+              Translation: [-7.5999999, -0.899999976, -3]
+              Rotation: [0, 0, 0]
               Scale: [1, 0.699999988, 0.800000012]
           MeshComponent:
             Model:
