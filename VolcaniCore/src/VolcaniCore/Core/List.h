@@ -56,11 +56,11 @@ public:
 
 	template<typename ...Args>
 	T& Emplace(Args&&... args) {
-		m_Buffer.Add(T(std::forward<Args>(args)...));
+		Add(T(std::forward<Args>(args)...));
 		return *At(-1);
 	}
 
-	void Add(const T& element) {
+	void Add(const T& element, int32_t pos = -1) {
 		if(Count() >= m_Buffer.GetMaxCount())
 			Reallocate(10);
 

@@ -46,7 +46,7 @@ public:
 
 	ArgList operator [](const std::string& option) const {
 		if(!Has(option))
-			return ArgList();
+			return ArgList(false);
 		return m_ArgMap.at(option);
 	}
 
