@@ -70,10 +70,10 @@ EditorLayer::~EditorLayer() {
 }
 
 void EditorLayer::Update(TimeStep ts) {
-	for(auto tab : m_Tabs)
+	for(auto& tab : m_Tabs)
 		tab->Update(ts);
 
-	for(auto panel : m_Panels)
+	for(auto& panel : m_Panels)
 		panel->Update(ts);
 }
 
@@ -148,7 +148,7 @@ void EditorLayer::Render() {
 				menu.tab.newTab = true;
 
 			Ref<Tab> tabToDelete = nullptr;
-			for(auto tab : m_Tabs) {
+			for(auto& tab : m_Tabs) {
 				TabState state = UIRenderer::DrawTab(tab->GetName());
 				if(state.Closed)
 					tabToDelete = tab;
@@ -165,7 +165,7 @@ void EditorLayer::Render() {
 		ImGuiID dockspaceID = ImGui::GetID("DockSpace");
 		ImGui::DockSpace(dockspaceID, ImVec2(0.0f, 0.0f), dockspaceFlags);
 
-		for(auto panel : m_Panels)
+		for(auto& panel : m_Panels)
 			panel->Draw();
 
 		if(m_CurrentTab)

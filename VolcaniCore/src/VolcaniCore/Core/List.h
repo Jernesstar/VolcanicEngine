@@ -15,7 +15,7 @@ template<typename T>
 class List {
 public:
 	List()
-		: m_Buffer(10) { }
+		: m_Buffer(5) { }
 	List(uint64_t size)
 		: m_Buffer(size) { }
 	List(const std::initializer_list<T>& list)
@@ -97,7 +97,7 @@ public:
 
 	void Add(const T& element, int32_t pos = -1) {
 		if(Count() >= m_Buffer.GetMaxCount())
-			Reallocate(10);
+			Reallocate(5);
 
 		if(pos < 0)
 			pos += ++m_Back;
@@ -123,7 +123,7 @@ public:
 	}
 
 	void Remove(int64_t idx) {
-		// At(idx)->T::~T();
+		At(idx)->T::~T();
 		m_Buffer.Remove();
 	}
 

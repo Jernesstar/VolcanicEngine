@@ -12,7 +12,8 @@ public:
 	void OnUpdate(TimeStep ts);
 
 private:
-
+	UIPage* page;
+	UINode node;
 };
 
 UI::UI()
@@ -26,6 +27,23 @@ UI::UI()
 		});
 
 	UIRenderer::Init();
+
+	page = new UIPage();
+
+	node = page->Add(UIElementType::Window, "TEST_PANEL");
+	page->ClearFirstOrders();
+	page->Add(node);
+
+	auto node1 = page->Add(UIElementType::Window, "Image");
+	auto node2 = page->Add(UIElementType::Button, "Button");
+
+	page->Get(node)->Add(node1);
+	page->Get(node1)->Add(node2);
+
+	auto root = page->Get(node);
+
+	root->GetChild("Image")->GetParent()->GetID();
+	root->GetChild("Image")->GetChild("Button")->GetParent()->GetParent()->GetID();
 }
 
 UI::~UI() {

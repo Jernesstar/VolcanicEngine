@@ -69,7 +69,7 @@ project "{name}"
     }
 
     filter "toolset:msc or system:linux"
-        links "PhysX",
+        links "PhysX"
 
     filter "system:linux"
         links {

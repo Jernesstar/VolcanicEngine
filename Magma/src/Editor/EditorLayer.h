@@ -24,6 +24,8 @@ public:
 	void NewTab(const Scene& scene);
 	void NewTab(const UI::UIPage& page);
 
+	const Project& GetProject() const { return m_Project; }
+
 private:
 	Project m_Project;
 	Ref<Tab> m_CurrentTab;

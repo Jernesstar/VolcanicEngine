@@ -6,6 +6,7 @@
 
 #include "Core/Log.h"
 #include "Core/Assert.h"
+#include "Core/FileUtils.h"
 
 namespace VolcaniCore {
 
@@ -51,6 +52,8 @@ static Ref<Texture> LoadTexture(const std::string& dir,
 Ref<Mesh> LoadMesh(const std::string& path,
 				   const aiScene* scene, uint32_t meshIndex)
 {
+
+
 	auto mesh = scene->mMeshes[meshIndex];
 	auto mat = scene->mMaterials[mesh->mMaterialIndex];
 
@@ -82,16 +85,6 @@ Ref<Mesh> LoadMesh(const std::string& path,
 		indices.Add(face.mIndices[2]);
 	}
 
-	std::size_t slashIndex = path.find("textures");
-	std::string dir;
-
-	if(slashIndex == std::string::npos)
-		dir = ".";
-	else if(slashIndex == 0)
-		dir = "/";
-	else
-		dir = path.substr(0, slashIndex);
-
 	glm::vec4 diffuse = glm::vec4(0.0f);
 	glm::vec4 specular = glm::vec4(0.0f);
 	glm::vec4 emissive = glm::vec4(0.0f);
@@ -104,6 +97,10 @@ Ref<Mesh> LoadMesh(const std::string& path,
 		specular = glm::vec4(color.r, color.g, color.b, color.a);
 	if(material->Get(AI_MATKEY_COLOR_EMISSIVE, color) == AI_SUCCESS)
 		emissive = glm::vec4(color.r, color.g, color.b, color.a);
+
+	namespace fs = std::filesystem;
+
+	std::string dir = (fs::path(path).parent_path() / "textures").string();
 
 	Ref<Mesh> newMesh = Mesh::Create(vertices, indices,
 		Material{
@@ -131,7 +128,7 @@ Ref<Texture> LoadTexture(const std::string& dir,
 		return nullptr;
 
 	std::string p(path.data);
-	std::string fullPath = dir + "/" + p;
+	std::string fullPath = p;
 	return Texture::Create(fullPath);
 }
 

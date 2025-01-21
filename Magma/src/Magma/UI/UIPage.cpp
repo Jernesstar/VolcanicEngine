@@ -40,24 +40,34 @@ static void TraverseElement(UIElement* element,
 		TraverseElement(child, func);
 }
 
-UIPage::UIPage() {
-	Windows.Reallocate(10);
-	Buttons.Reallocate(10);
-	Dropdowns.Reallocate(10);
-	Texts.Reallocate(10);
-	TextInputs.Reallocate(10);
-	Images.Reallocate(10);
-}
+UIPage::UIPage() { }
 
 UIPage::UIPage(const std::string &name)
-    : Name(name)
-{
-	Windows.Reallocate(10);
-	Buttons.Reallocate(10);
-	Dropdowns.Reallocate(10);
-	Texts.Reallocate(10);
-	TextInputs.Reallocate(10);
-	Images.Reallocate(10);
+	: Name(name) { }
+
+UIPage& UIPage::operator=(const UIPage& other) {
+	m_FirstOrders = other.m_FirstOrders;
+	Windows = other.Windows;
+	Buttons = other.Buttons;
+	Dropdowns = other.Dropdowns;
+	Texts = other.Texts;
+	TextInputs = other.TextInputs;
+	Images = other.Images;
+
+	for(auto& val : Windows)
+		val.m_Root = this;
+	for(auto& val : Buttons)
+		val.m_Root = this;
+	for(auto& val : Dropdowns)
+		val.m_Root = this;
+	for(auto& val : Texts)
+		val.m_Root = this;
+	for(auto& val : TextInputs)
+		val.m_Root = this;
+	for(auto& val : Images)
+		val.m_Root = this;
+
+	return *this;
 }
 
 void UIPage::Render() {
@@ -78,43 +88,37 @@ UINode UIPage::Add(UIElementType type, const std::string& id) {
 		case UIElementType::Window:
 		{
 			auto& element = Windows.Emplace(id, this);
-			element.m_Node = { type, Windows.Count() - 1 };
-			return element.m_Node;
+			return element.m_Node = { type, Windows.Count() - 1 };
 			break;
 		}
 		case UIElementType::Button:
 		{
 			auto& element = Buttons.Emplace(id, this);
-			element.m_Node = { type, Buttons.Count() - 1 };
-			return element.m_Node;
+			return element.m_Node = { type, Buttons.Count() - 1 };
 			break;
 		}
 		case UIElementType::Dropdown:
 		{
 			auto& element = Dropdowns.Emplace(id, this);
-			element.m_Node = { type, Dropdowns.Count() - 1 };
-			return element.m_Node;
+			return element.m_Node = { type, Dropdowns.Count() - 1 };
 			break;
 		}
 		case UIElementType::Text:
 		{
 			auto& element = Texts.Emplace(id, this);
-			element.m_Node = { type, Texts.Count() - 1 };
-			return element.m_Node;
+			return element.m_Node = { type, Texts.Count() - 1 };
 			break;
 		}
 		case UIElementType::TextInput:
 		{
 			auto& element = TextInputs.Emplace(id, this);
-			element.m_Node = { type, TextInputs.Count() - 1 };
-			return element.m_Node;
+			return element.m_Node = { type, TextInputs.Count() - 1 };
 			break;
 		}
 		case UIElementType::Image:
 		{
 			auto& element = Images.Emplace(id, this);
-			element.m_Node = { type, Images.Count() - 1 };
-			return element.m_Node;
+			return element.m_Node = { type, Images.Count() - 1 };
 			break;
 		}
 	}
@@ -124,22 +128,6 @@ UINode UIPage::Add(UIElementType type, const std::string& id) {
 
 void UIPage::Add(const UINode& node) {
 	m_FirstOrders.Add(node);
-}
-
-void UIPage::Parent(const UINode& node, const UINode& parent) {
-	// if(!Get(node))
-	// 	return;
-
-	// UIElement* element = Get(node);
-	// bool firstOrder = !element->GetParent();
-	// element->SetParent(parent);
-
-	// if(!firstOrder)
-	// 	return;
-
-	// auto it = std::find(m_FirstOrders.begin(), m_FirstOrders.end(), node);
-	// uint32_t index = std::distance(m_FirstOrders.begin(), it);
-	// m_FirstOrders.erase(it);
 }
 
 void UIPage::Clear() {
@@ -159,47 +147,59 @@ void UIPage::ClearFirstOrders() {
 UIElement* UIPage::Get(const UINode& node) const {
 	switch(node.first) {
 		case UIElementType::Window:
+		{
 			if(node.second < Windows.Count())
-				return (UIElement*)Windows.At(node.second);
+				return dynamic_cast<UIElement*>(Windows.At(node.second));
+			break;
+		}
 		case UIElementType::Button:
+		{
 			if(node.second < Buttons.Count())
-				return (UIElement*)Buttons.At(node.second);
+				return dynamic_cast<UIElement*>(Buttons.At(node.second));
+			break;
+		}
 		case UIElementType::Dropdown:
+		{
 			if(node.second < Dropdowns.Count())
-				return (UIElement*)Dropdowns.At(node.second);
+				return dynamic_cast<UIElement*>(Dropdowns.At(node.second));
+			break;
+		}
 		case UIElementType::Text:
+		{
 			if(node.second < Texts.Count())
-				return (UIElement*)Texts.At(node.second);
+				return dynamic_cast<UIElement*>(Texts.At(node.second));
+			break;
+		}
 		case UIElementType::TextInput:
+		{
 			if(node.second < TextInputs.Count())
-				return (UIElement*)TextInputs.At(node.second);
+				return dynamic_cast<UIElement*>(TextInputs.At(node.second));
+			break;
+		}
 		case UIElementType::Image:
+		{
 			if(node.second < Images.Count())
-				return (UIElement*)Images.At(node.second);
+				return dynamic_cast<UIElement*>(Images.At(node.second));
+			break;
+		}
 	}
 
 	return nullptr;
 }
 
 UIElement* UIPage::Get(const std::string& id) const {
-	if(auto res =
-		Windows.Find([&](auto& element) { return element.GetID() == id; }))
-		return (UIElement*)Windows.At(res.Index);
-	if(auto res =
-		Buttons.Find([&](auto& element) { return element.GetID() == id; }))
-		return (UIElement*)Buttons.At(res.Index);
-	if(auto res =
-		Dropdowns.Find([&](auto& element) { return element.GetID() == id; }))
-		return (UIElement*)Dropdowns.At(res.Index);
-	if(auto res =
-		Texts.Find([&](auto& element) { return element.GetID() == id; }))
-		return (UIElement*)Texts.At(res.Index);
-	if(auto res =
-		TextInputs.Find([&](auto& element) { return element.GetID() == id; }))
-		return (UIElement*)TextInputs.At(res.Index);
-	if(auto res =
-		Images.Find([&](auto& element) { return element.GetID() == id; }))
-		return (UIElement*)Images.At(res.Index);
+	if(auto res = Windows.Find([&](auto& val) { return val.GetID() == id; }))
+		return dynamic_cast<UIElement*>(Windows.At(res.Index));
+	if(auto res = Buttons.Find([&](auto& val) { return val.GetID() == id; }))
+		return dynamic_cast<UIElement*>(Buttons.At(res.Index));
+	if(auto res = Dropdowns.Find([&](auto& val) { return val.GetID() == id; }))
+		return dynamic_cast<UIElement*>(Dropdowns.At(res.Index));
+	if(auto res = Texts.Find([&](auto& val) { return val.GetID() == id; }))
+		return dynamic_cast<UIElement*>(Texts.At(res.Index));
+	if(auto res = TextInputs.Find([&](auto& val) { return val.GetID() == id; }))
+		return dynamic_cast<UIElement*>(TextInputs.At(res.Index));
+	if(auto res = Images.Find([&](auto& val) { return val.GetID() == id; }))
+		return dynamic_cast<UIElement*>(Images.At(res.Index));
 
 	return nullptr;
 }

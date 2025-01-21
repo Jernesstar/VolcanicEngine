@@ -81,10 +81,6 @@ void UIElement::Clear() {
 	m_Children.Clear();
 }
 
-void UIElement::SetParent(const UINode& node) {
-	m_Parent = node;
-}
-
 UIElement* UIElement::GetParent() {
 	if(m_Root)
 		return m_Root->Get(m_Parent);

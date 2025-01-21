@@ -55,7 +55,7 @@ UITab::~UITab() {
 }
 
 void UITab::Update(TimeStep ts) {
-	for(auto panel : m_Panels)
+	for(auto& panel : m_Panels)
 		if(panel->IsOpen())
 			panel->Update(ts);
 }
@@ -106,7 +106,7 @@ void UITab::Render() {
 	if(menu.edit.addButton)
 		AddButton();
 
-	for(auto panel : m_Panels)
+	for(auto& panel : m_Panels)
 		if(panel->IsOpen())
 			panel->Draw();
 }

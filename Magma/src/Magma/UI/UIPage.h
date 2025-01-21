@@ -42,7 +42,12 @@ public:
 public:
 	UIPage();
 	UIPage(const std::string& name);
+	UIPage(const UIPage& other) {
+		*this = other;
+	}
 	~UIPage() = default;
+
+	UIPage& operator =(const UIPage& other);
 
 	void Render();
 
@@ -50,7 +55,6 @@ public:
 
 	UINode Add(UIElementType type, const std::string& id);
 	void Add(const UINode& node);
-	void Parent(const UINode& node, const UINode& parent);
 
 	template<typename TUIElement, typename ...Args>
 	requires std::derived_from<TUIElement, UIElement>

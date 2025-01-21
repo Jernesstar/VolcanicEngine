@@ -69,7 +69,7 @@ project "test"
     }
 
     filter "toolset:msc or system:linux"
-        links "PhysX",
+        links "PhysX"
 
     filter "system:linux"
         links {
@@ -171,8 +171,10 @@ project "test2"
         "ImGuiFileDialog",
         "flecs",
         "rapidjson",
-        -- "PhysX",
     }
+
+    filter "toolset:msc or system:linux"
+        links "PhysX"
 
     filter "system:linux"
         links {

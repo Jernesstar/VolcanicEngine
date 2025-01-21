@@ -61,8 +61,6 @@ UIState UIRenderer::DrawWindow(UI::Window& window) {
 	float x = viewport->Pos.x;
 	float y = viewport->Pos.y;
 
-	// window.GetParent()->GetID();
-
 	if(window.GetParent()) {
 		UIElement* parent = window.GetParent();
 		width = parent->Width;
@@ -90,7 +88,8 @@ UIState UIRenderer::DrawWindow(UI::Window& window) {
 		ImVec2{ x + alignX + window.x, y + alignY + window.y });
 
 	if(s_Stack
-	&& (s_Stack[-1] == UIType::Window || s_Stack[-1] == UIType::DummyWindow))
+	&& (s_Stack[-1] == UIType::Window || s_Stack[-1] == UIType::DummyWindow
+		|| s_Stack[-1] == UIType::ChildWindow))
 	{
 		auto childFlags = ImGuiChildFlags_Border | ImGuiChildFlags_FrameStyle;
 		ImVec2 size(window.Width, window.Height);
@@ -350,8 +349,6 @@ void UIRenderer::Pop(uint32_t count) {
 			case UIType::TabBar:
 				ImGui::EndTabBar();
 				break;
-			// case UIType::Tab:
-			// 	ImGui::EndTabItem();
 		}
 	}
 }

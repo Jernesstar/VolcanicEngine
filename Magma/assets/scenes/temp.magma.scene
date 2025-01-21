@@ -10,8 +10,8 @@ Scene:
             Camera:
               Type: Stereographic
               VerticalFOV: 45
-              Position: [-14.7762337, 4.71722698, 8.91693401]
-              Direction: [0.774798453, -0.484155267, -0.406545848]
+              Position: [2.41009474, -1.97400212, 15.0552292]
+              Direction: [0.0174563732, 0.100493088, -0.994783998]
               ViewportWidth: 800
               ViewportHeight: 600
               Near: 0.00100000005
@@ -617,12 +617,25 @@ Scene:
         ID: 596
         Components:
           TagComponent:
-            Tag: NewPlayerEntity
+            Tag: TorchEntity
           TransformComponent:
             Transform:
-              Translation: [-7.5999999, -0.899999976, -3]
+              Translation: [1, 0, 0]
               Rotation: [0, 0, 0]
-              Scale: [1, 0.699999988, 0.800000012]
+              Scale: [17.8999996, 4.9000001, 1]
           MeshComponent:
             Model:
-              Path: ..\TheMazeIsLava\asset\model\player\Knight_Golden_Male.obj
+              Path: ..\TheMazeIsLava\asset\model\torch\torch.obj
+    - Entity:
+        ID: 597
+        Components:
+          TagComponent:
+            Tag: NewTorch
+          TransformComponent:
+            Transform:
+              Translation: [0, 0, 0]
+              Rotation: [0, 0, 0]
+              Scale: [22.2000008, 40.2000008, 28.1000004]
+          MeshComponent:
+            Model:
+              Path: ..\TheMazeIsLava\asset\model\torch\torch.obj

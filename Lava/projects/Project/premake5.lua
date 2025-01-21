@@ -65,7 +65,7 @@ project "Project"
     }
 
     filter "toolset:msc or system:linux"
-        links "PhysX",
+        links "PhysX"
 
     filter "toolset:gcc or toolset:clang"
         buildoptions {

@@ -157,7 +157,6 @@ void ContentBrowserPanel::Draw() {
 				m_CurrentAssetPath = newPath;
 		}
 		ImGui::EndChild();
-
 	}
 	ImGui::End();
 }
