@@ -37,8 +37,6 @@ public:
 			else if(lastOption != -1)
 				m_ArgMap[m_Args[lastOption]].Args.Add(m_Args[i]);
 		}
-
-		VOLCANICORE_LOG_INFO("Here");
 	}
 
 	std::string operator [](uint32_t index) const {

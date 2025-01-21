@@ -17,10 +17,7 @@ public:
 	List()
 		: m_Buffer(10) { }
 	List(uint64_t size)
-		: m_Buffer(size)
-	{
-		VOLCANICORE_LOG_INFO("Alloc");
-	}
+		: m_Buffer(size) { }
 	List(const std::initializer_list<T>& list)
 		: m_Buffer(list.size())
 	{
@@ -30,46 +27,56 @@ public:
 	List(List&& other)
 		: m_Buffer(other.m_Buffer.GetMaxCount())
 	{
-		m_Front = other.m_Front;
-		m_Back = other.m_Back;
-		for(uint64_t i = 0; i < other.Count(); i++)
-			Add(*other.At(i));
+		for(auto val : other)
+			Add(val);
 	}
 	List(const List& other)
 		: m_Buffer(other.m_Buffer.GetMaxCount())
 	{
-		m_Front = other.m_Front;
-		m_Back = other.m_Back;
-		for(uint64_t i = 0; i < other.Count(); i++)
-			Add(*other.At(i));
+		for(auto val : other)
+			Add(val);
 	}
 
 	~List() {
 		Clear();
-		m_Buffer.Delete();
 	}
 
-	List& operator =(const List& other) {
-		m_Buffer = Buffer<T>(other.m_Buffer.GetMaxCount());
-		m_Front = other.m_Front;
-		m_Back = other.m_Back;
-		for(uint64_t i = 0; i < other.Count(); i++)
-			Add(*other.At(i));
+	List& operator =(const std::initializer_list<T>& list) {
+		Clear();
+		m_Buffer.Delete();
+		m_Buffer = Buffer<T>(list.size());
+
+		for(auto& val : list)
+			Add(val);
 
 		return *this;
 	}
 
 	List& operator =(List&& other) {
+		Clear();
+		m_Buffer.Delete();
 		m_Buffer = Buffer<T>(other.m_Buffer.GetMaxCount());
-		m_Front = other.m_Front;
-		m_Back = other.m_Back;
-		for(uint64_t i = 0; i < other.Count(); i++)
-			Add(*other.At(i));
+
+		for(auto& val : other)
+			Add(val);
+
+		return *this;
+	}
+
+	List& operator =(const List& other) {
+		Clear();
+		m_Buffer.Delete();
+		m_Buffer = Buffer<T>(other.m_Buffer.GetMaxCount());
+
+		for(auto& val : other)
+			Add(val);
 
 		return *this;
 	}
 
 	operator bool() const { return Count(); }
+
+	uint64_t Count() const { return m_Back - m_Front; }
 
 	T& operator[](int64_t idx) { return *At(idx); }
 	const T& operator[](int64_t idx) const { return *At(idx); }
@@ -80,8 +87,6 @@ public:
 
 		return m_Buffer.Get() + m_Front + (uint64_t)idx;
 	}
-
-	uint64_t Count() const { return m_Back - m_Front; }
 
 	template<typename ...Args>
 	T& Emplace(Args&&... args) {
@@ -103,20 +108,6 @@ public:
 		m_Buffer.Add();
 	}
 
-	void Add(const std::vector<T>& list) {
-		if(Count() + list.size() >= m_Buffer.GetMaxCount())
-			Reallocate(list.size());
-
-		m_Buffer.Add(list);
-	}
-
-	void Add(const List& list) {
-		if(Count() + list.size() >= m_Buffer.GetMaxCount())
-			Reallocate(list.size());
-
-		m_Buffer.Add(list.m_Buffer);
-	}
-
 	void Push(const T& element, bool back = true) {
 		if(back)
 			Add(element);
@@ -132,7 +123,7 @@ public:
 	}
 
 	void Remove(int64_t idx) {
-		At(idx)->~T();
+		// At(idx)->T::~T();
 		m_Buffer.Remove();
 	}
 
@@ -172,7 +163,7 @@ public:
 	}
 
 	void Clear() {
-		for(uint64_t i = 0; i < Count(); i++)
+		for(int64_t i = 0; i < Count(); i++)
 			Remove(i);
 
 		m_Front = 0;
