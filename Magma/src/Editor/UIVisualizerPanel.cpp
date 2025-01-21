@@ -10,12 +10,14 @@
 
 #include <Magma/UI/UIRenderer.h>
 
+using namespace Magma::UI;
+
 namespace Magma {
 
-UIVisualizerPanel::UIVisualizerPanel(UI::UIPage* page)
+UIVisualizerPanel::UIVisualizerPanel(UIPage* page)
 	: Panel("UIVisualizer")
 {
-	m_Running = new UI::UIPage();
+	m_Running = new UIPage();
 	SetContext(page);
 }
 
@@ -23,18 +25,18 @@ UIVisualizerPanel::~UIVisualizerPanel() {
 	delete m_Running;
 }
 
-void UIVisualizerPanel::SetContext(UI::UIPage* page) {
+void UIVisualizerPanel::SetContext(UIPage* page) {
 	if(!page)
 		return;
 
 	m_Context = page;
 	*m_Running = *page;
 
-	m_Node = m_Running->Add(UI::UIElementType::Window, "UI_VISUALIZER_PANEL");
+	m_Node = m_Running->Add(UIElementType::Window, "UI_VISUALIZER_PANEL");
 	m_Running->ClearFirstOrders();
 	m_Running->Add(m_Node);
 
-	UI::UIElement* window = m_Running->Get(m_Node);
+	UIElement* window = m_Running->Get(m_Node);
 	for(auto* element : page->GetFirstOrderElements())
 		window->Add(element->GetNode());
 }
@@ -42,6 +44,12 @@ void UIVisualizerPanel::SetContext(UI::UIPage* page) {
 void UIVisualizerPanel::Update(TimeStep ts) {
 
 }
+
+struct {
+	struct {
+		std::string path;
+	} add;
+} static options;
 
 void UIVisualizerPanel::Draw() {
 	ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4{ 0.0f, 0.0f, 0.0f, 1.0f });
@@ -123,36 +131,95 @@ void UIVisualizerPanel::Draw() {
 			if(auto payload = ImGui::AcceptDragDropPayload("Image", flags)) {
 				if(!payload->IsDelivery())
 					ImGui::SetTooltip("Create Image or Button!");
-				else
-					VOLCANICORE_LOG_INFO("Delivered");
+				else {
+					ImGui::OpenPopup("Create Image or Button");
+					options.add.path = std::string((const char*)payload->Data);
+				}
 			}
 			ImGui::EndDragDropTarget();
 		}
 
-		UI::UIElement* window = m_Running->Get(m_Node);
+		if(ImGui::BeginPopupModal("Create Image or Button")) {
+			static std::string str;
+			static std::string hint = "Enter UI ID";
+			ImGui::InputTextWithHint("##Input", hint.c_str(), &str);
+
+			UIElementType type;
+			bool exit = false;
+
+			if(ImGui::Button("Cancel"))
+				ImGui::CloseCurrentPopup();
+
+			ImGui::SameLine();
+			if(ImGui::Button("Create as Image")) {
+				if(str == "")
+					exit = false;
+				else if(m_Running->Get(str)) {
+					exit = false;
+					str = "";
+					hint = "UI ID must be unique";
+				}
+				else {
+					type = UIElementType::Image;
+					exit = true;
+				}
+			}
+
+			ImGui::SameLine();
+			if(ImGui::Button("Create as Button")) {
+				if(str == "")
+					exit = false;
+				else if(m_Running->Get(str)) {
+					exit = false;
+					str = "";
+					hint = "UI ID must be unique";
+				}
+				else {
+					type = UIElementType::Button;
+					exit = true;
+				}
+			}
+
+			if(exit) {
+				auto node = m_Running->Add(type, str);
+				UIElement* element = m_Running->Get(node);
+
+				if(type == UIElementType::Image)
+					element->As<Image>()->SetImage(options.add.path);
+				else
+					element->As<Button>()->Display =
+						CreateRef<Image>(options.add.path);
+
+				ImGui::CloseCurrentPopup();
+			}
+
+			ImGui::EndPopup();
+		}
+
+		UIElement* window = m_Running->Get(m_Node);
 		window->SetPosition(origin.x, origin.y);
 		window->SetSize(size.x, size.y);
 
 		// Push a dummy window so the rest will be children
-		UI::Window dummy;
+		Window dummy;
 		dummy.Width = 0;
 		dummy.Height = 0;
-		UI::UIRenderer::DrawWindow(dummy);
+		UIRenderer::DrawWindow(dummy);
 
 		m_Running->Traverse(
-			[&](UI::UIElement* element)
+			[&](UIElement* element)
 			{
 				if(element == window)
 					return;
 
 				element->Draw();
 
-				UI::UIState state = element->GetState();
+				UIState state = element->GetState();
 				if(state.Clicked)
 					VOLCANICORE_LOG_INFO("Clicked");
 			});
 
-		UI::UIRenderer::Pop(0);
+		UIRenderer::Pop(0);
 	}
 	ImGui::End();
 }
