@@ -613,29 +613,3 @@ Scene:
           MeshComponent:
             Meshes:
               []
-    - Entity:
-        ID: 596
-        Components:
-          TagComponent:
-            Tag: TorchEntity
-          TransformComponent:
-            Transform:
-              Translation: [1, 0, 0]
-              Rotation: [0, 0, 0]
-              Scale: [17.8999996, 4.9000001, 1]
-          MeshComponent:
-            Model:
-              Path: ..\TheMazeIsLava\asset\model\torch\torch.obj
-    - Entity:
-        ID: 597
-        Components:
-          TagComponent:
-            Tag: NewTorch
-          TransformComponent:
-            Transform:
-              Translation: [0, 0, 0]
-              Rotation: [0, 0, 0]
-              Scale: [22.2000008, 40.2000008, 28.1000004]
-          MeshComponent:
-            Model:
-              Path: ..\TheMazeIsLava\asset\model\torch\torch.obj

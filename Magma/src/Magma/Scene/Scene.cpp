@@ -24,8 +24,24 @@ void Scene::OnUpdate(TimeStep ts) {
 }
 
 void Scene::OnRender(SceneRenderer& renderer) {
-	renderer.SetContext(this);
-	renderer.Render();
+	auto& world = EntityWorld.GetNative();
+
+	// Query?
+	world
+	.system<const TransformComponent, const MeshComponent>("Objects")
+	.each(
+		[&](flecs::entity id, const TransformComponent&, const MeshComponent&)
+		{
+			renderer.Submit(Entity{ id });
+		})
+	.run();
+	// world
+	// .system<const TransformComponent>("PointLights")
+	// .run(
+	// 	[&](flecs::entity id, const PointLightComponent&)
+	// 	{
+	// 		renderer.Submit(Entity{ id });
+	// 	});
 }
 
 void Scene::RegisterSystems() {

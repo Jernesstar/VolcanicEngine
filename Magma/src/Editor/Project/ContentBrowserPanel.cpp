@@ -10,7 +10,7 @@
 
 #include <Magma/UI/UIRenderer.h>
 
-#include "Editor.h"
+#include "EditorApp.h"
 
 namespace Magma {
 
@@ -208,7 +208,7 @@ ImRect Traverse(fs::path path) {
 
 			if(ImGui::BeginPopup("NewTab")) {
 				if(ImGui::Button("Open file as new tab")) {
-					auto& editor = Application::As<Editor>()->GetEditor();
+					auto& editor = Application::As<EditorApp>()->GetEditor();
 					if(type == "Scene")
 						editor.NewTab(CreateRef<SceneTab>(selected));
 					if(type == "UI")

@@ -11,7 +11,6 @@ namespace VolcaniCore {
 
 static DrawBuffer* s_CubemapBuffer;
 static DrawBuffer* s_MeshBuffer;
-// static DrawBuffer* s_PointBuffer;
 static Map<Ref<Mesh>, DrawCommand*> s_Meshes;
 uint64_t s_InstanceEnd;
 
@@ -156,8 +155,10 @@ void Renderer3D::DrawMesh(Ref<Mesh> mesh, const glm::mat4& tr,
 	if(!mesh)
 		return;
 
-	if(!s_Meshes.count(mesh)) {
-		auto* command = Renderer::NewCommand();
+	DrawCommand* command = cmd;
+
+	if(!s_Meshes.count(mesh) && !cmd) {
+		command = Renderer::NewCommand();
 		command->AddIndices(mesh->GetIndices().Get());
 		command->AddVertices(mesh->GetVertices().Get());
 
@@ -170,9 +171,8 @@ void Renderer3D::DrawMesh(Ref<Mesh> mesh, const glm::mat4& tr,
 		s_Meshes[mesh] = command;
 	}
 
-	auto* command = s_Meshes[mesh];
-	auto* buffer = Renderer::GetPass()->Get()->BufferData;
-
+	if(!cmd)
+		command = s_Meshes[mesh];
 	if(!command->Calls || command->Calls[-1].InstanceCount >= 10'000) {
 		auto& call = command->NewDrawCall();
 		call.Primitive = PrimitiveType::Triangle;
@@ -185,6 +185,7 @@ void Renderer3D::DrawMesh(Ref<Mesh> mesh, const glm::mat4& tr,
 		s_InstanceEnd += 10'000;
 	}
 
+	auto* buffer = Renderer::GetPass()->Get()->BufferData;
 	auto& call = command->Calls[-1];
 	RendererAPI::Get()
 	->SetBufferData(buffer, DrawBufferIndex::Instances, glm::value_ptr(tr),

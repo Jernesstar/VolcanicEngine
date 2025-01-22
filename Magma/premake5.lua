@@ -81,6 +81,7 @@ project "Editor"
 
     includedirs {
         "src/Editor",
+
         "src/Magma",
 
         "%{RootPath}/VolcaniCore/src",

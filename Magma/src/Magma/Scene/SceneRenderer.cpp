@@ -28,27 +28,6 @@ DefaultSceneRenderer::DefaultSceneRenderer() {
 	m_Controller.TranslationSpeed = 10.0f;
 }
 
-void DefaultSceneRenderer::SetContext(Scene* scene) {
-	m_Scene = scene;
-
-	auto& world = m_Scene->EntityWorld.GetNative();
-	m_RenderSystem = world
-	.system<const TransformComponent, const MeshComponent>("RenderSystem")
-	.kind(0)
-	.each(
-		[](const TransformComponent& tc, const MeshComponent& mc)
-		{
-			Transform tr
-				{
-					.Translation = tc.Translation,
-					.Rotation	 = tc.Rotation,
-					.Scale		 = tc.Scale
-				};
-
-			Renderer3D::DrawModel(mc.Mesh, tr);
-		});
-}
-
 void DefaultSceneRenderer::Update(TimeStep ts) {
 	if(!m_Scene)
 		return;
@@ -67,6 +46,23 @@ void DefaultSceneRenderer::Update(TimeStep ts) {
 	cam->SetPositionDirection(camera->GetPosition(), camera->GetDirection());
 }
 
+void DefaultSceneRenderer::Submit(Entity entity) {
+	if(entity.Has<TransformComponent>() && entity.Has<MeshComponent>()) {
+		auto& tc = entity.Get<TransformComponent>();
+		auto& mc = entity.Get<MeshComponent>();
+
+		Transform tr
+			{
+				.Translation = tc.Translation,
+				.Rotation	 = tc.Rotation,
+				.Scale		 = tc.Scale
+			};
+
+		auto* command = RendererAPI::Get()->NewDrawCommand(m_DrawPass->Get());
+		Renderer3D::DrawModel(mc.Mesh, tr, command);
+	}
+}
+
 void DefaultSceneRenderer::Render() {
 	auto camera = m_Controller.GetCamera();
 
@@ -75,7 +71,7 @@ void DefaultSceneRenderer::Render() {
 		Renderer::Clear();
 		Renderer3D::Begin(camera);
 
-		m_RenderSystem.run();
+
 
 		Renderer3D::End();
 	}

@@ -8,8 +8,9 @@
 #include <VolcaniCore/Core/Application.h>
 #include <VolcaniCore/Core/FileUtils.h>
 
-#include "UIElementPickerPanel.h"
+#include "UIHierarchyPanel.h"
 #include "UIVisualizerPanel.h"
+#include "UIElementPickerPanel.h"
 
 #include <Lava/UILoader.h>
 
@@ -112,8 +113,9 @@ void UITab::Render() {
 }
 
 void UITab::Setup() {
-	AddPanel<UIElementPickerPanel>(&m_Root);
+	AddPanel<UIHierarchyPanel>(&m_Root);
 	AddPanel<UIVisualizerPanel>(&m_Root);
+	AddPanel<UIElementPickerPanel>(&m_Root);
 }
 
 void UITab::Load(const std::string& path) {
@@ -143,8 +145,6 @@ void UITab::NewUI() {
 }
 
 void UITab::OpenUI() {
-	namespace fs = std::filesystem;
-
 	IGFD::FileDialogConfig config;
 	config.path = ".";
 	auto instance = ImGuiFileDialog::Instance();
@@ -152,8 +152,8 @@ void UITab::OpenUI() {
 
 	if(instance->Display("ChooseFile")) {
 		if(instance->IsOk()) {
-			fs::path path = instance->GetFilePathName();
-			Load(path.stem().stem().stem().string());
+			std::string path = instance->GetFilePathName();
+			Load(path);
 		}
 
 		instance->Close();

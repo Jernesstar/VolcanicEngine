@@ -51,6 +51,8 @@ struct HitInfo {
 		: HasHit(false), Actor(nullptr), Distance(0.0f) { }
 	HitInfo(RigidBody* actor, float distance)
 		: HasHit(true), Actor(actor), Distance(distance) { }
+	
+	operator bool() const { return HasHit; }
 };
 
 class World {

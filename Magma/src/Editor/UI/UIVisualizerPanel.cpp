@@ -39,10 +39,19 @@ void UIVisualizerPanel::SetContext(UIPage* page) {
 	UIElement* window = m_Running->Get(m_Node);
 	for(auto* element : page->GetFirstOrderElements())
 		window->Add(element->GetNode());
+
+	m_Running->Traverse(
+		[&](UIElement* element)
+		{
+			element->xAlignment = XAlignment::Left;
+			element->yAlignment = YAlignment::Top;
+		});
 }
 
-void UIVisualizerPanel::Update(TimeStep ts) {
+static TimeStep s_TimeStep;
 
+void UIVisualizerPanel::Update(TimeStep ts) {
+	s_TimeStep = ts;
 }
 
 struct {
@@ -67,8 +76,8 @@ void UIVisualizerPanel::Draw() {
 		ImVec2 size = ImGui::GetContentRegionAvail();
 		min.x += -ImGui::GetStyle().WindowPadding.x;
 		min.y += -ImGui::GetStyle().WindowPadding.y;
-		size.x += +2.0f*ImGui::GetStyle().WindowPadding.x;
-		size.y += +2.0f*ImGui::GetStyle().WindowPadding.y;
+		size.x += 2.0f*ImGui::GetStyle().WindowPadding.x;
+		size.y += 2.0f*ImGui::GetStyle().WindowPadding.y;
 
 		ImVec2 p0 = min;
 		ImVec2 p1 = ImVec2(p0.x + size.x, p0.y + size.y);
@@ -95,15 +104,15 @@ void UIVisualizerPanel::Draw() {
 			scrolling.y += io.MouseDelta.y;
 		}
 		if(isHovered) {
-			gridStep += 10.0f * io.MouseWheel;
+			gridStep += s_TimeStep * 10.0f * io.MouseWheel;
 			if(gridStep < 25.0f)
 				gridStep = 25.0f;
 			if(gridStep > 150.0f)
 				gridStep = 150.0f;
 		}
 
-		ImVec2 drag_delta = ImGui::GetMouseDragDelta(1);
-		if(drag_delta.x == 0.0f && drag_delta.y == 0.0f)
+		ImVec2 dragDelta = ImGui::GetMouseDragDelta(1);
+		if(dragDelta.x == 0.0f && dragDelta.y == 0.0f)
 			ImGui::OpenPopupOnItemClick("Options", 1);
 		if(ImGui::BeginPopup("Options")) {
 			ImGui::Checkbox("Enable Grid", &enableGrid);

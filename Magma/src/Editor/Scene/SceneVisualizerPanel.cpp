@@ -8,13 +8,16 @@
 #include <VolcaniCore/Core/Input.h>
 #include <VolcaniCore/Graphics/Renderer.h>
 #include <VolcaniCore/Graphics/RendererAPI.h>
+#include <VolcaniCore/Graphics/StereographicCamera.h>
 
 #include "ECS/Component.h"
 #include "ECS/PhysicsSystem.h"
 
+#include "Scene/SceneRenderer.h"
+
 #include "UI/UIRenderer.h"
 
-#include "Editor.h"
+#include "EditorApp.h"
 #include "Tab.h"
 #include "SceneHierarchyPanel.h"
 
@@ -127,7 +130,7 @@ void SceneVisualizerPanel::Draw() {
 						newEntity = world.AddEntity();
 
 					if(exit) {
-						auto& editor = Application::As<Editor>()->GetEditor();
+						auto& editor = Application::As<EditorApp>()->GetEditor();
 						auto path = editor.GetProject().Path;
 
 						Application::PushDir(path);
@@ -141,44 +144,61 @@ void SceneVisualizerPanel::Draw() {
 		}
 
 		if(ImGui::IsMouseClicked(0) && ImGui::IsWindowHovered()) {
-			// auto& cameraController = m_Renderer.GetCameraController();
+			auto& cameraController = m_Renderer.GetCameraController();
 			// auto& world = m_Context->EntityWorld.Get<PhysicsSystem>()->Get();
-			// auto camera = cameraController.GetCamera();
+			auto camera = cameraController.GetCamera();
 
-			// glm::vec2 pos = { ImGui::GetMousePos().x, ImGui::GetMousePos().y };
-			// glm::vec4 originNDC
-			// {
-			// 	(pos.x/width - 0.5f) * 2.0f,
-			// 	(pos.y/height - 0.5f) * 2.0f,
-			// 	-1.0f, 1.0f
-			// };
-			// glm::vec4 endNDC
-			// {
-			// 	(pos.x/width - 0.5f) * 2.0f,
-			// 	(pos.y/height - 0.5f) * 2.0f,
-			// 	1.0f, 1.0f
-			// };
+			glm::vec2 pos = { ImGui::GetMousePos().x, ImGui::GetMousePos().y };
+			glm::vec4 originNDC
+			{
+				(pos.x/width - 0.5f) * 2.0f,
+				(pos.y/height - 0.5f) * 2.0f,
+				-1.0f, 1.0f
+			};
+			glm::vec4 endNDC
+			{
+				(pos.x/width - 0.5f) * 2.0f,
+				(pos.y/height - 0.5f) * 2.0f,
+				1.0f, 1.0f
+			};
 
-			// glm::mat4 invViewProj = glm::inverse(camera->GetViewProjection());
-			// glm::vec4 worldStart = invViewProj * originNDC;
-			// glm::vec4 worldEnd   = invViewProj * endNDC;
-			// worldStart /= worldStart.w;
-			// worldEnd   /= worldEnd.w;
-			// glm::vec3 rayDir = glm::vec3(worldEnd - worldStart);
-			// float maxDist = 10000.0f;
+			glm::mat4 invViewProj = glm::inverse(camera->GetViewProjection());
+			glm::vec4 worldStart = invViewProj * originNDC;
+			glm::vec4 worldEnd   = invViewProj * endNDC;
+			worldStart /= worldStart.w;
+			worldEnd   /= worldEnd.w;
+			glm::vec3 rayDir = glm::vec3(worldEnd - worldStart);
+			float maxDist = 10000.0f;
 
 			// auto hitInfo = world.Raycast(worldStart, rayDir, maxDist);
-			// m_Selected.Collider = Ref<RigidBody>(hitInfo.Actor);
+			// if(hitInfo) {
+				VOLCANICORE_LOG_INFO("Hit something");
+				// m_Selected.Collider = Ref<RigidBody>(hitInfo.Actor);
+				// m_Renderer.Select(entity);
+				// auto hierarchy =
+				// 	m_Tab->GetPanel("SceneHierarchy")->As<SceneHierarchyPanel>();
+				// // hierarchy->Select(entity);
+			// }
 
-			auto hierarchy =
-				m_Tab->GetPanel("SceneVisualizer")->As<SceneVisualizerPanel>();
-			// hierarchy->Select(entity);
 		}
 	}
 	ImGui::End();
 }
 
+SceneVisualizerPanel::Renderer::Renderer() {
+	auto window = Application::GetWindow();
+	m_Output = Framebuffer::Create(window->GetWidth(), window->GetHeight());
+
+	auto camera = CreateRef<StereographicCamera>(75.0f);
+	m_Controller.SetCamera(camera);
+	m_Controller.TranslationSpeed = 10.0f;
+}
+
 void SceneVisualizerPanel::Renderer::Update(TimeStep ts) {
+
+}
+
+void SceneVisualizerPanel::Renderer::Submit(Entity entity) {
 
 }
 

@@ -9,9 +9,11 @@
 
 #include "Core/JSONParser.h"
 
-#include "Light.h"
+#include "ECS/Entity.h"
 
 using namespace VolcaniCore;
+
+using namespace Magma::ECS;
 
 namespace Magma {
 
@@ -23,13 +25,12 @@ public:
 	virtual ~SceneRenderer() = default;
 
 	virtual void Update(TimeStep ts) = 0;
+	virtual void Submit(Entity entity) = 0;
 	virtual void Render() = 0;
 
-	virtual void SetContext(Scene* scene) {
-		m_Scene = scene;
-	}
+	void SetContext(Scene* scene) { m_Scene = scene; }
 
-	Ref<Framebuffer> GetOutput() { return m_Output; }
+	Ref<Framebuffer> GetOutput() const { return m_Output; }
 	CameraController& GetCameraController() { return m_Controller; }
 
 protected:
@@ -44,16 +45,12 @@ public:
 	~DefaultSceneRenderer() = default;
 
 	void Update(TimeStep ts) override;
+	void Submit(Entity entity) override;
 	void Render() override;
-	void SetContext(Scene* scene) override;
 
 private:
 	Ref<RenderPass> m_DrawPass;
-	Ref<RenderPass> m_LightingPass;
-
-	Buffer<PointLight> m_PointLightBuffer;
-
-	flecs::system m_RenderSystem;
+	List<DrawCommand> m_CommandList;
 };
 
 }

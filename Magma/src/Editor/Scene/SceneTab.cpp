@@ -86,7 +86,7 @@ void SceneTab::SetScene(const std::string& path) {
 }
 
 void SceneTab::Update(TimeStep ts) {
-	for(auto& panel : m_Panels)
+	for(auto panel : m_Panels)
 		if(panel->IsOpen())
 			panel->Update(ts);
 }
@@ -112,7 +112,7 @@ void SceneTab::Render() {
 
 			ImGui::EndMenu();
 		}
-		for(auto& panel : m_Panels) {
+		for(auto panel : m_Panels) {
 			if(panel->IsOpen())
 				continue;
 
@@ -145,7 +145,7 @@ void SceneTab::Render() {
 	if(menu.edit.addEntity)
 		AddEntity();
 
-	for(auto& panel : m_Panels)
+	for(auto panel : m_Panels)
 		if(panel->IsOpen())
 			panel->Draw();
 }
