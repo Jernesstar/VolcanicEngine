@@ -10,7 +10,7 @@ public:
 	void OnUpdate(TimeStep ts);
 
 private:
-	void RenderScene();
+	void RenderScene(Ref<Camera> camera);
 
 	Ref<RenderPass> depthPass;
 	Ref<RenderPass> shadowPass;
@@ -47,6 +47,7 @@ Shadows::Shadows()
 		{
 			{ AttachmentTarget::Depth, { { depthTexture } } }
 		});
+
 	depthPass = RenderPass::Create("Depth", depthShader);
 	depthPass->SetOutput(depthMap);
 	shadowPass = RenderPass::Create("Shadow", shadowShader);
@@ -104,12 +105,11 @@ void Shadows::OnUpdate(TimeStep ts) {
 				.Culling = CullingMode::Front
 			});
 
-		RenderScene();
+		RenderScene(depthCamera);
 	}
 	Renderer::EndPass();
-	Renderer::Flush();
 
-	// RendererAPI::Get()->RenderFramebuffer(depthMap, AttachmentTarget::Depth);
+	// Renderer2D::DrawFullscreenQuad(depthMap, AttachmentTarget::Depth);
 
 	Renderer::StartPass(shadowPass);
 	{
@@ -142,27 +142,27 @@ void Shadows::OnUpdate(TimeStep ts) {
 				return { depthMap->Get(AttachmentTarget::Depth), 1 };
 			});
 
-		RenderScene();
+		RenderScene(sceneCamera);
 
-		auto pos = depthCamera->GetPosition();
-		Renderer3D::DrawMesh(torch,
-			{
-				.Translation = pos  - glm::vec3{ 0.0f, 0.5f, 0.0f }
-			});
-		Renderer3D::DrawMesh(Mesh::Create(MeshPrimitive::Cube, glm::vec4(1.0f)),
-			{
-				.Translation = pos,
-				.Scale = glm::vec3(0.5f)
-			});
+		// auto pos = depthCamera->GetPosition();
+		// Renderer3D::DrawMesh(torch,
+		// 	{
+		// 		.Translation = pos  - glm::vec3{ 0.0f, 0.5f, 0.0f }
+		// 	});
+		// Renderer3D::DrawMesh(Mesh::Create(MeshPrimitive::Cube, glm::vec4(1.0f)),
+		// 	{
+		// 		.Translation = pos,
+		// 		.Scale = glm::vec3(0.5f)
+		// 	});
 	}
 	Renderer::EndPass();
-	Renderer::Flush();
 
+	Renderer::Flush();
 	UIRenderer::EndFrame();
 }
 
-void Shadows::RenderScene() {
-	// Renderer3D::Begin(camera);
+void Shadows::RenderScene(Ref<Camera> camera) {
+	Renderer3D::Begin(camera);
 
 	Renderer3D::DrawMesh(cube, { .Translation = { -2.0f,  0.0f,  0.0f } });
 	Renderer3D::DrawMesh(cube, { .Translation = {  2.0f,  0.0f,  0.0f } });
@@ -174,7 +174,7 @@ void Shadows::RenderScene() {
 									.Scale = glm::vec3(20.0f)
 								});
 
-	// Renderer3D::End();
+	Renderer3D::End();
 }
 
 }

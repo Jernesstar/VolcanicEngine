@@ -152,6 +152,13 @@ struct DrawUniforms {
 
 	List<UniformSlot> UniformBuffers;
 
+	operator bool () const {
+		return IntUniforms.size() || FloatUniforms.size()
+		|| TextureUniforms.size() || Vec2Uniforms.size()
+		|| Vec3Uniforms.size() || Vec4Uniforms.size() || Mat2Uniforms.size()
+		|| Mat3Uniforms.size() || Mat4Uniforms.size() || UniformBuffers;
+	}
+
 	void SetInput(const std::string& name, int32_t data) {
 		IntUniforms[name] = data;
 	}

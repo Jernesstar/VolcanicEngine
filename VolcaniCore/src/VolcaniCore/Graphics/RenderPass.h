@@ -57,7 +57,7 @@ public:
 	template<typename TUniform>
 	CallbackMap<TUniform>& GetCallbacks();
 
-	operator bool () {
+	operator bool () const {
 		return IntCallbacks.size() || FloatCallbacks.size()
 		|| TextureCallbacks.size() || BufferCallbacks.size()
 		|| Vec2Callbacks.size() || Vec3Callbacks.size() || Vec4Callbacks.size()

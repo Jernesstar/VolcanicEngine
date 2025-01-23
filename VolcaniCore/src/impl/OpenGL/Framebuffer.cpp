@@ -212,6 +212,8 @@ void Framebuffer::CreateDepthAttachment() {
 			attachment.m_RendererID = id;
 		}
 
+		attachment.m_Texture =
+			CreateRef<Texture2D>(attachment.m_RendererID, width, height);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
 								GL_TEXTURE_2D, attachment.m_RendererID, 0);
 	}

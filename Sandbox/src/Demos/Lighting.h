@@ -195,51 +195,52 @@ void Lighting::OnUpdate(TimeStep ts) {
 
 		for(int y = -length; y < length; y++) {
 			for(int x = -width; x < width; x++) {
-				// int i = 2*width * (y + length) + (x + width);
-				// std::string name = "u_PointLights[" + std::to_string(i) + "].";
+				int i = 2*width * (y + length) + (x + width);
+				std::string name = "u_PointLights[" + std::to_string(i) + "].";
 
-				// uniforms
-				// .Set(name + "Position",
-				// 	[x=x, y=y]() -> glm::vec3
-				// 	{
-				// 		return { x, 1.5f, y };
-				// 	})
-				// .Set(name + "Ambient",
-				// 	[&]() -> glm::vec3
-				// 	{
-				// 		return light.Ambient;
-				// 	})
-				// .Set(name + "Diffuse",
-				// 	[&]() -> glm::vec3
-				// 	{
-				// 		return light.Diffuse;
-				// 	})
-				// .Set(name + "Specular",
-				// 	[&]() -> glm::vec3
-				// 	{
-				// 		return light.Specular;
-				// 	})
-				// .Set(name + "Constant",
-				// 	[&]() -> float
-				// 	{
-				// 		return light.Constant;
-				// 	})
-				// .Set(name + "Linear",
-				// 	[&]() -> float
-				// 	{
-				// 		return light.Linear;
-				// 	})
-				// .Set(name + "Quadratic",
-				// 	[&]() -> float
-				// 	{
-				// 		return light.Quadratic;
-				// 	});
-				// Renderer::GetPass()->SetUniforms(command);
+				uniforms
+				.Set(name + "Position",
+					[x=x, y=y]() -> glm::vec3
+					{
+						return { x, 1.5f, y };
+					})
+				.Set(name + "Ambient",
+					[&]() -> glm::vec3
+					{
+						return light.Ambient;
+					})
+				.Set(name + "Diffuse",
+					[&]() -> glm::vec3
+					{
+						return light.Diffuse;
+					})
+				.Set(name + "Specular",
+					[&]() -> glm::vec3
+					{
+						return light.Specular;
+					})
+				.Set(name + "Constant",
+					[&]() -> float
+					{
+						return light.Constant;
+					})
+				.Set(name + "Linear",
+					[&]() -> float
+					{
+						return light.Linear;
+					})
+				.Set(name + "Quadratic",
+					[&]() -> float
+					{
+						return light.Quadratic;
+					});
+				Renderer::GetPass()->SetUniforms(command);
 
-				Renderer3D::DrawMesh(cube, { .Translation = { x, 0.0f, y } });
-				Renderer3D::DrawMesh(torch, { .Translation = { x, 1.0f, y } });
+				Renderer3D::DrawMesh(cube, { .Translation = { x, 0.0f, y } }, cubeCommand);
+				Renderer3D::DrawMesh(torch, { .Translation = { x, 1.0f, y } }, torchCommand);
 			}
 		}
+
 		Renderer3D::DrawModel(player);
 
 		Renderer3D::End();

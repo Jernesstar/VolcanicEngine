@@ -92,7 +92,8 @@ void Renderer::EndCommand() {
 	if(!s_DrawCommand)
 		return;
 
-	s_RenderPass->SetUniforms(s_DrawCommand);
+	if(!s_DrawCommand->UniformData)
+		s_RenderPass->SetUniforms(s_DrawCommand);
 	s_DrawCommand = nullptr;
 }
 
