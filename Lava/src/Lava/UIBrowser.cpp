@@ -63,7 +63,7 @@ void UIBrowser::Compile(const std::string& folderPath,
 	.Write("using namespace Lava;")
 	.Write("");
 
-	auto srcPath = fs::path(folderPath).parent_path();
+	auto srcPath = fs::path(folderPath).parent_path() / "src";
 
 	auto app = srcPath / "App";
 	auto _class = srcPath / "Class";
@@ -74,7 +74,7 @@ void UIBrowser::Compile(const std::string& folderPath,
 		for(auto path : FileUtils::GetFiles(dir.string(), { ".h" }))
 			contextIncludes.Write("#include \"" + path + "\"");
 
-	auto projName = srcPath.parent_path().stem().string();
+	auto projName = fs::path(folderPath).parent_path().stem().string();
 	contextIncludes
 	.Write("")
 	.Write("using namespace " + projName + ";")
@@ -86,13 +86,13 @@ void UIBrowser::Compile(const std::string& folderPath,
 	for(auto filePath : filePaths) {
 		fs::path p(filePath);
 		auto name = p.stem().stem().stem().string();
-		auto filePathName = (fs::path(folderPath) / name).string();
+		auto filePathName = (fs::path(folderPath) / "Page" / name).string();
 
 		if(name != "theme")
 			UILoader::Compile(filePathName);
 	}
 
-	s_CurrentPage = &s_Pages[0];
+	s_CurrentPage = s_Pages.At(0);
 }
 
 void UIBrowser::Reload() {

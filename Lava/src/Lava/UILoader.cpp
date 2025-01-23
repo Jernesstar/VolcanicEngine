@@ -300,10 +300,9 @@ void UILoader::Compile(const std::string& filePathName) {
 	}
 
 	auto name = fs::path(filePathName).stem().string();
-	auto projPath = fs::path(filePathName)
-					.parent_path().parent_path().parent_path().string();
+	auto funcFolder = (fs::path(filePathName).parent_path() / "Func").string();
 	auto jsonPath = filePathName + ".magma.ui.json";
-	auto funcPath = filePathName + ".magma.ui.func";
+	auto funcPath = funcFolder + ".magma.ui.func";
 	if(!FileUtils::FileExists(jsonPath)) {
 		VOLCANICORE_LOG_ERROR(
 			"Could not find .magma.ui.json file with name %s",

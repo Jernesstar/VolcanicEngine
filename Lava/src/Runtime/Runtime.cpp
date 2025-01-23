@@ -33,7 +33,7 @@ Runtime::Runtime(const CommandLineArgs& args)
 	Project project;
 	ProjectLoader::Load(project, volcPath);
 
-	auto path = (fs::path(volcPath).parent_path() / "src" / "UI");
+	auto path = (fs::path(volcPath).parent_path() / "UI" / "Page");
 	UIBrowser::Load(path.string());
 
 	if(!args.Has("-c"))
