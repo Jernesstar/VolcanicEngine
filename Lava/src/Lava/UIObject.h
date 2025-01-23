@@ -2,10 +2,9 @@
 
 #include <VolcaniCore/Core/Time.h>
 
-#include <Magma/UI/UIPage.h>
+#include <Magma/Core/Screen.h>
 
 using namespace VolcaniCore;
-using namespace Magma::UI;
 
 namespace Lava {
 
@@ -31,12 +30,12 @@ public:
 		// Creates OnMouseDownEvent(ID)
 	}
 
-	void SetPage(UIPage* page) {
-		Page = page;
+	void SetScreen(Screen* screen) {
+		m_Screen = screen;
 	}
 
 protected:
-	UIPage* Page;
+	Screen* m_Screen;
 };
 
 }

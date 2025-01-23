@@ -6,7 +6,6 @@
 
 #include <Magma/Core/YAMLSerializer.h>
 
-#include "UIBrowser.h"
 #include "UILoader.h"
 #include "SceneLoader.h"
 
@@ -17,7 +16,7 @@ using namespace Magma;
 namespace Lava {
 
 static void LoadSource(YAML::Node& node, const std::string& srcPath);
-static void LoadAssets(YAML::Node& node, const std::string& assetPath);
+static void LoadScenes(YAML::Node& node, const std::string& sceneFolder);
 
 void ProjectLoader::Load(Project& proj, const std::string& volcPath) {
 	YAML::Node file;
@@ -31,7 +30,7 @@ void ProjectLoader::Load(Project& proj, const std::string& volcPath) {
 	auto projNode = file["Project"];
 	VOLCANICORE_ASSERT(projNode);
 
-	proj.Path = fs::path(volcPath).parent_path().string();
+	proj.Path = fs::canonical(volcPath).parent_path().string();
 	proj.Name = projNode["Name"].as<std::string>();
 	proj.App = projNode["App"].as<std::string>();
 }
@@ -40,18 +39,21 @@ void ProjectLoader::Save(const Project& proj, const std::string& volcPath) {
 	YAMLSerializer serializer;
 	serializer.BeginMapping(); // File
 
-	serializer.WriteKey("Project").BeginMapping();
-		serializer
+	serializer.WriteKey("Project")
+	.BeginMapping()
 		.WriteKey("Name").Write(proj.Name)
-		.WriteKey("App").Write(proj.App);
+		.WriteKey("App").Write(proj.App)
+	.EndMapping(); // Project
 
-	serializer.EndMapping(); // Project
 	serializer.EndMapping(); // File
 
 	serializer.Finalize(volcPath);
 }
 
-void ProjectLoader::Compile(const std::string& volcPath) {
+void ProjectLoader::Compile(const Project& project) {
+	auto parentPath = fs::path(project.Path);
+	auto volcPath = (parentPath / ".volc.proj").string();
+
 	YAML::Node file;
 	try {
 		file = YAML::LoadFile(volcPath);
@@ -63,21 +65,17 @@ void ProjectLoader::Compile(const std::string& volcPath) {
 	auto projNode = file["Project"];
 	VOLCANICORE_ASSERT(projNode);
 
-	auto fullPath = fs::canonical(volcPath);
-	auto parentPath = fullPath.parent_path();
 	auto name = parentPath.stem().string();
-	auto rootPath = parentPath.string();
-	auto srcPath   = (parentPath / "src").string();
-	auto assetPath = (parentPath / "asset").string();
+	auto projectPath = (parentPath / "Project").string();
+	auto visualPath = (parentPath / "Visual");
 
-	auto genPath = fs::path("Lava") / "projects" / "UI" / "gen";
-	UIBrowser::Compile((parentPath / "UI").string(), genPath.string());
-	LoadSource(projNode, rootPath);
+	UILoader::CompileFolder((visualPath / "UI").string());
+	LoadSource(projNode, projectPath);
 
-	// LoadAssets(projNode, assetPath);
+	// LoadScenes(projNode, (visualPath / "Scene").string());
 }
 
-void LoadSource(YAML::Node& node, const std::string& srcPath) {
+void LoadSource(YAML::Node& node, const std::string& projectPath) {
 	auto genPath = fs::path("Lava") / "projects" / "Project" / "gen";
 
 	if(!fs::is_directory(genPath) || !fs::exists(genPath))
@@ -107,14 +105,13 @@ void LoadSource(YAML::Node& node, const std::string& srcPath) {
 
 	Replace(templateStr, "{appName}", appName);
 	cppFile.Write(templateStr);
-
 	cppFile.Close();
 
 	std::string command;
 #ifdef VOLCANICENGINE_WINDOWS
 	command = "vendor\\premake\\bin\\Windows\\premake5.exe gmake2";
 	command += " --file=Lava\\projects\\premake5.lua";
-	command += " --src=\"" + srcPath + "\"";
+	command += " --path=\"" + projectPath + "\"";
 	system(command.c_str());
 
 	command = "powershell Start-Process mingw32-make.exe -NoNewWindow -Wait";
@@ -124,7 +121,7 @@ void LoadSource(YAML::Node& node, const std::string& srcPath) {
 #elif VOLCANICENGINE_LINUX
 	command = "vendor/premake/bin/Linux/premake5.exe gmake2";
 	command += " --file=Lava/projects/premake5.lua";
-	command += " --src=\"" + srcPath + "\"";
+	command += " --path=\"" + projectPath + "\"";
 	system(command.c_str());
 
 	command = "cd Lava/projects/build; make -f Makefile;";
@@ -132,12 +129,8 @@ void LoadSource(YAML::Node& node, const std::string& srcPath) {
 #endif
 }
 
-void LoadAssets(YAML::Node& node, const std::string& assetPath) {
-	auto modelPath = (fs::path(assetPath) / "model").string();
+void LoadScenes(YAML::Node& node, const std::string& sceneFolder) {
 
-	// for(auto path : FileUtils::GetFiles(modelPath)) {
-	// 	AssetManager::GetOrCreate<Mesh>(path);
-	// }
 }
 
 Ref<DLL> ProjectLoader::GetDLL() {

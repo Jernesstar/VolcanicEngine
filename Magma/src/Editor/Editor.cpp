@@ -293,7 +293,7 @@ void Editor::OpenProject() {
 void Editor::ReloadProject() {
 	menu.project.reloadProject = false;
 	
-	Lava::ProjectLoader::Compile(m_Project.Path + "/.volc.proj");
+	Lava::ProjectLoader::Compile(m_Project);
 }
 
 void Editor::RunProject() {

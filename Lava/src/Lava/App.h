@@ -2,6 +2,8 @@
 
 #include <VolcaniCore/Core/Time.h>
 
+#include <Magma/Core/Screen.h>
+
 using namespace VolcaniCore;
 
 namespace Lava {
@@ -21,14 +23,14 @@ public:
 	virtual void OnClose();
 	virtual void OnUpdate(TimeStep ts);
 
-	// template<typename TComponent>
-	// void OnSerialize(const TComponent& component, YAMLSerializer& serializer);
-
-	// template<typename TComponent>
-	// TComponent& OnDeserialize();
+	void LoadScreen(const std::string& name);
 
 private:
 	inline static App* s_Instance;
+
+private:
+	List<Magma::Screen> m_Screens;
+	int32_t m_CurrentScreen = -1;
 };
 
 }

@@ -2,14 +2,39 @@
 
 #include <Magma/UI/UIRenderer.h>
 
-#include "UIBrowser.h"
+#include <VolcaniCore/Core/Log.h>
+#include <VolcaniCore/Core/List.h>
+#include <VolcaniCore/Core/FileUtils.h>
+
+#include <Magma/Core/DLL.h>
+
+#include "UILoader.h"
+#include "UIObject.h"
 
 using namespace Magma::UI;
 
 namespace Lava {
 
+static Map<std::string, Ref<DLL>> s_DLLs;
+
 void App::OnLoad() {
 	UIRenderer::Init();
+
+	// auto path = (fs::path(volcPath).parent_path() / "UI" / "Page");
+	// UILoader::LoadFolder(path.string());
+
+	for(auto& screen : m_Screens) {
+		auto dll = UILoader::GetDLL(screen.Name);
+		if(!dll) {
+			VOLCANICORE_LOG_WARNING(
+				"DLL Functions not found for page: %s", screen.Name);
+			continue;
+		}
+
+		auto load = dll->GetFunction<void, Screen*>("LoadObjects");
+		load(&screen);
+		s_DLLs[screen.Name] = dll;
+	}
 }
 
 void App::OnClose() {
@@ -17,7 +42,48 @@ void App::OnClose() {
 }
 
 void App::OnUpdate(TimeStep ts) {
-	UIBrowser::OnUpdate(ts);
+	if(m_CurrentScreen == -1)
+		return;
+
+	auto& screen = m_Screens[m_CurrentScreen];
+
+	// screen.GetScene().OnRender();
+
+	UIRenderer::BeginFrame();
+
+	auto dll = s_DLLs[screen.Name];
+	if(!dll)
+		return;
+
+	auto get = dll->GetFunction<UIObject*, std::string>("GetObject");
+
+	screen.GetPage().Traverse(
+		[&](UIElement* element)
+		{
+			UIObject* object = get(element->GetID());
+			if(!object)
+				return;
+
+			object->OnUpdate(ts);
+
+			UIState state = element->GetState();
+			if(state.Clicked)
+				object->OnClick();
+			if(state.Hovered)
+				object->OnHover();
+			if(state.MouseUp)
+				object->OnMouseUp();
+			if(state.MouseDown)
+				object->OnMouseDown();
+		});
+
+	screen.GetPage().Render();
+
+	UIRenderer::EndFrame();
+}
+
+void App::LoadScreen(const std::string& name) {
+
 }
 
 }

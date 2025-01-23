@@ -7,12 +7,12 @@ project "Project"
     targetdir ("build/lib")
 
     files {
-        "%{ProjectSrcDir}/**.cpp",
+        "%{ProjectDir}/**.cpp",
     }
 
     includedirs {
-        "%{ProjectSrcDir}",
-        "%{ProjectSrcDir}/**",
+        "%{ProjectDir}",
+        "%{ProjectDir}/**",
 
         "%{VolcanicEngineDir}/VolcaniCore/src",
         "%{VolcanicEngineDir}/VolcaniCore/src/VolcaniCore",
@@ -98,9 +98,11 @@ project "Loader"
         "gen/AppLoader.cpp"
     }
 
+    print(ProjectDir)
     includedirs {
-        "%{ProjectSrcDir}/",
-        "%{ProjectSrcDir}/**",
+        "%{ProjectDir}",
+        "%{ProjectDir}/**",
+        "../TestProj/Project/**",
 
         "%{VolcanicEngineDir}/VolcaniCore/src",
         "%{VolcanicEngineDir}/VolcaniCore/src/VolcaniCore",
@@ -152,8 +154,10 @@ project "Loader"
         "ImGuiFileDialog",
         "flecs",
         "rapidjson",
-        -- "PhysX",
     }
+
+    filter "toolset:msc or system:linux"
+        links "PhysX"
 
     filter "system:linux"
         links {

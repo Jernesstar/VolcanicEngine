@@ -8,7 +8,6 @@
 #include <Magma/UI/UIRenderer.h>
 
 #include <Lava/ProjectLoader.h>
-#include <Lava/UIBrowser.h>
 
 namespace fs = std::filesystem;
 
@@ -33,19 +32,14 @@ Runtime::Runtime(const CommandLineArgs& args)
 	Project project;
 	ProjectLoader::Load(project, volcPath);
 
-	auto path = (fs::path(volcPath).parent_path() / "UI" / "Page");
-	UIBrowser::Load(path.string());
-
 	if(!args.Has("-c"))
-		ProjectLoader::Compile(volcPath);
+		ProjectLoader::Compile(project);
 
 	m_AppDLL = ProjectLoader::GetDLL();
 	if(!m_AppDLL)
 		VOLCANICORE_LOG_ERROR(
 			"-c Flag used, though no DLLs could be found. \
 			Make sure to have previously called ProjectLoader::Compile");
-
-	UIBrowser::Reload();
 
 	m_AppDLL->GetFunction<void>("LoadApp")();
 
@@ -64,15 +58,9 @@ Runtime::~Runtime() {
 }
 
 void Runtime::OnUpdate(TimeStep ts) {
-	Renderer::Clear();
-
-	UIRenderer::BeginFrame();
-
 	App* app = Get();
 	app->App::OnUpdate(ts);
 	app->OnUpdate(ts);
-
-	UIRenderer::EndFrame();
 }
 
 App* Runtime::Get() {

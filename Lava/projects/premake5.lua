@@ -11,12 +11,12 @@ workspace "Projects"
         optimize "Full"
 
     newoption {
-        trigger = "src",
-        value = "Src Path",
-        description = "The path to the directory of a the source files"
+        trigger = "path",
+        value = "Project Path",
+        description = "The project's source files"
     }
 
-ProjectSrcDir = _OPTIONS["src"]
+ProjectDir = _OPTIONS["path"]
 
 include "Project"
 include "UI"

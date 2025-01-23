@@ -13,8 +13,8 @@ project "{name}"
     includedirs {
         "gen",
 
-        "%{ProjectSrcDir}",
-        "%{ProjectSrcDir}/**",
+        "%{ProjectDir}",
+        "%{ProjectDir}/**",
 
         "%{VolcanicEngineDir}/VolcaniCore/src",
         "%{VolcanicEngineDir}/VolcaniCore/src/VolcaniCore",

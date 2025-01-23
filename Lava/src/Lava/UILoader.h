@@ -14,6 +14,9 @@ public:
 	static Map<UIElementType, ThemeElement> LoadTheme(const std::string& path);
 	static void Compile(const std::string& path);
 	static Ref<DLL> GetDLL(const std::string& pageName);
+
+	static void LoadFolder(const std::string& folderPath);
+	static void CompileFolder(const std::string& folderPath);
 };
 
 }

@@ -19,15 +19,10 @@ struct Asset {
 class AssetManager {
 public:
 	AssetManager() = default;
-	~AssetManager() = default;
-
-	void Init();
-	void Close();
+	virtual ~AssetManager() = default;
 
 	template<typename T, typename ...Args>
-	Asset GetOrCreate(const Args&... args);
-	template<typename T, typename ...Args>
-	Ref<T> GetOrCreate(const Args&... args);
+	Asset GetOrCreate(Args&&... args);
 };
 
 }

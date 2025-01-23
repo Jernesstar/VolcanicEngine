@@ -7,13 +7,89 @@
 #include <VolcaniCore/Core/Algo.h>
 #include <VolcaniCore/Core/FileUtils.h>
 
+#include <Magma/Core/DLL.h>
+
 #include <Magma/Core/JSONSerializer.h>
 
 namespace fs = std::filesystem;
 
+using namespace Magma;
+using namespace Magma::UI;
+
 namespace Lava {
 
 static void LoadElement(UIPage& page, const rapidjson::Value& elementNode);
+
+void UILoader::LoadFolder(const std::string& folderPath) {
+	List<UIPage> pages;
+
+	Theme theme;
+	auto themePath = (fs::path(folderPath) / "theme.magma.ui.json").string();
+	if(FileUtils::FileExists(themePath))
+		theme = UILoader::LoadTheme(themePath);
+
+	auto filePaths = FileUtils::GetFiles(folderPath, { ".json" });
+
+	for(auto filePath : filePaths) {
+		fs::path p(filePath);
+		auto name = p.stem().stem().stem().string();
+		auto filePathName = (fs::path(folderPath) / name).string();
+
+		if(name != "theme") {
+			auto& page = pages.Emplace(name);
+			page.SetTheme(theme);
+			UILoader::Load(page, filePathName);
+		}
+	}
+}
+
+void UILoader::CompileFolder(const std::string& folderPath) {
+	auto genPath = fs::path("Lava") / "projects" / "UI" / "gen";
+
+	fs::remove_all(genPath);
+	fs::create_directory(genPath);
+
+	auto contextIncludes = File("Lava/projects/UI/gen/Context.h");
+	contextIncludes
+	.Write("#pragma once\n")
+	.Write("#include <Magma/UI/UI.h>")
+	.Write("#include <Lava/UIObject.h>")
+	.Write("#include <Lava/UILoader.h>")
+	.Write("#include <VolcaniCore/Core/Log.h>")
+	.Write("#include <VolcaniCore/Core/Input.h>")
+	.Write("")
+	.Write("using namespace Lava;")
+	.Write("");
+
+	auto srcPath = fs::path(folderPath).parent_path() / "Project";
+
+	auto app = srcPath / "App";
+	auto _class = srcPath / "Class";
+	auto common = srcPath / "Common";
+	auto script = srcPath / "Script";
+
+	for(auto dir : { app, _class, common, script })
+		for(auto path : FileUtils::GetFiles(dir.string(), { ".h" }))
+			contextIncludes.Write("#include \"" + path + "\"");
+
+	auto projName = fs::path(folderPath).parent_path().stem().string();
+	contextIncludes
+	.Write("")
+	.Write("using namespace " + projName + ";")
+	.Write("");
+
+	auto premakeFile = std::ofstream("Lava/projects/UI/pages.lua"); // Deletes file contents
+
+	auto filePaths = FileUtils::GetFiles(folderPath, { ".json" });
+	for(auto filePath : filePaths) {
+		fs::path p(filePath);
+		auto name = p.stem().stem().stem().string();
+		auto filePathName = (fs::path(folderPath) / "Page" / name).string();
+
+		if(name != "theme")
+			UILoader::Compile(filePathName);
+	}
+}
 
 void UILoader::Load(UIPage& page, const std::string& path) {
 	using namespace rapidjson;
