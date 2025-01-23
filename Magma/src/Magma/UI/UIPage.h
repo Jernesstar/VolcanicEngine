@@ -51,7 +51,8 @@ public:
 
 	void Render();
 
-	void Traverse(const Func<void, UIElement*>& func);
+	void Traverse(const Func<void, UIElement*>& func, bool dfs = true);
+	void Traverse(const Func<void, UIElement*, uint32_t>& func);
 
 	UINode Add(UIElementType type, const std::string& id);
 	void Add(const UINode& node);
