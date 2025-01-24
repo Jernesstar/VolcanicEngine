@@ -191,37 +191,34 @@ ImRect Traverse(fs::path path) {
 					| ImGuiTreeNodeFlags_Bullet
 					| ImGuiTreeNodeFlags_DefaultOpen;
 		bool open = ImGui::TreeNodeEx(path.filename().string().c_str(), flags);
-		{
-			nodeRect = ImRect(ImGui::GetItemRectMin(), ImGui::GetItemRectMax());
 
-			if(ImGui::IsMouseClicked(1) && ImGui::IsItemHovered()) {
-				if(path.extension().string() == ".scene")
-					type = "Scene";
-				else if(path.extension().string() == ".json")
-					type = "UI";
+		nodeRect = ImRect(ImGui::GetItemRectMin(), ImGui::GetItemRectMax());
+		if(ImGui::IsMouseClicked(1) && ImGui::IsItemHovered()) {
+			if(path.extension().string() == ".scene")
+				type = "Scene";
+			else if(path.extension().string() == ".json")
+				type = "UI";
 
-				if(type != "") {
-					ImGui::OpenPopup("NewTab");
-					selected = path.string();
-				}
+			if(type != "") {
+				ImGui::OpenPopup("NewTab");
+				selected = path.string();
+			}
+		}
+
+		if(ImGui::BeginPopup("NewTab")) {
+			if(ImGui::Button("Open file as new tab")) {
+				auto& editor = Application::As<EditorApp>()->GetEditor();
+				if(type == "Scene")
+					editor.NewTab(CreateRef<SceneTab>(selected));
+				if(type == "UI")
+					editor.NewTab(CreateRef<UITab>(selected));
+
+				selected = "";
+				type = "";
+				ImGui::CloseCurrentPopup();
 			}
 
-			if(ImGui::BeginPopup("NewTab")) {
-				if(ImGui::Button("Open file as new tab")) {
-					auto& editor = Application::As<EditorApp>()->GetEditor();
-					if(type == "Scene")
-						editor.NewTab(CreateRef<SceneTab>(selected));
-					if(type == "UI")
-						editor.NewTab(CreateRef<UITab>(selected));
-
-					selected = "";
-					type = "";
-					ImGui::CloseCurrentPopup();
-				}
-
-				ImGui::EndPopup();
-			}
-
+			ImGui::EndPopup();
 		}
 
 		if(open)

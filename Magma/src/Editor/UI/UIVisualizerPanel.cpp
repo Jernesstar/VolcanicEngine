@@ -160,22 +160,11 @@ void UIVisualizerPanel::Draw() {
 				ImGui::CloseCurrentPopup();
 
 			ImGui::SameLine();
-			if(ImGui::Button("Create as Image")) {
-				if(str == "")
-					exit = false;
-				else if(m_Running->Get(str)) {
-					exit = false;
-					str = "";
-					hint = "UI ID must be unique";
-				}
-				else {
-					type = UIElementType::Image;
-					exit = true;
-				}
-			}
-
+			bool image = ImGui::Button("Create as Image");
 			ImGui::SameLine();
-			if(ImGui::Button("Create as Button")) {
+			bool button = ImGui::Button("Create as Button");
+
+			if(image || button) {
 				if(str == "")
 					exit = false;
 				else if(m_Running->Get(str)) {
@@ -183,13 +172,13 @@ void UIVisualizerPanel::Draw() {
 					str = "";
 					hint = "UI ID must be unique";
 				}
-				else {
-					type = UIElementType::Button;
+				else
 					exit = true;
-				}
 			}
 
 			if(exit) {
+				UIElementType type =
+					image ? UIElementType::Image : UIElementType::Button;
 				auto node = m_Running->Add(type, str);
 				UIElement* element = m_Running->Get(node);
 
