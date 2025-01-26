@@ -8,6 +8,7 @@ project "angelscript"
 
     files {
         "%{VendorPaths.angelscript}/angelscript/source/*.cpp",
+        "%{VendorPaths.angelscript}/add_on/**.cpp",
     }
 
     includedirs {
