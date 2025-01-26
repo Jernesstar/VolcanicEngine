@@ -220,7 +220,7 @@ void FlushCommand(DrawCommand& command) {
 
 	if(command.Pass && command.Pass->Output)
 		Resize(command.Pass->Output->GetWidth(), command.Pass->Output->GetHeight());
-	else if(command.ViewportWidth != 0 && command.ViewportHeight != 0)
+	else if(command.ViewportWidth && command.ViewportHeight)
 		Resize(command.ViewportWidth, command.ViewportHeight);
 
 	if(command.Clear)

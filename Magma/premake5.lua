@@ -33,6 +33,8 @@ project "Magma"
         "%{Includes.glad}",
         "%{Includes.glfw}",
         "%{Includes.imgui}",
+        "%{Includes.angelscript}",
+        "%{VendorPaths.angelscript}",
     }
 
     links {
@@ -43,6 +45,7 @@ project "Magma"
         "ImGuiFileDialog",
         "flecs",
         "rapidjson",
+        "angelscript"
     }
 
     filter "toolset:msc or system:linux"
@@ -63,6 +66,15 @@ project "Magma"
 
     filter "system:windows"
         systemversion "latest"
+
+
+include "Magma/.builddeps/imgui"
+include "Magma/.builddeps/yaml-cpp"
+include "Magma/.builddeps/ImGuiFileDialog"
+include "Magma/.builddeps/flecs"
+include "Magma/.builddeps/rapidjson"
+include "Magma/.builddeps/angelscript"
+include "Magma/.builddeps/PhysX"
 
 
 project "Editor"
@@ -104,6 +116,8 @@ project "Editor"
         "%{Includes.glad}",
         "%{Includes.glfw}",
         "%{Includes.imgui}",
+        "%{Includes.angelscript}",
+        "%{VendorPaths.angelscript}",
     }
 
     links {
@@ -122,6 +136,7 @@ project "Editor"
         "ImGuiFileDialog",
         "flecs",
         "rapidjson",
+        "angelscript"
     }
 
     filter "toolset:msc or system:linux"
@@ -150,11 +165,3 @@ project "Editor"
             "-Wno-format-security",
             "-Wno-pointer-arith"
         }
-
-
-include "Magma/.builddeps/imgui"
-include "Magma/.builddeps/yaml-cpp"
-include "Magma/.builddeps/ImGuiFileDialog"
-include "Magma/.builddeps/flecs"
-include "Magma/.builddeps/rapidjson"
-include "Magma/.builddeps/PhysX"

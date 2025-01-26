@@ -36,3 +36,6 @@
 [submodule "Magma/vendor/rapidjson"]
 	path = Magma/vendor/rapidjson
 	url = https://github.com/Tencent/rapidjson.git
+[submodule "Magma/vendor/angelscript"]
+	path = Magma/vendor/angelscript
+	url = https://github.com/Jernesstar/angelscript.git

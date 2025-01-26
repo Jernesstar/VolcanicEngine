@@ -2,7 +2,7 @@
 
 #include <VolcaniCore/Core/FileUtils.h>
 
-#include "Panel.h"
+#include "Editor/Panel.h"
 
 namespace Magma {
 

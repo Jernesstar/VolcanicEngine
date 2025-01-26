@@ -8,11 +8,11 @@
 #include <VolcaniCore/Core/Application.h>
 #include <VolcaniCore/Core/FileUtils.h>
 
+#include <Lava/UILoader.h>
+
 #include "UIHierarchyPanel.h"
 #include "UIVisualizerPanel.h"
 #include "UIElementPickerPanel.h"
-
-#include <Lava/UILoader.h>
 
 namespace Magma {
 

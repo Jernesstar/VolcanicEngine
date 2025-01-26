@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Tab.h"
+#include <Magma/Scene/Scene.h>
 
-#include "Scene/Scene.h"
+#include "Editor/Tab.h"
 
 #include "UI/Button.h"
 

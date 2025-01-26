@@ -13,6 +13,8 @@ public:
 	std::string Path;
 	std::string Name;
 	std::string App;
+	std::string StartScreen;
+	List<std::string> Screens;
 
 public:
 	Project();

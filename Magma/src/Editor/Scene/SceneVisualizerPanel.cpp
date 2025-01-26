@@ -10,15 +10,15 @@
 #include <VolcaniCore/Graphics/RendererAPI.h>
 #include <VolcaniCore/Graphics/StereographicCamera.h>
 
-#include "ECS/Component.h"
-#include "ECS/PhysicsSystem.h"
+#include <Magma/Scene/SceneRenderer.h>
+#include <Magma/UI/UIRenderer.h>
 
-#include "Scene/SceneRenderer.h"
+#include <Magma/ECS/Component.h>
+#include <Magma/ECS/PhysicsSystem.h>
 
-#include "UI/UIRenderer.h"
+#include "Editor/EditorApp.h"
+#include "Editor/Tab.h"
 
-#include "EditorApp.h"
-#include "Tab.h"
 #include "SceneHierarchyPanel.h"
 
 using namespace Magma::ECS;
@@ -145,7 +145,7 @@ void SceneVisualizerPanel::Draw() {
 
 		if(ImGui::IsMouseClicked(0) && ImGui::IsWindowHovered()) {
 			auto& cameraController = m_Renderer.GetCameraController();
-			// auto& world = m_Context->EntityWorld.Get<PhysicsSystem>()->Get();
+			// auto world = m_Context->EntityWorld.Get<PhysicsSystem>()->Get();
 			auto camera = cameraController.GetCamera();
 
 			glm::vec2 pos = { ImGui::GetMousePos().x, ImGui::GetMousePos().y };

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Tab.h"
+#include "Editor/Tab.h"
 
 #include "UI/UIPage.h"
 

@@ -10,7 +10,7 @@
 
 #include <Magma/UI/UIRenderer.h>
 
-#include "EditorApp.h"
+#include "Editor/EditorApp.h"
 
 namespace Magma {
 

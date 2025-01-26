@@ -2,6 +2,7 @@
 
 #include <VolcaniCore/Core/Time.h>
 
+#include <Magma/Core/Project.h>
 #include <Magma/Core/Screen.h>
 
 using namespace VolcaniCore;

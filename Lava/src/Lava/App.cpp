@@ -15,26 +15,24 @@ using namespace Magma::UI;
 
 namespace Lava {
 
-static Map<std::string, Ref<DLL>> s_DLLs;
-
 void App::OnLoad() {
 	UIRenderer::Init();
 
-	// auto path = (fs::path(volcPath).parent_path() / "UI" / "Page");
-	// UILoader::LoadFolder(path.string());
+	// auto list = UILoader::LoadFolder(project);
+	// for(auto& screenName : project.Screens) {
+	// 	auto& screen = m_Screens.Emplace(screenName);
 
-	for(auto& screen : m_Screens) {
-		auto dll = UILoader::GetDLL(screen.Name);
-		if(!dll) {
-			VOLCANICORE_LOG_WARNING(
-				"DLL Functions not found for page: %s", screen.Name);
-			continue;
-		}
+	// 	auto dll = UILoader::GetDLL(screen.Name);
+	// 	if(!dll) {
+	// 		VOLCANICORE_LOG_WARNING(
+	// 			"DLL Functions not found for page: %s", screen.Name);
+	// 		continue;
+	// 	}
 
-		auto load = dll->GetFunction<void, Screen*>("LoadObjects");
-		load(&screen);
-		s_DLLs[screen.Name] = dll;
-	}
+	// 	auto load = dll->GetFunction<void, Screen*>("LoadObjects");
+	// 	load(&screen);
+	// 	s_DLLs[screen.Name] = dll;
+	// }
 }
 
 void App::OnClose() {
@@ -51,33 +49,33 @@ void App::OnUpdate(TimeStep ts) {
 
 	UIRenderer::BeginFrame();
 
-	auto dll = s_DLLs[screen.Name];
-	if(!dll)
-		return;
+	// auto dll = s_DLLs[screen.Name];
+	// if(!dll)
+	// 	return;
 
-	auto get = dll->GetFunction<UIObject*, std::string>("GetObject");
+	// auto get = dll->GetFunction<UIObject*, std::string>("GetObject");
 
-	screen.GetPage().Traverse(
-		[&](UIElement* element)
-		{
-			UIObject* object = get(element->GetID());
-			if(!object)
-				return;
+	// screen.GetPage().Traverse(
+	// 	[&](UIElement* element)
+	// 	{
+	// 		UIObject* object = get(element->GetID());
+	// 		if(!object)
+	// 			return;
 
-			object->OnUpdate(ts);
+	// 		object->OnUpdate(ts);
 
-			UIState state = element->GetState();
-			if(state.Clicked)
-				object->OnClick();
-			if(state.Hovered)
-				object->OnHover();
-			if(state.MouseUp)
-				object->OnMouseUp();
-			if(state.MouseDown)
-				object->OnMouseDown();
-		});
+	// 		UIState state = element->GetState();
+	// 		if(state.Clicked)
+	// 			object->OnClick();
+	// 		if(state.Hovered)
+	// 			object->OnHover();
+	// 		if(state.MouseUp)
+	// 			object->OnMouseUp();
+	// 		if(state.MouseDown)
+	// 			object->OnMouseDown();
+	// 	});
 
-	screen.GetPage().Render();
+	// screen.GetPage().Render();
 
 	UIRenderer::EndFrame();
 }

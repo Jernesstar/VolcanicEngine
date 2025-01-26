@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Panel.h"
+#include "Editor/Panel.h"
 
 #include <Magma/ECS/Entity.h>
 

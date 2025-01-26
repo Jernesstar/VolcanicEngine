@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Panel.h"
+#include <Magma/UI/UIPage.h>
 
-#include "UI/UIPage.h"
+#include "Editor/Panel.h"
 
 namespace Magma {
 

@@ -32,6 +32,13 @@ project "Sandbox"
         "%{RootPath}/Lava/src",
         "%{RootPath}/Lava/src/Lava",
 
+        "%{Includes.glfw}",
+        "%{Includes.glad}",
+        "%{Includes.glm}",
+        "%{Includes.freetype}",
+        "%{Includes.assimp}",
+        "%{Includes.stb_image}",
+
         "%{Includes.imgui}",
         "%{Includes.imgui}/imgui",
         "%{Includes.yaml_cpp}",
@@ -39,13 +46,8 @@ project "Sandbox"
         "%{Includes.flecs}",
         "%{Includes.rapidjson}",
         "%{Includes.PhysX}",
-
-        "%{Includes.glfw}",
-        "%{Includes.glad}",
-        "%{Includes.glm}",
-        "%{Includes.freetype}",
-        "%{Includes.assimp}",
-        "%{Includes.stb_image}",
+        "%{Includes.angelscript}",
+        "%{VendorPaths.angelscript}",
     }
 
     links {
@@ -65,6 +67,7 @@ project "Sandbox"
         "ImGuiFileDialog",
         "flecs",
         "rapidjson",
+        "angelscript",
     }
 
     filter "toolset:msc or system:linux"

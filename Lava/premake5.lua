@@ -33,6 +33,8 @@ project "Lava"
         "%{Includes.glad}",
         "%{Includes.glfw}",
         "%{Includes.imgui}",
+        "%{Includes.angelscript}",
+        "%{VendorPaths.angelscript}",
     }
 
     links {
@@ -44,6 +46,7 @@ project "Lava"
         "ImGuiFileDialog",
         "flecs",
         "rapidjson",
+        "angelscript",
     }
 
     filter "toolset:msc or system:linux"
@@ -64,6 +67,14 @@ project "Lava"
 
     filter "system:windows"
         systemversion "latest"
+
+
+include "Magma/.builddeps/imgui"
+include "Magma/.builddeps/yaml-cpp"
+include "Magma/.builddeps/ImGuiFileDialog"
+include "Magma/.builddeps/flecs"
+include "Magma/.builddeps/rapidjson"
+include "Magma/.builddeps/PhysX"
 
 
 project "Runtime"
@@ -89,17 +100,19 @@ project "Runtime"
         "%{RootPath}/Magma/src",
         "%{RootPath}/Magma/src/Magma",
 
+        "%{Includes.glm}",
+        "%{Includes.glad}",
+        "%{Includes.glfw}",
+        "%{Includes.imgui}",
+
         "%{Includes.imgui}/imgui",
         "%{Includes.yaml_cpp}",
         "%{Includes.ImGuiFileDialog}",
         "%{Includes.flecs}",
         "%{Includes.rapidjson}",
         "%{Includes.PhysX}",
-
-        "%{Includes.glm}",
-        "%{Includes.glad}",
-        "%{Includes.glfw}",
-        "%{Includes.imgui}",
+        "%{Includes.angelscript}",
+        "%{VendorPaths.angelscript}",
     }
 
     links {
@@ -118,6 +131,7 @@ project "Runtime"
         "ImGuiFileDialog",
         "flecs",
         "rapidjson",
+        "angelscript",
     }
 
     filter "system:linux"
@@ -143,10 +157,3 @@ project "Runtime"
             "-Wno-format-security",
             "-Wno-pointer-arith"
         }
-
-include "Magma/.builddeps/imgui"
-include "Magma/.builddeps/yaml-cpp"
-include "Magma/.builddeps/ImGuiFileDialog"
-include "Magma/.builddeps/flecs"
-include "Magma/.builddeps/rapidjson"
--- include "Magma/.builddeps/PhysX"

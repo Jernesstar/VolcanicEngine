@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Panel.h"
+#include <Magma/Scene/Scene.h>
 
-#include "Scene/Scene.h"
+#include "Editor/Panel.h"
 
 #include "UI/Image.h"
 #include "UI/Button.h"

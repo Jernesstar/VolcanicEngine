@@ -1,7 +1,8 @@
 #pragma once
 
-#include "Panel.h"
-#include "Scene/Scene.h"
+#include <Magma/Scene/Scene.h>
+
+#include "Editor/Panel.h"
 
 namespace Magma {
 

@@ -20,10 +20,11 @@ namespace Lava {
 
 static void LoadElement(UIPage& page, const rapidjson::Value& elementNode);
 
-void UILoader::LoadFolder(const std::string& folderPath) {
+List<UIPage> UILoader::LoadFolder(const Project& project) {
+	auto folderPath = project.Path;
 	List<UIPage> pages;
-
 	Theme theme;
+
 	auto themePath = (fs::path(folderPath) / "theme.magma.ui.json").string();
 	if(FileUtils::FileExists(themePath))
 		theme = UILoader::LoadTheme(themePath);
@@ -41,6 +42,8 @@ void UILoader::LoadFolder(const std::string& folderPath) {
 			UILoader::Load(page, filePathName);
 		}
 	}
+
+	return pages;
 }
 
 void UILoader::CompileFolder(const std::string& folderPath) {

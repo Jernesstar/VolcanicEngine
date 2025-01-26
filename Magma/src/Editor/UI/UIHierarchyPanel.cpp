@@ -135,7 +135,7 @@ ImRect Traverse(UIElement* element) {
 
 	ImDrawList* drawList = ImGui::GetWindowDrawList();
 
-	for(auto child : element->GetChildren()) {
+	for(UIElement* child : element->GetChildren()) {
 		ImRect childRect = Traverse(child);
 		float horizontalLineSize = 8.0f; // Arbitrary
 		float midpoint = (childRect.Min.y + childRect.Max.y) / 2.0f;

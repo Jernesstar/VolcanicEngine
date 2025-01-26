@@ -8,9 +8,9 @@
 
 #include <VolcaniCore/Core/Log.h>
 
-#include "ECS/Component.h"
+#include <Magma/ECS/Component.h>
 
-#include "Tab.h"
+#include "Editor/Tab.h"
 
 #include "SceneVisualizerPanel.h"
 #include "ComponentEditorPanel.h"

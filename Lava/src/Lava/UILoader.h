@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Magma/Core/Project.h>
 #include <Magma/UI/UIPage.h>
 
 using namespace Magma;
@@ -15,7 +16,7 @@ public:
 	static void Compile(const std::string& path);
 	static Ref<DLL> GetDLL(const std::string& pageName);
 
-	static void LoadFolder(const std::string& folderPath);
+	static List<UIPage> LoadFolder(const Project& projectx);
 	static void CompileFolder(const std::string& folderPath);
 };
 

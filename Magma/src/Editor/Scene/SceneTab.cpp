@@ -7,7 +7,8 @@
 
 #include <Lava/SceneLoader.h>
 
-#include "Tab.h"
+#include "Editor/Tab.h"
+
 #include "SceneHierarchyPanel.h"
 #include "SceneVisualizerPanel.h"
 #include "ComponentEditorPanel.h"
