@@ -91,7 +91,10 @@ UIState UIRenderer::DrawWindow(UI::Window& window) {
 	&& (s_Stack[-1] == UIType::Window || s_Stack[-1] == UIType::DummyWindow
 		|| s_Stack[-1] == UIType::ChildWindow))
 	{
-		auto childFlags = ImGuiChildFlags_Border | ImGuiChildFlags_FrameStyle;
+		auto childFlags = ImGuiChildFlags_Border
+						| ImGuiChildFlags_FrameStyle
+						| ImGuiChildFlags_ResizeX
+						| ImGuiChildFlags_ResizeY;
 		ImVec2 size(window.Width, window.Height);
 
 		ImGui::PushStyleColor(ImGuiCol_FrameBg, window.Color);
@@ -123,9 +126,12 @@ UIState UIRenderer::DrawWindow(UI::Window& window) {
 		s_Stack.Add(UIType::Window);
 	}
 
+	window.Width = ImGui::GetWindowSize().x;
+	window.Height = ImGui::GetWindowSize().y;
+
 	// TODO(Implement): WindowState
 	return {
-		ImGui::IsItemClicked(),
+		ImGui::IsMouseClicked(0) && ImGui::IsWindowHovered(),
 		ImGui::IsWindowHovered(),
 		ImGui::IsMouseReleased(0),
 		ImGui::IsMouseDown(0),

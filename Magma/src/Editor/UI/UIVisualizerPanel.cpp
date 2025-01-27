@@ -18,6 +18,7 @@ UIVisualizerPanel::UIVisualizerPanel(UIPage* page)
 	: Panel("UIVisualizer")
 {
 	m_Running = new UIPage();
+	m_Selected = nullptr;
 	SetContext(page);
 }
 
@@ -83,7 +84,7 @@ void UIVisualizerPanel::Draw() {
 		ImVec2 p1 = ImVec2(p0.x + size.x, p0.y + size.y);
 
 		ImDrawList* drawList = ImGui::GetWindowDrawList();
-		drawList->AddRectFilled(p0, p1, ImColor(50, 50, 50, 255));
+		drawList->AddRectFilled(p0, p1, ImColor(30, 30, 30, 255));
 		drawList->AddRect(p0, p1, ImColor(255, 255, 255, 255), 0.5f);
 
 		ImGuiIO& io = ImGui::GetIO();
@@ -119,6 +120,9 @@ void UIVisualizerPanel::Draw() {
 			ImGui::EndPopup();
 		}
 
+		if(ImGui::IsMouseClicked(0))
+			m_Selected = nullptr;
+
 		drawList->PushClipRect(p0, p1, false);
 		if(enableGrid) {
 			float x = fmodf(scrolling.x, gridStep);
@@ -126,11 +130,11 @@ void UIVisualizerPanel::Draw() {
 			for(; x < size.x; x += gridStep)
 				drawList->AddLine(
 					ImVec2(p0.x + x, p0.y), ImVec2(p0.x + x, p1.y),
-					ImColor(200, 200, 200, 40));
+					ImColor(230, 230, 230, 40));
 			for (; y < size.y; y += gridStep)
 				drawList->AddLine(
 					ImVec2(p0.x, p0.y + y), ImVec2(p1.x, p0.y + y),
-					ImColor(200, 200, 200, 40));
+					ImColor(230, 230, 230, 40));
 		}
 		drawList->PopClipRect();
 
@@ -214,10 +218,36 @@ void UIVisualizerPanel::Draw() {
 
 				UIState state = element->GetState();
 				if(state.Clicked)
-					VOLCANICORE_LOG_INFO("Clicked");
+					m_Selected = element;
 			});
 
 		UIRenderer::Pop(0);
+
+		if(m_Selected) {
+			if(ImGui::IsMouseDragging(0)) {
+				m_Selected->x += io.MouseDelta.x;
+				m_Selected->y += io.MouseDelta.y;
+			}
+
+			UIElement* element = m_Context->Get(m_Selected->GetID());
+			element->x = m_Selected->x;
+			element->y = m_Selected->y;
+			element->Width = m_Selected->Width;
+			element->Height = m_Selected->Height;
+
+			ImVec2 minPos =
+				{ origin.x + m_Selected->x, origin.y + m_Selected->y };
+
+			UIElement* parent = m_Selected->GetParent();
+			if(parent && parent->GetID() != "UI_VISUALIZER_PANEL") {
+				minPos.x += parent->x;
+				minPos.y += parent->y;
+			}
+			ImVec2 maxPos =
+				{ minPos.x + m_Selected->Width, minPos.y + m_Selected->Height };
+			drawList->AddRect(
+				minPos, maxPos, ImColor(0, 0, 200, 255), 0, 0, 3.0f);
+		}
 	}
 	ImGui::End();
 }

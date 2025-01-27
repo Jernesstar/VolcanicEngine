@@ -15,7 +15,7 @@ public:
 	void Draw() override;
 
 	void SetContext(UI::UIPage* page);
-	void Select(UIElement* element) {
+	void Select(UI::UIElement* element) {
 		m_Selected = element;
 	}
 

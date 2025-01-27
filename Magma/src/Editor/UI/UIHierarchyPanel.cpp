@@ -32,11 +32,11 @@ struct {
 	struct {
 		bool window = false;
 		bool button = false;
-		bool text = false;
 		bool image = false;
+		bool text = false;
 
 		operator bool() const {
-			return window || button || text || image;
+			return window || button || image || text;
 		}
 	} add;
 } static options;
@@ -54,10 +54,10 @@ void UIHierarchyPanel::Draw() {
 					options.add.window = true;
 				if(ImGui::MenuItem("Button"))
 					options.add.button = true;
-				if(ImGui::MenuItem("Text"))
-					options.add.text = true;
 				if(ImGui::MenuItem("Image"))
 					options.add.image = true;
+				if(ImGui::MenuItem("Text"))
+					options.add.text = true;
 
 				ImGui::EndMenu();
 			}
@@ -78,8 +78,8 @@ void UIHierarchyPanel::Draw() {
 				if(ImGui::Button("Cancel")) {
 					options.add.window = false;
 					options.add.button = false;
-					options.add.text = false;
 					options.add.image = false;
+					options.add.text = false;
 					ImGui::CloseCurrentPopup();
 				}
 
