@@ -45,7 +45,7 @@ void ContentBrowserPanel::Draw() {
 		auto windowFlags = ImGuiWindowFlags_MenuBar;
 		auto childFlags = ImGuiChildFlags_Border;
 
-		ImVec2 size = { 300, ImGui::GetContentRegionAvail().y };
+		ImVec2 size = { 350, ImGui::GetContentRegionAvail().y };
 		ImGui::BeginChild("File-Hierarchy-View", size, childFlags, windowFlags);
 		{
 			ImVec2 windowStart = ImGui::GetCursorPos();

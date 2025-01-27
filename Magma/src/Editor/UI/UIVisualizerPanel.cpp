@@ -32,11 +32,11 @@ void UIVisualizerPanel::SetContext(UIPage* page) {
 	m_Context = page;
 	*m_Running = *page;
 
-	m_Node = m_Running->Add(UIElementType::Window, "UI_VISUALIZER_PANEL");
+	m_RootNode = m_Running->Add(UIElementType::Window, "UI_VISUALIZER_PANEL");
 	m_Running->ClearFirstOrders();
-	m_Running->Add(m_Node);
+	m_Running->Add(m_RootNode);
 
-	UIElement* window = m_Running->Get(m_Node);
+	UIElement* window = m_Running->Get(m_RootNode);
 	for(auto* element : page->GetFirstOrderElements())
 		window->Add(element->GetNode());
 
@@ -92,14 +92,14 @@ void UIVisualizerPanel::Draw() {
 
 		ImGui::SetNextItemAllowOverlap();
 		ImGui::InvisibleButton("Canvas", size, buttonFlags);
-		const bool isHovered = ImGui::IsItemHovered(); // Hovered
+		const bool isHovered = ImGui::IsItemHovered();
 		const bool isActive = ImGui::IsItemActive(); // Held
 		// Lock scrolled origin
 		const ImVec2 origin = { p0.x + scrolling.x, p0.y + scrolling.y };
 		const ImVec2 mousePosCanvas =
 			{ io.MousePos.x - origin.x, io.MousePos.y - origin.y };
 
-		if(isActive && ImGui::IsMouseDragging(1)) {
+		if(isActive && isHovered && ImGui::IsMouseDragging(1)) {
 			scrolling.x += io.MouseDelta.x;
 			scrolling.y += io.MouseDelta.y;
 		}
@@ -194,7 +194,7 @@ void UIVisualizerPanel::Draw() {
 			ImGui::EndPopup();
 		}
 
-		UIElement* window = m_Running->Get(m_Node);
+		UIElement* window = m_Running->Get(m_RootNode);
 		window->SetPosition(origin.x, origin.y);
 		window->SetSize(size.x, size.y);
 

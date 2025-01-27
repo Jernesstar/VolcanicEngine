@@ -142,12 +142,11 @@ void SceneHierarchyPanel::DrawEntityNode(Entity& entity) {
 		if(ImGui::IsMouseClicked(1) && ImGui::IsItemHovered())
 			ImGui::OpenPopup("Properties");
 
-		auto flags = ImGuiTreeNodeFlags_Bullet;
+		auto flags = ImGuiTreeNodeFlags_Bullet | ImGuiTreeNodeFlags_DefaultOpen;
 		if(entity.Has<CameraComponent>()) {
 			bool focus = editor->IsFocused<CameraComponent>(entity);
-			auto addFlags = focus ? ImGuiTreeNodeFlags_Selected
-								   | ImGuiTreeNodeFlags_DefaultOpen : 0;
-			if(ImGui::TreeNodeEx("Component1", flags | addFlags, "CameraComponent")) {
+			auto addFlags = focus ? ImGuiTreeNodeFlags_Selected : 0;
+			if(ImGui::TreeNodeEx("CameraComponent", flags | addFlags)) {
 				editor->SetFocus<CameraComponent>();
 				if(ImGui::IsItemClicked())
 					editor->ClearFocus();
@@ -156,45 +155,40 @@ void SceneHierarchyPanel::DrawEntityNode(Entity& entity) {
 		}
 		if(entity.Has<MeshComponent>()) {
 			bool focus = editor->IsFocused<MeshComponent>(entity);
-			auto addFlags = focus ? ImGuiTreeNodeFlags_Selected
-								   | ImGuiTreeNodeFlags_DefaultOpen : 0;
-			if(ImGui::TreeNodeEx("Component2", flags | addFlags, "MeshComponent")) {
+			auto addFlags = focus ? ImGuiTreeNodeFlags_Selected : 0;
+			if(ImGui::TreeNodeEx("MeshComponent", flags | addFlags)) {
 				editor->SetFocus<MeshComponent>();
 				ImGui::TreePop();
 			}
 		}
 		if(entity.Has<RigidBodyComponent>()) {
 			bool focus = editor->IsFocused<RigidBodyComponent>(entity);
-			auto addFlags = focus ? ImGuiTreeNodeFlags_Selected
-								   | ImGuiTreeNodeFlags_DefaultOpen : 0;
-			if(ImGui::TreeNodeEx("Component3", flags | addFlags, "RigidBodyComponent")) {
+			auto addFlags = focus ? ImGuiTreeNodeFlags_Selected : 0;
+			if(ImGui::TreeNodeEx("RigidBodyComponent", flags | addFlags)) {
 				editor->SetFocus<RigidBodyComponent>();
 				ImGui::TreePop();
 			}
 		}
 		if(entity.Has<TagComponent>()) {
 			bool focus = editor->IsFocused<TagComponent>(entity);
-			auto addFlags = focus ? ImGuiTreeNodeFlags_Selected
-								   | ImGuiTreeNodeFlags_DefaultOpen : 0;
-			if(ImGui::TreeNodeEx("Component4", flags | addFlags, "TagComponent")) {
+			auto addFlags = focus ? ImGuiTreeNodeFlags_Selected : 0;
+			if(ImGui::TreeNodeEx("TagComponent", flags | addFlags)) {
 				editor->SetFocus<TagComponent>();
 				ImGui::TreePop();
 			}
 		}
 		if(entity.Has<TransformComponent>()) {
 			bool focus = editor->IsFocused<TransformComponent>(entity);
-			auto addFlags = focus ? ImGuiTreeNodeFlags_Selected
-								   | ImGuiTreeNodeFlags_DefaultOpen : 0;
-			if(ImGui::TreeNodeEx("Component5", flags | addFlags, "TransformComponent")) {
+			auto addFlags = focus ? ImGuiTreeNodeFlags_Selected : 0;
+			if(ImGui::TreeNodeEx("TransformComponent", flags | addFlags)) {
 				editor->SetFocus<TransformComponent>();
 				ImGui::TreePop();
 			}
 		}
 		if(entity.Has<ScriptComponent>()) {
 			bool focus = editor->IsFocused<ScriptComponent>(entity);
-			auto addFlags = focus ? ImGuiTreeNodeFlags_Selected
-								   | ImGuiTreeNodeFlags_DefaultOpen : 0;
-			if(ImGui::TreeNodeEx("Component6", flags | addFlags, "ScriptComponent")) {
+			auto addFlags = focus ? ImGuiTreeNodeFlags_Selected : 0;
+			if(ImGui::TreeNodeEx("ScriptComponent", flags | addFlags)) {
 				editor->SetFocus<ScriptComponent>();
 				ImGui::TreePop();
 			}

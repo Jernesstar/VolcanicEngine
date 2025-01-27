@@ -12,7 +12,7 @@
 
 #include "UIHierarchyPanel.h"
 #include "UIVisualizerPanel.h"
-#include "UIElementPickerPanel.h"
+#include "UIElementEditorPanel.h"
 
 namespace Magma {
 
@@ -115,7 +115,7 @@ void UITab::Render() {
 void UITab::Setup() {
 	AddPanel<UIHierarchyPanel>(&m_Root);
 	AddPanel<UIVisualizerPanel>(&m_Root);
-	AddPanel<UIElementPickerPanel>(&m_Root);
+	AddPanel<UIElementEditorPanel>(&m_Root);
 }
 
 void UITab::Load(const std::string& path) {

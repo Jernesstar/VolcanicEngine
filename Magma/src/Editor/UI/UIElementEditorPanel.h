@@ -6,23 +6,22 @@
 
 namespace Magma {
 
-class UIVisualizerPanel : public Panel {
+class UIElementEditorPanel : public Panel {
 public:
-	UIVisualizerPanel(UI::UIPage* page);
-	~UIVisualizerPanel();
+	UIElementEditorPanel(UI::UIPage* page);
+	~UIElementEditorPanel() = default;
 
 	void Update(TimeStep ts) override;
 	void Draw() override;
 
 	void SetContext(UI::UIPage* page);
-	void Select(UIElement* element) {
-		m_Selected = element;
+
+	void Select(const std::string& id) {
+		m_Selected = m_Context->Get(id);
 	}
 
 private:
 	UI::UIPage* m_Context;
-	UI::UIPage* m_Running;
-	UI::UINode m_RootNode;
 	UI::UIElement* m_Selected;
 };
 

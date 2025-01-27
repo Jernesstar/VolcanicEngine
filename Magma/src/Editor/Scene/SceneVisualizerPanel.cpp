@@ -40,6 +40,7 @@ void SceneVisualizerPanel::SetContext(Scene* context) {
 	m_Selected.Handle = Entity{ };
 	// m_Selected.Collider = CreateRef<Physics::RigidBody>();
 
+	m_Renderer.SetContext(context);
 	m_Image->SetImage(m_Renderer.GetOutput(), AttachmentTarget::Color);
 }
 
