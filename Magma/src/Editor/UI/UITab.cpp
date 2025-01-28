@@ -113,9 +113,9 @@ void UITab::Render() {
 }
 
 void UITab::Setup() {
-	AddPanel<UIHierarchyPanel>(&m_Root);
-	AddPanel<UIVisualizerPanel>(&m_Root);
-	AddPanel<UIElementEditorPanel>(&m_Root);
+	AddPanel<UIHierarchyPanel>(&m_Root)->SetTab(this);
+	AddPanel<UIVisualizerPanel>(&m_Root)->SetTab(this);
+	AddPanel<UIElementEditorPanel>(&m_Root)->SetTab(this);
 }
 
 void UITab::Load(const std::string& path) {

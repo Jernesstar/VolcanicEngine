@@ -10,6 +10,10 @@
 
 #include <Magma/UI/UIRenderer.h>
 
+#include "Editor/Tab.h"
+
+#include "UIElementEditorPanel.h"
+
 using namespace Magma::UI;
 
 namespace Magma {
@@ -41,12 +45,10 @@ void UIVisualizerPanel::SetContext(UIPage* page) {
 	for(auto* element : page->GetFirstOrderElements())
 		window->Add(element->GetNode());
 
-	m_Running->Traverse(
-		[&](UIElement* element)
-		{
-			element->xAlignment = XAlignment::Left;
-			element->yAlignment = YAlignment::Top;
-		});
+	for(UIElement* element : window->GetChildren()) {
+		element->xAlignment = XAlignment::Left;
+		element->yAlignment = YAlignment::Top;
+	};
 }
 
 static TimeStep s_TimeStep;
@@ -104,7 +106,7 @@ void UIVisualizerPanel::Draw() {
 			scrolling.x += io.MouseDelta.x;
 			scrolling.y += io.MouseDelta.y;
 		}
-		if(isHovered) {
+		if(true) {
 			gridStep += s_TimeStep * 10.0f * io.MouseWheel;
 			if(gridStep < 25.0f)
 				gridStep = 25.0f;
@@ -120,8 +122,12 @@ void UIVisualizerPanel::Draw() {
 			ImGui::EndPopup();
 		}
 
-		if(ImGui::IsMouseClicked(0))
+		auto editor =
+			m_Tab->GetPanel("UIElementEditor")->As<UIElementEditorPanel>();
+		if(ImGui::IsMouseClicked(0) && isHovered) {
 			m_Selected = nullptr;
+			// editor->Select(nullptr);
+		}
 
 		drawList->PushClipRect(p0, p1, false);
 		if(enableGrid) {
@@ -208,41 +214,64 @@ void UIVisualizerPanel::Draw() {
 		dummy.Height = 0;
 		UIRenderer::DrawWindow(dummy);
 
+		auto elementHovered = false;
 		m_Running->Traverse(
 			[&](UIElement* element)
 			{
 				if(element == window)
 					return;
 
+				UIElement* other = m_Context->Get(element->GetID());
+				element->x = other->x;
+				element->y = other->y;
+				element->Width = other->Width;
+				element->Height = other->Height;
+				element->Color = other->Color;
+
+				// Exclude all the elements that were recently first orders
+				if(other->GetParent()) {
+					element->xAlignment = other->xAlignment;
+					element->yAlignment = other->yAlignment;
+				}
+
 				element->Draw();
 
 				UIState state = element->GetState();
-				if(state.Clicked)
+				if(state.Clicked) {
 					m_Selected = element;
+					editor->Select(m_Selected->GetID());
+				}
+				if(state.Hovered)
+					elementHovered = true;
 			});
 
 		UIRenderer::Pop(0);
 
 		if(m_Selected) {
-			if(ImGui::IsMouseDragging(0)) {
+			if(elementHovered && ImGui::IsMouseDragging(0)) {
 				m_Selected->x += io.MouseDelta.x;
 				m_Selected->y += io.MouseDelta.y;
+				if(m_Selected->x < 0)
+					m_Selected->x = 0;
+				if(m_Selected->y < 0)
+					m_Selected->y = 0;
 			}
 
-			UIElement* element = m_Context->Get(m_Selected->GetID());
-			element->x = m_Selected->x;
-			element->y = m_Selected->y;
-			element->Width = m_Selected->Width;
-			element->Height = m_Selected->Height;
+			UIElement* other = m_Context->Get(m_Selected->GetID());
+			other->x = m_Selected->x;
+			other->y = m_Selected->y;
+			other->Width = m_Selected->Width;
+			other->Height = m_Selected->Height;
 
 			ImVec2 minPos =
 				{ origin.x + m_Selected->x, origin.y + m_Selected->y };
 
-			UIElement* parent = m_Selected->GetParent();
-			if(parent && parent->GetID() != "UI_VISUALIZER_PANEL") {
+			UIElement* parent = other->GetParent();
+			if(parent) {
 				minPos.x += parent->x;
 				minPos.y += parent->y;
 			}
+
 			ImVec2 maxPos =
 				{ minPos.x + m_Selected->Width, minPos.y + m_Selected->Height };
 			drawList->AddRect(
