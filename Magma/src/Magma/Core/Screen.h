@@ -1,7 +1,6 @@
 #pragma once
 
-#include "UI/UIPage.h"
-#include "Scene/Scene.h"
+#include <string>
 
 namespace Magma {
 

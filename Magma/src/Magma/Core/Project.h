@@ -1,8 +1,9 @@
 #pragma once
 
 #include <VolcaniCore/Core/Defines.h>
+#include <VolcaniCore/Core/List.h>
 
-#include "YAMLSerializer.h"
+#include "Screen.h"
 
 using namespace VolcaniCore;
 
@@ -14,7 +15,7 @@ public:
 	std::string Name;
 	std::string App;
 	std::string StartScreen;
-	List<std::string> Screens;
+	List<Screen> Screens;
 
 public:
 	Project();

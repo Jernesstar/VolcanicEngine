@@ -23,17 +23,18 @@ private:
 
 Script::Script() {
 	Events::RegisterListener<KeyPressedEvent>(
-		[](const KeyPressedEvent& event)
+		[&](const KeyPressedEvent& event)
 		{
 			if(event.Key == Key::Escape)
 				Application::Close();
+			if(event.Key == Key::K)
+				RunScriptEngine();
 		});
 
 	camera = CreateRef<StereographicCamera>(75.0f);
 	camera->SetPosition({ 0.0f, 0.0f, 3.0f });
 	controller = CameraController{ camera };
 
-	RunScriptEngine();
 	VOLCANICORE_LOG_INFO("Success");
 }
 
