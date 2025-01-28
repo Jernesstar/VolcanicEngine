@@ -16,13 +16,13 @@ public:
 
 	void SetContext(UI::UIPage* page);
 
-	void Select(const std::string& id) {
-		m_Selected = m_Context->Get(id);
+	void Select(UI::UIElement* element) {
+		m_Selected = element;
 	}
 
 private:
 	UI::UIPage* m_Context;
-	UI::UIElement* m_Selected;
+	UI::UIElement* m_Selected = nullptr;
 };
 
 }

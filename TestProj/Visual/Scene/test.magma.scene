@@ -207,7 +207,7 @@ Scene:
           TransformComponent:
             Transform:
               Translation: [0, -4, -7]
-              Rotation: [0, 0, 0]
+              Rotation: [0.157079637, 0, 0]
               Scale: [0.100000001, 0.100000001, 0.100000001]
           MeshComponent:
             Meshes:
@@ -237,9 +237,9 @@ Scene:
             Tag: Cube12
           TransformComponent:
             Transform:
-              Translation: [-7, -6, 6]
-              Rotation: [0, 0, 0]
-              Scale: [1, 1, 1]
+              Translation: [-5.19999981, -6, 6]
+              Rotation: [0.104719758, 0, 0]
+              Scale: [1.10000002, 1, 1]
           MeshComponent:
             Meshes:
               - Mesh:

@@ -16,14 +16,17 @@ public:
 
 	void SetContext(UI::UIPage* page);
 	void Select(UI::UIElement* element) {
-		m_Selected = element;
+		if(!element)
+			m_Selected = nullptr;
+		else
+			m_Selected = m_Running->Get(element->GetID());
 	}
+	void Add(UI::UIElement* element);
 
 private:
 	UI::UIPage* m_Context;
 	UI::UIPage* m_Running;
-	UI::UINode m_RootNode;
-	UI::UIElement* m_Selected;
+	UI::UIElement* m_Selected = nullptr;
 };
 
 }

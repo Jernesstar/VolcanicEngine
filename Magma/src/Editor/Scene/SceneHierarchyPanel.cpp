@@ -121,9 +121,8 @@ void SceneHierarchyPanel::DrawEntityNode(Entity& entity) {
 
 	auto id = (void*)(uint64_t)(uint32_t)entity.GetHandle();
 	std::string tag;
-	if(entity.Has<TagComponent>()) {
+	if(entity.Has<TagComponent>())
 		tag = entity.Get<TagComponent>().Tag.c_str();
-	}
 	else
 		tag = std::to_string(entity.GetHandle());
 
@@ -142,14 +141,17 @@ void SceneHierarchyPanel::DrawEntityNode(Entity& entity) {
 		if(ImGui::IsMouseClicked(1) && ImGui::IsItemHovered())
 			ImGui::OpenPopup("Properties");
 
-		auto flags = ImGuiTreeNodeFlags_Bullet | ImGuiTreeNodeFlags_DefaultOpen;
+		flags = ImGuiTreeNodeFlags_Bullet | ImGuiTreeNodeFlags_DefaultOpen;
 		if(entity.Has<CameraComponent>()) {
 			bool focus = editor->IsFocused<CameraComponent>(entity);
 			auto addFlags = focus ? ImGuiTreeNodeFlags_Selected : 0;
 			if(ImGui::TreeNodeEx("CameraComponent", flags | addFlags)) {
-				editor->SetFocus<CameraComponent>();
-				if(ImGui::IsItemClicked())
-					editor->ClearFocus();
+				if(ImGui::IsMouseClicked(0) && ImGui::IsItemHovered()) {
+					if(focus)
+						editor->ClearFocus();
+					else
+						editor->SetFocus<CameraComponent>();
+				}
 				ImGui::TreePop();
 			}
 		}
@@ -157,7 +159,12 @@ void SceneHierarchyPanel::DrawEntityNode(Entity& entity) {
 			bool focus = editor->IsFocused<MeshComponent>(entity);
 			auto addFlags = focus ? ImGuiTreeNodeFlags_Selected : 0;
 			if(ImGui::TreeNodeEx("MeshComponent", flags | addFlags)) {
-				editor->SetFocus<MeshComponent>();
+				if(ImGui::IsMouseClicked(0) && ImGui::IsItemHovered()) {
+					if(focus)
+						editor->ClearFocus();
+					else
+						editor->SetFocus<MeshComponent>();
+				}
 				ImGui::TreePop();
 			}
 		}
@@ -165,7 +172,12 @@ void SceneHierarchyPanel::DrawEntityNode(Entity& entity) {
 			bool focus = editor->IsFocused<RigidBodyComponent>(entity);
 			auto addFlags = focus ? ImGuiTreeNodeFlags_Selected : 0;
 			if(ImGui::TreeNodeEx("RigidBodyComponent", flags | addFlags)) {
-				editor->SetFocus<RigidBodyComponent>();
+				if(ImGui::IsMouseClicked(0) && ImGui::IsItemHovered()) {
+					if(focus)
+						editor->ClearFocus();
+					else
+						editor->SetFocus<RigidBodyComponent>();
+				}
 				ImGui::TreePop();
 			}
 		}
@@ -173,7 +185,12 @@ void SceneHierarchyPanel::DrawEntityNode(Entity& entity) {
 			bool focus = editor->IsFocused<TagComponent>(entity);
 			auto addFlags = focus ? ImGuiTreeNodeFlags_Selected : 0;
 			if(ImGui::TreeNodeEx("TagComponent", flags | addFlags)) {
-				editor->SetFocus<TagComponent>();
+				if(ImGui::IsMouseClicked(0) && ImGui::IsItemHovered()) {
+					if(focus)
+						editor->ClearFocus();
+					else
+						editor->SetFocus<TagComponent>();
+				}
 				ImGui::TreePop();
 			}
 		}
@@ -181,7 +198,12 @@ void SceneHierarchyPanel::DrawEntityNode(Entity& entity) {
 			bool focus = editor->IsFocused<TransformComponent>(entity);
 			auto addFlags = focus ? ImGuiTreeNodeFlags_Selected : 0;
 			if(ImGui::TreeNodeEx("TransformComponent", flags | addFlags)) {
-				editor->SetFocus<TransformComponent>();
+				if(ImGui::IsMouseClicked(0) && ImGui::IsItemHovered()) {
+					if(focus)
+						editor->ClearFocus();
+					else
+						editor->SetFocus<TransformComponent>();
+				}
 				ImGui::TreePop();
 			}
 		}
@@ -189,7 +211,12 @@ void SceneHierarchyPanel::DrawEntityNode(Entity& entity) {
 			bool focus = editor->IsFocused<ScriptComponent>(entity);
 			auto addFlags = focus ? ImGuiTreeNodeFlags_Selected : 0;
 			if(ImGui::TreeNodeEx("ScriptComponent", flags | addFlags)) {
-				editor->SetFocus<ScriptComponent>();
+				if(ImGui::IsMouseClicked(0) && ImGui::IsItemHovered()) {
+					if(focus)
+						editor->ClearFocus();
+					else
+						editor->SetFocus<ScriptComponent>();
+				}
 				ImGui::TreePop();
 			}
 		}

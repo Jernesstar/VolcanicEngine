@@ -12,6 +12,7 @@
 
 #include "Editor/Tab.h"
 
+#include "UIHierarchyPanel.h"
 #include "UIElementEditorPanel.h"
 
 using namespace Magma::UI;
@@ -22,7 +23,6 @@ UIVisualizerPanel::UIVisualizerPanel(UIPage* page)
 	: Panel("UIVisualizer")
 {
 	m_Running = new UIPage();
-	m_Selected = nullptr;
 	SetContext(page);
 }
 
@@ -37,11 +37,11 @@ void UIVisualizerPanel::SetContext(UIPage* page) {
 	m_Context = page;
 	*m_Running = *page;
 
-	m_RootNode = m_Running->Add(UIElementType::Window, "UI_VISUALIZER_PANEL");
+	auto root = m_Running->Add(UIElementType::Window, "UI_VISUALIZER_PANEL");
 	m_Running->ClearFirstOrders();
-	m_Running->Add(m_RootNode);
+	m_Running->Add(root);
 
-	UIElement* window = m_Running->Get(m_RootNode);
+	UIElement* window = m_Running->Get(root);
 	for(auto* element : page->GetFirstOrderElements())
 		window->Add(element->GetNode());
 
@@ -51,10 +51,30 @@ void UIVisualizerPanel::SetContext(UIPage* page) {
 	};
 }
 
-static TimeStep s_TimeStep;
+void UIVisualizerPanel::Add(UIElement* element) {
+	UIElement* parent = element->GetParent();
+
+	UINode node = m_Running->Add(element->GetType(), element->GetID());
+	UIElement* newElement = m_Running->Get(node);
+	newElement->x = element->x;
+	newElement->y = element->y;
+	newElement->Width = element->Width;
+	newElement->Height = element->Height;
+	newElement->Color = element->Color;
+	newElement->xAlignment = element->xAlignment;
+	newElement->yAlignment = element->yAlignment;
+
+	if(parent)
+		m_Running->Get(parent->GetID())->Add(node);
+	else {
+		m_Running->Get("UI_VISUALIZER_PANEL")->Add(node);
+		newElement->xAlignment = XAlignment::Left;
+		newElement->yAlignment = YAlignment::Top;
+	}
+}
 
 void UIVisualizerPanel::Update(TimeStep ts) {
-	s_TimeStep = ts;
+
 }
 
 struct {
@@ -107,7 +127,7 @@ void UIVisualizerPanel::Draw() {
 			scrolling.y += io.MouseDelta.y;
 		}
 		if(true) {
-			gridStep += s_TimeStep * 10.0f * io.MouseWheel;
+			gridStep += io.MouseWheel;
 			if(gridStep < 25.0f)
 				gridStep = 25.0f;
 			if(gridStep > 150.0f)
@@ -122,11 +142,14 @@ void UIVisualizerPanel::Draw() {
 			ImGui::EndPopup();
 		}
 
+		auto hierarchy =
+			m_Tab->GetPanel("UIHierarchy")->As<UIHierarchyPanel>();
 		auto editor =
 			m_Tab->GetPanel("UIElementEditor")->As<UIElementEditorPanel>();
 		if(ImGui::IsMouseClicked(0) && isHovered) {
 			m_Selected = nullptr;
-			// editor->Select(nullptr);
+			editor->Select(nullptr);
+			hierarchy->Select(nullptr);
 		}
 
 		drawList->PushClipRect(p0, p1, false);
@@ -204,7 +227,7 @@ void UIVisualizerPanel::Draw() {
 			ImGui::EndPopup();
 		}
 
-		UIElement* window = m_Running->Get(m_RootNode);
+		UIElement* window = m_Running->Get("UI_VISUALIZER_PANEL");
 		window->SetPosition(origin.x, origin.y);
 		window->SetSize(size.x, size.y);
 
@@ -227,7 +250,6 @@ void UIVisualizerPanel::Draw() {
 				element->Width = other->Width;
 				element->Height = other->Height;
 				element->Color = other->Color;
-
 				// Exclude all the elements that were recently first orders
 				if(other->GetParent()) {
 					element->xAlignment = other->xAlignment;
@@ -239,7 +261,8 @@ void UIVisualizerPanel::Draw() {
 				UIState state = element->GetState();
 				if(state.Clicked) {
 					m_Selected = element;
-					editor->Select(m_Selected->GetID());
+					editor->Select(other);
+					hierarchy->Select(other);
 				}
 				if(state.Hovered)
 					elementHovered = true;
@@ -264,7 +287,10 @@ void UIVisualizerPanel::Draw() {
 			other->Height = m_Selected->Height;
 
 			ImVec2 minPos =
-				{ origin.x + m_Selected->x, origin.y + m_Selected->y };
+				{
+					origin.x + m_Selected->x - 2.0f,
+					origin.y + m_Selected->y - 2.0f
+				};
 
 			UIElement* parent = other->GetParent();
 			if(parent) {
@@ -273,9 +299,12 @@ void UIVisualizerPanel::Draw() {
 			}
 
 			ImVec2 maxPos =
-				{ minPos.x + m_Selected->Width, minPos.y + m_Selected->Height };
+				{
+					minPos.x + m_Selected->Width + 4.0f,
+					minPos.y + m_Selected->Height + 4.0f
+				};
 			drawList->AddRect(
-				minPos, maxPos, ImColor(0, 0, 200, 255), 0, 0, 3.0f);
+				minPos, maxPos, ImColor(0, 0, 200, 255), 0, 0, 4.0f);
 		}
 	}
 	ImGui::End();

@@ -18,7 +18,6 @@ UIElementEditorPanel::UIElementEditorPanel(UI::UIPage* page)
 	: Panel("UIElementEditor")
 {
 	SetContext(page);
-	m_Selected = nullptr;
 }
 
 void UIElementEditorPanel::SetContext(UI::UIPage* page) {
@@ -43,10 +42,13 @@ static void EditColor(glm::vec4& color) {
 
 	ImGui::Text("Color");
 	ImGui::SameLine();
+	ImGui::PushID(&color);
 	bool popup =
 		ImGui::ColorButton("Color##Preview", vColor, buttonFlags, { 20, 20 });
+	ImGui::PopID();
 	ImGui::SameLine();
 
+	ImGui::PushID(&color.y);
 	if(popup) {
 		ImGui::OpenPopup("ColorPicker");
 		backupColor = color;
@@ -57,7 +59,10 @@ static void EditColor(glm::vec4& color) {
 		ImGui::Text("Select Color");
 		ImGui::Separator();
 		ImGui::SetColorEditOptions(ImGuiColorEditFlags_AlphaBar);
+
+		ImGui::PushID(&color.z);
 		ImGui::ColorPicker4("##Picker", (float*)&color, buttonFlags);
+		ImGui::PopID();
 		ImGui::SameLine();
 
 		ImGui::BeginGroup(); // Lock X position
@@ -72,6 +77,7 @@ static void EditColor(glm::vec4& color) {
 
 		ImGui::EndPopup();
 	}
+	ImGui::PopID();
 
 	ImGui::NewLine();
 }
@@ -93,7 +99,17 @@ void EditElement<Window>(UIElement* element) {
 
 template<>
 void EditElement<Button>(UIElement* element) {
-	
+	auto* button = element->As<Button>();
+	ImGui::SeparatorText("Display");
+	ImGui::Indent(25.0f);
+
+	Ref<UIElement> display = button->Display;
+
+	ImGui::Button("Set Text");
+	ImGui::Text("Text: ");
+	ImGui::Button("Set Image");
+	ImGui::Text("Image: ");
+	// ImGui::InputText("Button Text", &display->As<Text>()->Content);
 }
 
 template<>

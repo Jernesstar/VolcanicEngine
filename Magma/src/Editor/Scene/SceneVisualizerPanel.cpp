@@ -136,8 +136,8 @@ void SceneVisualizerPanel::Draw() {
 
 						Application::PushDir(path);
 						newEntity.Add<MeshComponent>(options.add.mesh);
-						ImGui::CloseCurrentPopup();
 						Application::PopDir();
+						ImGui::CloseCurrentPopup();
 					}
 				}
 			}

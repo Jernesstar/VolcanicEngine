@@ -69,9 +69,12 @@ public:
 	requires std::derived_from<TUIElement, UIElement>
 	UINode AddNew(Args&&... args) {
 		auto& list = GetList<TUIElement>();
-		list.emplace_back(std::forward<Args>(args)...);
+		list.Emplace(std::forward<Args>(args)...);
 		return { GetType<TUIElement>(), list.size() };
 	}
+
+	void Delete(const UINode& node);
+	void Delete(const std::string& id);
 
 	void Clear();
 	void ClearFirstOrders();
