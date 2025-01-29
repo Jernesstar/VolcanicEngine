@@ -1,6 +1,6 @@
 #include "ScriptObject.h"
 
-namespace Magma {
+namespace Magma::Script {
 
 ScriptObject::ScriptObject() {
 	m_RefCount = 1;
@@ -25,14 +25,11 @@ uint32_t ScriptObject::Release() {
 }
 
 void ScriptObject::DestroyAndRelease() {
-	// Since there might be other object's still referencing this one, we
-	// cannot just delete it. Here we will release all other references that
-	// this object holds, so it doesn't end up holding circular references.
-
 	if(m_Handle) {
 		m_Handle->Release();
 		m_Handle = nullptr;
 	}
+
 	Release();
 }
 
