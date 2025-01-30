@@ -6,6 +6,11 @@ ScriptObject::ScriptObject() {
 	m_RefCount = 1;
 }
 
+ScriptObject::ScriptObject(asIScriptObject* obj) {
+	m_Handle = obj;
+	m_RefCount = 1;
+}
+
 ScriptObject::~ScriptObject() {
 	if(m_Handle)
 		m_Handle->Release();

@@ -5,15 +5,13 @@
 #include <VolcaniCore/Core/Defines.h>
 
 #include "ScriptObject.h"
+#include "ScriptClass.h"
 
 using namespace VolcaniCore;
 
 namespace Magma::Script {
 
 class ScriptModule {
-public:
-	static Ref<ScriptModule> Create();
-
 public:
 	const std::string Name;
 
@@ -23,7 +21,9 @@ public:
 
 	void Reload(const std::string& path = "");
 
+	Ref<ScriptClass> GetScriptClass(const std::string& name);
 
+	asIScriptContext* GetContext() { return m_Ctx; }
 
 private:
 	std::string m_Path;

@@ -2,20 +2,32 @@
 
 #include <VolcaniCore/Core/Defines.h>
 
-#include <angelscript.h>
+#include "ScriptEngine.h"
 
 namespace Magma::Script {
 
-class ScriptModule;
+class ScriptClass;
 
 class ScriptObject {
 public:
 	ScriptObject();
+	ScriptObject(asIScriptObject* handle);
 	virtual ~ScriptObject();
 
 	template<typename T, typename... Args>
 	T Call(const std::string& name, Args&&... args) {
+		auto* function = m_Class->GetFunction(name);
+		auto* ctx = m_Class->GetModule()->GetContext();
+		ScriptFunc func{ function, ctx, this };
+		return func.Call<T>(std::forward<Args>(args)...);
+	}
 
+	template<typename... Args>
+	void Call(const std::string& name, Args&&... args) {
+		auto* function = m_Class->GetFunction(name);
+		auto* ctx = m_Class->GetModule()->GetContext();
+		ScriptFunc func{ function, ctx, this };
+		func.Call(std::forward<Args>(args)...);
 	}
 
 private:
@@ -24,12 +36,12 @@ private:
 	void DestroyAndRelease();
 
 private:
-	asIScriptObject *m_Handle = nullptr;
+	asIScriptObject* m_Handle = nullptr;
 	int m_RefCount;
 
-	ScriptModule* m_Module;
+	ScriptClass* m_Class;
 
-	friend class ScriptEngine;
+	friend class ScriptClass;
 };
 
 }

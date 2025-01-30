@@ -11,21 +11,15 @@ namespace Magma::Script {
 ScriptModule::ScriptModule(const std::string& name)
 	: Name(name)
 {
-
+	m_Ctx = ScriptEngine::Get()->CreateContext();
 }
 
 ScriptModule::~ScriptModule() {
 
 }
 
-void PrintString(std::string& str) {
-
-}
-
 void ScriptModule::Reload(const std::string& path) {
 	auto* engine = ScriptEngine::Get();
-
-	// ScriptEngine::RegisterGlobalFunction(PrintString);
 
 	if(path != "") {
 		m_Path = path;
@@ -43,6 +37,14 @@ void ScriptModule::Reload(const std::string& path) {
 		return;
 
 	// TODO(Implement): Hot reload
+}
+
+Ref<ScriptClass> ScriptModule::GetScriptClass(const std::string& name) {
+	asITypeInfo* type = m_Handle->GetTypeInfoByDecl(name.c_str());
+	auto scriptClass = CreateRef<ScriptClass>(name, type);
+	scriptClass->m_Module = this;
+
+	return scriptClass;
 }
 
 }

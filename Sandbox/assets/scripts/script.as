@@ -1,8 +1,34 @@
-float calc(float a, float b)
-{
-    // Print the value that we received
-    Print("Received: " + a + ", " + b + "\n");
 
-    // Do the calculation and return the value to the application
-    return a * b;
+namespace UI {
+
+class Button : IUIObject
+{
+    // Screen @thisScreen;
+
+    Button()
+    {
+        // @thisScreen = screen;
+    }
+
+    void OnClick()
+    {
+        print("The button was clicked");
+    }
+
+    void OnHover()
+    {
+        print("Hovering...");
+    }
+
+    void OnMouseUp()
+    {
+        print("Mouse up");
+    }
+
+    void OnMouseDown()
+    {
+        print("Mouse down");
+    }
+}
+
 }
