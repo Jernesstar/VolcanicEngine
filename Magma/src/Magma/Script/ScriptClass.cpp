@@ -13,7 +13,7 @@ ScriptClass::ScriptClass(const std::string& name, asITypeInfo* type)
 }
 
 ScriptClass::~ScriptClass() {
-	
+
 }
 
 void ScriptClass::SetInstanceMethod(const List<std::string>& args) {
@@ -26,7 +26,9 @@ void ScriptClass::SetInstanceMethod(const List<std::string>& args) {
 }
 
 ScriptClass* ScriptClass::CacheFunction(const std::string& name) {
-	m_Functions[name] = m_Type->GetMethodByName(name.c_str());
+	auto func = m_Type->GetMethodByName(name.c_str());
+	VOLCANICORE_ASSERT(func);
+	m_Functions[name] = func;
 	return this;
 }
 

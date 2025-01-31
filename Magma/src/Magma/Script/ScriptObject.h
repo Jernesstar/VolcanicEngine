@@ -18,16 +18,16 @@ public:
 	T Call(const std::string& name, Args&&... args) {
 		auto* function = m_Class->GetFunction(name);
 		auto* ctx = m_Class->GetModule()->GetContext();
-		ScriptFunc func{ function, ctx, this };
-		return func.Call<T>(std::forward<Args>(args)...);
+		ScriptFunc func{ function, ctx, m_Handle };
+		return func.CallReturn<T>(std::forward<Args>(args)...);
 	}
 
 	template<typename... Args>
 	void Call(const std::string& name, Args&&... args) {
 		auto* function = m_Class->GetFunction(name);
 		auto* ctx = m_Class->GetModule()->GetContext();
-		ScriptFunc func{ function, ctx, this };
-		func.Call(std::forward<Args>(args)...);
+		ScriptFunc func{ function, ctx, m_Handle };
+		func.CallVoid(std::forward<Args>(args)...);
 	}
 
 private:

@@ -22,14 +22,15 @@ private:
 	CameraController controller;
 
 	Ref<ScriptModule> mod;
+	Ref<ScriptClass> scriptClass;
+	Ref<ScriptObject> obj;
+
 	Screen screen;
 };
 
 Script::Script()
 	: screen("Test", "Test", "Test")
 {
-	Ref<ScriptObject> obj;
-
 	Events::RegisterListener<KeyPressedEvent>(
 		[&](const KeyPressedEvent& event)
 		{
@@ -59,10 +60,16 @@ Script::Script()
 	mod = CreateRef<ScriptModule>("TestScript");
 	mod->Reload("Sandbox/assets/scripts/script.as");
 
-	Ref<ScriptClass> scriptClass = mod->GetScriptClass("UI::Button");
+	scriptClass = mod->GetScriptClass("UI::Button");
 	// scriptClass->SetInstanceMethod({ "Screen @screen" });
+	scriptClass
+	->CacheFunction("OnClick")
+	->CacheFunction("OnHover")
+	->CacheFunction("OnMouseUp")
+	->CacheFunction("OnMouseDown");
 
-	// obj = scriptClass->Instantiate(screen);
+	VOLCANICORE_LOG_INFO("Here");
+	obj = scriptClass->Instantiate();
 }
 
 Script::~Script() {

@@ -24,9 +24,13 @@ public:
 	template<typename... Args>
 	Ref<ScriptObject> Instantiate(Args&&... args) {
 		ScriptFunc func{ m_Factory, m_Module->GetContext() };
-		auto* obj = *func.Call<asIScriptObject**>(std::forward<Args>(args)...);
+		asIScriptObject* obj =
+			func.CallReturn<asIScriptObject*>(std::forward<Args>(args)...);
+		obj->AddRef();
+		auto newObj = CreateRef<ScriptObject>(obj);
+		newObj->m_Class = this;
 
-		return CreateRef<ScriptObject>(obj);
+		return newObj;
 	}
 
 	asIScriptFunction* GetFunction(const std::string& name);

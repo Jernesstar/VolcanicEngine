@@ -15,7 +15,8 @@ ScriptModule::ScriptModule(const std::string& name)
 }
 
 ScriptModule::~ScriptModule() {
-
+	m_Ctx->Release();
+	m_Handle->Discard();
 }
 
 void ScriptModule::Reload(const std::string& path) {

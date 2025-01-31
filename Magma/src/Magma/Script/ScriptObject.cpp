@@ -1,5 +1,9 @@
 #include "ScriptObject.h"
 
+#include <VolcaniCore/Core/Assert.h>
+
+#include "ScriptClass.h"
+
 namespace Magma::Script {
 
 ScriptObject::ScriptObject() {
@@ -8,6 +12,7 @@ ScriptObject::ScriptObject() {
 
 ScriptObject::ScriptObject(asIScriptObject* obj) {
 	m_Handle = obj;
+	VOLCANICORE_LOG_INFO("Count: %i", obj->GetPropertyCount());
 	m_RefCount = 1;
 }
 

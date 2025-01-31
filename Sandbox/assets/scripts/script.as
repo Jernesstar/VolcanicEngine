@@ -1,4 +1,9 @@
 
+float test(float a, float b)
+{
+    return a + b;
+}
+
 namespace UI {
 
 class Button : IUIObject

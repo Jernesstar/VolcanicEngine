@@ -11,10 +11,10 @@ namespace Magma::Script {
 struct ScriptFunc {
 	asIScriptFunction* Func;
 	asIScriptContext* Context;
-	void* Object = nullptr;
+	asIScriptObject* Object = nullptr;
 
 	template<typename T, typename... Args>
-	T Call(Args&&... args) {
+	T CallReturn(Args&&... args) {
 		Context->Prepare(Func);
 		if(Object)
 			Context->SetObject(Object);
@@ -23,16 +23,17 @@ struct ScriptFunc {
 		do_for(
 			[&](auto& arg)
 			{
-				AddArg(++i, arg);
-			}, args...);
+				AddArg(i++, arg);
+			}, std::forward<Args>(args)...);
 
 		Context->Execute();
+		// Context->Unprepare();
 
 		return Get<T>();
 	}
 
 	template<typename... Args>
-	void Call(Args&&... args) {
+	void CallVoid(Args&&... args) {
 		Context->Prepare(Func);
 		if(Object)
 			Context->SetObject(Object);
@@ -41,11 +42,11 @@ struct ScriptFunc {
 		do_for(
 			[&](auto& arg)
 			{
-				AddArg(++i, arg);
-			}, args...);
+				AddArg(i++, arg);
+			}, std::forward<Args>(args)...);
 
 		Context->Execute();
-		Context->Unprepare();
+		// Context->Unprepare();
 	}
 
 private:
@@ -67,9 +68,74 @@ private:
 
 	template<typename T>
 	T Get() {
-		return (T)Context->GetAddressOfReturnValue();
+		return *(T*)Context->GetReturnObject();
 	}
 };
+
+template<> inline
+void ScriptFunc::AddArg(uint32_t idx, const uint8_t& arg) {
+	Context->SetArgByte(idx, arg);
+}
+
+template<> inline
+void ScriptFunc::AddArg(uint32_t idx, const uint16_t& arg) {
+	Context->SetArgWord(idx, arg);
+}
+
+template<> inline
+void ScriptFunc::AddArg(uint32_t idx, const uint32_t& arg) {
+	Context->SetArgWord(idx, arg);
+}
+
+template<> inline
+void ScriptFunc::AddArg(uint32_t idx, const uint64_t& arg) {
+	Context->SetArgWord(idx, arg);
+}
+
+template<> inline
+void ScriptFunc::AddArg(uint32_t idx, const float& arg) {
+	Context->SetArgFloat(idx, arg);
+}
+
+template<> inline
+void ScriptFunc::AddArg(uint32_t idx, const double& arg) {
+	Context->SetArgDouble(idx, arg);
+}
+
+template<> inline
+uint8_t ScriptFunc::Get() {
+	return Context->GetReturnByte();
+}
+
+template<> inline
+uint16_t ScriptFunc::Get() {
+	return Context->GetReturnWord();
+}
+
+template<> inline
+uint32_t ScriptFunc::Get() {
+	return Context->GetReturnDWord();
+}
+
+template<> inline
+uint64_t ScriptFunc::Get() {
+	return Context->GetReturnQWord();
+}
+
+template<> inline
+float ScriptFunc::Get() {
+	return Context->GetReturnFloat();
+}
+
+template<> inline
+double ScriptFunc::Get() {
+	return Context->GetReturnDouble();
+}
+
+template<> inline
+asIScriptObject* ScriptFunc::Get() {
+	return *(asIScriptObject**)Context->GetAddressOfReturnValue();
+}
 
 struct InterfaceBuilder {
 	const std::string Name;
