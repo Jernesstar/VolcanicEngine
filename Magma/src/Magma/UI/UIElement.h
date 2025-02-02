@@ -69,6 +69,7 @@ public:
 
 	void Clear();
 
+	bool Is(UIElementType type) const { return m_Type == type; }
 	UIElementType GetType() const { return m_Type; }
 	std::string GetID() const { return m_ID; }
 	UIPage* GetRoot() const { return m_Root; }

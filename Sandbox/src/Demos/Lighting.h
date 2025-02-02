@@ -60,9 +60,9 @@ Lighting::Lighting() {
 				Application::Close();
 		});
 
-	Ref<ShaderPipeline> shader;
-	shader = ShaderPipeline::Create("Sandbox/assets/shaders", "Lighting");
+	auto shader = ShaderPipeline::Create("Sandbox/assets/shaders", "Lighting");
 	lightingPass = RenderPass::Create("Lighting", shader);
+	lightingPass->SetData(Renderer3D::GetMeshBuffer());
 
 	// light = 
 	// 	PointLight
@@ -74,7 +74,7 @@ Lighting::Lighting() {
 	// light.Position = { 0.0f, 0.001f, 0.0f };
 	// light.Ambient  = { 0.002f, 0.002f, 0.002f };
 	// light.Diffuse  = { 0.005f, 0.005f, 0.005f };
-	// light.Specular = { 0.001f, 0.001f, 0.001f };
+	// // light.Specular = { 0.001f, 0.001f, 0.001f };
 
 	spot = SpotLight
 		{
@@ -142,6 +142,7 @@ void Lighting::OnUpdate(TimeStep ts) {
 	Renderer::StartPass(lightingPass);
 	{
 		Renderer::Clear();
+		Renderer::Resize(800, 600);
 
 		Renderer3D::Begin(camera);
 
@@ -151,95 +152,31 @@ void Lighting::OnUpdate(TimeStep ts) {
 		command->UniformData
 		.SetInput("u_PointLightCount", 2 * width * 2 * length);
 
-		Renderer::GetPass()->GetUniforms()
-		.Clear()
-		.Set("u_Material.Diffuse",
-			[&]() -> TextureSlot
-			{
-				return { cube->GetMaterial().Diffuse, 0 };
-			})
-		.Set("u_Material.Specular",
-			[&]() -> TextureSlot
-			{
-				return { cube->GetMaterial().Specular, 1 };
-			})
-		.Set("u_Material.Shininess",
-			[&]() -> float
-			{
-				return 32.0f;
-			});
 		auto* cubeCommand = Renderer::NewCommand();
-		Renderer::GetPass()->SetUniforms(cubeCommand);
+		cubeCommand->UniformData
+		.SetInput("u_Material.Diffuse",
+				  TextureSlot{ cube->GetMaterial().Diffuse, 0 });
+		cubeCommand->UniformData
+		.SetInput("u_Material.Specular",
+				  TextureSlot{ cube->GetMaterial().Specular, 1 });
+		cubeCommand->UniformData
+		.SetInput("u_Material.Shininess", 32.0f);
 
-		Renderer::GetPass()->GetUniforms()
-		.Clear()
-		.Set("u_Material.Diffuse",
-			[&]() -> TextureSlot
-			{
-				return { torch->GetMaterial().Diffuse, 0 };
-			})
-		.Set("u_Material.Specular",
-			[&]() -> TextureSlot
-			{
-				return { torch->GetMaterial().Specular, 1 };
-			})
-		.Set("u_Material.Shininess",
-			[&]() -> float
-			{
-				return 32.0f;
-			});
 		auto* torchCommand = Renderer::NewCommand();
-		Renderer::GetPass()->SetUniforms(torchCommand);
+		torchCommand->UniformData
+		.SetInput("u_Material.Diffuse",
+				  TextureSlot{ torch->GetMaterial().Diffuse, 0 });
+		torchCommand->UniformData
+		.SetInput("u_Material.Specular",
+				  TextureSlot{ torch->GetMaterial().Specular, 1 });
+		torchCommand->UniformData
+		.SetInput("u_Material.Shininess", 32.0f);
 
-		auto& uniforms = Renderer::GetPass()->GetUniforms().Clear();
-
-		for(int y = -length; y < length; y++) {
-			for(int x = -width; x < width; x++) {
-				int i = 2*width * (y + length) + (x + width);
-				std::string name = "u_PointLights[" + std::to_string(i) + "].";
-
-				uniforms
-				.Set(name + "Position",
-					[x=x, y=y]() -> glm::vec3
-					{
-						return { x, 1.5f, y };
-					})
-				.Set(name + "Ambient",
-					[&]() -> glm::vec3
-					{
-						return light.Ambient;
-					})
-				.Set(name + "Diffuse",
-					[&]() -> glm::vec3
-					{
-						return light.Diffuse;
-					})
-				.Set(name + "Specular",
-					[&]() -> glm::vec3
-					{
-						return light.Specular;
-					})
-				.Set(name + "Constant",
-					[&]() -> float
-					{
-						return light.Constant;
-					})
-				.Set(name + "Linear",
-					[&]() -> float
-					{
-						return light.Linear;
-					})
-				.Set(name + "Quadratic",
-					[&]() -> float
-					{
-						return light.Quadratic;
-					});
-				Renderer::GetPass()->SetUniforms(command);
-
+		for(int y = -50; y < 50; y++)
+			for(int x = -50; x < 50; x++) {
 				Renderer3D::DrawMesh(cube, { .Translation = { x, 0.0f, y } }, cubeCommand);
 				Renderer3D::DrawMesh(torch, { .Translation = { x, 1.0f, y } }, torchCommand);
 			}
-		}
 
 		Renderer3D::DrawModel(player);
 

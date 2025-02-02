@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Graphics/RendererAPI.h"
 #include "Graphics/OrthographicCamera.h"
 #include "Graphics/Transform.h"
 
@@ -14,6 +15,7 @@ class Renderer2D {
 public:
 	static void StartFrame();
 	static void EndFrame();
+	static DrawBuffer* GetScreenBuffer();
 
 	static void Begin(Ref<OrthographicCamera> camera);
 	static void End();

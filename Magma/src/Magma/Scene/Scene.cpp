@@ -26,21 +26,22 @@ void Scene::OnUpdate(TimeStep ts) {
 void Scene::OnRender(SceneRenderer& renderer) {
 	auto& world = EntityWorld.GetNative();
 
-	// Query?
-	world
-	.system<const TransformComponent, const MeshComponent>("Objects")
-	.each(
-		[&](flecs::entity id, const TransformComponent&, const MeshComponent&)
-		{
-			renderer.Submit(Entity{ id });
-		})
-	.run();
-	// world
-	// .system<const TransformComponent>("PointLights")
-	// .run(
-	// 	[&](flecs::entity id, const PointLightComponent&)
+	// world.query_builder()
+	// .with<MeshComponent>().and_().with<TransformComponent>()
+	// .build()
+	// .each(
+	// 	[&](flecs::entity id)
 	// 	{
-	// 		renderer.Submit(Entity{ id });
+	// 		renderer.SubmitObject(Entity{ id });
+	// 	});
+
+	// world.query_builder()
+	// .with<PointLightComponent>().or_().with<SpotlightComponent>()
+	// .build()
+	// .each(
+	// 	[&](flecs::entity id)
+	// 	{
+	// 		renderer.SubmitLight(Entity{ id });
 	// 	});
 }
 

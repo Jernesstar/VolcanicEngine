@@ -48,7 +48,7 @@ void UIVisualizerPanel::SetContext(UIPage* page) {
 	for(UIElement* element : window->GetChildren()) {
 		element->xAlignment = XAlignment::Left;
 		element->yAlignment = YAlignment::Top;
-	};
+	}
 }
 
 void UIVisualizerPanel::Add(UIElement* element) {
@@ -107,7 +107,7 @@ void UIVisualizerPanel::Draw() {
 
 		ImDrawList* drawList = ImGui::GetWindowDrawList();
 		drawList->AddRectFilled(p0, p1, ImColor(30, 30, 30, 255));
-		drawList->AddRect(p0, p1, ImColor(255, 255, 255, 255), 0.5f);
+		drawList->AddRect(p0, p1, ImColor(255, 255, 255, 255), 0, 0, 5.0f);
 
 		ImGuiIO& io = ImGui::GetIO();
 		auto buttonFlags = ImGuiButtonFlags_MouseButtonLeft
@@ -121,6 +121,10 @@ void UIVisualizerPanel::Draw() {
 		const ImVec2 origin = { p0.x + scrolling.x, p0.y + scrolling.y };
 		const ImVec2 mousePosCanvas =
 			{ io.MousePos.x - origin.x, io.MousePos.y - origin.y };
+		drawList->AddRect(
+			{ origin.x - 2.5f, origin.y - 2.5f },
+			{ origin.x + 1920, origin.y + 1080 },
+			ImColor(255, 255, 255, 255), 0, 0, 5.0f);
 
 		if(isActive && isHovered && ImGui::IsMouseDragging(1)) {
 			scrolling.x += io.MouseDelta.x;
@@ -237,7 +241,7 @@ void UIVisualizerPanel::Draw() {
 		dummy.Height = 0;
 		UIRenderer::DrawWindow(dummy);
 
-		auto elementHovered = false;
+		bool elementHovered = false;
 		m_Running->Traverse(
 			[&](UIElement* element)
 			{

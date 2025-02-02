@@ -35,7 +35,7 @@ public:
 
 protected:
 	std::string m_Path = "";
-	uint32_t m_Width, m_Height;
+	uint32_t m_Width = 0, m_Height = 0;
 };
 
 }

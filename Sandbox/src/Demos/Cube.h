@@ -81,9 +81,9 @@ Cube::Cube()
 		});
 
 	auto shader = ShaderPipeline::Create("VolcaniCore/assets/shaders", "Mesh");
+	auto depth = Texture::Create(480, 270, Texture::Format::Depth);
 	auto color = Texture::Create(480, 270, Texture::Format::Normal,
 								 Texture::Sampling::Nearest);
-	auto depth = Texture::Create(1920, 1080, Texture::Format::Depth);
 	auto framebuffer = Framebuffer::Create(
 		{
 			{ AttachmentTarget::Color, { color } },
@@ -91,6 +91,7 @@ Cube::Cube()
 		});
 
 	drawPass = RenderPass::Create("Draw", shader);
+	drawPass->SetData(Renderer3D::GetMeshBuffer());
 	drawPass->SetOutput(framebuffer);
 
 	cube = Mesh::Create(MeshPrimitive::Cube,
@@ -101,7 +102,6 @@ Cube::Cube()
 	torch = Mesh::Create("Sandbox/assets/models/mc-torch/Torch.obj");
 
 	camera = CreateRef<IsometricCamera>();
-	camera->Resize(480, 270);
 	controller =
 		CameraController(
 			MovementControls(
@@ -146,18 +146,20 @@ void Cube::OnUpdate(TimeStep ts) {
 		ImGui::Text("Indices: %li", info.Indices);
 		ImGui::Text("Vertices: %li", info.Vertices);
 		ImGui::Text("Instances: %li", info.Instances);
-		ImGui::Text("Triangles: %li", info.Instances * uint64_t(info.Vertices / 3));
+		ImGui::Text("Triangles: %li",
+			info.Instances * uint64_t(info.Vertices / 3));
 	}
 	ImGui::End();
 
 	Renderer::StartPass(drawPass);
 	{
 		Renderer::Clear();
+		Renderer::Resize(480, 270);
 
 		Renderer3D::Begin(camera);
 
-		for(int y = -10; y < 10; y++)
-			for(int x = -10; x < 10; x++) {
+		for(int y = -50; y < 50; y++)
+			for(int x = -50; x < 50; x++) {
 				Renderer3D::DrawMesh(cube, { .Translation = { x, 0.0f, y } });
 				Renderer3D::DrawMesh(torch, { .Translation = { x, 1.0f, y } });
 			}
@@ -166,7 +168,8 @@ void Cube::OnUpdate(TimeStep ts) {
 	}
 	Renderer::EndPass();
 
-	Renderer2D::DrawFullscreenQuad(drawPass->GetOutput(), AttachmentTarget::Color);
+	Renderer2D::DrawFullscreenQuad(
+		drawPass->GetOutput(), AttachmentTarget::Color);
 	Renderer::Flush();
 
 	UIRenderer::EndFrame();

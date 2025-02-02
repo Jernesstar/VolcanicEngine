@@ -89,7 +89,7 @@ template<>
 void EditElement<Window>(UIElement* element) {
 	auto* window = element->As<Window>();
 	ImGui::SeparatorText("Border");
-	ImGui::Indent(25.0f);
+	ImGui::Indent(22.0f);
 
 	auto* dim = &window->BorderWidth;
 	ImGui::Text("Dimension"); ImGui::SameLine(140.0f);
@@ -101,14 +101,17 @@ template<>
 void EditElement<Button>(UIElement* element) {
 	auto* button = element->As<Button>();
 	ImGui::SeparatorText("Display");
-	ImGui::Indent(25.0f);
+	ImGui::Indent(22.0f);
 
 	Ref<UIElement> display = button->Display;
 
+	if(display->Is(UIElementType::Text))
+		ImGui::Text("Text: %s", display->As<Text>()->Content.c_str());
 	ImGui::Button("Set Text");
-	ImGui::Text("Text: ");
+
+	if(display->Is(UIElementType::Image))
+		ImGui::Text("Image: %s", display->As<Image>()->Content->GetPath().c_str());
 	ImGui::Button("Set Image");
-	ImGui::Text("Image: ");
 	// ImGui::InputText("Button Text", &display->As<Text>()->Content);
 }
 
@@ -135,7 +138,7 @@ void EditElement<Dropdown>(UIElement* element) {
 template<>
 void EditElement<UIElement>(UIElement* element) {
 	ImGui::SeparatorText(element->GetID().c_str());
-	ImGui::Indent(25.0f);
+	ImGui::Indent(22.0f);
 
 	std::string type;
 	switch(element->GetType()) {

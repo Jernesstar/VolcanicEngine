@@ -116,6 +116,7 @@ public:
 	}
 
 	T Pop(bool back = true) {
+		VOLCANICORE_ASSERT(Count());
 		auto idx = back ? --m_Back : m_Front++;
 		T val = *At(idx);
 		Remove(idx);

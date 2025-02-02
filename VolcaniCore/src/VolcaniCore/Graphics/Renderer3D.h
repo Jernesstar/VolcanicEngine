@@ -1,8 +1,9 @@
 #pragma once
 
-#include "Graphics/Camera.h"
+#include "Graphics/RendererAPI.h"
 #include "Graphics/RenderPass.h"
 #include "Graphics/Transform.h"
+#include "Graphics/Camera.h"
 
 #include "Graphics/Cubemap.h"
 #include "Graphics/Point.h"
@@ -19,6 +20,8 @@ class Renderer3D {
 public:
 	static void StartFrame();
 	static void EndFrame();
+	static DrawBuffer* GetMeshBuffer();
+	static DrawBuffer* GetCubemapBuffer();
 
 	static void Begin(Ref<Camera> camera);
 	static void End();

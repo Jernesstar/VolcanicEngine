@@ -63,6 +63,9 @@ void Renderer::Init() {
 	glEnable(GL_FRAMEBUFFER_SRGB);			// Gamma correction
 	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS); // Smooth cubemap edges
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+
+	s_Data.Commands.Reallocate(10);
+	s_Data.Passes.Reallocate(10);
 }
 
 void Renderer::Close() {
@@ -218,9 +221,7 @@ void FlushCommand(DrawCommand& command) {
 			command.Pass->Output->Attach(target, idx, i++);
 	}
 
-	if(command.Pass && command.Pass->Output)
-		Resize(command.Pass->Output->GetWidth(), command.Pass->Output->GetHeight());
-	else if(command.ViewportWidth && command.ViewportHeight)
+	if(command.ViewportWidth && command.ViewportHeight)
 		Resize(command.ViewportWidth, command.ViewportHeight);
 
 	if(command.Clear)
@@ -248,6 +249,9 @@ void FlushCommand(DrawCommand& command) {
 		command.Pass->Output->As<OpenGL::Framebuffer>()->Unbind();
 	if(command.Pass && command.Pass->Pipeline)
 		command.Pass->Pipeline->As<OpenGL::ShaderProgram>()->Unbind();
+
+	Resize(Application::GetWindow()->GetWidth(),
+		   Application::GetWindow()->GetHeight());
 }
 
 void FlushCall(DrawCall& call) {
@@ -272,7 +276,7 @@ void FlushCall(DrawCall& call) {
 		// else
 		// 	glMultiDrawElementsIndirect();
 
-		// Add indirect objects. If full, make draw call and clear
+		// Add indirect objects. When full, make draw call and clear
 		return;
 	}
 
@@ -333,7 +337,7 @@ void SetUniforms(DrawCommand& command) {
 		shader->SetMat4(name, data);
 
 	for(auto& [buffer, name, binding] : uniforms.UniformBuffers) {
-		if(name == "")
+		if(name != "")
 			shader->SetBuffer(name, binding);
 		buffer->As<OpenGL::UniformBuffer>()->Bind(binding);
 	}

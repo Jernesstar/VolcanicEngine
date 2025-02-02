@@ -18,12 +18,10 @@ const uint64_t Renderer::MaxInstances = MaxTriangles * 4;
 
 static FrameData s_Frame;
 static Ref<RenderPass> s_RenderPass;
-static DrawCommand* s_DrawCommand;
+static List<DrawCommand*> s_Stack;
 
 static DrawCall s_Options;
 static bool s_OptionsValid = false;
-static uint32_t s_Width = 0;
-static uint32_t s_Height = 0;
 
 void Renderer::Init() {
 	s_Frame = { };
@@ -55,11 +53,11 @@ void Renderer::EndFrame() {
 
 void Renderer::StartPass(Ref<RenderPass> pass) {
 	s_RenderPass = pass;
-	NewCommand();
+	PushCommand();
 }
 
 void Renderer::EndPass() {
-	EndCommand();
+	PopCommand();
 	s_RenderPass = nullptr;
 }
 
@@ -67,48 +65,43 @@ Ref<RenderPass> Renderer::GetPass() {
 	return s_RenderPass;
 }
 
+DrawCommand* Renderer::PushCommand() {
+	s_Stack.Push(NewCommand());
+	return GetCommand();
+}
+
+void Renderer::PopCommand() {
+	if(!s_Stack)
+		return;
+
+	if(!s_Stack[-1]->UniformData)
+		s_RenderPass->SetUniforms(s_Stack[-1]);
+	s_Stack.Pop();
+}
+
 DrawCommand* Renderer::GetCommand() {
-	return s_DrawCommand;
+	return s_Stack[-1];
 }
 
 DrawCommand* Renderer::NewCommand(bool usePrevious) {
-	if(usePrevious && s_DrawCommand && !s_DrawCommand->Calls)
-		return s_DrawCommand;
+	if(usePrevious && s_Stack && !s_Stack[-1]->Calls)
+		return s_Stack[-1];
 
-	EndCommand();
-	s_DrawCommand = RendererAPI::Get()->NewDrawCommand(s_RenderPass->Get());
-
-	if(!s_Width || !s_Height) {
-		s_Width = Application::GetWindow()->GetWidth();
-		s_Height = Application::GetWindow()->GetHeight();
-	}
-	s_DrawCommand->ViewportWidth = s_Width;
-	s_DrawCommand->ViewportHeight = s_Height;
-
-	return s_DrawCommand;
-}
-
-void Renderer::EndCommand() {
-	if(!s_DrawCommand)
-		return;
-
-	if(!s_DrawCommand->UniformData)
-		s_RenderPass->SetUniforms(s_DrawCommand);
-	s_DrawCommand = nullptr;
+	return RendererAPI::Get()->NewDrawCommand(s_RenderPass->Get());
 }
 
 void Renderer::Clear() {
-	if(!s_DrawCommand) {
+	if(!s_Stack) {
 		RendererAPI::Get()->NewDrawCommand(nullptr)->Clear = true;
 		Renderer::Flush();
 	}
 	else
-		s_DrawCommand->Clear = true;
+		GetCommand()->Clear = true;
 }
 
 void Renderer::Resize(uint32_t width, uint32_t height) {
-	s_Width = width;
-	s_Height = height;
+	GetCommand()->ViewportWidth = width;
+	GetCommand()->ViewportHeight = height;
 }
 
 void Renderer::PushOptions(const DrawCall& options) {
@@ -116,7 +109,7 @@ void Renderer::PushOptions(const DrawCall& options) {
 	s_OptionsValid = true;
 }
 
-// TODO(Implement)
+// TODO(Implement):
 void Renderer::PopOptions(uint32_t count) {
 	s_OptionsValid = false;
 }

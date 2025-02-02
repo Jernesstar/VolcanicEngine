@@ -41,8 +41,7 @@ private:
 class Framebuffer : public VolcaniCore::Framebuffer {
 public:
 	Framebuffer(uint32_t width, uint32_t height);
-	Framebuffer(const Map<AttachmentTarget, List<Attachment>>& map,
-				uint32_t width = 0, uint32_t height = 0);
+	Framebuffer(const Map<AttachmentTarget, List<Attachment>>& map);
 	~Framebuffer();
 
 	void Bind() const;

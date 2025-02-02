@@ -44,38 +44,34 @@ struct {
 	} add;
 } static options;
 
-static bool s_AddToElement;
+static UIElement* s_AddToElement;
 
 void UIHierarchyPanel::Draw() {
 	ImGui::Begin("UI Hierarchy", &m_Open);
 	{
-		auto visual =
-			m_Tab->GetPanel("UIVisualizer")->As<UIVisualizerPanel>();
-		auto editor =
-			m_Tab->GetPanel("UIElementEditor")->As<UIElementEditorPanel>();
-
 		for(UIElement* element : m_Context->GetFirstOrderElements())
 			Traverse(element);
-
-		if(m_Selected) {
-			editor->Select(m_Selected);
-			visual->Select(m_Selected);
-		}
 
 		if(ImGui::IsMouseClicked(1) && ImGui::IsWindowHovered())
 			ImGui::OpenPopup("Options");
 		if(ImGui::IsMouseClicked(0) && ImGui::IsWindowHovered()) {
 			m_Selected = nullptr;
-			s_AddToElement = false;
-			editor->Select(nullptr);
-			visual->Select(nullptr);
+			s_AddToElement = nullptr;
 		}
+
+		auto visual =
+			m_Tab->GetPanel("UIVisualizer")->As<UIVisualizerPanel>();
+		auto editor =
+			m_Tab->GetPanel("UIElementEditor")->As<UIElementEditorPanel>();
+
+		editor->Select(m_Selected);
+		visual->Select(m_Selected);
 
 		if(ImGui::BeginPopup("Options"))
 		{
 			std::string menuName = "Add";
-			if(s_AddToElement && m_Selected)
-				menuName += " to " + m_Selected->GetID();
+			if(s_AddToElement)
+				menuName += " to " + s_AddToElement->GetID();
 
 			if(ImGui::BeginMenu(menuName.c_str())) {
 				if(ImGui::MenuItem("Window"))
@@ -90,10 +86,9 @@ void UIHierarchyPanel::Draw() {
 				ImGui::EndMenu();
 			}
 
-			if(s_AddToElement && m_Selected)
+			if(s_AddToElement)
 				if(ImGui::MenuItem("Delete")) {
-					// m_Running->Delete(m_Selected->GetID());
-					m_Selected = nullptr;
+					// m_Running->Delete(s_AddToElement->GetID());
 				}
 
 			ImGui::EndPopup();
@@ -110,8 +105,8 @@ void UIHierarchyPanel::Draw() {
 			if(options.add.text)
 				typeStr = "Add New Text";
 
-			if(s_AddToElement && m_Selected)
-				typeStr += " to " + m_Selected->GetID();
+			if(s_AddToElement)
+				typeStr += " to " + s_AddToElement->GetID();
 
 			ImGui::OpenPopup(typeStr.c_str());
 			if(ImGui::BeginPopupModal(typeStr.c_str())) {
@@ -173,13 +168,13 @@ void UIHierarchyPanel::Draw() {
 				}
 
 				if(exit) {
-					UINode newElement = m_Context->Add(type, str);
-					UIElement* element = m_Context->Get(newElement);
+					UINode newNode = m_Context->Add(type, str);
+					UIElement* element = m_Context->Get(newNode);
 
-					if(s_AddToElement && m_Selected)
-						m_Selected->Add(newElement);
+					if(s_AddToElement)
+						s_AddToElement->Add(newNode);
 					else
-						m_Context->Add(newElement);
+						m_Context->Add(newNode);
 
 					visual->Add(element);
 
@@ -187,6 +182,8 @@ void UIHierarchyPanel::Draw() {
 					options.add.button = false;
 					options.add.image = false;
 					options.add.text = false;
+					s_AddToElement = nullptr;
+
 					ImGui::CloseCurrentPopup();
 				}
 
@@ -208,14 +205,13 @@ ImRect UIHierarchyPanel::Traverse(UIElement* element) {
 	bool open = ImGui::TreeNodeEx(tag.c_str(), flags, tag.c_str());
 	ImRect nodeRect = ImRect(ImGui::GetItemRectMin(), ImGui::GetItemRectMax());
 
-	if(!open)
-		return nodeRect;
-
 	if(ImGui::IsMouseClicked(0) && ImGui::IsItemHovered())
 		m_Selected = element;
 	if(ImGui::IsMouseClicked(1) && ImGui::IsItemHovered())
-		if(element == m_Selected)
-			s_AddToElement = true;
+		s_AddToElement = element;
+
+	if(!open)
+		return nodeRect;
 
 	ImColor TreeLineColor = ImGui::GetColorU32(ImGuiCol_Text);
 	float SmallOffsetX = -8.5f; // TODO: Take tree indent into account

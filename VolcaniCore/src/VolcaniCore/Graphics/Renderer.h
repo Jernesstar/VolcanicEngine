@@ -31,9 +31,10 @@ public:
 	static void EndPass();
 	static Ref<RenderPass> GetPass();
 
+	static DrawCommand* PushCommand();
+	static void PopCommand();
 	static DrawCommand* GetCommand();
 	static DrawCommand* NewCommand(bool usePrevious = false);
-	static void EndCommand();
 
 	static void Clear();
 	static void Resize(uint32_t width, uint32_t height);

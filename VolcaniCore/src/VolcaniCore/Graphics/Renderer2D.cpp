@@ -53,6 +53,10 @@ void Renderer2D::EndFrame() {
 
 }
 
+DrawBuffer* Renderer2D::GetScreenBuffer() {
+	return s_ScreenBuffer;
+}
+
 void Renderer2D::Begin(Ref<OrthographicCamera> camera) {
 
 }
@@ -90,10 +94,8 @@ void Renderer2D::DrawFullscreenQuad(Ref<Framebuffer> buffer,
 	}
 
 	DrawCommand* command;
-	if(Renderer::GetPass()) {
+	if(Renderer::GetPass())
 		command = Renderer::NewCommand(true);
-		Renderer::GetPass()->SetData(s_ScreenBuffer);
-	}
 	else {
 		auto pipeline = ShaderLibrary::Get("Framebuffer");
 		auto* pass = RendererAPI::Get()->NewDrawPass(s_ScreenBuffer, pipeline);

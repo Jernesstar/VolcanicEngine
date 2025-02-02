@@ -1,11 +1,5 @@
 #version 450 core
 
-struct Material {
-    sampler2D Diffuse;
-    sampler2D Specular;
-    float Shininess;
-};
-
 struct PointLight {
     vec3 Position;
     vec3 Ambient;
@@ -38,18 +32,11 @@ struct DirectionalLight {
 //     float OuterCutoffAngle;
 // };
 
-#define MAX_POINT_LIGHTS 110
-
-layout(location = 0) in vec3 v_Position;
-layout(location = 1) in vec3 v_Normal;
-layout(location = 2) in vec2 v_TexCoords;
-
 uniform vec3 u_CameraPosition;
 
-uniform Material u_Material;
-
+// #define MAX_POINT_LIGHTS 100
 uniform int u_PointLightCount;
-uniform PointLight u_PointLights[MAX_POINT_LIGHTS];
+// uniform PointLight u_PointLights[MAX_POINT_LIGHTS];
 // uniform DirectionalLight u_DirectionalLight;
 // uniform SpotLight u_Spotlight;
 
@@ -61,9 +48,22 @@ layout(std140, binding = 0) uniform SpotLight
     float OuterCutoffAngle;
 } spotlight;
 
+
+struct Material {
+    sampler2D Diffuse;
+    sampler2D Specular;
+    float Shininess;
+};
+
+uniform Material u_Material;
+
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 viewDir);
 // vec3 CalcDirLight(vec3 normal, vec3 viewDir);
 vec3 CalcSpotLight(vec3 normal, vec3 viewDir);
+
+layout(location = 0) in vec3 v_Position;
+layout(location = 1) in vec3 v_Normal;
+layout(location = 2) in vec2 v_TexCoords;
 
 out vec4 FragColor;
 
@@ -73,8 +73,8 @@ void main()
     vec3 viewDir = normalize(u_CameraPosition - v_Position);
 
     vec3 result = vec3(0.0, 0.0, 0.0);
-    for(int i = 0; i < u_PointLightCount; i++)
-        result += CalcPointLight(u_PointLights[i], normal, viewDir);
+    // for(int i = 0; i < u_PointLightCount; i++)
+    //     result += CalcPointLight(u_PointLights[i], normal, viewDir);
 
     // result += CalcDirLight(normal, viewDir);
     result += CalcSpotLight(normal, viewDir);
@@ -97,7 +97,6 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 viewDir)
     vec3 specular = light.Specular * spec * vec3(texture(u_Material.Specular, v_TexCoords.xy));
 
     return (ambient + diffuse + specular) * attenuation;
-    // return vec3(dist);
 }
 
 // vec3 CalcDirLight(vec3 normal, vec3 viewDir)

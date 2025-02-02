@@ -50,23 +50,20 @@ Framebuffer::Framebuffer(uint32_t width, uint32_t height)
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-Framebuffer::Framebuffer(const Map<AttachmentTarget, List<Attachment>>& map,
-						 uint32_t width, uint32_t height)
-	: VolcaniCore::Framebuffer(width, height), m_AttachmentMap(map)
+Framebuffer::Framebuffer(const Map<AttachmentTarget, List<Attachment>>& map)
+	: VolcaniCore::Framebuffer(0, 0), m_AttachmentMap(map)
 {
-	if(m_Width == 0 || m_Height == 0) {
-		if(Has(AttachmentTarget::Color)) {
-			auto& att = m_AttachmentMap[AttachmentTarget::Color][0];
-			m_Width  = att.m_Width;
-			m_Height = att.m_Height;
-		}
-		else
-			for(const auto& [_, attachments] : m_AttachmentMap)
-				for(const auto& att : attachments) {
-					m_Width  = std::max(m_Width, att.m_Width);
-					m_Height = std::max(m_Height, att.m_Height);
-				}
+	if(Has(AttachmentTarget::Color)) {
+		auto& att = m_AttachmentMap[AttachmentTarget::Color][0];
+		m_Width  = att.m_Width;
+		m_Height = att.m_Height;
 	}
+	else
+		for(const auto& [_, attachments] : m_AttachmentMap)
+			for(const auto& att : attachments) {
+				m_Width  = std::max(m_Width, att.m_Width);
+				m_Height = std::max(m_Height, att.m_Height);
+			}
 
 	glGenFramebuffers(1, &m_BufferID);
 	glBindFramebuffer(GL_FRAMEBUFFER, m_BufferID);

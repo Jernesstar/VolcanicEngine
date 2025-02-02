@@ -12,7 +12,7 @@ namespace VolcaniCore {
 static DrawBuffer* s_CubemapBuffer;
 static DrawBuffer* s_MeshBuffer;
 static Map<Ref<Mesh>, DrawCommand*> s_Meshes;
-uint64_t s_InstanceEnd;
+static uint64_t s_InstanceEnd = 0;
 
 void Renderer3D::Init() {
 	BufferLayout vertexLayout =
@@ -113,19 +113,23 @@ void Renderer3D::Close() {
 	RendererAPI::Get()->ReleaseBuffer(s_MeshBuffer);
 }
 
+DrawBuffer* Renderer3D::GetMeshBuffer() {
+	return s_MeshBuffer;
+}
+
+DrawBuffer* Renderer3D::GetCubemapBuffer() {
+	return s_CubemapBuffer;
+}
+
 void Renderer3D::StartFrame() {
 	s_MeshBuffer->Clear();
-	s_InstanceEnd = 0;
 }
 
 void Renderer3D::EndFrame() {
-	s_Meshes.clear();
+	s_InstanceEnd = 0;
 }
 
 void Renderer3D::Begin(Ref<Camera> camera) {
-	auto pass = Renderer::GetPass();
-	pass->SetData(s_MeshBuffer);
-
 	auto* command = Renderer::GetCommand();
 	command->UniformData
 	.SetInput("u_ViewProj", camera->GetViewProjection());
@@ -134,7 +138,7 @@ void Renderer3D::Begin(Ref<Camera> camera) {
 }
 
 void Renderer3D::End() {
-	Renderer::EndCommand();
+	s_Meshes.clear();
 }
 
 void Renderer3D::DrawSkybox(Ref<Cubemap> cubemap) {
@@ -155,24 +159,26 @@ void Renderer3D::DrawMesh(Ref<Mesh> mesh, const glm::mat4& tr,
 	if(!mesh)
 		return;
 
-	DrawCommand* command = cmd;
+	if(!s_Meshes.count(mesh)) {
+		if(cmd)
+			s_Meshes[mesh] = cmd;
+		else {
+			s_Meshes[mesh] = Renderer::NewCommand();
 
-	if(!s_Meshes.count(mesh) && !cmd) {
-		command = Renderer::NewCommand();
-		command->AddIndices(mesh->GetIndices().Get());
-		command->AddVertices(mesh->GetVertices().Get());
+			Material& mat = mesh->GetMaterial();
+			s_Meshes[mesh]->UniformData
+			.SetInput("u_Diffuse", TextureSlot{ mat.Diffuse, 0 });
+			s_Meshes[mesh]->UniformData
+			.SetInput("u_Specular", TextureSlot{ mat.Specular, 1 });
+		}
 
-		Material& mat = mesh->GetMaterial();
-		command->UniformData
-		.SetInput("u_Diffuse", TextureSlot{ mat.Diffuse, 0 });
-		command->UniformData
-		.SetInput("u_Specular", TextureSlot{ mat.Specular, 1 });
-
-		s_Meshes[mesh] = command;
+		s_Meshes[mesh]->AddIndices(mesh->GetIndices().Get());
+		s_Meshes[mesh]->AddVertices(mesh->GetVertices().Get());
 	}
 
-	if(!cmd)
-		command = s_Meshes[mesh];
+	DrawCommand* command = s_Meshes[mesh];
+
+	// TODO(Fix): DrawCall offsets should be relative to DrawCommand's
 	if(!command->Calls || command->Calls[-1].InstanceCount >= 10'000) {
 		auto& call = command->NewDrawCall();
 		call.Primitive = PrimitiveType::Triangle;

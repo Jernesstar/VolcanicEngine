@@ -38,10 +38,6 @@ Ref<Framebuffer> Framebuffer::Create(
 						});
 
 					texture->As<OpenGL::Texture2D>()->m_Owns = false;
-
-					// Only need one depth or stencil attachment
-					if(target != AttachmentTarget::Color)
-						break;
 				}
 
 			return CreateRef<OpenGL::Framebuffer>(attachments);
