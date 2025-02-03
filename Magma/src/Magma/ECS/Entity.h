@@ -2,8 +2,6 @@
 
 #include <flecs/flecs.h>
 
-#include "Component.h"
-
 namespace Magma::ECS {
 
 class Entity {
@@ -20,32 +18,27 @@ public:
 	}
 
 	template<typename TComponent>
-	requires std::derived_from<TComponent, Component>
 	bool Has() const {
 		return m_Handle.get<TComponent>() != nullptr;
 	}
 
 	template<typename TComponent, typename ...Args>
-	requires std::derived_from<TComponent, Component>
 	TComponent& Add(Args&&... args) {
 		m_Handle.set<TComponent>({ std::forward<Args>(args)... });
 		return Get<TComponent>();
 	}
 
 	template<typename TComponent>
-	requires std::derived_from<TComponent, Component>
 	TComponent& Get() {
 		return *m_Handle.get_mut<TComponent>();
 	}
 
 	template<typename TComponent>
-	requires std::derived_from<TComponent, Component>
 	const TComponent& Get() const {
 		return *m_Handle.get<TComponent>();
 	}
 
 	template<typename TComponent>
-	requires std::derived_from<TComponent, Component>
 	void Remove() {
 		m_Handle.remove<TComponent>();
 	}

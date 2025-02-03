@@ -7,8 +7,6 @@
 #include <VolcaniCore/Graphics/Camera.h>
 #include <VolcaniCore/Graphics/CameraController.h>
 
-#include "Core/JSONParser.h"
-
 #include "ECS/Entity.h"
 
 using namespace VolcaniCore;
@@ -25,7 +23,10 @@ public:
 	virtual ~SceneRenderer() = default;
 
 	virtual void Update(TimeStep ts) = 0;
-	virtual void Submit(Entity entity) = 0;
+	virtual void SubmitMesh(Entity entity) = 0;
+	virtual void SubmitLight(Entity entity) = 0;
+	virtual void SubmitCamera(Entity entity) = 0;
+	virtual void SubmitSkybox(Entity entity) = 0;
 	virtual void Render() = 0;
 
 	void SetContext(Scene* scene) { m_Scene = scene; }
@@ -37,20 +38,6 @@ protected:
 	Scene* m_Scene;
 	Ref<Framebuffer> m_Output;
 	CameraController m_Controller;
-};
-
-class DefaultSceneRenderer : public SceneRenderer {
-public:
-	DefaultSceneRenderer();
-	~DefaultSceneRenderer() = default;
-
-	void Update(TimeStep ts) override;
-	void Submit(Entity entity) override;
-	void Render() override;
-
-private:
-	Ref<RenderPass> m_DrawPass;
-	List<DrawCommand> m_CommandList;
 };
 
 }

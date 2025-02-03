@@ -6,10 +6,12 @@
 #include <VolcaniCore/Graphics/Model.h>
 #include <VolcaniCore/Graphics/Camera.h>
 
-#include <Physics/RigidBody.h>
+#include "Physics/RigidBody.h"
+
+#include "Script/ScriptObject.h"
+#include "Script/ScriptClass.h"
 
 using namespace VolcaniCore;
-using namespace Magma::Physics;
 
 namespace Magma::ECS {
 
@@ -48,16 +50,17 @@ struct MeshComponent : public Component {
 };
 
 struct RigidBodyComponent : public Component {
-	Ref<RigidBody> Body;
+	Ref<Physics::RigidBody> Body;
 
 	RigidBodyComponent() = default;
-	RigidBodyComponent(Ref<RigidBody> body)
+	RigidBodyComponent(Ref<Physics::RigidBody> body)
 		: Body(body) { }
-	RigidBodyComponent(RigidBody::Type type) {
-		Body = RigidBody::Create(type);
+	RigidBodyComponent(Physics::RigidBody::Type type) {
+		Body = Physics::RigidBody::Create(type);
 	}
-	RigidBodyComponent(RigidBody::Type type, Ref<Shape> shape) {
-		Body = RigidBody::Create(type, shape);
+	RigidBodyComponent(Physics::RigidBody::Type type, Ref<Physics::Shape> shape)
+	{
+		Body = Physics::RigidBody::Create(type, shape);
 	}
 	RigidBodyComponent(const RigidBodyComponent& other) = default;
 };
@@ -88,17 +91,55 @@ struct TransformComponent : public Component {
 };
 
 struct ScriptComponent : public Component {
-	// std::string Path;
-
-	Func<void, TransformComponent&> OnInput;
+	Ref<Script::ScriptObject> Instance;
 
 	ScriptComponent() = default;
-	ScriptComponent(const std::string& path)
-		// : Path(path)
+	ScriptComponent(const std::string& _class)
 	{
 		// ScriptEngine::LoadScript(path);
 	}
 	ScriptComponent(const ScriptComponent& other) = default;
+};
+
+struct DirectionalLightComponent : public Component {
+	glm::vec3 Ambient;
+	glm::vec3 Diffuse;
+	glm::vec3 Specular;
+	glm::vec3 Direction;
+
+	DirectionalLightComponent() = default;
+	DirectionalLightComponent(const DirectionalLightComponent& other) = default;
+};
+
+struct PointLightComponent : public Component {
+	glm::vec3 Ambient;
+	glm::vec3 Diffuse;
+	glm::vec3 Specular;
+	float Constant;
+	float Linear;
+	float Quadratic;
+
+	PointLightComponent() = default;
+	PointLightComponent(const PointLightComponent& other) = default;
+};
+
+struct SpotlightComponent : public Component {
+	glm::vec3 Ambient;
+	glm::vec3 Diffuse;
+	glm::vec3 Specular;
+	glm::vec3 Direction;
+	float CutoffAngle;
+	float OuterCutoffAngle;
+
+	SpotlightComponent() = default;
+	SpotlightComponent(const SpotlightComponent& other) = default;
+};
+
+struct SkyboxComponent : public Component {
+	// Asset Cubemap;
+
+	SkyboxComponent() = default;
+	SkyboxComponent(const SkyboxComponent& other) = default;
 };
 
 }

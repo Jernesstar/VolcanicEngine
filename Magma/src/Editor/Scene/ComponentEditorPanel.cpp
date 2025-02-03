@@ -8,6 +8,8 @@
 
 #include <VolcaniCore/Core/Log.h>
 
+#include <Magma/Scene/Component.h>
+
 namespace Magma {
 
 ComponentEditorPanel::ComponentEditorPanel()

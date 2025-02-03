@@ -2,20 +2,9 @@
 
 #include <VolcaniCore/Core/UUID.h>
 
-#define GET_QUERY(TComponent) \
-template<> \
-flecs::query<TComponent> World::GetQuery<TComponent>() { \
-	return m_##TComponent##Query; \
-}
+#include "Scene/Component.h"
 
 namespace Magma::ECS {
-
-GET_QUERY(CameraComponent)
-GET_QUERY(MeshComponent)
-GET_QUERY(RigidBodyComponent)
-GET_QUERY(TagComponent)
-GET_QUERY(TransformComponent)
-GET_QUERY(ScriptComponent)
 
 World::World() {
 	m_AllEntitiesQuery = m_World.query_builder()
@@ -24,32 +13,10 @@ World::World() {
 	.with<RigidBodyComponent>().or_()
 	.with<TagComponent>().or_()
 	.with<TransformComponent>().or_()
-	.with<ScriptComponent>()
-	.build();
-
-	m_CameraComponentQuery = m_World.query_builder<CameraComponent>()
-	.with<CameraComponent>()
-	.cached()
-	.build();
-	m_MeshComponentQuery = m_World.query_builder<MeshComponent>()
-	.with<MeshComponent>()
-	.cached()
-	.build();
-	m_RigidBodyComponentQuery = m_World.query_builder<RigidBodyComponent>()
-	.with<RigidBodyComponent>()
-	.cached()
-	.build();
-	m_TagComponentQuery = m_World.query_builder<TagComponent>()
-	.with<TagComponent>()
-	.cached()
-	.build();
-	m_TransformComponentQuery = m_World.query_builder<TransformComponent>()
-	.with<TransformComponent>()
-	.cached()
-	.build();
-	m_ScriptComponentQuery = m_World.query_builder<ScriptComponent>()
-	.with<ScriptComponent>()
-	.cached()
+	.with<ScriptComponent>().or_()
+	.with<DirectionalLightComponent>().or_()
+	.with<PointLightComponent>().or_()
+	.with<SpotlightComponent>()
 	.build();
 
 	m_EventHandler = m_World.entity("WorldEventHandler");

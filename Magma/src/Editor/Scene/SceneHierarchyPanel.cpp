@@ -8,7 +8,7 @@
 
 #include <VolcaniCore/Core/Log.h>
 
-#include <Magma/ECS/Component.h>
+#include <Magma/Scene/Component.h>
 
 #include "Editor/Tab.h"
 

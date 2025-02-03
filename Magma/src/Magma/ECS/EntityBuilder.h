@@ -6,7 +6,6 @@
 #include "flecs/flecs.h"
 
 #include "Entity.h"
-#include "Component.h"
 
 namespace Magma::ECS {
 
@@ -21,7 +20,6 @@ public:
 	~EntityBuilder() = default;
 
 	template<typename TComponent, typename ...Args>
-	requires std::derived_from<TComponent, Component>
 	EntityBuilder& Add(Args&&... args) {
 		m_Handle.set<TComponent>(TComponent(std::forward<Args>(args)...));
 		return *this;

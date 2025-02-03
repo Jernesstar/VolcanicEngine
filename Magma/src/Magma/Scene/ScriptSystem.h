@@ -1,12 +1,16 @@
 #pragma once
 
-#include "System.h"
+#include "ECS/System.h"
 
-namespace Magma::ECS {
+#include "Component.h"
+
+using namespace Magma::ECS;
+
+namespace Magma {
 
 class ScriptSystem : public System<ScriptComponent> {
 public:
-	ScriptSystem(World* world)
+	ScriptSystem(ECS::World* world)
 		: System(world) { }
 
 	void Update(TimeStep ts) override;

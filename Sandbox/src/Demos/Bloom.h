@@ -52,6 +52,11 @@ Bloom::Bloom()
 				Application::Close();
 		});
 
+	auto width = Application::GetWindow()->GetWidth();
+	auto height = Application::GetWindow()->GetHeight();
+	src = Framebuffer::Create(width, height);
+	InitMips();
+
 	Ref<ShaderPipeline> shader;
 	shader = ShaderPipeline::Create(
 		{
@@ -59,6 +64,8 @@ Bloom::Bloom()
 			{ "Sandbox/assets/shaders/Downsample.glsl.frag", ShaderType::Fragment }
 		});
 	downsamplePass = RenderPass::Create("Downsample", shader);
+	downsamplePass->SetOutput(mips);
+	downsamplePass->SetData(Renderer3D::GetMeshBuffer());
 
 	shader = ShaderPipeline::Create(
 		{
@@ -66,6 +73,8 @@ Bloom::Bloom()
 			{ "Sandbox/assets/shaders/Upsample.glsl.frag", ShaderType::Fragment }
 		});
 	upsamplePass = RenderPass::Create("Upsample", shader);
+	upsamplePass->SetOutput(mips);
+	upsamplePass->SetData(Renderer3D::GetMeshBuffer());
 
 	shader = ShaderPipeline::Create(
 		{
@@ -76,15 +85,8 @@ Bloom::Bloom()
 
 	shader = ShaderPipeline::Create("VolcaniCore/assets/shaders", "Mesh");
 	drawPass = RenderPass::Create("Draw", shader);
-
-	auto width = Application::GetWindow()->GetWidth();
-	auto height = Application::GetWindow()->GetHeight();
-	src = Framebuffer::Create(width, height);
-	InitMips();
-
 	drawPass->SetOutput(src);
-	downsamplePass->SetOutput(mips);
-	upsamplePass->SetOutput(mips);
+	drawPass->SetData(Renderer3D::GetMeshBuffer());
 
 	cube = Mesh::Create(MeshPrimitive::Cube, { 0.98f, 0.92f, 0.0f, 1.0f });
 
@@ -119,6 +121,8 @@ void Bloom::OnUpdate(TimeStep ts) {
 	Renderer::StartPass(drawPass);
 	{
 		Renderer::Clear();
+		Renderer::Resize(1920, 1080);
+
 		Renderer3D::Begin(camera);
 
 		Renderer3D::DrawMesh(cube, { .Translation = { -2.0f,  0.0f,  0.0f } });
@@ -138,7 +142,10 @@ void Bloom::OnUpdate(TimeStep ts) {
 		.Set("u_SrcResolution",
 			[&]() -> glm::vec2
 			{
-				return { Application::GetWindow()->GetWidth(), Application::GetWindow()->GetHeight() };
+				return {
+					Application::GetWindow()->GetWidth(),
+					Application::GetWindow()->GetHeight()
+				};
 			})
 		.Set("u_SrcTexture",
 			[&]() -> TextureSlot
@@ -150,53 +157,53 @@ void Bloom::OnUpdate(TimeStep ts) {
 	}
 	Renderer::EndPass();
 
-	// Renderer2D::DrawFullscreenQuad(mips, AttachmentTarget::Color);
+	Renderer2D::DrawFullscreenQuad(mips, AttachmentTarget::Color);
 
-	Renderer::StartPass(upsamplePass);
-	{
-		Renderer::GetPass()->GetUniforms()
-		.Set("u_FilterRadius",
-			[&]() -> float
-			{
-				return filterRadius;
-			});
+	// Renderer::StartPass(upsamplePass);
+	// {
+	// 	Renderer::GetPass()->GetUniforms()
+	// 	.Set("u_FilterRadius",
+	// 		[&]() -> float
+	// 		{
+	// 			return filterRadius;
+	// 		});
 
-		Upsample();
-	}
-	Renderer::EndPass();
+	// 	Upsample();
+	// }
+	// Renderer::EndPass();
 
-	// Renderer2D::DrawFullscreenQuad(mips, AttachmentTarget::Color);
+	// // Renderer2D::DrawFullscreenQuad(mips, AttachmentTarget::Color);
 
-	Renderer::StartPass(bloomPass);
-	{
-		Renderer::GetPass()->GetUniforms()
-		.Set("u_Exposure",
-			[&]() -> float
-			{
-				return exposure;
-			})
-		.Set("u_BloomStrength",
-			[&]() -> float
-			{
-				return bloomStrength;
-			})
-		.Set("u_BloomTexture",
-			[&]() -> TextureSlot
-			{
-				return { mips->Get(AttachmentTarget::Color), 0 };
-			})
-		.Set("u_SceneTexture",
-			[&]() -> TextureSlot
-			{
-				return { src->Get(AttachmentTarget::Color), 1 };
-			});
+	// Renderer::StartPass(bloomPass);
+	// {
+	// 	Renderer::GetPass()->GetUniforms()
+	// 	.Set("u_Exposure",
+	// 		[&]() -> float
+	// 		{
+	// 			return exposure;
+	// 		})
+	// 	.Set("u_BloomStrength",
+	// 		[&]() -> float
+	// 		{
+	// 			return bloomStrength;
+	// 		})
+	// 	.Set("u_BloomTexture",
+	// 		[&]() -> TextureSlot
+	// 		{
+	// 			return { mips->Get(AttachmentTarget::Color), 0 };
+	// 		})
+	// 	.Set("u_SceneTexture",
+	// 		[&]() -> TextureSlot
+	// 		{
+	// 			return { src->Get(AttachmentTarget::Color), 1 };
+	// 		});
 
-		Renderer::Resize(Application::GetWindow()->GetWidth(), Application::GetWindow()->GetHeight());
-		Renderer2D::DrawFullscreenQuad(mips, AttachmentTarget::Color);
-	}
-	Renderer::EndPass();
+	// 	Renderer::Resize(Application::GetWindow()->GetWidth(), Application::GetWindow()->GetHeight());
+	// 	Renderer2D::DrawFullscreenQuad(mips, AttachmentTarget::Color);
+	// }
+	// Renderer::EndPass();
+
 	Renderer::Flush();
-
 	UIRenderer::EndFrame();
 }
 
@@ -227,24 +234,18 @@ void Bloom::InitMips() {
 		{
 			{ AttachmentTarget::Color, textures }
 		});
-
-			// Apply(mipChain,
-			// 		[](BloomMip& mip) -> Ref<Texture>
-			// 		{
-			// 			return mip.Sampler;
-			// 		})
 }
 
 void Bloom::Downsample() {
 	uint32_t i = 0;
 	for(const auto& mip : mipChain) {
 		auto* command = Renderer::GetCommand();
-
-		command->Outputs = { { AttachmentTarget::Color, i } };
+		command->Outputs = { { AttachmentTarget::Color, i++ } };
 
 		Renderer2D::DrawFullscreenQuad(mips, AttachmentTarget::Color);
+		Renderer::PopCommand();
 
-		Renderer::NewCommand();
+		Renderer::PushCommand();
 		auto& uniforms = Renderer::GetPass()->GetUniforms()
 		.Clear()
 		.Set("u_SrcResolution",
@@ -265,12 +266,7 @@ void Bloom::Upsample() {
 		const BloomMip& mip = mipChain[i];
 		const BloomMip& nextMip = mipChain[i - 1];
 
-		Renderer::PushOptions(
-			{
-				.Blending = BlendingMode::Additive
-			});
-
-		auto command = Renderer::GetCommand();
+		auto* command = Renderer::GetCommand();
 		Renderer::GetPass()->GetUniforms()
 		.Set("u_SrcTexture",
 			[mip]() -> TextureSlot
@@ -280,9 +276,15 @@ void Bloom::Upsample() {
 		
 		command->Outputs = { { AttachmentTarget::Color, i - 1 } };
 
+		Renderer::PushOptions(
+		{
+			.Blending = BlendingMode::Additive
+		});
 		Renderer2D::DrawFullscreenQuad(mips, AttachmentTarget::Color);
+		Renderer::PopOptions();
+		Renderer::PopCommand();
 
-		Renderer::NewCommand();
+		Renderer::PushCommand();
 	}
 }
 

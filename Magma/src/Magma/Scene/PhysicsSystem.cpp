@@ -1,14 +1,20 @@
 #include "PhysicsSystem.h"
 
-#include "World.h"
+#include "ECS/World.h"
 
 #include <VolcaniCore/Core/Log.h>
 
 using namespace Magma::Physics;
 
-namespace Magma::ECS {
+namespace Magma {
 
 struct CollidedWith { }; // Tag, indicates that a collision has occured
+
+PhysicsSystem::PhysicsSystem(ECS::World* world)
+	: System(world)
+{
+
+}
 
 void PhysicsSystem::Update(TimeStep ts) {
 	m_World.OnUpdate(ts);

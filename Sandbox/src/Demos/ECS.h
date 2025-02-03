@@ -14,7 +14,7 @@ public:
 
 private:
 	Ref<Scene> scene;
-	DefaultSceneRenderer renderer;
+	// DefaultSceneRenderer renderer;
 };
 
 ECS::ECS() {
@@ -26,7 +26,7 @@ ECS::ECS() {
 		});
 
 	scene = CreateRef<Scene>("Titled Scene");
-	renderer.GetCameraController().TranslationSpeed = 20.0f;
+	// renderer.GetCameraController().TranslationSpeed = 20.0f;
 
 	auto& world = scene->EntityWorld;
 

@@ -2,9 +2,13 @@
 
 #include <VolcaniCore/Graphics/Transform.h>
 
-#include "System.h"
+#include "ECS/System.h"
 
-namespace Magma::ECS {
+#include "Component.h"
+
+using namespace Magma::ECS;
+
+namespace Magma {
 
 class TransformSystem : public System<TransformComponent> {
 public:

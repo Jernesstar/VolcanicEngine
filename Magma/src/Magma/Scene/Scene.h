@@ -26,8 +26,6 @@ public:
 
 private:
 	void RegisterSystems();
-
-	
 };
 
 }

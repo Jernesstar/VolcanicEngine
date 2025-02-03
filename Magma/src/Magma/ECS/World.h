@@ -12,7 +12,6 @@
 
 #include "Entity.h"
 #include "EntityBuilder.h"
-#include "Component.h"
 #include "System.h"
 
 using namespace VolcaniCore;
@@ -133,12 +132,12 @@ public:
 	}
 
 	template<typename TSystem>
-	Ref<TSystem> Get() {
+	TSystem* Get() {
 		auto id = TypeIDGenerator<System<>>::GetID<TSystem>();
 		if(!m_Systems.count(id))
 			Add<TSystem>({ Phase::OnUpdate });
 
-		return Ref<TSystem>((TSystem*)m_Systems[id]);
+		return (TSystem*)m_Systems[id];
 	}
 
 	flecs::world& GetNative() { return m_World; }
@@ -147,13 +146,6 @@ private:
 	flecs::world m_World;
 
 	flecs::query<> m_AllEntitiesQuery;
-
-	flecs::query<CameraComponent>	 m_CameraComponentQuery;
-	flecs::query<MeshComponent>		 m_MeshComponentQuery;
-	flecs::query<RigidBodyComponent> m_RigidBodyComponentQuery;
-	flecs::query<TagComponent>		 m_TagComponentQuery;
-	flecs::query<TransformComponent> m_TransformComponentQuery;
-	flecs::query<ScriptComponent>	 m_ScriptComponentQuery;
 
 	flecs::entity m_EventHandler;
 

@@ -9,6 +9,8 @@
 #include <Magma/Core/AssetManager.h>
 #include <Magma/Core/YAMLSerializer.h>
 
+#include <Magma/Scene/Component.h>
+
 using namespace Magma::ECS;
 using namespace Magma::Physics;
 

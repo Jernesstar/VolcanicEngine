@@ -172,10 +172,23 @@ void Renderer3D::DrawMesh(Ref<Mesh> mesh, const glm::mat4& tr, DrawCommand* cmd)
 			s_Meshes[mesh] = command = Renderer::NewCommand();
 
 			Material& mat = mesh->GetMaterial();
+			if(mat.Diffuse) {
+				command->UniformData
+				.SetInput("u_Material.Diffuse", TextureSlot{ mat.Diffuse, 0 });
+				command->UniformData
+				.SetInput("u_Material.IsTextured", true);
+			}
+			else {
+				command->UniformData
+				.SetInput("u_Material.DiffuseColor", mat.DiffuseColor);
+				command->UniformData
+				.SetInput("u_Material.IsTextured", false);
+			}
+
 			command->UniformData
-			.SetInput("u_Diffuse", TextureSlot{ mat.Diffuse, 0 });
+			.SetInput("u_Material.Specular", TextureSlot{ mat.Specular, 1 });
 			command->UniformData
-			.SetInput("u_Specular", TextureSlot{ mat.Specular, 1 });
+			.SetInput("u_Material.SpecularColor", mat.DiffuseColor);
 		}
 
 		command->AddIndices(mesh->GetIndices().Get());

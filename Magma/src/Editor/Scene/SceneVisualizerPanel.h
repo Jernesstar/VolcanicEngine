@@ -40,7 +40,10 @@ private:
 		Renderer();
 		~Renderer() = default;
 		void Update(TimeStep ts) override;
-		void Submit(Entity entity) override;
+		void SubmitMesh(Entity entity) override;
+		void SubmitLight(Entity entity) override;
+		void SubmitCamera(Entity entity) override;
+		void SubmitSkybox(Entity entity) override;
 		void Render() override;
 
 		void Select(Entity entity) { Selected = entity; }
@@ -48,24 +51,22 @@ private:
 	private:
 		Entity Selected;
 
-		// Lighting
+		// Lighting and shadows
 		Ref<RenderPass> Lighting;
+		Ref<RenderPass> Depth;
+		Ref<RenderPass> Shadow;
+		Ref<UniformBuffer> PointLightBuffer;
+		Ref<UniformBuffer> SpotlightBuffer;
 
 		// Outlining
 		Ref<RenderPass> Mask;
 		Ref<RenderPass> Outline;
-
-		// Shadows
-		Ref<RenderPass> Depth;
-		Ref<RenderPass> Shadow;
 
 		// Bloom
 		Ref<Framebuffer> Mips;
 		Ref<RenderPass> Downsample;
 		Ref<RenderPass> Upsample;
 		Ref<RenderPass> Bloom;
-
-		Ref<RenderPass> FinalComposite;
 	};
 
 private:

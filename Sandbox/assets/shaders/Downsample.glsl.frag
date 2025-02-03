@@ -34,7 +34,7 @@ void main()
     vec3 c = texture(u_SrcTexture, vec2(v_TexCoords.x + 2*x, v_TexCoords.y + 2*y)).rgb;
 
     vec3 d = texture(u_SrcTexture, vec2(v_TexCoords.x - 2*x,  v_TexCoords.y)).rgb;
-    vec3 e = texture(u_SrcTexture, vec2(v_TexCoords.x,        v_TexCoords.y)).rgb;
+    vec3 e = texture(u_SrcTexture, vec2(v_TexCoords.x, v_TexCoords.y)).rgb;
     vec3 f = texture(u_SrcTexture, vec2(v_TexCoords.x + 2*x,  v_TexCoords.y)).rgb;
 
     vec3 g = texture(u_SrcTexture, vec2(v_TexCoords.x - 2*x, v_TexCoords.y - 2*y)).rgb;

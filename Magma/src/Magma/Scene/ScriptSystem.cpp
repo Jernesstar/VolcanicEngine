@@ -1,8 +1,8 @@
 #include "ScriptSystem.h"
 
-#include "World.h"
+#include "ECS/World.h"
 
-namespace Magma::ECS {
+namespace Magma {
 
 void ScriptSystem::Update(TimeStep ts) {
 
@@ -15,7 +15,7 @@ void ScriptSystem::Run(Phase phase) {
 		{
 			auto [sc] = GetRequired(entity);
 			auto& tr = entity.Get<TransformComponent>();
-			sc.OnInput(tr);
+			// sc.Instance->Call("Update");
 		});
 }
 

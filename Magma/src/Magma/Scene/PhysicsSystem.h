@@ -2,14 +2,17 @@
 
 #include "Physics/World.h"
 
-#include "System.h"
+#include "ECS/System.h"
 
-namespace Magma::ECS {
+#include "Component.h"
+
+using namespace Magma::ECS;
+
+namespace Magma {
 
 class PhysicsSystem : public System<RigidBodyComponent> {
 public:
-	PhysicsSystem(World* world)
-		: System(world) { }
+	PhysicsSystem(ECS::World* world);
 
 	void Update(TimeStep ts) override;
 	void Run(Phase phase) override;

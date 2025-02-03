@@ -13,8 +13,8 @@
 #include <Magma/Scene/SceneRenderer.h>
 #include <Magma/UI/UIRenderer.h>
 
-#include <Magma/ECS/Component.h>
-#include <Magma/ECS/PhysicsSystem.h>
+#include <Magma/Scene/Component.h>
+#include <Magma/Scene/PhysicsSystem.h>
 
 #include "Editor/EditorApp.h"
 #include "Editor/Tab.h"
@@ -187,19 +187,47 @@ void SceneVisualizerPanel::Draw() {
 }
 
 SceneVisualizerPanel::Renderer::Renderer() {
-	auto window = Application::GetWindow();
-	m_Output = Framebuffer::Create(window->GetWidth(), window->GetHeight());
-
 	auto camera = CreateRef<StereographicCamera>(75.0f);
 	m_Controller.SetCamera(camera);
 	m_Controller.TranslationSpeed = 10.0f;
+
+	auto window = Application::GetWindow();
+
+	// Ref<ShaderPipeline> shader;
+	// Ref<Framebuffer> frame;
+	// shader = ShaderPipeline::Create("Magma/assets/shaders", "Lighting");
+	// frame = Framebuffer::Create(window->GetWidth(), window->GetHeight());
+	// Lighting = RenderPass::Create("Lighting", shader);
+	m_Output = Framebuffer::Create(window->GetWidth(), window->GetHeight());
 }
 
 void SceneVisualizerPanel::Renderer::Update(TimeStep ts) {
 
 }
 
-void SceneVisualizerPanel::Renderer::Submit(Entity entity) {
+void SceneVisualizerPanel::Renderer::SubmitMesh(Entity entity) {
+	auto& tc = entity.Get<TransformComponent>();
+	auto& mc = entity.Get<MeshComponent>();
+	Transform tr
+	{
+		.Translation = tc.Translation,
+		.Rotation	 = tc.Rotation,
+		.Scale		 = tc.Scale
+	};
+
+	// auto* command = RendererAPI::Get()->NewDrawCommand(m_DrawPass->Get());
+	// Renderer3D::DrawModel(mc.Mesh, tr, command);
+}
+
+void SceneVisualizerPanel::Renderer::SubmitLight(Entity entity) {
+
+}
+
+void SceneVisualizerPanel::Renderer::SubmitCamera(Entity entity) {
+
+}
+
+void SceneVisualizerPanel::Renderer::SubmitSkybox(Entity entity) {
 
 }
 

@@ -24,8 +24,6 @@
 
 #include <Magma/UI/UI.h>
 
-#include <Magma/Scene/Scene.h>
-
 #include <Magma/ECS/World.h>
 #include <Magma/ECS/Entity.h>
 #include <Magma/ECS/EntityBuilder.h>
@@ -34,6 +32,9 @@
 #include <Magma/Physics/RigidBody.h>
 #include <Magma/Physics/Shape.h>
 #include <Magma/Physics/World.h>
+
+#include <Magma/Scene/Scene.h>
+#include <Magma/Scene/Component.h>
 
 #include <Lava/ProjectLoader.h>
 #include <Lava/UILoader.h>

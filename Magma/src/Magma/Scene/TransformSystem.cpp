@@ -1,6 +1,6 @@
 #include "TransformSystem.h"
 
-namespace Magma::ECS {
+namespace Magma {
 
 Transform TransformSystem::GetTransform(Entity& entity) {
 	auto [tc] = GetRequired(entity);
