@@ -243,36 +243,42 @@ void UIVisualizerPanel::Draw() {
 
 		bool elementHovered = false;
 		m_Running->Traverse(
-			[&](UIElement* element)
+			[&](UIElement* element, TraversalState state)
 			{
-				if(element == window)
-					return;
+				if(state == TraversalState::Begin) {
+					if(element == window)
+						return;
 
-				UIElement* other = m_Context->Get(element->GetID());
-				element->x = other->x;
-				element->y = other->y;
-				element->Width = other->Width;
-				element->Height = other->Height;
-				element->Color = other->Color;
-				// Exclude all the elements that were recently first orders
-				if(other->GetParent()) {
-					element->xAlignment = other->xAlignment;
-					element->yAlignment = other->yAlignment;
+					UIElement* other = m_Context->Get(element->GetID());
+					element->x = other->x;
+					element->y = other->y;
+					element->Width = other->Width;
+					element->Height = other->Height;
+					element->Color = other->Color;
+					// Exclude all the elements that were recently first orders
+					if(other->GetParent()) {
+						element->xAlignment = other->xAlignment;
+						element->yAlignment = other->yAlignment;
+					}
+
+					element->Draw();
+
+					UIState state = element->GetState();
+					if(state.Clicked) {
+						m_Selected = element;
+						editor->Select(other);
+						hierarchy->Select(other);
+					}
+					if(state.Hovered)
+						elementHovered = true;
 				}
-
-				element->Draw();
-
-				UIState state = element->GetState();
-				if(state.Clicked) {
-					m_Selected = element;
-					editor->Select(other);
-					hierarchy->Select(other);
+				else {
+					if(element->GetType() == UIElementType::Window)
+						UIRenderer::Pop(1);
 				}
-				if(state.Hovered)
-					elementHovered = true;
 			});
 
-		UIRenderer::Pop(0);
+		UIRenderer::Pop();
 
 		if(m_Selected) {
 			if(elementHovered && ImGui::IsMouseDragging(0)) {

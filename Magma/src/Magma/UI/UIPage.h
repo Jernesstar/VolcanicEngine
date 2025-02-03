@@ -34,6 +34,8 @@ struct ThemeElement {
 
 using Theme = Map<UIElementType, ThemeElement>;
 
+enum class TraversalState { Begin, End };
+
 class UIPage {
 public:
 	bool Visible = true;
@@ -52,7 +54,7 @@ public:
 	void Render();
 
 	void Traverse(const Func<void, UIElement*>& func, bool dfs = true);
-	void Traverse(const Func<void, UIElement*, uint32_t>& func);
+	void Traverse(const Func<void, UIElement*, TraversalState>& func);
 
 	UINode Add(UIElementType type, const std::string& id);
 	void Add(const UINode& node);

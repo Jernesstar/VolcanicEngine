@@ -40,6 +40,15 @@ static void TraverseElement(UIElement* element,
 		TraverseElement(child, func);
 }
 
+static void TraverseElement(UIElement* element,
+							const Func<void, UIElement*, TraversalState>& func)
+{
+	func(element, TraversalState::Begin);
+	for(UIElement* child : element->GetChildren())
+		TraverseElement(child, func);
+	func(element, TraversalState::End);
+}
+
 UIPage::UIPage() { }
 
 UIPage::UIPage(const std::string &name)
@@ -78,32 +87,29 @@ void UIPage::Render() {
 }
 
 void UIPage::Traverse(const Func<void, UIElement*>& func, bool dfs) {
-	if(dfs)
+	if(dfs) {
 		for(UIElement* element : GetFirstOrderElements())
 			TraverseElement(element, func);
-	else {
-		Traverse(
-			[&](UIElement* element, uint32_t _)
-			{
-				func(element);
-			});
+
+		return;
 	}
-}
 
-void UIPage::Traverse(const Func<void, UIElement*, uint32_t>& func) {
-	uint32_t depth = 0;
 	List<UIElement*> q;
-
 	for(UIElement* element : GetFirstOrderElements())
 		q.Add(element);
 
 	while(q) {
 		UIElement* element = q.Pop(false);
-		func(element, depth);
+		func(element);
 
 		for(UIElement* child : element->GetChildren())
 			q.Push(child, true);
 	}
+}
+
+void UIPage::Traverse(const Func<void, UIElement*, TraversalState>& func) {
+	for(UIElement* element : GetFirstOrderElements())
+		TraverseElement(element, func);
 }
 
 UINode UIPage::Add(UIElementType type, const std::string& id) {
