@@ -153,10 +153,10 @@ struct DrawUniforms {
 	List<UniformSlot> UniformBuffers;
 
 	operator bool () const {
-		return IntUniforms.size() || FloatUniforms.size()
-		|| TextureUniforms.size() || Vec2Uniforms.size()
-		|| Vec3Uniforms.size() || Vec4Uniforms.size() || Mat2Uniforms.size()
-		|| Mat3Uniforms.size() || Mat4Uniforms.size() || UniformBuffers;
+		return UniformBuffers
+		|| IntUniforms.size() || FloatUniforms.size() || TextureUniforms.size()
+		|| Vec2Uniforms.size() || Vec3Uniforms.size() || Vec4Uniforms.size()
+		|| Mat2Uniforms.size() || Mat3Uniforms.size() || Mat4Uniforms.size();
 	}
 
 	void SetInput(const std::string& name, int32_t data) {
@@ -206,32 +206,36 @@ struct DrawCommand {
 	uint64_t VerticesIndex	= 0;
 	uint64_t InstancesIndex = 0;
 
+	uint64_t IndicesCount	= 0;
+	uint64_t VerticesCount	= 0;
+	uint64_t InstancesCount = 0;
+
 	void AddIndices(const Buffer<uint32_t>& data) {
 		Pass->BufferData->AddIndices(data);
-		IndicesIndex += data.GetCount();
+		IndicesCount += data.GetCount();
 	}
 
 	template<typename T>
 	void AddVertices(const Buffer<T>& data) {
 		Pass->BufferData->AddVertices(data);
-		VerticesIndex += data.GetCount();
+		VerticesCount += data.GetCount();
 	}
 
 	template<typename T>
 	void AddInstances(const Buffer<T>& data) {
 		Pass->BufferData->AddInstances(data);
-		InstancesIndex += data.GetCount();
+		InstancesCount += data.GetCount();
 	}
 
 	void AddInstance(const void* data) {
 		RendererAPI::Get()
 		->SetBufferData(Pass->BufferData, DrawBufferIndex::Instances, data, 1,
-						InstancesIndex++);
+						InstancesCount++);
 	}
 
 	DrawCall& NewDrawCall() {
 		return
-			Calls.Emplace(IndicesIndex, 0, VerticesIndex, 0, InstancesIndex, 0);
+			Calls.Emplace(0, IndicesCount, 0, VerticesCount, 0, 0);
 	}
 };
 
@@ -243,11 +247,11 @@ enum class PrimitiveType { Point, Line, Triangle, Cubemap };
 enum class PartitionType { Single, Instanced, MultiDraw };
 
 struct DrawCall {
-	uint64_t IndexStart	   = 0;
+	uint64_t IndexStart	   = 0; // Relative
 	uint64_t IndexCount	   = 0;
-	uint64_t VertexStart   = 0;
+	uint64_t VertexStart   = 0; // Relative
 	uint64_t VertexCount   = 0;
-	uint64_t InstanceStart = 0;
+	uint64_t InstanceStart = 0; // Absolute
 	uint64_t InstanceCount = 0;
 
 	PartitionType Partition = PartitionType::Instanced;

@@ -29,8 +29,8 @@ namespace VolcaniCore::OpenGL {
 static void Clear();
 static void Resize(uint32_t width, uint32_t height);
 
-static void FlushCommand(DrawCommand& command);
-static void FlushCall(DrawCall& call);
+static void FlushCommand(DrawCommand&);
+static void FlushCall(DrawCommand&, DrawCall&);
 
 static void SetUniforms(DrawCommand& command);
 static void SetOptions(DrawCall& call);
@@ -235,7 +235,7 @@ void FlushCommand(DrawCommand& command) {
 
 		array->Bind();
 		for(auto& call : command.Calls) {
-			FlushCall(call);
+			FlushCall(command, call);
 			s_Info.InstanceCount += call.InstanceCount;
 			s_Info.DrawCallCount++;
 		}
@@ -254,7 +254,7 @@ void FlushCommand(DrawCommand& command) {
 		   Application::GetWindow()->GetHeight());
 }
 
-void FlushCall(DrawCall& call) {
+void FlushCall(DrawCommand& command, DrawCall& call) {
 	SetOptions(call);
 
 	uint32_t primitive;
@@ -282,22 +282,25 @@ void FlushCall(DrawCall& call) {
 
 	if(call.Partition == PartitionType::Single) {
 		if(call.IndexCount == 0)
-			glDrawArrays(primitive, call.VertexStart, call.VertexCount);
+			glDrawArrays(primitive, command.VerticesIndex + call.VertexStart,
+						 call.VertexCount);
 		else
 			glDrawElementsBaseVertex(
 				primitive, call.IndexCount, GL_UNSIGNED_INT,
-				(void*)(sizeof(uint32_t) * call.IndexStart), call.VertexStart);
+				(void*)(sizeof(uint32_t) * (command.IndicesIndex + call.IndexStart)),
+				command.VerticesIndex + call.VertexStart);
 	}
 	else if(call.Partition == PartitionType::Instanced) {
 		if(call.IndexCount == 0)
 			glDrawArraysInstancedBaseInstance(
-				primitive, call.VertexStart, call.VertexCount,
-				call.InstanceCount, call.InstanceStart);
+				primitive, command.VerticesIndex + call.VertexStart,
+				call.VertexCount, call.InstanceCount, call.InstanceStart);
 		else
 			glDrawElementsInstancedBaseVertexBaseInstance(
 				primitive, call.IndexCount, GL_UNSIGNED_INT,
-				(void*)(sizeof(uint32_t) * call.IndexStart),
-				call.InstanceCount, call.VertexStart, call.InstanceStart);
+				(void*)(sizeof(uint32_t) * (command.IndicesIndex + call.IndexStart)),
+				call.InstanceCount, command.VerticesIndex + call.VertexStart,
+				call.InstanceStart);
 	}
 }
 

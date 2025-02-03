@@ -41,7 +41,7 @@ void main()
     // if(v_Textured == 1)
         color = texture(u_Diffuse, v_TexCoords).rgb;
     // else
-    //     color = vec4(u_Diffuse.DiffuseColor, 1.0);
+    //     color = vec4(u_Material.DiffuseColor, 1.0);
 
     vec3 normal = normalize(v_Normal);
     vec3 lightColor = vec3(1.0);

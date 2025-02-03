@@ -12,7 +12,7 @@ namespace VolcaniCore {
 static DrawBuffer* s_CubemapBuffer;
 static DrawBuffer* s_MeshBuffer;
 static Map<Ref<Mesh>, DrawCommand*> s_Meshes;
-static uint64_t s_InstanceEnd = 0;
+static uint64_t s_InstancesIndex = 0;
 
 void Renderer3D::Init() {
 	BufferLayout vertexLayout =
@@ -126,7 +126,7 @@ void Renderer3D::StartFrame() {
 }
 
 void Renderer3D::EndFrame() {
-	s_InstanceEnd = 0;
+	s_InstancesIndex = 0;
 }
 
 void Renderer3D::Begin(Ref<Camera> camera) {
@@ -153,42 +153,41 @@ void Renderer3D::DrawSkybox(Ref<Cubemap> cubemap) {
 	// .SetInput("u_Skybox", TextureSlot{ cubemap, 0 });
 }
 
-void Renderer3D::DrawMesh(Ref<Mesh> mesh, const glm::mat4& tr,
-						  DrawCommand* cmd)
+void Renderer3D::DrawMesh(Ref<Mesh> mesh, const glm::mat4& tr, DrawCommand* cmd)
 {
 	if(!mesh)
 		return;
 
-	if(!s_Meshes.count(mesh)) {
-		if(cmd)
-			s_Meshes[mesh] = cmd;
+	DrawCommand* command;
+
+	if(s_Meshes.count(mesh))
+		command = s_Meshes[mesh];
+	else {
+		if(cmd) {
+			s_Meshes[mesh] = command = cmd;
+			command->VerticesIndex = s_MeshBuffer->VerticesCount;
+			command->IndicesIndex = s_MeshBuffer->IndicesCount;
+		}
 		else {
-			s_Meshes[mesh] = Renderer::NewCommand();
+			s_Meshes[mesh] = command = Renderer::NewCommand();
 
 			Material& mat = mesh->GetMaterial();
-			s_Meshes[mesh]->UniformData
+			command->UniformData
 			.SetInput("u_Diffuse", TextureSlot{ mat.Diffuse, 0 });
-			s_Meshes[mesh]->UniformData
+			command->UniformData
 			.SetInput("u_Specular", TextureSlot{ mat.Specular, 1 });
 		}
 
-		s_Meshes[mesh]->AddIndices(mesh->GetIndices().Get());
-		s_Meshes[mesh]->AddVertices(mesh->GetVertices().Get());
+		command->AddIndices(mesh->GetIndices().Get());
+		command->AddVertices(mesh->GetVertices().Get());
 	}
 
-	DrawCommand* command = s_Meshes[mesh];
-
-	// TODO(Fix): DrawCall offsets should be relative to DrawCommand's
 	if(!command->Calls || command->Calls[-1].InstanceCount >= 10'000) {
 		auto& call = command->NewDrawCall();
 		call.Primitive = PrimitiveType::Triangle;
 		call.Partition = PartitionType::Instanced;
-		call.IndexCount  = mesh->GetIndices().Count();
-		call.VertexCount = mesh->GetVertices().Count();
-		call.IndexStart -= mesh->GetIndices().Count();
-		call.VertexStart -= mesh->GetVertices().Count();
-		call.InstanceStart = s_InstanceEnd;
-		s_InstanceEnd += 10'000;
+		call.InstanceStart = s_InstancesIndex;
+		s_InstancesIndex += 10'000;
 	}
 
 	auto* buffer = Renderer::GetPass()->Get()->BufferData;

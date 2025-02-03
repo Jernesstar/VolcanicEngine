@@ -4,7 +4,7 @@ Project:
   StartScreen: test
   Screens:
     - Screen:
-        Name: TestScreen
+        Name: TestHome
         UI: test
         Scene: test
     - Screen:
