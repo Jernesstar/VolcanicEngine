@@ -95,7 +95,7 @@ void Renderer2D::DrawFullscreenQuad(Ref<Framebuffer> buffer,
 
 	DrawCommand* command;
 	if(Renderer::GetPass())
-		command = Renderer::NewCommand(true);
+		command = Renderer::NewCommand();
 	else {
 		auto pipeline = ShaderLibrary::Get("Framebuffer");
 		auto* pass = RendererAPI::Get()->NewDrawPass(s_ScreenBuffer, pipeline);

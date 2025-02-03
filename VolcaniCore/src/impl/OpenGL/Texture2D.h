@@ -11,6 +11,11 @@ namespace VolcaniCore::OpenGL {
 
 class Texture2D : public VolcaniCore::Texture {
 public:
+	static uint32_t CreateTexture(uint32_t width, uint32_t height,
+								  Format internal = Format::Normal,
+								  Sampling sampling = Sampling::Linear);
+
+public:
 	Texture2D(const std::string& path);
 	Texture2D(uint32_t id, uint32_t width, uint32_t height);
 	Texture2D(uint32_t width, uint32_t height, Format format, Sampling sampling);
@@ -29,10 +34,6 @@ public:
 	bool operator !=(const Texture2D& other) const {
 		return this->m_TextureID != other.m_TextureID;
 	}
-
-	static uint32_t CreateTexture(uint32_t width, uint32_t height,
-								  Format internal = Format::Normal,
-								  Sampling sampling = Sampling::Linear);
 
 private:
 	bool m_Owns;

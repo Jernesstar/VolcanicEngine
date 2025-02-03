@@ -29,7 +29,7 @@ float ShadowCalculation()
     float currentDepth = projCoords.z;
     // check whether current frag pos is in shadow
     vec3 lightDir = normalize(v_Position - u_LightPosition);
-    float bias = max(0.0001 * (1.0 - dot(v_Normal, lightDir)), 0.0001);
+    float bias = max(0.001 * (1.0 - dot(v_Normal, -lightDir)), 0.001);
     float shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;
 
     return shadow;
@@ -45,19 +45,18 @@ void main()
 
     vec3 normal = normalize(v_Normal);
     vec3 lightColor = vec3(1.0);
-    // ambient
+    // Ambient
     vec3 ambient = 0.15 * lightColor;
-    // diffuse
+    // Diffuse
     vec3 lightDir = normalize(v_Position - u_LightPosition);
     float diff = max(dot(-lightDir, normal), 0.0);
     vec3 diffuse = diff * lightColor;
-    // specular
+    // Specular
     vec3 viewDir = normalize(v_Position - u_CameraPosition);
-    float spec = 0.0;
     vec3 halfwayDir = normalize((-lightDir) + (-viewDir));
-    spec = pow(max(dot(normal, halfwayDir), 0.0), 64.0);
+    float spec = pow(max(dot(normal, halfwayDir), 0.0), 64.0);
     vec3 specular = spec * lightColor;
-    // calculate shadow
+    // Calculate shadow
     float shadow = ShadowCalculation();
     vec3 lighting = (ambient + (1.0 - shadow) * (diffuse + specular)) * color;
 

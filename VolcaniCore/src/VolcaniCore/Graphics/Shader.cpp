@@ -75,12 +75,13 @@ bool StringContains(const std::string& str, const std::string& subStr) {
 std::vector<ShaderFile> GetShaders(const std::string& shaderFolder,
 									const std::string& name)
 {
-	// TODO(Change): Find by name, then by extensions
+	namespace fs = std::filesystem;
+
 	std::vector<std::string> paths;
 	for(auto path : FileUtils::GetFiles(shaderFolder,
 					{ ".vert", ".frag", ".geom", ".comp" }))
 	{
-		if(StringContains(path, name))
+		if(fs::path(path).stem().stem().string() == name)
 			paths.push_back(path);
 	}
 	
@@ -97,10 +98,10 @@ ShaderFile TryGetShader(const std::string& path) {
 	std::string str = path.substr(dot);
 	if(StringContains(str, "vert") || StringContains(str, "vs"))
 		return ShaderFile{ path, ShaderType::Vertex };
-	if(StringContains(str, "geom") || StringContains(str, "gs"))
-		return ShaderFile{ path, ShaderType::Geometry };
 	if(StringContains(str, "frag") || StringContains(str, "fs"))
 		return ShaderFile{ path, ShaderType::Fragment };
+	if(StringContains(str, "geom") || StringContains(str, "gs"))
+		return ShaderFile{ path, ShaderType::Geometry };
 	if(StringContains(str, "comp") || StringContains(str, "compute"))
 		return ShaderFile{ path, ShaderType::Compute };
 

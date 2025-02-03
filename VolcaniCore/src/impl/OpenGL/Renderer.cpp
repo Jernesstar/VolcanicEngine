@@ -209,11 +209,16 @@ void FlushCommand(DrawCommand& command) {
 		// 	s_Data.LastPass->Pipeline->As<OpenGL::ShaderProgram>()->Unbind();
 
 		// s_Data.LastPass = command.Pass;
-		if(command.Pass && command.Pass->Pipeline)
-			command.Pass->Pipeline->As<OpenGL::ShaderProgram>()->Bind();
-		if(command.Pass && command.Pass->Output)
-			command.Pass->Output->As<OpenGL::Framebuffer>()->Bind();
 	// }
+	if(command.ViewportWidth && command.ViewportHeight)
+		Resize(command.ViewportWidth, command.ViewportHeight);
+	// else if(command.Pass && command.Pass->Output)
+	// 	Resize(command.Pass->Output->GetWidth(), command.Pass->Output->GetHeight());
+
+	if(command.Pass && command.Pass->Pipeline)
+		command.Pass->Pipeline->As<OpenGL::ShaderProgram>()->Bind();
+	if(command.Pass && command.Pass->Output)
+		command.Pass->Output->As<OpenGL::Framebuffer>()->Bind();
 
 	if(command.Pass && command.Pass->Output) {
 		uint32_t i = 0;
@@ -221,11 +226,13 @@ void FlushCommand(DrawCommand& command) {
 			command.Pass->Output->Attach(target, idx, i++);
 	}
 
-	if(command.ViewportWidth && command.ViewportHeight)
-		Resize(command.ViewportWidth, command.ViewportHeight);
-
-	if(command.Clear)
-		Clear();
+	if(command.Clear) {
+		// if(command.Pass && command.Pass->Output
+		// && command.Pass->Output->Has(AttachmentTarget::Color))
+		// 	glClear(GL_DEPTH_BUFFER_BIT);
+		// else
+			Clear();
+	}
 
 	if(command.Pass)
 		SetUniforms(command);
@@ -250,8 +257,8 @@ void FlushCommand(DrawCommand& command) {
 	if(command.Pass && command.Pass->Pipeline)
 		command.Pass->Pipeline->As<OpenGL::ShaderProgram>()->Unbind();
 
-	Resize(Application::GetWindow()->GetWidth(),
-		   Application::GetWindow()->GetHeight());
+	// Resize(Application::GetWindow()->GetWidth(),
+	// 	   Application::GetWindow()->GetHeight());
 }
 
 void FlushCall(DrawCommand& command, DrawCall& call) {

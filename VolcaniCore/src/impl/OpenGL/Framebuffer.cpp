@@ -68,10 +68,6 @@ Framebuffer::Framebuffer(const Map<AttachmentTarget, List<Attachment>>& map)
 	glGenFramebuffers(1, &m_BufferID);
 	glBindFramebuffer(GL_FRAMEBUFFER, m_BufferID);
 
-	if(!Has(AttachmentTarget::Color)) {
-		glDrawBuffer(GL_NONE);
-		glReadBuffer(GL_NONE);
-	}
 	// TODO(Change): Replace with RenderBuffer
 	if(!Has(AttachmentTarget::Depth))
 		m_AttachmentMap.insert(
@@ -89,7 +85,11 @@ Framebuffer::Framebuffer(const Map<AttachmentTarget, List<Attachment>>& map)
 	// if(Has(AttachmentTarget::Stencil))
 	// 	CreateStencilAttachment();
 
-	if(index != 0) {
+	if(!Has(AttachmentTarget::Color)) {
+		glDrawBuffer(GL_NONE);
+		glReadBuffer(GL_NONE);
+	}
+	else {
 		uint32_t* atts = new uint32_t[index];
 		for(uint32_t i = 0; i < index; i++)
 			atts[i] = GL_COLOR_ATTACHMENT0 + i;
@@ -178,8 +178,8 @@ void Framebuffer::CreateColorAttachment(uint32_t index) {
 	if(attachment.GetType() == Attachment::Type::Texture) {
 		if(attachment.m_RendererID == 0) {
 			Texture::Format format = Texture::Format::Float;
-			uint32_t id = Texture2D::CreateTexture(width, height, format);
-			attachment.m_RendererID = id;
+			attachment.m_RendererID =
+				Texture2D::CreateTexture(width, height, format);
 		}
 
 		// uint32_t samples = 4;
@@ -205,8 +205,8 @@ void Framebuffer::CreateDepthAttachment() {
 	if(attachment.GetType() == Attachment::Type::Texture) {
 		if(attachment.m_RendererID == 0) {
 			Texture::Format format = Texture::Format::Depth;
-			uint32_t id = Texture2D::CreateTexture(width, height, format);
-			attachment.m_RendererID = id;
+			attachment.m_RendererID =
+				Texture2D::CreateTexture(width, height, format);
 		}
 
 		attachment.m_Texture =

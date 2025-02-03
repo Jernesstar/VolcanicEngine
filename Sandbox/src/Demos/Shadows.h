@@ -14,9 +14,9 @@ private:
 
 	Ref<RenderPass> depthPass;
 	Ref<RenderPass> shadowPass;
+	Ref<RenderPass> depthViewPass;
 
 	Ref<Framebuffer> src;
-	Ref<Texture> depthTexture;
 	Ref<Framebuffer> depthMap;
 
 	Ref<Mesh> cube;
@@ -37,21 +37,27 @@ Shadows::Shadows()
 				Application::Close();
 		});
 
-	Ref<ShaderPipeline> depthShader;
-	Ref<ShaderPipeline> shadowShader;
-	depthShader = ShaderPipeline::Create("Sandbox/assets/shaders", "Depth");
-	shadowShader = ShaderPipeline::Create("Sandbox/assets/shaders", "Shadow");
+	auto depthViewShader = ShaderPipeline::Create(
+		{
+			{ "VolcaniCore/assets/shaders/Framebuffer.glsl.vert", ShaderType::Vertex },
+			{ "Sandbox/assets/shaders/DepthView.glsl.frag", ShaderType::Fragment }
+		});
+	depthViewPass = RenderPass::Create("DepthView", depthViewShader);
+	depthViewPass->SetData(Renderer2D::GetScreenBuffer());
 
-	depthTexture = Texture::Create(2048, 2048, Texture::Format::Depth);
+	auto depth = ShaderPipeline::Create("Sandbox/assets/shaders", "Depth");
+	auto shadow = ShaderPipeline::Create("Sandbox/assets/shaders", "Shadow");
+
+	auto depthTexture = Texture::Create(2048, 2048, Texture::Format::Depth);
 	depthMap = Framebuffer::Create(
 		{
 			{ AttachmentTarget::Depth, { { depthTexture } } }
 		});
 
-	depthPass = RenderPass::Create("Depth", depthShader);
+	depthPass = RenderPass::Create("Depth", depth);
 	depthPass->SetOutput(depthMap);
 	depthPass->SetData(Renderer3D::GetMeshBuffer());
-	shadowPass = RenderPass::Create("Shadow", shadowShader);
+	shadowPass = RenderPass::Create("Shadow", shadow);
 	shadowPass->SetData(Renderer3D::GetMeshBuffer());
 
 	cube =
@@ -62,11 +68,11 @@ Shadows::Shadows()
 			});
 	torch = Mesh::Create("Sandbox/assets/models/mc-torch/Torch.obj");
 
-	depthCamera = CreateRef<OrthographicCamera>(20.0f, 20.0f, 1.0f, 17.5f);
+	depthCamera = CreateRef<OrthographicCamera>(20.0f, 20.0f, 1.0f, 20.0f);
+	depthCamera->SetPosition({ -2.0f, 6.0f, -2.0f });
+	depthCamera->SetDirection({ 0.0f, -2.0f, 0.0f });
 	sceneCamera = CreateRef<StereographicCamera>(75.0f);
 	sceneCamera->Resize(1920, 1080);
-	depthCamera->SetPosition({ 6.0f, 4.f, 5.0f });
-	depthCamera->SetDirection({ -1.0f, -0.5f, -1.0f });
 
 	controller = CameraController{ sceneCamera };
 	controller.TranslationSpeed = 5.0f;
@@ -96,23 +102,31 @@ void Shadows::OnUpdate(TimeStep ts) {
 		Renderer::Clear();
 		Renderer::Resize(2048, 2048);
 
+		Renderer::PushCommand();
 		Renderer::GetPass()->GetUniforms()
 		.Set("u_LightSpaceMatrix",
 			[&]() -> glm::mat4
 			{
 				return depthCamera->GetViewProjection();
 			});
+		Renderer::PopCommand();
 
-		// Renderer::PushOptions(
-		// 	{
-		// 		.Culling = CullingMode::Front
-		// 	});
+		Renderer::PushOptions(
+			{
+				.Culling = CullingMode::Front
+			});
 
 		RenderScene(depthCamera);
+
+		Renderer::PopOptions();
 	}
 	Renderer::EndPass();
 
-	// Renderer2D::DrawFullscreenQuad(depthMap, AttachmentTarget::Depth);
+	// Renderer::StartPass(depthViewPass);
+	// {
+	// 	Renderer2D::DrawFullscreenQuad(depthMap, AttachmentTarget::Depth);
+	// }
+	// Renderer::EndPass();
 
 	Renderer::StartPass(shadowPass);
 	{
@@ -121,21 +135,11 @@ void Shadows::OnUpdate(TimeStep ts) {
 
 		Renderer::PushCommand();
 		Renderer::GetPass()->GetUniforms()
-		// .Set("u_ViewProj",
-		// 	[&]() -> glm::mat4
-		// 	{
-		// 		return sceneCamera->GetViewProjection();
-		// 	})
 		.Set("u_LightSpaceMatrix",
 			[&]() -> glm::mat4
 			{
 				return depthCamera->GetViewProjection();
 			})
-		// .Set("u_CameraPosition",
-		// 	[&]() -> glm::vec3
-		// 	{
-		// 		return sceneCamera->GetPosition();
-		// 	})
 		.Set("u_LightPosition",
 			[&]() -> glm::vec3
 			{
