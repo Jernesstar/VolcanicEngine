@@ -3,34 +3,35 @@
 #include <VolcaniCore/Core/Time.h>
 
 #include <Magma/Core/Project.h>
-#include <Magma/Core/Screen.h>
+
+#include <Magma/Script/ScriptModule.h>
+#include <Magma/Script/ScriptClass.h>
+#include <Magma/Script/ScriptObject.h>
 
 using namespace VolcaniCore;
+using namespace Magma::Script;
 
 namespace Lava {
 
 class App {
 public:
-	template<typename TApp>
-	static TApp* As() { return (TApp*)s_Instance; }
-
-public:
-	App() {
-		s_Instance = this;
+	App(const Project& project)
+		: m_Project(project)
+	{
 	}
-	virtual ~App() = default;
+	~App() = default;
 
-	virtual void OnLoad();
-	virtual void OnClose();
-	virtual void OnUpdate(TimeStep ts);
+	void OnLoad();
+	void OnClose();
+	void OnUpdate(TimeStep ts);
 
-	void LoadScreen(const std::string& name);
-
-private:
-	inline static App* s_Instance;
+	void SetScreen(const std::string& name);
 
 private:
-	List<Magma::Screen> m_Screens;
+	Project m_Project;
+
+	Ref<ScriptModule> m_AppModule;
+
 	int32_t m_CurrentScreen = -1;
 };
 

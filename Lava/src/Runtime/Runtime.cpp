@@ -23,49 +23,36 @@ Runtime::Runtime(const CommandLineArgs& args)
 				Application::Close();
 		});
 
-	if(!args["--project"]) {
-		VOLCANICORE_LOG_ERROR("No project specified");
-		Application::Close();
+	std::string volcPath;
+	if(args["--project"]) {
+		volcPath = args["--project"].Args[0];
+	}
+	else {
+#ifdef VOLCANICENGINE_WINDOWS
+		#include <windows.h>
+		GetModuleFileName(0)
+#endif
 	}
 
-	std::string volcPath = args["--project"];
 	Project project;
 	ProjectLoader::Load(project, volcPath);
 
 	if(!args.Has("-c"))
 		ProjectLoader::Compile(project);
 
-	m_AppDLL = ProjectLoader::GetDLL();
-	if(!m_AppDLL)
-		VOLCANICORE_LOG_ERROR(
-			"-c Flag used, though no DLLs could be found. \
-			Make sure to have previously called ProjectLoader::Compile");
-
-	m_AppDLL->GetFunction<void>("LoadApp")();
-
 	Application::GetWindow()->SetTitle(project.Name);
 	Application::PushDir(project.Path);
 
-	App* app = Get();
-	app->App::OnLoad();
-	app->OnLoad();
+	m_App = CreateRef<App>(project);
+	m_App->OnLoad();
 }
 
 Runtime::~Runtime() {
-	App* app = Get();
-	app->OnClose();
-	app->App::OnClose();
+	m_App->OnClose();
 }
 
 void Runtime::OnUpdate(TimeStep ts) {
-	App* app = Get();
-	app->App::OnUpdate(ts);
-	app->OnUpdate(ts);
-}
-
-App* Runtime::Get() {
-	auto get = m_AppDLL->GetFunction<App*>("GetApp");
-	return get();
+	m_App->OnUpdate(ts);
 }
 
 }

@@ -226,13 +226,8 @@ void FlushCommand(DrawCommand& command) {
 			command.Pass->Output->Attach(target, idx, i++);
 	}
 
-	if(command.Clear) {
-		// if(command.Pass && command.Pass->Output
-		// && command.Pass->Output->Has(AttachmentTarget::Color))
-		// 	glClear(GL_DEPTH_BUFFER_BIT);
-		// else
-			Clear();
-	}
+	if(command.Clear)
+		Clear();
 
 	if(command.Pass)
 		SetUniforms(command);
@@ -256,9 +251,6 @@ void FlushCommand(DrawCommand& command) {
 		command.Pass->Output->As<OpenGL::Framebuffer>()->Unbind();
 	if(command.Pass && command.Pass->Pipeline)
 		command.Pass->Pipeline->As<OpenGL::ShaderProgram>()->Unbind();
-
-	// Resize(Application::GetWindow()->GetWidth(),
-	// 	   Application::GetWindow()->GetHeight());
 }
 
 void FlushCall(DrawCommand& command, DrawCall& call) {

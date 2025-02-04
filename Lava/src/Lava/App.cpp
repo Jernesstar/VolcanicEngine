@@ -18,6 +18,8 @@ namespace Lava {
 void App::OnLoad() {
 	UIRenderer::Init();
 
+	// ScriptEngine::RegisterSingleton
+
 	// auto list = UILoader::LoadFolder(project);
 	// for(auto& screenName : project.Screens) {
 	// 	auto& screen = m_Screens.Emplace(screenName);
@@ -80,7 +82,7 @@ void App::OnUpdate(TimeStep ts) {
 	UIRenderer::EndFrame();
 }
 
-void App::LoadScreen(const std::string& name) {
+void App::SetScreen(const std::string& name) {
 
 }
 

@@ -122,7 +122,11 @@ void EditElement<Image>(UIElement* element) {
 
 template<>
 void EditElement<Text>(UIElement* element) {
+	auto* text = element->As<Text>();
+	ImGui::SeparatorText("Text");
+	ImGui::Indent(22.0f);
 
+	ImGui::InputTextWithHint("##Text", "Enter text here", &text->Content);
 }
 
 template<>

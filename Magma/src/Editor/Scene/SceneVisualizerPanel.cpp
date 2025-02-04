@@ -220,7 +220,17 @@ void SceneVisualizerPanel::Renderer::SubmitMesh(Entity entity) {
 }
 
 void SceneVisualizerPanel::Renderer::SubmitLight(Entity entity) {
-
+	if(entity.Has<DirectionalLightComponent>()) {
+		auto& dc = entity.Get<DirectionalLightComponent>();
+	}
+	else if(entity.Has<PointLightComponent>()) {
+		auto& pc = entity.Get<PointLightComponent>();
+		// PointLightBuffer->SetData
+	}
+	else if(entity.Has<SpotlightComponent>()) {
+		auto& sc = entity.Get<SpotlightComponent>();
+		// SpotlightBuffer->SetData
+	}
 }
 
 void SceneVisualizerPanel::Renderer::SubmitCamera(Entity entity) {

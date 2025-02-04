@@ -19,10 +19,8 @@ public:
 
 	void OnUpdate(TimeStep ts) override;
 
-	App* Get();
-
-private:
-	Ref<DLL> m_AppDLL;
+public:
+	Ref<App> m_App;
 };
 
 }

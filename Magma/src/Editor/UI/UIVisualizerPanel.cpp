@@ -255,6 +255,8 @@ void UIVisualizerPanel::Draw() {
 					element->Width = other->Width;
 					element->Height = other->Height;
 					element->Color = other->Color;
+					if(element->GetType() == UIElementType::Text)
+						element->As<Text>()->Content = other->As<Text>()->Content;
 					// Exclude all the elements that were recently first orders
 					if(other->GetParent()) {
 						element->xAlignment = other->xAlignment;

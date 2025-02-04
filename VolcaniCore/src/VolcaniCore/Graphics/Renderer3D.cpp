@@ -200,6 +200,9 @@ void Renderer3D::DrawMesh(Ref<Mesh> mesh, const glm::mat4& tr, DrawCommand* cmd)
 		call.Primitive = PrimitiveType::Triangle;
 		call.Partition = PartitionType::Instanced;
 		call.InstanceStart = s_InstancesIndex;
+
+		
+
 		s_InstancesIndex += 10'000;
 	}
 
@@ -222,8 +225,9 @@ void Renderer3D::DrawQuad(Ref<Quad> quad, const glm::mat4& tr,
 {
 	Ref<Mesh> mesh;
 	if(quad->IsTextured)
-		mesh = Mesh::Create(MeshPrimitive::Quad,
-			Material{ .Diffuse = quad->GetTexture() });
+		mesh =
+			Mesh::Create(MeshPrimitive::Quad,
+						 Material{ .Diffuse = quad->GetTexture() });
 	else
 		mesh = Mesh::Create(MeshPrimitive::Quad, quad->GetColor());
 

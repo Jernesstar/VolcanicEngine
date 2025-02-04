@@ -95,10 +95,14 @@ UIState UIRenderer::DrawWindow(UI::Window& window) {
 						| ImGuiChildFlags_FrameStyle
 						| ImGuiChildFlags_ResizeX
 						| ImGuiChildFlags_ResizeY;
+		auto windowFlags = ImGuiWindowFlags_NoScrollbar
+						 | ImGuiWindowFlags_NoScrollWithMouse
+						 | ImGuiWindowFlags_NoTitleBar
+						 | ImGuiWindowFlags_NoCollapse;
 		ImVec2 size(window.Width, window.Height);
 
 		ImGui::PushStyleColor(ImGuiCol_FrameBg, window.Color);
-		ImGui::BeginChild(window.GetID().c_str(), size, childFlags);
+		ImGui::BeginChild(window.GetID().c_str(), size, childFlags, windowFlags);
 		ImGui::PopStyleColor();
 
 		s_Stack.Add(UIType::ChildWindow);
@@ -194,6 +198,9 @@ UIState UIRenderer::DrawImage(UI::Image& image) {
 }
 
 UIState UIRenderer::DrawText(UI::Text& text) {
+	if(text.Content == "")
+		return { };
+
 	ImVec2 size = ImGui::CalcTextSize(text.Content.c_str());
 	text.Width = size.x;
 	text.Height = size.y;
