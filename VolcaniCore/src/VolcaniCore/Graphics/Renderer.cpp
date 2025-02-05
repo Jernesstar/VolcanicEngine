@@ -74,8 +74,7 @@ void Renderer::PopCommand() {
 	if(!s_Stack)
 		return;
 
-	if(!s_Stack[-1]->UniformData)
-		s_RenderPass->SetUniforms(s_Stack[-1]);
+	s_RenderPass->SetUniforms(s_Stack[-1]);
 	s_Stack.Pop();
 }
 

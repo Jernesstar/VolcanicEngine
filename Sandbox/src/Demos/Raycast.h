@@ -1,9 +1,5 @@
 #pragma once
 
-static void createActors(Physics::World& world) {
-
-}
-
 namespace Demo {
 
 class Raycast : public Application {
@@ -17,9 +13,9 @@ private:
 	void CreateActors();
 
 	Ref<Physics::World> world;
+	List<Ref<RigidBody>> actors;
 
-	// Ref<RigidBody> selected{ nullptr };
-	RigidBody* selected = nullptr;
+	Ref<RigidBody> selected{ nullptr };
 
 	glm::vec2 pixelSize{ 1.0f/800.0f, 1.0f/600.0f };
 	glm::vec4 outlineColor{ 0.0f, 0.5f, 1.0f, 1.0f };
@@ -50,12 +46,14 @@ Raycast::Raycast() {
 
 			auto width = Application::GetWindow()->GetWidth();
 			auto height = Application::GetWindow()->GetHeight();
-			glm::vec4 originNDC{
+			glm::vec4 originNDC
+			{
 				(event.x/width - 0.5f) * 2.0f,
 				(event.y/height - 0.5f) * 2.0f,
 				-1.0f, 1.0f
 			};
-			glm::vec4 endNDC{
+			glm::vec4 endNDC
+			{
 				(event.x/width - 0.5f) * 2.0f,
 				(event.y/height - 0.5f) * 2.0f,
 				1.0f, 1.0f
@@ -70,41 +68,22 @@ Raycast::Raycast() {
 			float maxDist = 10000.0f;
 
 			auto hitInfo = world->Raycast(worldStart, rayDir, maxDist);
-			selected = hitInfo.Actor;
+			// selected = hitInfo.Actor;
 		});
 
-	Ref<ShaderPipeline> drawShader;
-	Ref<ShaderPipeline> maskShader;
-	Ref<ShaderPipeline> outlineShader;
-	drawShader = ShaderPipeline::Create("VolcaniCore/assets/shaders", "Mesh");
-	maskShader = ShaderPipeline::Create("Sandbox/assets/shaders", "Mask");
-	outlineShader = ShaderPipeline::Create("Sandbox/assets/shaders", "Outline");
+	auto draw = ShaderPipeline::Create("VolcaniCore/assets/shaders", "Mesh");
+	auto mask = ShaderPipeline::Create("Sandbox/assets/shaders", "Mask");
+	auto outline = ShaderPipeline::Create("Sandbox/assets/shaders", "Outline");
 
-	drawPass = RenderPass::Create("Draw", drawShader);
-	maskPass = RenderPass::Create("Mask", maskShader);
-	outlinePass = RenderPass::Create("Outline", outlineShader);
+	drawPass = RenderPass::Create("Draw", draw);
+	drawPass->SetData(Renderer3D::GetMeshBuffer());
+	maskPass = RenderPass::Create("Mask", mask);
+	maskPass->SetData(Renderer3D::GetMeshBuffer());
+	outlinePass = RenderPass::Create("Outline", outline);
+	outlinePass->SetData(Renderer3D::GetMeshBuffer());
 
-	outlinePass->GetUniforms()
-	.Set("u_PixelSize",
-		[this]() -> glm::vec2
-		{
-			return pixelSize;
-		});
-	outlinePass->GetUniforms()
-	.Set("u_Color",
-		[this]() -> glm::vec4
-		{
-			return outlineColor;
-		});
-	maskPass->GetUniforms()
-	.Set("u_Color",
-		[]() -> glm::vec4
-		{
-			return glm::vec4(1.0f);
-		});
-
-	Ref<Framebuffer> mask = Framebuffer::Create(800, 600);
-	maskPass->SetOutput(mask);
+	Ref<Framebuffer> maskBuffer = Framebuffer::Create(800, 600);
+	maskPass->SetOutput(maskBuffer);
 
 	camera = CreateRef<StereographicCamera>(75.0f);
 	camera->SetPosition({ 0.0f, 0.0f, 3.0f });
@@ -138,9 +117,11 @@ void Raycast::CreateActors() {
 			RigidBody::Create(RigidBody::Type::Static, box,
 				Transform{ .Translation = { x * 2.0f, 0.0f, 0.0f } });
 
-		if(x == 3)
-			selected = body.get();
-		world->AddActor(body);
+		if(x == 1)
+			selected = body;
+
+		// world->AddActor(body);
+		actors.Add(body);
 	}
 }
 
@@ -152,12 +133,14 @@ void Raycast::OnUpdate(TimeStep ts) {
 	Renderer::StartPass(drawPass);
 	{
 		Renderer::Clear();
+		Renderer::Resize(800, 600);
+
 		Renderer3D::Begin(camera);
 
-		for(Ref<RigidBody> actor : *world) {
-			actor->UpdateTransform();
+		for(Ref<RigidBody> actor : actors) {
+			// actor->UpdateTransform();
 
-			if(actor.get() == selected)
+			if(actor == selected)
 				continue;
 
 			Renderer3D::DrawMesh(cube, actor->GetTransform());
@@ -174,31 +157,58 @@ void Raycast::OnUpdate(TimeStep ts) {
 	Renderer::StartPass(maskPass);
 	{
 		Renderer::Clear();
+		Renderer::Resize(800, 600);
+
+		Renderer::PushCommand();
+		Renderer::GetPass()->GetUniforms()
+		.Set("u_Color",
+			[]() -> glm::vec4
+			{
+				return glm::vec4(1.0f);
+			});
+		Renderer::PopCommand();
 
 		Renderer3D::Begin(camera);
 		Renderer3D::DrawMesh(cube, selected->GetTransform());
 		Renderer3D::End();
 	}
 	Renderer::EndPass();
-	Renderer::Flush();
 
 	// 3. Render full-screen quad that creates outline
 	Renderer::StartPass(outlinePass);
 	{
+		Renderer::Resize(800, 600);
+
+		Renderer::PushCommand();
+		Renderer::GetPass()->GetUniforms()
+		.Set("u_PixelSize",
+			[this]() -> glm::vec2
+			{
+				return pixelSize;
+			});
+		Renderer::GetPass()->GetUniforms()
+		.Set("u_Color",
+			[this]() -> glm::vec4
+			{
+				return outlineColor;
+			});
+
 		auto mask = maskPass->GetOutput();
-
 		Renderer2D::DrawFullscreenQuad(mask, AttachmentTarget::Color);
+
+		Renderer::PopCommand();
 	}
 	Renderer::EndPass();
 
-	// 4. Draw selected object
-	Renderer::StartPass(drawPass);
-	{
-		Renderer3D::Begin(camera);
-		Renderer3D::DrawMesh(cube, selected->GetTransform());
-		Renderer3D::End();
-	}
-	Renderer::EndPass();
+	// // 4. Draw selected object
+	// Renderer::StartPass(drawPass);
+	// {
+	// 	// Renderer::Resize(800, 600);
+	// 	Renderer3D::Begin(camera);
+	// 	Renderer3D::DrawMesh(cube, selected->GetTransform());
+	// 	Renderer3D::End();
+	// }
+	// Renderer::EndPass();
 
 	// auto scene = world.Get();
 	// const PxRenderBuffer& rb = scene->getRenderBuffer();

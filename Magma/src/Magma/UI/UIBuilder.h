@@ -17,9 +17,9 @@ public:
 	UIBuilder(const std::string& path) {
 		// m_Element = UISerializer::Load(path);
 	}
-	UIBuilder(const TUIElement::Specification& specs) {
-		m_Element = TUIElement::Create(specs);
-	}
+	//UIBuilder(const TUIElement::Specification& specs) {
+	//	m_Element = TUIElement::Create(specs);
+	//}
 
 	~UIBuilder() = default;
 
@@ -48,8 +48,6 @@ public:
 	operator Ref<UIElement>() const { return Finalize(); }
 
 	Ref<TUIElement> Finalize() const { return m_Element; }
-
-	void Save(const std::string& path);
 
 private:
 	Ref<TUIElement> m_Element;

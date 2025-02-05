@@ -102,10 +102,8 @@ void Renderer2D::DrawFullscreenQuad(Ref<Framebuffer> buffer,
 		command = RendererAPI::Get()->NewDrawCommand(pass);
 	}
 
-	command->Clear = true;
 	command->ViewportWidth = Application::GetWindow()->GetWidth();
 	command->ViewportHeight = Application::GetWindow()->GetHeight();
-
 	command->UniformData
 	.SetInput("u_ScreenTexture", TextureSlot{ buffer->Get(target), 0 });
 

@@ -29,8 +29,8 @@ Runtime::Runtime(const CommandLineArgs& args)
 	}
 	else {
 #ifdef VOLCANICENGINE_WINDOWS
-		#include <windows.h>
-		GetModuleFileName(0)
+		// #include <windows.h>
+		// GetModuleFileName(0)
 #endif
 	}
 

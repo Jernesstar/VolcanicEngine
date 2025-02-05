@@ -2,10 +2,11 @@
 
 precision highp float;
 
+uniform sampler2D u_ScreenTexture;
+
 uniform vec2 u_PixelSize;
 uniform vec4 u_Color;
 // uniform flat int u_Width;
-uniform sampler2D u_Texture;
 
 layout(location = 0) in vec2 v_TexCoords;
 
@@ -25,7 +26,7 @@ void main()
         for(int x = -WIDTH; x <= WIDTH; x++)
         {
             vec2 dUV = vec2(float(x) * u_PixelSize.x, float(y) * u_PixelSize.y);
-            float mask = texture(u_Texture, v_TexCoords + dUV).r;
+            float mask = texture(u_ScreenTexture, v_TexCoords + dUV).r;
             coverage += mask;
 
             if(mask >= 0.5)
@@ -39,7 +40,7 @@ void main()
     // // if(x == 0 && y == 0) {
     // //     isInside = mask > 0.5;
     // // }
-    isInside = texture(u_Texture, v_TexCoords).r > 0.5;
+    isInside = texture(u_ScreenTexture, v_TexCoords).r > 0.5;
 
     coverage /= float(count);
     float a;
