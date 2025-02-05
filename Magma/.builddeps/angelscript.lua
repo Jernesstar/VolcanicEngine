@@ -30,12 +30,6 @@ project "angelscript"
 
     }
 
-    filter "system:linux"
-        buildoptions {
-            "-fPIC",
-            "-Wl,-Bsymbolic"
-        }
-
     filter { "action:vs", "system:windows" }
         rules { "ASM" }
         files {

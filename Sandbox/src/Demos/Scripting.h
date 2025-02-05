@@ -62,11 +62,6 @@ Script::Script()
 
 	scriptClass = mod->GetScriptClass("UI::Button");
 	// scriptClass->SetInstanceMethod({ "Screen @screen" });
-	scriptClass
-	->CacheFunction("OnClick")
-	->CacheFunction("OnHover")
-	->CacheFunction("OnMouseUp")
-	->CacheFunction("OnMouseDown");
 
 	VOLCANICORE_LOG_INFO("Here");
 	obj = scriptClass->Instantiate();

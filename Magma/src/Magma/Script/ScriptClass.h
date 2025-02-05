@@ -16,10 +16,9 @@ public:
 
 public:
 	ScriptClass(const std::string& name, asITypeInfo* type);
-	~ScriptClass();
+	~ScriptClass() = default;
 
 	void SetInstanceMethod(const List<std::string>& args);
-	ScriptClass* CacheFunction(const std::string& name);
 
 	template<typename... Args>
 	Ref<ScriptObject> Instantiate(Args&&... args) {

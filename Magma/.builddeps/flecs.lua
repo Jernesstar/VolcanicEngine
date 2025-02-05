@@ -29,9 +29,3 @@ project "flecs"
 
     filter "toolset:gcc or toolset:clang"
         cdialect "gnu99"
-
-    filter "system:linux"
-        buildoptions {
-            "-fPIC",
-            "-Wl,-Bsymbolic"
-        }

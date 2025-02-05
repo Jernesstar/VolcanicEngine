@@ -14,9 +14,3 @@ project "ImGuiFileDialog"
         "%{Includes.ImGuiFileDialog}",
         "%{Includes.imgui}/imgui"
     }
-
-    filter "system:linux"
-        buildoptions {
-            "-fPIC",
-            "-Wl,-Bsymbolic"
-        }

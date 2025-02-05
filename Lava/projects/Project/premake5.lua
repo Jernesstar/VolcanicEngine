@@ -79,12 +79,6 @@ project "Project"
             "/NODEFAULTLIB:library"
         }
 
-    filter "system:linux"
-        buildoptions {
-            "-fPIC",
-            "-Wl,-Bsymbolic"
-        }
-
 
 project "Loader"
     kind "SharedLib"

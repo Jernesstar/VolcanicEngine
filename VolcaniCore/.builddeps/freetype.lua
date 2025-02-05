@@ -35,9 +35,3 @@ project "freetype"
     buildoptions  {
         "-DFT2_BUILD_LIBRARY",
     }
-
-    filter "system:linux"
-        buildoptions {
-            "-fPIC",
-            "-Wl,-Bsymbolic"
-        }

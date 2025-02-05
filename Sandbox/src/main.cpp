@@ -56,7 +56,7 @@ using namespace Lava;
 #include "Demos/ECS.h"
 #include "Demos/Raycast.h"
 #include "Demos/Collision.h"
-#include "Demos/Script.h"
+#include "Demos/Scripting.h"
 #include "Demos/Raytracing.h"
 #include "Demos/Template.h"
 

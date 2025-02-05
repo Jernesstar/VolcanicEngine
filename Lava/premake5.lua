@@ -52,12 +52,6 @@ project "Lava"
     filter "action:vs* or system:linux"
         links { "PhysX" }
 
-    filter "system:linux"
-        buildoptions {
-            "-fPIC",
-            "-Wl,-Bsymbolic"
-        }
-
     filter "toolset:gcc or toolset:clang"
         buildoptions {
             "-fexceptions",
@@ -73,6 +67,8 @@ project "Runtime"
     kind "ConsoleApp"
     language "C++"
     cppdialect "C++latest"
+    exceptionhandling "On"
+    rtti "Off"
     staticruntime "Off"
 
     objdir ("%{RootPath}/build/Lava/obj")

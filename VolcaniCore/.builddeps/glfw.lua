@@ -60,8 +60,3 @@ project "glfw"
         defines {
             "_GLFW_X11"
         }
-
-        buildoptions {
-            "-fPIC",
-            "-Wl,-Bsymbolic"
-        }

@@ -35,12 +35,6 @@ project "VolcaniCore"
         "stb_image"
     }
 
-    filter "system:linux"
-        buildoptions {
-            "-fPIC",
-            "-Wl,-Bsymbolic"
-        }
-
     filter "toolset:gcc or toolset:clang"
         buildoptions {
             "-Wno-format-security",

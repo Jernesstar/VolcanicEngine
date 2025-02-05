@@ -15,6 +15,7 @@ ScriptModule::ScriptModule(const std::string& name)
 }
 
 ScriptModule::~ScriptModule() {
+	m_Ctx->Unprepare();
 	m_Ctx->Release();
 	m_Handle->Discard();
 }

@@ -142,9 +142,3 @@ project "assimp"
             "-O3",
             "-W",
         }
-
-    filter "system:linux"
-        buildoptions {
-            "-fPIC",
-            "-Wl,-Bsymbolic"
-        }

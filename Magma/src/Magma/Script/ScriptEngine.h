@@ -8,6 +8,36 @@ using namespace VolcaniCore;
 
 namespace Magma::Script {
 
+struct InterfaceBuilder {
+	const std::string Name;
+
+	InterfaceBuilder& AddMethod(const std::string& decl);
+};
+
+class ScriptEngine {
+public:
+	static void Init();
+	static void Shutdown();
+
+	static asIScriptEngine* Get();
+
+	static void RegisterSingleton(const std::string& className,
+								  const std::string& instanceName,
+								  void* instance);
+
+	template<typename T, typename TMethod>
+	static void RegisterMethod(const std::string& className,
+							   const std::string& methodDecl, TMethod method)
+	{
+		Get()->RegisterObjectMethod(
+			className.c_str(), methodDecl.c_str(),
+			asSMethodPtr<sizeof(void (T::*)())>::Convert((void (T::*)())(method)),
+			asCALL_THISCALL);
+	}
+
+	static InterfaceBuilder RegisterInterface(const std::string& name);
+};
+
 struct ScriptFunc {
 	asIScriptFunction* Func;
 	asIScriptContext* Context;
@@ -136,33 +166,5 @@ template<> inline
 asIScriptObject* ScriptFunc::Get() {
 	return *(asIScriptObject**)Context->GetAddressOfReturnValue();
 }
-
-struct InterfaceBuilder {
-	const std::string Name;
-
-	InterfaceBuilder& AddMethod(const std::string& name);
-};
-
-class ScriptEngine {
-public:
-	static void Init();
-	static void Shutdown();
-
-	static asIScriptEngine* Get();
-
-	template<typename T>
-	static void RegisterType();
-
-	template<class TFunc>
-	static void RegisterFunction(TFunc func);
-
-	template<class TClass>
-	static void RegisterSingleton();
-
-	static InterfaceBuilder RegisterInterface(const std::string& name);
-
-private:
-
-};
 
 }

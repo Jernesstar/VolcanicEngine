@@ -78,8 +78,6 @@ project "PhysX"
         
         buildoptions {
             "-std=c++0x",
-            "-fPIC",
-            "-Wl,-Bsymbolic"
         }
         
     filter { "action:vs*", "system:windows" }

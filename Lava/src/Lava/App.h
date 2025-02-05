@@ -30,10 +30,6 @@ public:
 
 private:
 	Project m_Project;
-
-	Ref<ScriptModule> m_AppModule;
-
-	int32_t m_CurrentScreen = -1;
 };
 
 }

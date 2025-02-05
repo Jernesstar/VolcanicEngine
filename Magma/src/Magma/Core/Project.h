@@ -22,7 +22,8 @@ public:
 	~Project();
 
 	void AddClass(const std::string& name);
-	void AddComponent(const std::string& name);
+	void AddScreen(const std::string& name,
+				   const std::string& scene, const std::string& ui);
 };
 
 }

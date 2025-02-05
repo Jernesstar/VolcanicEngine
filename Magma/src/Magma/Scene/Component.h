@@ -8,8 +8,8 @@
 
 #include "Physics/RigidBody.h"
 
-#include "Script/ScriptObject.h"
-#include "Script/ScriptClass.h"
+// #include "Script/ScriptObject.h"
+// #include "Script/ScriptClass.h"
 
 using namespace VolcaniCore;
 
@@ -91,7 +91,7 @@ struct TransformComponent : public Component {
 };
 
 struct ScriptComponent : public Component {
-	Ref<Script::ScriptObject> Instance;
+	// Ref<Script::ScriptObject> Instance;
 
 	ScriptComponent() = default;
 	ScriptComponent(const std::string& _class)

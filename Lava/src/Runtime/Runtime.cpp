@@ -1,5 +1,11 @@
 #include "Runtime.h"
 
+#ifdef VOLCANICENGINE_WINDOWS
+	#include <windows.h>
+#elif VOLCANICENGINE_LINUX
+	#include <unistd.h>
+#endif
+
 #include <filesystem>
 
 #include <VolcaniCore/Event/Events.h>
@@ -29,19 +35,18 @@ Runtime::Runtime(const CommandLineArgs& args)
 	}
 	else {
 #ifdef VOLCANICENGINE_WINDOWS
-		// #include <windows.h>
-		// GetModuleFileName(0)
+		char buf[2*MAX_PATH];
+		size_t len = GetModuleFileName(0, buf, 2*MAX_PATH);
+#elif VOLCANICENGINE_LINUX
+		char buf[2*PATH_MAX];
+		size_t len = readlink("/proc/self/exe", buf, 2*PATH_MAX);
 #endif
+		auto rootPath = fs::path(std::string(buf, len)).parent_path();
+		volcPath = (rootPath / ".volc.proj").string();
 	}
 
 	Project project;
 	ProjectLoader::Load(project, volcPath);
-
-	if(!args.Has("-c"))
-		ProjectLoader::Compile(project);
-
-	Application::GetWindow()->SetTitle(project.Name);
-	Application::PushDir(project.Path);
 
 	m_App = CreateRef<App>(project);
 	m_App->OnLoad();

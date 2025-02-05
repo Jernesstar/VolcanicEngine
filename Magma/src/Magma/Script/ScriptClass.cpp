@@ -10,10 +10,11 @@ ScriptClass::ScriptClass(const std::string& name, asITypeInfo* type)
 	std::string str = Name + " @" + Name + "()";
 	m_Type = type;
 	m_Factory = m_Type->GetFactoryByDecl(str.c_str());
-}
 
-ScriptClass::~ScriptClass() {
-
+	for(uint32_t i = 0; i < m_Type->GetMethodCount(); i++) {
+		auto method = m_Type->GetMethodByIndex(i);
+		m_Functions[method->GetName()] = method;
+	}
 }
 
 void ScriptClass::SetInstanceMethod(const List<std::string>& args) {
@@ -23,13 +24,6 @@ void ScriptClass::SetInstanceMethod(const List<std::string>& args) {
 	method += ")";
 
 	m_Factory = m_Type->GetFactoryByDecl(method.c_str());
-}
-
-ScriptClass* ScriptClass::CacheFunction(const std::string& name) {
-	auto func = m_Type->GetMethodByName(name.c_str());
-	VOLCANICORE_ASSERT(func);
-	m_Functions[name] = func;
-	return this;
 }
 
 asIScriptFunction* ScriptClass::GetFunction(const std::string& name) {

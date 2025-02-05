@@ -34,9 +34,3 @@ project "yaml-cpp"
         buildoptions {
             "-W4"
         }
-
-    filter "system:linux"
-        buildoptions {
-            "-fPIC",
-            "-Wl,-Bsymbolic"
-        }
