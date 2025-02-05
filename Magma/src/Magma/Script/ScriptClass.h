@@ -23,7 +23,7 @@ public:
 
 	template<typename... Args>
 	Ref<ScriptObject> Instantiate(Args&&... args) {
-		ScriptFunc func{ m_Factory, m_Module->GetContext() };
+		ScriptFunc func = GetFunc();
 		asIScriptObject* obj =
 			func.CallReturn<asIScriptObject*>(std::forward<Args>(args)...);
 		obj->AddRef();
@@ -36,6 +36,9 @@ public:
 	asIScriptFunction* GetFunction(const std::string& name);
 
 	ScriptModule* GetModule() { return m_Module; }
+
+private:
+	ScriptFunc GetFunc();
 
 private:
 	asITypeInfo* m_Type;

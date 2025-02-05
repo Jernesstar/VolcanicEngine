@@ -3,6 +3,7 @@
 #include <VolcaniCore/Core/Assert.h>
 
 #include "ScriptClass.h"
+#include "ScriptModule.h"
 
 namespace Magma::Script {
 
@@ -41,6 +42,12 @@ void ScriptObject::DestroyAndRelease() {
 	}
 
 	Release();
+}
+
+ScriptFunc ScriptObject::GetFunc(const std::string& name) {
+	auto* function = m_Class->GetFunction(name);
+	auto* ctx = m_Class->GetModule()->GetContext();
+	return ScriptFunc{ function, ctx, m_Handle };
 }
 
 }

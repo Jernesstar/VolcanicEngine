@@ -44,12 +44,12 @@ project "Magma"
         "yaml-cpp",
         "ImGuiFileDialog",
         "flecs",
-        "rapidjson",
+        -- "rapidjson",
         "angelscript"
     }
 
-    filter "toolset:msc or system:linux"
-        links "PhysX"
+    filter "action:vs* or system:linux"
+        links { "PhysX" }
 
     filter "system:linux"
         buildoptions {
@@ -135,7 +135,7 @@ project "Editor"
         "yaml-cpp",
         "ImGuiFileDialog",
         "flecs",
-        "rapidjson",
+        -- "rapidjson",
         "angelscript"
     }
 

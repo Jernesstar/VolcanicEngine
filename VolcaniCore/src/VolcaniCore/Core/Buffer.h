@@ -212,12 +212,6 @@ public:
 		return Buffer<void>(*this);
 	}
 
-	Buffer<void> Partition(uint64_t count = 0) {
-		if(count == 0)
-			count = m_MaxCount;
-		return Buffer(m_Data + (m_Count += count), m_SizeT, count);
-	}
-
 	void Add(const Buffer& buffer) {
 		if(m_MaxCount != 0 && m_Count + buffer.GetCount() >= m_MaxCount)
 			return;
@@ -235,7 +229,7 @@ public:
 		if(offset + count >= m_MaxCount)
 			count = m_MaxCount - offset;
 
-		memcpy(m_Data + offset * m_SizeT, data, count * m_SizeT);
+		memcpy((char*)m_Data + offset * m_SizeT, data, count * m_SizeT);
 
 		if(offset + count > m_Count)
 			m_Count = offset + count;

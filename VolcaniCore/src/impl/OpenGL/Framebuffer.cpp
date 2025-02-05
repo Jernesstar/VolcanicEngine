@@ -1,5 +1,8 @@
 #include "Framebuffer.h"
 
+#ifdef VOLCANICENGINE_WINDOWS
+#define NOMINMAX
+#endif
 #include <algorithm>
 
 #include <glad/glad.h>
@@ -95,7 +98,7 @@ Framebuffer::Framebuffer(const Map<AttachmentTarget, List<Attachment>>& map)
 			atts[i] = GL_COLOR_ATTACHMENT0 + i;
 
 		glDrawBuffers(index, atts);
-		delete atts;
+		delete[] atts;
 	}
 
 	VOLCANICORE_ASSERT(

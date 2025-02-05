@@ -45,12 +45,12 @@ project "Lava"
         "yaml-cpp",
         "ImGuiFileDialog",
         "flecs",
-        "rapidjson",
+        -- "rapidjson",
         "angelscript",
     }
 
-    filter "toolset:msc or system:linux"
-        links "PhysX"
+    filter "action:vs* or system:linux"
+        links { "PhysX" }
 
     filter "system:linux"
         buildoptions {
@@ -67,14 +67,6 @@ project "Lava"
 
     filter "system:windows"
         systemversion "latest"
-
-
-include "Magma/.builddeps/imgui"
-include "Magma/.builddeps/yaml-cpp"
-include "Magma/.builddeps/ImGuiFileDialog"
-include "Magma/.builddeps/flecs"
-include "Magma/.builddeps/rapidjson"
-include "Magma/.builddeps/PhysX"
 
 
 project "Runtime"
@@ -130,9 +122,12 @@ project "Runtime"
         "yaml-cpp",
         "ImGuiFileDialog",
         "flecs",
-        "rapidjson",
+        -- "rapidjson",
         "angelscript",
     }
+
+    filter "action:vs* or system:linux"
+        links { "PhysX" }
 
     filter "system:linux"
         links {

@@ -7,7 +7,7 @@ project "PhysX"
     objdir ("%{RootPath}/build/Magma/obj")
     targetdir ("%{RootPath}/build/Magma/lib")
 
-    filter "toolset:msc or system:linux"
+    filter "action:vs* or system:linux"
         files {
             "%{VendorPaths.PhysX}/physx/source/physx/src/*.cpp",
             "%{VendorPaths.PhysX}/physx/source/physx/src/gpu/*.cpp",
@@ -71,28 +71,27 @@ project "PhysX"
             "%{VendorPaths.PhysX}/physx/source/foundation/unix/*.cpp",
             "%{VendorPaths.PhysX}/physx/source/physx/src/device/linux/PhysXIndicatorLinux.cpp"
         }
-
+        
         defines {
-            "PX_LINUX",
+            -- "PX_LINUX",
         }
-
+        
         buildoptions {
             "-std=c++0x",
             "-fPIC",
             "-Wl,-Bsymbolic"
         }
-
-    filter { "toolset:msc", "system:windows" }
+        
+    filter { "action:vs*", "system:windows" }
+        characterset "MBCS"
         files {
+            "%{VendorPaths.PhysX}/physx/source/common/src/windows/*.cpp",
             "%{VendorPaths.PhysX}/physx/source/foundation/windows/*.cpp",
+            "%{VendorPaths.PhysX}/physx/source/physx/src/device/windows/PhysXIndicatorWindows.cpp"
         }
 
         defines {
             -- "PX_WINDOWS",
-        }
-
-        buildoptions {
-            -- "-std=c++14",
         }
 
     filter "toolset:gcc or toolset:clang"

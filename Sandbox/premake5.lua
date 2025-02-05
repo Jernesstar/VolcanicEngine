@@ -66,12 +66,12 @@ project "Sandbox"
         "yaml-cpp",
         "ImGuiFileDialog",
         "flecs",
-        "rapidjson",
+        -- "rapidjson",
         "angelscript",
     }
 
-    filter "toolset:msc or system:linux"
-        links "PhysX"
+    filter "action:vs* or system:linux"
+        links { "PhysX" }
 
     filter "system:linux"
         links {

@@ -45,7 +45,7 @@ void App::OnUpdate(TimeStep ts) {
 	if(m_CurrentScreen == -1)
 		return;
 
-	auto& screen = m_Screens[m_CurrentScreen];
+	//auto& screen = m_Screens[m_CurrentScreen];
 
 	// screen.GetScene().OnRender();
 

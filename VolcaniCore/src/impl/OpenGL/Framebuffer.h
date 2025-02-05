@@ -9,6 +9,8 @@
 
 namespace VolcaniCore::OpenGL {
 
+class Framebuffer;
+
 class Attachment {
 public:
 	enum class Type { Texture, RenderBuffer };

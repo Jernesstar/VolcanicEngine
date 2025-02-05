@@ -16,17 +16,13 @@ public:
 
 	template<typename T, typename... Args>
 	T Call(const std::string& name, Args&&... args) {
-		auto* function = m_Class->GetFunction(name);
-		auto* ctx = m_Class->GetModule()->GetContext();
-		ScriptFunc func{ function, ctx, m_Handle };
+		ScriptFunc func = GetFunc(name);
 		return func.CallReturn<T>(std::forward<Args>(args)...);
 	}
 
 	template<typename... Args>
 	void Call(const std::string& name, Args&&... args) {
-		auto* function = m_Class->GetFunction(name);
-		auto* ctx = m_Class->GetModule()->GetContext();
-		ScriptFunc func{ function, ctx, m_Handle };
+		ScriptFunc func = GetFunc(name);
 		func.CallVoid(std::forward<Args>(args)...);
 	}
 
@@ -34,6 +30,8 @@ private:
 	uint32_t AddRef();
 	uint32_t Release();
 	void DestroyAndRelease();
+
+	ScriptFunc GetFunc(const std::string& name);
 
 private:
 	asIScriptObject* m_Handle = nullptr;
