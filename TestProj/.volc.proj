@@ -1,13 +1,13 @@
 Project:
   Name: TestProj
   App: TestGame
-  StartScreen: test
+  StartScreen: TestHome
   Screens:
     - Screen:
         Name: TestHome
-        UI: test
         Scene: test
+        UI: test
     - Screen:
         Name: TestScreen2
-        UI: test2
         Scene: test
+        UI: test2

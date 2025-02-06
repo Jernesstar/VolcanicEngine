@@ -20,80 +20,6 @@ namespace Lava {
 
 static void LoadElement(UIPage& page, const rapidjson::Value& elementNode);
 
-List<UIPage> UILoader::LoadFolder(const Project& project) {
-	auto folderPath = project.Path;
-	List<UIPage> pages;
-	Theme theme;
-
-	auto themePath = (fs::path(folderPath) / "theme.magma.ui.json").string();
-	if(FileUtils::FileExists(themePath))
-		theme = UILoader::LoadTheme(themePath);
-
-	auto filePaths = FileUtils::GetFiles(folderPath, { ".json" });
-
-	for(auto filePath : filePaths) {
-		fs::path p(filePath);
-		auto name = p.stem().stem().stem().string();
-		auto filePathName = (fs::path(folderPath) / name).string();
-
-		if(name != "theme") {
-			auto& page = pages.Emplace(name);
-			page.SetTheme(theme);
-			UILoader::Load(page, filePathName);
-		}
-	}
-
-	return pages;
-}
-
-void UILoader::CompileFolder(const std::string& folderPath) {
-	auto genPath = fs::path("Lava") / "projects" / "UI" / "gen";
-
-	fs::remove_all(genPath);
-	fs::create_directory(genPath);
-
-	auto contextIncludes = File("Lava/projects/UI/gen/Context.h");
-	contextIncludes
-	.Write("#pragma once\n")
-	.Write("#include <Magma/UI/UI.h>")
-	.Write("#include <Lava/UIObject.h>")
-	.Write("#include <Lava/UILoader.h>")
-	.Write("#include <VolcaniCore/Core/Log.h>")
-	.Write("#include <VolcaniCore/Core/Input.h>")
-	.Write("")
-	.Write("using namespace Lava;")
-	.Write("");
-
-	auto srcPath = fs::path(folderPath).parent_path() / "Project";
-
-	auto app = srcPath / "App";
-	auto _class = srcPath / "Class";
-	auto common = srcPath / "Common";
-	auto script = srcPath / "Script";
-
-	for(auto dir : { app, _class, common, script })
-		for(auto path : FileUtils::GetFiles(dir.string(), { ".h" }))
-			contextIncludes.Write("#include \"" + path + "\"");
-
-	auto projName = fs::path(folderPath).parent_path().stem().string();
-	contextIncludes
-	.Write("")
-	.Write("using namespace " + projName + ";")
-	.Write("");
-
-	auto premakeFile = std::ofstream("Lava/projects/UI/pages.lua"); // Deletes file contents
-
-	auto filePaths = FileUtils::GetFiles(folderPath, { ".json" });
-	for(auto filePath : filePaths) {
-		fs::path p(filePath);
-		auto name = p.stem().stem().stem().string();
-		auto filePathName = (fs::path(folderPath) / "Page" / name).string();
-
-		if(name != "theme")
-			UILoader::Compile(filePathName);
-	}
-}
-
 void UILoader::Load(UIPage& page, const std::string& path) {
 	using namespace rapidjson;
 
@@ -144,7 +70,7 @@ void UILoader::Load(UIPage& page, const std::string& path) {
 }
 
 template<typename TUIElement>
-static void Serialize(const TUIElement* ui, JSONSerializer& serializer);
+static void Serialize(const TUIElement* ui, JSONSerializer& serializer) { }
 
 template<>
 void Serialize(const Window* ui, JSONSerializer& serializer) {
@@ -155,30 +81,39 @@ void Serialize(const Window* ui, JSONSerializer& serializer) {
 }
 
 template<>
-void Serialize(const Button* ui, JSONSerializer& serializer) {
-
-}
-
-template<>
 void Serialize(const Dropdown* ui, JSONSerializer& serializer) {
+	serializer.WriteKey("Options").BeginSequence();
+	for(auto element : ui->Options)
+		serializer.Write(element);
 
+	serializer.EndSequence();
 }
 
 template<>
 void Serialize(const Text* ui, JSONSerializer& serializer) {
 	serializer
-		.WriteKey("Text").Write(ui->Content);
+		.WriteKey("Text").Write(ui->Content)
+		.WriteKey("TextColor").Write(ui->Color);
 }
 
 template<>
 void Serialize(const TextInput* ui, JSONSerializer& serializer) {
 	serializer
-		.WriteKey("Text").Write(ui->Text);
+		.WriteKey("Text").Write(ui->Text)
+		.WriteKey("Hint").Write(ui->Hint);
 }
 
 template<>
 void Serialize(const Image* ui, JSONSerializer& serializer) {
 	serializer.WriteKey("Path").Write(ui->Content->GetPath());
+}
+
+template<>
+void Serialize(const Button* ui, JSONSerializer& serializer) {
+	if(ui->Display->GetType() == UIElementType::Text)
+		Serialize(ui->Display->As<Text>(), serializer);
+	else
+		Serialize(ui->Display->As<Image>(), serializer);
 }
 
 template<>
@@ -207,6 +142,9 @@ void Serialize(const UIElement* ui, JSONSerializer& serializer) {
 			serializer.Write("Image");
 			break;
 	}
+
+	if(ui->GetParent())
+		serializer.WriteKey("Parent").Write(ui->GetParent()->GetID());
 
 	serializer
 		.WriteKey("Width").Write(ui->Width)
@@ -248,8 +186,8 @@ void Serialize(const UIElement* ui, JSONSerializer& serializer) {
 		case UIElementType::Button:
 			Serialize(ui->As<Button>(), serializer);
 			break;
-		case UIElementType::Dropdown:
-			Serialize(ui->As<Dropdown>(), serializer);
+		case UIElementType::Image:
+			Serialize(ui->As<Image>(), serializer);
 			break;
 		case UIElementType::Text:
 			Serialize(ui->As<Text>(), serializer);
@@ -257,15 +195,13 @@ void Serialize(const UIElement* ui, JSONSerializer& serializer) {
 		case UIElementType::TextInput:
 			Serialize(ui->As<TextInput>(), serializer);
 			break;
-		case UIElementType::Image:
-			Serialize(ui->As<Image>(), serializer);
+		case UIElementType::Dropdown:
+			Serialize(ui->As<Dropdown>(), serializer);
 			break;
 	}
 
-	serializer.WriteKey("Children").BeginSequence();
 	for(auto child : ui->GetChildren())
 		Serialize(child, serializer);
-	serializer.EndSequence();
 
 	serializer.EndMapping();
 }
@@ -413,14 +349,13 @@ void UILoader::Compile(const std::string& filePathName) {
 	}
 }
 
-Ref<DLL> UILoader::GetDLL(const std::string& pageName) {
-	std::string path = "Lava/projects/UI/build/lib/";
-#ifdef VOLCANICENGINE_WINDOWS
-	path += pageName + ".dll";
-#elif VOLCANICENGINE_LINUX
-	path = "./" + path + "lib" + pageName + ".so";
-#endif
-	return CreateRef<DLL>(path);
+Ref<ScriptModule> UILoader::GetModule(const std::string& name) {
+	auto genPath = fs::path("Lava") / "projects" / "UI" / "gen";
+	auto mod = CreateRef<ScriptModule>(name);
+	mod->Reload((genPath / name).string() + ".as");
+	fs::remove_all(genPath);
+	fs::create_directory(genPath);
+	return mod;
 }
 
 template<typename T>
@@ -484,8 +419,8 @@ void LoadElement(UIPage& page, const rapidjson::Value& elementNode) {
 		else
 			button->Display = CreateRef<Text>(button->GetID());
 	}
-	if(typeStr == "Dropdown") {
-		node = page.Add(UIElementType::Dropdown, id);
+	if(typeStr == "Image") {
+		node = page.Add(UIElementType::Image, id);
 		element = page.Get(node);
 		theme = &page.GetTheme()[element->GetType()];
 	}
@@ -499,8 +434,8 @@ void LoadElement(UIPage& page, const rapidjson::Value& elementNode) {
 		element = page.Get(node);
 		theme = &page.GetTheme()[element->GetType()];
 	}
-	if(typeStr == "Image") {
-		node = page.Add(UIElementType::Image, id);
+	if(typeStr == "Dropdown") {
+		node = page.Add(UIElementType::Dropdown, id);
 		element = page.Get(node);
 		theme = &page.GetTheme()[element->GetType()];
 	}
@@ -561,8 +496,7 @@ void CompileElement(const std::string& name, const std::string& funcPath,
 		return;
 
 	auto genPath = fs::path("Lava") / "projects" / "UI" / "gen";
-	auto hFile = File((genPath / name).string() + ".h");
-	auto cppFile = File((genPath / name).string() + ".cpp");
+	auto script = File((genPath / name).string() + ".as");
 
 	std::string funcFileStr = "";
 	if(FileUtils::FileExists(funcPath))
@@ -570,25 +504,25 @@ void CompileElement(const std::string& name, const std::string& funcPath,
 
 	std::string id = elementNode["ID"].Get<std::string>();
 
-	cppFile.Write("\tm_Objects[\"" + id + "\"] = new " + id + ";");
-	cppFile.Write("\tm_Objects[\"" + id + "\"]->SetPage(page);");
+	script
+	.Write("class " + id + " : IUIObject")
+	.Write("{");
 
-	hFile
-	.Write("class " + id + " : public UIObject {")
-	.Write("public:");
+	script
+	.Write("\t" + id + "() { }\n");
 
 	for(std::string name :
 		{ "OnUpdate", "OnClick", "OnHover", "OnMouseUp", "OnMouseDown" })
 	{
-		if(!elementNode.HasMember(name))
+		script.Write("\tvoid " + name + "(" +
+					(name == "OnUpdate" ? "float ts" : "") + ") {");
+
+		if(!elementNode.HasMember(name)) {
+			script.Write("\t}");
 			continue;
+		}
 
 		const auto& element = elementNode[name];
-
-		hFile.Write("\tvoid " + name + "(" +
-					(name == "OnUpdate" ? "TimeStep ts" : "") + ") override {");
-		hFile.Write("\t\tUIObject::" + name + "(" +
-					(name == "OnUpdate" ? "ts" : "") + ");");
 
 		if(element.IsObject()) {
 			// TODO(Implement): Animation
@@ -596,11 +530,11 @@ void CompileElement(const std::string& name, const std::string& funcPath,
 		if(element.IsString()) {
 			auto string = element.Get<std::string>();
 
-			if(string.substr(0, 4) == "@cpp") {
+			if(string.substr(0, 7) == "@script") {
 				uint32_t left = string.find_first_of('{');
 				uint32_t right = string.find_last_of('}');
 				if(string.find_first_not_of(' ') != right)
-					hFile.Write("\t\t" +
+					script.Write("\t\t" +
 								string.substr(left + 2, right - left - 3));
 			}
 			else if(string == "Default" && funcFileStr != "") {
@@ -627,61 +561,39 @@ void CompileElement(const std::string& name, const std::string& funcPath,
 					}
 				}
 
-				hFile.Write(funcFileStr.substr(start + 2, max - start - 5));
+				script.Write(funcFileStr.substr(start + 2, max - start - 5));
 			}
 		}
 
-		hFile.Write("\t}");
+		script.Write("\t}");
 	}
 
-	hFile.Write("};");
+	script.Write("}");
 }
 
 void GenFiles(const std::string& name, const std::string& funcPath) {
 	auto genPath = fs::path("Lava") / "projects" / "UI" / "gen";
+	auto script = File((genPath / name).string() + ".as");
+	// auto contextIncludes = File("Lava/projects/UI/gen/Context.h");
 
-	auto hFile = File((genPath / name).string() + ".h");
-	auto cppFile = File((genPath / name).string() + ".cpp");
-	auto templateFile = File("Lava/projects/UI/template.lua");
-	auto premakeFile = File("Lava/projects/UI/pages.lua");
-	auto contextIncludes = File("Lava/projects/UI/gen/Context.h");
+	// if(FileUtils::FileExists(funcPath)) {
+	// 	auto funcFileStr = File(funcPath).Get();
+	// 	uint64_t elementsIdx = funcFileStr.find("namespace UIObjects");
+	// 	std::string includes = funcFileStr.substr(0, elementsIdx - 1);
+	// 	contextIncludes.Write(includes);
+	// }
 
-	if(FileUtils::FileExists(funcPath)) {
-		auto funcFileStr = File(funcPath).Get();
-		uint64_t elementsIdx = funcFileStr.find("namespace UIObjects");
-		std::string includes = funcFileStr.substr(0, elementsIdx - 1);
-		contextIncludes.Write(includes);
-	}
-
-	hFile
-	.Write("#include \"Context.h\"")
-	.Write("\n")
-	.Write("namespace UIObjects {\n");
-
-	cppFile
-	.Write("#include \"" + fs::path(hFile.Path).filename().string() + "\"\n")
-	.Write("namespace UIObjects {\n")
-	.Write("static Map<std::string, UIObject*> m_Objects;\n")
-	.Write("extern \"C\" EXPORT UIObject* GetObject(const std::string& id) {")
-	.Write("\tif(!m_Objects.count(id)) { return nullptr; }")
-	.Write("\treturn m_Objects[id];")
-	.Write("}\n")
-	.Write("extern \"C\" EXPORT void LoadObjects(UIPage* page) {");
-
-	std::string templateStr = templateFile.Get();
-	Replace(templateStr, "{name}", name);
-	premakeFile.Write(templateStr);
+	// script
+	// .Write("#include \"Context.h\"")
+	// .Write("\n")
+	// .Write("namespace UIElements {\n");
 }
 
 void CompleteFiles(const std::string& name) {
 	auto genPath = fs::path("Lava") / "projects" / "UI" / "gen";
-	auto hFile = File((genPath / name).string() + ".h");
-	auto cppFile = File((genPath / name).string() + ".cpp");
+	auto script = File((genPath / name).string() + ".as");
 
-	cppFile.Write("}"); // LoadObjects
-	cppFile.Write("\n}"); // namespace UIElements
-
-	hFile.Write("\n}"); // namespace UIElements
+	// script.Write("\n}"); // namespace UIElements
 }
 
 }

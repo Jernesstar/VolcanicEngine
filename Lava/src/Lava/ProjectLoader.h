@@ -13,7 +13,6 @@ public:
 	static void Load(Project& proj, const std::string& volcPath);
 	static void Save(const Project& proj, const std::string& volcPath);
 	static void Compile(const Project& proj);
-	static Ref<DLL> GetDLL();
 };
 
 }

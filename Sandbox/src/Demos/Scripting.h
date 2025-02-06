@@ -24,13 +24,9 @@ private:
 	Ref<ScriptModule> mod;
 	Ref<ScriptClass> scriptClass;
 	Ref<ScriptObject> obj;
-
-	Screen screen;
 };
 
-Script::Script()
-	: screen("Test", "Test", "Test")
-{
+Script::Script() {
 	Events::RegisterListener<KeyPressedEvent>(
 		[&](const KeyPressedEvent& event)
 		{
@@ -61,13 +57,14 @@ Script::Script()
 	mod->Reload("Sandbox/assets/scripts/script.as");
 
 	scriptClass = mod->GetScriptClass("UI::Button");
-	// scriptClass->SetInstanceMethod({ "Screen @screen" });
 
 	VOLCANICORE_LOG_INFO("Here");
 	obj = scriptClass->Instantiate();
 }
 
 Script::~Script() {
+	obj.reset();
+	mod.reset();
 	ScriptEngine::Shutdown();
 }
 

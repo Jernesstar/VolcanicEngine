@@ -15,9 +15,8 @@ ScriptModule::ScriptModule(const std::string& name)
 }
 
 ScriptModule::~ScriptModule() {
-	m_Ctx->Unprepare();
 	m_Ctx->Release();
-	m_Handle->Discard();
+	// m_Handle->Discard();
 }
 
 void ScriptModule::Reload(const std::string& path) {
@@ -43,6 +42,9 @@ void ScriptModule::Reload(const std::string& path) {
 
 Ref<ScriptClass> ScriptModule::GetScriptClass(const std::string& name) {
 	asITypeInfo* type = m_Handle->GetTypeInfoByDecl(name.c_str());
+	if(!type)
+		return nullptr;
+
 	auto scriptClass = CreateRef<ScriptClass>(name, type);
 	scriptClass->m_Module = this;
 

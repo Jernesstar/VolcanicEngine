@@ -41,16 +41,21 @@ public:
 
 static Ref<Renderer> s_SceneRenderer;
 
-static Ref<ScriptModule> m_AppModule;
-static Ref<ScriptClass> m_AppClass;
-static Ref<ScriptObject> m_AppObject;
-static Map<std::string, Ref<ScriptModule>> m_Modules;
+static Ref<ScriptModule> s_AppModule;
+static Ref<ScriptClass> s_AppClass;
+static Ref<ScriptObject> s_AppObject;
 
-static std::string m_CurrentScreen;
-static Ref<Scene> m_CurrentScene = nullptr;
+struct RuntimeScreen {
+	Scene Scene;
+	UIPage Page;
+};
 
-static Map<std::string, Ref<ScriptObject>> m_Objects;
-static Ref<UIPage> m_CurrentPage = nullptr;
+static RuntimeScreen* s_CurrentScreen;
+
+static Ref<ScriptModule> s_Module;
+static List<Ref<ScriptClass>> s_Classes;
+static Map<std::string, Ref<ScriptObject>> s_Objects;
+static Theme s_Theme;
 
 void App::OnLoad() {
 	ScriptEngine::Init();
@@ -71,74 +76,80 @@ void App::OnLoad() {
 
 	auto appPath =
 		(fs::path(m_Project.Path) / "Project" / "App" / m_Project.App).string() + ".as";
-	m_AppModule = CreateRef<ScriptModule>(m_Project.App);
-	m_AppModule->Reload(appPath);
+	s_AppModule = CreateRef<ScriptModule>(m_Project.App);
+	s_AppModule->Reload(appPath);
 
 	Application::GetWindow()->SetTitle(m_Project.Name);
 	// Application::PushDir(project.Path);
 
-	m_AppClass = m_AppModule->GetScriptClass(m_Project.App);
+	s_AppClass = s_AppModule->GetScriptClass(m_Project.App);
 
-	m_AppObject = m_AppClass->Instantiate();
-	m_AppObject->Call("OnLoad");
+	s_AppObject = s_AppClass->Instantiate();
+	s_AppObject->Call("OnLoad");
 
-	// SetScreen(m_Project.StartScreen);
+	auto themePath =
+		(fs::path(m_Project.Path) / "Visual" / "UI" / "Page" / "theme.magma.ui.json").string();
+	if(FileUtils::FileExists(themePath))
+		s_Theme = UILoader::LoadTheme(themePath);
 
-	// s_SceneRenderer = CreateRef<Lava::Renderer>();
+	SetScreen(m_Project.StartScreen);
 
 	UIRenderer::Init();
+
+	s_SceneRenderer = CreateRef<Lava::Renderer>();
 }
 
 void App::OnClose() {
-	m_AppObject->Call("OnClose");
-
 	UIRenderer::Close();
 
-	m_AppObject.reset();
-	m_AppModule.reset();
+	s_AppObject->Call("OnClose");
+
+	s_Objects.clear();
+	s_Classes.Clear();
+
+	s_Module.reset();
+	s_AppObject.reset();
+	s_AppModule.reset();
 	ScriptEngine::Shutdown();
 }
 
 void App::OnUpdate(TimeStep ts) {
-	m_AppObject->Call("OnUpdate", (float)ts);
+	s_AppObject->Call("OnUpdate", (float)ts);
 
-	if(!m_CurrentScene || !m_CurrentPage)
+	if(!s_CurrentScreen)
 		return;
 
-	if(m_CurrentScene)
-		m_CurrentScene->OnRender(*s_SceneRenderer);
+	s_CurrentScreen->Scene.OnRender(*s_SceneRenderer);
 
 	UIRenderer::BeginFrame();
 
-	if(m_CurrentPage) {
-		m_CurrentPage->Render();
+	s_CurrentScreen->Page.Render();
+	s_CurrentScreen->Page.Traverse(
+		[&](UIElement* element)
+		{
+			if(!s_Objects.count(element->GetID()))
+				return;
+			auto object = s_Objects[element->GetID()];
 
-		m_CurrentPage->Traverse(
-			[&](UIElement* element)
-			{
-				if(!m_Objects.count(element->GetID()))
-					return;
-				auto object = m_Objects[element->GetID()];
+			object->Call("OnUpdate", (float)ts);
 
-				object->Call("OnUpdate", ts);
-
-				UIState state = element->GetState();
-				if(state.Clicked)
-					object->Call("OnClick");
-				if(state.Hovered)
-					object->Call("OnHover");
-				if(state.MouseUp)
-					object->Call("OnMouseUp");
-				if(state.MouseDown)
-					object->Call("OnMouseDown");
-			});
-	}
+			UIState state = element->GetState();
+			if(state.Clicked)
+				object->Call("OnClick");
+			if(state.Hovered)
+				object->Call("OnHover");
+			if(state.MouseUp)
+				object->Call("OnMouseUp");
+			if(state.MouseDown)
+				object->Call("OnMouseDown");
+		});
 
 	UIRenderer::EndFrame();
 }
 
 void App::SetScreen(const std::string& name) {
-	auto [found, idx] = m_Project.Screens.Find(
+	auto [found, idx] =
+	m_Project.Screens.Find(
 		[name](const Screen& screen) -> bool
 		{
 			return screen.Name == name;
@@ -149,10 +160,31 @@ void App::SetScreen(const std::string& name) {
 	}
 
 	auto& screen = m_Project.Screens[idx];
-	m_CurrentScene = CreateRef<Scene>();
-	m_CurrentPage = CreateRef<UIPage>();
-	SceneLoader::Load(*m_CurrentScene, screen.Scene);
-	UILoader::Load(*m_CurrentPage, screen.Page);
+	delete s_CurrentScreen;
+	s_CurrentScreen = new RuntimeScreen;
+
+	auto scenePath = fs::path(m_Project.Path) / "Visual" / "Scene" / "Schema" / screen.Scene;
+	SceneLoader::Load(s_CurrentScreen->Scene, scenePath.string() + ".magma.scene");
+
+	auto pagePath = fs::path(m_Project.Path) / "Visual" / "UI" / "Page" / screen.Page;
+	s_CurrentScreen->Page.SetTheme(s_Theme);
+	UILoader::Load(s_CurrentScreen->Page, pagePath.string());
+	UILoader::Compile(pagePath.string());
+
+	s_Module = UILoader::GetModule(screen.Page);
+	s_CurrentScreen->Page.Traverse(
+		[](UIElement* element)
+		{
+			Ref<ScriptClass> scriptClass =
+				s_Module->GetScriptClass(element->GetID());
+
+			if(!scriptClass)
+				return;
+
+			s_Classes.Add(scriptClass);
+			s_Objects[element->GetID()] =
+				scriptClass->Instantiate();
+		});
 }
 
 Renderer::Renderer() {

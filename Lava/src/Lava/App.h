@@ -17,9 +17,7 @@ namespace Lava {
 class App {
 public:
 	App(const Project& project)
-		: m_Project(project)
-	{
-	}
+		: m_Project(project) { }
 	~App() = default;
 
 	void OnLoad();

@@ -7,6 +7,7 @@ namespace Magma::UI {
 class TextInput : public UIElement {
 public:
 	std::string Text;
+	std::string Hint;
 
 public:
 	TextInput(uint32_t maxChars = 100);

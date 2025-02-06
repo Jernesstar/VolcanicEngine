@@ -81,7 +81,7 @@ void UIElement::Clear() {
 	m_Children.Clear();
 }
 
-UIElement* UIElement::GetParent() {
+UIElement* UIElement::GetParent() const {
 	if(m_Root)
 		return m_Root->Get(m_Parent);
 	return nullptr;

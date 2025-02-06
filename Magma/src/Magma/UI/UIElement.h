@@ -75,7 +75,7 @@ public:
 	UIPage* GetRoot() const { return m_Root; }
 	UINode GetNode() const { return m_Node; }
 
-	UIElement* GetParent();
+	UIElement* GetParent() const;
 	UIElement* GetChild(const UINode& node) const;
 	UIElement* GetChild(const std::string& id) const;
 	List<UIElement*> GetChildren() const;

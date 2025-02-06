@@ -9,7 +9,9 @@ ScriptClass::ScriptClass(const std::string& name, asITypeInfo* type)
 {
 	std::string str = Name + " @" + Name + "()";
 	m_Type = type;
+	VOLCANICORE_ASSERT(m_Type);
 	m_Factory = m_Type->GetFactoryByDecl(str.c_str());
+	VOLCANICORE_ASSERT(m_Factory);
 
 	for(uint32_t i = 0; i < m_Type->GetMethodCount(); i++) {
 		auto method = m_Type->GetMethodByIndex(i);
@@ -18,7 +20,7 @@ ScriptClass::ScriptClass(const std::string& name, asITypeInfo* type)
 }
 
 void ScriptClass::SetInstanceMethod(const List<std::string>& args) {
-	std::string method = Name + "@ " + Name + "(";
+	std::string method = Name + " @" + Name + "(";
 	for(auto& arg : args)
 		method += arg;
 	method += ")";

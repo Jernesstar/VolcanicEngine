@@ -292,7 +292,7 @@ void Editor::OpenProject() {
 
 void Editor::ReloadProject() {
 	menu.project.reloadProject = false;
-	
+
 	Lava::ProjectLoader::Compile(m_Project);
 }
 

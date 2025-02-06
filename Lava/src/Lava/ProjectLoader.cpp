@@ -33,6 +33,12 @@ void ProjectLoader::Load(Project& proj, const std::string& volcPath) {
 	proj.Path = fs::canonical(volcPath).parent_path().string();
 	proj.Name = projNode["Name"].as<std::string>();
 	proj.App = projNode["App"].as<std::string>();
+	proj.StartScreen = projNode["StartScreen"].as<std::string>();
+	for(auto node : projNode["Screens"])
+		proj.AddScreen(
+			node["Screen"]["Name"].as<std::string>(),
+			node["Screen"]["Scene"].as<std::string>(),
+			node["Screen"]["UI"].as<std::string>());
 }
 
 void ProjectLoader::Save(const Project& proj, const std::string& volcPath) {
@@ -43,6 +49,22 @@ void ProjectLoader::Save(const Project& proj, const std::string& volcPath) {
 	.BeginMapping()
 		.WriteKey("Name").Write(proj.Name)
 		.WriteKey("App").Write(proj.App)
+		.WriteKey("StartScreen").Write(proj.StartScreen);
+
+	serializer.WriteKey("Screens").BeginSequence();
+	for(const auto& screen : proj.Screens)
+		serializer.BeginMapping()
+		.WriteKey("Screen")
+		.BeginMapping()
+			.WriteKey("Name").Write(screen.Name)
+			.WriteKey("Scene").Write(screen.Scene)
+			.WriteKey("UI").Write(screen.Page)
+		.EndMapping()
+		.EndMapping();
+
+	serializer.EndSequence();
+
+	serializer
 	.EndMapping(); // Project
 
 	serializer.EndMapping(); // File
@@ -50,97 +72,8 @@ void ProjectLoader::Save(const Project& proj, const std::string& volcPath) {
 	serializer.Finalize(volcPath);
 }
 
-void ProjectLoader::Compile(const Project& project) {
-	auto parentPath = fs::path(project.Path);
-	auto volcPath = (parentPath / ".volc.proj").string();
+void ProjectLoader::Compile(const Project& proj) {
 
-	YAML::Node file;
-	try {
-		file = YAML::LoadFile(volcPath);
-	}
-	catch(YAML::ParserException e) {
-		return;
-	}
-
-	auto projNode = file["Project"];
-	VOLCANICORE_ASSERT(projNode);
-
-	auto name = parentPath.stem().string();
-	auto projectPath = (parentPath / "Project").string();
-	auto visualPath = (parentPath / "Visual");
-
-	UILoader::CompileFolder((visualPath / "UI").string());
-	LoadSource(projNode, projectPath);
-
-	// LoadScenes(projNode, (visualPath / "Scene").string());
-}
-
-void LoadSource(YAML::Node& node, const std::string& projectPath) {
-	auto genPath = fs::path("Lava") / "projects" / "Project" / "gen";
-
-	if(!fs::is_directory(genPath) || !fs::exists(genPath))
-		fs::create_directory(genPath);
-	else
-		for(auto path : FileUtils::GetFiles(genPath.string()))
-			std::remove(path.c_str());
-
-	auto namespaceName = node["Name"].as<std::string>();
-	auto appName = node["App"].as<std::string>();
-
-	FileUtils::CreateFile((genPath / "AppLoader.cpp").string());
-	auto cppFile = File((genPath / "AppLoader.cpp").string());
-
-	std::string templateStr =
-		"#include <VolcaniCore/Core/Defines.h>\n\n"
-		"#include <App/{appName}.h>\n\n"
-		"namespace Project {\n\n"
-		"static Lava::App* s_App;\n\n"
-		"extern \"C\" EXPORT Lava::App* GetApp() {\n"
-		"\treturn s_App;\n"
-		"}\n\n"
-		"extern \"C\" EXPORT void LoadApp() {\n"
-		"\ts_App = new " + namespaceName + "::{appName};\n"
-		"}\n\n"
-		"}";
-
-	Replace(templateStr, "{appName}", appName);
-	cppFile.Write(templateStr);
-	cppFile.Close();
-
-	std::string command;
-#ifdef VOLCANICENGINE_WINDOWS
-	command = "vendor\\premake\\bin\\Windows\\premake5.exe gmake2";
-	command += " --file=Lava\\projects\\premake5.lua";
-	command += " --path=\"" + projectPath + "\"";
-	system(command.c_str());
-
-	command = "powershell Start-Process mingw32-make.exe -NoNewWindow -Wait";
-	command += " -WorkingDir Lava\\projects\\build";
-	command += " -ArgumentList '-f Makefile';";
-	system(command.c_str());
-#elif VOLCANICENGINE_LINUX
-	command = "vendor/premake/bin/Linux/premake5.exe gmake2";
-	command += " --file=Lava/projects/premake5.lua";
-	command += " --path=\"" + projectPath + "\"";
-	system(command.c_str());
-
-	command = "cd Lava/projects/build; make -f Makefile;";
-	system(command.c_str());
-#endif
-}
-
-void LoadScenes(YAML::Node& node, const std::string& sceneFolder) {
-
-}
-
-Ref<DLL> ProjectLoader::GetDLL() {
-	std::string path = "Lava/projects/Project/build/lib/";
-#ifdef VOLCANICENGINE_WINDOWS
-	path += "Loader.dll";
-#elif VOLCANICENGINE_LINUX
-	path = "./" + path + "libLoader.so";
-#endif
-	return CreateRef<DLL>(path);
 }
 
 }
