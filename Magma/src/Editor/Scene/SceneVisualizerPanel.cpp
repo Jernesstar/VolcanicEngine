@@ -81,7 +81,7 @@ void SceneVisualizerPanel::Draw() {
 		auto height = size.y;
 
 		m_Image->SetPosition(pos.x, pos.y);
-		m_Image->SetSize(size.x, size.y);
+		// m_Image->SetSize(size.x, size.y);
 		m_Image->Draw();
 
 		// ImGui::SetCursorPos(pos);

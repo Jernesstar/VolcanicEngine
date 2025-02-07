@@ -183,11 +183,9 @@ UIState UIRenderer::DrawButton(UI::Button& button) {
 UIState UIRenderer::DrawImage(UI::Image& image) {
 	auto texture = image.Content->As<OpenGL::Texture2D>();
 
-	auto v0 = ImVec2(1.0f, 1.0f);
-	auto v1 = ImVec2(0.0f, 0.0f);
 	ImVec2 dim = ImVec2(image.Width, image.Height);
 	ImGui::SetCursorPos(ImVec2(image.x, image.y));
-	ImGui::Image((ImTextureID)(intptr_t)texture->GetID(), dim, v0, v1);
+	ImGui::Image((ImTextureID)(intptr_t)texture->GetID(), dim);
 
 	return {
 		ImGui::IsItemClicked(),

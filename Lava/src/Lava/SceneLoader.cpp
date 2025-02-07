@@ -87,7 +87,6 @@ void SerializeEntity(YAMLSerializer& serializer, const Entity& entity) {
 	serializer.WriteKey("Components")
 	.BeginMapping(); // Components
 
-	// TODO(Fix): Find a way to iterate through the entities
 	if(entity.Has<TagComponent>()) {
 		auto& tag = entity.Get<TagComponent>().Tag;
 
@@ -239,12 +238,12 @@ void SerializeEntity(YAMLSerializer& serializer, const Entity& entity) {
 	}
 
 	if(entity.Has<ScriptComponent>()) {
-		// std::string& path = entity.Get<ScriptComponent>().Path;
+		std::string _class = entity.Get<ScriptComponent>().Class;
 
 		serializer.WriteKey("ScriptComponent")
 		.BeginMapping()
 			.WriteKey("Script").BeginMapping()
-			// .WriteKey("Path").Write(path)
+				.WriteKey("Class").Write(_class)
 			.EndMapping()
 		.EndMapping();
 	}
@@ -264,7 +263,7 @@ void DeserializeEntity(YAML::Node entityNode, Scene& scene) {
 
 	Entity entity;
 
-	// TODO(Fix): Replace this part with NameComponent
+	// TODO(Fix): TagComponent -> NameComponent
 	auto tagComponentNode = components["TagComponent"];
 	if(tagComponentNode) {
 		auto tag = tagComponentNode["Tag"].as<std::string>();

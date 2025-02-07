@@ -18,24 +18,6 @@ using namespace VolcaniCore;
 
 namespace Magma::ECS {
 
-template<typename>
-struct stripSystem;
-
-template<typename ...T>
-struct stripSystem<std::tuple<T...>>
-{
-	using type = flecs::system_builder<T...>;
-};
-
-// template<typename>
-// struct stripObserver;
-
-// template<typename ...T>
-// struct stripObserver<std::tuple<T...>>
-// {
-// 	using type = flecs::observer<T...>;
-// };
-
 struct Event { };
 
 class World {
@@ -101,43 +83,22 @@ public:
 	// 	m_EventHandler.emit<TEvent>(TEvent{ std::forward<Args>(args)... });
 	// }
 
-	template<typename TSystem>
-	void Add(const List<Phase>& phases) {
-		using SystemType =
-			stripSystem<typename TSystem::RequiredComponents>::type;
-		// using ObserverType =
-		// 	stripObserver<typename TSystem::RequiredComponents>::type;
-
+	template<class TSystem>
+	void Add() {
  		uint64_t id = TypeIDGenerator<System<>>::GetID<TSystem>();
-		if(!m_Systems.count(id))
-			m_Systems[id] = new TSystem(this);
-
-		auto sys = (TSystem*)m_Systems[id];
-
-		for(const auto& phase : phases)
-			SystemType(m_World)
-			.kind(phase)
-			.run(
-				[sys = sys, phase = phase](flecs::iter& it)
-				{
-					if(phase == Phase::OnUpdate)
-						sys->Update(it.delta_time());
-					sys->Run(phase);
-				});
-
-		// ObserverType(m_World)
-		// .event(flecs::OnSet)
-		// .each(
-		// 	[&](flecs::entity e, RigidBodyComponent& r)
+		m_Systems[id] = new TSystem(this);
 	}
 
 	template<typename TSystem>
 	TSystem* Get() {
 		auto id = TypeIDGenerator<System<>>::GetID<TSystem>();
-		if(!m_Systems.count(id))
-			Add<TSystem>({ Phase::OnUpdate });
-
 		return (TSystem*)m_Systems[id];
+	}
+
+	template<class TSystem>
+	void Remove() {
+ 		uint64_t id = TypeIDGenerator<System<>>::GetID<TSystem>();
+		delete (TSystem*)m_Systems[id];
 	}
 
 	flecs::world& GetNative() { return m_World; }

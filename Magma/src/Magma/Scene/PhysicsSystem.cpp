@@ -13,7 +13,6 @@ struct CollidedWith { }; // Tag, indicates that a collision has occured
 PhysicsSystem::PhysicsSystem(ECS::World* world)
 	: System(world)
 {
-
 }
 
 void PhysicsSystem::Update(TimeStep ts) {
@@ -21,9 +20,9 @@ void PhysicsSystem::Update(TimeStep ts) {
 }
 
 void PhysicsSystem::Run(Phase phase) {
+	VOLCANICORE_LOG_INFO("%i", phase);
 	if(phase == Phase::PreUpdate) {
-		m_EntityWorld
-		->ForEach<RigidBodyComponent, TransformComponent>(
+		m_EntityWorld->ForEach<RigidBodyComponent, TransformComponent>(
 			[this](Entity& entity)
 			{
 				auto [rc] = GetRequired(entity);
@@ -38,8 +37,7 @@ void PhysicsSystem::Run(Phase phase) {
 	}
 
 	if(phase == Phase::PostUpdate) {
-		m_EntityWorld
-		->ForEach<RigidBodyComponent, TransformComponent>(
+		m_EntityWorld->ForEach<RigidBodyComponent, TransformComponent>(
 			[this](Entity& entity)
 			{
 				auto [rc] = GetRequired(entity);
@@ -53,10 +51,40 @@ void PhysicsSystem::Run(Phase phase) {
 	}
 }
 
-void PhysicsSystem::Register(Entity& entity) {
-	Ref<RigidBody> actor = entity.Get<RigidBodyComponent>().Body;
+void PhysicsSystem::OnComponentAdd(Entity& entity) {
+	VOLCANICORE_LOG_INFO("RigidBody added");
+	// auto& r = entity.Get<RigidBodyComponent>();
 
-	m_World.AddActor(actor);
+	// Creating RigidBodyComponent then MeshComponent ==> bounding volume
+	// Creating MeshComponent then RigidBodyComponent ==> tightly-fitting volume
+
+	// If the RigidBody was created without a shape,
+	// inherit the shape of the current MeshComponent
+	// if(entity.Has<MeshComponent>() && !r.Body->HasShape()) {
+	// 	auto mesh = entity.Get<MeshComponent>().Mesh;
+	// 	Ref<Shape> shape = Shape::Create(mesh);
+	// 	r.Body->SetShape(shape);
+	// }
+	// if(entity.Has<TransformComponent>()) {
+	// 	auto& t = entity.Get<TransformComponent>();
+
+	// 	Transform tr{
+	// 		.Translation = t.Translation,
+	// 		.Rotation	 = t.Rotation,
+	// 		.Scale		 = t.Scale
+	// 	};
+	// 	r.Body->UpdateTransform(tr);
+	// }
+
+	// m_World.AddActor(r.Body);
+}
+
+void PhysicsSystem::OnComponentSet(Entity& entity) {
+
+}
+
+void PhysicsSystem::OnComponentRemove(Entity& entity) {
+
 }
 
 void PhysicsSystem::Collides(Entity& e1, Entity& e2) {
@@ -83,41 +111,5 @@ bool PhysicsSystem::Collided(Entity& e1, Entity& e2) {
 
 	return handle1.has<CollidedWith>(handle2);
 }
-
-// void Scene::RegisterObservers() {
-// 	auto& world = EntityWorld.GetNative();
-
-// 	// Creating RigidBodyComponent then MeshComponent ==> bounding volume
-// 	// Creating MeshComponent then RigidBodyComponent ==> tightly-fitting volume
-
-// 	world
-// 	.observer<RigidBodyComponent>("OnSetRigidBody")
-// 	.event(flecs::OnSet)
-// 	.each(
-// 		[&](flecs::entity e, RigidBodyComponent& r)
-// 		{
-// 			Entity entity{ e };
-
-// 			// If the RigidBody was created without a shape,
-// 			// inherit the shape of the current MeshComponent
-// 			if(entity.Has<MeshComponent>() && !r.Body->HasShape()) {
-// 				auto mesh = entity.Get<MeshComponent>().Mesh;
-// 				Ref<Shape> shape = Shape::Create(mesh);
-// 				r.Body->SetShape(shape);
-// 			}
-// 			if(entity.Has<TransformComponent>()) {
-// 				auto& t = entity.Get<TransformComponent>();
-
-// 				Transform tr{
-// 					.Translation = t.Translation,
-// 					.Rotation	 = t.Rotation,
-// 					.Scale		 = t.Scale
-// 				};
-// 				r.Body->UpdateTransform(tr);
-// 			}
-
-// 			Register(entity);
-// 		});
-// }
 
 }

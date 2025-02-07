@@ -7,17 +7,29 @@
 namespace Magma::ECS {
 
 World::World() {
-	m_AllEntitiesQuery = m_World.query_builder()
-	.with<CameraComponent>().or_()
-	.with<MeshComponent>().or_()
-	.with<RigidBodyComponent>().or_()
-	.with<TagComponent>().or_()
-	.with<TransformComponent>().or_()
-	.with<ScriptComponent>().or_()
-	.with<DirectionalLightComponent>().or_()
-	.with<PointLightComponent>().or_()
-	.with<SpotlightComponent>()
-	.build();
+	// flecs::entity pipeline =
+	// 	m_World.pipeline()
+	// 		.with(flecs::System)
+	// 		.up
+	// 		.with(Phase::PreUpdate)
+	// 		.with(Phase::OnUpdate)
+	// 		.with(Phase::PostUpdate)
+	// 		.build();
+
+	// m_World.set_pipeline(pipeline);
+
+	m_AllEntitiesQuery =
+		m_World.query_builder()
+			.with<CameraComponent>().or_()
+			.with<MeshComponent>().or_()
+			.with<RigidBodyComponent>().or_()
+			.with<TagComponent>().or_()
+			.with<TransformComponent>().or_()
+			.with<ScriptComponent>().or_()
+			.with<DirectionalLightComponent>().or_()
+			.with<PointLightComponent>().or_()
+			.with<SpotlightComponent>()
+			.build();
 
 	m_EventHandler = m_World.entity("WorldEventHandler");
 }

@@ -15,6 +15,13 @@ public:
 
 	void Update(TimeStep ts) override;
 	void Run(Phase phase) override;
+
+	void OnComponentAdd(Entity& entity) override;
+	void OnComponentSet(Entity& entity) override;
+	void OnComponentRemove(Entity& entity) override;
+
+public:
+	TimeStep m_TimeStep;
 };
 
 }
