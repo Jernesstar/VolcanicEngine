@@ -6,13 +6,18 @@
 
 namespace VolcaniCore {
 
-Ref<UniformBuffer> UniformBuffer::Create(const BufferLayout& layout) {
+Ref<UniformBuffer> UniformBuffer::Create(const BufferLayout& layout,
+										 uint64_t count)
+{
 	RendererAPI::Backend backend = RendererAPI::Get()->GetBackend();
 
 	switch(backend) {
 		case RendererAPI::Backend::OpenGL:
-			return CreateRef<OpenGL::UniformBuffer>(layout);
+			return CreateRef<OpenGL::UniformBuffer>(layout, count);
+			break;
 	}
+
+	return nullptr;
 }
 
 }

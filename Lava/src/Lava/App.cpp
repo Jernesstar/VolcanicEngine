@@ -31,11 +31,14 @@ class Renderer : public SceneRenderer {
 public:
 	Renderer();
 	~Renderer() = default;
+
 	void Update(TimeStep ts) override;
-	void SubmitMesh(Entity entity) override;
-	void SubmitLight(Entity entity) override;
+
+	void Begin() override;
 	void SubmitCamera(Entity entity) override;
 	void SubmitSkybox(Entity entity) override;
+	void SubmitLight(Entity entity) override;
+	void SubmitMesh(Entity entity) override;
 	void Render() override;
 };
 
@@ -191,15 +194,11 @@ Renderer::Renderer() {
 
 }
 
+void Renderer::Begin() {
+
+}
+
 void Renderer::Update(TimeStep ts) {
-
-}
-
-void Renderer::SubmitMesh(Entity entity) {
-
-}
-
-void Renderer::SubmitLight(Entity entity) {
 
 }
 
@@ -208,6 +207,14 @@ void Renderer::SubmitCamera(Entity entity) {
 }
 
 void Renderer::SubmitSkybox(Entity entity) {
+
+}
+
+void Renderer::SubmitLight(Entity entity) {
+
+}
+
+void Renderer::SubmitMesh(Entity entity) {
 
 }
 

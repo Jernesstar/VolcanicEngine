@@ -28,26 +28,7 @@ void Scene::OnUpdate(TimeStep ts) {
 void Scene::OnRender(SceneRenderer& renderer) {
 	auto& world = EntityWorld.GetNative();
 
-	world.query_builder()
-	.with<MeshComponent>().and_().with<TransformComponent>()
-	.build()
-	.each(
-		[&](flecs::entity id)
-		{
-			renderer.SubmitMesh(Entity{ id });
-		});
-
-	world.query_builder()
-	.with<PointLightComponent>().or_()
-	.with<SpotlightComponent>().or_()
-	.with<DirectionalLightComponent>().and_()
-	.with<TransformComponent>()
-	.build()
-	.each(
-		[&](flecs::entity id)
-		{
-			renderer.SubmitLight(Entity{ id });
-		});
+	renderer.Begin();
 
 	world.query_builder()
 	.with<CameraComponent>()
@@ -66,11 +47,35 @@ void Scene::OnRender(SceneRenderer& renderer) {
 		{
 			renderer.SubmitSkybox(Entity{ id });
 		});
+
+	world.query_builder()
+	.with<PointLightComponent>().or_()
+	.with<SpotlightComponent>().or_()
+	.with<DirectionalLightComponent>()
+	.build()
+	.each(
+		[&](flecs::entity id)
+		{
+			renderer.SubmitLight(Entity{ id });
+		});
+
+	world.query_builder()
+	.with<MeshComponent>().and_()
+	.with<TransformComponent>()
+	.build()
+	.each(
+		[&](flecs::entity id)
+		{
+			renderer.SubmitMesh(Entity{ id });
+		});
+
+	renderer.Render();
 }
 
 void Scene::RegisterSystems() {
 	EntityWorld.Add<ScriptSystem>({ Phase::PreUpdate });
-	EntityWorld.Add<PhysicsSystem>({ Phase::PreUpdate, Phase::OnUpdate, Phase::PostUpdate });
+	EntityWorld.Add<PhysicsSystem>(
+		{ Phase::PreUpdate, Phase::OnUpdate, Phase::PostUpdate });
 	EntityWorld.Add<TransformSystem>({ Phase::OnUpdate });
 }
 

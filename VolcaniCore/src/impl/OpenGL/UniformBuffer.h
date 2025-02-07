@@ -15,8 +15,9 @@ public:
 	const uint64_t Size;
 
 public:
-	UniformBuffer(const BufferLayout& layout, const void* data = nullptr)
-		: VolcaniCore::UniformBuffer(layout), Size(layout.Stride)
+	UniformBuffer(const BufferLayout& layout, uint64_t count = 1,
+				  const void* data = nullptr)
+		: VolcaniCore::UniformBuffer(layout, count), Size(layout.Stride * count)
 	{
 		glCreateBuffers(1, &m_BufferID);
 		glNamedBufferData(m_BufferID, Size, data, GL_DYNAMIC_DRAW);
@@ -36,7 +37,9 @@ public:
 		glDeleteBuffers(1, &m_BufferID);
 	}
 
-	void SetData(const void* data, uint32_t count = 1, uint32_t offset = 0) {
+	void SetData(const void* data, uint64_t count = 1,
+				 uint64_t offset = 0) override
+	{
 		glNamedBufferSubData(m_BufferID, offset * Layout.Stride,
 							 count == 0 ? Size : count * Layout.Stride, data);
 	}

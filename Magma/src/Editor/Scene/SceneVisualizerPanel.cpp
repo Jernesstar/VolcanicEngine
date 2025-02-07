@@ -6,8 +6,11 @@
 
 #include <VolcaniCore/Core/Application.h>
 #include <VolcaniCore/Core/Input.h>
+
 #include <VolcaniCore/Graphics/Renderer.h>
 #include <VolcaniCore/Graphics/RendererAPI.h>
+#include <VolcaniCore/Graphics/Renderer2D.h>
+#include <VolcaniCore/Graphics/Renderer3D.h>
 #include <VolcaniCore/Graphics/StereographicCamera.h>
 
 #include <Magma/Scene/SceneRenderer.h>
@@ -40,7 +43,6 @@ void SceneVisualizerPanel::SetContext(Scene* context) {
 	m_Selected.Handle = Entity{ };
 	// m_Selected.Collider = CreateRef<Physics::RigidBody>();
 
-	m_Renderer.SetContext(context);
 	m_Image->SetImage(m_Renderer.GetOutput(), AttachmentTarget::Color);
 }
 
@@ -146,7 +148,7 @@ void SceneVisualizerPanel::Draw() {
 
 		if(ImGui::IsMouseClicked(0) && ImGui::IsWindowHovered()) {
 			auto& cameraController = m_Renderer.GetCameraController();
-			// auto world = m_Context->EntityWorld.Get<PhysicsSystem>()->Get();
+			auto world = m_Context->EntityWorld.Get<PhysicsSystem>()->Get();
 			auto camera = cameraController.GetCamera();
 
 			glm::vec2 pos = { ImGui::GetMousePos().x, ImGui::GetMousePos().y };
@@ -180,7 +182,6 @@ void SceneVisualizerPanel::Draw() {
 				// 	m_Tab->GetPanel("SceneHierarchy")->As<SceneHierarchyPanel>();
 				// // hierarchy->Select(entity);
 			// }
-
 		}
 	}
 	ImGui::End();
@@ -193,16 +194,96 @@ SceneVisualizerPanel::Renderer::Renderer() {
 
 	auto window = Application::GetWindow();
 
-	// Ref<ShaderPipeline> shader;
-	// Ref<Framebuffer> frame;
-	// shader = ShaderPipeline::Create("Magma/assets/shaders", "Lighting");
-	// frame = Framebuffer::Create(window->GetWidth(), window->GetHeight());
-	// Lighting = RenderPass::Create("Lighting", shader);
+	Ref<ShaderPipeline> shader;
+	Ref<Framebuffer> buffer;
+
+	shader = ShaderPipeline::Create("Magma/assets/shaders", "Lighting");
+	buffer = Framebuffer::Create(window->GetWidth(), window->GetHeight());
+	LightingPass = RenderPass::Create("Lighting", shader, buffer);
+	LightingPass->SetData(Renderer3D::GetMeshBuffer());
+
+	shader = ShaderPipeline::Create("Magma/assets/shaders", "Mask");
+	buffer = Framebuffer::Create(window->GetWidth(), window->GetHeight());
+	MaskPass = RenderPass::Create("Mask", shader, buffer);
+	MaskPass->SetData(Renderer3D::GetMeshBuffer());
+
+	shader = ShaderPipeline::Create("Magma/assets/shaders", "Outline");
+	buffer = Framebuffer::Create(window->GetWidth(), window->GetHeight());
+	OutlinePass = RenderPass::Create("Outline", shader, buffer);
+	OutlinePass->SetData(Renderer2D::GetScreenBuffer());
+
 	m_Output = Framebuffer::Create(window->GetWidth(), window->GetHeight());
+
+	DirectionalLightBuffer = 
+		UniformBuffer::Create(
+			BufferLayout
+			{
+				{ "Ambient",   BufferDataType::Vec3 },
+				{ "Diffuse",   BufferDataType::Vec3 },
+				{ "Specular",  BufferDataType::Vec3 },
+				{ "Direction", BufferDataType::Vec3 },
+			});
+
+	PointLightBuffer = 
+		UniformBuffer::Create(
+			BufferLayout
+			{
+				{ "Ambient",   BufferDataType::Vec3 },
+				{ "Diffuse",   BufferDataType::Vec3 },
+				{ "Specular",  BufferDataType::Vec3 },
+				{ "Position",  BufferDataType::Vec3 },
+				{ "Direction", BufferDataType::Vec3 },
+				{ "Constant",  BufferDataType::Float },
+				{ "Linear",	   BufferDataType::Float },
+				{ "Quadratic", BufferDataType::Float },
+			}, 100);
+
+	SpotlightBuffer = 
+		UniformBuffer::Create(
+			BufferLayout
+			{
+				{ "Ambient",   BufferDataType::Vec3 },
+				{ "Diffuse",   BufferDataType::Vec3 },
+				{ "Specular",  BufferDataType::Vec3 },
+				{ "Direction", BufferDataType::Vec3 },
+				{ "CutoffAngle",	  BufferDataType::Float },
+				{ "OuterCutoffAngle", BufferDataType::Float },
+			}, 100);
 }
 
 void SceneVisualizerPanel::Renderer::Update(TimeStep ts) {
+	m_Controller.OnUpdate(ts);
+}
 
+void SceneVisualizerPanel::Renderer::Begin() {
+	FirstCommand = RendererAPI::Get()->NewDrawCommand(LightingPass->Get());
+}
+
+void SceneVisualizerPanel::Renderer::SubmitCamera(Entity entity) {
+
+}
+
+void SceneVisualizerPanel::Renderer::SubmitSkybox(Entity entity) {
+	// auto& sc = entity.Get<SkyboxComponent>();
+
+	// FirstCommand->UniformData
+	// .SetInput("u_Skybox", CubemapSlot{ sc.Asset.Get<Cubemap>() });
+}
+
+void SceneVisualizerPanel::Renderer::SubmitLight(Entity entity) {
+	if(entity.Has<DirectionalLightComponent>()) {
+		auto& dc = entity.Get<DirectionalLightComponent>();
+		DirectionalLightBuffer->SetData(&dc);
+		HasDirectionalLight = true;
+	}
+	else if(entity.Has<PointLightComponent>()) {
+		auto& pc = entity.Get<PointLightComponent>();
+		PointLightBuffer->SetData(&pc, 1, PointLightCount++);
+	}
+	else if(entity.Has<SpotlightComponent>()) {
+		auto& sc = entity.Get<SpotlightComponent>();
+		SpotlightBuffer->SetData(&sc, 1, SpotlightCount++);
+	}
 }
 
 void SceneVisualizerPanel::Renderer::SubmitMesh(Entity entity) {
@@ -215,34 +296,35 @@ void SceneVisualizerPanel::Renderer::SubmitMesh(Entity entity) {
 		.Scale		 = tc.Scale
 	};
 
-	// auto* command = RendererAPI::Get()->NewDrawCommand(m_DrawPass->Get());
+	if(!Objects.count(mc.Mesh)) {
+		// if(Selected.IsValid() && entity == Selected) {
+		// 	auto* command = Objects[mc.Mesh] =
+		// 		RendererAPI::Get()->NewDrawCommand(MaskPass->Get());
+		// 	command->UniformData
+		// 	.SetInput("u_Color", glm::vec4(1.0f));
+		// }
+		// else
+			Objects[mc.Mesh] =
+				RendererAPI::Get()->NewDrawCommand(LightingPass->Get());
+	}
+	// auto* command = Objects[mc.Mesh];
+
 	// Renderer3D::DrawModel(mc.Mesh, tr, command);
 }
 
-void SceneVisualizerPanel::Renderer::SubmitLight(Entity entity) {
-	if(entity.Has<DirectionalLightComponent>()) {
-		auto& dc = entity.Get<DirectionalLightComponent>();
-	}
-	else if(entity.Has<PointLightComponent>()) {
-		auto& pc = entity.Get<PointLightComponent>();
-		// PointLightBuffer->SetData
-	}
-	else if(entity.Has<SpotlightComponent>()) {
-		auto& sc = entity.Get<SpotlightComponent>();
-		// SpotlightBuffer->SetData
-	}
-}
-
-void SceneVisualizerPanel::Renderer::SubmitCamera(Entity entity) {
-
-}
-
-void SceneVisualizerPanel::Renderer::SubmitSkybox(Entity entity) {
-
-}
-
 void SceneVisualizerPanel::Renderer::Render() {
+	FirstCommand->UniformData
+	.SetInput("u_DirectionalLightCount", (int32_t)HasDirectionalLight);
+	FirstCommand->UniformData
+	.SetInput("u_PointLightCount", (int32_t)PointLightCount);
+	FirstCommand->UniformData
+	.SetInput("u_SpotlightCount", (int32_t)SpotlightCount);
 
+	VolcaniCore::Renderer::Flush();
+
+	PointLightCount = 0;
+	SpotlightCount = 0;
+	HasDirectionalLight = false;
 }
 
 }

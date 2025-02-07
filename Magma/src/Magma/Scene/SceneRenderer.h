@@ -23,13 +23,13 @@ public:
 	virtual ~SceneRenderer() = default;
 
 	virtual void Update(TimeStep ts) = 0;
-	virtual void SubmitMesh(Entity entity) = 0;
-	virtual void SubmitLight(Entity entity) = 0;
+
+	virtual void Begin() = 0;
 	virtual void SubmitCamera(Entity entity) = 0;
 	virtual void SubmitSkybox(Entity entity) = 0;
+	virtual void SubmitLight(Entity entity) = 0;
+	virtual void SubmitMesh(Entity entity) = 0;
 	virtual void Render() = 0;
-
-	void SetContext(Scene* scene) { m_Scene = scene; }
 
 	Ref<Framebuffer> GetOutput() const { return m_Output; }
 	CameraController& GetCameraController() { return m_Controller; }

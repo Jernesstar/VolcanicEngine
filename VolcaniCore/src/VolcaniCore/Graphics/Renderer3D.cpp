@@ -200,9 +200,6 @@ void Renderer3D::DrawMesh(Ref<Mesh> mesh, const glm::mat4& tr, DrawCommand* cmd)
 		call.Primitive = PrimitiveType::Triangle;
 		call.Partition = PartitionType::Instanced;
 		call.InstanceStart = s_InstancesIndex;
-
-		
-
 		s_InstancesIndex += 10'000;
 	}
 

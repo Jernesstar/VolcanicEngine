@@ -12,8 +12,9 @@ Ref<Cubemap> Cubemap::Create(const std::string& cubemap_folder) {
 	switch(backend) {
 		case RendererAPI::Backend::OpenGL:
 			return CreateRef<OpenGL::Cubemap>(cubemap_folder);
-			break;
 	}
+
+	return nullptr;
 }
 
 Ref<Cubemap> Cubemap::Create(const std::vector<std::string>& faces) {
@@ -22,8 +23,9 @@ Ref<Cubemap> Cubemap::Create(const std::vector<std::string>& faces) {
 	switch(backend) {
 		case RendererAPI::Backend::OpenGL:
 			return CreateRef<OpenGL::Cubemap>(faces);
-			break;
 	}
+
+	return nullptr;
 }
 
 }

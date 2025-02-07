@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Magma/Scene/Scene.h>
+#include <Magma/Scene/Component.h>
 
 #include "Editor/Panel.h"
 
@@ -39,11 +40,14 @@ private:
 	public:
 		Renderer();
 		~Renderer() = default;
+
 		void Update(TimeStep ts) override;
-		void SubmitMesh(Entity entity) override;
-		void SubmitLight(Entity entity) override;
+
+		void Begin() override;
 		void SubmitCamera(Entity entity) override;
 		void SubmitSkybox(Entity entity) override;
+		void SubmitLight(Entity entity) override;
+		void SubmitMesh(Entity entity) override;
 		void Render() override;
 
 		void Select(Entity entity) { Selected = entity; }
@@ -51,22 +55,28 @@ private:
 	private:
 		Entity Selected;
 
+		DrawCommand* FirstCommand;
+		Map<Ref<Model>, DrawCommand*> Objects;
+
 		// Lighting and shadows
-		Ref<RenderPass> Lighting;
-		Ref<RenderPass> Depth;
-		Ref<RenderPass> Shadow;
+		Ref<RenderPass> DepthPass;
+		Ref<RenderPass> LightingPass;
+		Ref<UniformBuffer> DirectionalLightBuffer;
 		Ref<UniformBuffer> PointLightBuffer;
 		Ref<UniformBuffer> SpotlightBuffer;
+		bool HasDirectionalLight = false;
+		uint32_t PointLightCount = 0;
+		uint32_t SpotlightCount = 0;
 
 		// Outlining
-		Ref<RenderPass> Mask;
-		Ref<RenderPass> Outline;
+		Ref<RenderPass> MaskPass;
+		Ref<RenderPass> OutlinePass;
 
 		// Bloom
 		Ref<Framebuffer> Mips;
-		Ref<RenderPass> Downsample;
-		Ref<RenderPass> Upsample;
-		Ref<RenderPass> Bloom;
+		Ref<RenderPass> DownsamplePass;
+		Ref<RenderPass> UpsamplePass;
+		Ref<RenderPass> BloomPass;
 	};
 
 private:

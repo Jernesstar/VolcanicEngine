@@ -14,7 +14,6 @@
 #include "Defines.h"
 
 #include "Shader.h"
-#include "Mesh.h"
 #include "Cubemap.h"
 #include "Texture2D.h"
 #include "Framebuffer.h"

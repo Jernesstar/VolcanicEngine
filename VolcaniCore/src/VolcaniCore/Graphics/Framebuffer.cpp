@@ -14,6 +14,8 @@ Ref<Framebuffer> Framebuffer::Create(uint32_t width, uint32_t height) {
 		case RendererAPI::Backend::OpenGL:
 			return CreateRef<OpenGL::Framebuffer>(width, height);
 	}
+
+	return nullptr;
 }
 
 Ref<Framebuffer> Framebuffer::Create(
@@ -43,6 +45,8 @@ Ref<Framebuffer> Framebuffer::Create(
 			return CreateRef<OpenGL::Framebuffer>(attachments);
 		}
 	}
+
+	return nullptr;
 }
 
 }

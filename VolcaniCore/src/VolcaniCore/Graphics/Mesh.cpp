@@ -2,8 +2,6 @@
 
 #include "Graphics/RendererAPI.h"
 
-#include "OpenGL/Mesh.h"
-
 #include "Model.h"
 
 namespace VolcaniCore {
@@ -18,26 +16,14 @@ Mesh::Mesh(const std::string& path)
 }
 
 Ref<Mesh> Mesh::Create(const std::string& path) {
-	RendererAPI::Backend backend = RendererAPI::Get()->GetBackend();
-
-	switch(backend) {
-		case RendererAPI::Backend::OpenGL:
-			return CreateRef<OpenGL::Mesh>(path);
-			break;
-	}
+	return CreateRef<Mesh>(path);
 }
 
 Ref<Mesh> Mesh::Create(const List<Vertex>& vertices,
 						const List<uint32_t>& indices,
 						const Material& material)
 {
-	RendererAPI::Backend backend = RendererAPI::Get()->GetBackend();
-
-	switch(backend) {
-		case RendererAPI::Backend::OpenGL:
-			return CreateRef<OpenGL::Mesh>(vertices, indices, material);
-			break;
-	}
+	return CreateRef<Mesh>(vertices, indices, material);
 }
 
 Ref<Mesh> Mesh::Create(MeshPrimitive primitive, const Material& material) {

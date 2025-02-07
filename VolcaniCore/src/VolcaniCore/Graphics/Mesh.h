@@ -54,16 +54,11 @@ public:
 		 const Material& material = { })
 			: m_Vertices(vertices), m_Indices(indices), m_Material(material),
 				Path("") { }
-
-	virtual ~Mesh() = default;
+	~Mesh() = default;
 
 	const List<Vertex>& GetVertices() const { return m_Vertices; }
 	const List<uint32_t>& GetIndices() const { return m_Indices; }
 	Material& GetMaterial() { return m_Material; }
-
-	template<typename TDerived>
-	requires std::derived_from<TDerived, Mesh>
-	TDerived* As() const { return (TDerived*)(this); }
 
 protected:
 	List<Vertex> m_Vertices;
