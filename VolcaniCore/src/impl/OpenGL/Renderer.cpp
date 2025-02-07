@@ -63,7 +63,7 @@ void Renderer::Init() {
 	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS); // Smooth cubemap edges
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
-	s_Data.Commands.Reallocate(10);
+	s_Data.Commands.Reallocate(120);
 	s_Data.Passes.Reallocate(10);
 }
 
@@ -72,10 +72,10 @@ void Renderer::Close() {
 }
 
 void Renderer::StartFrame() {
-	s_Info.DrawCallCount  = 0;
-	s_Info.IndexCount     = 0;
-	s_Info.VertexCount    = 0;
-	s_Info.InstanceCount  = 0;
+	s_Info.DrawCallCount = 0;
+	s_Info.IndexCount    = 0;
+	s_Info.VertexCount   = 0;
+	s_Info.InstanceCount = 0;
 }
 
 void Renderer::EndFrame() {
@@ -211,8 +211,8 @@ void FlushCommand(DrawCommand& command) {
 	// }
 	if(command.ViewportWidth && command.ViewportHeight)
 		Resize(command.ViewportWidth, command.ViewportHeight);
-	// else if(command.Pass && command.Pass->Output)
-	// 	Resize(command.Pass->Output->GetWidth(), command.Pass->Output->GetHeight());
+	else if(command.Pass && command.Pass->Output)
+		Resize(command.Pass->Output->GetWidth(), command.Pass->Output->GetHeight());
 
 	if(command.Pass && command.Pass->Pipeline)
 		command.Pass->Pipeline->As<OpenGL::ShaderProgram>()->Bind();

@@ -154,7 +154,6 @@ void Cube::OnUpdate(TimeStep ts) {
 	Renderer::StartPass(drawPass);
 	{
 		Renderer::Clear();
-		Renderer::Resize(480, 270);
 
 		Renderer3D::Begin(camera);
 

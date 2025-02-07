@@ -34,12 +34,6 @@ void Image::SetImage(const std::string& imagePath) {
 	SetImage(Texture::Create(imagePath));
 }
 
-void Image::SetImage(Ref<Framebuffer> framebuffer, AttachmentTarget target) {
-	Content = framebuffer->Get(target);
-	Width = Content->GetWidth();
-	Height = Content->GetHeight();
-}
-
 void Image::Draw() {
 	m_State = UIRenderer::DrawImage(*this);
 }

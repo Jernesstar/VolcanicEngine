@@ -77,6 +77,7 @@ Collision::Collision() {
 	Ref<ShaderPipeline> shader;
 	shader = ShaderPipeline::Create("VolcaniCore/assets/shaders", "Mesh");
 	drawPass = RenderPass::Create("Draw", shader);
+	drawPass->SetData(Renderer3D::GetMeshBuffer());
 
 	cube = Mesh::Create(MeshPrimitive::Cube,
 		Material
@@ -107,9 +108,9 @@ void Collision::OnUpdate(TimeStep ts) {
 
 	Renderer::StartPass(drawPass);
 	{
-		Renderer3D::Begin(camera);
-
 		Renderer::Clear();
+
+		Renderer3D::Begin(camera);
 
 		for(auto body : *world) {
 			body->UpdateTransform();

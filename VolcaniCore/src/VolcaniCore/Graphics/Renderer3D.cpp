@@ -130,6 +130,9 @@ void Renderer3D::EndFrame() {
 }
 
 void Renderer3D::Begin(Ref<Camera> camera) {
+	if(!camera)
+		return;
+
 	auto* command = Renderer::GetCommand();
 	command->UniformData
 	.SetInput("u_ViewProj", camera->GetViewProjection());
@@ -168,9 +171,10 @@ void Renderer3D::DrawMesh(Ref<Mesh> mesh, const glm::mat4& tr, DrawCommand* cmd)
 			command->VerticesIndex = s_MeshBuffer->VerticesCount;
 			command->IndicesIndex = s_MeshBuffer->IndicesCount;
 		}
-		else {
+		else
 			s_Meshes[mesh] = command = Renderer::NewCommand();
 
+		if(!command->UniformData) {
 			Material& mat = mesh->GetMaterial();
 			if(mat.Diffuse) {
 				command->UniformData
@@ -203,7 +207,7 @@ void Renderer3D::DrawMesh(Ref<Mesh> mesh, const glm::mat4& tr, DrawCommand* cmd)
 		s_InstancesIndex += 10'000;
 	}
 
-	auto* buffer = Renderer::GetPass()->Get()->BufferData;
+	auto* buffer = command->Pass->BufferData;
 	auto& call = command->Calls[-1];
 	RendererAPI::Get()
 	->SetBufferData(buffer, DrawBufferIndex::Instances, glm::value_ptr(tr),
@@ -214,7 +218,7 @@ void Renderer3D::DrawModel(Ref<Model> model, const glm::mat4& tr,
 						   DrawCommand* command)
 {
 	for(auto& mesh : *model)
-		DrawMesh(mesh, tr);
+		DrawMesh(mesh, tr, command);
 }
 
 void Renderer3D::DrawQuad(Ref<Quad> quad, const glm::mat4& tr,
@@ -228,19 +232,19 @@ void Renderer3D::DrawQuad(Ref<Quad> quad, const glm::mat4& tr,
 	else
 		mesh = Mesh::Create(MeshPrimitive::Quad, quad->GetColor());
 
-	DrawMesh(mesh, tr);
+	DrawMesh(mesh, tr, command);
 }
 
 void Renderer3D::DrawQuad(Ref<Texture> texture, const glm::mat4& tr,
 						  DrawCommand* command)
 {
-	DrawQuad(Quad::Create(texture), tr);
+	DrawQuad(Quad::Create(texture), tr, command);
 }
 
 void Renderer3D::DrawQuad(const glm::vec4& color, const glm::mat4& tr,
 						  DrawCommand* command)
 {
-	DrawQuad(Quad::Create(1, 1, color), tr);
+	DrawQuad(Quad::Create(1, 1, color), tr, command);
 }
 
 void Renderer3D::DrawPoint(const Point& point, const glm::mat4& tr,

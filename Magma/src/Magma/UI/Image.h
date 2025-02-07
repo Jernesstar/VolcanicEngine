@@ -26,13 +26,10 @@ public:
 	Image(const std::string& id, UIPage* root)
 		: UIElement(UIElementType::Image, id, root) { }
 
+	void Draw() override;
+
 	void SetImage(Ref<Texture> texture);
 	void SetImage(const std::string& imagePath);
-	// TODO(Change): Move this to Texture
-	void SetImage(Ref<Framebuffer> framebuffer, AttachmentTarget target);
-
-private:
-	void Draw() override;
 };
 
 }

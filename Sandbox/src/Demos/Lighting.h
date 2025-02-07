@@ -142,7 +142,6 @@ void Lighting::OnUpdate(TimeStep ts) {
 	Renderer::StartPass(lightingPass);
 	{
 		Renderer::Clear();
-		Renderer::Resize(800, 600);
 
 		Renderer3D::Begin(camera);
 

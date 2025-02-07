@@ -43,7 +43,7 @@ void SceneVisualizerPanel::SetContext(Scene* context) {
 	m_Selected.Handle = Entity{ };
 	// m_Selected.Collider = CreateRef<Physics::RigidBody>();
 
-	m_Image->SetImage(m_Renderer.GetOutput(), AttachmentTarget::Color);
+	m_Image->SetImage(m_Renderer.GetOutput()->Get(AttachmentTarget::Color));
 }
 
 static bool s_Hovered = false;
@@ -73,17 +73,33 @@ void SceneVisualizerPanel::Draw() {
 		ImGui::PopStyleVar();
 		ImGui::PopStyleColor();
 
-		s_Hovered = ImGui::IsWindowHovered()
-				 || Input::GetCursorMode() == CursorMode::Locked;
+		s_Hovered = ImGui::IsWindowHovered();
 
-		auto size = ImGui::GetWindowContentRegionMin();
-		auto offset = ImGui::GetWindowPos();
+		ImVec2 pos = ImGui::GetCursorPos();
+		ImVec2 size = ImGui::GetContentRegionAvail();
 		auto width = size.x;
 		auto height = size.y;
 
-		m_Image->Render();
+		m_Image->SetPosition(pos.x, pos.y);
+		m_Image->SetSize(size.x, size.y);
+		m_Image->Draw();
 
-		auto& world = m_Context->EntityWorld;
+		// ImGui::SetCursorPos(pos);
+
+		// auto windowFlags = ImGuiWindowFlags_MenuBar;
+		// auto childFlags = ImGuiChildFlags_Border;
+		// ImGui::BeginChild("Debug", { 200, 200 }, childFlags, windowFlags);
+		// {
+		// 	auto info = VolcaniCore::Renderer::GetDebugInfo();
+		// 	ImGui::Text("FPS: %0.1f", info.FPS);
+		// 	ImGui::Text("Draw Calls: %li", info.DrawCalls);
+		// 	ImGui::Text("Indices: %li", info.Indices);
+		// 	ImGui::Text("Vertices: %li", info.Vertices);
+		// 	ImGui::Text("Instances: %li", info.Instances);
+		// 	ImGui::Text("Triangles: %li",
+		// 		info.Instances * uint64_t(info.Vertices / 3));
+		// }
+		// ImGui::EndChild();
 
 		if(ImGui::BeginDragDropTarget())
 		{
@@ -106,6 +122,7 @@ void SceneVisualizerPanel::Draw() {
 			ImGui::EndDragDropTarget();
 		}
 
+		auto& world = m_Context->EntityWorld;
 		if(ImGui::BeginPopupModal("Create Entity with MeshComponent")) {
 			static std::string str;
 			static std::string hint = "Enter entity name";
@@ -148,7 +165,7 @@ void SceneVisualizerPanel::Draw() {
 
 		if(ImGui::IsMouseClicked(0) && ImGui::IsWindowHovered()) {
 			auto& cameraController = m_Renderer.GetCameraController();
-			auto world = m_Context->EntityWorld.Get<PhysicsSystem>()->Get();
+			// auto physicsWorld = world.Get<PhysicsSystem>()->Get();
 			auto camera = cameraController.GetCamera();
 
 			glm::vec2 pos = { ImGui::GetMousePos().x, ImGui::GetMousePos().y };
@@ -173,7 +190,7 @@ void SceneVisualizerPanel::Draw() {
 			glm::vec3 rayDir = glm::vec3(worldEnd - worldStart);
 			float maxDist = 10000.0f;
 
-			// auto hitInfo = world.Raycast(worldStart, rayDir, maxDist);
+			// auto hitInfo = physicsWorld.Raycast(worldStart, rayDir, maxDist);
 			// if(hitInfo) {
 				VOLCANICORE_LOG_INFO("Hit something");
 				// m_Selected.Collider = Ref<RigidBody>(hitInfo.Actor);
@@ -194,61 +211,62 @@ SceneVisualizerPanel::Renderer::Renderer() {
 
 	auto window = Application::GetWindow();
 
+	m_Output = Framebuffer::Create(window->GetWidth(), window->GetHeight());
+
 	Ref<ShaderPipeline> shader;
 	Ref<Framebuffer> buffer;
 
-	shader = ShaderPipeline::Create("Magma/assets/shaders", "Lighting");
-	buffer = Framebuffer::Create(window->GetWidth(), window->GetHeight());
-	LightingPass = RenderPass::Create("Lighting", shader, buffer);
+	shader = ShaderPipeline::Create("VolcaniCore/assets/shaders", "Mesh");
+	// buffer = Framebuffer::Create(window->GetWidth(), window->GetHeight());
+	LightingPass = RenderPass::Create("Lighting", shader, m_Output);
 	LightingPass->SetData(Renderer3D::GetMeshBuffer());
 
-	shader = ShaderPipeline::Create("Magma/assets/shaders", "Mask");
-	buffer = Framebuffer::Create(window->GetWidth(), window->GetHeight());
-	MaskPass = RenderPass::Create("Mask", shader, buffer);
-	MaskPass->SetData(Renderer3D::GetMeshBuffer());
+	// shader = ShaderPipeline::Create("Magma/assets/shaders", "Mask");
+	// buffer = Framebuffer::Create(window->GetWidth(), window->GetHeight());
+	// MaskPass = RenderPass::Create("Mask", shader, buffer);
+	// MaskPass->SetData(Renderer3D::GetMeshBuffer());
 
-	shader = ShaderPipeline::Create("Magma/assets/shaders", "Outline");
-	buffer = Framebuffer::Create(window->GetWidth(), window->GetHeight());
-	OutlinePass = RenderPass::Create("Outline", shader, buffer);
-	OutlinePass->SetData(Renderer2D::GetScreenBuffer());
+	// shader = ShaderPipeline::Create("Magma/assets/shaders", "Outline");
+	// buffer = Framebuffer::Create(window->GetWidth(), window->GetHeight());
+	// OutlinePass = RenderPass::Create("Outline", shader, buffer);
+	// OutlinePass->SetData(Renderer2D::GetScreenBuffer());
 
-	m_Output = Framebuffer::Create(window->GetWidth(), window->GetHeight());
+	// DirectionalLightBuffer =
+	// 	UniformBuffer::Create(
+	// 		BufferLayout
+	// 		{
+	// 			{ "Ambient",   BufferDataType::Vec3 },
+	// 			{ "Diffuse",   BufferDataType::Vec3 },
+	// 			{ "Specular",  BufferDataType::Vec3 },
+	// 			{ "Direction", BufferDataType::Vec3 },
+	// 		});
 
-	DirectionalLightBuffer = 
-		UniformBuffer::Create(
-			BufferLayout
-			{
-				{ "Ambient",   BufferDataType::Vec3 },
-				{ "Diffuse",   BufferDataType::Vec3 },
-				{ "Specular",  BufferDataType::Vec3 },
-				{ "Direction", BufferDataType::Vec3 },
-			});
+	// PointLightBuffer =
+	// 	UniformBuffer::Create(
+	// 		BufferLayout
+	// 		{
+	// 			{ "Ambient",   BufferDataType::Vec3 },
+	// 			{ "Diffuse",   BufferDataType::Vec3 },
+	// 			{ "Specular",  BufferDataType::Vec3 },
+	// 			{ "Position",  BufferDataType::Vec3 },
+	// 			{ "Direction", BufferDataType::Vec3 },
+	// 			{ "Constant",  BufferDataType::Float },
+	// 			{ "Linear",	   BufferDataType::Float },
+	// 			{ "Quadratic", BufferDataType::Float },
+	// 		}, 100);
 
-	PointLightBuffer = 
-		UniformBuffer::Create(
-			BufferLayout
-			{
-				{ "Ambient",   BufferDataType::Vec3 },
-				{ "Diffuse",   BufferDataType::Vec3 },
-				{ "Specular",  BufferDataType::Vec3 },
-				{ "Position",  BufferDataType::Vec3 },
-				{ "Direction", BufferDataType::Vec3 },
-				{ "Constant",  BufferDataType::Float },
-				{ "Linear",	   BufferDataType::Float },
-				{ "Quadratic", BufferDataType::Float },
-			}, 100);
-
-	SpotlightBuffer = 
-		UniformBuffer::Create(
-			BufferLayout
-			{
-				{ "Ambient",   BufferDataType::Vec3 },
-				{ "Diffuse",   BufferDataType::Vec3 },
-				{ "Specular",  BufferDataType::Vec3 },
-				{ "Direction", BufferDataType::Vec3 },
-				{ "CutoffAngle",	  BufferDataType::Float },
-				{ "OuterCutoffAngle", BufferDataType::Float },
-			}, 100);
+	// SpotlightBuffer =
+	// 	UniformBuffer::Create(
+	// 		BufferLayout
+	// 		{
+	// 			{ "Ambient",   BufferDataType::Vec3 },
+	// 			{ "Diffuse",   BufferDataType::Vec3 },
+	// 			{ "Specular",  BufferDataType::Vec3 },
+	// 			{ "Position",  BufferDataType::Vec3 },
+	// 			{ "Direction", BufferDataType::Vec3 },
+	// 			{ "CutoffAngle",	  BufferDataType::Float },
+	// 			{ "OuterCutoffAngle", BufferDataType::Float },
+	// 		}, 100);
 }
 
 void SceneVisualizerPanel::Renderer::Update(TimeStep ts) {
@@ -297,22 +315,28 @@ void SceneVisualizerPanel::Renderer::SubmitMesh(Entity entity) {
 	};
 
 	if(!Objects.count(mc.Mesh)) {
-		// if(Selected.IsValid() && entity == Selected) {
+		// if(entity == Selected) {
 		// 	auto* command = Objects[mc.Mesh] =
 		// 		RendererAPI::Get()->NewDrawCommand(MaskPass->Get());
 		// 	command->UniformData
 		// 	.SetInput("u_Color", glm::vec4(1.0f));
 		// }
-		// else
-			Objects[mc.Mesh] =
+		// else {
+			auto* command = Objects[mc.Mesh] =
 				RendererAPI::Get()->NewDrawCommand(LightingPass->Get());
+		// }
 	}
-	// auto* command = Objects[mc.Mesh];
+	auto* command = Objects[mc.Mesh];
 
-	// Renderer3D::DrawModel(mc.Mesh, tr, command);
+	Renderer3D::DrawModel(mc.Mesh, tr, command);
 }
 
 void SceneVisualizerPanel::Renderer::Render() {
+	FirstCommand->Clear = true;
+	FirstCommand->UniformData
+	.SetInput("u_ViewProj", m_Controller.GetCamera()->GetViewProjection());
+	FirstCommand->UniformData
+	.SetInput("u_CameraPosition", m_Controller.GetCamera()->GetPosition());
 	FirstCommand->UniformData
 	.SetInput("u_DirectionalLightCount", (int32_t)HasDirectionalLight);
 	FirstCommand->UniformData
@@ -321,6 +345,9 @@ void SceneVisualizerPanel::Renderer::Render() {
 	.SetInput("u_SpotlightCount", (int32_t)SpotlightCount);
 
 	VolcaniCore::Renderer::Flush();
+
+	Renderer3D::End();
+	Objects.clear();
 
 	PointLightCount = 0;
 	SpotlightCount = 0;

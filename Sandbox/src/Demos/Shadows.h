@@ -100,7 +100,6 @@ void Shadows::OnUpdate(TimeStep ts) {
 	Renderer::StartPass(depthPass);
 	{
 		Renderer::Clear();
-		Renderer::Resize(2048, 2048);
 
 		Renderer::PushCommand();
 		Renderer::GetPass()->GetUniforms()

@@ -133,7 +133,6 @@ void Raycast::OnUpdate(TimeStep ts) {
 	Renderer::StartPass(drawPass);
 	{
 		Renderer::Clear();
-		Renderer::Resize(800, 600);
 
 		Renderer3D::Begin(camera);
 
@@ -157,7 +156,6 @@ void Raycast::OnUpdate(TimeStep ts) {
 	Renderer::StartPass(maskPass);
 	{
 		Renderer::Clear();
-		Renderer::Resize(800, 600);
 
 		Renderer::PushCommand();
 		Renderer::GetPass()->GetUniforms()
@@ -177,8 +175,6 @@ void Raycast::OnUpdate(TimeStep ts) {
 	// 3. Render full-screen quad that creates outline
 	Renderer::StartPass(outlinePass);
 	{
-		Renderer::Resize(800, 600);
-
 		Renderer::PushCommand();
 		Renderer::GetPass()->GetUniforms()
 		.Set("u_PixelSize",
@@ -203,7 +199,6 @@ void Raycast::OnUpdate(TimeStep ts) {
 	// // 4. Draw selected object
 	// Renderer::StartPass(drawPass);
 	// {
-	// 	// Renderer::Resize(800, 600);
 	// 	Renderer3D::Begin(camera);
 	// 	Renderer3D::DrawMesh(cube, selected->GetTransform());
 	// 	Renderer3D::End();

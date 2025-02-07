@@ -13,7 +13,7 @@
 
 using namespace VolcaniCore;
 
-namespace Magma::ECS {
+namespace Magma {
 
 struct Component {
 	Component() = default;
