@@ -25,18 +25,18 @@ void Renderer2D::Init() {
 	};
 
 	BufferLayout layout =
+	{
 		{
-			{
-				{ "Position", BufferDataType::Vec2 },
-			},
-			false, // Dynamic
-			false  // Structure of arrays
-		};
+			{ "Position", BufferDataType::Vec2 },
+		},
+		false, // Dynamic
+		false  // Structure of arrays
+	};
 	DrawBufferSpecification specs
-		{
-			.VertexLayout = layout,
-			.MaxVertexCount = 6
-		};
+	{
+		.VertexLayout = layout,
+		.MaxVertexCount = 6
+	};
 
 	s_ScreenBuffer = RendererAPI::Get()->NewDrawBuffer(specs, screenCoords);
 }
@@ -113,7 +113,7 @@ void Renderer2D::DrawFullscreenQuad(Ref<Framebuffer> buffer,
 	call.Partition = PartitionType::Single;
 	call.DepthTest = DepthTestingMode::Off;
 	call.Culling = CullingMode::Off;
-	call.Blending = BlendingMode::Off;
+	call.Blending = BlendingMode::Greatest;
 }
 
 }

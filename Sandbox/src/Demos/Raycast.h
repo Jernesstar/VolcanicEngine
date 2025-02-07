@@ -18,7 +18,7 @@ private:
 	Ref<RigidBody> selected{ nullptr };
 
 	glm::vec2 pixelSize{ 1.0f/800.0f, 1.0f/600.0f };
-	glm::vec4 outlineColor{ 0.0f, 0.5f, 1.0f, 1.0f };
+	glm::vec3 outlineColor{ 0.0f, 0.0f, 1.0f };
 
 	Ref<RenderPass> drawPass;
 	Ref<RenderPass> maskPass;
@@ -80,7 +80,7 @@ Raycast::Raycast() {
 	maskPass = RenderPass::Create("Mask", mask);
 	maskPass->SetData(Renderer3D::GetMeshBuffer());
 	outlinePass = RenderPass::Create("Outline", outline);
-	outlinePass->SetData(Renderer3D::GetMeshBuffer());
+	outlinePass->SetData(Renderer2D::GetScreenBuffer());
 
 	Ref<Framebuffer> maskBuffer = Framebuffer::Create(800, 600);
 	maskPass->SetOutput(maskBuffer);
@@ -129,11 +129,11 @@ void Raycast::OnUpdate(TimeStep ts) {
 	controller.OnUpdate(ts);
 	world->OnUpdate(ts);
 
+	Renderer::Clear();
+
 	// 1. Draw scene without selected object
 	Renderer::StartPass(drawPass);
 	{
-		Renderer::Clear();
-
 		Renderer3D::Begin(camera);
 
 		for(Ref<RigidBody> actor : actors) {
@@ -184,26 +184,25 @@ void Raycast::OnUpdate(TimeStep ts) {
 			});
 		Renderer::GetPass()->GetUniforms()
 		.Set("u_Color",
-			[this]() -> glm::vec4
+			[this]() -> glm::vec3
 			{
 				return outlineColor;
 			});
 
 		auto mask = maskPass->GetOutput();
 		Renderer2D::DrawFullscreenQuad(mask, AttachmentTarget::Color);
-
 		Renderer::PopCommand();
 	}
 	Renderer::EndPass();
 
-	// // 4. Draw selected object
-	// Renderer::StartPass(drawPass);
-	// {
-	// 	Renderer3D::Begin(camera);
-	// 	Renderer3D::DrawMesh(cube, selected->GetTransform());
-	// 	Renderer3D::End();
-	// }
-	// Renderer::EndPass();
+	// 4. Draw selected object
+	Renderer::StartPass(drawPass);
+	{
+		Renderer3D::Begin(camera);
+		Renderer3D::DrawMesh(cube, selected->GetTransform());
+		Renderer3D::End();
+	}
+	Renderer::EndPass();
 
 	// auto scene = world.Get();
 	// const PxRenderBuffer& rb = scene->getRenderBuffer();
