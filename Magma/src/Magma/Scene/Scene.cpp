@@ -88,13 +88,16 @@ void Scene::RegisterSystems() {
 		if(phase == flecs::PostUpdate)
 			ourPhase = Phase::PostUpdate;
 
-		auto sys = EntityWorld.Get<ScriptSystem>();
 		EntityWorld.GetNative()
 		.system<ScriptComponent>()
 		.kind(phase)
-		.run([ourPhase = ourPhase, sys = sys]
-			(flecs::iter& it)
+		.run(
+			[&](flecs::iter& it)
 			{
+				auto sys = EntityWorld.Get<PhysicsSystem>();
+				if(!sys)
+					return;
+
 				if(ourPhase == Phase::OnUpdate)
 					sys->Update(it.delta_time());
 				sys->Run(ourPhase);
@@ -110,13 +113,16 @@ void Scene::RegisterSystems() {
 		if(phase == flecs::PostUpdate)
 			ourPhase = Phase::PostUpdate;
 
-		auto sys = EntityWorld.Get<PhysicsSystem>();
 		EntityWorld.GetNative()
 		.system<RigidBodyComponent>()
 		.kind(phase)
-		.run([ourPhase = ourPhase, sys = sys]
-			(flecs::iter& it)
+		.run(
+			[&](flecs::iter& it)
 			{
+				auto sys = EntityWorld.Get<PhysicsSystem>();
+				if(!sys)
+					return;
+
 				if(ourPhase == Phase::OnUpdate)
 					sys->Update(it.delta_time());
 				sys->Run(ourPhase);
@@ -130,8 +136,11 @@ void Scene::RegisterSystems() {
 	.each(
 		[&](flecs::iter& it, size_t i)
 		{
-			Entity entity{ it.entity(i) };
 			auto sys = EntityWorld.Get<ScriptSystem>();
+			if(!sys)
+				return;
+
+			Entity entity{ it.entity(i) };
 
 			if(it.event() == flecs::OnAdd)
 				sys->OnComponentAdd(entity);
@@ -148,8 +157,11 @@ void Scene::RegisterSystems() {
 	.each(
 		[&](flecs::iter& it, size_t i)
 		{
-			Entity entity{ it.entity(i) };
 			auto sys = EntityWorld.Get<PhysicsSystem>();
+			if(!sys)
+				return;
+
+			Entity entity{ it.entity(i) };
 
 			if(it.event() == flecs::OnAdd)
 				sys->OnComponentAdd(entity);

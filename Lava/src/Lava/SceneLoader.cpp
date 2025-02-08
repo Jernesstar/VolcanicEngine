@@ -142,9 +142,11 @@ void SerializeEntity(YAMLSerializer& serializer, const Entity& entity) {
 	}
 
 	if(entity.Has<MeshComponent>()) {
-		auto model = entity.Get<MeshComponent>().Mesh;
+		auto asset = entity.Get<MeshComponent>().MeshAsset;
 		serializer.WriteKey("MeshComponent")
 		.BeginMapping();
+
+		serializer.WriteKey("")
 
 		if(model->Path != "") {
 			serializer.WriteKey("Model")
@@ -156,8 +158,6 @@ void SerializeEntity(YAMLSerializer& serializer, const Entity& entity) {
 			serializer.WriteKey("Meshes").BeginSequence();
 
 			for(auto& mesh : *model) {
-				auto& mat = mesh->GetMaterial();
-
 				serializer.BeginMapping();
 				serializer.WriteKey("Mesh").BeginMapping();
 
@@ -175,6 +175,7 @@ void SerializeEntity(YAMLSerializer& serializer, const Entity& entity) {
 					serializer.WriteKey("Material")
 					.BeginMapping();
 
+					auto& mat = mesh->GetMaterial();
 					if(mat.Diffuse)
 						serializer.WriteKey("Diffuse")
 						.BeginMapping()
@@ -186,6 +187,19 @@ void SerializeEntity(YAMLSerializer& serializer, const Entity& entity) {
 						.BeginMapping()
 							.WriteKey("Path").Write(mat.Specular->GetPath())
 						.EndMapping();
+
+					if(mat.Emissive)
+						serializer.WriteKey("Emissive")
+						.BeginMapping()
+							.WriteKey("Path").Write(mat.Emissive->GetPath())
+						.EndMapping();
+
+					serializer
+						.WriteKey("DiffuseColor").Write(mat.DiffuseColor);
+					serializer
+						.WriteKey("SpecularColor").Write(mat.SpecularColor);
+					serializer
+						.WriteKey("EmissiveColor").Write(mat.EmissiveColor);
 
 					serializer
 					.EndMapping(); // Material

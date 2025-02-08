@@ -20,7 +20,6 @@ void PhysicsSystem::Update(TimeStep ts) {
 }
 
 void PhysicsSystem::Run(Phase phase) {
-	VOLCANICORE_LOG_INFO("%i", phase);
 	if(phase == Phase::PreUpdate) {
 		m_EntityWorld->ForEach<RigidBodyComponent, TransformComponent>(
 			[this](Entity& entity)
@@ -30,10 +29,6 @@ void PhysicsSystem::Run(Phase phase) {
 
 				rc.Body->UpdateTransform({ t.Translation, t.Rotation, t.Scale });
 			});
-	}
-
-	if(phase == Phase::OnUpdate) {
-		VOLCANICORE_LOG_INFO("Update");
 	}
 
 	if(phase == Phase::PostUpdate) {
@@ -52,7 +47,6 @@ void PhysicsSystem::Run(Phase phase) {
 }
 
 void PhysicsSystem::OnComponentAdd(Entity& entity) {
-	VOLCANICORE_LOG_INFO("RigidBody added");
 	// auto& r = entity.Get<RigidBodyComponent>();
 
 	// Creating RigidBodyComponent then MeshComponent ==> bounding volume

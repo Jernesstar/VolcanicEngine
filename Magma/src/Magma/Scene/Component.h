@@ -6,6 +6,8 @@
 #include <VolcaniCore/Graphics/Model.h>
 #include <VolcaniCore/Graphics/Camera.h>
 
+#include "Core/AssetManager.h"
+
 #include "Physics/RigidBody.h"
 
 #include "Script/ScriptObject.h"
@@ -27,41 +29,6 @@ struct CameraComponent : public Component {
 	CameraComponent(Ref<Camera> camera)
 		: Cam(camera) { }
 	CameraComponent(const CameraComponent& other) = default;
-};
-
-struct MeshComponent : public Component {
-	// TODO(Change): AssetID
-	Ref<Model> Mesh;
-
-	MeshComponent() {
-		Mesh = Model::Create("");
-	}
-	MeshComponent(Ref<Model> mesh)
-		: Mesh(mesh) { }
-	MeshComponent(Ref<VolcaniCore::Mesh> mesh) {
-		Mesh = Model::Create("");
-		Mesh->AddMesh(mesh);
-	}
-	MeshComponent(const std::string& path) {
-		Mesh = Model::Create(path);
-	}
-	MeshComponent(const MeshComponent& other) = default;
-};
-
-struct RigidBodyComponent : public Component {
-	Ref<Physics::RigidBody> Body;
-
-	RigidBodyComponent() = default;
-	RigidBodyComponent(Ref<Physics::RigidBody> body)
-		: Body(body) { }
-	RigidBodyComponent(Physics::RigidBody::Type type) {
-		Body = Physics::RigidBody::Create(type);
-	}
-	RigidBodyComponent(Physics::RigidBody::Type type, Ref<Physics::Shape> shape)
-	{
-		Body = Physics::RigidBody::Create(type, shape);
-	}
-	RigidBodyComponent(const RigidBodyComponent& other) = default;
 };
 
 struct TagComponent : public Component {
@@ -89,6 +56,40 @@ struct TransformComponent : public Component {
 	TransformComponent(const TransformComponent& other) = default;
 };
 
+struct MeshComponent : public Component {
+	Asset MeshAsset;
+
+	MeshComponent() = default;
+	MeshComponent(const Asset& asset)
+		: MeshAsset(asset) { }
+	MeshComponent(const MeshComponent& other) = default;
+};
+
+struct SkyboxComponent : public Component {
+	Asset CubemapAsset;
+
+	SkyboxComponent() = default;
+	SkyboxComponent(const Asset& asset)
+		: CubemapAsset(asset) { }
+	SkyboxComponent(const SkyboxComponent& other) = default;
+};
+
+struct RigidBodyComponent : public Component {
+	Ref<Physics::RigidBody> Body;
+
+	RigidBodyComponent() = default;
+	RigidBodyComponent(Ref<Physics::RigidBody> body)
+		: Body(body) { }
+	RigidBodyComponent(Physics::RigidBody::Type type) {
+		Body = Physics::RigidBody::Create(type);
+	}
+	RigidBodyComponent(Physics::RigidBody::Type type, Ref<Physics::Shape> shape)
+	{
+		Body = Physics::RigidBody::Create(type, shape);
+	}
+	RigidBodyComponent(const RigidBodyComponent& other) = default;
+};
+
 struct ScriptComponent : public Component {
 	std::string Class;
 	Ref<Script::ScriptObject> Instance;
@@ -113,6 +114,7 @@ struct PointLightComponent : public Component {
 	glm::vec3 Ambient;
 	glm::vec3 Diffuse;
 	glm::vec3 Specular;
+	glm::vec3 Position;
 	float Constant;
 	float Linear;
 	float Quadratic;
@@ -125,19 +127,13 @@ struct SpotlightComponent : public Component {
 	glm::vec3 Ambient;
 	glm::vec3 Diffuse;
 	glm::vec3 Specular;
+	glm::vec3 Position;
 	glm::vec3 Direction;
 	float CutoffAngle;
 	float OuterCutoffAngle;
 
 	SpotlightComponent() = default;
 	SpotlightComponent(const SpotlightComponent& other) = default;
-};
-
-struct SkyboxComponent : public Component {
-	// Asset Cubemap;
-
-	SkyboxComponent() = default;
-	SkyboxComponent(const SkyboxComponent& other) = default;
 };
 
 }

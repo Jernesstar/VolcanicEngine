@@ -99,6 +99,7 @@ public:
 	void Remove() {
  		uint64_t id = TypeIDGenerator<System<>>::GetID<TSystem>();
 		delete (TSystem*)m_Systems[id];
+		m_Systems.erase(id);
 	}
 
 	flecs::world& GetNative() { return m_World; }
