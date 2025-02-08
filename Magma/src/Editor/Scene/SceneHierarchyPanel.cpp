@@ -121,8 +121,8 @@ void SceneHierarchyPanel::DrawEntityNode(Entity& entity) {
 
 	auto id = (void*)(uint64_t)(uint32_t)entity.GetHandle();
 	std::string tag;
-	if(entity.Has<TagComponent>())
-		tag = entity.Get<TagComponent>().Tag.c_str();
+	if(entity.GetName() != "")
+		tag = entity.GetName();
 	else
 		tag = std::to_string(entity.GetHandle());
 

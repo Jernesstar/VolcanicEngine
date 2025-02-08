@@ -9,6 +9,8 @@
 #include "Scene/SceneTab.h"
 #include "UI/UITab.h"
 
+#include "AssetManager.h"
+
 using namespace VolcaniCore;
 
 namespace Magma {
@@ -27,12 +29,16 @@ public:
 
 	const Project& GetProject() const { return m_Project; }
 
+	EditorAssetManager& GetAssets() { return m_Manager; }
+
 private:
 	Project m_Project;
 	Ref<Tab> m_CurrentTab;
 	List<Ref<Tab>> m_Tabs;
 	List<Ref<Tab>> m_ClosedTabs;
 	List<Ref<Panel>> m_Panels;
+
+	EditorAssetManager m_Manager;
 
 	void SetTab(Ref<Tab> tab);
 	void NewTab();

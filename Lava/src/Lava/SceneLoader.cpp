@@ -27,6 +27,15 @@ Serializer& Serializer::Write(const VolcaniCore::Vertex& value) {
 	return *this;
 }
 
+template<>
+Serializer& Serializer::Write(const Asset& value) {
+	BeginMapping();
+		WriteKey("ID").Write((uint64_t)value.ID);
+		WriteKey("Type").Write((uint32_t)value.Type);
+	EndMapping();
+	return *this;
+}
+
 }
 
 namespace Lava {
@@ -82,34 +91,11 @@ void SceneLoader::Save(const Scene& scene, const std::string& path) {
 void SerializeEntity(YAMLSerializer& serializer, const Entity& entity) {
 	serializer.WriteKey("Entity").BeginMapping(); // Entity
 
+	serializer.WriteKey("Name").Write(entity.GetName());
 	serializer.WriteKey("ID").Write((uint64_t)entity.GetHandle());
 
 	serializer.WriteKey("Components")
 	.BeginMapping(); // Components
-
-	if(entity.Has<TagComponent>()) {
-		auto& tag = entity.Get<TagComponent>().Tag;
-
-		serializer.WriteKey("TagComponent")
-		.BeginMapping()
-			.WriteKey("Tag").Write(tag)
-		.EndMapping();
-	}
-
-	if(entity.Has<TransformComponent>()) {
-		auto& t = entity.Get<TransformComponent>().Translation;
-		auto& r = entity.Get<TransformComponent>().Rotation;
-		auto& s = entity.Get<TransformComponent>().Scale;
-
-		serializer.WriteKey("TransformComponent")
-		.BeginMapping()
-			.WriteKey("Transform").BeginMapping()
-				.WriteKey("Translation").Write(t)
-				.WriteKey("Rotation")	.Write(r)
-				.WriteKey("Scale")		.Write(s)
-			.EndMapping()
-		.EndMapping(); // TransformComponent
-	}
 
 	if(entity.Has<CameraComponent>()) {
 		auto& camera = entity.Get<CameraComponent>().Cam;
@@ -141,76 +127,44 @@ void SerializeEntity(YAMLSerializer& serializer, const Entity& entity) {
 		.EndMapping();
 	}
 
+	if(entity.Has<TagComponent>()) {
+		auto& tag = entity.Get<TagComponent>().Tag;
+
+		serializer.WriteKey("TagComponent")
+		.BeginMapping()
+			.WriteKey("Tag").Write(tag)
+		.EndMapping();
+	}
+
+	if(entity.Has<TransformComponent>()) {
+		auto& t = entity.Get<TransformComponent>().Translation;
+		auto& r = entity.Get<TransformComponent>().Rotation;
+		auto& s = entity.Get<TransformComponent>().Scale;
+
+		serializer.WriteKey("TransformComponent")
+		.BeginMapping()
+			.WriteKey("Transform").BeginMapping()
+				.WriteKey("Translation").Write(t)
+				.WriteKey("Rotation")	.Write(r)
+				.WriteKey("Scale")		.Write(s)
+			.EndMapping()
+		.EndMapping(); // TransformComponent
+	}
+
 	if(entity.Has<MeshComponent>()) {
 		auto asset = entity.Get<MeshComponent>().MeshAsset;
 		serializer.WriteKey("MeshComponent")
-		.BeginMapping();
+		.BeginMapping()
+			.WriteKey("Asset").Write(asset)
+		.EndMapping();
+	}
 
-		serializer.WriteKey("")
-
-		if(model->Path != "") {
-			serializer.WriteKey("Model")
-			.BeginMapping()
-				.WriteKey("Path").Write(model->Path)
-			.EndMapping();
-		}
-		else {
-			serializer.WriteKey("Meshes").BeginSequence();
-
-			for(auto& mesh : *model) {
-				serializer.BeginMapping();
-				serializer.WriteKey("Mesh").BeginMapping();
-
-				if(mesh->Path != "")
-					serializer.WriteKey("Path").Write(mesh->Path);
-				else {
-					serializer.WriteKey("Vertices")
-					.SetOptions(Serializer::Options::ArrayOneLine)
-					.Write(mesh->GetVertices());
-
-					serializer.WriteKey("Indices")
-					.SetOptions(Serializer::Options::ArrayOneLine)
-					.Write(mesh->GetIndices());
-
-					serializer.WriteKey("Material")
-					.BeginMapping();
-
-					auto& mat = mesh->GetMaterial();
-					if(mat.Diffuse)
-						serializer.WriteKey("Diffuse")
-						.BeginMapping()
-							.WriteKey("Path").Write(mat.Diffuse->GetPath())
-						.EndMapping();
-
-					if(mat.Specular)
-						serializer.WriteKey("Specular")
-						.BeginMapping()
-							.WriteKey("Path").Write(mat.Specular->GetPath())
-						.EndMapping();
-
-					if(mat.Emissive)
-						serializer.WriteKey("Emissive")
-						.BeginMapping()
-							.WriteKey("Path").Write(mat.Emissive->GetPath())
-						.EndMapping();
-
-					serializer
-						.WriteKey("DiffuseColor").Write(mat.DiffuseColor);
-					serializer
-						.WriteKey("SpecularColor").Write(mat.SpecularColor);
-					serializer
-						.WriteKey("EmissiveColor").Write(mat.EmissiveColor);
-
-					serializer
-					.EndMapping(); // Material
-				}
-				serializer.EndMapping(); // Mesh
-				serializer.EndMapping();
-			}
-			serializer.EndSequence();
-		}
-
-		serializer.EndMapping(); // MeshComponent
+	if(entity.Has<SkyboxComponent>()) {
+		auto asset = entity.Get<SkyboxComponent>().CubemapAsset;
+		serializer.WriteKey("SkyboxComponent")
+		.BeginMapping()
+			.WriteKey("Asset").Write(asset)
+		.EndMapping();
 	}
 
 	if(entity.Has<RigidBodyComponent>()) {
@@ -261,32 +215,31 @@ void SerializeEntity(YAMLSerializer& serializer, const Entity& entity) {
 			.EndMapping()
 		.EndMapping();
 	}
+
+	if(entity.Has<DirectionalLightComponent>()) {
+
+	}
+
+	if(entity.Has<PointLightComponent>()) {
+
+	}
+
+	if(entity.Has<SpotlightComponent>()) {
+
+	}
+
 	serializer.EndMapping(); // Components
 
 	serializer.EndMapping(); // Entity
 }
 
 void DeserializeEntity(YAML::Node entityNode, Scene& scene) {
+	VolcaniCore::UUID id(entityNode["ID"].as<uint64_t>());
+
+	Entity entity = scene.EntityWorld.AddEntity(id);
+	entity.SetName(entityNode["Name"].as<std::string>());
+
 	auto components = entityNode["Components"];
-
-	if(!components) {
-		VolcaniCore::UUID id(entityNode["ID"].as<uint64_t>());
-		scene.EntityWorld.AddEntity(id);
-		return;
-	}
-
-	Entity entity;
-
-	// TODO(Fix): TagComponent -> NameComponent
-	auto tagComponentNode = components["TagComponent"];
-	if(tagComponentNode) {
-		auto tag = tagComponentNode["Tag"].as<std::string>();
-		entity = scene.EntityWorld.AddEntity(tag);
-	}
-	else {
-		VolcaniCore::UUID id(entityNode["ID"].as<uint64_t>());
-		entity = scene.EntityWorld.AddEntity(id);
-	}
 
 	auto cameraComponentNode = components["CameraComponent"];
 	if(cameraComponentNode) {
@@ -318,54 +271,10 @@ void DeserializeEntity(YAML::Node entityNode, Scene& scene) {
 		entity.Add<CameraComponent>(camera);
 	}
 
-	auto meshComponentNode = components["MeshComponent"];
-	if(meshComponentNode) {
-		auto modelNode = meshComponentNode["Model"];
-		if(modelNode) {
-			auto path = modelNode["Path"].as<std::string>();
-			// auto model = AssetManager::GetOrCreate<Model>(path);
-			auto model = Model::Create(path);
-			entity.Add<MeshComponent>(model);
-		}
-		else {
-			auto model = entity.Add<MeshComponent>().Mesh;
-			for(auto meshNode : meshComponentNode["Meshes"]) {
-				auto node = meshNode["Mesh"];
-				if(node["Path"]) {
-					auto path = node["Path"].as<std::string>();
-					// auto mesh = AssetManager::GetOrCreate<Mesh>(path);
-					// model->AddMesh(mesh);
-					continue;
-				}
-
-				auto v = node["Vertices"].as<List<VolcaniCore::Vertex>>();
-				auto i = node["Indices"].as<List<uint32_t>>();
-				auto diffuseNode = node["Material"]["Diffuse"];
-				auto specularNode = node["Material"]["Specular"];
-
-				Material mat;
-				if(diffuseNode) {
-					auto path = diffuseNode["Path"].as<std::string>();
-					mat.Diffuse = Texture::Create(path);
-				}
-				if(specularNode) {
-					auto path = specularNode["Path"].as<std::string>();
-					mat.Diffuse = Texture::Create(path);
-				}
-
-				model->AddMesh(Mesh::Create(v, i, mat));
-			}
-		}
-	}
-
-	auto scriptComponentNode = components["ScriptComponent"];
-	if(scriptComponentNode) {
-		// auto scriptNode = scriptComponentNode["Script"];
-		// std::string path = scriptNode.as<std::string>();
-
-		// ScriptComponent& sc = entity.Add<ScriptComponent>(path);
-
-		ScriptComponent& sc = entity.Add<ScriptComponent>();
+	auto tagComponentNode = components["TagComponent"];
+	if(tagComponentNode) {
+		auto tag = tagComponentNode["Tag"].as<std::string>();
+		entity = scene.EntityWorld.AddEntity(tag);
 	}
 
 	auto transformComponentNode = components["TransformComponent"];
@@ -382,6 +291,23 @@ void DeserializeEntity(YAML::Node entityNode, Scene& scene) {
 				.Rotation	 = rotationNode.as<glm::vec3>(),
 				.Scale		 = scaleNode.as<glm::vec3>()
 			});
+	}
+
+	auto meshComponentNode = components["MeshComponent"];
+	if(meshComponentNode) {
+		entity.Add<MeshComponent>(meshComponentNode["Asset"].as<Asset>());
+	}
+
+	auto skyboxComponentNode = components["SkyboxComponent"];
+	if(skyboxComponentNode) {
+		entity.Add<SkyboxComponent>(skyboxComponentNode["Asset"].as<Asset>());
+	}
+
+	auto scriptComponentNode = components["ScriptComponent"];
+	if(scriptComponentNode) {
+		auto classNode = scriptComponentNode["Class"];
+		std::string _class = classNode.as<std::string>();
+		entity.Add<ScriptComponent>(_class);
 	}
 
 	auto rigidBodyComponentNode = components["RigidBodyComponent"];
@@ -406,6 +332,21 @@ void DeserializeEntity(YAML::Node entityNode, Scene& scene) {
 		else {
 			entity.Add<RigidBodyComponent>(type);
 		}
+	}
+
+	auto directionalLightComponentNode = components["DirectionalLightComponent"];
+	if(directionalLightComponentNode) {
+
+	}
+
+	auto pointLightComponentNode = components["PointLightComponent"];
+	if(pointLightComponentNode) {
+
+	}
+
+	auto spotlightComponentNode = components["SpotlightComponent"];
+	if(spotlightComponentNode) {
+
 	}
 }
 
@@ -516,6 +457,22 @@ struct convert<VolcaniCore::Vertex> {
 		vertex.Position = node[0].as<glm::vec3>();
 		vertex.Normal	= node[1].as<glm::vec3>();
 		vertex.TexCoord = node[2].as<glm::vec2>();
+		return true;
+	}
+};
+
+template<>
+struct convert<Asset> {
+	static Node encode(const Asset& asset) {
+		Node node;
+		node["Type"] = (uint32_t)asset.Type;
+		node["ID"] = (uint64_t)asset.ID;
+		return node;
+	}
+
+	static bool decode(const Node& node, Asset& asset) {
+		asset.Type = (AssetType)node["Type"].as<uint32_t>();
+		asset.ID = (UUID)node["ID"].as<uint64_t>();
 		return true;
 	}
 };

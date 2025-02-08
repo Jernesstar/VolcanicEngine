@@ -21,7 +21,7 @@ Model::Model(const std::string& path)
 }
 
 void Model::AddMesh(Ref<Mesh> mesh) {
-	m_Meshes.push_back(mesh);
+	m_Meshes.Add(mesh);
 }
 
 static Ref<Mesh> LoadMesh(const std::string& path,
@@ -41,9 +41,9 @@ void Model::Load(const std::string& path) {
 	VOLCANICORE_ASSERT_ARGS(scene, "Error importing model(s) from %s: %s",
 									path.c_str(), importer.GetErrorString());
 
-	m_Meshes.reserve(scene->mNumMeshes);
+	m_Meshes.Reallocate(scene->mNumMeshes);
 	for(uint32_t i = 0; i < scene->mNumMeshes; i++)
-		m_Meshes.push_back(LoadMesh(path, scene, i));
+		m_Meshes.Add(LoadMesh(path, scene, i));
 }
 
 static Ref<Texture> LoadTexture(const std::string& dir,
@@ -127,9 +127,7 @@ Ref<Texture> LoadTexture(const std::string& dir,
 	if(material->GetTexture(type, 0, &path) == AI_FAILURE)
 		return nullptr;
 
-	std::string p(path.data);
-	std::string fullPath = p;
-	return Texture::Create(fullPath);
+	return Texture::Create(std::string(path.data));
 }
 
 }

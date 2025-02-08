@@ -17,9 +17,6 @@ public:
 	enum class Options { ArrayOneLine };
 
 public:
-	Ref<Serializer> Create(Serializer::Format format);
-
-public:
 	Serializer() = default;
 	virtual ~Serializer() = default;
 

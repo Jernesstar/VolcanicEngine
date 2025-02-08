@@ -27,7 +27,7 @@ struct Material {
 	glm::vec4 EmissiveColor = glm::vec4(0.0f);
 };
 
-enum class MeshPrimitive { Point, Line, Quad, Cube, Pyramid };
+enum class MeshPrimitive { Quad, Cube, Pyramid, Sphere };
 
 class Mesh {
 public:

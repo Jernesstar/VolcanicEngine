@@ -149,11 +149,10 @@ void SceneVisualizerPanel::Draw() {
 
 					if(exit) {
 						auto& editor = Application::As<EditorApp>()->GetEditor();
-						auto path = editor.GetProject().Path;
-
-						Application::PushDir(path);
-						newEntity.Add<MeshComponent>(options.add.mesh);
-						Application::PopDir();
+						auto& assetManager = editor.GetAssets();
+						Asset asset =
+							assetManager.Get(options.add.mesh, AssetType::Mesh);
+						newEntity.Add<MeshComponent>(asset);
 						ImGui::CloseCurrentPopup();
 					}
 				}
@@ -311,22 +310,23 @@ void SceneVisualizerPanel::Renderer::SubmitMesh(Entity entity) {
 		.Rotation	 = tc.Rotation,
 		.Scale		 = tc.Scale
 	};
+	auto mesh = mc.MeshAsset.Get<Model>();
 
-	if(!Objects.count(mc.Mesh)) {
+	if(!Objects.count(mesh)) {
 		// if(entity == Selected) {
-		// 	auto* command = Objects[mc.Mesh] =
+		// 	auto* command = Objects[mesh] =
 		// 		RendererAPI::Get()->NewDrawCommand(MaskPass->Get());
 		// 	command->UniformData
 		// 	.SetInput("u_Color", glm::vec4(1.0f));
 		// }
 		// else {
-			auto* command = Objects[mc.Mesh] =
+			auto* command = Objects[mesh] =
 				RendererAPI::Get()->NewDrawCommand(LightingPass->Get());
 		// }
 	}
-	auto* command = Objects[mc.Mesh];
+	auto* command = Objects[mesh];
 
-	Renderer3D::DrawModel(mc.Mesh, tr, command);
+	Renderer3D::DrawModel(mesh, tr, command);
 }
 
 void SceneVisualizerPanel::Renderer::Render() {

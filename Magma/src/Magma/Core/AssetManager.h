@@ -16,8 +16,8 @@ enum class AssetType { Mesh, Texture, Cubemap, Font, Sound };
 class AssetManager;
 
 struct Asset {
-	const AssetType Type;
-	const UUID ID;
+	AssetType Type;
+	UUID ID;
 
 	void Load();
 	void Unload();
@@ -26,8 +26,6 @@ struct Asset {
 	Ref<T> Get();
 
 private:
-	bool m_Loaded = false;
-
 	AssetManager* m_Root;
 
 	friend class AssetManager;
@@ -38,51 +36,62 @@ public:
 	AssetManager() = default;
 	virtual ~AssetManager() = default;
 
+	bool IsLoaded(Asset& asset) {
+		return m_AssetRegistry[asset.ID];
+	}
 	virtual void Load(Asset& asset) = 0;
 	virtual void Unload(Asset& asset) = 0;
 
 	template<typename T>
 	Ref<T> Get(Asset& asset);
 
-public:
-	virtual Ref<Model> GetMesh(Asset& asset) = 0;
-	virtual Ref<Texture> GetTexture(Asset& asset) = 0;
-	virtual Ref<Cubemap> GetCubemap(Asset& asset) = 0;
-
-	Map<UUID, Ref<Mesh>> m_MeshAssets;
-	Map<UUID, Ref<Texture>> M_TextureAssets;
+protected:
+	Map<UUID, bool> m_AssetRegistry;
+	Map<UUID, Ref<Model>> m_MeshAssets;
+	Map<UUID, Ref<Texture>> m_TextureAssets;
 	Map<UUID, Ref<Cubemap>> m_CubemapAssets;
+
+private:
+	Ref<Model> GetMesh(Asset& asset) {
+		return m_MeshAssets[asset.ID];
+	}
+	Ref<Texture> GetTexture(Asset& asset) {
+		return m_TextureAssets[asset.ID];
+	}
+	Ref<Cubemap> GetCubemap(Asset& asset) {
+		return m_CubemapAssets[asset.ID];
+	}
 };
 
-template<>
+template<> inline
 Ref<Model> AssetManager::Get(Asset& asset) {
 	VOLCANICORE_ASSERT(asset.Type == AssetType::Mesh);
 	return GetMesh(asset);
 }
 
-template<>
+template<> inline
 Ref<Texture> AssetManager::Get(Asset& asset) {
 	VOLCANICORE_ASSERT(asset.Type == AssetType::Texture);
 	return GetTexture(asset);
 }
 
-template<>
+template<> inline
 Ref<Cubemap> AssetManager::Get(Asset& asset) {
 	VOLCANICORE_ASSERT(asset.Type == AssetType::Cubemap);
 	return GetCubemap(asset);
 }
 
-void Asset::Load() {
+inline void Asset::Load() {
 	m_Root->Load(*this);
 }
 
-void Asset::Unload() {
+inline void Asset::Unload() {
 	m_Root->Unload(*this);
 }
 
-template<typename T>
+template<typename T> inline
 Ref<T> Asset::Get() {
-	if(!m_Loaded)
+	if(!m_Root->IsLoaded(*this))
 		Load();
 
 	return m_Root->Get<T>(*this);
