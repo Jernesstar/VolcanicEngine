@@ -49,8 +49,6 @@ void SceneVisualizerPanel::SetContext(Scene* context) {
 static bool s_Hovered = false;
 
 void SceneVisualizerPanel::Update(TimeStep ts) {
-	m_Context->OnUpdate(ts);
-
 	if(s_Hovered)
 		m_Renderer.Update(ts);
 }
@@ -86,20 +84,20 @@ void SceneVisualizerPanel::Draw() {
 
 		// ImGui::SetCursorPos(pos);
 
-		// auto windowFlags = ImGuiWindowFlags_MenuBar;
-		// auto childFlags = ImGuiChildFlags_Border;
-		// ImGui::BeginChild("Debug", { 200, 200 }, childFlags, windowFlags);
-		// {
-		// 	auto info = VolcaniCore::Renderer::GetDebugInfo();
-		// 	ImGui::Text("FPS: %0.1f", info.FPS);
-		// 	ImGui::Text("Draw Calls: %li", info.DrawCalls);
-		// 	ImGui::Text("Indices: %li", info.Indices);
-		// 	ImGui::Text("Vertices: %li", info.Vertices);
-		// 	ImGui::Text("Instances: %li", info.Instances);
-		// 	ImGui::Text("Triangles: %li",
-		// 		info.Instances * uint64_t(info.Vertices / 3));
-		// }
-		// ImGui::EndChild();
+		auto windowFlags = ImGuiWindowFlags_MenuBar;
+		auto childFlags = ImGuiChildFlags_Border;
+		ImGui::BeginChild("Debug", { 200, 200 }, childFlags, windowFlags);
+		{
+			auto info = VolcaniCore::Renderer::GetDebugInfo();
+			ImGui::Text("FPS: %0.1f", info.FPS);
+			ImGui::Text("Draw Calls: %li", info.DrawCalls);
+			ImGui::Text("Indices: %li", info.Indices);
+			ImGui::Text("Vertices: %li", info.Vertices);
+			ImGui::Text("Instances: %li", info.Instances);
+			ImGui::Text("Triangles: %li",
+				info.Instances * uint64_t(info.Vertices / 3));
+		}
+		ImGui::EndChild();
 
 		if(ImGui::BeginDragDropTarget())
 		{
@@ -151,11 +149,10 @@ void SceneVisualizerPanel::Draw() {
 
 					if(exit) {
 						auto& editor = Application::As<EditorApp>()->GetEditor();
-						auto path = editor.GetProject().Path;
-
-						Application::PushDir(path);
-						newEntity.Add<MeshComponent>(options.add.mesh);
-						Application::PopDir();
+						auto& assetManager = editor.GetAssets();
+						Asset asset =
+							assetManager.Get(options.add.mesh, AssetType::Mesh);
+						newEntity.Add<MeshComponent>(asset);
 						ImGui::CloseCurrentPopup();
 					}
 				}
@@ -313,22 +310,23 @@ void SceneVisualizerPanel::Renderer::SubmitMesh(Entity entity) {
 		.Rotation	 = tc.Rotation,
 		.Scale		 = tc.Scale
 	};
+	auto mesh = mc.MeshAsset.Get<Model>();
 
-	if(!Objects.count(mc.Mesh)) {
+	if(!Objects.count(mesh)) {
 		// if(entity == Selected) {
-		// 	auto* command = Objects[mc.Mesh] =
+		// 	auto* command = Objects[mesh] =
 		// 		RendererAPI::Get()->NewDrawCommand(MaskPass->Get());
 		// 	command->UniformData
 		// 	.SetInput("u_Color", glm::vec4(1.0f));
 		// }
 		// else {
-			auto* command = Objects[mc.Mesh] =
+			auto* command = Objects[mesh] =
 				RendererAPI::Get()->NewDrawCommand(LightingPass->Get());
 		// }
 	}
-	auto* command = Objects[mc.Mesh];
+	auto* command = Objects[mesh];
 
-	Renderer3D::DrawModel(mc.Mesh, tr, command);
+	Renderer3D::DrawModel(mesh, tr, command);
 }
 
 void SceneVisualizerPanel::Renderer::Render() {

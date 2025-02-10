@@ -27,26 +27,25 @@ public:
 
 	void OnUpdate(TimeStep ts);
 
-	Entity GetEntity(const std::string& tag);
+	Entity GetEntity(const std::string& name);
 	Entity GetEntity(VolcaniCore::UUID id);
 
 	EntityBuilder BuildEntity() { return EntityBuilder{ *this }; }
 	EntityBuilder BuildEntity(VolcaniCore::UUID id) {
 		return EntityBuilder{ *this, id };
 	}
-	EntityBuilder BuildEntity(const std::string& tag) {
-		return EntityBuilder{ *this, tag };
+	EntityBuilder BuildEntity(const std::string& name) {
+		return EntityBuilder{ *this, name };
 	}
 
 	Entity AddEntity();
 	Entity AddEntity(VolcaniCore::UUID id);
-	Entity AddEntity(const std::string& tag);
+	Entity AddEntity(const std::string& name);
 
 	void RemoveEntity(VolcaniCore::UUID id);
-	void RemoveEntity(const std::string& tag);
+	void RemoveEntity(const std::string& name);
 
 	void ForEach(const Func<void, Entity&>& func);
-
 	void ForEach(const Func<void, const Entity&>& func) const;
 
 	template<typename ...TComponents>
@@ -99,6 +98,7 @@ public:
 	void Remove() {
  		uint64_t id = TypeIDGenerator<System<>>::GetID<TSystem>();
 		delete (TSystem*)m_Systems[id];
+		m_Systems.erase(id);
 	}
 
 	flecs::world& GetNative() { return m_World; }

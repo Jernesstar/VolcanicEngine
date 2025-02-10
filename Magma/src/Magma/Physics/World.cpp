@@ -41,7 +41,7 @@ void World::OnUpdate(TimeStep ts) {
 void World::AddActor(Ref<RigidBody> body) {
 #ifdef MAGMA_PHYSICS
 	m_Scene->addActor(*body->m_Actor);
-	m_Actors.push_back(body);
+	m_Actors.Add(body);
 	m_ActorCount++;
 #endif
 }

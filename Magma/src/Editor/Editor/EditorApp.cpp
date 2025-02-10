@@ -7,7 +7,10 @@
 
 #include <Magma/UI/UI.h>
 
+#include <Magma/Physics/Physics.h>
+
 using namespace Magma::UI;
+using namespace Magma::Physics;
 
 namespace Magma {
 

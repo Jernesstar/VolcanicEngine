@@ -38,9 +38,9 @@ void World::OnUpdate(TimeStep ts) {
 	m_World.progress(ts);
 }
 
-Entity World::GetEntity(const std::string& tag) {
-	flecs::entity handle = m_World.lookup(tag.c_str());
-	return Entity{ handle };
+Entity World::GetEntity(const std::string& name) {
+	flecs::entity handle = m_World.lookup(name.c_str());
+	return Entity{ handle, name };
 }
 
 Entity World::GetEntity(VolcaniCore::UUID id) {
@@ -58,10 +58,9 @@ Entity World::AddEntity(VolcaniCore::UUID id) {
 	return Entity{ handle };
 }
 
-Entity World::AddEntity(const std::string& tag) {
-	flecs::entity handle = m_World.entity(tag.c_str());
-	Entity entity{ handle };
-	entity.Add<TagComponent>(std::string(tag));
+Entity World::AddEntity(const std::string& name) {
+	flecs::entity handle = m_World.entity(name.c_str());
+	Entity entity{ handle, name };
 
 	return entity;
 }
@@ -70,8 +69,8 @@ void World::RemoveEntity(VolcaniCore::UUID id) {
 	GetEntity(id).Kill();
 }
 
-void World::RemoveEntity(const std::string& tag) {
-	GetEntity(tag).Kill();
+void World::RemoveEntity(const std::string& name) {
+	GetEntity(name).Kill();
 }
 
 void World::ForEach(const Func<void, Entity&>& func) {

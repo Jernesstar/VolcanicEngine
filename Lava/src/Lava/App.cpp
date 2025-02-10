@@ -49,8 +49,8 @@ static Ref<ScriptClass> s_AppClass;
 static Ref<ScriptObject> s_AppObject;
 
 struct RuntimeScreen {
-	Scene Scene;
-	UIPage Page;
+	Scene CurrentScene;
+	UIPage CurrentPage;
 };
 
 static RuntimeScreen* s_CurrentScreen;
@@ -122,12 +122,12 @@ void App::OnUpdate(TimeStep ts) {
 	if(!s_CurrentScreen)
 		return;
 
-	s_CurrentScreen->Scene.OnRender(*s_SceneRenderer);
+	s_CurrentScreen->CurrentScene.OnRender(*s_SceneRenderer);
 
 	UIRenderer::BeginFrame();
 
-	s_CurrentScreen->Page.Render();
-	s_CurrentScreen->Page.Traverse(
+	s_CurrentScreen->CurrentPage.Render();
+	s_CurrentScreen->CurrentPage.Traverse(
 		[&](UIElement* element)
 		{
 			if(!s_Objects.count(element->GetID()))
@@ -167,15 +167,15 @@ void App::SetScreen(const std::string& name) {
 	s_CurrentScreen = new RuntimeScreen;
 
 	auto scenePath = fs::path(m_Project.Path) / "Visual" / "Scene" / "Schema" / screen.Scene;
-	SceneLoader::Load(s_CurrentScreen->Scene, scenePath.string() + ".magma.scene");
+	SceneLoader::Load(s_CurrentScreen->CurrentScene, scenePath.string() + ".magma.scene");
 
 	auto pagePath = fs::path(m_Project.Path) / "Visual" / "UI" / "Page" / screen.Page;
-	s_CurrentScreen->Page.SetTheme(s_Theme);
-	UILoader::Load(s_CurrentScreen->Page, pagePath.string());
+	s_CurrentScreen->CurrentPage.SetTheme(s_Theme);
+	UILoader::Load(s_CurrentScreen->CurrentPage, pagePath.string());
 	UILoader::Compile(pagePath.string());
 
 	s_Module = UILoader::GetModule(screen.Page);
-	s_CurrentScreen->Page.Traverse(
+	s_CurrentScreen->CurrentPage.Traverse(
 		[](UIElement* element)
 		{
 			Ref<ScriptClass> scriptClass =

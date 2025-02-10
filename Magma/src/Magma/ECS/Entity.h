@@ -7,8 +7,10 @@ namespace Magma::ECS {
 class Entity {
 public:
 	Entity() = default;
-	Entity(flecs::entity handle)
-		: m_Handle(handle) { }
+	Entity(const std::string& name)
+		: m_Name(name) { }
+	Entity(flecs::entity handle, const std::string& name = "")
+		: m_Handle(handle), m_Name(name == "" ? "Unnamed Entity" : name) { }
 	~Entity() = default;
 
 	bool IsValid() const { return m_Handle != 0; }
@@ -50,9 +52,12 @@ public:
 	}
 
 	flecs::entity GetHandle() const { return m_Handle; }
+	const std::string& GetName() const { return m_Name; }
+	void SetName(const std::string& name) { m_Name = name; }
 
 private:
 	flecs::entity m_Handle;
+	std::string m_Name;
 };
 
 }

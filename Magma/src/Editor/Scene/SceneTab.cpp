@@ -87,6 +87,9 @@ void SceneTab::SetScene(const std::string& path) {
 }
 
 void SceneTab::Update(TimeStep ts) {
+	if(m_SceneState == SceneState::Play)
+		m_Scene.OnUpdate(ts);
+
 	for(auto panel : m_Panels)
 		if(panel->IsOpen())
 			panel->Update(ts);

@@ -14,6 +14,8 @@
 
 #include <Magma/UI/UIRenderer.h>
 
+#include <Magma/Physics/Physics.h>
+
 #include <Lava/ProjectLoader.h>
 
 #include "Project/AssetEditorPanel.h"
@@ -21,6 +23,7 @@
 
 using namespace VolcaniCore;
 using namespace Magma::UI;
+using namespace Magma::Physics;
 using namespace Lava;
 
 namespace Magma {
@@ -41,6 +44,8 @@ struct {
 } static menu;
 
 Editor::Editor(const CommandLineArgs& args) {
+	Physics::Init();
+	
 	if(args["--project"]) {
 		ProjectLoader::Load(m_Project, args["--project"]);
 		SetTab(nullptr);
@@ -67,6 +72,8 @@ Editor::Editor(const CommandLineArgs& args) {
 Editor::~Editor() {
 	m_Tabs.Clear();
 	m_Panels.Clear();
+
+	Physics::Close();
 }
 
 void Editor::Update(TimeStep ts) {
@@ -226,7 +233,7 @@ void Editor::OpenTab() {
 	namespace fs = std::filesystem;
 
 	IGFD::FileDialogConfig config;
-	config.path = ".";
+	config.path = m_Project.Path;
 	auto instance = ImGuiFileDialog::Instance();
 	instance->OpenDialog("ChooseFile", "Choose File",
 						 ".magma.scene, .magma.ui.json", config);
@@ -274,7 +281,7 @@ void Editor::NewProject() {
 
 void Editor::OpenProject() {
 	IGFD::FileDialogConfig config;
-	config.path = ".";
+	config.path = m_Project.Path;
 	auto instance = ImGuiFileDialog::Instance();
 	instance->OpenDialog("ChooseFile", "Choose File", ".volc.proj", config);
 
@@ -301,10 +308,10 @@ void Editor::RunProject() {
 
 	std::string command;
 #ifdef VOLCANICENGINE_WINDOWS
-	command = ".\\build\\Lava\\bin\\Runtime -c --project ";
+	command = ".\\build\\Lava\\bin\\Runtime --project ";
 	command += m_Project.Path + "\\.volc.proj";
 #elif VOLCANICENGINE_LINUX
-	command = "./build/Lava/bin/Runtime -c --project ";
+	command = "./build/Lava/bin/Runtime --project ";
 	command += m_Project.Path + "/.volc.proj";
 #endif
 	system(command.c_str());

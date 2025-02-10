@@ -16,25 +16,25 @@ public:
 
 	void AddMesh(Ref<Mesh> mesh);
 
-	Ref<Mesh> GetMesh(uint32_t i) const {
+	Ref<Mesh> GetMesh(int64_t i) const {
 		return m_Meshes[i];
 	}
 
 	uint32_t GetMeshCount() const {
-		return m_Meshes.size();
+		return m_Meshes.Count();
 	}
 
-	std::vector<Ref<Mesh>>::const_iterator begin() const {
+	List<Ref<Mesh>>::const_iterator begin() const {
 		return m_Meshes.begin();
 	}
-	std::vector<Ref<Mesh>>::const_iterator end() const {
+	List<Ref<Mesh>>::const_iterator end() const {
 		return m_Meshes.end();
 	}
 
 private:
 	void Load(const std::string& path);
 
-	std::vector<Ref<Mesh>> m_Meshes;
+	List<Ref<Mesh>> m_Meshes;
 };
 
 }
