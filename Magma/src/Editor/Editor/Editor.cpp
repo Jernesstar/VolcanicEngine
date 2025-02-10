@@ -73,7 +73,7 @@ Editor::~Editor() {
 	m_Tabs.Clear();
 	m_Panels.Clear();
 
-	Physics::Close();
+	// Physics::Close();
 }
 
 void Editor::Update(TimeStep ts) {

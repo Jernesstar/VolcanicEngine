@@ -60,7 +60,7 @@ struct {
 } static options;
 
 void SceneVisualizerPanel::Draw() {
-	m_Context->OnRender(m_Renderer);
+	// m_Context->OnRender(m_Renderer);
 
 	auto flags = ImGuiWindowFlags_NoScrollbar
 			   | ImGuiWindowFlags_NoScrollWithMouse;
@@ -82,7 +82,7 @@ void SceneVisualizerPanel::Draw() {
 		// m_Image->SetSize(size.x, size.y);
 		m_Image->Draw();
 
-		// ImGui::SetCursorPos(pos);
+		ImGui::SetCursorPos(pos);
 
 		auto windowFlags = ImGuiWindowFlags_MenuBar;
 		auto childFlags = ImGuiChildFlags_Border;
@@ -135,7 +135,9 @@ void SceneVisualizerPanel::Draw() {
 				{
 					Entity newEntity;
 					bool exit = true;
-					if(str != "") {
+					if(str == "")
+						newEntity = world.AddEntity();
+					else {
 						if(world.GetEntity(str).IsValid()) {
 							exit = false;
 							str = "";
@@ -144,8 +146,6 @@ void SceneVisualizerPanel::Draw() {
 						else
 							newEntity = world.AddEntity(str);
 					}
-					else
-						newEntity = world.AddEntity();
 
 					if(exit) {
 						auto& editor = Application::As<EditorApp>()->GetEditor();
@@ -162,7 +162,7 @@ void SceneVisualizerPanel::Draw() {
 
 		if(ImGui::IsMouseClicked(0) && ImGui::IsWindowHovered()) {
 			auto& cameraController = m_Renderer.GetCameraController();
-			// auto physicsWorld = world.Get<PhysicsSystem>()->Get();
+			auto& physicsWorld = world.Get<PhysicsSystem>()->Get();
 			auto camera = cameraController.GetCamera();
 
 			glm::vec2 pos = { ImGui::GetMousePos().x, ImGui::GetMousePos().y };
@@ -187,15 +187,18 @@ void SceneVisualizerPanel::Draw() {
 			glm::vec3 rayDir = glm::vec3(worldEnd - worldStart);
 			float maxDist = 10000.0f;
 
-			// auto hitInfo = physicsWorld.Raycast(worldStart, rayDir, maxDist);
-			// if(hitInfo) {
+			auto hitInfo = physicsWorld.Raycast(worldStart, rayDir, maxDist);
+			if(hitInfo) {
 				VOLCANICORE_LOG_INFO("Hit something");
-				// m_Selected.Collider = Ref<RigidBody>(hitInfo.Actor);
+				m_Selected.Collider = hitInfo.Actor;
 				// m_Renderer.Select(entity);
-				// auto hierarchy =
-				// 	m_Tab->GetPanel("SceneHierarchy")->As<SceneHierarchyPanel>();
-				// // hierarchy->Select(entity);
-			// }
+				auto hierarchy =
+					m_Tab->GetPanel("SceneHierarchy")->As<SceneHierarchyPanel>();
+				// hierarchy->Select(entity);
+			}
+			else {
+				VOLCANICORE_LOG_INFO("Void and Emptiness");
+			}
 		}
 	}
 	ImGui::End();
@@ -267,7 +270,7 @@ SceneVisualizerPanel::Renderer::Renderer() {
 }
 
 void SceneVisualizerPanel::Renderer::Update(TimeStep ts) {
-	m_Controller.OnUpdate(ts);
+	// m_Controller.OnUpdate(ts);
 }
 
 void SceneVisualizerPanel::Renderer::Begin() {

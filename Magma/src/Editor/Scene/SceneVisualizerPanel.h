@@ -12,7 +12,7 @@ namespace Magma {
 
 struct EditorEntity {
 	ECS::Entity Handle;
-	Ref<Physics::RigidBody> Collider; // Used to press on Entity objects
+	Physics::RigidBody* Collider;
 };
 
 class SceneVisualizerPanel : public Panel {

@@ -19,6 +19,10 @@ public:
 	void Load(const std::string& path);
 	void Save(const std::string& path);
 	void SaveRuntime(const std::string& path);
+
+public:
+	std::string m_Path;
+	Map<UUID, MeshPrimitive> m_Primitives;
 };
 
 }

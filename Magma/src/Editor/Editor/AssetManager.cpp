@@ -25,75 +25,62 @@ Asset EditorAssetManager::Get(const std::string& path, AssetType type) {
 }
 
 void EditorAssetManager::Load(const std::string& path) {
+	m_Path = path;
+
 	
 }
 
 void EditorAssetManager::Save(const std::string& path) {
 	YAMLSerializer serializer;
 
+	serializer.WriteKey("MeshAssets").BeginSequence();
 	for(auto& [id, model] : m_MeshAssets) {
 		if(model->Path != "") {
-			serializer.WriteKey("Model")
-			.BeginMapping()
-				.WriteKey("Path").Write(model->Path)
-			.EndMapping();
+
 		}
 		else {
-			serializer.WriteKey("Meshes").BeginSequence();
+			serializer.BeginMapping();
+			serializer.WriteKey("Mesh").BeginMapping();
+			serializer.WriteKey("Type").Write((uint32_t)m_Primitives[id]);
 
-			for(auto mesh : *model) {
-				serializer.BeginMapping();
-				serializer.WriteKey("Mesh").BeginMapping();
+			serializer.WriteKey("Material")
+			.BeginMapping();
 
-				if(mesh->Path != "")
-					serializer.WriteKey("Path").Write(mesh->Path);
-				else {
-					serializer.WriteKey("Vertices")
-					.SetOptions(Serializer::Options::ArrayOneLine)
-					.Write(mesh->GetVertices());
+			auto& mat = mesh->GetMaterial();
+			if(mat.Diffuse)
+				serializer.WriteKey("Diffuse")
+				.BeginMapping()
+					.WriteKey("Path").Write(mat.Diffuse->GetPath())
+				.EndMapping();
 
-					serializer.WriteKey("Indices")
-					.SetOptions(Serializer::Options::ArrayOneLine)
-					.Write(mesh->GetIndices());
+			if(mat.Specular)
+				serializer.WriteKey("Specular")
+				.BeginMapping()
+					.WriteKey("Path").Write(mat.Specular->GetPath())
+				.EndMapping();
 
-					serializer.WriteKey("Material")
-					.BeginMapping();
+			if(mat.Emissive)
+				serializer.WriteKey("Emissive")
+				.BeginMapping()
+					.WriteKey("Path").Write(mat.Emissive->GetPath())
+				.EndMapping();
 
-					auto& mat = mesh->GetMaterial();
-					if(mat.Diffuse)
-						serializer.WriteKey("Diffuse")
-						.BeginMapping()
-							.WriteKey("Path").Write(mat.Diffuse->GetPath())
-						.EndMapping();
+			serializer
+				.WriteKey("DiffuseColor").Write(mat.DiffuseColor);
+			serializer
+				.WriteKey("SpecularColor").Write(mat.SpecularColor);
+			serializer
+				.WriteKey("EmissiveColor").Write(mat.EmissiveColor);
 
-					if(mat.Specular)
-						serializer.WriteKey("Specular")
-						.BeginMapping()
-							.WriteKey("Path").Write(mat.Specular->GetPath())
-						.EndMapping();
+			serializer
+			.EndMapping(); // Material
 
-					if(mat.Emissive)
-						serializer.WriteKey("Emissive")
-						.BeginMapping()
-							.WriteKey("Path").Write(mat.Emissive->GetPath())
-						.EndMapping();
-
-					serializer
-						.WriteKey("DiffuseColor").Write(mat.DiffuseColor);
-					serializer
-						.WriteKey("SpecularColor").Write(mat.SpecularColor);
-					serializer
-						.WriteKey("EmissiveColor").Write(mat.EmissiveColor);
-
-					serializer
-					.EndMapping(); // Material
-				}
-				serializer.EndMapping(); // Mesh
-				serializer.EndMapping();
-			}
-			serializer.EndSequence();
+			serializer.EndMapping(); // Mesh
+			serializer.EndMapping();
 		}
 	}
+
+	serializer.EndSequence();
 }
 
 void EditorAssetManager::SaveRuntime(const std::string& path) {

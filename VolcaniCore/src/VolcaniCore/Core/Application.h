@@ -35,7 +35,7 @@ protected:
 private:
 	static void Init();
 	static void Run();
-	static void SetCurrentDir(const char* path);
+	static void SetCurrentDir();
 
 	inline static std::string s_LibraryPath;
 	inline static std::string s_Path;

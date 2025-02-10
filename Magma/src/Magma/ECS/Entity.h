@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include <flecs/flecs.h>
 
 namespace Magma::ECS {
