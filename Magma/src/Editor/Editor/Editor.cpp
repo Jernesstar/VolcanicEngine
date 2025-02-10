@@ -58,15 +58,13 @@ Editor::Editor(const CommandLineArgs& args) {
 		panel2->Open();
 		m_Panels.Add(panel1);
 		m_Panels.Add(panel2);
+
+		m_Manager.Load(path.string());
 	}
-	for(auto& path : args["--scene"]) {
-		auto tab = CreateRef<SceneTab>(path);
-		NewTab(tab);
-	}
-	for(auto& path : args["--ui"]) {
-		auto tab = CreateRef<UITab>(path);
-		NewTab(tab);
-	}
+	for(auto& path : args["--scene"])
+		NewTab(CreateRef<SceneTab>(path););
+	for(auto& path : args["--ui"])
+		NewTab(CreateRef<UITab>(path));
 }
 
 Editor::~Editor() {
@@ -79,7 +77,6 @@ Editor::~Editor() {
 void Editor::Update(TimeStep ts) {
 	for(auto tab : m_Tabs)
 		tab->Update(ts);
-
 	for(auto panel : m_Panels)
 		panel->Update(ts);
 }
