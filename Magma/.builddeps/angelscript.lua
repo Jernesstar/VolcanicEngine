@@ -4,8 +4,8 @@ rule "ASM"
     location "%{RootPath}/build"
 
     buildmessage "Compiling %(Filename) ASM file for MSVC build"
-    buildcommands 'ml64.exe /c /nologo /Fo"%(FullPath)" /W3 /Zi /Ta "%(IntDir)/%(Filename).obj"'
-    buildoutputs '%(IntDir)/%(Filename).obj'
+    buildcommands 'ml64.exe /c /nologo /Fo"%(Outputs)as_callfunc_x64_msvc_asm.obj" /W3 /Zi /Ta "%(RootDir)%(Directory)%(Filename)%(Extension)"'
+    buildoutputs '%(Outputs)as_callfunc_x64_msvc_asm.obj'
 
 project "angelscript"
     kind "StaticLib"
@@ -15,6 +15,8 @@ project "angelscript"
 
     objdir ("%{RootPath}/build/Magma/obj")
     targetdir ("%{RootPath}/build/Magma/lib")
+
+    rules { "ASM" }
 
     files {
         "%{VendorPaths.angelscript}/angelscript/source/*.cpp",
@@ -30,19 +32,11 @@ project "angelscript"
 
     }
 
-    filter { "action:vs", "system:windows" }
-        rules { "ASM" }
+    filter { "action:vs*", "system:windows" }
         files {
             "%{VendorPaths.angelscript}/angelscript/source/as_callfunc_x64_msvc_asm.asm"
         }
 
-    -- filter 'files:**.asm'
-    --     buildmessage 'Compiling %[%{file.relpath}]'
-
-    --     -- One or more commands to run (required)
-    --     buildcommands {
-    --         'ml64.exe /c /nologo /Fo "%[%{!cfg.objdir}/%{file.basename}.obj]" /W3 /Zi /Ta "%[%{file.relpath}]"'
-    --     }
-
-    --     -- One or more outputs resulting from the build (required)
-    --     buildoutputs { "%[%{!cfg.objdir}/%{file.basename}.obj]" }
+        defines {
+            "/NODEFAULTLIB:library"
+        }

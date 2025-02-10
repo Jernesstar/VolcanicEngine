@@ -64,7 +64,7 @@ void App::OnLoad() {
 	ScriptEngine::Init();
 
 	ScriptEngine::RegisterSingleton("App", "s_App", this);
-	ScriptEngine::RegisterMethod<App>("App", "void SetScreen(const string &in)", SetScreen);
+	ScriptEngine::RegisterMethod<App>("App", "void SetScreen(const string &in)", &App::SetScreen);
 
 	ScriptEngine::RegisterInterface("IApp")
 		.AddMethod("void OnLoad()")

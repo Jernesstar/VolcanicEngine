@@ -35,7 +35,6 @@ public:
 	CameraController& GetCameraController() { return m_Controller; }
 
 protected:
-	Scene* m_Scene;
 	Ref<Framebuffer> m_Output;
 	CameraController m_Controller;
 };
