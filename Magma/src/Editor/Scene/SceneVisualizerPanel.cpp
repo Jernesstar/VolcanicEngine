@@ -55,12 +55,12 @@ void SceneVisualizerPanel::Update(TimeStep ts) {
 
 struct {
 	struct {
-		std::string mesh;
+		Asset asset;
 	} add;
 } static options;
 
 void SceneVisualizerPanel::Draw() {
-	// m_Context->OnRender(m_Renderer);
+	m_Context->OnRender(m_Renderer);
 
 	auto flags = ImGuiWindowFlags_NoScrollbar
 			   | ImGuiWindowFlags_NoScrollWithMouse;
@@ -82,6 +82,23 @@ void SceneVisualizerPanel::Draw() {
 		// m_Image->SetSize(size.x, size.y);
 		m_Image->Draw();
 
+		if(ImGui::BeginDragDropTarget())
+		{
+			if(auto payload = ImGui::AcceptDragDropPayload("ASSET")) {
+				options.add.asset = *(Asset*)payload->Data;
+
+				switch(options.add.asset.Type) {
+					case AssetType::Mesh:
+						ImGui::OpenPopup("Create Entity with MeshComponent");
+						break;
+					case AssetType::Cubemap:
+						ImGui::OpenPopup("Create Entity with SkyboxComponent");
+						break;
+				}
+			}
+			ImGui::EndDragDropTarget();
+		}
+
 		ImGui::SetCursorPos(pos);
 
 		auto windowFlags = ImGuiWindowFlags_MenuBar;
@@ -94,34 +111,17 @@ void SceneVisualizerPanel::Draw() {
 			ImGui::Text("Indices: %li", info.Indices);
 			ImGui::Text("Vertices: %li", info.Vertices);
 			ImGui::Text("Instances: %li", info.Instances);
-			ImGui::Text("Triangles: %li",
-				info.Instances * uint64_t(info.Vertices / 3));
 		}
 		ImGui::EndChild();
 
-		if(ImGui::BeginDragDropTarget())
-		{
-			auto flags = ImGuiDragDropFlags_AcceptBeforeDelivery;
-			if(auto payload = ImGui::AcceptDragDropPayload("Image", flags)) {
-				if(!payload->IsDelivery()) {
-					ImGui::SetMouseCursor(ImGuiMouseCursor_NotAllowed);
-					ImGui::SetTooltip("Can't drop here yet!");
-				}
-				else {
-					VOLCANICORE_LOG_INFO("Delivered");
-				}
-			}
-			if(auto payload = ImGui::AcceptDragDropPayload("Model", flags)) {
-				if(payload->IsDelivery()) {
-					ImGui::OpenPopup("Create Entity with MeshComponent");
-					options.add.mesh = std::string((const char*)payload->Data);
-				}
-			}
-			ImGui::EndDragDropTarget();
-		}
-
 		auto& world = m_Context->EntityWorld;
-		if(ImGui::BeginPopupModal("Create Entity with MeshComponent")) {
+
+		bool open = false;
+		open = ImGui::BeginPopupModal("Create Entity with MeshComponent");
+		if(!open)
+			open = ImGui::BeginPopupModal("Create Entity with SkyboxComponent");
+
+		if(open) {
 			static std::string str;
 			static std::string hint = "Enter entity name";
 			ImGui::InputTextWithHint("##Input", hint.c_str(), &str);
@@ -148,12 +148,11 @@ void SceneVisualizerPanel::Draw() {
 					}
 
 					if(exit) {
-						auto& editor = Application::As<EditorApp>()->GetEditor();
-						auto& assetManager = editor.GetAssets();
-						Asset asset =
-							assetManager.GetFromPath(
-								options.add.mesh, AssetType::Mesh);
-						newEntity.Add<MeshComponent>(asset);
+						if(options.add.asset.Type == AssetType::Mesh)
+							newEntity.Add<MeshComponent>(options.add.asset);
+						if(options.add.asset.Type == AssetType::Cubemap)
+							newEntity.Add<SkyboxComponent>(options.add.asset);
+
 						ImGui::CloseCurrentPopup();
 					}
 				}
@@ -271,7 +270,7 @@ SceneVisualizerPanel::Renderer::Renderer() {
 }
 
 void SceneVisualizerPanel::Renderer::Update(TimeStep ts) {
-	// m_Controller.OnUpdate(ts);
+	m_Controller.OnUpdate(ts);
 }
 
 void SceneVisualizerPanel::Renderer::Begin() {
@@ -306,7 +305,7 @@ void SceneVisualizerPanel::Renderer::SubmitLight(Entity entity) {
 }
 
 void SceneVisualizerPanel::Renderer::SubmitMesh(Entity entity) {
-	auto assetManager = Application::As<EditorApp>()->GetEditor().GetAssets();
+	auto& assetManager = Application::As<EditorApp>()->GetEditor().GetAssets();
 
 	auto& tc = entity.Get<TransformComponent>();
 	auto& mc = entity.Get<MeshComponent>();
@@ -317,6 +316,8 @@ void SceneVisualizerPanel::Renderer::SubmitMesh(Entity entity) {
 		.Scale		 = tc.Scale
 	};
 	auto mesh = assetManager.Get<Model>(mc.MeshAsset);
+	if(!mesh)
+		return;
 
 	if(!Objects.count(mesh)) {
 		// if(entity == Selected) {

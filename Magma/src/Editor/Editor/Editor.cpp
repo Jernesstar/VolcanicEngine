@@ -33,6 +33,7 @@ struct {
 		bool openProject   = false;
 		bool reloadProject = false;
 		bool runProject    = false;
+		bool exportProject = false;
 	} project;
 
 	struct {
@@ -45,12 +46,12 @@ struct {
 
 Editor::Editor(const CommandLineArgs& args) {
 	Physics::Init();
-	
+
 	if(args["--project"]) {
 		ProjectLoader::Load(m_Project, args["--project"]);
 		SetTab(nullptr);
 
-		auto panel1 = CreateRef<AssetEditorPanel>(m_Project.Path);
+		auto panel1 = CreateRef<AssetEditorPanel>();
 		auto panel2 = CreateRef<ContentBrowserPanel>(m_Project.Path);
 		panel1->Open();
 		panel2->Open();
@@ -118,6 +119,10 @@ void Editor::Render() {
 				if(ImGui::MenuItem("Run", "Ctrl+R"))
 					menu.project.runProject = true;
 
+				ImGui::Separator();
+				if(ImGui::MenuItem("Export"))
+					menu.project.exportProject = true;
+
 				ImGui::EndMenu();
 			}
 
@@ -182,6 +187,8 @@ void Editor::Render() {
 		ReloadProject();
 	if(menu.project.runProject)
 		RunProject();
+	if(menu.project.exportProject)
+		ExportProject();
 
 	if(menu.tab.newTab)
 		NewTab();
@@ -310,6 +317,11 @@ void Editor::RunProject() {
 	command += m_Project.Path + "/.volc.proj";
 #endif
 	system(command.c_str());
+}
+
+void Editor::ExportProject() {
+	menu.project.exportProject = false;
+
 }
 
 }

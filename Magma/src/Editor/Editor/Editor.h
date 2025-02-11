@@ -29,6 +29,19 @@ public:
 
 	const Project& GetProject() const { return m_Project; }
 
+	Ref<Panel> GetPanel(const std::string& name) {
+		auto [found, idx] =
+			m_Panels.Find(
+				[&](auto& panel)
+				{
+					return panel->Name == name;
+				});
+
+		if(!found)
+			return nullptr;
+
+		return m_Panels[idx];
+	}
 	EditorAssetManager& GetAssets() { return m_Manager; }
 
 private:
@@ -50,6 +63,7 @@ private:
 	void OpenProject();
 	void ReloadProject();
 	void RunProject();
+	void ExportProject();
 };
 
 }

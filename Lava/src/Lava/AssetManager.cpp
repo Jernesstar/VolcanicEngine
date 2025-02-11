@@ -10,11 +10,11 @@ RuntimeAssetManager::~RuntimeAssetManager() {
 
 }
 
-void RuntimeAssetManager::Load(Asset& asset) {
+void RuntimeAssetManager::Load(Asset asset) {
 
 }
 
-void RuntimeAssetManager::Unload(Asset& asset) {
+void RuntimeAssetManager::Unload(Asset asset) {
 
 }
 

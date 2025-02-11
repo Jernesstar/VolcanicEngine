@@ -3,18 +3,24 @@
 #include <VolcaniCore/Core/FileUtils.h>
 
 #include "Editor/Panel.h"
+#include "Editor/AssetManager.h"
 
 namespace Magma {
 
 class AssetEditorPanel : public Panel {
 public:
-	AssetEditorPanel(const std::string& path);
+	AssetEditorPanel();
 	~AssetEditorPanel() = default;
 
 	void Update(TimeStep ts) override;
 	void Draw() override;
 
+	void Select(Asset asset) {
+		m_CurrentAsset = asset;
+	}
+
 private:
+	Asset m_CurrentAsset;
 	std::string m_Path;
 };
 

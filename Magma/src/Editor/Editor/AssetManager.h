@@ -9,10 +9,15 @@ public:
 	EditorAssetManager();
 	~EditorAssetManager();
 
-	void Load(Asset& asset) override;
-	void Unload(Asset& asset) override;
+	void Load(Asset asset) override;
+	void Unload(Asset asset) override;
 
-	Asset GetFromPath(const std::string& path, AssetType type);
+	Asset Add(MeshPrimitive primitive);
+	Asset Add(const std::string& path, AssetType type);
+
+	std::string GetPath(UUID id);
+
+	const Map<Asset, bool>& GetRegistry() const { return m_AssetRegistry; }
 
 	void Load(const std::string& path);
 	void Save();

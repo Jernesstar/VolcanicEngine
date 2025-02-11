@@ -9,8 +9,8 @@ public:
 	RuntimeAssetManager();
 	~RuntimeAssetManager();
 
-	void Load(Asset& asset) override;
-	void Unload(Asset& asset) override;
+	void Load(Asset asset) override;
+	void Unload(Asset asset) override;
 
 	void LoadRegistry(const std::string& registryFile);
 };

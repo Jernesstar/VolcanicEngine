@@ -35,8 +35,8 @@ struct TagComponent : public Component {
 	std::string Tag;
 
 	TagComponent()
-		: Tag("Unnamed Entity") { }
-	TagComponent(const std::string_view& tag)
+		: Tag("Empty Tag") { }
+	TagComponent(const std::string& tag)
 		: Tag(tag) { }
 	TagComponent(const TagComponent& other) = default;
 };

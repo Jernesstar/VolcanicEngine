@@ -17,6 +17,7 @@ project "flecs"
 
     defines {
         "FLECS_DEBUG",
+        "FLECS_CPP_NO_AUTO_REGISTRATION",
         -- "FLECS_CUSTOM_BUILD",
         -- "FLECS_CPP",
         -- "FLECS_SYSTEM",

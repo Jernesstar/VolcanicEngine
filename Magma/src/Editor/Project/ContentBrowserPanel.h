@@ -22,8 +22,6 @@ public:
 
 private:
 	fs::path m_Path;
-	fs::path m_CurrentPath;
-	fs::path m_AssetPath;
 	Ref<UI::Image> m_FileIcon;
 	Ref<UI::Image> m_FolderIcon;
 };

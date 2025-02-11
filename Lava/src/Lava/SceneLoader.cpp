@@ -234,10 +234,11 @@ void SerializeEntity(YAMLSerializer& serializer, const Entity& entity) {
 }
 
 void DeserializeEntity(YAML::Node entityNode, Scene& scene) {
-	VolcaniCore::UUID id(entityNode["ID"].as<uint64_t>());
-
-	Entity entity = scene.EntityWorld.AddEntity(id);
-	entity.SetName(entityNode["Name"].as<std::string>());
+	Entity entity;
+	entity = scene.EntityWorld.AddEntity(entityNode["ID"].as<uint64_t>());
+	auto name = entityNode["Name"].as<std::string>();
+	if(name != "")
+		entity.SetName(name);
 
 	auto components = entityNode["Components"];
 
@@ -274,7 +275,7 @@ void DeserializeEntity(YAML::Node entityNode, Scene& scene) {
 	auto tagComponentNode = components["TagComponent"];
 	if(tagComponentNode) {
 		auto tag = tagComponentNode["Tag"].as<std::string>();
-		entity = scene.EntityWorld.AddEntity(tag);
+		entity.Add<TagComponent>(tag);
 	}
 
 	auto transformComponentNode = components["TransformComponent"];
@@ -295,12 +296,16 @@ void DeserializeEntity(YAML::Node entityNode, Scene& scene) {
 
 	auto meshComponentNode = components["MeshComponent"];
 	if(meshComponentNode) {
-		entity.Add<MeshComponent>(meshComponentNode["Asset"].as<Asset>());
+		auto assetNode = meshComponentNode["Asset"];
+		auto id = assetNode["ID"].as<uint64_t>();
+		entity.Add<MeshComponent>(Asset{ id, AssetType::Mesh });
 	}
 
 	auto skyboxComponentNode = components["SkyboxComponent"];
 	if(skyboxComponentNode) {
-		entity.Add<SkyboxComponent>(skyboxComponentNode["Asset"].as<Asset>());
+		auto assetNode = skyboxComponentNode["Asset"];
+		auto id = assetNode["ID"].as<uint64_t>();
+		entity.Add<SkyboxComponent>(Asset{ id, AssetType::Cubemap });
 	}
 
 	auto scriptComponentNode = components["ScriptComponent"];
@@ -325,12 +330,11 @@ void DeserializeEntity(YAML::Node entityNode, Scene& scene) {
 		if(shapeTypeStr == "Capsule") shapeType = Shape::Type::Capsule;
 		if(shapeTypeStr == "Mesh")	  shapeType = Shape::Type::Mesh;
 
-		if(shapeType != Shape::Type::Mesh) {
+		if(shapeType == Shape::Type::Mesh)
+			entity.Add<RigidBodyComponent>(type);
+		else {
 			Ref<Shape> shape = Shape::Create(shapeType);
 			entity.Add<RigidBodyComponent>(type, shape);
-		}
-		else {
-			entity.Add<RigidBodyComponent>(type);
 		}
 	}
 
@@ -457,22 +461,6 @@ struct convert<VolcaniCore::Vertex> {
 		vertex.Position = node[0].as<glm::vec3>();
 		vertex.Normal	= node[1].as<glm::vec3>();
 		vertex.TexCoord = node[2].as<glm::vec2>();
-		return true;
-	}
-};
-
-template<>
-struct convert<Asset> {
-	static Node encode(const Asset& asset) {
-		Node node;
-		node["Type"] = (uint32_t)asset.Type;
-		node["ID"] = (uint64_t)asset.ID;
-		return node;
-	}
-
-	static bool decode(const Node& node, Asset& asset) {
-		asset.Type = (AssetType)node["Type"].as<uint32_t>();
-		asset.ID = (UUID)node["ID"].as<uint64_t>();
 		return true;
 	}
 };

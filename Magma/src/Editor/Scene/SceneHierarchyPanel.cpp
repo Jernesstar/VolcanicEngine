@@ -38,7 +38,8 @@ struct {
 	struct {
 		bool entity = false;
 		bool skybox = false;
-		bool pointlight = false;
+		bool directionalLight = false;
+		bool pointLight = false;
 		bool spotlight = false;
 	} add;
 } static options;
@@ -58,8 +59,10 @@ void SceneHierarchyPanel::Draw() {
 					options.add.entity = true;
 				if(ImGui::MenuItem("Skybox"))
 					options.add.skybox = true;
+				if(ImGui::MenuItem("DirectionalLight"))
+					options.add.directionalLight = true;
 				if(ImGui::MenuItem("PointLight"))
-					options.add.pointlight = true;
+					options.add.pointLight = true;
 				if(ImGui::MenuItem("Spotlight"))
 					options.add.spotlight = true;
 
@@ -107,7 +110,6 @@ void SceneHierarchyPanel::Draw() {
 
 				ImGui::EndPopup();
 			}
-			break;
 		}
 
 		m_Context->EntityWorld
@@ -127,14 +129,9 @@ void SceneHierarchyPanel::DrawEntityNode(Entity& entity) {
 	if(entity == m_Selected)
 		flags |= ImGuiTreeNodeFlags_Selected;
 
-	auto id = (void*)(uint64_t)(uint32_t)entity.GetHandle();
-	std::string tag;
-	if(entity.GetName() != "")
-		tag = entity.GetName();
-	else
-		tag = std::to_string(entity.GetHandle());
-
-	if(ImGui::TreeNodeEx(id, flags, tag.c_str())) {
+	void* id = (void*)(uint64_t)(uint32_t)entity.GetHandle();
+	auto name = entity.GetName() != "" ? entity.GetName() : "Unnamed Entity";
+	if(ImGui::TreeNodeEx(id, flags, name.c_str())) {
 		auto editor =
 			m_Tab->GetPanel("ComponentEditor")->As<ComponentEditorPanel>();
 		auto visual =
@@ -243,9 +240,6 @@ void SceneHierarchyPanel::DrawEntityNode(Entity& entity) {
 					if(!entity.Has<RigidBodyComponent>()
 					&& ImGui::MenuItem("RigidBodyComponent"))
 						entity.Add<RigidBodyComponent>();
-					if(!entity.Has<TagComponent>()
-					&& ImGui::MenuItem("TagComponent"))
-						entity.Add<TagComponent>();
 					if(!entity.Has<TransformComponent>()
 					&& ImGui::MenuItem("TransformComponent"))
 						entity.Add<TransformComponent>();
@@ -266,9 +260,6 @@ void SceneHierarchyPanel::DrawEntityNode(Entity& entity) {
 					if(entity.Has<RigidBodyComponent>()
 					&& ImGui::MenuItem("RigidBodyComponent"))
 						entity.Remove<RigidBodyComponent>();
-					if(entity.Has<TagComponent>()
-					&& ImGui::MenuItem("TagComponent"))
-						entity.Remove<TagComponent>();
 					if(entity.Has<TransformComponent>()
 					&& ImGui::MenuItem("TransformComponent"))
 						entity.Remove<TransformComponent>();

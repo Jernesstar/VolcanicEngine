@@ -12,6 +12,8 @@
 
 #include "Editor/EditorApp.h"
 
+#include "Project/AssetEditorPanel.h"
+
 namespace Magma {
 
 ContentBrowserPanel::ContentBrowserPanel(const std::string& path)
@@ -19,9 +21,6 @@ ContentBrowserPanel::ContentBrowserPanel(const std::string& path)
 {
 	m_FileIcon = CreateRef<UI::Image>("Magma/assets/icons/FileIcon.png");
 	m_FolderIcon = CreateRef<UI::Image>("Magma/assets/icons/FolderIcon.png");
-
-	m_CurrentPath = m_Path;
-	m_AssetPath = m_Path / "asset";
 }
 
 void ContentBrowserPanel::Update(TimeStep ts) {
@@ -98,63 +97,49 @@ void ContentBrowserPanel::Draw() {
 			int32_t columnCount = (int32_t)(panelWidth / cellSize);
 			columnCount = columnCount ? columnCount : 1;
 
-			static fs::path m_CurrentAssetPath = m_AssetPath;
-
-			int32_t delta = 0;
-			static fs::path newPath;
-			if(m_CurrentAssetPath != m_AssetPath)
-				if(ImGui::Button("<-"))
-					m_CurrentAssetPath = m_CurrentAssetPath.parent_path();
+			auto& editor = Application::As<EditorApp>()->GetEditor();
+			auto& assetManager = editor.GetAssets();
 
 			if(ImGui::BeginTable("AssetsTable", columnCount))
 			{
-				for(auto p : FileUtils::GetFiles(m_CurrentAssetPath.string())) {
-					fs::path path(p);
+				for(auto& [asset, _] : assetManager.GetRegistry()) {
+					ImGui::TableNextColumn();
+
+					std::string display = assetManager.GetPath(asset.ID);
+					if(display == "")
+						display = std::to_string((uint64_t)asset.ID);
+					else
+						display = fs::path(display).filename().string();
+
 					UI::Button button;
 					button.Width = thumbnailSize;
 					button.Height = thumbnailSize;
-
-					ImGui::TableNextColumn();
-					if(fs::is_directory(path)) {
-						button.Display = m_FolderIcon;
-						if(UI::UIRenderer::DrawButton(button).Clicked) {
-							delta++;
-							newPath = path;
-						}
-					}
-					else {
-						button.Display = m_FileIcon;
-						if(UI::UIRenderer::DrawButton(button).Clicked)
-							newPath = path;
+					button.Display = m_FileIcon;
+					if(UI::UIRenderer::DrawButton(button).Clicked) {
+						auto panel =
+							editor.GetPanel("AssetEditor")
+								->As<AssetEditorPanel>();
+						panel->Select(asset);
 					}
 
-					std::string type = "";
-					if(HasExtension(newPath, { ".png", ".jpeg", ".jpg", ".webp" })) {
-						type = "Image";
-					}
-					else if(HasExtension(newPath, { ".obj", ".gltf" })) {
-						type = "Model";
-					}
+					if(ImGui::BeginDragDropSource())
+					{
+						ImGui::SetDragDropPayload("ASSET",
+							&asset, sizeof(Asset), ImGuiCond_Once);
 
-					if(type != "" && newPath.string() != "")
-						if(ImGui::BeginDragDropSource())
-						{
-							ImGui::SetDragDropPayload(type.c_str(),
-								newPath.string().c_str(),
-								(newPath.string().size() + 1) * sizeof(char),
-								ImGuiCond_Once);
+						UI::Image image;
+						image.Content = m_FileIcon->Content;
+						image.Width = thumbnailSize;
+						image.Height = thumbnailSize;
+						UI::UIRenderer::DrawImage(image);
 
-							ImGui::Text(newPath.filename().string().c_str());
-							ImGui::EndDragDropSource();
-						}
-					ImGui::TextWrapped(path.filename().string().c_str());
+						ImGui::EndDragDropSource();
+					}
+					ImGui::TextWrapped(display.c_str());
 				}
 
 				ImGui::EndTable();
 			}
-
-			if(delta > 0)
-				m_CurrentAssetPath = newPath;
 		}
 		ImGui::EndChild();
 	}
@@ -233,24 +218,16 @@ ImRect Traverse(fs::path path) {
 
 	ImDrawList* drawList = ImGui::GetWindowDrawList();
 
-	for(auto folder : folders) {
-		ImRect childRect = Traverse(folder);
-		float horizontalLineSize = 8.0f; // Arbitrary
-		float midpoint = (childRect.Min.y + childRect.Max.y) / 2.0f;
-		auto p0 = ImVec2(verticalLineStart.x, midpoint);
-		auto p1 = ImVec2(verticalLineStart.x + horizontalLineSize, midpoint);
-		drawList->AddLine(p0, p1, TreeLineColor);
-		verticalLineEnd.y = midpoint;
-	}
-	for(auto file : files) {
-		ImRect childRect = Traverse(file);
-		float horizontalLineSize = 8.0f; // Arbitrary
-		float midpoint = (childRect.Min.y + childRect.Max.y) / 2.0f;
-		auto p0 = ImVec2(verticalLineStart.x, midpoint);
-		auto p1 = ImVec2(verticalLineStart.x + horizontalLineSize, midpoint);
-		drawList->AddLine(p0, p1, TreeLineColor);
-		verticalLineEnd.y = midpoint;
-	}
+	for(auto entries : { folders, files })
+		for(auto entry : entries) {
+			ImRect childRect = Traverse(entry);
+			float horizontalLineSize = 8.0f; // Arbitrary
+			float midpoint = (childRect.Min.y + childRect.Max.y) / 2.0f;
+			auto p0 = ImVec2(verticalLineStart.x, midpoint);
+			auto p1 = ImVec2(verticalLineStart.x + horizontalLineSize, midpoint);
+			drawList->AddLine(p0, p1, TreeLineColor);
+			verticalLineEnd.y = midpoint;
+		}
 
 	drawList->AddLine(verticalLineStart, verticalLineEnd, TreeLineColor);
 
