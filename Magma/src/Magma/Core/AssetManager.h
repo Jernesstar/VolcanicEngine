@@ -13,22 +13,9 @@ namespace Magma {
 
 enum class AssetType { Mesh, Texture, Cubemap, Font, Sound };
 
-class AssetManager;
-
 struct Asset {
-	AssetType Type;
 	UUID ID;
-
-	void Load();
-	void Unload();
-
-	template<typename T>
-	Ref<T> Get();
-
-private:
-	AssetManager* m_Root;
-
-	friend class AssetManager;
+	AssetType Type;
 };
 
 class AssetManager {
@@ -79,22 +66,6 @@ template<> inline
 Ref<Cubemap> AssetManager::Get(Asset& asset) {
 	VOLCANICORE_ASSERT(asset.Type == AssetType::Cubemap);
 	return GetCubemap(asset);
-}
-
-inline void Asset::Load() {
-	m_Root->Load(*this);
-}
-
-inline void Asset::Unload() {
-	m_Root->Unload(*this);
-}
-
-template<typename T> inline
-Ref<T> Asset::Get() {
-	if(!m_Root->IsLoaded(*this))
-		Load();
-
-	return m_Root->Get<T>(*this);
 }
 
 }

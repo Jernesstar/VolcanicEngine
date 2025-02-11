@@ -9,8 +9,8 @@ public:
 	Cubemap(const std::string& cubemap_folder) { }
 	Cubemap(const std::vector<std::string>& faces) { }
 
-	inline static Ref<Cubemap> Create(const std::string& cubemap_folder);
-	inline static Ref<Cubemap> Create(const std::vector<std::string>& faces);
+	static Ref<Cubemap> Create(const std::string& cubemap_folder);
+	static Ref<Cubemap> Create(const std::vector<std::string>& faces);
 
 	template<typename Derived>
 	Derived* As() const { return ((Derived*)(this)); }

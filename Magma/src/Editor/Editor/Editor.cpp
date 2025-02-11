@@ -50,19 +50,17 @@ Editor::Editor(const CommandLineArgs& args) {
 		ProjectLoader::Load(m_Project, args["--project"]);
 		SetTab(nullptr);
 
-		namespace fs = std::filesystem;
-		auto path = fs::path(m_Project.Path);
-		auto panel1 = CreateRef<AssetEditorPanel>("");
-		auto panel2 = CreateRef<ContentBrowserPanel>(path.string());
+		auto panel1 = CreateRef<AssetEditorPanel>(m_Project.Path);
+		auto panel2 = CreateRef<ContentBrowserPanel>(m_Project.Path);
 		panel1->Open();
 		panel2->Open();
 		m_Panels.Add(panel1);
 		m_Panels.Add(panel2);
 
-		m_Manager.Load(path.string());
+		m_Manager.Load(m_Project.Path);
 	}
 	for(auto& path : args["--scene"])
-		NewTab(CreateRef<SceneTab>(path););
+		NewTab(CreateRef<SceneTab>(path));
 	for(auto& path : args["--ui"])
 		NewTab(CreateRef<UITab>(path));
 }

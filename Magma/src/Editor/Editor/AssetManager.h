@@ -12,12 +12,10 @@ public:
 	void Load(Asset& asset) override;
 	void Unload(Asset& asset) override;
 
-	Asset Get(const std::string& path, AssetType type);
-
-	void AddMesh(Ref<Model> mesh);
+	Asset GetFromPath(const std::string& path, AssetType type);
 
 	void Load(const std::string& path);
-	void Save(const std::string& path);
+	void Save();
 	void SaveRuntime(const std::string& path);
 
 public:

@@ -151,7 +151,8 @@ void SceneVisualizerPanel::Draw() {
 						auto& editor = Application::As<EditorApp>()->GetEditor();
 						auto& assetManager = editor.GetAssets();
 						Asset asset =
-							assetManager.Get(options.add.mesh, AssetType::Mesh);
+							assetManager.GetFromPath(
+								options.add.mesh, AssetType::Mesh);
 						newEntity.Add<MeshComponent>(asset);
 						ImGui::CloseCurrentPopup();
 					}
@@ -305,6 +306,8 @@ void SceneVisualizerPanel::Renderer::SubmitLight(Entity entity) {
 }
 
 void SceneVisualizerPanel::Renderer::SubmitMesh(Entity entity) {
+	auto assetManager = Application::As<EditorApp>()->GetEditor().GetAssets();
+
 	auto& tc = entity.Get<TransformComponent>();
 	auto& mc = entity.Get<MeshComponent>();
 	Transform tr
@@ -313,7 +316,7 @@ void SceneVisualizerPanel::Renderer::SubmitMesh(Entity entity) {
 		.Rotation	 = tc.Rotation,
 		.Scale		 = tc.Scale
 	};
-	auto mesh = mc.MeshAsset.Get<Model>();
+	auto mesh = assetManager.Get<Model>(mc.MeshAsset);
 
 	if(!Objects.count(mesh)) {
 		// if(entity == Selected) {

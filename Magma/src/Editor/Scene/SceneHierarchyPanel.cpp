@@ -58,7 +58,7 @@ void SceneHierarchyPanel::Draw() {
 					options.add.entity = true;
 				if(ImGui::MenuItem("Skybox"))
 					options.add.skybox = true;
-				if(ImGui::MenuItem("Pointlight"))
+				if(ImGui::MenuItem("PointLight"))
 					options.add.pointlight = true;
 				if(ImGui::MenuItem("Spotlight"))
 					options.add.spotlight = true;
@@ -69,7 +69,9 @@ void SceneHierarchyPanel::Draw() {
 		}
 
 		uint32_t i = 0;
-		for(auto type : { "Entity", "Skybox", "Pointlight", "Spotlight" }) {
+		for(auto type : { "Entity", "Skybox",
+						  "DirectionalLight", "PointLight", "Spotlight" })
+		{
 			auto& option = *(bool*)(&options.add.entity + i++);
 			if(!option)
 				continue;
@@ -90,10 +92,16 @@ void SceneHierarchyPanel::Draw() {
 					else
 						newEntity = m_Context->EntityWorld.AddEntity(str);
 
-					// if(type == "Pointlight")
-					// 	newEntity.Add<PointlightComponent>();
-					// if(type == "Spotlight")
-					// 	newEntity.Add<SpotlightComponent>();
+					if(type == "Skybox")
+						newEntity.Add<SkyboxComponent>();
+					if(type == "DirectionalLight")
+						newEntity.Add<DirectionalLightComponent>();
+					if(type == "PointLight")
+						newEntity.Add<PointLightComponent>();
+					if(type == "Spotlight")
+						newEntity.Add<SpotlightComponent>();
+
+					str = "";
 					option = false;
 				}
 
