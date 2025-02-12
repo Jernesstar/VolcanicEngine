@@ -129,11 +129,10 @@ void Raycast::OnUpdate(TimeStep ts) {
 	controller.OnUpdate(ts);
 	world->OnUpdate(ts);
 
-	Renderer::Clear();
-
 	// 1. Draw scene without selected object
 	Renderer::StartPass(drawPass);
 	{
+		Renderer::Clear();
 		Renderer3D::Begin(camera);
 
 		for(Ref<RigidBody> actor : actors) {
@@ -213,7 +212,7 @@ void Raycast::OnUpdate(TimeStep ts) {
 	// for(PxU32 i=0; i < rb.getNbLines(); i++)
 	// {
 	// 	const PxDebugLine& line = rb.getLines()[i];
-		
+
 	// }
 }
 

@@ -136,7 +136,7 @@ void ContentBrowserPanel::Draw() {
 					if(display != "")
 						ImGui::TextWrapped(display.c_str());
 					else
-						ImGui::Text("Asset %li", asset.ID);
+						ImGui::Text("Asset %li", (uint64_t)asset.ID);
 				}
 
 				ImGui::EndTable();

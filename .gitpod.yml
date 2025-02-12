@@ -7,4 +7,6 @@ ports:
     protocol: "http"
 tasks:
   - command: "git pull && git submodule update --init \
-              && scripts/premake.sh && scripts/build.sh"
+              && scripts/Unix/premake.sh && scripts/Unix/build.sh"
+env:
+  VOLC_PATH: /workspace/VolcanicEngine

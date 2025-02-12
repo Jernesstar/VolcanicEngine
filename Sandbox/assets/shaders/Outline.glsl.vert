@@ -2,7 +2,7 @@
 
 layout(location = 0) in vec2 a_TexCoords;
 
-out vec2 v_TexCoords;
+layout(location = 0) out vec2 v_TexCoords;
 
 void main()
 {

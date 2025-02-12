@@ -57,6 +57,10 @@ void SceneTab::Setup() {
 	AddPanel<SceneVisualizerPanel>(&m_Scene)->SetTab(this);
 	AddPanel<ComponentEditorPanel>()->SetTab(this);
 
+	GetPanel("SceneHierarchy")->Open();
+	GetPanel("SceneVisualizer")->Open();
+	GetPanel("ComponentEditor")->Open();
+
 	m_PlayButton = CreateRef<UI::Button>();
 	m_PlayButton->Display =
 		CreateRef<UI::Image>("Magma/assets/icons/PlayButton.png");

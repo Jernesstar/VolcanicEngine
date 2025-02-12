@@ -163,16 +163,19 @@ void Renderer3D::DrawMesh(Ref<Mesh> mesh, const glm::mat4& tr, DrawCommand* cmd)
 
 	DrawCommand* command;
 
-	if(s_Meshes.count(mesh))
+	if(cmd)
+		command = cmd;
+	else if(s_Meshes.count(mesh))
 		command = s_Meshes[mesh];
 	else {
+		s_Meshes[mesh] = command = Renderer::NewCommand();
+	}
+
+	if(!command->VerticesCount) {
 		if(cmd) {
-			s_Meshes[mesh] = command = cmd;
 			command->VerticesIndex = s_MeshBuffer->VerticesCount;
 			command->IndicesIndex = s_MeshBuffer->IndicesCount;
 		}
-		else
-			s_Meshes[mesh] = command = Renderer::NewCommand();
 
 		if(!command->UniformData) {
 			Material& mat = mesh->GetMaterial();

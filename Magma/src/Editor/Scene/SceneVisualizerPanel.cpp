@@ -315,8 +315,8 @@ void EditorSceneRenderer::SubmitLight(Entity entity) {
 }
 
 void EditorSceneRenderer::SubmitMesh(Entity entity) {
-	auto& assetManager = Application::As<EditorApp>()->GetEditor().GetAssets();
-
+	auto& assetManager =
+		Application::As<EditorApp>()->GetEditor().GetAssets();
 	auto& tc = entity.Get<TransformComponent>();
 	auto& mc = entity.Get<MeshComponent>();
 	auto mesh = assetManager.Get<Model>(mc.MeshAsset);
@@ -326,19 +326,14 @@ void EditorSceneRenderer::SubmitMesh(Entity entity) {
 	if(!Selected)
 		Selected = entity;
 
-	if(entity != Selected && !Objects.count(mesh))
+	if(entity == Selected)
+		return;
+
+	if(!Objects.count(mesh))
 		Objects[mesh] =
 			RendererAPI::Get()->NewDrawCommand(LightingPass->Get());
 
-	DrawCommand* command;
-	if(Selected != entity)
-		command = Objects[mesh];
-	else {
-		command = RendererAPI::Get()->NewDrawCommand(MaskPass->Get());
-		command->Clear = true;
-		command->UniformData
-		.SetInput("u_Color", glm::vec4(1.0f));
-	}
+	auto* command = Objects[mesh];
 
 	Renderer3D::DrawModel(mesh, tc, command);
 }
@@ -351,7 +346,6 @@ void EditorSceneRenderer::Render() {
 		.SetInput("u_CameraPosition", m_Controller.GetCamera()->GetPosition());
 	}
 
-	FirstCommand->Clear = true;
 	FirstCommand->UniformData
 	.SetInput("u_DirectionalLightCount", (int32_t)HasDirectionalLight);
 	FirstCommand->UniformData
@@ -359,42 +353,49 @@ void EditorSceneRenderer::Render() {
 	FirstCommand->UniformData
 	.SetInput("u_SpotlightCount", (int32_t)SpotlightCount);
 
-	// if(Selected) {
-	// 	float width = (float)Application::GetWindow()->GetWidth();
-	// 	float height = (float)Application::GetWindow()->GetHeight();
+	if(Selected) {
+		auto& assetManager =
+			Application::As<EditorApp>()->GetEditor().GetAssets();
+		auto& tc = Selected.Get<TransformComponent>();
+		auto& mc = Selected.Get<MeshComponent>();
+		auto mesh = assetManager.Get<Model>(mc.MeshAsset);
 
-	// 	Renderer::StartPass(OutlinePass);
-	// 	{
-	// 		Renderer::GetPass()->GetUniforms()
-	// 		.Set("u_PixelSize",
-	// 			[&]() -> glm::vec2
-	// 			{
-	// 				return { 1.0f/width, 1.0f/height };
-	// 			})
-	// 		.Set("u_Color",
-	// 			[&]() -> glm::vec3
-	// 			{
-	// 				return { 0.0f, 0.0f, 1.0f };
-	// 			});
+		DrawCommand* command;
 
-	// 		auto mask = MaskPass->GetOutput();
-	// 		Renderer2D::DrawFullscreenQuad(mask, AttachmentTarget::Color);
-	// 	}
+		command = RendererAPI::Get()->NewDrawCommand(MaskPass->Get());
+		command->Clear = true;
+		command->UniformData
+		.SetInput("u_ViewProj",
+			FirstCommand->UniformData.Mat4Uniforms["u_ViewProj"]);
+		command->UniformData
+		.SetInput("u_Color", glm::vec4(1.0f));
 
-	// 	auto& assetManager =
-	// 		Application::As<EditorApp>()->GetEditor().GetAssets();
-	// 	auto& tc = Selected.Get<TransformComponent>();
-	// 	auto& mc = Selected.Get<MeshComponent>();
-	// 	auto mesh = assetManager.Get<Model>(mc.MeshAsset);
+		Renderer3D::DrawModel(mesh, tc, command);
 
-	// 	auto* command = RendererAPI::Get()->NewDrawCommand(LightingPass->Get());
-	// 	Renderer3D::DrawModel(mesh, tc, command);
-	// }
+		auto width = (float)Application::GetWindow()->GetWidth();
+		auto height = (float)Application::GetWindow()->GetHeight();
 
-	Renderer::Flush();
+		Renderer::StartPass(OutlinePass);
+		{
+			auto* outlineCommand = Renderer::GetCommand();
+			outlineCommand->UniformData
+			.SetInput("u_PixelSize", 1.0f/glm::vec2(width, height));
+			outlineCommand->UniformData
+			.SetInput("u_Color", glm::vec3(0.0f, 0.0f, 1.0f));
+
+			auto mask = MaskPass->GetOutput();
+			Renderer2D::DrawFullscreenQuad(mask, AttachmentTarget::Color);
+		}
+		Renderer::EndPass();
+
+		command = RendererAPI::Get()->NewDrawCommand(LightingPass->Get());
+		Renderer3D::DrawModel(mesh, tc, command);
+	}
 
 	Renderer3D::End();
 	Objects.clear();
+
+	Renderer::Flush();
 
 	PointLightCount = 0;
 	SpotlightCount = 0;
