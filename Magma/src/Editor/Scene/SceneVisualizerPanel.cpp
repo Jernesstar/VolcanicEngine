@@ -164,7 +164,6 @@ void SceneVisualizerPanel::Draw() {
 
 		if(ImGui::IsMouseClicked(0) && ImGui::IsWindowHovered()) {
 			auto& cameraController = m_Renderer.GetCameraController();
-			auto& physicsWorld = world.Get<PhysicsSystem>()->Get();
 			auto camera = cameraController.GetCamera();
 
 			glm::vec2 pos = { ImGui::GetMousePos().x, ImGui::GetMousePos().y };
@@ -189,7 +188,7 @@ void SceneVisualizerPanel::Draw() {
 			glm::vec3 rayDir = glm::vec3(worldEnd - worldStart);
 			float maxDist = 10000.0f;
 
-			auto hitInfo = physicsWorld.Raycast(worldStart, rayDir, maxDist);
+			auto hitInfo = m_World.Raycast(worldStart, rayDir, maxDist);
 			if(hitInfo) {
 				VOLCANICORE_LOG_INFO("Hit something");
 				m_Selected.Collider = hitInfo.Actor;
@@ -323,9 +322,6 @@ void EditorSceneRenderer::SubmitMesh(Entity entity) {
 	if(!mesh)
 		return;
 
-	if(!Selected)
-		Selected = entity;
-
 	if(entity == Selected)
 		return;
 
@@ -353,7 +349,7 @@ void EditorSceneRenderer::Render() {
 	FirstCommand->UniformData
 	.SetInput("u_SpotlightCount", (int32_t)SpotlightCount);
 
-	if(Selected) {
+	if(Selected && State == SceneState::Edit) {
 		auto& assetManager =
 			Application::As<EditorApp>()->GetEditor().GetAssets();
 		auto& tc = Selected.Get<TransformComponent>();
@@ -366,7 +362,7 @@ void EditorSceneRenderer::Render() {
 		command->Clear = true;
 		command->UniformData
 		.SetInput("u_ViewProj",
-			FirstCommand->UniformData.Mat4Uniforms["u_ViewProj"]);
+				  FirstCommand->UniformData.Mat4Uniforms["u_ViewProj"]);
 		command->UniformData
 		.SetInput("u_Color", glm::vec4(1.0f));
 
@@ -379,7 +375,7 @@ void EditorSceneRenderer::Render() {
 		{
 			auto* outlineCommand = Renderer::GetCommand();
 			outlineCommand->UniformData
-			.SetInput("u_PixelSize", 1.0f/glm::vec2(width, height));
+			.SetInput("u_PixelSize", 1.0f/glm::vec2(800, 600));
 			outlineCommand->UniformData
 			.SetInput("u_Color", glm::vec3(0.0f, 0.0f, 1.0f));
 

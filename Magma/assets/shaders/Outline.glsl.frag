@@ -5,7 +5,7 @@ precision highp float;
 uniform sampler2D u_ScreenTexture;
 
 uniform vec2 u_PixelSize;
-uniform vec4 u_Color;
+uniform vec3 u_Color;
 // uniform flat int u_Width;
 
 layout(location = 0) in vec2 v_TexCoords;
@@ -15,7 +15,7 @@ out vec4 FragColor;
 void main()
 {
     // const int WIDTH = u_Width;
-    const int WIDTH = 5;
+    const int WIDTH = 7;
     bool isInside = false;
     float coverage = 0.0;
     float dist = 1e6;
@@ -53,6 +53,5 @@ void main()
         a = 1.0 - min(1.0, max(0.0, dist - solid) / fuzzy);
     }
 
-    FragColor = vec4(u_Color.xyz, a);
-    FragColor = vec4(0.0, 0.0, 1.0, 1.0);
+    FragColor = vec4(u_Color, a);
 }

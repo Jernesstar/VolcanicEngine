@@ -13,9 +13,7 @@ private:
 	void CreateActors();
 
 	Ref<Physics::World> world;
-	List<Ref<RigidBody>> actors;
-
-	Ref<RigidBody> selected{ nullptr };
+	RigidBody* selected{ nullptr };
 
 	glm::vec2 pixelSize{ 1.0f/800.0f, 1.0f/600.0f };
 	glm::vec3 outlineColor{ 0.0f, 0.0f, 1.0f };
@@ -68,7 +66,11 @@ Raycast::Raycast() {
 			float maxDist = 10000.0f;
 
 			auto hitInfo = world->Raycast(worldStart, rayDir, maxDist);
-			// selected = hitInfo.Actor;
+			selected = hitInfo.Actor;
+			if(hitInfo)
+				VOLCANICORE_LOG_INFO("Hit");
+			else
+				VOLCANICORE_LOG_INFO("No hit");
 		});
 
 	auto draw = ShaderPipeline::Create("VolcaniCore/assets/shaders", "Mesh");
@@ -117,11 +119,7 @@ void Raycast::CreateActors() {
 			RigidBody::Create(RigidBody::Type::Static, box,
 				Transform{ .Translation = { x * 2.0f, 0.0f, 0.0f } });
 
-		if(x == 1)
-			selected = body;
-
-		// world->AddActor(body);
-		actors.Add(body);
+		world->AddActor(body);
 	}
 }
 
@@ -135,10 +133,10 @@ void Raycast::OnUpdate(TimeStep ts) {
 		Renderer::Clear();
 		Renderer3D::Begin(camera);
 
-		for(Ref<RigidBody> actor : actors) {
+		for(Ref<RigidBody> actor : *world) {
 			// actor->UpdateTransform();
 
-			if(actor == selected)
+			if(actor.get() == selected)
 				continue;
 
 			Renderer3D::DrawMesh(cube, actor->GetTransform());

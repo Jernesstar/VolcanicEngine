@@ -42,8 +42,6 @@ private:
 
 struct HitInfo {
 	const bool HasHit;
-	// TODO(Fix): Use smart pointer
-	// const Ref<RigidBody> Actor;
 	RigidBody* Actor;
 	const float Distance;
 
