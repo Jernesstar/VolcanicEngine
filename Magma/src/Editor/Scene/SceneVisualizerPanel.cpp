@@ -22,6 +22,7 @@
 #include "Editor/EditorApp.h"
 #include "Editor/Tab.h"
 
+#include "SceneTab.h"
 #include "SceneHierarchyPanel.h"
 
 using namespace Magma::ECS;
@@ -49,8 +50,9 @@ void SceneVisualizerPanel::SetContext(Scene* context) {
 static bool s_Hovered = false;
 
 void SceneVisualizerPanel::Update(TimeStep ts) {
-	if(s_Hovered)
-		m_Renderer.Update(ts);
+	m_Renderer.SetState(m_Tab->As<SceneTab>()->GetState());
+	m_Renderer.IsHovered(s_Hovered);
+	m_Renderer.Update(ts);
 }
 
 struct {
@@ -105,7 +107,7 @@ void SceneVisualizerPanel::Draw() {
 		auto childFlags = ImGuiChildFlags_Border;
 		ImGui::BeginChild("Debug", { 200, 200 }, childFlags, windowFlags);
 		{
-			auto info = VolcaniCore::Renderer::GetDebugInfo();
+			auto info = Renderer::GetDebugInfo();
 			ImGui::Text("FPS: %0.1f", info.FPS);
 			ImGui::Text("Draw Calls: %li", info.DrawCalls);
 			ImGui::Text("Indices: %li", info.Indices);
@@ -204,7 +206,7 @@ void SceneVisualizerPanel::Draw() {
 	ImGui::End();
 }
 
-SceneVisualizerPanel::Renderer::Renderer() {
+EditorSceneRenderer::EditorSceneRenderer() {
 	auto camera = CreateRef<StereographicCamera>(75.0f);
 	m_Controller.SetCamera(camera);
 	m_Controller.TranslationSpeed = 10.0f;
@@ -221,15 +223,14 @@ SceneVisualizerPanel::Renderer::Renderer() {
 	LightingPass = RenderPass::Create("Lighting", shader, m_Output);
 	LightingPass->SetData(Renderer3D::GetMeshBuffer());
 
-	// shader = ShaderPipeline::Create("Magma/assets/shaders", "Mask");
-	// buffer = Framebuffer::Create(window->GetWidth(), window->GetHeight());
-	// MaskPass = RenderPass::Create("Mask", shader, buffer);
-	// MaskPass->SetData(Renderer3D::GetMeshBuffer());
+	shader = ShaderPipeline::Create("Magma/assets/shaders", "Mask");
+	buffer = Framebuffer::Create(window->GetWidth(), window->GetHeight());
+	MaskPass = RenderPass::Create("Mask", shader, buffer);
+	MaskPass->SetData(Renderer3D::GetMeshBuffer());
 
-	// shader = ShaderPipeline::Create("Magma/assets/shaders", "Outline");
-	// buffer = Framebuffer::Create(window->GetWidth(), window->GetHeight());
-	// OutlinePass = RenderPass::Create("Outline", shader, buffer);
-	// OutlinePass->SetData(Renderer2D::GetScreenBuffer());
+	shader = ShaderPipeline::Create("Magma/assets/shaders", "Outline");
+	OutlinePass = RenderPass::Create("Outline", shader, m_Output);
+	OutlinePass->SetData(Renderer2D::GetScreenBuffer());
 
 	// DirectionalLightBuffer =
 	// 	UniformBuffer::Create(
@@ -269,26 +270,35 @@ SceneVisualizerPanel::Renderer::Renderer() {
 	// 		}, 100);
 }
 
-void SceneVisualizerPanel::Renderer::Update(TimeStep ts) {
-	m_Controller.OnUpdate(ts);
+void EditorSceneRenderer::Update(TimeStep ts) {
+	if(State == SceneState::Edit && Hovered)
+		m_Controller.OnUpdate(ts);
 }
 
-void SceneVisualizerPanel::Renderer::Begin() {
+void EditorSceneRenderer::Begin() {
 	FirstCommand = RendererAPI::Get()->NewDrawCommand(LightingPass->Get());
+	FirstCommand->Clear = true;
 }
 
-void SceneVisualizerPanel::Renderer::SubmitCamera(Entity entity) {
+void EditorSceneRenderer::SubmitCamera(Entity entity) {
+	if(State == SceneState::Edit)
+		return;
 
+	auto camera = entity.Get<CameraComponent>().Cam;
+	FirstCommand->UniformData
+	.SetInput("u_ViewProj", camera->GetViewProjection());
+	FirstCommand->UniformData
+	.SetInput("u_CameraPosition", camera->GetPosition());
 }
 
-void SceneVisualizerPanel::Renderer::SubmitSkybox(Entity entity) {
+void EditorSceneRenderer::SubmitSkybox(Entity entity) {
 	// auto& sc = entity.Get<SkyboxComponent>();
 
 	// FirstCommand->UniformData
 	// .SetInput("u_Skybox", CubemapSlot{ sc.Asset.Get<Cubemap>() });
 }
 
-void SceneVisualizerPanel::Renderer::SubmitLight(Entity entity) {
+void EditorSceneRenderer::SubmitLight(Entity entity) {
 	if(entity.Has<DirectionalLightComponent>()) {
 		auto& dc = entity.Get<DirectionalLightComponent>();
 		DirectionalLightBuffer->SetData(&dc);
@@ -304,44 +314,44 @@ void SceneVisualizerPanel::Renderer::SubmitLight(Entity entity) {
 	}
 }
 
-void SceneVisualizerPanel::Renderer::SubmitMesh(Entity entity) {
+void EditorSceneRenderer::SubmitMesh(Entity entity) {
 	auto& assetManager = Application::As<EditorApp>()->GetEditor().GetAssets();
 
 	auto& tc = entity.Get<TransformComponent>();
 	auto& mc = entity.Get<MeshComponent>();
-	Transform tr
-	{
-		.Translation = tc.Translation,
-		.Rotation	 = tc.Rotation,
-		.Scale		 = tc.Scale
-	};
 	auto mesh = assetManager.Get<Model>(mc.MeshAsset);
 	if(!mesh)
 		return;
 
-	if(!Objects.count(mesh)) {
-		// if(entity == Selected) {
-		// 	auto* command = Objects[mesh] =
-		// 		RendererAPI::Get()->NewDrawCommand(MaskPass->Get());
-		// 	command->UniformData
-		// 	.SetInput("u_Color", glm::vec4(1.0f));
-		// }
-		// else {
-			auto* command = Objects[mesh] =
-				RendererAPI::Get()->NewDrawCommand(LightingPass->Get());
-		// }
-	}
-	auto* command = Objects[mesh];
+	if(!Selected)
+		Selected = entity;
 
-	Renderer3D::DrawModel(mesh, tr, command);
+	if(entity != Selected && !Objects.count(mesh))
+		Objects[mesh] =
+			RendererAPI::Get()->NewDrawCommand(LightingPass->Get());
+
+	DrawCommand* command;
+	if(Selected != entity)
+		command = Objects[mesh];
+	else {
+		command = RendererAPI::Get()->NewDrawCommand(MaskPass->Get());
+		command->Clear = true;
+		command->UniformData
+		.SetInput("u_Color", glm::vec4(1.0f));
+	}
+
+	Renderer3D::DrawModel(mesh, tc, command);
 }
 
-void SceneVisualizerPanel::Renderer::Render() {
+void EditorSceneRenderer::Render() {
+	if(State == SceneState::Edit) {
+		FirstCommand->UniformData
+		.SetInput("u_ViewProj", m_Controller.GetCamera()->GetViewProjection());
+		FirstCommand->UniformData
+		.SetInput("u_CameraPosition", m_Controller.GetCamera()->GetPosition());
+	}
+
 	FirstCommand->Clear = true;
-	FirstCommand->UniformData
-	.SetInput("u_ViewProj", m_Controller.GetCamera()->GetViewProjection());
-	FirstCommand->UniformData
-	.SetInput("u_CameraPosition", m_Controller.GetCamera()->GetPosition());
 	FirstCommand->UniformData
 	.SetInput("u_DirectionalLightCount", (int32_t)HasDirectionalLight);
 	FirstCommand->UniformData
@@ -349,7 +359,39 @@ void SceneVisualizerPanel::Renderer::Render() {
 	FirstCommand->UniformData
 	.SetInput("u_SpotlightCount", (int32_t)SpotlightCount);
 
-	VolcaniCore::Renderer::Flush();
+	// if(Selected) {
+	// 	float width = (float)Application::GetWindow()->GetWidth();
+	// 	float height = (float)Application::GetWindow()->GetHeight();
+
+	// 	Renderer::StartPass(OutlinePass);
+	// 	{
+	// 		Renderer::GetPass()->GetUniforms()
+	// 		.Set("u_PixelSize",
+	// 			[&]() -> glm::vec2
+	// 			{
+	// 				return { 1.0f/width, 1.0f/height };
+	// 			})
+	// 		.Set("u_Color",
+	// 			[&]() -> glm::vec3
+	// 			{
+	// 				return { 0.0f, 0.0f, 1.0f };
+	// 			});
+
+	// 		auto mask = MaskPass->GetOutput();
+	// 		Renderer2D::DrawFullscreenQuad(mask, AttachmentTarget::Color);
+	// 	}
+
+	// 	auto& assetManager =
+	// 		Application::As<EditorApp>()->GetEditor().GetAssets();
+	// 	auto& tc = Selected.Get<TransformComponent>();
+	// 	auto& mc = Selected.Get<MeshComponent>();
+	// 	auto mesh = assetManager.Get<Model>(mc.MeshAsset);
+
+	// 	auto* command = RendererAPI::Get()->NewDrawCommand(LightingPass->Get());
+	// 	Renderer3D::DrawModel(mesh, tc, command);
+	// }
+
+	Renderer::Flush();
 
 	Renderer3D::End();
 	Objects.clear();

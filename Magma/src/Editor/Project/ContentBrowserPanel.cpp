@@ -106,9 +106,7 @@ void ContentBrowserPanel::Draw() {
 					ImGui::TableNextColumn();
 
 					std::string display = assetManager.GetPath(asset.ID);
-					if(display == "")
-						display = std::to_string((uint64_t)asset.ID);
-					else
+					if(display != "")
 						display = fs::path(display).filename().string();
 
 					UI::Button button;
@@ -135,7 +133,10 @@ void ContentBrowserPanel::Draw() {
 
 						ImGui::EndDragDropSource();
 					}
-					ImGui::TextWrapped(display.c_str());
+					if(display != "")
+						ImGui::TextWrapped(display.c_str());
+					else
+						ImGui::Text("Asset %li", asset.ID);
 				}
 
 				ImGui::EndTable();

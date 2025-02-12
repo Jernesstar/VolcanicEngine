@@ -10,6 +10,8 @@ using namespace VolcaniCore;
 
 namespace Magma {
 
+enum class SceneState { Edit, Play, Pause };
+
 class SceneTab : public Tab {
 public:
 	SceneTab();
@@ -23,12 +25,13 @@ public:
 	void SetScene(const Scene& scene);
 	void SetScene(const std::string& path);
 
+	SceneState GetState() const { return m_SceneState; }
+
 private:
 	Scene m_Scene;
 	std::string m_ScenePath;
 	Ref<UI::Button> m_PlayButton, m_PauseButton, m_StopButton;
 
-	enum class SceneState { Edit, Play, Pause };
 	SceneState m_SceneState = SceneState::Edit;
 
 private:

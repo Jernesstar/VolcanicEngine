@@ -129,12 +129,12 @@ void UITab::Load(const std::string& path) {
 		m_Root.SetTheme(s_Theme);
 	}
 
-	Lava::UILoader::Load(m_Root, path);
+	Lava::UILoader::EditorLoad(m_Root, path);
 	m_Name = "UI: " + m_Root.Name;
 }
 
 void UITab::Save(const std::string& path) {
-	Lava::UILoader::Save(m_Root, path);
+	Lava::UILoader::EditorSave(m_Root, path);
 	m_Name = "UI: " + m_Root.Name;
 }
 

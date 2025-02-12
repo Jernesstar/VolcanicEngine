@@ -5,7 +5,7 @@
 
 #include <Magma/Core/DLL.h>
 
-#include <Lava/App.h>
+#include "App.h"
 
 using namespace VolcaniCore;
 using namespace Magma;

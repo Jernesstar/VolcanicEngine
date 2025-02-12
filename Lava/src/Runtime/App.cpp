@@ -18,8 +18,8 @@
 
 #include <Magma/UI/UIRenderer.h>
 
-#include "SceneLoader.h"
-#include "UILoader.h"
+#include <Lava/SceneLoader.h>
+#include <Lava/UILoader.h>
 
 using namespace Magma::UI;
 
@@ -83,7 +83,6 @@ void App::OnLoad() {
 	s_AppModule->Reload(appPath);
 
 	Application::GetWindow()->SetTitle(m_Project.Name);
-	// Application::PushDir(project.Path);
 
 	s_AppClass = s_AppModule->GetScriptClass(m_Project.App);
 
@@ -167,11 +166,11 @@ void App::SetScreen(const std::string& name) {
 	s_CurrentScreen = new RuntimeScreen;
 
 	auto scenePath = fs::path(m_Project.Path) / "Visual" / "Scene" / "Schema" / screen.Scene;
-	SceneLoader::Load(s_CurrentScreen->CurrentScene, scenePath.string() + ".magma.scene");
+	SceneLoader::EditorLoad(s_CurrentScreen->CurrentScene, scenePath.string() + ".magma.scene");
 
 	auto pagePath = fs::path(m_Project.Path) / "Visual" / "UI" / "Page" / screen.Page;
 	s_CurrentScreen->CurrentPage.SetTheme(s_Theme);
-	UILoader::Load(s_CurrentScreen->CurrentPage, pagePath.string());
+	UILoader::EditorLoad(s_CurrentScreen->CurrentPage, pagePath.string());
 	UILoader::Compile(pagePath.string());
 
 	s_Module = UILoader::GetModule(screen.Page);

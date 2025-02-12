@@ -42,7 +42,7 @@ ECS::ECS() {
 	.Add<CameraComponent>(CreateRef<StereographicCamera>())
 	.Finalize();
 
-	SceneLoader::Save(*scene, "Magma/assets/scenes/temp.magma.scene");
+	SceneLoader::EditorSave(*scene, "Magma/assets/scenes/temp.magma.scene");
 	VOLCANICORE_LOG_INFO("Success");
 }
 

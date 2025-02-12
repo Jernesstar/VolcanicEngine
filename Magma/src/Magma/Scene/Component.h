@@ -54,6 +54,8 @@ struct TransformComponent : public Component {
 	TransformComponent(const Transform& t)
 		: Translation(t.Translation), Rotation(t.Rotation), Scale(t.Scale) { }
 	TransformComponent(const TransformComponent& other) = default;
+
+	operator Transform() const { return { Translation, Rotation, Scale }; }
 };
 
 struct MeshComponent : public Component {

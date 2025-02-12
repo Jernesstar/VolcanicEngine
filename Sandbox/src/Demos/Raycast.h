@@ -175,14 +175,12 @@ void Raycast::OnUpdate(TimeStep ts) {
 	// 3. Render full-screen quad that creates outline
 	Renderer::StartPass(outlinePass);
 	{
-		Renderer::PushCommand();
 		Renderer::GetPass()->GetUniforms()
 		.Set("u_PixelSize",
 			[this]() -> glm::vec2
 			{
 				return pixelSize;
-			});
-		Renderer::GetPass()->GetUniforms()
+			})
 		.Set("u_Color",
 			[this]() -> glm::vec3
 			{
@@ -191,7 +189,6 @@ void Raycast::OnUpdate(TimeStep ts) {
 
 		auto mask = maskPass->GetOutput();
 		Renderer2D::DrawFullscreenQuad(mask, AttachmentTarget::Color);
-		Renderer::PopCommand();
 	}
 	Renderer::EndPass();
 

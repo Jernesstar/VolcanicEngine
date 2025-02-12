@@ -20,7 +20,7 @@ namespace Lava {
 
 static void LoadElement(UIPage& page, const rapidjson::Value& elementNode);
 
-void UILoader::Load(UIPage& page, const std::string& path) {
+void UILoader::EditorLoad(UIPage& page, const std::string& path) {
 	using namespace rapidjson;
 
 	if(path == "")
@@ -162,6 +162,9 @@ void Serialize(const UIElement* ui, JSONSerializer& serializer) {
 							return "Center";
 						case XAlignment::Right:
 							return "Right";
+
+						default:
+							return "None";
 					}
 				}())
 		.WriteKey("yAlignment")
@@ -175,6 +178,9 @@ void Serialize(const UIElement* ui, JSONSerializer& serializer) {
 							return "Center";
 						case YAlignment::Bottom:
 							return "Bottom";
+						
+						default:
+							return "None";
 					}
 				}())
 		.WriteKey("Color").Write(ui->Color);
@@ -206,7 +212,7 @@ void Serialize(const UIElement* ui, JSONSerializer& serializer) {
 	serializer.EndMapping();
 }
 
-void UILoader::Save(const UIPage& page, const std::string& path) {
+void UILoader::EditorSave(const UIPage& page, const std::string& path) {
 	JSONSerializer serializer;
 	serializer.BeginMapping(); // File
 

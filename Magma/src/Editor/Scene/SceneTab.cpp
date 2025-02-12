@@ -49,7 +49,7 @@ SceneTab::SceneTab(const std::string& path)
 SceneTab::~SceneTab() {
 	if(m_ScenePath == "")
 		m_ScenePath = "Magma/assets/scenes/" + m_Scene.Name + ".magma.scene";
-	Lava::SceneLoader::Save(m_Scene, m_ScenePath);
+	Lava::SceneLoader::EditorSave(m_Scene, m_ScenePath);
 }
 
 void SceneTab::Setup() {
@@ -81,7 +81,7 @@ void SceneTab::SetScene(const Scene& scene) {
 }
 
 void SceneTab::SetScene(const std::string& path) {
-	Lava::SceneLoader::Load(m_Scene, path);
+	Lava::SceneLoader::EditorLoad(m_Scene, path);
 	m_Name = "Scene: " + m_Scene.Name;
 	m_ScenePath = path;
 }
@@ -140,7 +140,7 @@ void SceneTab::Render() {
 		if(m_ScenePath == "")
 			SaveScene();
 		else
-			Lava::SceneLoader::Save(m_Scene, m_ScenePath);
+			Lava::SceneLoader::EditorSave(m_Scene, m_ScenePath);
 		menu.file.saveScene = false;
 	}
 	if(menu.file.saveAsScene)
@@ -186,7 +186,7 @@ void SceneTab::SaveScene() {
 	if(instance->Display("ChooseFile")) {
 		if(instance->IsOk()) {
 			std::string path = instance->GetFilePathName();
-			Lava::SceneLoader::Save(m_Scene, path);
+			Lava::SceneLoader::EditorSave(m_Scene, path);
 			m_ScenePath = path;
 		}
 

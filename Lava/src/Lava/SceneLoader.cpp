@@ -43,7 +43,7 @@ namespace Lava {
 static void DeserializeEntity(YAML::Node entityNode, Scene& scene);
 static void SerializeEntity(YAMLSerializer& out, const Entity& entity);
 
-void SceneLoader::Load(Scene& scene, const std::string& path) {
+void SceneLoader::EditorLoad(Scene& scene, const std::string& path) {
 	YAML::Node file;
 	try {
 		file = YAML::LoadFile(path);
@@ -62,7 +62,7 @@ void SceneLoader::Load(Scene& scene, const std::string& path) {
 		DeserializeEntity(node["Entity"], scene);
 }
 
-void SceneLoader::Save(const Scene& scene, const std::string& path) {
+void SceneLoader::EditorSave(const Scene& scene, const std::string& path) {
 	YAMLSerializer serializer;
 	serializer.BeginMapping(); // File
 
