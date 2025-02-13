@@ -27,18 +27,19 @@ public:
 	List(List&& other)
 		: m_Buffer(other.m_Buffer.GetMaxCount())
 	{
-		for(auto val : other)
+		for(auto& val : other)
 			Add(val);
 	}
 	List(const List& other)
 		: m_Buffer(other.m_Buffer.GetMaxCount())
 	{
-		for(auto val : other)
+		for(auto& val : other)
 			Add(val);
 	}
 
 	~List() {
 		Clear();
+		m_Buffer.Delete();
 	}
 
 	List& operator =(const std::initializer_list<T>& list) {
@@ -90,12 +91,15 @@ public:
 
 	template<typename ...Args>
 	T& Emplace(Args&&... args) {
+		if(Count() >= m_Buffer.GetMaxCount())
+			Reallocate(5);
+
 		m_Buffer.Add();
 		T* t = new (m_Buffer.Get() + m_Back++) T(std::forward<Args>(args)...);
 		return *t;
 	}
 
-	void Add(const T& element, int32_t pos = -1) {
+	void Add(const T& element, int64_t pos = -1) {
 		if(Count() >= m_Buffer.GetMaxCount())
 			Reallocate(5);
 
@@ -124,7 +128,7 @@ public:
 	}
 
 	void Remove(int64_t idx) {
-		At(idx)->T::~T();
+		At(idx)->~T();
 		m_Buffer.Remove();
 	}
 
@@ -164,7 +168,7 @@ public:
 	}
 
 	void Clear() {
-		for(int64_t i = 0; i < Count(); i++)
+		for(uint64_t i = 0; i < Count(); i++)
 			Remove(i);
 
 		m_Front = 0;
@@ -184,8 +188,12 @@ public:
 
 private:
 	Buffer<T> m_Buffer;
-
 	uint64_t m_Front = 0, m_Back = 0;
+
+private:
+	void Shift() {
+
+	}
 };
 
 }

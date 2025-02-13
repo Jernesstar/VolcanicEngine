@@ -13,8 +13,6 @@ public:
 	void OnUpdate(TimeStep ts);
 
 private:
-	Ref<Scene> scene;
-	// DefaultSceneRenderer renderer;
 };
 
 ECS::ECS() {
@@ -25,8 +23,7 @@ ECS::ECS() {
 				Application::Close();
 		});
 
-	scene = CreateRef<Scene>("Titled Scene");
-	// renderer.GetCameraController().TranslationSpeed = 20.0f;
+	auto scene = CreateRef<Scene>("Titled Scene");
 
 	auto& world = scene->EntityWorld;
 
@@ -38,21 +35,10 @@ ECS::ECS() {
 	// 	});
 	// world.Emit<PlayerDiedEvent>();
 
-	EntityBuilder(world, "MainCamera")
-	.Add<CameraComponent>(CreateRef<StereographicCamera>())
-	.Finalize();
-
-	SceneLoader::EditorSave(*scene, "Magma/assets/scenes/temp.magma.scene");
-	VOLCANICORE_LOG_INFO("Success");
 }
 
 void ECS::OnUpdate(TimeStep ts) {
-	// renderer.Update(ts);
-	scene->OnUpdate(ts);
-	// scene->OnRender(renderer);
 
-	// Ref<Framebuffer> output = renderer.GetOutput();
-	// Renderer2D::DrawFullscreenQuad(output, AttachmentTarget::Color);
 }
 
 }

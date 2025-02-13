@@ -2,6 +2,11 @@
 
 #include <fstream>
 
+#include <VolcaniCore/Core/Defines.h>
+#include <VolcaniCore/Core/List.h>
+
+using namespace VolcaniCore;
+
 namespace Magma {
 
 class BinaryWriter {
@@ -15,7 +20,8 @@ public:
 	}
 
 	BinaryWriter& WriteData(const void* data, uint64_t size) {
-		m_Stream.write(data, size);
+		m_Stream.write((char*)data, size);
+		return *this;
 	}
 
 	template<typename TPrimitive>
@@ -30,9 +36,9 @@ public:
 	template<typename TData>
 	BinaryWriter& Write(const TData& value) {
 		if constexpr(std::is_trivial<TData>())
-			WriteRaw<TData>(val);
+			WriteRaw<TData>(value);
 		else
-			WriteObject<TData>(val);
+			WriteObject<TData>(value);
 		return *this;
 	}
 
@@ -46,7 +52,7 @@ public:
 	}
 
 	template<typename TKey, typename TValue>
-	BinaryWriter& WriteMap(const Map<TKey, TValue>& map) {
+	BinaryWriter& Write(const Map<TKey, TValue>& map) {
 		WriteRaw<uint64_t>(map.size());
 		for(auto& [key, val] : map) {
 			Write(key); Write(val);

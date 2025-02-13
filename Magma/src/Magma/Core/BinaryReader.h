@@ -2,6 +2,11 @@
 
 #include <fstream>
 
+#include <VolcaniCore/Core/Defines.h>
+#include <VolcaniCore/Core/List.h>
+
+using namespace VolcaniCore;
+
 namespace Magma {
 
 class BinaryReader {
@@ -15,7 +20,8 @@ public:
 	}
 
 	BinaryReader& ReadData(void* data, uint64_t size) {
-		m_Stream.read(data, size);
+		m_Stream.read((char*)data, size);
+		return *this;
 	}
 
 	template<typename TPrimitive>
@@ -30,9 +36,9 @@ public:
 	template<typename TData>
 	BinaryReader& Read(TData& value) {
 		if constexpr(std::is_trivial<TData>())
-			ReadRaw<TData>(val);
+			ReadRaw<TData>(value);
 		else
-			ReadObject<TData>(val);
+			ReadObject<TData>(value);
 		return *this;
 	}
 
@@ -40,7 +46,6 @@ public:
 	BinaryReader& Read(List<TData>& values) {
 		uint64_t size;
 		ReadRaw<uint64_t>(size);
-
 		for(uint64_t i = 0; i < size; i++)
 			Read(values.Emplace());
 
@@ -48,11 +53,11 @@ public:
 	}
 
 	template<typename TKey, typename TValue>
-	BinaryReader& ReadMap(Map<TKey, TValue>& map) {
+	BinaryReader& Read(Map<TKey, TValue>& map) {
 		uint64_t size;
 		ReadRaw<uint64_t>(size);
 
-		for(auto& [key, val] : map) {
+		for(uint64_t i = 0; i < size; i++) {
 			TKey key;
 			Read(key); Read(map[key]);
 		}
