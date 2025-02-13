@@ -35,6 +35,7 @@ project "Magma"
         "%{Includes.imgui}",
         "%{Includes.angelscript}",
         "%{VendorPaths.angelscript}",
+        "%{Includes.soloud}",
     }
 
     links {
@@ -45,7 +46,8 @@ project "Magma"
         "ImGuiFileDialog",
         "flecs",
         -- "rapidjson",
-        "angelscript"
+        "angelscript",
+        "soloud"
     }
 
     filter "action:vs* or system:linux"
@@ -69,6 +71,7 @@ include "Magma/.builddeps/flecs"
 include "Magma/.builddeps/rapidjson"
 include "Magma/.builddeps/angelscript"
 include "Magma/.builddeps/PhysX"
+include "Magma/.builddeps/soloud"
 
 
 project "Editor"
@@ -112,6 +115,7 @@ project "Editor"
         "%{Includes.imgui}",
         "%{Includes.angelscript}",
         "%{VendorPaths.angelscript}",
+        "%{Includes.soloud}",
     }
 
     links {
@@ -130,7 +134,8 @@ project "Editor"
         "ImGuiFileDialog",
         "flecs",
         -- "rapidjson",
-        "angelscript"
+        "angelscript",
+        "soloud"
     }
 
     filter "toolset:msc or system:linux"

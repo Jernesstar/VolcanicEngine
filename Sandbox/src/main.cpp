@@ -57,6 +57,7 @@ using namespace Lava;
 #include "Demos/Raycast.h"
 #include "Demos/Collision.h"
 #include "Demos/Scripting.h"
+#include "Demos/Sound.h"
 #include "Demos/Raytracing.h"
 #include "Demos/Template.h"
 
@@ -83,8 +84,10 @@ Application* CreateApplication(const CommandLineArgs& args) {
 	else if(project == "Raycast") return new Demo::Raycast();
 	// Collision detection
 	else if(project == "Collision") return new Demo::Collision();
-	// Scripts
+	// Scripting
 	else if(project == "Script") return new Demo::Script();
+	// Sounds
+	else if(project == "Sound") return new Demo::Sound();
 	// PBR
 	else if(project == "Raytracing") return new Demo::Raytracing();
 

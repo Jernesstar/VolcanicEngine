@@ -48,6 +48,7 @@ project "Sandbox"
         "%{Includes.PhysX}",
         "%{Includes.angelscript}",
         "%{VendorPaths.angelscript}",
+        "%{Includes.soloud}",
     }
 
     links {
@@ -68,6 +69,7 @@ project "Sandbox"
         "flecs",
         -- "rapidjson",
         "angelscript",
+        "soloud",
     }
 
     filter "action:vs* or system:linux"

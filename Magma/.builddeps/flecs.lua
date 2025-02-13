@@ -1,7 +1,6 @@
 project "flecs"
     kind "StaticLib"
     language "C"
---    staticruntime "On"
     staticruntime "Off"
 
     objdir ("%{RootPath}/build/Magma/obj")
@@ -22,10 +21,10 @@ project "flecs"
         -- "FLECS_CPP",
         -- "FLECS_SYSTEM",
         -- "FLECS_PIPELINE"
-        -- -- "FLECS_ALERTS",
-        -- -- "FLECS_LOG",
-        -- -- "FLECS_METRICS",
-        -- -- "FLECS_STATS",
+        -- "FLECS_ALERTS",
+        -- "FLECS_LOG",
+        -- "FLECS_METRICS",
+        -- "FLECS_STATS",
     }
 
     filter "toolset:gcc or toolset:clang"

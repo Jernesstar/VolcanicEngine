@@ -35,18 +35,15 @@ project "Lava"
         "%{Includes.imgui}",
         "%{Includes.angelscript}",
         "%{VendorPaths.angelscript}",
+        "%{Includes.soloud}",
     }
 
     links {
         "Magma",
         "VolcaniCore",
 
-        "imgui",
         "yaml-cpp",
-        "ImGuiFileDialog",
-        "flecs",
         -- "rapidjson",
-        "angelscript",
     }
 
     filter "action:vs* or system:linux"
@@ -101,6 +98,7 @@ project "Runtime"
         "%{Includes.PhysX}",
         "%{Includes.angelscript}",
         "%{VendorPaths.angelscript}",
+        "%{Includes.soloud}",
     }
 
     links {
@@ -120,6 +118,7 @@ project "Runtime"
         "flecs",
         -- "rapidjson",
         "angelscript",
+        "soloud"
     }
 
     filter "action:vs* or system:linux"

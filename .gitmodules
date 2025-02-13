@@ -39,3 +39,6 @@
 [submodule "Magma/vendor/angelscript"]
 	path = Magma/vendor/angelscript
 	url = https://github.com/Jernesstar/angelscript.git
+[submodule "Magma/vendor/soloud"]
+	path = Magma/vendor/soloud
+	url = https://github.com/jarikomppa/soloud.git
