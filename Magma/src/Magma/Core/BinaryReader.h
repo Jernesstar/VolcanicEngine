@@ -42,12 +42,12 @@ public:
 		return *this;
 	}
 
-	template<typename TData>
-	BinaryReader& Read(List<TData>& values) {
+	template<typename TData, typename... Args>
+	BinaryReader& Read(List<TData>& values, Args&&... args) {
 		uint64_t size;
 		ReadRaw<uint64_t>(size);
 		for(uint64_t i = 0; i < size; i++)
-			Read(values.Emplace());
+			Read(values.Emplace(std::forward<Args>(args)...));
 
 		return *this;
 	}

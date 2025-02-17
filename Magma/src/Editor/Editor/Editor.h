@@ -42,7 +42,7 @@ public:
 
 		return m_Panels[idx];
 	}
-	EditorAssetManager& GetAssets() { return m_Manager; }
+	EditorAssetManager& GetAssets() { return m_AssetManager; }
 
 private:
 	Project m_Project;
@@ -51,7 +51,7 @@ private:
 	List<Ref<Tab>> m_ClosedTabs;
 	List<Ref<Panel>> m_Panels;
 
-	EditorAssetManager m_Manager;
+	EditorAssetManager m_AssetManager;
 
 	void SetTab(Ref<Tab> tab);
 	void NewTab();

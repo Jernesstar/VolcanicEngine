@@ -1,6 +1,8 @@
 #include "AssetManager.h"
 
-namespace Magma {
+#include <Magma/Core/BinaryReader.h>
+
+namespace Lava {
 
 RuntimeAssetManager::RuntimeAssetManager() {
 
@@ -18,7 +20,7 @@ void RuntimeAssetManager::Unload(Asset asset) {
 
 }
 
-void RuntimeAssetManager::LoadRegistry(const std::string& registryFile) {
+void RuntimeAssetManager::Load(const std::string& registryFile) {
 	
 }
 

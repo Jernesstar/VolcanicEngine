@@ -10,6 +10,7 @@
 #include <VolcaniCore/Graphics/Renderer.h>
 #include <VolcaniCore/Graphics/Renderer2D.h>
 #include <VolcaniCore/Graphics/Renderer3D.h>
+#include <VolcaniCore/Graphics/ShaderLibrary.h>
 #include <VolcaniCore/Graphics/Camera.h>
 #include <VolcaniCore/Graphics/StereographicCamera.h>
 #include <VolcaniCore/Graphics/OrthographicCamera.h>
@@ -63,6 +64,13 @@ using namespace Lava;
 
 Application* CreateApplication(const CommandLineArgs& args) {
 	std::string project = args["--project"];
+
+	Application::PushDir();
+	ShaderLibrary::Add("Mesh",
+		ShaderPipeline::Create("VolcaniCore/assets/shaders/", "Mesh"));
+	ShaderLibrary::Add("Framebuffer",
+		ShaderPipeline::Create("VolcaniCore/assets/shaders/", "Framebuffer"));
+	Application::PopDir();
 
 	// Isometric Camera, smooth scroll pixels, instancing
 	if(project == "Cube") return new Demo::Cube();

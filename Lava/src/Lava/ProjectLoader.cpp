@@ -72,8 +72,4 @@ void ProjectLoader::Save(const Project& proj, const std::string& volcPath) {
 	serializer.Finalize(volcPath);
 }
 
-void ProjectLoader::Compile(const Project& proj) {
-
-}
-
 }

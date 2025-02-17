@@ -1,9 +1,14 @@
 #include "EditorApp.h"
 
+#include <imgui/imgui.h>
+#include <imgui/imgui_internal.h>
+#include <imgui/misc/cpp/imgui_stdlib.h>
+
 #include <VolcaniCore/Core/Log.h>
 #include <VolcaniCore/Event/Events.h>
 #include <VolcaniCore/Graphics/Renderer.h>
 #include <VolcaniCore/Graphics/RendererAPI.h>
+#include <VolcaniCore/Graphics/ShaderLibrary.h>
 
 #include <Magma/UI/UI.h>
 
@@ -25,6 +30,23 @@ EditorApp::EditorApp(const CommandLineArgs& args)
 		});
 
 	UIRenderer::Init();
+
+	Application::PushDir();
+
+	ShaderLibrary::Add("Mesh",
+		ShaderPipeline::Create("VolcaniCore/assets/shaders/", "Mesh"));
+	ShaderLibrary::Add("Framebuffer",
+		ShaderPipeline::Create("VolcaniCore/assets/shaders/", "Framebuffer"));
+	float fontSize = 18.0f;
+
+	ImGuiIO& io = ImGui::GetIO();
+	io.Fonts->AddFontFromFileTTF(
+		"VolcaniCore/assets/fonts/JetBrainsMono-Bold.ttf", fontSize);
+	io.FontDefault =
+		io.Fonts->AddFontFromFileTTF(
+			"VolcaniCore/assets/fonts/JetBrainsMono-Regular.ttf", fontSize);
+
+	Application::PopDir();
 }
 
 EditorApp::~EditorApp() {

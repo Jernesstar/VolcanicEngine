@@ -8,6 +8,8 @@
 #include <Magma/Script/ScriptClass.h>
 #include <Magma/Script/ScriptObject.h>
 
+#include "AssetManager.h"
+
 using namespace VolcaniCore;
 using namespace Magma;
 using namespace Magma::Script;
@@ -28,6 +30,8 @@ public:
 
 private:
 	Project m_Project;
+
+	RuntimeAssetManager m_Assets;
 };
 
 }

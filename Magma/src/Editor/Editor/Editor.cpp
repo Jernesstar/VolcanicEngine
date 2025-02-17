@@ -17,6 +17,8 @@
 #include <Magma/Physics/Physics.h>
 
 #include <Lava/ProjectLoader.h>
+#include <Lava/SceneLoader.h>
+#include <Lava/UILoader.h>
 
 #include "Project/AssetEditorPanel.h"
 #include "Project/ContentBrowserPanel.h"
@@ -58,7 +60,7 @@ Editor::Editor(const CommandLineArgs& args) {
 		m_Panels.Add(panel1);
 		m_Panels.Add(panel2);
 
-		m_Manager.Load(m_Project.Path);
+		m_AssetManager.Load(m_Project.Path);
 	}
 	for(auto& path : args["--scene"])
 		NewTab(CreateRef<SceneTab>(path));
@@ -285,7 +287,7 @@ void Editor::OpenProject() {
 	IGFD::FileDialogConfig config;
 	config.path = m_Project.Path;
 	auto instance = ImGuiFileDialog::Instance();
-	instance->OpenDialog("ChooseFile", "Choose File", ".volc.proj", config);
+	instance->OpenDialog("ChooseFile", "Choose File", ".magma.proj", config);
 
 	if(instance->Display("ChooseFile")) {
 		if(instance->IsOk()) {
@@ -302,7 +304,6 @@ void Editor::OpenProject() {
 void Editor::ReloadProject() {
 	menu.project.reloadProject = false;
 
-	Lava::ProjectLoader::Compile(m_Project);
 }
 
 void Editor::RunProject() {
@@ -311,17 +312,53 @@ void Editor::RunProject() {
 	std::string command;
 #ifdef VOLCANICENGINE_WINDOWS
 	command = ".\\build\\Lava\\bin\\Runtime --project ";
-	command += m_Project.Path + "\\.volc.proj";
+	command += m_Project.Path + "\\.magma.proj";
 #elif VOLCANICENGINE_LINUX
 	command = "./build/Lava/bin/Runtime --project ";
-	command += m_Project.Path + "/.volc.proj";
+	command += m_Project.Path + "/.magma.proj";
 #endif
 	system(command.c_str());
 }
 
 void Editor::ExportProject() {
-	menu.project.exportProject = false;
+	IGFD::FileDialogConfig config;
+	config.path = ".";
+	auto instance = ImGuiFileDialog::Instance();
+	instance->OpenDialog("ChooseFile", "Choose File", "", config);
 
+	std::string exportPath;
+	if(instance->Display("ChooseFile")) {
+		if(instance->IsOk())
+			exportPath = instance->GetFilePathName();
+
+		instance->Close();
+		menu.project.openProject = false;
+	}
+
+	if(menu.project.exportProject)
+		return;
+
+	for(auto& screen : m_Project.Screens) {
+		auto mod = CreateRef<ScriptModule>(screen.Name);
+		mod->Reload(
+			(fs::path(m_Project.Path) / "Project" / "Screen" / screen.Name
+			).string() + ".as");
+		mod->Save(
+			(fs::path(exportPath) / "Screen" / screen.Name).string() + ".class");
+
+		auto scenePath = fs::path(m_Project.Path) / "Visual" / "Scene" / "Schema";
+		auto uiPath = fs::path(m_Project.Path) / "Visual" / "UI" / "Page";
+
+		Scene scene;
+		SceneLoader::EditorLoad(scene, scenePath.string());
+		UIPage ui;
+		UILoader::EditorLoad(ui, uiPath.string());
+
+		SceneLoader::RuntimeSave(scene, m_Project.Path, exportPath);
+		UILoader::RuntimeSave(ui, m_Project.Path, exportPath);
+	}
+
+	m_AssetManager.RuntimeSave(exportPath);
 }
 
 }

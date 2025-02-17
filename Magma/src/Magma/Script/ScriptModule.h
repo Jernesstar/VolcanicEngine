@@ -20,6 +20,7 @@ public:
 	~ScriptModule();
 
 	void Reload(const std::string& path = "");
+	void Save(const std::string& path);
 
 	Ref<ScriptClass> GetScriptClass(const std::string& name);
 

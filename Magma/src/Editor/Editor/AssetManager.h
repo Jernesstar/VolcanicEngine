@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core/AssetManager.h"
+#include <Magma/Core/AssetManager.h>
 
 namespace Magma {
 
@@ -21,7 +21,7 @@ public:
 
 	void Load(const std::string& path);
 	void Save();
-	void SaveRuntime(const std::string& path);
+	void RuntimeSave(const std::string& exportPath);
 
 public:
 	std::string m_Path;

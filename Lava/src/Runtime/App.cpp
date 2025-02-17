@@ -27,10 +27,10 @@ namespace fs = std::filesystem;
 
 namespace Lava {
 
-class Renderer : public SceneRenderer {
+class RuntimeSceneRenderer : public SceneRenderer {
 public:
-	Renderer();
-	~Renderer() = default;
+	RuntimeSceneRenderer();
+	~RuntimeSceneRenderer() = default;
 
 	void Update(TimeStep ts) override;
 
@@ -42,7 +42,7 @@ public:
 	void Render() override;
 };
 
-static Ref<Renderer> s_SceneRenderer;
+static Ref<RuntimeSceneRenderer> s_SceneRenderer;
 
 static Ref<ScriptModule> s_AppModule;
 static Ref<ScriptClass> s_AppClass;
@@ -51,6 +51,9 @@ static Ref<ScriptObject> s_AppObject;
 struct RuntimeScreen {
 	Scene CurrentScene;
 	UIPage CurrentPage;
+
+	RuntimeScreen(const Screen& screen)
+		: CurrentScene(screen.Scene), CurrentPage(screen.Page) { }
 };
 
 static RuntimeScreen* s_CurrentScreen;
@@ -58,13 +61,13 @@ static RuntimeScreen* s_CurrentScreen;
 static Ref<ScriptModule> s_Module;
 static List<Ref<ScriptClass>> s_Classes;
 static Map<std::string, Ref<ScriptObject>> s_Objects;
-static Theme s_Theme;
 
 void App::OnLoad() {
 	ScriptEngine::Init();
 
 	ScriptEngine::RegisterSingleton("App", "s_App", this);
-	ScriptEngine::RegisterMethod<App>("App", "void SetScreen(const string &in)", &App::SetScreen);
+	ScriptEngine::RegisterMethod<App>(
+		"App", "void SetScreen(const string &in)", &App::SetScreen);
 
 	ScriptEngine::RegisterInterface("IApp")
 		.AddMethod("void OnLoad()")
@@ -77,8 +80,7 @@ void App::OnLoad() {
 		.AddMethod("void OnMouseUp()")
 		.AddMethod("void OnMouseDown()");
 
-	auto appPath =
-		(fs::path(m_Project.Path) / "Project" / "App" / m_Project.App).string() + ".as";
+	auto appPath = (fs::path(m_Project.ExportPath) / ".volc.class").string();
 	s_AppModule = CreateRef<ScriptModule>(m_Project.App);
 	s_AppModule->Reload(appPath);
 
@@ -89,16 +91,11 @@ void App::OnLoad() {
 	s_AppObject = s_AppClass->Instantiate();
 	s_AppObject->Call("OnLoad");
 
-	auto themePath =
-		(fs::path(m_Project.Path) / "Visual" / "UI" / "Page" / "theme.magma.ui.json").string();
-	if(FileUtils::FileExists(themePath))
-		s_Theme = UILoader::LoadTheme(themePath);
-
 	SetScreen(m_Project.StartScreen);
 
 	UIRenderer::Init();
 
-	s_SceneRenderer = CreateRef<Lava::Renderer>();
+	s_SceneRenderer = CreateRef<Lava::RuntimeSceneRenderer>();
 }
 
 void App::OnClose() {
@@ -151,11 +148,12 @@ void App::OnUpdate(TimeStep ts) {
 
 void App::SetScreen(const std::string& name) {
 	auto [found, idx] =
-	m_Project.Screens.Find(
-		[name](const Screen& screen) -> bool
-		{
-			return screen.Name == name;
-		});
+		m_Project.Screens.Find(
+			[name](const Screen& screen) -> bool
+			{
+				return screen.Name == name;
+			});
+
 	if(!found) {
 		VOLCANICORE_LOG_INFO("Screen '%s' was not found", name.c_str());
 		return;
@@ -163,17 +161,15 @@ void App::SetScreen(const std::string& name) {
 
 	auto& screen = m_Project.Screens[idx];
 	delete s_CurrentScreen;
-	s_CurrentScreen = new RuntimeScreen;
+	s_CurrentScreen = new RuntimeScreen(screen);
 
-	auto scenePath = fs::path(m_Project.Path) / "Visual" / "Scene" / "Schema" / screen.Scene;
-	SceneLoader::EditorLoad(s_CurrentScreen->CurrentScene, scenePath.string() + ".magma.scene");
+	SceneLoader::RuntimeLoad(
+		s_CurrentScreen->CurrentScene, m_Project.ExportPath);
 
-	auto pagePath = fs::path(m_Project.Path) / "Visual" / "UI" / "Page" / screen.Page;
-	s_CurrentScreen->CurrentPage.SetTheme(s_Theme);
-	UILoader::EditorLoad(s_CurrentScreen->CurrentPage, pagePath.string());
-	UILoader::Compile(pagePath.string());
+	s_Module =
+		UILoader::RuntimeLoad(
+			s_CurrentScreen->CurrentPage, m_Project.ExportPath);
 
-	s_Module = UILoader::GetModule(screen.Page);
 	s_CurrentScreen->CurrentPage.Traverse(
 		[](UIElement* element)
 		{
@@ -184,40 +180,39 @@ void App::SetScreen(const std::string& name) {
 				return;
 
 			s_Classes.Add(scriptClass);
-			s_Objects[element->GetID()] =
-				scriptClass->Instantiate();
+			s_Objects[element->GetID()] = scriptClass->Instantiate();
 		});
 }
 
-Renderer::Renderer() {
+RuntimeSceneRenderer::RuntimeSceneRenderer() {
 
 }
 
-void Renderer::Begin() {
+void RuntimeSceneRenderer::Begin() {
 
 }
 
-void Renderer::Update(TimeStep ts) {
+void RuntimeSceneRenderer::Update(TimeStep ts) {
 
 }
 
-void Renderer::SubmitCamera(Entity entity) {
+void RuntimeSceneRenderer::SubmitCamera(Entity entity) {
 
 }
 
-void Renderer::SubmitSkybox(Entity entity) {
+void RuntimeSceneRenderer::SubmitSkybox(Entity entity) {
 
 }
 
-void Renderer::SubmitLight(Entity entity) {
+void RuntimeSceneRenderer::SubmitLight(Entity entity) {
 
 }
 
-void Renderer::SubmitMesh(Entity entity) {
+void RuntimeSceneRenderer::SubmitMesh(Entity entity) {
 
 }
 
-void Renderer::Render() {
+void RuntimeSceneRenderer::Render() {
 
 }
 

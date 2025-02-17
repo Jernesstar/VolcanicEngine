@@ -2,7 +2,10 @@
 
 #include <VolcaniCore/Core/FileUtils.h>
 
-#include "Core/YAMLSerializer.h"
+#include <Magma/Core/YAMLSerializer.h>
+
+#include <Magma/Core/BinaryWriter.h>
+#include <Magma/Core/BinaryReader.h>
 
 namespace Magma {
 
@@ -76,7 +79,7 @@ std::string EditorAssetManager::GetPath(UUID id) {
 void EditorAssetManager::Load(const std::string& path) {
 	namespace fs = std::filesystem;
 
-	auto packPath = (fs::path(path) / "Visual" / ".assetpack").string();
+	auto packPath = (fs::path(path) / "Visual" / ".magma.assetpk").string();
 	m_Path = packPath;
 
 	YAML::Node file;
@@ -202,7 +205,7 @@ void EditorAssetManager::Save() {
 	serializer.Finalize(m_Path);
 }
 
-void EditorAssetManager::SaveRuntime(const std::string& path) {
+void EditorAssetManager::RuntimeSave(const std::string& path) {
 
 }
 

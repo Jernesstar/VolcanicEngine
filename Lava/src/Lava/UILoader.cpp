@@ -7,9 +7,10 @@
 #include <VolcaniCore/Core/Algo.h>
 #include <VolcaniCore/Core/FileUtils.h>
 
-#include <Magma/Core/DLL.h>
-
 #include <Magma/Core/JSONSerializer.h>
+
+#include <Magma/Core/BinaryWriter.h>
+#include <Magma/Core/BinaryReader.h>
 
 namespace fs = std::filesystem;
 
@@ -18,30 +19,27 @@ using namespace Magma::UI;
 
 namespace Lava {
 
+static void GenFiles(const std::string& name, const std::string& funcPath);
+static void CompileElement(const std::string& name, const std::string& funcPath,
+						   const rapidjson::Value& elementNode);
 static void LoadElement(UIPage& page, const rapidjson::Value& elementNode);
 
-void UILoader::EditorLoad(UIPage& page, const std::string& path) {
+void UILoader::EditorLoad(UIPage& page, const std::string& filePathName) {
 	using namespace rapidjson;
 
-	if(path == "")
+	if(filePathName == "") {
+		VOLCANICORE_LOG_ERROR("Filename was empty");
 		return;
-
-	std::string name;
-	std::string jsonPath;
-	fs::path filePathName = path;
-	if(fs::path(filePathName).has_extension()) {
-		name = filePathName.stem().stem().stem().string();
-		jsonPath = filePathName.string();
-	}
-	else {
-		name = filePathName.stem().string();
-		jsonPath = path + ".magma.ui.json";
 	}
 
+	auto name = fs::path(filePathName).stem().string();
+	auto funcFolder = (fs::path(filePathName).parent_path() / "Func").string();
+	auto jsonPath = filePathName + ".magma.ui.json";
+	auto funcPath = funcFolder + ".magma.ui.func";
 	if(!FileUtils::FileExists(jsonPath)) {
 		VOLCANICORE_LOG_ERROR(
 			"Could not find .magma.ui.json file with name %s",
-			filePathName.string().c_str());
+				filePathName.c_str());
 		return;
 	}
 
@@ -53,20 +51,20 @@ void UILoader::EditorLoad(UIPage& page, const std::string& path) {
 		VOLCANICORE_LOG_INFO("%i", (uint32_t)doc.GetParseError());
 		return;
 	}
-	if(!doc.IsObject())
+	if(!doc.IsObject()) {
+		VOLCANICORE_LOG_ERROR("File did not have root object");
 		return;
-
-	if(doc.HasMember("Theme"))
-		page.SetTheme(LoadTheme(jsonPath));
-
-	if(doc.HasMember("Elements")) {
-		const auto& elements = doc["Elements"];
-		for(const auto& element : elements.GetArray())
-			LoadElement(page, element);
 	}
 
-	if(page.Name == "")
-		page.Name = name;
+	if(doc.HasMember("Elements")) {
+		GenFiles(name, funcPath);
+
+		const auto& elements = doc["Elements"];
+		for(const auto& element : elements.GetArray()) {
+			LoadElement(page, element);
+			CompileElement(name, funcPath, element);
+		}
+	}
 }
 
 template<typename TUIElement>
@@ -307,66 +305,79 @@ Theme UILoader::LoadTheme(const std::string& path) {
 	return res;
 }
 
-static void GenFiles(const std::string& name, const std::string& funcPath);
-static void CompleteFiles(const std::string& name);
-static void CompileElement(const std::string& name, const std::string& funcPath,
-						   const rapidjson::Value& elementNode);
-
-void UILoader::Compile(const std::string& filePathName) {
-	using namespace rapidjson;
-
-	if(filePathName == "") {
-		VOLCANICORE_LOG_ERROR("Filename was empty");
-		return;
-	}
-
-	auto name = fs::path(filePathName).stem().string();
-	auto funcFolder = (fs::path(filePathName).parent_path() / "Func").string();
-	auto jsonPath = filePathName + ".magma.ui.json";
-	auto funcPath = funcFolder + ".magma.ui.func";
-	if(!FileUtils::FileExists(jsonPath)) {
-		VOLCANICORE_LOG_ERROR(
-			"Could not find .magma.ui.json file with name %s",
-			filePathName.c_str());
-		return;
-	}
-
-	std::string file = FileUtils::ReadFile(jsonPath);
-	Document doc;
-	doc.Parse(file);
-
-	if(doc.HasParseError()) {
-		VOLCANICORE_LOG_INFO("%i", (uint32_t)doc.GetParseError());
-		return;
-	}
-	if(!doc.IsObject()) {
-		VOLCANICORE_LOG_ERROR("File did not have root object");
-		return;
-	}
-
-	if(doc.HasMember("Elements")) {
-		GenFiles(name, funcPath);
-
-		const auto& elements = doc["Elements"];
-		for(const auto& element : elements.GetArray())
-			CompileElement(name, funcPath, element);
-
-		CompleteFiles(name);
-	}
 }
 
-Ref<ScriptModule> UILoader::GetModule(const std::string& name) {
-	auto genPath = fs::path("Lava") / "projects" / "UI" / "gen";
-	auto mod = CreateRef<ScriptModule>(name);
-	mod->Reload((genPath / name).string() + ".as");
-	fs::remove_all(genPath);
-	fs::create_directory(genPath);
+namespace Magma {
+
+// template<>
+// BinaryWriter& BinaryWriter::WriteObject(const Demo::ComplexClass& complex) {
+// 	WriteRaw<uint32_t>((uint32_t)complex.Type);
+// 	WriteRaw<uint64_t>(complex.Data.GetCount());
+// 	WriteData(complex.Data.Get(), complex.Data.GetSize());
+
+// 	return *this;
+// }
+
+// template<>
+// BinaryReader& BinaryReader::ReadObject(Demo::ComplexClass& complex) {
+// 	ReadRaw<uint32_t>((uint32_t&)complex.Type);
+// 	uint64_t size;
+// 	ReadRaw<uint64_t>(size);
+// 	complex.Data = Buffer<uint32_t>(size);
+// 	ReadData(complex.Data.Get(), size * sizeof(uint32_t));
+// 	for(uint64_t i = 0; i < size; i++)
+// 		complex.Data.Add();
+
+// 	return *this;
+// }
+
+}
+
+namespace Lava {
+
+void UILoader::RuntimeSave(const UIPage& page, const std::string& projectPath,
+						   const std::string& exportPath)
+{
+	auto pagePath =
+		(fs::path(projectPath) / "Visual" / "UI" / "Page" / page.Name
+		).string() + ".magma.ui.json";
+	auto funcPath =
+		(fs::path(projectPath) / "Visual" / "UI" / "Func" / page.Name
+		).string() + ".magma.ui.func";
+
+	auto dataPath =
+		(fs::path(exportPath) / "UI" / "Data" / page.Name).string() + ".bin";
+	BinaryWriter writer(dataPath);
+
+	// writer
+	// 	.Write(page.GetWindows())
+	// 	.Write(page.GetButtons())
+	// 	.Write(page.GetDropdowns())
+	// 	.Write(page.GetTexts())
+	// 	.Write(page.GetTextInputs())
+	// 	.Write(page.GetImages());
+
+	// writer.Write(page.GetFirstOrderNodes());
+}
+
+Ref<ScriptModule> UILoader::RuntimeLoad(UIPage& page,
+										const std::string& projectPath)
+{
+	auto pagePath =
+		(fs::path(projectPath) / "UI" / "Data" / page.Name).string() + ".bin";
+	auto funcPath =
+		(fs::path(projectPath) / "UI" / "Func" / page.Name).string() + ".class";
+
+	BinaryReader reader(pagePath);
+	
+
+	auto mod = CreateRef<ScriptModule>(page.Name);
+	mod->Reload(funcPath);
 	return mod;
 }
 
 template<typename T>
-T TryGet(const rapidjson::Value& node, const std::string& name, const T& alt)
-{
+T TryGet(const rapidjson::Value& node, const std::string& name, const T& alt) {
 	if(node.HasMember(name))
 		return node[name].Get<T>();
 	return alt;
@@ -593,13 +604,6 @@ void GenFiles(const std::string& name, const std::string& funcPath) {
 	// .Write("#include \"Context.h\"")
 	// .Write("\n")
 	// .Write("namespace UIElements {\n");
-}
-
-void CompleteFiles(const std::string& name) {
-	auto genPath = fs::path("Lava") / "projects" / "UI" / "gen";
-	auto script = File((genPath / name).string() + ".as");
-
-	// script.Write("\n}"); // namespace UIElements
 }
 
 }

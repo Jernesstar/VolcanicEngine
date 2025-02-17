@@ -1,8 +1,10 @@
 #pragma once
 
-#include "Core/AssetManager.h"
+#include <Magma/Core/AssetManager.h>
 
-namespace Magma {
+using namespace Magma;
+
+namespace Lava {
 
 class RuntimeAssetManager : public AssetManager {
 public:
@@ -12,7 +14,7 @@ public:
 	void Load(Asset asset) override;
 	void Unload(Asset asset) override;
 
-	void LoadRegistry(const std::string& registryFile);
+	void Load(const std::string& path);
 };
 
 }

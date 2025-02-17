@@ -59,27 +59,12 @@ public:
 	UINode Add(UIElementType type, const std::string& id);
 	void Add(const UINode& node);
 
-	template<typename TUIElement, typename ...Args>
-	requires std::derived_from<TUIElement, UIElement>
-	UINode Add(Args&&... args) {
-		auto node = AddNew(std::forward<Args>(args)...);
-		m_FirstOrders.Add(node);
-		return node;
-	}
-
-	template<typename TUIElement, typename ...Args>
-	requires std::derived_from<TUIElement, UIElement>
-	UINode AddNew(Args&&... args) {
-		auto& list = GetList<TUIElement>();
-		list.Emplace(std::forward<Args>(args)...);
-		return { GetType<TUIElement>(), list.size() };
-	}
-
 	void Delete(const UINode& node);
 	void Delete(const std::string& id);
 
 	void Clear();
 	void ClearFirstOrders();
+	const List<UINode>& GetFirstOrderNodes() const { return m_FirstOrders; }
 	List<UIElement*> GetFirstOrderElements() const;
 
 	UIElement* Get(const UINode& node) const;
@@ -87,6 +72,13 @@ public:
 
 	void SetTheme(const Theme& theme);
 	Theme& GetTheme() { return m_Theme; }
+
+	const auto& GetWindows() const { return Windows; }
+	const auto& GetButtons() const { return Buttons; }
+	const auto& GetDropdowns() const { return Dropdowns; }
+	const auto& GetTexts() const { return Texts; }
+	const auto& GetTextInputs() const { return TextInputs; }
+	const auto& GetImages() const { return Images; }
 
 private:
 	List<Window> Windows;
@@ -105,8 +97,6 @@ private:
 	List<TUIType>& GetList();
 	template<typename TUIType>
 	UIElementType GetType();
-
-	void UpdateElement(UIElement* element, TimeStep ts);
 };
 
 }

@@ -4,9 +4,38 @@
 #include <angelscript/add_on/scriptstdstring/scriptstdstring.h>
 #include <angelscript/add_on/scriptbuilder/scriptbuilder.h>
 
+#include <VolcaniCore/Core/FileUtils.h>
+
+#include <Magma/Core/BinaryReader.h>
+#include <Magma/Core/BinaryWriter.h>
+
 #include "ScriptEngine.h"
 
 namespace Magma::Script {
+
+class ByteCodeStream : public asIBinaryStream {
+public:
+	ByteCodeStream(const std::string& path, bool option) {
+		if(option == 0)
+			m_Reader = new BinaryReader(path);
+		else
+			m_Writer = new BinaryWriter(path);
+	}
+
+	int Read(void* data, uint32_t size) override {
+		VOLCANICORE_ASSERT(m_Reader);
+		m_Reader->ReadData(data, (uint64_t)size);
+	}
+
+	int Write(const void* data, uint32_t size) override {
+		VOLCANICORE_ASSERT(m_Writer);
+		m_Writer->WriteData(data, (uint64_t)size);
+	}
+
+private:
+	BinaryReader* m_Reader = nullptr;
+	BinaryWriter* m_Writer = nullptr;
+};
 
 ScriptModule::ScriptModule(const std::string& name)
 	: Name(name)
@@ -16,20 +45,28 @@ ScriptModule::ScriptModule(const std::string& name)
 
 ScriptModule::~ScriptModule() {
 	m_Ctx->Release();
-	// m_Handle->Discard();
 }
 
 void ScriptModule::Reload(const std::string& path) {
+	namespace fs = std::filesystem;
+
 	auto* engine = ScriptEngine::Get();
 
 	if(path != "") {
 		m_Path = path;
 
-		CScriptBuilder builder;
-		builder.StartNewModule(engine, Name.c_str());
-		builder.AddSectionFromFile(m_Path.c_str());
-		builder.BuildModule();
-		m_Handle = builder.GetModule();
+		if(fs::path(path).extension() == ".as") {
+			CScriptBuilder builder;
+			builder.StartNewModule(engine, Name.c_str());
+			builder.AddSectionFromFile(m_Path.c_str());
+			builder.BuildModule();
+			m_Handle = builder.GetModule();
+		}
+		else {
+			m_Handle = engine->GetModule(Name.c_str(), asGM_ALWAYS_CREATE);
+			ByteCodeStream stream(path, 0);
+			m_Handle->LoadByteCode(&stream);
+		}
 
 		return;
 	}
@@ -38,6 +75,11 @@ void ScriptModule::Reload(const std::string& path) {
 		return;
 
 	// TODO(Implement): Hot reload
+}
+
+void ScriptModule::Save(const std::string& path) {
+	ByteCodeStream stream(path, 1);
+	m_Handle->SaveByteCode(&stream, true);
 }
 
 Ref<ScriptClass> ScriptModule::GetScriptClass(const std::string& name) {

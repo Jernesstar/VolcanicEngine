@@ -1,13 +1,16 @@
 #include "SceneLoader.h"
 
 #include <VolcaniCore/Core/Assert.h>
+#include <VolcaniCore/Core/FileUtils.h>
 #include <VolcaniCore/Core/List.h>
 #include <VolcaniCore/Core/UUID.h>
 #include <VolcaniCore/Graphics/StereographicCamera.h>
 #include <VolcaniCore/Graphics/OrthographicCamera.h>
 
-#include <Magma/Core/AssetManager.h>
 #include <Magma/Core/YAMLSerializer.h>
+
+#include <Magma/Core/BinaryWriter.h>
+#include <Magma/Core/BinaryReader.h>
 
 #include <Magma/Scene/Component.h>
 
@@ -354,7 +357,41 @@ void DeserializeEntity(YAML::Node entityNode, Scene& scene) {
 	}
 }
 
+void SceneLoader::RuntimeSave(const Scene& scene,
+							  const std::string& projectPath,
+							  const std::string& exportPath)
+{
+	namespace fs = std::filesystem;
+
+	auto scenePath =
+		(fs::path(projectPath) / "Visual" / "Scene" / "Schema" / scene.Name
+		).string() + ".magma.scene";
+	auto binPath =
+		(fs::path(exportPath) / "Scene" / "Data" / scene.Name).string() + ".bin";
+
+	BinaryWriter writer(binPath);
+
+	writer.Write(scene.Name);
+
+	scene.EntityWorld
+	.ForEach(
+		[&](const Entity& entity) {
+			// writer.Write(entity);
+		});
 }
+
+void SceneLoader::RuntimeLoad(Scene& scene, const std::string& projectPath) {
+	namespace fs = std::filesystem;
+
+	auto scenePath =
+		(fs::path(projectPath) / "Scene" / "Data" / scene.Name
+		).string() + ".magma.scene";
+
+	
+}
+
+}
+
 
 namespace YAML {
 

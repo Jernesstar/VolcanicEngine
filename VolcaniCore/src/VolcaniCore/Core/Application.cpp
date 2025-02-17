@@ -1,14 +1,12 @@
 #include <cstdlib>
 
 #include "Application.h"
-
 #include "Assert.h"
 
 #include "Event/Events.h"
 
 #include "Graphics/Renderer.h"
 #include "Graphics/RendererAPI.h"
-#include "Graphics/ShaderLibrary.h"
 
 namespace fs = std::filesystem;
 
@@ -30,7 +28,6 @@ void Application::Init() {
 	Events::Init();
 
 	RendererAPI::Create(RendererAPI::Backend::OpenGL);
-	ShaderLibrary::Init();
 	Renderer::Init();
 }
 

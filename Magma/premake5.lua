@@ -42,7 +42,7 @@ project "Magma"
         "VolcaniCore",
 
         "imgui",
-        "yaml-cpp",
+        -- "yaml-cpp",
         "ImGuiFileDialog",
         "flecs",
         -- "rapidjson",
