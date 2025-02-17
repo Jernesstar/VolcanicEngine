@@ -41,10 +41,10 @@ EditorApp::EditorApp(const CommandLineArgs& args)
 
 	ImGuiIO& io = ImGui::GetIO();
 	io.Fonts->AddFontFromFileTTF(
-		"VolcaniCore/assets/fonts/JetBrainsMono-Bold.ttf", fontSize);
+		"Magma/assets/fonts/JetBrainsMono-Bold.ttf", fontSize);
 	io.FontDefault =
 		io.Fonts->AddFontFromFileTTF(
-			"VolcaniCore/assets/fonts/JetBrainsMono-Regular.ttf", fontSize);
+			"Magma/assets/fonts/JetBrainsMono-Regular.ttf", fontSize);
 
 	Application::PopDir();
 }

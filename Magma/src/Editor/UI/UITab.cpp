@@ -51,8 +51,9 @@ UITab::UITab(const UI::UIPage& page)
 }
 
 UITab::~UITab() {
-	// Lava::UILoader::Save(
-	// 	m_Root, "Magma/assets/ui/" + m_Root.Name + ".magma.ui.json");
+	if(m_UIPath == "")
+		m_UIPath = "Magma/assets/scenes/" + m_Root.Name + ".magma.scene";
+	Lava::UILoader::EditorSave(m_Root, m_UIPath);
 }
 
 void UITab::Update(TimeStep ts) {
@@ -121,6 +122,7 @@ void UITab::Setup() {
 void UITab::Load(const std::string& path) {
 	namespace fs = std::filesystem;
 
+	m_UIPath = path;
 	m_Root.Clear();
 
 	auto themePath = fs::path(path).parent_path() / "theme.magma.ui.json";

@@ -24,26 +24,24 @@ static void CompileElement(const std::string& name, const std::string& funcPath,
 						   const rapidjson::Value& elementNode);
 static void LoadElement(UIPage& page, const rapidjson::Value& elementNode);
 
-void UILoader::EditorLoad(UIPage& page, const std::string& filePathName) {
+void UILoader::EditorLoad(UIPage& page, const std::string& path) {
 	using namespace rapidjson;
 
-	if(filePathName == "") {
+	if(path == "") {
 		VOLCANICORE_LOG_ERROR("Filename was empty");
 		return;
 	}
 
-	auto name = fs::path(filePathName).stem().string();
-	auto funcFolder = (fs::path(filePathName).parent_path() / "Func").string();
-	auto jsonPath = filePathName + ".magma.ui.json";
+	auto name = fs::path(path).stem().stem().stem().string();
+	auto funcFolder = (fs::path(path).parent_path() / "Func").string();
 	auto funcPath = funcFolder + ".magma.ui.func";
-	if(!FileUtils::FileExists(jsonPath)) {
+	if(!FileUtils::FileExists(path)) {
 		VOLCANICORE_LOG_ERROR(
-			"Could not find .magma.ui.json file with name %s",
-				filePathName.c_str());
+			"Could not find .magma.ui.json file with name %s", name.c_str());
 		return;
 	}
 
-	std::string file = FileUtils::ReadFile(jsonPath);
+	std::string file = FileUtils::ReadFile(path);
 	Document doc;
 	doc.Parse(file);
 
@@ -65,6 +63,8 @@ void UILoader::EditorLoad(UIPage& page, const std::string& filePathName) {
 			CompileElement(name, funcPath, element);
 		}
 	}
+
+	page.Name = name;
 }
 
 template<typename TUIElement>
@@ -369,7 +369,6 @@ Ref<ScriptModule> UILoader::RuntimeLoad(UIPage& page,
 		(fs::path(projectPath) / "UI" / "Func" / page.Name).string() + ".class";
 
 	BinaryReader reader(pagePath);
-	
 
 	auto mod = CreateRef<ScriptModule>(page.Name);
 	mod->Reload(funcPath);

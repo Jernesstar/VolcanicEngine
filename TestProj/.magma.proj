@@ -1,13 +1,14 @@
 Project:
   Name: TestProj
   App: TestGame
+  ExportPath: ""
   StartScreen: TestHome
   Screens:
     - Screen:
         Name: TestHome
-        Scene: test
+        Scene: ""
         UI: test
     - Screen:
         Name: TestScreen2
         Scene: test
-        UI: test2
+        UI: ""

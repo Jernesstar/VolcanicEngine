@@ -31,6 +31,7 @@ void ProjectLoader::Load(Project& proj, const std::string& volcPath) {
 	VOLCANICORE_ASSERT(projNode);
 
 	proj.Path = fs::canonical(volcPath).parent_path().string();
+	proj.ExportPath = projNode["ExportPath"].as<std::string>();
 	proj.Name = projNode["Name"].as<std::string>();
 	proj.App = projNode["App"].as<std::string>();
 	proj.StartScreen = projNode["StartScreen"].as<std::string>();
@@ -47,6 +48,7 @@ void ProjectLoader::Save(const Project& proj, const std::string& volcPath) {
 
 	serializer.WriteKey("Project")
 	.BeginMapping()
+		.WriteKey("ExportPath").Write(proj.ExportPath)
 		.WriteKey("Name").Write(proj.Name)
 		.WriteKey("App").Write(proj.App)
 		.WriteKey("StartScreen").Write(proj.StartScreen);

@@ -1,5 +1,6 @@
 #include "Editor.h"
 
+#include <cstdlib>
 #include <filesystem>
 
 #include <imgui/imgui.h>
@@ -15,6 +16,9 @@
 #include <Magma/UI/UIRenderer.h>
 
 #include <Magma/Physics/Physics.h>
+
+#include <Magma/Script/ScriptEngine.h>
+#include <Magma/Script/ScriptModule.h>
 
 #include <Lava/ProjectLoader.h>
 #include <Lava/SceneLoader.h>
@@ -48,6 +52,7 @@ struct {
 
 Editor::Editor(const CommandLineArgs& args) {
 	Physics::Init();
+	ScriptEngine::Init();
 
 	if(args["--project"]) {
 		ProjectLoader::Load(m_Project, args["--project"]);
@@ -73,6 +78,7 @@ Editor::~Editor() {
 	m_Panels.Clear();
 
 	// Physics::Close();
+	ScriptEngine::Shutdown();
 }
 
 void Editor::Update(TimeStep ts) {
@@ -324,19 +330,32 @@ void Editor::ExportProject() {
 	IGFD::FileDialogConfig config;
 	config.path = ".";
 	auto instance = ImGuiFileDialog::Instance();
-	instance->OpenDialog("ChooseFile", "Choose File", "", config);
+	instance->OpenDialog("ChooseDir", "Choose Directory", nullptr, config);
 
-	std::string exportPath;
-	if(instance->Display("ChooseFile")) {
+	std::string exportPath = "";
+	if(instance->Display("ChooseDir")) {
 		if(instance->IsOk())
-			exportPath = instance->GetFilePathName();
+			exportPath = instance->GetCurrentPath();
 
 		instance->Close();
-		menu.project.openProject = false;
+		menu.project.exportProject = false;
 	}
 
-	if(menu.project.exportProject)
+	if(exportPath == "")
 		return;
+
+	m_Project.ExportPath = exportPath;
+
+	fs::create_directories(exportPath);
+
+	fs::create_directories(fs::path(exportPath) / "Class");
+	fs::create_directories(fs::path(exportPath) / "Scene");
+	fs::create_directories(fs::path(exportPath) / "Scene" / "Data");
+	fs::create_directories(fs::path(exportPath) / "Scene" / "Script");
+	fs::create_directories(fs::path(exportPath) / "Scene" / "Shader");
+	fs::create_directories(fs::path(exportPath) / "UI");
+	fs::create_directories(fs::path(exportPath) / "UI" / "Data");
+	fs::create_directories(fs::path(exportPath) / "UI" / "Script");
 
 	for(auto& screen : m_Project.Screens) {
 		auto mod = CreateRef<ScriptModule>(screen.Name);
@@ -344,21 +363,43 @@ void Editor::ExportProject() {
 			(fs::path(m_Project.Path) / "Project" / "Screen" / screen.Name
 			).string() + ".as");
 		mod->Save(
-			(fs::path(exportPath) / "Screen" / screen.Name).string() + ".class");
+			(fs::path(exportPath) / "Class" / screen.Name).string() + ".class");
 
-		auto scenePath = fs::path(m_Project.Path) / "Visual" / "Scene" / "Schema";
-		auto uiPath = fs::path(m_Project.Path) / "Visual" / "UI" / "Page";
-
-		Scene scene;
-		SceneLoader::EditorLoad(scene, scenePath.string());
-		UIPage ui;
-		UILoader::EditorLoad(ui, uiPath.string());
-
-		SceneLoader::RuntimeSave(scene, m_Project.Path, exportPath);
-		UILoader::RuntimeSave(ui, m_Project.Path, exportPath);
+		if(screen.Scene != "") {
+			auto scenePath =
+				fs::path(m_Project.Path) / "Visual" / "Scene" / "Schema"
+					/ screen.Scene;
+			Scene scene;
+			SceneLoader::EditorLoad(scene, scenePath.string() + ".magma.scene");
+			SceneLoader::RuntimeSave(scene, m_Project.Path, exportPath);
+		}
+		if(screen.Page != "") {
+			auto uiPath =
+				fs::path(m_Project.Path) / "Visual" / "UI" / "Page"
+					/ screen.Page;
+			UIPage ui;
+			UILoader::EditorLoad(ui, uiPath.string() + ".magma.ui.json");
+			UILoader::RuntimeSave(ui, m_Project.Path, exportPath);
+		}
 	}
 
+	auto mod = CreateRef<ScriptModule>(m_Project.App);
+	mod->Reload(
+		(fs::path(m_Project.Path) / "Project" / "App" / m_Project.App
+		).string() + ".as");
+	mod->Save((fs::path(exportPath) / ".volc.class").string());
+
 	m_AssetManager.RuntimeSave(exportPath);
+
+	ProjectLoader::Save(
+		m_Project, (fs::path(exportPath) / ".volc.proj").string());
+
+	auto runtimeEnv = getenv("VOLC_RUNTIME");
+	VOLCANICORE_ASSERT(runtimeEnv);
+	std::string runtimePath = runtimeEnv;
+	auto target = (fs::path(exportPath) / m_Project.App).string() + ".exe";
+
+	fs::copy_file(runtimePath, target, fs::copy_options::overwrite_existing);
 }
 
 }

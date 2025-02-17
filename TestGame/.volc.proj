@@ -1,0 +1,14 @@
+Project:
+  ExportPath: /workspaces/VolcanicEngine/NewTestGame
+  Name: TestProj
+  App: TestGame
+  StartScreen: TestHome
+  Screens:
+    - Screen:
+        Name: TestHome
+        Scene: ""
+        UI: test
+    - Screen:
+        Name: TestScreen2
+        Scene: test
+        UI: ""

@@ -23,6 +23,7 @@ public:
 
 private:
 	UI::UIPage m_Root;
+	std::string m_UIPath;
 
 private:
 	void Setup();

@@ -357,6 +357,14 @@ void DeserializeEntity(YAML::Node entityNode, Scene& scene) {
 	}
 }
 
+}
+
+namespace Magma {
+
+}
+
+namespace Lava {
+
 void SceneLoader::RuntimeSave(const Scene& scene,
 							  const std::string& projectPath,
 							  const std::string& exportPath)
@@ -375,7 +383,8 @@ void SceneLoader::RuntimeSave(const Scene& scene,
 
 	scene.EntityWorld
 	.ForEach(
-		[&](const Entity& entity) {
+		[&](const Entity& entity)
+		{
 			// writer.Write(entity);
 		});
 }

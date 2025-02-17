@@ -30,7 +30,8 @@
 	},
 
 	"remoteEnv": {
-		"VOLC_PATH": "/workspaces/VolcanicEngine"
+		"VOLC_PATH": "/workspaces/VolcanicEngine",
+		"VOLC_RUNTIME": "/workspaces/VolcanicEngine/build/Lava/bin/Runtime"
 	},
 
 	"remoteUser": "root"

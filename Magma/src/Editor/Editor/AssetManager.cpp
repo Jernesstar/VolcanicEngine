@@ -205,7 +205,22 @@ void EditorAssetManager::Save() {
 	serializer.Finalize(m_Path);
 }
 
+}
+
+namespace Magma {
+
+
+}
+
+// #define 
+
+namespace Magma {
+
 void EditorAssetManager::RuntimeSave(const std::string& path) {
+	namespace fs = std::filesystem;
+
+	auto dataPath = (fs::path(path) / ".volc.assetpk").string();
+	BinaryWriter writer(dataPath);
 
 }
 
