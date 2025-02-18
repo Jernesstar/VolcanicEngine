@@ -41,7 +41,7 @@ Serializer& Serializer::Write(const Asset& value) {
 
 }
 
-namespace Lava {
+namespace Magma {
 
 static void DeserializeEntity(YAML::Node entityNode, Scene& scene);
 static void SerializeEntity(YAMLSerializer& out, const Entity& entity);
@@ -363,7 +363,7 @@ namespace Magma {
 
 }
 
-namespace Lava {
+namespace Magma {
 
 void SceneLoader::RuntimeSave(const Scene& scene,
 							  const std::string& projectPath,
@@ -387,16 +387,6 @@ void SceneLoader::RuntimeSave(const Scene& scene,
 		{
 			// writer.Write(entity);
 		});
-}
-
-void SceneLoader::RuntimeLoad(Scene& scene, const std::string& projectPath) {
-	namespace fs = std::filesystem;
-
-	auto scenePath =
-		(fs::path(projectPath) / "Scene" / "Data" / scene.Name
-		).string() + ".magma.scene";
-
-	
 }
 
 }

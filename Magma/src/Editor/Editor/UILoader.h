@@ -10,7 +10,7 @@ using namespace Magma;
 using namespace Magma::Script;
 using namespace Magma::UI;
 
-namespace Lava {
+namespace Magma {
 
 struct ThemeElement {
 	uint32_t Width = 0;
@@ -37,8 +37,6 @@ public:
 
 	static void RuntimeSave(const UIPage& page, const std::string& projectPath,
 							const std::string& exportPath);
-	static Ref<ScriptModule> RuntimeLoad(UIPage& page,
-										 const std::string& projectPath);
 };
 
 }

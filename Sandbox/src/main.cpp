@@ -37,10 +37,6 @@
 #include <Magma/Scene/Scene.h>
 #include <Magma/Scene/Component.h>
 
-#include <Lava/ProjectLoader.h>
-#include <Lava/UILoader.h>
-#include <Lava/SceneLoader.h>
-
 using namespace VolcaniCore;
 using namespace Magma;
 using namespace Magma::ECS;

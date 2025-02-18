@@ -8,7 +8,6 @@
 
 using namespace VolcaniCore;
 using namespace Magma;
-using namespace Magma::Script;
 
 namespace Lava {
 

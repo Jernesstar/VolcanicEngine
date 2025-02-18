@@ -2,9 +2,7 @@
 
 #include <Magma/Scene/Scene.h>
 
-using namespace Magma;
-
-namespace Lava {
+namespace Magma {
 
 class SceneLoader {
 public:
@@ -13,7 +11,6 @@ public:
 	static void RuntimeSave(const Scene& scene,
 							const std::string& projectPath,
 							const std::string& exportPath);
-	static void RuntimeLoad(Scene& scene, const std::string& projectPath);
 };
 
 }

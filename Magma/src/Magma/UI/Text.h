@@ -11,18 +11,14 @@ public:
 	std::string Content;
 
 public:
-	Text(const std::string& text, const glm::vec4& textColor)
-		: UIElement(UIElementType::Text), Content(text)
-	{
-		Color = textColor;
-	}
+	Text()
+		: UIElement(UIElementType::Text) { }
 	Text(const std::string& id, UIPage* root)
 		: UIElement(UIElementType::Text, id, root) { }
+	Text(const std::string& text)
+		: UIElement(UIElementType::Text), Content(text) { }
 
-private:
 	void Draw() override;
-
-	friend class UIRenderer;
 };
 
 }

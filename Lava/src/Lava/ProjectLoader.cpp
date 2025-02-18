@@ -6,9 +6,6 @@
 
 #include <Magma/Core/YAMLSerializer.h>
 
-#include "UILoader.h"
-#include "SceneLoader.h"
-
 namespace fs = std::filesystem;
 
 using namespace Magma;

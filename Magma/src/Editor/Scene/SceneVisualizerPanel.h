@@ -82,7 +82,7 @@ private:
 	Scene* m_Context;
 	EditorEntity m_Selected;
 	Physics::World m_World;
-	Ref<UI::Image> m_Image;
+	UI::Image m_Image;
 
 private:
 	EditorSceneRenderer m_Renderer;

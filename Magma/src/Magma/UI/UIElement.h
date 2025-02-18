@@ -50,7 +50,7 @@ public:
 	UIElement(UIElementType type)
 		: m_Type(type), m_ID(""), m_Root(nullptr) { }
 	UIElement(UIElementType type, const std::string& id, UIPage* root)
-		m_Type(type), m_ID(id), m_Root(root) { }
+		: m_Type(type), m_ID(id), m_Root(root) { }
 	virtual ~UIElement() = default;
 
 	virtual void Draw() = 0;
@@ -96,6 +96,8 @@ protected:
 	List<UINode> m_Children;
 
 	UIState m_State;
+
+	friend class UIPage;
 };
 
 }

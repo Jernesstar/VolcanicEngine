@@ -14,12 +14,6 @@ public:
 	UIBuilder(Ref<UIElement> element) {
 		m_Element = element;
 	}
-	UIBuilder(const std::string& path) {
-		// m_Element = UISerializer::Load(path);
-	}
-	//UIBuilder(const TUIElement::Specification& specs) {
-	//	m_Element = TUIElement::Create(specs);
-	//}
 
 	~UIBuilder() = default;
 
@@ -27,13 +21,6 @@ public:
 	requires std::derived_from<TElement, UIElement>
 	UIBuilder& Add(Ref<TElement> element) {
 		m_Element->Add(element);
-		return *this;
-	}
-
-	template<typename TElement>
-	requires std::derived_from<TElement, UIElement>
-	UIBuilder& Add(const TElement::Specification& specs) {
-		return this->Add(TElement::Create(specs));
 		return *this;
 	}
 

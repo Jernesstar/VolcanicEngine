@@ -14,10 +14,11 @@ public:
 	Ref<UIElement> Display;
 
 public:
+	Button()
+		: UIElement(UIElementType::Button) { }
 	Button(const std::string& id, UIPage* root)
 		: UIElement(UIElementType::Button, id, root) { }
 
-private:
 	void Draw() override;
 };
 

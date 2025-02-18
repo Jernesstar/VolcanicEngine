@@ -19,10 +19,11 @@
 
 #include <Magma/UI/UIRenderer.h>
 
-#include <Lava/SceneLoader.h>
-#include <Lava/UILoader.h>
+#include "SceneLoader.h"
+#include "UILoader.h"
 
 using namespace Magma::UI;
+using namespace Magma::Script;
 
 namespace fs = std::filesystem;
 
@@ -152,12 +153,10 @@ void App::SetScreen(const std::string& name) {
 	delete s_CurrentScreen;
 	s_CurrentScreen = new RuntimeScreen(screen);
 
-	SceneLoader::RuntimeLoad(
-		s_CurrentScreen->CurrentScene, m_Project.ExportPath);
+	SceneLoader::Load(s_CurrentScreen->CurrentScene, m_Project.ExportPath);
 
 	s_Module =
-		UILoader::RuntimeLoad(
-			s_CurrentScreen->CurrentPage, m_Project.ExportPath);
+		UILoader::Load(s_CurrentScreen->CurrentPage, m_Project.ExportPath);
 
 	s_CurrentScreen->CurrentPage.Traverse(
 		[](UIElement* element)

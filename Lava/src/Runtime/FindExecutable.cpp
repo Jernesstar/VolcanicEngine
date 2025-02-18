@@ -1,6 +1,6 @@
-#pragma once
-
 #include <string>
+
+#include <VolcaniCore/Core/Defines.h>
 
 #ifdef VOLCANICENGINE_WINDOWS
 	#include <windows.h>

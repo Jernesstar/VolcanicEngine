@@ -19,8 +19,12 @@ namespace Magma {
 ContentBrowserPanel::ContentBrowserPanel(const std::string& path)
 	: Panel("ContentBrowser"), m_Path(path)
 {
-	m_FileIcon = CreateRef<UI::Image>("Magma/assets/icons/FileIcon.png");
-	m_FolderIcon = CreateRef<UI::Image>("Magma/assets/icons/FolderIcon.png");
+	m_FileIcon =
+		CreateRef<UI::Image>(
+			Texture::Create("Magma/assets/icons/FileIcon.png"));
+	m_FolderIcon =
+		CreateRef<UI::Image>(
+			Texture::Create("Magma/assets/icons/FolderIcon.png"));
 }
 
 void ContentBrowserPanel::Update(TimeStep ts) {

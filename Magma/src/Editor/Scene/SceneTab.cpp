@@ -5,9 +5,8 @@
 #include <imgui/misc/cpp/imgui_stdlib.h>
 #include <ImGuiFileDialog/ImGuiFileDialog.h>
 
-#include <Lava/SceneLoader.h>
-
 #include "Editor/Tab.h"
+#include "Editor/SceneLoader.h"
 
 #include "SceneHierarchyPanel.h"
 #include "SceneVisualizerPanel.h"
@@ -49,7 +48,7 @@ SceneTab::SceneTab(const std::string& path)
 SceneTab::~SceneTab() {
 	if(m_ScenePath == "")
 		m_ScenePath = "Magma/assets/scenes/" + m_Scene.Name + ".magma.scene";
-	Lava::SceneLoader::EditorSave(m_Scene, m_ScenePath);
+	SceneLoader::EditorSave(m_Scene, m_ScenePath);
 }
 
 void SceneTab::Setup() {
@@ -61,23 +60,22 @@ void SceneTab::Setup() {
 	GetPanel("SceneVisualizer")->Open();
 	GetPanel("ComponentEditor")->Open();
 
-	m_PlayButton = CreateRef<UI::Button>();
-	m_PlayButton->Display =
-		CreateRef<UI::Image>("Magma/assets/icons/PlayButton.png");
-	m_PlayButton->Width = 20;
-	m_PlayButton->Height = 20;
+	Ref<Texture> image;
 
-	m_PauseButton = CreateRef<UI::Button>();
-	m_PauseButton->Display =
-		CreateRef<UI::Image>("Magma/assets/icons/PauseButton.png");
-	m_PauseButton->Width = 20;
-	m_PauseButton->Height = 20;
+	image = Texture::Create("Magma/assets/icons/PlayButton.png");
+	m_PlayButton.Display = CreateRef<UI::Image>(image);
+	m_PlayButton.Width = 20;
+	m_PlayButton.Height = 20;
 
-	m_StopButton = CreateRef<UI::Button>();
-	m_StopButton->Display =
-		CreateRef<UI::Image>("Magma/assets/icons/StopButton.png");
-	m_StopButton->Width = 20;
-	m_StopButton->Height = 20;
+	image = Texture::Create("Magma/assets/icons/PauseButton.png");
+	m_PauseButton.Display = CreateRef<UI::Image>(image);
+	m_PauseButton.Width = 20;
+	m_PauseButton.Height = 20;
+
+	image = Texture::Create("Magma/assets/icons/StopButton.png");
+	m_StopButton.Display = CreateRef<UI::Image>(image);
+	m_StopButton.Width = 20;
+	m_StopButton.Height = 20;
 }
 
 void SceneTab::SetScene(const Scene& scene) {
@@ -85,7 +83,7 @@ void SceneTab::SetScene(const Scene& scene) {
 }
 
 void SceneTab::SetScene(const std::string& path) {
-	Lava::SceneLoader::EditorLoad(m_Scene, path);
+	SceneLoader::EditorLoad(m_Scene, path);
 	m_Name = "Scene: " + m_Scene.Name;
 	m_ScenePath = path;
 }
@@ -144,7 +142,7 @@ void SceneTab::Render() {
 		if(m_ScenePath == "")
 			SaveScene();
 		else
-			Lava::SceneLoader::EditorSave(m_Scene, m_ScenePath);
+			SceneLoader::EditorSave(m_Scene, m_ScenePath);
 		menu.file.saveScene = false;
 	}
 	if(menu.file.saveAsScene)
@@ -190,7 +188,7 @@ void SceneTab::SaveScene() {
 	if(instance->Display("ChooseFile")) {
 		if(instance->IsOk()) {
 			std::string path = instance->GetFilePathName();
-			Lava::SceneLoader::EditorSave(m_Scene, path);
+			SceneLoader::EditorSave(m_Scene, path);
 			m_ScenePath = path;
 		}
 
@@ -236,9 +234,9 @@ void SceneTab::ToolbarUI() {
 	{
 		float size = ImGui::GetWindowHeight() - 2.0f;
 		auto x = 0.5f * (ImGui::GetWindowContentRegionMax().x - size);
-		auto button = m_PlayButton;
+		UI::Button* button = &m_PlayButton;
 		if(m_SceneState == SceneState::Play)
-			button = m_PauseButton;
+			button = &m_PauseButton;
 
 		button->x = x;
 		button->y = ImGui::GetCursorPosY();
@@ -246,17 +244,17 @@ void SceneTab::ToolbarUI() {
 		button->Render();
 
 		ImGui::SameLine();
-		m_StopButton->x = ImGui::GetCursorPosX() + 5.0f;
-		m_StopButton->y = ImGui::GetCursorPosY();
-		m_StopButton->SetSize(size, size);
-		m_StopButton->Render();
+		m_StopButton.x = ImGui::GetCursorPosX() + 5.0f;
+		m_StopButton.y = ImGui::GetCursorPosY();
+		m_StopButton.SetSize(size, size);
+		m_StopButton.Render();
 
 		if(button->GetState().Clicked)
-			if(button == m_PlayButton)
+			if(button == &m_PlayButton)
 				OnScenePlay();
 			else
 				OnScenePause();
-		if(m_StopButton->GetState().Clicked)
+		if(m_StopButton.GetState().Clicked)
 			OnSceneStop();
 	}
 	ImGui::End();

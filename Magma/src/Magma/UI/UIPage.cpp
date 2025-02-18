@@ -24,7 +24,7 @@ static void TraverseElement(UIElement* element,
 }
 
 UIPage& UIPage::operator=(const UIPage& other) {
-	m_FirstOrders = other.m_FirstOrders;
+	FirstOrders = other.FirstOrders;
 	Windows = other.Windows;
 	Buttons = other.Buttons;
 	Dropdowns = other.Dropdowns;
@@ -85,37 +85,43 @@ UINode UIPage::Add(UIElementType type, const std::string& id) {
 		case UIElementType::Window:
 		{
 			auto& element = Windows.Emplace(id, this);
-			return element.SetNode({ type, Windows.Count() - 1 });
+			element.SetNode({ type, Windows.Count() - 1 });
+			return element.GetNode();
 			break;
 		}
 		case UIElementType::Button:
 		{
 			auto& element = Buttons.Emplace(id, this);
-			return element.SetNode({ type, Buttons.Count() - 1 });
+			element.SetNode({ type, Buttons.Count() - 1 });
+			return element.GetNode();
 			break;
 		}
 		case UIElementType::Dropdown:
 		{
 			auto& element = Dropdowns.Emplace(id, this);
-			return element.SetNode({ type, Dropdowns.Count() - 1 });
+			element.SetNode({ type, Dropdowns.Count() - 1 });
+			return element.GetNode();
 			break;
 		}
 		case UIElementType::Text:
 		{
 			auto& element = Texts.Emplace(id, this);
-			return element.SetNode({ type, Texts.Count() - 1 });
+			element.SetNode({ type, Texts.Count() - 1 });
+			return element.GetNode();
 			break;
 		}
 		case UIElementType::TextInput:
 		{
 			auto& element = TextInputs.Emplace(id, this);
-			return element.SetNode({ type, TextInputs.Count() - 1 });
+			element.SetNode({ type, TextInputs.Count() - 1 });
+			return element.GetNode();
 			break;
 		}
 		case UIElementType::Image:
 		{
 			auto& element = Images.Emplace(id, this);
-			return element.SetNode({ type, Images.Count() - 1 });
+			element.SetNode({ type, Images.Count() - 1 });
+			return element.GetNode();
 			break;
 		}
 	}
@@ -124,21 +130,17 @@ UINode UIPage::Add(UIElementType type, const std::string& id) {
 }
 
 void UIPage::Add(const UINode& node) {
-	m_FirstOrders.Add(node);
+	FirstOrders.Add(node);
 }
 
 void UIPage::Clear() {
-	m_FirstOrders.Clear();
+	FirstOrders.Clear();
 	Windows.Clear();
 	Buttons.Clear();
 	Dropdowns.Clear();
 	Texts.Clear();
 	TextInputs.Clear();
 	Images.Clear();
-}
-
-void UIPage::ClearFirstOrders() {
-	m_FirstOrders.Clear();
 }
 
 UIElement* UIPage::Get(const UINode& node) const {
@@ -203,7 +205,7 @@ UIElement* UIPage::Get(const std::string& id) const {
 
 List<UIElement*> UIPage::GetFirstOrderElements() const {
 	List<UIElement*> res;
-	for(auto node : m_FirstOrders)
+	for(auto node : FirstOrders)
 		res.Add(Get(node));
 
 	return res;

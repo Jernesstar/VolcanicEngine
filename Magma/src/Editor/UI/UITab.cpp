@@ -8,7 +8,7 @@
 #include <VolcaniCore/Core/Application.h>
 #include <VolcaniCore/Core/FileUtils.h>
 
-#include <Lava/UILoader.h>
+#include "Editor/UILoader.h"
 
 #include "UIHierarchyPanel.h"
 #include "UIVisualizerPanel.h"
@@ -29,7 +29,7 @@ struct {
 	} edit;
 } static menu;
 
-static Theme s_Theme;
+// static Theme s_Theme;
 
 UITab::UITab()
 	: Tab(TabType::UI), m_Root("")
@@ -53,7 +53,7 @@ UITab::UITab(const UI::UIPage& page)
 UITab::~UITab() {
 	if(m_UIPath == "")
 		m_UIPath = "Magma/assets/ui/" + m_Root.Name + ".magma.ui.json";
-	Lava::UILoader::EditorSave(m_Root, m_UIPath);
+	UILoader::EditorSave(m_Root, m_UIPath);
 }
 
 void UITab::Update(TimeStep ts) {
@@ -127,16 +127,16 @@ void UITab::Load(const std::string& path) {
 
 	auto themePath = fs::path(path).parent_path() / "theme.magma.ui.json";
 	if(fs::exists(themePath)) {
-		s_Theme = Lava::UILoader::LoadTheme(themePath.string());
-		m_Root.SetTheme(s_Theme);
+		// s_Theme = UILoader::LoadTheme(themePath.string());
+		// m_Root.SetTheme(s_Theme);
 	}
 
-	Lava::UILoader::EditorLoad(m_Root, path);
+	UILoader::EditorLoad(m_Root, path);
 	m_Name = "UI: " + m_Root.Name;
 }
 
 void UITab::Save(const std::string& path) {
-	Lava::UILoader::EditorSave(m_Root, path);
+	UILoader::EditorSave(m_Root, path);
 	m_Name = "UI: " + m_Root.Name;
 }
 

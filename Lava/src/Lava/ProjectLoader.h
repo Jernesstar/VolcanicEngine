@@ -1,7 +1,6 @@
 #pragma once
 
 #include <Magma/Core/Project.h>
-#include <Magma/Core/DLL.h>
 
 using namespace VolcaniCore;
 using namespace Magma;

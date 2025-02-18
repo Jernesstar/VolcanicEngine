@@ -14,11 +14,10 @@ public:
 
 public:
 	Window()
-		: UIElement(UIElementType::Window, nullptr) { }
+		: UIElement(UIElementType::Window) { }
 	Window(const std::string& id, UIPage* root)
 		: UIElement(UIElementType::Window, id, root) { }
 
-protected:
 	void Draw() override;
 };
 

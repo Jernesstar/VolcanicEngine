@@ -38,7 +38,7 @@ void UIVisualizerPanel::SetContext(UIPage* page) {
 	*m_Running = *page;
 
 	auto root = m_Running->Add(UIElementType::Window, "UI_VISUALIZER_PANEL");
-	m_Running->ClearFirstOrders();
+	m_Running->FirstOrders.Clear();
 	m_Running->Add(root);
 
 	UIElement* window = m_Running->Get(root);
@@ -219,11 +219,11 @@ void UIVisualizerPanel::Draw() {
 				auto node = m_Running->Add(type, str);
 				UIElement* element = m_Running->Get(node);
 
-				if(type == UIElementType::Image)
-					element->As<Image>()->SetImage(options.add.path);
-				else
-					element->As<Button>()->Display =
-						CreateRef<Image>(options.add.path);
+				// if(type == UIElementType::Image)
+				// 	element->As<Image>()->SetImage(options.add.path);
+				// else
+				// 	element->As<Button>()->Display =
+				// 		CreateRef<Image>(options.add.path);
 
 				ImGui::CloseCurrentPopup();
 			}

@@ -32,9 +32,8 @@ namespace Magma {
 SceneVisualizerPanel::SceneVisualizerPanel(Scene* context)
 	: Panel("SceneVisualizer")
 {
-	m_Image = CreateRef<UI::Image>();
-	m_Image->Width = Application::GetWindow()->GetWidth();
-	m_Image->Height = = Application::GetWindow()->GetHeight();
+	m_Image.Width = Application::GetWindow()->GetWidth();
+	m_Image.Height = Application::GetWindow()->GetHeight();
 
 	SetContext(context);
 }
@@ -78,14 +77,9 @@ void SceneVisualizerPanel::Draw() {
 		auto width = size.x;
 		auto height = size.y;
 
-		m_Image->SetPosition(pos.x, pos.y);
-		// m_Image->SetSize(size.x, size.y);
-		// m_Image->Draw();
-		ImVec2 dim = ImVec2(m_Image.Width, m_Image.Height);
-		ImGui::SetCursorPos(ImVec2(m_Image.x, m_Image.y));
-		auto texture = m_Renderer.GetOutput()->Get(AttachmentTarget::Color);
-		auto native = texture->As<OpenGL::Texture2D>();
-		ImGui::Image((ImTextureID)(intptr_t)native->GetID(), dim);
+		m_Image.SetPosition(pos.x, pos.y);
+		// m_Image.SetSize(size.x, size.y);
+		m_Image.Draw();
 
 		if(ImGui::BeginDragDropTarget())
 		{

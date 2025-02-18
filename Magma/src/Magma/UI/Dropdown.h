@@ -15,10 +15,9 @@ public:
 	Dropdown(const std::string& id, UIPage* root)
 		: UIElement(UIElementType::Dropdown, id, root) { }
 
-	std::string GetSelected() const { return Options[CurrentItem]; }
-
-private:
 	void Draw() override;
+
+	std::string GetSelected() const { return Options[CurrentItem]; }
 };
 
 }

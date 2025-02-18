@@ -17,12 +17,13 @@ namespace fs = std::filesystem;
 using namespace Magma;
 using namespace Magma::UI;
 
-namespace Lava {
+namespace Magma {
 
 static void GenFiles(const std::string& name, const std::string& funcPath);
 static void CompileElement(const std::string& name, const std::string& funcPath,
 						   const rapidjson::Value& elementNode);
-static void LoadElement(UIPage& page, const rapidjson::Value& elementNode);
+static void LoadElement(UIPage& page, const rapidjson::Value& elementNode, 
+						const Theme& theme);
 
 void UILoader::EditorLoad(UIPage& page, const std::string& path) {
 	using namespace rapidjson;
@@ -59,7 +60,7 @@ void UILoader::EditorLoad(UIPage& page, const std::string& path) {
 
 		const auto& elements = doc["Elements"];
 		for(const auto& element : elements.GetArray()) {
-			LoadElement(page, element);
+			LoadElement(page, element, { });
 			CompileElement(name, funcPath, element);
 		}
 	}
@@ -103,7 +104,7 @@ void Serialize(const TextInput* ui, JSONSerializer& serializer) {
 
 template<>
 void Serialize(const Image* ui, JSONSerializer& serializer) {
-	serializer.WriteKey("Path").Write(ui->Content->GetPath());
+	// serializer.WriteKey("Asset").Write((uint64_t)ui->ImageAsset.ID);
 }
 
 template<>
@@ -365,7 +366,7 @@ BinaryWriter& BinaryWriter::WriteObject(const UI::TextInput& textInput) {
 template<>
 BinaryWriter& BinaryWriter::WriteObject(const UI::Image& image) {
 	WriteUI(this, &image);
-	Write((uint64_t)image.ImageAsset.ID);
+	// Write((uint64_t)image.ImageAsset.ID);
 	
 	return *this;
 }
@@ -448,8 +449,9 @@ BinaryReader& BinaryReader::ReadObject(UI::TextInput& textInput) {
 template<>
 BinaryReader& BinaryReader::ReadObject(UI::Image& image) {
 	ReadUI(this, &image);
-	image.ImageAsset = { 0, AssetType::Texture };
-	Read((uint64_t&)image.ImageAsset.ID);
+	uint64_t id;
+	Read(id);
+	// image.ImageAsset = { id, AssetType::Texture };
 
 	return *this;
 }
@@ -483,7 +485,7 @@ BinaryReader& BinaryReader::ReadObject(UI::UINode& node) {
 
 }
 
-namespace Lava {
+namespace Magma {
 
 void UILoader::RuntimeSave(const UIPage& page, const std::string& projectPath,
 						   const std::string& exportPath)
@@ -502,41 +504,14 @@ void UILoader::RuntimeSave(const UIPage& page, const std::string& projectPath,
 	writer.Write(page.Name);
 
 	writer
-		.Write(Windows)
-		.Write(Buttons)
-		.Write(Dropdowns)
-		.Write(Texts)
-		.Write(TextInputs)
-		.Write(Images);
+		.Write(page.Windows)
+		.Write(page.Buttons)
+		.Write(page.Dropdowns)
+		.Write(page.Texts)
+		.Write(page.TextInputs)
+		.Write(page.Images);
 
-	writer.Write(page.GetFirstOrderNodes());
-}
-
-Ref<ScriptModule> UILoader::RuntimeLoad(UIPage& page,
-										const std::string& projectPath)
-{
-	auto pagePath =
-		(fs::path(projectPath) / "UI" / "Data" / page.Name).string() + ".bin";
-	auto funcPath =
-		(fs::path(projectPath) / "UI" / "Func" / page.Name).string() + ".class";
-
-	BinaryReader reader(pagePath);
-
-	reader.Read(page.Name);
-
-	reader
-		.Read(Windows, "", &page)
-		.Read(Buttons, "", &page)
-		.Read(Dropdowns, "", &page)
-		.Read(Texts, "", &page)
-		.Read(TextInputs, "", &page)
-		.Read(Images, "", &page);
-
-	reader.Read(page.GetFirstOrderNodes());
-
-	auto mod = CreateRef<ScriptModule>(page.Name);
-	mod->Reload(funcPath);
-	return mod;
+	writer.Write(page.FirstOrders);
 }
 
 template<typename T>
@@ -546,7 +521,9 @@ T TryGet(const rapidjson::Value& node, const std::string& name, const T& alt) {
 	return alt;
 }
 
-void LoadElement(UIPage& page, const rapidjson::Value& elementNode) {
+void LoadElement(UIPage& page, const rapidjson::Value& elementNode,
+				 const Theme& pageTheme)
+{
 	std::string id = elementNode["ID"].GetString();
 	std::string typeStr = elementNode["Type"].GetString();
 	std::string parent = "";
@@ -556,12 +533,12 @@ void LoadElement(UIPage& page, const rapidjson::Value& elementNode) {
 
 	UINode node;
 	UIElement* element;
-	ThemeElement* theme;
+	const ThemeElement* theme;
 
 	if(typeStr == "Window") {
 		node = page.Add(UIElementType::Window, id);
 		element = page.Get(node);
-		theme = &page.GetTheme()[element->GetType()];
+		theme = &pageTheme.at(element->GetType());
 		auto* window = element->As<Window>();
 
 		if(elementNode.HasMember("Border")) {
@@ -586,13 +563,14 @@ void LoadElement(UIPage& page, const rapidjson::Value& elementNode) {
 	if(typeStr == "Button") {
 		node = page.Add(UIElementType::Button, id);
 		element = page.Get(node);
-		theme = &page.GetTheme()[element->GetType()];
+		theme = &pageTheme.at(element->GetType());
 
 		auto* button = element->As<Button>();
 
 		if(elementNode.HasMember("Image"))
-			button->Display
-				= CreateRef<Image>(elementNode["Image"].Get<std::string>());
+			// button->Display
+			// 	= CreateRef<Image>(elementNode["Image"].Get<std::string>());
+			;
 		else if(elementNode.HasMember("Text"))
 			button->Display
 				= CreateRef<Text>(elementNode["Text"].Get<std::string>());
@@ -602,22 +580,22 @@ void LoadElement(UIPage& page, const rapidjson::Value& elementNode) {
 	if(typeStr == "Image") {
 		node = page.Add(UIElementType::Image, id);
 		element = page.Get(node);
-		theme = &page.GetTheme()[element->GetType()];
+		theme = &pageTheme.at(element->GetType());
 	}
 	if(typeStr == "Text") {
 		node = page.Add(UIElementType::Text, id);
 		element = page.Get(node);
-		theme = &page.GetTheme()[element->GetType()];
+		theme = &pageTheme.at(element->GetType());
 	}
 	if(typeStr == "TextInput") {
 		node = page.Add(UIElementType::TextInput, id);
 		element = page.Get(node);
-		theme = &page.GetTheme()[element->GetType()];
+		theme = &pageTheme.at(element->GetType());
 	}
 	if(typeStr == "Dropdown") {
 		node = page.Add(UIElementType::Dropdown, id);
 		element = page.Get(node);
-		theme = &page.GetTheme()[element->GetType()];
+		theme = &pageTheme.at(element->GetType());
 	}
 
 	if(parent == "")
