@@ -4,33 +4,7 @@
 
 #include <VolcaniCore/Core/Log.h>
 
-#define GET_LIST(TUIElement) \
-template<> \
-List<TUIElement>& UIPage::GetList<TUIElement>() { \
-	return TUIElement##s; \
-}
-
-#define GET_TYPE(TUIElement) \
-template<> \
-UIElementType UIPage::GetType<TUIElement>() { \
-	return UIElementType::TUIElement; \
-}
-
 namespace Magma::UI {
-
-GET_LIST(Window)
-GET_LIST(Button)
-GET_LIST(Dropdown)
-GET_LIST(Text)
-GET_LIST(TextInput)
-GET_LIST(Image)
-
-GET_TYPE(Window)
-GET_TYPE(Button)
-GET_TYPE(Dropdown)
-GET_TYPE(Text)
-GET_TYPE(TextInput)
-GET_TYPE(Image)
 
 static void TraverseElement(UIElement* element,
 							const Func<void, UIElement*>& func)
@@ -41,18 +15,13 @@ static void TraverseElement(UIElement* element,
 }
 
 static void TraverseElement(UIElement* element,
-							const Func<void, UIElement*, TraversalState>& func)
+							const Func<void, UIElement*, TraversalStage>& func)
 {
-	func(element, TraversalState::Begin);
+	func(element, TraversalStage::Begin);
 	for(UIElement* child : element->GetChildren())
 		TraverseElement(child, func);
-	func(element, TraversalState::End);
+	func(element, TraversalStage::End);
 }
-
-UIPage::UIPage() { }
-
-UIPage::UIPage(const std::string &name)
-	: Name(name) { }
 
 UIPage& UIPage::operator=(const UIPage& other) {
 	m_FirstOrders = other.m_FirstOrders;
@@ -90,7 +59,6 @@ void UIPage::Traverse(const Func<void, UIElement*>& func, bool dfs) {
 	if(dfs) {
 		for(UIElement* element : GetFirstOrderElements())
 			TraverseElement(element, func);
-
 		return;
 	}
 
@@ -107,7 +75,7 @@ void UIPage::Traverse(const Func<void, UIElement*>& func, bool dfs) {
 	}
 }
 
-void UIPage::Traverse(const Func<void, UIElement*, TraversalState>& func) {
+void UIPage::Traverse(const Func<void, UIElement*, TraversalStage>& func) {
 	for(UIElement* element : GetFirstOrderElements())
 		TraverseElement(element, func);
 }
@@ -117,37 +85,37 @@ UINode UIPage::Add(UIElementType type, const std::string& id) {
 		case UIElementType::Window:
 		{
 			auto& element = Windows.Emplace(id, this);
-			return element.m_Node = { type, Windows.Count() - 1 };
+			return element.SetNode({ type, Windows.Count() - 1 });
 			break;
 		}
 		case UIElementType::Button:
 		{
 			auto& element = Buttons.Emplace(id, this);
-			return element.m_Node = { type, Buttons.Count() - 1 };
+			return element.SetNode({ type, Buttons.Count() - 1 });
 			break;
 		}
 		case UIElementType::Dropdown:
 		{
 			auto& element = Dropdowns.Emplace(id, this);
-			return element.m_Node = { type, Dropdowns.Count() - 1 };
+			return element.SetNode({ type, Dropdowns.Count() - 1 });
 			break;
 		}
 		case UIElementType::Text:
 		{
 			auto& element = Texts.Emplace(id, this);
-			return element.m_Node = { type, Texts.Count() - 1 };
+			return element.SetNode({ type, Texts.Count() - 1 });
 			break;
 		}
 		case UIElementType::TextInput:
 		{
 			auto& element = TextInputs.Emplace(id, this);
-			return element.m_Node = { type, TextInputs.Count() - 1 };
+			return element.SetNode({ type, TextInputs.Count() - 1 });
 			break;
 		}
 		case UIElementType::Image:
 		{
 			auto& element = Images.Emplace(id, this);
-			return element.m_Node = { type, Images.Count() - 1 };
+			return element.SetNode({ type, Images.Count() - 1 });
 			break;
 		}
 	}
@@ -239,11 +207,6 @@ List<UIElement*> UIPage::GetFirstOrderElements() const {
 		res.Add(Get(node));
 
 	return res;
-}
-
-void UIPage::SetTheme(const Theme& theme) {
-	// TODO(Implement): Apply new theme on top of the old one
-	m_Theme = theme;
 }
 
 }

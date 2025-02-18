@@ -44,13 +44,13 @@ public:
 	XAlignment xAlignment = XAlignment::Left;
 	YAlignment yAlignment = YAlignment::Top;
 	glm::vec4 Color;
+	// TODO(Implement): Border
 
 public:
-	UIElement(UIElementType type, UIPage* root = nullptr);
-	UIElement(UIElementType type, const std::string& id, UIPage* root);
-	UIElement(UIElementType type, uint32_t width, uint32_t height,
-			  int32_t x, int32_t y, const glm::vec4& color,
-			  UIPage* root = nullptr);
+	UIElement(UIElementType type)
+		: m_Type(type), m_ID(""), m_Root(nullptr) { }
+	UIElement(UIElementType type, const std::string& id, UIPage* root)
+		m_Type(type), m_ID(id), m_Root(root) { }
 	virtual ~UIElement() = default;
 
 	virtual void Draw() = 0;
@@ -69,10 +69,12 @@ public:
 
 	void Clear();
 
+	void SetID(const std::string& id) { m_ID = id; }
+	void SetNode(const UINode& node) { m_Node = node; }
+
 	bool Is(UIElementType type) const { return m_Type == type; }
 	UIElementType GetType() const { return m_Type; }
 	std::string GetID() const { return m_ID; }
-	UIPage* GetRoot() const { return m_Root; }
 	UINode GetNode() const { return m_Node; }
 
 	UIElement* GetParent() const;
@@ -85,7 +87,7 @@ public:
 	TUIElement* As() const { return (TUIElement*)(this); }
 
 protected:
-	UIElementType m_Type;
+	const UIElementType m_Type;
 	std::string m_ID;
 
 	UIPage* m_Root;
@@ -94,8 +96,6 @@ protected:
 	List<UINode> m_Children;
 
 	UIState m_State;
-
-	friend class UIPage;
 };
 
 }

@@ -52,7 +52,7 @@ UITab::UITab(const UI::UIPage& page)
 
 UITab::~UITab() {
 	if(m_UIPath == "")
-		m_UIPath = "Magma/assets/scenes/" + m_Root.Name + ".magma.scene";
+		m_UIPath = "Magma/assets/ui/" + m_Root.Name + ".magma.ui.json";
 	Lava::UILoader::EditorSave(m_Root, m_UIPath);
 }
 

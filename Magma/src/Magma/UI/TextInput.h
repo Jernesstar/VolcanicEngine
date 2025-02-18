@@ -8,13 +8,11 @@ class TextInput : public UIElement {
 public:
 	std::string Text;
 	std::string Hint;
+	uint32_t MaxCharCount;
 
 public:
-	TextInput(uint32_t maxChars = 100);
 	TextInput(const std::string& id, UIPage* root)
-		: UIElement(UIElementType::TextInput, id, root), m_MaxCharCount(100) { }
-private:
-	uint32_t m_MaxCharCount;
+		: UIElement(UIElementType::TextInput, id, root), MaxCharCount(100) { }
 
 	void Draw() override;
 };

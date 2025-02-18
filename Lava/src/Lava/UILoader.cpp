@@ -309,27 +309,177 @@ Theme UILoader::LoadTheme(const std::string& path) {
 
 namespace Magma {
 
-// template<>
-// BinaryWriter& BinaryWriter::WriteObject(const Demo::ComplexClass& complex) {
-// 	WriteRaw<uint32_t>((uint32_t)complex.Type);
-// 	WriteRaw<uint64_t>(complex.Data.GetCount());
-// 	WriteData(complex.Data.Get(), complex.Data.GetSize());
+static void WriteUI(BinaryWriter* writer, const UIElement* element) {
+	writer->Write(element->GetID());
+	writer->Write(element->Width);
+	writer->Write(element->Height);
+	writer->Write(element->x);
+	writer->Write(element->y);
+	writer->Write((uint32_t)element->xAlignment);
+	writer->Write((uint32_t)element->yAlignment);
+	writer->Write(element->Color.r);
+	writer->Write(element->Color.g);
+	writer->Write(element->Color.b);
+	writer->Write(element->Color.a);
+}
 
-// 	return *this;
-// }
+template<>
+BinaryWriter& BinaryWriter::WriteObject(const UI::Window& window) {
+	WriteUI(this, &window);
+	Write(window.BorderWidth);
+	Write(window.BorderHeight);
+	Write(window.BorderColor.r);
+	Write(window.BorderColor.g);
+	Write(window.BorderColor.b);
+	Write(window.BorderColor.a);
+	
+	return *this;
+}
 
-// template<>
-// BinaryReader& BinaryReader::ReadObject(Demo::ComplexClass& complex) {
-// 	ReadRaw<uint32_t>((uint32_t&)complex.Type);
-// 	uint64_t size;
-// 	ReadRaw<uint64_t>(size);
-// 	complex.Data = Buffer<uint32_t>(size);
-// 	ReadData(complex.Data.Get(), size * sizeof(uint32_t));
-// 	for(uint64_t i = 0; i < size; i++)
-// 		complex.Data.Add();
+template<>
+BinaryWriter& BinaryWriter::WriteObject(const UI::Dropdown& dropdown) {
+	WriteUI(this, &dropdown);
+	Write(dropdown.CurrentItem);
+	Write(dropdown.Options);
+	
+	return *this;
+}
 
-// 	return *this;
-// }
+template<>
+BinaryWriter& BinaryWriter::WriteObject(const UI::Text& text) {
+	WriteUI(this, &text);
+	Write(text.Content);
+	
+	return *this;
+}
+
+template<>
+BinaryWriter& BinaryWriter::WriteObject(const UI::TextInput& textInput) {
+	WriteUI(this, &textInput);
+	Write(textInput.Text);
+	Write(textInput.Hint);
+	
+	return *this;
+}
+
+template<>
+BinaryWriter& BinaryWriter::WriteObject(const UI::Image& image) {
+	WriteUI(this, &image);
+	Write((uint64_t)image.ImageAsset.ID);
+	
+	return *this;
+}
+
+template<>
+BinaryWriter& BinaryWriter::WriteObject(const UI::Button& button) {
+	WriteUI(this, &button);
+	auto display = button.Display;
+	Write(display->Is(UI::UIElementType::Text));
+	if(display->Is(UI::UIElementType::Text))
+		Write(*display->As<UI::Text>());
+	else
+		Write(*display->As<UI::Image>());
+
+	return *this;
+}
+
+template<>
+BinaryWriter& BinaryWriter::WriteObject(const UI::UINode& node) {
+	Write((uint32_t)node.first);
+	Write(node.second);
+	return *this;
+}
+
+static void ReadUI(BinaryReader* reader, UIElement* element) {
+	std::string id;
+	reader->Read(id);
+	element->SetID(id);
+	reader->Read(element->Width);
+	reader->Read(element->Height);
+	reader->Read(element->x);
+	reader->Read(element->y);
+	reader->Read((uint32_t&)element->xAlignment);
+	reader->Read((uint32_t&)element->yAlignment);
+	reader->Read(element->Color.r);
+	reader->Read(element->Color.g);
+	reader->Read(element->Color.b);
+	reader->Read(element->Color.a);
+}
+
+template<>
+BinaryReader& BinaryReader::ReadObject(UI::Window& window) {
+	ReadUI(this, &window);
+	Read(window.BorderWidth);
+	Read(window.BorderHeight);
+	Read(window.BorderColor.r);
+	Read(window.BorderColor.g);
+	Read(window.BorderColor.b);
+	Read(window.BorderColor.a);
+
+	return *this;
+}
+
+template<>
+BinaryReader& BinaryReader::ReadObject(UI::Dropdown& dropdown) {
+	ReadUI(this, &dropdown);
+	Read(dropdown.CurrentItem);
+	Read(dropdown.Options);
+
+	return *this;
+}
+
+template<>
+BinaryReader& BinaryReader::ReadObject(UI::Text& text) {
+	ReadUI(this, &text);
+	Read(text.Content);
+
+	return *this;
+}
+
+template<>
+BinaryReader& BinaryReader::ReadObject(UI::TextInput& textInput) {
+	ReadUI(this, &textInput);
+	Read(textInput.Text);
+	Read(textInput.Hint);
+
+	return *this;
+}
+
+template<>
+BinaryReader& BinaryReader::ReadObject(UI::Image& image) {
+	ReadUI(this, &image);
+	image.ImageAsset = { 0, AssetType::Texture };
+	Read((uint64_t&)image.ImageAsset.ID);
+
+	return *this;
+}
+
+template<>
+BinaryReader& BinaryReader::ReadObject(UI::Button& button) {
+	ReadUI(this, &button);
+	bool isText;
+	Read(isText);
+	if(isText) {
+		auto display = CreateRef<UI::Text>();
+		Read(*display);
+		button.Display = display;
+	}
+	else {
+		auto display = CreateRef<UI::Image>();
+		Read(*display);
+		button.Display = display;
+	}
+
+	return *this;
+}
+
+template<>
+BinaryReader& BinaryReader::ReadObject(UI::UINode& node) {
+	Read((uint32_t&)node.first);
+	Read(node.second);
+
+	return *this;
+}
 
 }
 
@@ -349,15 +499,17 @@ void UILoader::RuntimeSave(const UIPage& page, const std::string& projectPath,
 		(fs::path(exportPath) / "UI" / "Data" / page.Name).string() + ".bin";
 	BinaryWriter writer(dataPath);
 
-	// writer
-	// 	.Write(page.GetWindows())
-	// 	.Write(page.GetButtons())
-	// 	.Write(page.GetDropdowns())
-	// 	.Write(page.GetTexts())
-	// 	.Write(page.GetTextInputs())
-	// 	.Write(page.GetImages());
+	writer.Write(page.Name);
 
-	// writer.Write(page.GetFirstOrderNodes());
+	writer
+		.Write(Windows)
+		.Write(Buttons)
+		.Write(Dropdowns)
+		.Write(Texts)
+		.Write(TextInputs)
+		.Write(Images);
+
+	writer.Write(page.GetFirstOrderNodes());
 }
 
 Ref<ScriptModule> UILoader::RuntimeLoad(UIPage& page,
@@ -369,6 +521,18 @@ Ref<ScriptModule> UILoader::RuntimeLoad(UIPage& page,
 		(fs::path(projectPath) / "UI" / "Func" / page.Name).string() + ".class";
 
 	BinaryReader reader(pagePath);
+
+	reader.Read(page.Name);
+
+	reader
+		.Read(Windows, "", &page)
+		.Read(Buttons, "", &page)
+		.Read(Dropdowns, "", &page)
+		.Read(Texts, "", &page)
+		.Read(TextInputs, "", &page)
+		.Read(Images, "", &page);
+
+	reader.Read(page.GetFirstOrderNodes());
 
 	auto mod = CreateRef<ScriptModule>(page.Name);
 	mod->Reload(funcPath);

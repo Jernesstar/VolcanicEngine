@@ -1,12 +1,8 @@
 #pragma once
 
-#include <VolcaniCore/Core/Time.h>
-
 #include <Magma/Core/Project.h>
 
-#include <Magma/Script/ScriptModule.h>
-#include <Magma/Script/ScriptClass.h>
-#include <Magma/Script/ScriptObject.h>
+#include <Magma/Scene/SceneRenderer.h>
 
 #include "AssetManager.h"
 
@@ -15,6 +11,21 @@ using namespace Magma;
 using namespace Magma::Script;
 
 namespace Lava {
+
+class RuntimeSceneRenderer : public SceneRenderer {
+	public:
+		RuntimeSceneRenderer();
+		~RuntimeSceneRenderer() = default;
+	
+		void Update(TimeStep ts) override;
+	
+		void Begin() override;
+		void SubmitCamera(Entity entity) override;
+		void SubmitSkybox(Entity entity) override;
+		void SubmitLight(Entity entity) override;
+		void SubmitMesh(Entity entity) override;
+		void Render() override;
+	};
 
 class App {
 public:
@@ -31,6 +42,7 @@ public:
 private:
 	Project m_Project;
 
+	RuntimeSceneRenderer m_SceneRenderer;
 	RuntimeAssetManager m_Assets;
 };
 

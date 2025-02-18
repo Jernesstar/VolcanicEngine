@@ -10,11 +10,12 @@
 #include <VolcaniCore/Graphics/RendererAPI.h>
 #include <VolcaniCore/Graphics/StereographicCamera.h>
 
-#include <Magma/Core/DLL.h>
-
 #include <Magma/Scene/Scene.h>
 #include <Magma/Scene/Component.h>
-#include <Magma/Scene/SceneRenderer.h>
+
+#include <Magma/Script/ScriptModule.h>
+#include <Magma/Script/ScriptClass.h>
+#include <Magma/Script/ScriptObject.h>
 
 #include <Magma/UI/UIRenderer.h>
 
@@ -26,23 +27,6 @@ using namespace Magma::UI;
 namespace fs = std::filesystem;
 
 namespace Lava {
-
-class RuntimeSceneRenderer : public SceneRenderer {
-public:
-	RuntimeSceneRenderer();
-	~RuntimeSceneRenderer() = default;
-
-	void Update(TimeStep ts) override;
-
-	void Begin() override;
-	void SubmitCamera(Entity entity) override;
-	void SubmitSkybox(Entity entity) override;
-	void SubmitLight(Entity entity) override;
-	void SubmitMesh(Entity entity) override;
-	void Render() override;
-};
-
-static Ref<RuntimeSceneRenderer> s_SceneRenderer;
 
 static Ref<ScriptModule> s_AppModule;
 static Ref<ScriptClass> s_AppClass;
@@ -94,8 +78,6 @@ void App::OnLoad() {
 	SetScreen(m_Project.StartScreen);
 
 	UIRenderer::Init();
-
-	s_SceneRenderer = CreateRef<Lava::RuntimeSceneRenderer>();
 }
 
 void App::OnClose() {
@@ -118,29 +100,36 @@ void App::OnUpdate(TimeStep ts) {
 	if(!s_CurrentScreen)
 		return;
 
-	s_CurrentScreen->CurrentScene.OnRender(*s_SceneRenderer);
+	s_CurrentScreen->CurrentScene.OnRender(m_SceneRenderer);
 
 	UIRenderer::BeginFrame();
 
-	s_CurrentScreen->CurrentPage.Render();
 	s_CurrentScreen->CurrentPage.Traverse(
-		[&](UIElement* element)
+		[&](UIElement* element, TraversalStage state)
 		{
-			if(!s_Objects.count(element->GetID()))
-				return;
-			auto object = s_Objects[element->GetID()];
+			if(state == TraversalStage::Begin) {
+				element->Draw();
 
-			object->Call("OnUpdate", (float)ts);
+				if(!s_Objects.count(element->GetID()))
+					return;
+				auto object = s_Objects[element->GetID()];
+				
+				object->Call("OnUpdate", (float)ts);
 
-			UIState state = element->GetState();
-			if(state.Clicked)
-				object->Call("OnClick");
-			if(state.Hovered)
-				object->Call("OnHover");
-			if(state.MouseUp)
-				object->Call("OnMouseUp");
-			if(state.MouseDown)
-				object->Call("OnMouseDown");
+				UIState state = element->GetState();
+				if(state.Clicked)
+					object->Call("OnClick");
+				if(state.Hovered)
+					object->Call("OnHover");
+				if(state.MouseUp)
+					object->Call("OnMouseUp");
+				if(state.MouseDown)
+					object->Call("OnMouseDown");
+			}
+			else {
+				if(element->GetType() == UIElementType::Window)
+					UIRenderer::Pop(1);
+			}
 		});
 
 	UIRenderer::EndFrame();

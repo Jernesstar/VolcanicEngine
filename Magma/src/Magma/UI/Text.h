@@ -8,23 +8,14 @@ namespace Magma::UI {
 
 class Text : public UIElement {
 public:
-	struct Specification {
-		std::string Text = "";
-		glm::vec4 Color = glm::vec4(1.0f);
-
-		float x = 0;
-		float y = 0;
-	};
-
-public:
-	static Ref<UI::Text> Create(const UI::Text::Specification& specs);
-
-public:
 	std::string Content;
 
 public:
-	Text(const std::string& text = "",
-		 const glm::vec4& textColor = glm::vec4(1.0f));
+	Text(const std::string& text, const glm::vec4& textColor)
+		: UIElement(UIElementType::Text), Content(text)
+	{
+		Color = textColor;
+	}
 	Text(const std::string& id, UIPage* root)
 		: UIElement(UIElementType::Text, id, root) { }
 

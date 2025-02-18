@@ -1,11 +1,5 @@
 #include "Runtime.h"
 
-#ifdef VOLCANICENGINE_WINDOWS
-	#include <windows.h>
-#elif VOLCANICENGINE_LINUX
-	#include <unistd.h>
-#endif
-
 #include <filesystem>
 
 #include <VolcaniCore/Event/Events.h>
@@ -18,6 +12,8 @@
 namespace fs = std::filesystem;
 
 namespace Lava {
+
+extern std::string FindExecutablePath();
 
 Runtime::Runtime(const CommandLineArgs& args)
 	: Application(1920, 1080)
@@ -34,14 +30,7 @@ Runtime::Runtime(const CommandLineArgs& args)
 		volcPath = args["--project"].Args[0];
 	}
 	else {
-#ifdef VOLCANICENGINE_WINDOWS
-		char buf[2*MAX_PATH];
-		size_t len = GetModuleFileName(0, buf, 2*MAX_PATH);
-#elif VOLCANICENGINE_LINUX
-		char buf[2*PATH_MAX];
-		size_t len = readlink("/proc/self/exe", buf, 2*PATH_MAX);
-#endif
-		auto rootPath = fs::path(std::string(buf, len)).parent_path();
+		auto rootPath = fs::path(FindExecutablePath()).parent_path();
 		volcPath = (rootPath / ".volc.proj").string();
 	}
 

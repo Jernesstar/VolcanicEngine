@@ -10,17 +10,6 @@ using namespace VolcaniCore;
 
 namespace Magma::UI {
 
-UIElement::UIElement(UIElementType type,
-					 uint32_t width, uint32_t height, int32_t x, int32_t y,
-					 const glm::vec4& color, UIPage* root)
-	: m_Type(type), m_ID(std::to_string(UUID())),
-		Width(width), Height(height), x(x), y(y), Color(color), m_Root(root) { }
-
-UIElement::UIElement(UIElementType type, UIPage* root)
-	: m_Type(type), m_ID(std::to_string(UUID())), m_Root(root) { }
-UIElement::UIElement(UIElementType type, const std::string& id, UIPage* root)
-	: m_Type(type), m_ID(id), m_Root(root) { }
-
 UINode UIElement::Add(UIElementType type, const std::string& id) {
 	if(!m_Root)
 		return { UIElementType::None, 0 };

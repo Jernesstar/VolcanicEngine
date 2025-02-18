@@ -243,9 +243,9 @@ void UIVisualizerPanel::Draw() {
 
 		bool elementHovered = false;
 		m_Running->Traverse(
-			[&](UIElement* element, TraversalState state)
+			[&](UIElement* element, TraversalStage state)
 			{
-				if(state == TraversalState::Begin) {
+				if(state == TraversalStage::Begin) {
 					if(element == window)
 						return;
 

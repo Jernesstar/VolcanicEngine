@@ -150,9 +150,9 @@ static void ButtonText(Ref<UIElement> element, ImVec2 dim) {
 }
 
 static void ButtonImage(Ref<UIElement> element, ImVec2 dim) {
-	auto tex = element->As<Image>()->Content->As<OpenGL::Texture2D>();
-	auto id = (ImTextureID)(intptr_t)tex->GetID();
-	ImGui::ImageButton(id, dim);
+	// auto tex = element->As<Image>()->Content->As<OpenGL::Texture2D>();
+	// auto id = (ImTextureID)(intptr_t)tex->GetID();
+	// ImGui::ImageButton(id, dim);
 }
 
 UIState UIRenderer::DrawButton(UI::Button& button) {
@@ -181,11 +181,11 @@ UIState UIRenderer::DrawButton(UI::Button& button) {
 }
 
 UIState UIRenderer::DrawImage(UI::Image& image) {
-	auto texture = image.Content->As<OpenGL::Texture2D>();
+	// auto texture = image.Content->As<OpenGL::Texture2D>();
 
-	ImVec2 dim = ImVec2(image.Width, image.Height);
-	ImGui::SetCursorPos(ImVec2(image.x, image.y));
-	ImGui::Image((ImTextureID)(intptr_t)texture->GetID(), dim);
+	// ImVec2 dim = ImVec2(image.Width, image.Height);
+	// ImGui::SetCursorPos(ImVec2(image.x, image.y));
+	// ImGui::Image((ImTextureID)(intptr_t)texture->GetID(), dim);
 
 	return {
 		ImGui::IsItemClicked(),
@@ -232,19 +232,13 @@ UIState UIRenderer::DrawTextInput(TextInput& textInput) {
 }
 
 UIState UIRenderer::DrawDropdown(Dropdown& dropdown) {
-	uint32_t n = dropdown.Options.Count();
-	//const char* items[n];
-	const char** items = new const char*[255];
-	// TODO(Implement): Images
-	for(uint32_t i = 0; i < n; i++)
-		items[i] = dropdown.Options[i].c_str();
-
-	if(ImGui::BeginCombo("##Combo", dropdown.m_CurrentItem))
+	if(ImGui::BeginCombo("##Combo", dropdown.GetSelected().c_str()))
 	{
 		for(uint32_t i = 0; i < n; i++) {
-			bool isSelected = (dropdown.m_CurrentItem == items[i]);
-			if(ImGui::Selectable(items[i], isSelected))
-				dropdown.m_CurrentItem = items[i];
+			auto item = dropdown.Options[i];
+			bool isSelected = dropdown.CurrentItem == i;
+			if(ImGui::Selectable(item.c_str(), isSelected))
+				dropdown.CurrentItem = i;
 			if(isSelected)
 				ImGui::SetItemDefaultFocus();
 		}
