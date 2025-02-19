@@ -42,7 +42,7 @@ public:
 
 		return m_Panels[idx];
 	}
-	EditorAssetManager& GetAssets() { return m_AssetManager; }
+	EditorAssetManager& GetAssetManager() { return m_AssetManager; }
 
 private:
 	Project m_Project;

@@ -3,7 +3,6 @@
 #include <VolcaniCore/Core/Time.h>
 
 #include "ECS/World.h"
-#include "Physics/World.h"
 
 #include "SceneRenderer.h"
 

@@ -1,13 +1,9 @@
 #include "Runtime.h"
 
-#include <filesystem>
-
 #include <VolcaniCore/Event/Events.h>
 #include <VolcaniCore/Graphics/Renderer.h>
 
 #include <Magma/UI/UIRenderer.h>
-
-#include <Lava/ProjectLoader.h>
 
 namespace fs = std::filesystem;
 
@@ -35,7 +31,7 @@ Runtime::Runtime(const CommandLineArgs& args)
 	}
 
 	Project project;
-	ProjectLoader::Load(project, volcPath);
+	project.Load(volcPath);
 
 	m_App = CreateRef<App>(project);
 	m_App->OnLoad();

@@ -7,3 +7,5 @@ AssetPack:
           DiffuseColor: [1, 1, 1, 1]
           SpecularColor: [0, 0, 0, 0]
           EmissiveColor: [0, 0, 0, 0]
+  TextureAssets:
+    []

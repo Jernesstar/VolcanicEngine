@@ -1,22 +1,19 @@
 #pragma once
 
-#include <fstream>
 
 #include <VolcaniCore/Core/Defines.h>
 #include <VolcaniCore/Core/List.h>
+
+#include "FileStream.h"
 
 using namespace VolcaniCore;
 
 namespace Magma {
 
-class BinaryReader {
+class BinaryReader : public FileStream {
 public:
 	BinaryReader(const std::string& path) {
-		m_Stream =
-			std::ifstream(path, std::ifstream::in | std::ifstream::binary);
-	}
-	~BinaryReader() {
-		m_Stream.close();
+		m_Stream.open(path, std::ios::in | std::ios::binary);
 	}
 
 	BinaryReader& ReadData(void* data, uint64_t size) {
@@ -64,9 +61,6 @@ public:
 
 		return *this;
 	}
-
-private:
-	std::ifstream m_Stream;
 };
 
 }

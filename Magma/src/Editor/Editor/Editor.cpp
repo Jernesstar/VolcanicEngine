@@ -20,9 +20,8 @@
 #include <Magma/Script/ScriptEngine.h>
 #include <Magma/Script/ScriptModule.h>
 
-#include <Lava/ProjectLoader.h>
-#include <Lava/SceneLoader.h>
-#include <Lava/UILoader.h>
+#include "SceneLoader.h"
+#include "UILoader.h"
 
 #include "Project/AssetEditorPanel.h"
 #include "Project/ContentBrowserPanel.h"
@@ -30,7 +29,6 @@
 using namespace VolcaniCore;
 using namespace Magma::UI;
 using namespace Magma::Physics;
-using namespace Lava;
 
 namespace Magma {
 struct {
@@ -55,7 +53,7 @@ Editor::Editor(const CommandLineArgs& args) {
 	ScriptEngine::Init();
 
 	if(args["--project"]) {
-		ProjectLoader::Load(m_Project, args["--project"]);
+		m_Project.Load(args["--project"]);
 		SetTab(nullptr);
 
 		auto panel1 = CreateRef<AssetEditorPanel>();
@@ -298,7 +296,7 @@ void Editor::OpenProject() {
 	if(instance->Display("ChooseFile")) {
 		if(instance->IsOk()) {
 			std::string path = instance->GetFilePathName();
-			ProjectLoader::Load(m_Project, path);
+			m_Project.Load(path);
 		}
 
 		instance->Close();
@@ -391,8 +389,7 @@ void Editor::ExportProject() {
 
 	m_AssetManager.RuntimeSave(exportPath);
 
-	ProjectLoader::Save(
-		m_Project, (fs::path(exportPath) / ".volc.proj").string());
+	m_Project.Save((fs::path(exportPath) / ".volc.proj").string());
 
 	auto runtimeEnv = getenv("VOLC_RUNTIME");
 	VOLCANICORE_ASSERT(runtimeEnv);

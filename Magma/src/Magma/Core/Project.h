@@ -19,8 +19,11 @@ public:
 	List<Screen> Screens;
 
 public:
-	Project();
-	~Project();
+	Project() = default;
+	~Project() = default;
+
+	void Load(const std::string& path);
+	void Save(const std::string& exportPath);
 
 	void AddScreen(const std::string& name,
 				   const std::string& scene, const std::string& ui);

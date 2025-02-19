@@ -2,6 +2,8 @@
 
 #include <fstream>
 
+#include <VolcaniCore/Core/Application.h>
+
 #include <VolcaniCore/Core/Log.h>
 #include <VolcaniCore/Core/List.h>
 #include <VolcaniCore/Core/Algo.h>
@@ -10,91 +12,13 @@
 #include <Magma/Core/BinaryWriter.h>
 #include <Magma/Core/BinaryReader.h>
 
+#include "Runtime.h"
+#include "AssetManager.h"
+
 using namespace Magma;
 using namespace Magma::UI;
 
 namespace Magma {
-
-static void WriteUI(BinaryWriter* writer, const UIElement* element) {
-	writer->Write(element->GetID());
-	writer->Write(element->Width);
-	writer->Write(element->Height);
-	writer->Write(element->x);
-	writer->Write(element->y);
-	writer->Write((uint32_t)element->xAlignment);
-	writer->Write((uint32_t)element->yAlignment);
-	writer->Write(element->Color.r);
-	writer->Write(element->Color.g);
-	writer->Write(element->Color.b);
-	writer->Write(element->Color.a);
-}
-
-template<>
-BinaryWriter& BinaryWriter::WriteObject(const UI::Window& window) {
-	WriteUI(this, &window);
-	Write(window.BorderWidth);
-	Write(window.BorderHeight);
-	Write(window.BorderColor.r);
-	Write(window.BorderColor.g);
-	Write(window.BorderColor.b);
-	Write(window.BorderColor.a);
-	
-	return *this;
-}
-
-template<>
-BinaryWriter& BinaryWriter::WriteObject(const UI::Dropdown& dropdown) {
-	WriteUI(this, &dropdown);
-	Write(dropdown.CurrentItem);
-	Write(dropdown.Options);
-	
-	return *this;
-}
-
-template<>
-BinaryWriter& BinaryWriter::WriteObject(const UI::Text& text) {
-	WriteUI(this, &text);
-	Write(text.Content);
-	
-	return *this;
-}
-
-template<>
-BinaryWriter& BinaryWriter::WriteObject(const UI::TextInput& textInput) {
-	WriteUI(this, &textInput);
-	Write(textInput.Text);
-	Write(textInput.Hint);
-	
-	return *this;
-}
-
-template<>
-BinaryWriter& BinaryWriter::WriteObject(const UI::Image& image) {
-	WriteUI(this, &image);
-	// Write((uint64_t)image.ImageAsset.ID);
-	
-	return *this;
-}
-
-template<>
-BinaryWriter& BinaryWriter::WriteObject(const UI::Button& button) {
-	WriteUI(this, &button);
-	auto display = button.Display;
-	Write(display->Is(UI::UIElementType::Text));
-	if(display->Is(UI::UIElementType::Text))
-		Write(*display->As<UI::Text>());
-	else
-		Write(*display->As<UI::Image>());
-
-	return *this;
-}
-
-template<>
-BinaryWriter& BinaryWriter::WriteObject(const UI::UINode& node) {
-	Write((uint32_t)node.first);
-	Write(node.second);
-	return *this;
-}
 
 static void ReadUI(BinaryReader* reader, UIElement* element) {
 	std::string id;
@@ -156,7 +80,9 @@ BinaryReader& BinaryReader::ReadObject(UI::Image& image) {
 	ReadUI(this, &image);
 	uint64_t id;
 	Read(id);
-	// image.ImageAsset = { id, AssetType::Texture };
+	auto& assetManager =
+		Application::As<Lava::Runtime>()->GetApp()->GetAssetManager();
+	image.Content = assetManager.Get<Texture>(Asset{ id, AssetType::Texture });
 
 	return *this;
 }
@@ -191,26 +117,6 @@ BinaryReader& BinaryReader::ReadObject(UI::UINode& node) {
 }
 
 namespace Lava {
-
-void UILoader::Save(const UIPage& page, const std::string& path) {
-	namespace fs = std::filesystem;
-
-	// auto dataPath =
-	// 	(fs::path(path) / "UI" / "Data" / page.Name).string() + ".bin";
-	// BinaryWriter writer(dataPath);
-
-	// writer.Write(page.Name);
-
-	// writer
-	// 	.Write(page.Windows)
-	// 	.Write(page.Buttons)
-	// 	.Write(page.Dropdowns)
-	// 	.Write(page.Texts)
-	// 	.Write(page.TextInputs)
-	// 	.Write(page.Images);
-
-	// writer.Write(page.FirstOrders);
-}
 
 Ref<ScriptModule> UILoader::Load(UIPage& page, const std::string& path) {
 	namespace fs = std::filesystem;

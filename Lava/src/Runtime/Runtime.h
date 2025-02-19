@@ -19,6 +19,8 @@ public:
 
 	void OnUpdate(TimeStep ts) override;
 
+	Ref<App> GetApp() const { return m_App; }
+
 public:
 	Ref<App> m_App;
 };

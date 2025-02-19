@@ -39,9 +39,9 @@
 
 using namespace VolcaniCore;
 using namespace Magma;
+using namespace Magma::UI;
 using namespace Magma::ECS;
 using namespace Magma::Physics;
-using namespace Lava;
 
 #include "Demos/Cube.h"
 #include "Demos/Lighting.h"

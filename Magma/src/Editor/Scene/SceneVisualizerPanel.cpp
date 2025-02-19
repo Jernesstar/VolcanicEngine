@@ -34,6 +34,8 @@ SceneVisualizerPanel::SceneVisualizerPanel(Scene* context)
 {
 	m_Image.Width = Application::GetWindow()->GetWidth();
 	m_Image.Height = Application::GetWindow()->GetHeight();
+	m_Image.Content =
+		m_Renderer.GetOutput()->Get(AttachmentTarget::Color);
 
 	SetContext(context);
 }
@@ -312,7 +314,7 @@ void EditorSceneRenderer::SubmitLight(Entity entity) {
 
 void EditorSceneRenderer::SubmitMesh(Entity entity) {
 	auto& assetManager =
-		Application::As<EditorApp>()->GetEditor().GetAssets();
+		Application::As<EditorApp>()->GetEditor().GetAssetManager();
 	auto& tc = entity.Get<TransformComponent>();
 	auto& mc = entity.Get<MeshComponent>();
 	auto mesh = assetManager.Get<Model>(mc.MeshAsset);
@@ -348,7 +350,7 @@ void EditorSceneRenderer::Render() {
 
 	if(Selected && State == SceneState::Edit) {
 		auto& assetManager =
-			Application::As<EditorApp>()->GetEditor().GetAssets();
+			Application::As<EditorApp>()->GetEditor().GetAssetManager();
 		auto& tc = Selected.Get<TransformComponent>();
 		auto& mc = Selected.Get<MeshComponent>();
 		auto mesh = assetManager.Get<Model>(mc.MeshAsset);

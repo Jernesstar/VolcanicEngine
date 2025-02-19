@@ -52,7 +52,7 @@ static void EditAsset(Asset asset) {
 	}
 
 	ImGui::Text("Type: %s", type.c_str());
-	ImGui::Text("ID: %li", (uint64_t)asset.ID);
+	ImGui::Text("ID: %lu", (uint64_t)asset.ID & 99999);
 }
 
 void AssetEditorPanel::Draw() {

@@ -93,8 +93,8 @@ void ContentBrowserPanel::Draw() {
 			ImGui::PopClipRect();
 			ImGui::SetCursorPos(windowStart);
 
-			static float padding = 16.0f;
-			static float thumbnailSize = 110.0f;
+			static float padding = 18.0f;
+			static float thumbnailSize = 100.0f;
 			static float cellSize = thumbnailSize + padding;
 
 			float panelWidth = ImGui::GetContentRegionAvail().x;
@@ -102,7 +102,7 @@ void ContentBrowserPanel::Draw() {
 			columnCount = columnCount ? columnCount : 1;
 
 			auto& editor = Application::As<EditorApp>()->GetEditor();
-			auto& assetManager = editor.GetAssets();
+			auto& assetManager = editor.GetAssetManager();
 
 			if(ImGui::BeginTable("AssetsTable", columnCount))
 			{
@@ -132,7 +132,7 @@ void ContentBrowserPanel::Draw() {
 						UI::Image image;
 						image.Content = m_FileIcon->Content;
 						image.Width = thumbnailSize;
-						image.Height = thumbnailSize;
+						image.Height = thumbnailSize + 20.0f;
 						UI::UIRenderer::DrawImage(image);
 
 						ImGui::EndDragDropSource();
@@ -140,7 +140,7 @@ void ContentBrowserPanel::Draw() {
 					if(display != "")
 						ImGui::TextWrapped(display.c_str());
 					else
-						ImGui::Text("Asset %li", (uint64_t)asset.ID);
+						ImGui::Text("Asset %lu", (uint64_t)asset.ID & 99999);
 				}
 
 				ImGui::EndTable();

@@ -1,22 +1,18 @@
 #pragma once
 
-#include <fstream>
-
 #include <VolcaniCore/Core/Defines.h>
 #include <VolcaniCore/Core/List.h>
+
+#include "FileStream.h"
 
 using namespace VolcaniCore;
 
 namespace Magma {
 
-class BinaryWriter {
+class BinaryWriter : public FileStream {
 public:
 	BinaryWriter(const std::string& path) {
-		m_Stream =
-			std::ofstream(path, std::ofstream::out | std::ofstream::binary);
-	}
-	~BinaryWriter() {
-		m_Stream.close();
+		m_Stream.open(path, std::ios::out | std::ios::binary);
 	}
 
 	BinaryWriter& WriteData(const void* data, uint64_t size) {
@@ -60,9 +56,6 @@ public:
 
 		return *this;
 	}
-
-private:
-	std::ofstream m_Stream;
 };
 
 }

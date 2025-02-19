@@ -82,13 +82,6 @@ struct RigidBodyComponent : public Component {
 	RigidBodyComponent() = default;
 	RigidBodyComponent(Ref<Physics::RigidBody> body)
 		: Body(body) { }
-	RigidBodyComponent(Physics::RigidBody::Type type) {
-		Body = Physics::RigidBody::Create(type);
-	}
-	RigidBodyComponent(Physics::RigidBody::Type type, Ref<Physics::Shape> shape)
-	{
-		Body = Physics::RigidBody::Create(type, shape);
-	}
 	RigidBodyComponent(const RigidBodyComponent& other) = default;
 };
 
@@ -100,6 +93,15 @@ struct ScriptComponent : public Component {
 	ScriptComponent(const std::string& _class)
 		: Class(_class) { }
 	ScriptComponent(const ScriptComponent& other) = default;
+};
+
+struct SoundComponent : public Component {
+	Asset SoundAsset;
+
+	SoundComponent() = default;
+	SoundComponent(const Asset& asset)
+		: SoundAsset(asset) { }
+	SoundComponent(const SoundComponent& other) = default;
 };
 
 struct DirectionalLightComponent : public Component {
@@ -136,6 +138,13 @@ struct SpotlightComponent : public Component {
 
 	SpotlightComponent() = default;
 	SpotlightComponent(const SpotlightComponent& other) = default;
+};
+
+struct ParticleSystemComponent : public Component {
+	float Lifetime;
+
+	ParticleSystemComponent() = default;
+	ParticleSystemComponent(const ParticleSystemComponent& other) = default;
 };
 
 }

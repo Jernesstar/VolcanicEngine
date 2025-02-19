@@ -1,5 +1,7 @@
 #include "SceneLoader.h"
 
+#include <bitset>
+
 #include <VolcaniCore/Core/Assert.h>
 #include <VolcaniCore/Core/FileUtils.h>
 #include <VolcaniCore/Core/List.h>
@@ -231,14 +233,18 @@ void SerializeEntity(YAMLSerializer& serializer, const Entity& entity) {
 
 	}
 
+	if(entity.Has<ParticleSystemComponent>()) {
+
+	}
+
 	serializer.EndMapping(); // Components
 
 	serializer.EndMapping(); // Entity
 }
 
 void DeserializeEntity(YAML::Node entityNode, Scene& scene) {
-	Entity entity;
-	entity = scene.EntityWorld.AddEntity(entityNode["ID"].as<uint64_t>());
+	Entity entity =
+		scene.EntityWorld.AddEntity(entityNode["ID"].as<uint64_t>());
 	auto name = entityNode["Name"].as<std::string>();
 	if(name != "")
 		entity.SetName(name);
@@ -333,12 +339,20 @@ void DeserializeEntity(YAML::Node entityNode, Scene& scene) {
 		if(shapeTypeStr == "Capsule") shapeType = Shape::Type::Capsule;
 		if(shapeTypeStr == "Mesh")	  shapeType = Shape::Type::Mesh;
 
+		Ref<RigidBody> body;
 		if(shapeType == Shape::Type::Mesh)
-			entity.Add<RigidBodyComponent>(type);
+			body = RigidBody::Create(type);
 		else {
 			Ref<Shape> shape = Shape::Create(shapeType);
-			entity.Add<RigidBodyComponent>(type, shape);
+			body = RigidBody::Create(type, shape);
 		}
+
+		entity.Add<RigidBodyComponent>(body);
+	}
+
+	auto soundComponent = components["SoundComponent"];
+	if(soundComponent) {
+
 	}
 
 	auto directionalLightComponentNode = components["DirectionalLightComponent"];
@@ -355,11 +369,137 @@ void DeserializeEntity(YAML::Node entityNode, Scene& scene) {
 	if(spotlightComponentNode) {
 
 	}
+
+	auto particleSystemComponent = components["ParticleSystemComponent"];
+	if(particleSystemComponent) {
+
+	}
 }
 
 }
 
 namespace Magma {
+
+template<>
+BinaryWriter& BinaryWriter::WriteObject(const CameraComponent& comp) {
+
+	return *this;
+}
+
+template<>
+BinaryWriter& BinaryWriter::WriteObject(const TagComponent& comp) {
+
+	return *this;
+}
+
+template<>
+BinaryWriter& BinaryWriter::WriteObject(const TransformComponent& comp) {
+
+	return *this;
+}
+
+template<>
+BinaryWriter& BinaryWriter::WriteObject(const MeshComponent& comp) {
+
+	return *this;
+}
+
+template<>
+BinaryWriter& BinaryWriter::WriteObject(const SkyboxComponent& comp) {
+
+	return *this;
+}
+
+template<>
+BinaryWriter& BinaryWriter::WriteObject(const RigidBodyComponent& comp) {
+
+	return *this;
+}
+
+template<>
+BinaryWriter& BinaryWriter::WriteObject(const ScriptComponent& comp) {
+
+	return *this;
+}
+
+template<>
+BinaryWriter& BinaryWriter::WriteObject(const SoundComponent& comp) {
+
+	return *this;
+}
+
+template<>
+BinaryWriter& BinaryWriter::WriteObject(const DirectionalLightComponent& comp) {
+
+	return *this;
+}
+
+template<>
+BinaryWriter& BinaryWriter::WriteObject(const PointLightComponent& comp) {
+
+	return *this;
+}
+
+template<>
+BinaryWriter& BinaryWriter::WriteObject(const SpotlightComponent& comp) {
+
+	return *this;
+}
+
+template<>
+BinaryWriter& BinaryWriter::WriteObject(const ParticleSystemComponent& comp) {
+
+	return *this;
+}
+
+template<>
+BinaryWriter& BinaryWriter::WriteObject(const Entity& entity) {
+	Write((uint64_t)entity.GetHandle());
+	Write(entity.GetName());
+
+	std::bitset<12> componentBits;
+	componentBits |= (entity.Has<CameraComponent>()			<< 0);
+	componentBits |= (entity.Has<TagComponent>()			<< 1);
+	componentBits |= (entity.Has<TransformComponent>()		<< 2);
+	componentBits |= (entity.Has<MeshComponent>()			<< 3);
+	componentBits |= (entity.Has<SkyboxComponent>()			<< 4);
+	componentBits |= (entity.Has<RigidBodyComponent>()		<< 5);
+	componentBits |= (entity.Has<ScriptComponent>()			<< 6);
+	componentBits |= (entity.Has<SoundComponent>()			<< 7);
+	componentBits |= (entity.Has<DirectionalLightComponent>() << 8);
+	componentBits |= (entity.Has<PointLightComponent>()		<< 9);
+	componentBits |= (entity.Has<SpotlightComponent>()		<< 10);
+	componentBits |= (entity.Has<ParticleSystemComponent>()	<< 11);
+
+	Write(componentBits.to_ulong());
+
+	if(entity.Has<CameraComponent>())
+		Write(entity.Get<CameraComponent>());
+	if(entity.Has<TagComponent>())
+		Write(entity.Get<TagComponent>());
+	if(entity.Has<TransformComponent>())
+		Write(entity.Get<TransformComponent>());
+	if(entity.Has<MeshComponent>())
+		Write(entity.Get<MeshComponent>());
+	if(entity.Has<SkyboxComponent>())
+		Write(entity.Get<SkyboxComponent>());
+	if(entity.Has<RigidBodyComponent>())
+		Write(entity.Get<RigidBodyComponent>());
+	if(entity.Has<ScriptComponent>())
+		Write(entity.Get<ScriptComponent>());
+	if(entity.Has<SoundComponent>())
+		Write(entity.Get<SoundComponent>());
+	if(entity.Has<DirectionalLightComponent>())
+		Write(entity.Get<DirectionalLightComponent>());
+	if(entity.Has<PointLightComponent>())
+		Write(entity.Get<PointLightComponent>());
+	if(entity.Has<SpotlightComponent>())
+		Write(entity.Get<SpotlightComponent>());
+	if(entity.Has<ParticleSystemComponent>())
+		Write(entity.Get<ParticleSystemComponent>());
+
+	return *this;
+}
 
 }
 
@@ -381,12 +521,20 @@ void SceneLoader::RuntimeSave(const Scene& scene,
 
 	writer.Write(scene.Name);
 
+	uint64_t entityCount = 0;
+	uint64_t idx = writer.GetPosition();
+	writer.Advance(sizeof(uint64_t));
+
 	scene.EntityWorld
 	.ForEach(
 		[&](const Entity& entity)
 		{
-			// writer.Write(entity);
+			entityCount++;
+			writer.Write(entity);
 		});
+
+	writer.SetPosition(idx);
+	writer.Write(entityCount);
 }
 
 }

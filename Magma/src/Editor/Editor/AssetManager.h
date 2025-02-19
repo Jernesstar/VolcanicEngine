@@ -15,7 +15,14 @@ public:
 	Asset Add(MeshPrimitive primitive);
 	Asset Add(const std::string& path, AssetType type);
 
+	Asset GetFromPath(const std::string& path);
+
 	std::string GetPath(UUID id);
+
+	template<typename T>
+	Asset Find(Ref<T> data) {
+
+	}
 
 	const Map<Asset, bool>& GetRegistry() const { return m_AssetRegistry; }
 

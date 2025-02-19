@@ -1,5 +1,7 @@
 #include "SceneLoader.h"
 
+#include <bitset>
+
 #include <VolcaniCore/Core/Assert.h>
 #include <VolcaniCore/Core/FileUtils.h>
 #include <VolcaniCore/Core/List.h>
@@ -19,39 +21,150 @@ using namespace Magma::Physics;
 
 namespace Magma {
 
+template<>
+BinaryReader& BinaryReader::ReadObject(CameraComponent& comp) {
+
+	return *this;
+}
+
+template<>
+BinaryReader& BinaryReader::ReadObject(TagComponent& comp) {
+
+	return *this;
+}
+
+template<>
+BinaryReader& BinaryReader::ReadObject(TransformComponent& comp) {
+
+	return *this;
+}
+
+template<>
+BinaryReader& BinaryReader::ReadObject(MeshComponent& comp) {
+
+	return *this;
+}
+
+template<>
+BinaryReader& BinaryReader::ReadObject(SkyboxComponent& comp) {
+
+	return *this;
+}
+
+template<>
+BinaryReader& BinaryReader::ReadObject(RigidBodyComponent& comp) {
+
+	return *this;
+}
+
+template<>
+BinaryReader& BinaryReader::ReadObject(ScriptComponent& comp) {
+
+	return *this;
+}
+
+template<>
+BinaryReader& BinaryReader::ReadObject(SoundComponent& comp) {
+
+	return *this;
+}
+
+template<>
+BinaryReader& BinaryReader::ReadObject(DirectionalLightComponent& comp) {
+
+	return *this;
+}
+
+template<>
+BinaryReader& BinaryReader::ReadObject(PointLightComponent& comp) {
+
+	return *this;
+}
+
+template<>
+BinaryReader& BinaryReader::ReadObject(SpotlightComponent& comp) {
+
+	return *this;
+}
+
+template<>
+BinaryReader& BinaryReader::ReadObject(ParticleSystemComponent& comp) {
+
+	return *this;
+}
+
+template<>
+BinaryReader& BinaryReader::ReadObject(Entity& entity) {
+	std::string name;
+	Read(name);
+	entity.SetName(name);
+
+	uint32_t bits;
+	Read(bits);
+	std::bitset<12> componentBits(bits);
+
+	if(componentBits.test(0))
+		Read(entity.Add<CameraComponent>());
+	if(componentBits.test(1))
+		Read(entity.Add<TagComponent>());
+	if(componentBits.test(2))
+		Read(entity.Add<TransformComponent>());
+	if(componentBits.test(3))
+		Read(entity.Add<MeshComponent>());
+	if(componentBits.test(4))
+		Read(entity.Add<SkyboxComponent>());
+	if(componentBits.test(5))
+		Read(entity.Add<RigidBodyComponent>());
+	if(componentBits.test(6))
+		Read(entity.Add<ScriptComponent>());
+	if(componentBits.test(7))
+		Read(entity.Add<SoundComponent>());
+	if(componentBits.test(8))
+		Read(entity.Add<DirectionalLightComponent>());
+	if(componentBits.test(9))
+		Read(entity.Add<PointLightComponent>());
+	if(componentBits.test(10))
+		Read(entity.Add<SpotlightComponent>());
+	if(componentBits.test(11))
+		Read(entity.Add<ParticleSystemComponent>());
+
+	return *this;
+}
+
 }
 
 namespace Lava {
 
-void SceneLoader::Save(const Scene& scene, const std::string& path) {
-	// namespace fs = std::filesystem;
-
-	// auto scenePath =
-	// 	(fs::path(projectPath) / "Visual" / "Scene" / "Schema" / scene.Name
-	// 	).string() + ".magma.scene";
-	// auto binPath =
-	// 	(fs::path(exportPath) / "Scene" / "Data" / scene.Name).string() + ".bin";
-
-	// BinaryWriter writer(binPath);
-
-	// writer.Write(scene.Name);
-
-	// scene.EntityWorld
-	// .ForEach(
-	// 	[&](const Entity& entity)
-	// 	{
-	// 		// writer.Write(entity);
-	// 	});
-}
-
-void SceneLoader::Load(Scene& scene, const std::string& projectPath) {
+void SceneLoader::Load(Scene& scene, const std::string& path) {
 	namespace fs = std::filesystem;
 
-	auto scenePath =
-		(fs::path(projectPath) / "Scene" / "Data" / scene.Name
-		).string() + ".magma.scene";
+	BinaryReader reader(path);
+	reader.Read(scene.Name);
 
-	
+	uint64_t entityCount;
+	reader.Read(entityCount);
+
+	for(uint64_t i = 0; i < entityCount; i++) {
+		uint64_t id;
+		reader.Read(id);
+		Entity entity = scene.EntityWorld.AddEntity(id);
+		reader.Read(entity);
+	}
+}
+
+void SceneLoader::Save(const Scene& scene, const std::string& path) {
+	namespace fs = std::filesystem;
+
+	BinaryWriter writer(path);
+
+	writer.Write(scene.Name);
+
+	scene.EntityWorld
+	.ForEach(
+		[&](const Entity& entity)
+		{
+			// writer.Write(entity);
+		});
 }
 
 }

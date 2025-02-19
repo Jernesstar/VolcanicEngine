@@ -23,6 +23,7 @@
 #include "UILoader.h"
 
 using namespace Magma::UI;
+using namespace Magma::ECS;
 using namespace Magma::Script;
 
 namespace fs = std::filesystem;

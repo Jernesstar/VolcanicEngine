@@ -3,6 +3,8 @@
 #include <Magma/Scene/Scene.h>
 #include <Magma/Scene/Component.h>
 
+#include <Magma/Physics/World.h>
+
 #include "Editor/Panel.h"
 #include "Scene/SceneTab.h"
 

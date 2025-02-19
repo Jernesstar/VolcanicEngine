@@ -1,5 +1,5 @@
 Project:
-  ExportPath: /workspaces/VolcanicEngine/NewTestGame
+  ExportPath: /workspaces/VolcanicEngine/TestGame
   Name: TestProj
   App: TestGame
   StartScreen: TestHome

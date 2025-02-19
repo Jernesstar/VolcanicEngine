@@ -38,11 +38,13 @@ public:
 
 	void SetScreen(const std::string& name);
 
+	RuntimeAssetManager& GetAssetManager() { return m_AssetManager; }
+
 private:
 	Project m_Project;
 
 	RuntimeSceneRenderer m_SceneRenderer;
-	RuntimeAssetManager m_Assets;
+	RuntimeAssetManager m_AssetManager;
 };
 
 }

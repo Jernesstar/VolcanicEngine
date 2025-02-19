@@ -1,5 +1,5 @@
 Scene:
-  Name: Titled Scene
+  Name: test
   Entities:
     - Entity:
         Name: MainCamera

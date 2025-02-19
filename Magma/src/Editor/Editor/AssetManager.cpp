@@ -69,10 +69,14 @@ Asset EditorAssetManager::Add(const std::string& path, AssetType type) {
 	return newAsset;
 }
 
+Asset EditorAssetManager::GetFromPath(const std::string& path) {
+	
+}
+
 std::string EditorAssetManager::GetPath(UUID id) {
 	if(!m_Paths.count(id))
 		return "";
-	
+
 	return m_Paths[id];
 }
 
@@ -196,8 +200,8 @@ void EditorAssetManager::Save() {
 	}
 	serializer.EndSequence();
 
-	// serializer.WriteKey("TextureAssets").BeginSequence();
-	// serializer.EndSequence();
+	serializer.WriteKey("TextureAssets").BeginSequence();
+	serializer.EndSequence();
 
 	serializer.EndMapping(); // AssetPack
 	serializer.EndMapping();
@@ -212,8 +216,6 @@ namespace Magma {
 
 }
 
-// #define 
-
 namespace Magma {
 
 void EditorAssetManager::RuntimeSave(const std::string& path) {
@@ -221,7 +223,7 @@ void EditorAssetManager::RuntimeSave(const std::string& path) {
 
 	auto dataPath = (fs::path(path) / ".volc.assetpk").string();
 	BinaryWriter writer(dataPath);
-
+	
 }
 
 }

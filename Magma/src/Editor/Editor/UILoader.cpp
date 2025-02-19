@@ -2,6 +2,8 @@
 
 #include <fstream>
 
+#include <VolcaniCore/Core/Application.h>
+
 #include <VolcaniCore/Core/Log.h>
 #include <VolcaniCore/Core/List.h>
 #include <VolcaniCore/Core/Algo.h>
@@ -11,6 +13,11 @@
 
 #include <Magma/Core/BinaryWriter.h>
 #include <Magma/Core/BinaryReader.h>
+
+#include <Magma/UI/UI.h>
+
+#include "EditorApp.h"
+#include "AssetManager.h"
 
 namespace fs = std::filesystem;
 
@@ -60,7 +67,7 @@ void UILoader::EditorLoad(UIPage& page, const std::string& path) {
 
 		const auto& elements = doc["Elements"];
 		for(const auto& element : elements.GetArray()) {
-			LoadElement(page, element, { });
+			LoadElement(page, element, Theme{ });
 			CompileElement(name, funcPath, element);
 		}
 	}
@@ -72,7 +79,7 @@ template<typename TUIElement>
 static void Serialize(const TUIElement* ui, JSONSerializer& serializer) { }
 
 template<>
-void Serialize(const Window* ui, JSONSerializer& serializer) {
+void Serialize(const UI::Window* ui, JSONSerializer& serializer) {
 	serializer
 		.WriteKey("BorderWidth").Write(ui->BorderWidth)
 		.WriteKey("BorderHeight").Write(ui->BorderHeight)
@@ -81,11 +88,8 @@ void Serialize(const Window* ui, JSONSerializer& serializer) {
 
 template<>
 void Serialize(const Dropdown* ui, JSONSerializer& serializer) {
-	serializer.WriteKey("Options").BeginSequence();
-	for(auto element : ui->Options)
-		serializer.Write(element);
-
-	serializer.EndSequence();
+	serializer.WriteKey("Options");
+	serializer.Write(ui->Options);
 }
 
 template<>
@@ -98,13 +102,16 @@ void Serialize(const Text* ui, JSONSerializer& serializer) {
 template<>
 void Serialize(const TextInput* ui, JSONSerializer& serializer) {
 	serializer
-		.WriteKey("Text").Write(ui->Text)
 		.WriteKey("Hint").Write(ui->Hint);
 }
 
 template<>
 void Serialize(const Image* ui, JSONSerializer& serializer) {
-	// serializer.WriteKey("Asset").Write((uint64_t)ui->ImageAsset.ID);
+	auto& assetManager =
+		Application::As<EditorApp>()->GetEditor().GetAssetManager();
+	UUID id = assetManager.Find(ui->Content).ID;
+
+	serializer.WriteKey("Asset").Write((uint64_t)id);
 }
 
 template<>
@@ -186,7 +193,7 @@ void Serialize(const UIElement* ui, JSONSerializer& serializer) {
 
 	switch(ui->GetType()) {
 		case UIElementType::Window:
-			Serialize(ui->As<Window>(), serializer);
+			Serialize(ui->As<UI::Window>(), serializer);
 			break;
 		case UIElementType::Button:
 			Serialize(ui->As<Button>(), serializer);
@@ -366,8 +373,11 @@ BinaryWriter& BinaryWriter::WriteObject(const UI::TextInput& textInput) {
 template<>
 BinaryWriter& BinaryWriter::WriteObject(const UI::Image& image) {
 	WriteUI(this, &image);
-	// Write((uint64_t)image.ImageAsset.ID);
-	
+	EditorAssetManager& assetManager =
+		Application::As<EditorApp>()->GetEditor().GetAssetManager();
+	UUID id = assetManager.Find(image.Content).ID;
+	Write((uint64_t)id);
+
 	return *this;
 }
 
@@ -388,98 +398,6 @@ template<>
 BinaryWriter& BinaryWriter::WriteObject(const UI::UINode& node) {
 	Write((uint32_t)node.first);
 	Write(node.second);
-	return *this;
-}
-
-static void ReadUI(BinaryReader* reader, UIElement* element) {
-	std::string id;
-	reader->Read(id);
-	element->SetID(id);
-	reader->Read(element->Width);
-	reader->Read(element->Height);
-	reader->Read(element->x);
-	reader->Read(element->y);
-	reader->Read((uint32_t&)element->xAlignment);
-	reader->Read((uint32_t&)element->yAlignment);
-	reader->Read(element->Color.r);
-	reader->Read(element->Color.g);
-	reader->Read(element->Color.b);
-	reader->Read(element->Color.a);
-}
-
-template<>
-BinaryReader& BinaryReader::ReadObject(UI::Window& window) {
-	ReadUI(this, &window);
-	Read(window.BorderWidth);
-	Read(window.BorderHeight);
-	Read(window.BorderColor.r);
-	Read(window.BorderColor.g);
-	Read(window.BorderColor.b);
-	Read(window.BorderColor.a);
-
-	return *this;
-}
-
-template<>
-BinaryReader& BinaryReader::ReadObject(UI::Dropdown& dropdown) {
-	ReadUI(this, &dropdown);
-	Read(dropdown.CurrentItem);
-	Read(dropdown.Options);
-
-	return *this;
-}
-
-template<>
-BinaryReader& BinaryReader::ReadObject(UI::Text& text) {
-	ReadUI(this, &text);
-	Read(text.Content);
-
-	return *this;
-}
-
-template<>
-BinaryReader& BinaryReader::ReadObject(UI::TextInput& textInput) {
-	ReadUI(this, &textInput);
-	Read(textInput.Text);
-	Read(textInput.Hint);
-
-	return *this;
-}
-
-template<>
-BinaryReader& BinaryReader::ReadObject(UI::Image& image) {
-	ReadUI(this, &image);
-	uint64_t id;
-	Read(id);
-	// image.ImageAsset = { id, AssetType::Texture };
-
-	return *this;
-}
-
-template<>
-BinaryReader& BinaryReader::ReadObject(UI::Button& button) {
-	ReadUI(this, &button);
-	bool isText;
-	Read(isText);
-	if(isText) {
-		auto display = CreateRef<UI::Text>();
-		Read(*display);
-		button.Display = display;
-	}
-	else {
-		auto display = CreateRef<UI::Image>();
-		Read(*display);
-		button.Display = display;
-	}
-
-	return *this;
-}
-
-template<>
-BinaryReader& BinaryReader::ReadObject(UI::UINode& node) {
-	Read((uint32_t&)node.first);
-	Read(node.second);
-
 	return *this;
 }
 
@@ -533,22 +451,25 @@ void LoadElement(UIPage& page, const rapidjson::Value& elementNode,
 
 	UINode node;
 	UIElement* element;
-	const ThemeElement* theme;
+	ThemeElement theme;
 
 	if(typeStr == "Window") {
 		node = page.Add(UIElementType::Window, id);
 		element = page.Get(node);
-		theme = &pageTheme.at(element->GetType());
-		auto* window = element->As<Window>();
+		if(pageTheme.count(element->GetType()))
+			theme = pageTheme.at(element->GetType());
+		else
+			theme = { };
+		auto* window = element->As<UI::Window>();
 
 		if(elementNode.HasMember("Border")) {
 			const auto& borderNode = elementNode["Border"];
 			window->BorderWidth
-				= TryGet<uint32_t>(borderNode, "Width", theme->BorderWidth);
+				= TryGet<uint32_t>(borderNode, "Width", theme.BorderWidth);
 			window->BorderHeight
-				= TryGet<uint32_t>(borderNode, "Height", theme->BorderHeight);
+				= TryGet<uint32_t>(borderNode, "Height", theme.BorderHeight);
 
-			window->BorderColor = theme->BorderColor;
+			window->BorderColor = theme.BorderColor;
 			if(borderNode.HasMember("Color"))
 				window->BorderColor =
 				glm::vec4
@@ -563,14 +484,22 @@ void LoadElement(UIPage& page, const rapidjson::Value& elementNode,
 	if(typeStr == "Button") {
 		node = page.Add(UIElementType::Button, id);
 		element = page.Get(node);
-		theme = &pageTheme.at(element->GetType());
-
+		if(pageTheme.count(element->GetType()))
+			theme = pageTheme.at(element->GetType());
+		else
+			theme = { };
 		auto* button = element->As<Button>();
 
-		if(elementNode.HasMember("Image"))
-			// button->Display
-			// 	= CreateRef<Image>(elementNode["Image"].Get<std::string>());
-			;
+		if(elementNode.HasMember("Image")) {
+			auto& assetManager =
+				Application::As<EditorApp>()->GetEditor().GetAssetManager();
+
+			auto asset =
+				assetManager.GetFromPath(
+					elementNode["Image"].Get<std::string>());
+			auto image = assetManager.Get<Texture>(asset);
+			button->Display = CreateRef<Image>(image);
+		}
 		else if(elementNode.HasMember("Text"))
 			button->Display
 				= CreateRef<Text>(elementNode["Text"].Get<std::string>());
@@ -580,22 +509,35 @@ void LoadElement(UIPage& page, const rapidjson::Value& elementNode,
 	if(typeStr == "Image") {
 		node = page.Add(UIElementType::Image, id);
 		element = page.Get(node);
-		theme = &pageTheme.at(element->GetType());
-	}
+		if(pageTheme.count(element->GetType()))
+			theme = pageTheme.at(element->GetType());
+		else
+			theme = { };
+		}
 	if(typeStr == "Text") {
-		node = page.Add(UIElementType::Text, id);
-		element = page.Get(node);
-		theme = &pageTheme.at(element->GetType());
+			node = page.Add(UIElementType::Text, id);
+			element = page.Get(node);
+			
+		if(pageTheme.count(element->GetType()))
+			theme = pageTheme.at(element->GetType());
+		else
+			theme = { };
 	}
 	if(typeStr == "TextInput") {
 		node = page.Add(UIElementType::TextInput, id);
 		element = page.Get(node);
-		theme = &pageTheme.at(element->GetType());
+		if(pageTheme.count(element->GetType()))
+			theme = pageTheme.at(element->GetType());
+		else
+			theme = { };
 	}
 	if(typeStr == "Dropdown") {
 		node = page.Add(UIElementType::Dropdown, id);
 		element = page.Get(node);
-		theme = &pageTheme.at(element->GetType());
+		if(pageTheme.count(element->GetType()))
+			theme = pageTheme.at(element->GetType());
+		else
+			theme = { };
 	}
 
 	if(parent == "")
@@ -603,13 +545,13 @@ void LoadElement(UIPage& page, const rapidjson::Value& elementNode,
 	else
 		page.Get(parent)->Add(node);
 
-	element->Width = TryGet<uint32_t>(elementNode, "Width", theme->Width);
-	element->Height = TryGet<uint32_t>(elementNode, "Height", theme->Height);
+	element->Width = TryGet<uint32_t>(elementNode, "Width", theme.Width);
+	element->Height = TryGet<uint32_t>(elementNode, "Height", theme.Height);
 
-	element->x = TryGet<int32_t>(elementNode, "x", theme->x);
-	element->y = TryGet<int32_t>(elementNode, "y", theme->y);
+	element->x = TryGet<int32_t>(elementNode, "x", theme.x);
+	element->y = TryGet<int32_t>(elementNode, "y", theme.y);
 
-	element->xAlignment = theme->xAlignment;
+	element->xAlignment = theme.xAlignment;
 	if(elementNode.HasMember("xAlignment")) {
 		std::string xAlign = elementNode["xAlignment"].Get<std::string>();
 		if(xAlign == "Left")
@@ -620,7 +562,7 @@ void LoadElement(UIPage& page, const rapidjson::Value& elementNode,
 			element->xAlignment = XAlignment::Right;
 	}
 
-	element->yAlignment = theme->yAlignment;
+	element->yAlignment = theme.yAlignment;
 	if(elementNode.HasMember("yAlignment")) {
 		std::string xAlign = elementNode["yAlignment"].Get<std::string>();
 		if(xAlign == "Top")
@@ -631,7 +573,7 @@ void LoadElement(UIPage& page, const rapidjson::Value& elementNode,
 			element->yAlignment = YAlignment::Bottom;
 	}
 
-	element->Color = theme->Color;
+	element->Color = theme.Color;
 	if(elementNode.HasMember("Color"))
 		element->Color =
 			glm::vec4
