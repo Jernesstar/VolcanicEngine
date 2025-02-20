@@ -104,29 +104,29 @@ BinaryReader& BinaryReader::ReadObject(Entity& entity) {
 	std::bitset<12> componentBits(bits);
 
 	if(componentBits.test(0))
-		Read(entity.Add<CameraComponent>());
+		Read(entity.Set<CameraComponent>());
 	if(componentBits.test(1))
-		Read(entity.Add<TagComponent>());
+		Read(entity.Set<TagComponent>());
 	if(componentBits.test(2))
-		Read(entity.Add<TransformComponent>());
+		Read(entity.Set<TransformComponent>());
 	if(componentBits.test(3))
-		Read(entity.Add<MeshComponent>());
+		Read(entity.Set<MeshComponent>());
 	if(componentBits.test(4))
-		Read(entity.Add<SkyboxComponent>());
+		Read(entity.Set<SkyboxComponent>());
 	if(componentBits.test(5))
-		Read(entity.Add<RigidBodyComponent>());
+		Read(entity.Set<RigidBodyComponent>());
 	if(componentBits.test(6))
-		Read(entity.Add<ScriptComponent>());
+		Read(entity.Set<ScriptComponent>());
 	if(componentBits.test(7))
-		Read(entity.Add<SoundComponent>());
+		Read(entity.Set<SoundComponent>());
 	if(componentBits.test(8))
-		Read(entity.Add<DirectionalLightComponent>());
+		Read(entity.Set<DirectionalLightComponent>());
 	if(componentBits.test(9))
-		Read(entity.Add<PointLightComponent>());
+		Read(entity.Set<PointLightComponent>());
 	if(componentBits.test(10))
-		Read(entity.Add<SpotlightComponent>());
+		Read(entity.Set<SpotlightComponent>());
 	if(componentBits.test(11))
-		Read(entity.Add<ParticleSystemComponent>());
+		Read(entity.Set<ParticleSystemComponent>());
 
 	return *this;
 }

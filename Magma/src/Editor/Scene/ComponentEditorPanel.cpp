@@ -108,7 +108,26 @@ static void DrawComponent(Entity& entity);
 
 template<>
 void DrawComponent<CameraComponent>(Entity& entity) {
-	
+	if(!entity.Has<CameraComponent>())
+		return;
+
+	auto& component = entity.Set<CameraComponent>();
+	auto camera = component.Cam;
+	ImGui::SeparatorText("CameraComponent");
+
+	auto pos = camera->GetPosition();
+	if(ImGui::SliderFloat3("Position", &pos.x, -FLT_MAX, +FLT_MAX))
+		camera->SetPosition(pos);
+	auto dir = camera->GetDirection();
+	if(ImGui::SliderFloat3("Direction", &dir.x, -FLT_MAX, +FLT_MAX));
+		camera->SetDirection(dir);
+
+	uint32_t max = 3000;
+	uint32_t min = 0;
+	auto vW = camera->GetViewportWidth();
+	bool w = ImGui::SliderScalar("Viewport Width", ImGuiDataType_U32, &vW, &min, &max);
+	auto vH = camera->GetViewportHeight();
+	bool h = ImGui::SliderScalar("Viewport Height", ImGuiDataType_U32, &vH, &min, &max);
 }
 
 template<>
@@ -131,7 +150,7 @@ void DrawComponent<TransformComponent>(Entity& entity) {
 	if(!entity.Has<TransformComponent>())
 		return;
 
-	auto& component = entity.Get<TransformComponent>();
+	auto& component = entity.Set<TransformComponent>();
 	ImGui::SeparatorText("TransformComponent");
 
 	auto tr = glm::value_ptr(component.Translation);

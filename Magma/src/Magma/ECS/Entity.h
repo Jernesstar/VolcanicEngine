@@ -25,20 +25,23 @@ public:
 	}
 
 	template<typename TComponent, typename ...Args>
-	TComponent& Add(Args&&... args) {
+	void Add(Args&&... args) {
 		if(!Has<TComponent>())
 			m_Handle.emplace<TComponent>(std::forward<Args>(args)...);
-		return Get<TComponent>();
-	}
-
-	template<typename TComponent>
-	TComponent& Get() {
-		return *m_Handle.get_mut<TComponent>();
 	}
 
 	template<typename TComponent>
 	const TComponent& Get() const {
 		return *m_Handle.get<TComponent>();
+	}
+
+	template<typename TComponent>
+	TComponent& Set() {
+		if(!Has<TComponent>())
+			Add<TComponent>();
+
+		m_Handle.modified<TComponent>();
+		return *m_Handle.get_mut<TComponent>();
 	}
 
 	template<typename TComponent>

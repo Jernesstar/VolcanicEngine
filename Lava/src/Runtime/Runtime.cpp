@@ -35,6 +35,7 @@ Runtime::Runtime(const CommandLineArgs& args)
 
 	m_App = CreateRef<App>(project);
 	m_App->OnLoad();
+	VOLCANICORE_LOG_INFO("Completed Load");
 }
 
 Runtime::~Runtime() {

@@ -43,7 +43,7 @@ public:
 	virtual void OnComponentRemove(Entity& entity) = 0;
 
 	TypeList<TComponents&...> GetRequired(Entity& entity) {
-		return { entity.Get<TComponents>()... };
+		return { entity.Set<TComponents>()... };
 	}
 
 protected:

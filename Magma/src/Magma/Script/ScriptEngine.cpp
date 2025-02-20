@@ -1,7 +1,5 @@
 #include "ScriptEngine.h"
 
-#include <iostream>
-
 #include <angelscript.h>
 #include <angelscript/add_on/scripthandle/scripthandle.h>
 #include <angelscript/add_on/scriptbuilder/scriptbuilder.h>
@@ -26,10 +24,6 @@ static void MessageCallback(const asSMessageInfo *msg, void *param) {
 		msg->section, msg->row, msg->col, type, msg->message);
 }
 
-static void print(const std::string& str) {
-	std::cout << str << "\n";
-}
-
 void ScriptEngine::Init() {
 	s_Engine = asCreateScriptEngine();
 
@@ -37,10 +31,6 @@ void ScriptEngine::Init() {
 
 	RegisterStdString(s_Engine);
 	RegisterScriptHandle(s_Engine);
-
-	s_Engine
-	->RegisterGlobalFunction(
-		"void print(string &in)", asFUNCTION(print), asCALL_CDECL);
 }
 
 void ScriptEngine::Shutdown() {
@@ -61,7 +51,6 @@ void ScriptEngine::RegisterSingleton(const std::string& className,
 	s_Engine->RegisterObjectType(
 		className.c_str(), 0, asOBJ_REF | asOBJ_NOHANDLE);
 
-	// Register the game manager's methods
 	s_Engine->RegisterGlobalProperty(
 		(className + " " + instanceName).c_str(), instance);
 }

@@ -125,8 +125,12 @@ void Serialize(const Button* ui, JSONSerializer& serializer) {
 template<>
 void Serialize(const UIElement* ui, JSONSerializer& serializer) {
 	serializer
-	.BeginMapping()
-		.WriteKey("Type");
+	.BeginMapping();
+
+	serializer
+		.WriteKey("ID").Write(ui->GetID());
+
+	serializer.WriteKey("Type");
 
 	switch(ui->GetType()) {
 		case UIElementType::Window:
@@ -212,10 +216,10 @@ void Serialize(const UIElement* ui, JSONSerializer& serializer) {
 			break;
 	}
 
+	serializer.EndMapping();
+
 	for(auto child : ui->GetChildren())
 		Serialize(child, serializer);
-
-	serializer.EndMapping();
 }
 
 void UILoader::EditorSave(const UIPage& page, const std::string& path) {

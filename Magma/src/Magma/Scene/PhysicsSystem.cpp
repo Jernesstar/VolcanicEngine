@@ -36,7 +36,7 @@ void PhysicsSystem::Run(Phase phase) {
 			[this](Entity& entity)
 			{
 				auto [rc] = GetRequired(entity);
-				auto& tc = entity.Get<TransformComponent>();
+				auto& tc = entity.Set<TransformComponent>();
 
 				Transform tr = rc.Body->GetTransform();
 				tc.Translation = tr.Translation;

@@ -20,11 +20,13 @@
 #include <Magma/Script/ScriptEngine.h>
 #include <Magma/Script/ScriptModule.h>
 
-#include "SceneLoader.h"
-#include "UILoader.h"
+#include <Lava/ScriptGlue.h>
 
 #include "Project/AssetEditorPanel.h"
 #include "Project/ContentBrowserPanel.h"
+
+#include "SceneLoader.h"
+#include "UILoader.h"
 
 using namespace VolcaniCore;
 using namespace Magma::UI;
@@ -51,6 +53,7 @@ struct {
 Editor::Editor(const CommandLineArgs& args) {
 	Physics::Init();
 	ScriptEngine::Init();
+	Lava::ScriptGlue::Init();
 
 	if(args["--project"]) {
 		m_Project.Load(args["--project"]);
@@ -395,6 +398,9 @@ void Editor::ExportProject() {
 	VOLCANICORE_ASSERT(runtimeEnv);
 	std::string runtimePath = runtimeEnv;
 	auto target = (fs::path(exportPath) / m_Project.App).string() + ".exe";
+
+	if(FileUtils::FileExists(target))
+		fs::remove(target);
 
 	fs::copy_file(runtimePath, target, fs::copy_options::overwrite_existing);
 }

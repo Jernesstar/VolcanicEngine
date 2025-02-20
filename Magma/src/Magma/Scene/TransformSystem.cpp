@@ -8,7 +8,7 @@ Transform TransformSystem::GetTransform(Entity& entity) {
 }
 
 void TransformSystem::SetTransform(Entity& entity, const Transform& tr) {
-	entity.Get<TransformComponent>() = tr;
+	entity.Set<TransformComponent>() = tr;
 }
 
 void TransformSystem::Translate(Entity& entity, const glm::vec3& vec) {

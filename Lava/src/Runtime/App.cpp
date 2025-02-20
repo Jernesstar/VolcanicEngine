@@ -19,6 +19,8 @@
 
 #include <Magma/UI/UIRenderer.h>
 
+#include <Lava/ScriptGlue.h>
+
 #include "SceneLoader.h"
 #include "UILoader.h"
 
@@ -50,21 +52,11 @@ static Map<std::string, Ref<ScriptObject>> s_Objects;
 
 void App::OnLoad() {
 	ScriptEngine::Init();
+	Lava::ScriptGlue::Init();
 
 	ScriptEngine::RegisterSingleton("App", "s_App", this);
 	ScriptEngine::RegisterMethod<App>(
 		"App", "void SetScreen(const string &in)", &App::SetScreen);
-
-	ScriptEngine::RegisterInterface("IApp")
-		.AddMethod("void OnLoad()")
-		.AddMethod("void OnClose()")
-		.AddMethod("void OnUpdate(float ts)");
-
-	ScriptEngine::RegisterInterface("IUIObject")
-		.AddMethod("void OnClick()")
-		.AddMethod("void OnHover()")
-		.AddMethod("void OnMouseUp()")
-		.AddMethod("void OnMouseDown()");
 
 	auto appPath = (fs::path(m_Project.ExportPath) / ".volc.class").string();
 	s_AppModule = CreateRef<ScriptModule>(m_Project.App);

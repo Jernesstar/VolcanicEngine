@@ -10,6 +10,11 @@ class TestHomeScreen : IScreen
 
     }
 
+    void OnUpdate(float ts)
+    {
+
+    }
+
     Scene @m_Scene;
     UIPage @m_Page;
 }
