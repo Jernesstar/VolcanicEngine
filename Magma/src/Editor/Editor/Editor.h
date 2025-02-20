@@ -4,6 +4,8 @@
 
 #include <Magma/Core/Project.h>
 
+#include <Lava/App.h>
+
 #include "Tab.h"
 #include "Project/ProjectTab.h"
 #include "Scene/SceneTab.h"
@@ -52,6 +54,7 @@ private:
 	List<Ref<Panel>> m_Panels;
 
 	EditorAssetManager m_AssetManager;
+	Ref<Lava::App> m_App;
 
 	void SetTab(Ref<Tab> tab);
 	void NewTab();

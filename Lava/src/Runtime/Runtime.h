@@ -3,9 +3,7 @@
 #include <VolcaniCore/Core/Application.h>
 #include <VolcaniCore/Core/CommandLineArgs.h>
 
-#include <Magma/Core/DLL.h>
-
-#include "App.h"
+#include <Lava/App.h>
 
 using namespace VolcaniCore;
 using namespace Magma;
@@ -23,6 +21,7 @@ public:
 
 public:
 	Ref<App> m_App;
+
 };
 
 }

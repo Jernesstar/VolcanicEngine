@@ -80,9 +80,9 @@ BinaryReader& BinaryReader::ReadObject(UI::Image& image) {
 	ReadUI(this, &image);
 	uint64_t id;
 	Read(id);
-	auto& assetManager =
+	auto* assetManager =
 		Application::As<Lava::Runtime>()->GetApp()->GetAssetManager();
-	image.Content = assetManager.Get<Texture>(Asset{ id, AssetType::Texture });
+	image.Content = assetManager->Get<Texture>(Asset{ id, AssetType::Texture });
 
 	return *this;
 }

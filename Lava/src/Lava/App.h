@@ -1,10 +1,9 @@
 #pragma once
 
 #include <Magma/Core/Project.h>
+#include <Magma/Core/AssetManager.h>
 
 #include <Magma/Scene/SceneRenderer.h>
-
-#include "AssetManager.h"
 
 using namespace VolcaniCore;
 using namespace Magma;
@@ -32,19 +31,24 @@ public:
 		: m_Project(project) { }
 	~App() = default;
 
+	void SetAssetManager(AssetManager& manager) {
+		m_AssetManager = &manager;
+	}
+
 	void OnLoad();
 	void OnClose();
 	void OnUpdate(TimeStep ts);
 
 	void SetScreen(const std::string& name);
 
-	RuntimeAssetManager& GetAssetManager() { return m_AssetManager; }
+	AssetManager* GetAssetManager() { return m_AssetManager; }
+	RuntimeSceneRenderer& GetRenderer() { return m_SceneRenderer; }
 
 private:
 	Project m_Project;
 
 	RuntimeSceneRenderer m_SceneRenderer;
-	RuntimeAssetManager m_AssetManager;
+	AssetManager* m_AssetManager;
 };
 
 }
