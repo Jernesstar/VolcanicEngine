@@ -5,6 +5,8 @@
 
 #include <Lava/App.h>
 
+#include "AssetManager.h"
+
 using namespace VolcaniCore;
 using namespace Magma;
 
@@ -21,7 +23,7 @@ public:
 
 public:
 	Ref<App> m_App;
-
+	RuntimeAssetManager m_AssetManager;
 };
 
 }

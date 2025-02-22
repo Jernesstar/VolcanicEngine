@@ -1,12 +1,21 @@
 #pragma once
 
+#include <VolcaniCore/Core/Defines.h>
+
 #include <Magma/Core/Project.h>
 #include <Magma/Core/AssetManager.h>
 
+#include <Magma/Scene/Scene.h>
 #include <Magma/Scene/SceneRenderer.h>
+
+#include <Magma/UI/UIPage.h>
+
+#include <Magma/Script/ScriptModule.h>
 
 using namespace VolcaniCore;
 using namespace Magma;
+using namespace Magma::UI;
+using namespace Magma::Script;
 
 namespace Lava {
 
@@ -27,8 +36,13 @@ class RuntimeSceneRenderer : public SceneRenderer {
 
 class App {
 public:
-	App(const Project& project)
-		: m_Project(project) { }
+	Func<void, Scene&> SceneLoad;
+	Func<void, const Scene&> SceneSave;
+	Func<Ref<ScriptModule>, UIPage&> UILoad;
+	Func<void, const UIPage&> UISave;
+
+public:
+	App(const Project& project);
 	~App() = default;
 
 	void SetAssetManager(AssetManager& manager) {
@@ -40,6 +54,8 @@ public:
 	void OnUpdate(TimeStep ts);
 
 	void SetScreen(const std::string& name);
+	void PushScreen(const std::string& name);
+	void PopScreen();
 
 	AssetManager* GetAssetManager() { return m_AssetManager; }
 	RuntimeSceneRenderer& GetRenderer() { return m_SceneRenderer; }
@@ -47,8 +63,8 @@ public:
 private:
 	Project m_Project;
 
-	RuntimeSceneRenderer m_SceneRenderer;
 	AssetManager* m_AssetManager;
+	RuntimeSceneRenderer m_SceneRenderer;
 };
 
 }

@@ -10,7 +10,6 @@
 #include <VolcaniCore/Graphics/RendererAPI.h>
 #include <VolcaniCore/Graphics/StereographicCamera.h>
 
-#include <Magma/Scene/Scene.h>
 #include <Magma/Scene/Component.h>
 
 #include <Magma/Script/ScriptModule.h>
@@ -19,10 +18,7 @@
 
 #include <Magma/UI/UIRenderer.h>
 
-#include <Lava/ScriptGlue.h>
-
-#include "SceneLoader.h"
-#include "UILoader.h"
+#include "ScriptGlue.h"
 
 using namespace Magma::UI;
 using namespace Magma::ECS;
@@ -50,13 +46,19 @@ static Ref<ScriptModule> s_Module;
 static List<Ref<ScriptClass>> s_Classes;
 static Map<std::string, Ref<ScriptObject>> s_Objects;
 
-void App::OnLoad() {
-	ScriptEngine::Init();
-	Lava::ScriptGlue::Init();
-
+App::App(const Project& project)
+	: m_Project(project)
+{
 	ScriptEngine::RegisterSingleton("App", "s_App", this);
+}
+
+void App::OnLoad() {
 	ScriptEngine::RegisterMethod<App>(
 		"App", "void SetScreen(const string &in)", &App::SetScreen);
+	ScriptEngine::RegisterMethod<App>(
+		"App", "void PushScreen(const string &in)", &App::PushScreen);
+	ScriptEngine::RegisterMethod<App>(
+		"App", "void PopScreen()", &App::PopScreen);
 
 	auto appPath = (fs::path(m_Project.ExportPath) / ".volc.class").string();
 	s_AppModule = CreateRef<ScriptModule>(m_Project.App);
@@ -146,10 +148,9 @@ void App::SetScreen(const std::string& name) {
 	delete s_CurrentScreen;
 	s_CurrentScreen = new RuntimeScreen(screen);
 
-	SceneLoader::Load(s_CurrentScreen->CurrentScene, m_Project.ExportPath);
+	SceneLoad(s_CurrentScreen->CurrentScene);
 
-	s_Module =
-		UILoader::Load(s_CurrentScreen->CurrentPage, m_Project.ExportPath);
+	s_Module = UILoad(s_CurrentScreen->CurrentPage);
 
 	s_CurrentScreen->CurrentPage.Traverse(
 		[](UIElement* element)
@@ -163,6 +164,14 @@ void App::SetScreen(const std::string& name) {
 			s_Classes.Add(scriptClass);
 			s_Objects[element->GetID()] = scriptClass->Instantiate();
 		});
+}
+
+void App::PushScreen(const std::string& name) {
+
+}
+
+void App::PopScreen() {
+
 }
 
 RuntimeSceneRenderer::RuntimeSceneRenderer() {

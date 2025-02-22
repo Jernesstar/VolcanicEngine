@@ -5,6 +5,8 @@
 
 #include <Magma/UI/UIRenderer.h>
 
+#include <Lava/ScriptGlue.h>
+
 namespace fs = std::filesystem;
 
 namespace Lava {
@@ -22,9 +24,8 @@ Runtime::Runtime(const CommandLineArgs& args)
 		});
 
 	std::string volcPath;
-	if(args["--project"]) {
+	if(args["--project"])
 		volcPath = args["--project"].Args[0];
-	}
 	else {
 		auto rootPath = fs::path(FindExecutablePath()).parent_path();
 		volcPath = (rootPath / ".volc.proj").string();
@@ -32,8 +33,14 @@ Runtime::Runtime(const CommandLineArgs& args)
 
 	Project project;
 	project.Load(volcPath);
+	m_AssetManager.Load(volcPath);
+
+	ScriptEngine::Init();
+	ScriptGlue::Init();
 
 	m_App = CreateRef<App>(project);
+	m_App->SetAssetManager(m_AssetManager);
+
 	m_App->OnLoad();
 	VOLCANICORE_LOG_INFO("Completed Load");
 }

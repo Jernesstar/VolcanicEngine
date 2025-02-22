@@ -20,7 +20,7 @@ void RuntimeAssetManager::Unload(Asset asset) {
 
 }
 
-void RuntimeAssetManager::Load(const std::string& registryFile) {
+void RuntimeAssetManager::Load(const std::string& path) {
 	
 }
 

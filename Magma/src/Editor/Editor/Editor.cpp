@@ -57,6 +57,7 @@ Editor::Editor(const CommandLineArgs& args) {
 
 	if(args["--project"]) {
 		m_Project.Load(args["--project"]);
+		m_App = CreateRef<Lava::App>(m_Project);
 		SetTab(nullptr);
 
 		auto panel1 = CreateRef<AssetEditorPanel>();
@@ -300,6 +301,7 @@ void Editor::OpenProject() {
 		if(instance->IsOk()) {
 			std::string path = instance->GetFilePathName();
 			m_Project.Load(path);
+			m_App = CreateRef<Lava::App>(m_Project);
 		}
 
 		instance->Close();

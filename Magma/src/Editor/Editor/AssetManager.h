@@ -21,7 +21,7 @@ public:
 
 	template<typename T>
 	Asset Find(Ref<T> data) {
-
+		return { };
 	}
 
 	const Map<Asset, bool>& GetRegistry() const { return m_AssetRegistry; }

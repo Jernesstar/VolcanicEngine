@@ -70,7 +70,7 @@ Asset EditorAssetManager::Add(const std::string& path, AssetType type) {
 }
 
 Asset EditorAssetManager::GetFromPath(const std::string& path) {
-	
+	return { };
 }
 
 std::string EditorAssetManager::GetPath(UUID id) {
