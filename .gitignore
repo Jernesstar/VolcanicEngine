@@ -9,3 +9,6 @@ build/
 
 # Generated files
 gen/
+
+# Binaries
+*.exe
