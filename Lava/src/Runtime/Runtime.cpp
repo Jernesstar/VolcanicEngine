@@ -3,7 +3,7 @@
 #include <VolcaniCore/Event/Events.h>
 #include <VolcaniCore/Graphics/Renderer.h>
 
-#include <Magma/UI/UIRenderer.h>
+#include <Magma/Physics/Physics.h>
 
 #include <Lava/ScriptGlue.h>
 
@@ -37,17 +37,19 @@ Runtime::Runtime(const CommandLineArgs& args)
 	project.Load("./.volc.proj");
 	m_AssetManager.Load();
 
+	Physics::Init();
 	ScriptEngine::Init();
 	ScriptGlue::Init();
 	m_App = CreateRef<App>(project);
 
 	m_App->SetAssetManager(m_AssetManager);
 	m_App->OnLoad();
-	VOLCANICORE_LOG_INFO("Completed Load");
 }
 
 Runtime::~Runtime() {
 	m_App->OnClose();
+
+	Physics::Close();
 }
 
 void Runtime::OnUpdate(TimeStep ts) {

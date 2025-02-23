@@ -138,7 +138,6 @@ void App::SetScreen(const std::string& name) {
 			{
 				return screen.Name == name;
 			});
-
 	if(!found) {
 		VOLCANICORE_LOG_INFO("Screen '%s' was not found", name.c_str());
 		return;
@@ -148,22 +147,22 @@ void App::SetScreen(const std::string& name) {
 	delete s_CurrentScreen;
 	s_CurrentScreen = new RuntimeScreen(screen);
 
-	SceneLoad(s_CurrentScreen->CurrentScene);
+	// SceneLoad(s_CurrentScreen->CurrentScene);
 
-	s_Module = UILoad(s_CurrentScreen->CurrentPage);
+	// s_Module = UILoad(s_CurrentScreen->CurrentPage);
 
-	s_CurrentScreen->CurrentPage.Traverse(
-		[](UIElement* element)
-		{
-			Ref<ScriptClass> scriptClass =
-				s_Module->GetScriptClass(element->GetID());
+	// s_CurrentScreen->CurrentPage.Traverse(
+	// 	[](UIElement* element)
+	// 	{
+	// 		Ref<ScriptClass> scriptClass =
+	// 			s_Module->GetScriptClass(element->GetID());
 
-			if(!scriptClass)
-				return;
+	// 		if(!scriptClass)
+	// 			return;
 
-			s_Classes.Add(scriptClass);
-			s_Objects[element->GetID()] = scriptClass->Instantiate();
-		});
+	// 		s_Classes.Add(scriptClass);
+	// 		s_Objects[element->GetID()] = scriptClass->Instantiate();
+	// 	});
 }
 
 void App::PushScreen(const std::string& name) {
