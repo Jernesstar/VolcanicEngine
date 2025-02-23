@@ -20,7 +20,7 @@ static void MessageCallback(const asSMessageInfo *msg, void *param) {
 	else if(msg->type == asMSGTYPE_INFORMATION)
 		type = "INFO";
 
-	VOLCANICORE_LOG_INFO("%s (%d, %d) : %s : %s\n",
+	VOLCANICORE_LOG_INFO("%s (%d, %d) : %s: %s\n",
 		msg->section, msg->row, msg->col, type, msg->message);
 }
 

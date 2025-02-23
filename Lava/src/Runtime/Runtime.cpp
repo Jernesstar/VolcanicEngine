@@ -23,22 +23,25 @@ Runtime::Runtime(const CommandLineArgs& args)
 				Application::Close();
 		});
 
-	std::string volcPath;
-	if(args["--project"])
-		volcPath = args["--project"].Args[0];
-	else {
-		auto rootPath = fs::path(FindExecutablePath()).parent_path();
-		volcPath = (rootPath / ".volc.proj").string();
+	std::string rootPath;
+	if(args["--project"]) {
+		auto volcPath = args["--project"].Args[0];
+		rootPath = fs::path(volcPath).parent_path().string();
 	}
+	else
+		rootPath = fs::path(FindExecutablePath()).parent_path().string();
+
+	Application::PushDir(rootPath);
 
 	Project project;
-	project.Load(volcPath);
-	m_AssetManager.Load(volcPath);
+	project.Load("./.volc.proj");
+	m_AssetManager.Load();
 
 	ScriptEngine::Init();
 	ScriptGlue::Init();
-
+	ScriptGlue::Load("./.scriptconfig");
 	m_App = CreateRef<App>(project);
+
 	m_App->SetAssetManager(m_AssetManager);
 
 	m_App->OnLoad();

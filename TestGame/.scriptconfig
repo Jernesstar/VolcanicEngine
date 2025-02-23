@@ -1,0 +1,159 @@
+// AngelScript 2.37.0
+// Lib options  AS_64BIT_PTR AS_LINUX AS_X64_GCC 
+// Engine properties
+ep 0 0
+ep 1 0
+ep 2 1
+ep 3 1
+ep 4 0
+ep 5 0
+ep 6 0
+ep 7 0
+ep 8 0
+ep 9 1
+ep 10 0
+ep 11 1
+ep 12 0
+ep 13 0
+ep 14 3
+ep 15 0
+ep 16 1
+ep 17 0
+ep 18 0
+ep 19 1
+ep 20 0
+ep 21 0
+ep 22 0
+ep 23 0
+ep 24 0
+ep 25 0
+ep 26 1
+ep 27 100
+ep 28 1
+ep 29 4096
+ep 30 10
+ep 31 0
+ep 32 0
+ep 33 0
+ep 34 0
+ep 35 1
+ep 36 0
+ep 37 0
+
+// Enums
+
+// Types
+access ffffffff
+objtype "string" 7938
+objtype "ref" 8070
+intf IApp
+intf IScreen
+intf IUIObject
+objtype "CameraComponent" 2147491594
+objtype "Entity" 2147549962
+objtype "Scene" 262145
+objtype "UIElement" 262145
+objtype "UIPage" 262145
+objtype "App" 17
+
+// Template type members
+
+// Type members
+objbeh "string" 2 "void string()"
+objbeh "string" 0 "void string()"
+objbeh "string" 0 "void string(const string&in)"
+objmthd "string" "string& opAssign(const string&in)"
+objmthd "string" "string& opAddAssign(const string&in)"
+objmthd "string" "bool opEquals(const string&in) const"
+objmthd "string" "int opCmp(const string&in) const"
+objmthd "string" "string opAdd(const string&in) const"
+objmthd "string" "uint length() const"
+objmthd "string" "void resize(uint)"
+objmthd "string" "bool isEmpty() const"
+objmthd "string" "uint8& opIndex(uint)"
+objmthd "string" "const uint8& opIndex(uint) const"
+objmthd "string" "string& opAssign(double)"
+objmthd "string" "string& opAddAssign(double)"
+objmthd "string" "string opAdd(double) const"
+objmthd "string" "string opAdd_r(double) const"
+objmthd "string" "string& opAssign(float)"
+objmthd "string" "string& opAddAssign(float)"
+objmthd "string" "string opAdd(float) const"
+objmthd "string" "string opAdd_r(float) const"
+objmthd "string" "string& opAssign(int64)"
+objmthd "string" "string& opAddAssign(int64)"
+objmthd "string" "string opAdd(int64) const"
+objmthd "string" "string opAdd_r(int64) const"
+objmthd "string" "string& opAssign(uint64)"
+objmthd "string" "string& opAddAssign(uint64)"
+objmthd "string" "string opAdd(uint64) const"
+objmthd "string" "string opAdd_r(uint64) const"
+objmthd "string" "string& opAssign(bool)"
+objmthd "string" "string& opAddAssign(bool)"
+objmthd "string" "string opAdd(bool) const"
+objmthd "string" "string opAdd_r(bool) const"
+objmthd "string" "string substr(uint = 0, int = - 1) const"
+objmthd "string" "int findFirst(const string&in, uint = 0) const"
+objmthd "string" "int findFirstOf(const string&in, uint = 0) const"
+objmthd "string" "int findFirstNotOf(const string&in, uint = 0) const"
+objmthd "string" "int findLast(const string&in, int = - 1) const"
+objmthd "string" "int findLastOf(const string&in, int = - 1) const"
+objmthd "string" "int findLastNotOf(const string&in, int = - 1) const"
+objmthd "string" "void insert(uint, const string&in)"
+objmthd "string" "void erase(uint, int = - 1)"
+objbeh "ref" 2 "void ref()"
+objbeh "ref" 12 "void $beh12(int&in)"
+objbeh "ref" 13 "void $beh13(int&in)"
+objbeh "ref" 0 "void ref()"
+objbeh "ref" 0 "void ref(const ref&in)"
+objbeh "ref" 0 "void ref(const ?&in)"
+objmthd "ref" "void opCast(?&out)"
+objmthd "ref" "ref& opHndlAssign(const ref&in)"
+objmthd "ref" "ref& opHndlAssign(const ?&in)"
+objmthd "ref" "bool opEquals(const ref&in) const"
+objmthd "ref" "bool opEquals(const ?&in) const"
+intfmthd IApp "void OnLoad()"
+intfmthd IApp "void OnClose()"
+intfmthd IApp "void OnUpdate(float)"
+intfmthd IScreen "void OnLoad()"
+intfmthd IScreen "void OnClose()"
+intfmthd IScreen "void OnUpdate(float)"
+intfmthd IUIObject "void OnClick()"
+intfmthd IUIObject "void OnHover()"
+intfmthd IUIObject "void OnMouseUp()"
+intfmthd IUIObject "void OnMouseDown()"
+objmthd "Entity" "string get_Name() const property"
+objmthd "Entity" "bool HasCameraComponent() const"
+objmthd "Entity" "bool HasTagComponent() const"
+objmthd "Entity" "bool HasTransformComponent() const"
+objmthd "Entity" "bool HasMeshComponent() const"
+objmthd "Entity" "bool HasSkyboxComponent() const"
+objmthd "Entity" "bool HasRigidBodyComponent() const"
+objmthd "Entity" "bool HasScriptComponent() const"
+objmthd "Entity" "bool HasSoundComponent() const"
+objmthd "Entity" "bool HasDirectionalLightComponent() const"
+objmthd "Entity" "bool HasPointLightComponent() const"
+objmthd "Entity" "bool HasSpotlightComponent() const"
+objmthd "Entity" "bool HasParticleSystemComponent() const"
+objmthd "Scene" "Entity GetEntity(const uint64&in)"
+objmthd "UIPage" "UIElement@ Get(const string&in)"
+objmthd "App" "void SetScreen(const string&in)"
+objmthd "App" "void PushScreen(const string&in)"
+objmthd "App" "void PopScreen()"
+
+// Functions
+func "string formatInt(int64, const string&in = \"\", uint = 0)"
+func "string formatUInt(uint64, const string&in = \"\", uint = 0)"
+func "string formatFloat(double, const string&in = \"\", uint = 0, uint = 0)"
+func "int64 parseInt(const string&in, uint = 10, uint&out = 0)"
+func "uint64 parseUInt(const string&in, uint = 10, uint&out = 0)"
+func "double parseFloat(const string&in, uint&out = 0)"
+func "void print(const string&in)"
+
+// Properties
+prop "App s_App"
+
+// String factory
+strfactory "string"
+
+// Default array type

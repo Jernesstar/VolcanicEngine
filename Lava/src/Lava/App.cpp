@@ -50,19 +50,18 @@ App::App(const Project& project)
 	: m_Project(project)
 {
 	ScriptEngine::RegisterSingleton("App", "s_App", this);
-}
 
-void App::OnLoad() {
 	ScriptEngine::RegisterMethod<App>(
 		"App", "void SetScreen(const string &in)", &App::SetScreen);
 	ScriptEngine::RegisterMethod<App>(
 		"App", "void PushScreen(const string &in)", &App::PushScreen);
 	ScriptEngine::RegisterMethod<App>(
 		"App", "void PopScreen()", &App::PopScreen);
+}
 
-	auto appPath = (fs::path(m_Project.ExportPath) / ".volc.class").string();
+void App::OnLoad() {
 	s_AppModule = CreateRef<ScriptModule>(m_Project.App);
-	s_AppModule->Reload(appPath);
+	s_AppModule->Reload("./.volc.class");
 
 	Application::GetWindow()->SetTitle(m_Project.Name);
 

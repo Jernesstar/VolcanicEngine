@@ -25,13 +25,13 @@ public:
 	int Read(void* data, uint32_t size) override {
 		VOLCANICORE_ASSERT(m_Reader);
 		m_Reader->ReadData(data, (uint64_t)size);
-		return true;
+		return 0;
 	}
 
 	int Write(const void* data, uint32_t size) override {
 		VOLCANICORE_ASSERT(m_Writer);
 		m_Writer->WriteData(data, (uint64_t)size);
-		return true;
+		return 0;
 	}
 
 private:

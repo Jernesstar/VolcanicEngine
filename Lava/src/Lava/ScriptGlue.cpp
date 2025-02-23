@@ -1,6 +1,9 @@
 #include "ScriptGlue.h"
 
 #include <iostream>
+#include <fstream>
+
+#include <angelscript/add_on/scripthelper/scripthelper.h>
 
 #include <Magma/ECS/Entity.h>
 
@@ -94,6 +97,15 @@ void ScriptGlue::Init() {
 	engine->RegisterObjectMethod("UIPage", "UIElement@ Get(const string &in)",
 		asMETHODPR(UIPage, Get, (const std::string&) const, UIElement*),
 		asCALL_THISCALL);
+}
+
+void ScriptGlue::Save(const std::string& path) {
+	WriteConfigToFile(ScriptEngine::Get(), path.c_str());
+}
+
+void ScriptGlue::Load(const std::string& path) {
+	std::ifstream stream(path);
+	ConfigEngineFromStream(ScriptEngine::Get(), stream, ".scriptconfig");
 }
 
 }

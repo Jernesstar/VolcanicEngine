@@ -392,6 +392,8 @@ void Editor::ExportProject() {
 		).string() + ".as");
 	mod->Save((fs::path(exportPath) / ".volc.class").string());
 
+	Lava::ScriptGlue::Save((fs::path(exportPath) / ".scriptconfig").string());
+
 	m_AssetManager.RuntimeSave(exportPath);
 
 	m_Project.Save((fs::path(exportPath) / ".volc.proj").string());
