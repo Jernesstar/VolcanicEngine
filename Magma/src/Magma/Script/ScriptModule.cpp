@@ -21,6 +21,12 @@ public:
 		else
 			m_Writer = new BinaryWriter(path);
 	}
+	~ByteCodeStream() {
+		if(m_Reader)
+			delete m_Reader;
+		else
+			delete m_Writer;
+	}
 
 	int Read(void* data, uint32_t size) override {
 		VOLCANICORE_ASSERT(m_Reader);

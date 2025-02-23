@@ -40,7 +40,7 @@ struct RuntimeScreen {
 		: CurrentScene(screen.Scene), CurrentPage(screen.Page) { }
 };
 
-static RuntimeScreen* s_CurrentScreen;
+static RuntimeScreen* s_CurrentScreen = nullptr;
 
 static Ref<ScriptModule> s_Module;
 static List<Ref<ScriptClass>> s_Classes;
@@ -49,6 +49,7 @@ static Map<std::string, Ref<ScriptObject>> s_Objects;
 App::App(const Project& project)
 	: m_Project(project)
 {
+	s_Instance = this;
 	ScriptEngine::RegisterSingleton("App", "s_App", this);
 
 	ScriptEngine::RegisterMethod<App>(

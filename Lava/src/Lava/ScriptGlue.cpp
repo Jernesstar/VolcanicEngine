@@ -3,6 +3,9 @@
 #include <iostream>
 #include <fstream>
 
+#include <angelscript.h>
+#include <angelscript/add_on/scripthandle/scripthandle.h>
+#include <angelscript/add_on/scriptstdstring/scriptstdstring.h>
 #include <angelscript/add_on/scripthelper/scripthelper.h>
 
 #include <Magma/ECS/Entity.h>
@@ -17,6 +20,8 @@
 #include <Magma/Script/ScriptClass.h>
 #include <Magma/Script/ScriptObject.h>
 
+#include "App.h"
+
 using namespace Magma;
 using namespace Magma::UI;
 using namespace Magma::ECS;
@@ -30,6 +35,9 @@ static void print(const std::string& str) {
 
 void ScriptGlue::Init() {
 	auto* engine = ScriptEngine::Get();
+
+	RegisterStdString(engine);
+	RegisterScriptHandle(engine);
 
 	engine->RegisterGlobalFunction(
 		"void print(const string &in)", asFUNCTION(print), asCALL_CDECL);
@@ -97,15 +105,6 @@ void ScriptGlue::Init() {
 	engine->RegisterObjectMethod("UIPage", "UIElement@ Get(const string &in)",
 		asMETHODPR(UIPage, Get, (const std::string&) const, UIElement*),
 		asCALL_THISCALL);
-}
-
-void ScriptGlue::Save(const std::string& path) {
-	WriteConfigToFile(ScriptEngine::Get(), path.c_str());
-}
-
-void ScriptGlue::Load(const std::string& path) {
-	std::ifstream stream(path);
-	ConfigEngineFromStream(ScriptEngine::Get(), stream, ".scriptconfig");
 }
 
 }

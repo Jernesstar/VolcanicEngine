@@ -28,9 +28,6 @@ void ScriptEngine::Init() {
 	s_Engine = asCreateScriptEngine();
 
 	s_Engine->SetMessageCallback(asFUNCTION(MessageCallback), 0, asCALL_CDECL);
-
-	RegisterStdString(s_Engine);
-	RegisterScriptHandle(s_Engine);
 }
 
 void ScriptEngine::Shutdown() {

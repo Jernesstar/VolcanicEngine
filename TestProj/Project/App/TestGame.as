@@ -13,6 +13,6 @@ class TestGame : IApp
 
 	void OnUpdate(float ts)
 	{
-		// print("OnUpdate: " + ts);
+		print("OnUpdate: " + ts);
 	}
 }

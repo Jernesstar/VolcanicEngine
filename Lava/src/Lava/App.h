@@ -36,6 +36,9 @@ class RuntimeSceneRenderer : public SceneRenderer {
 
 class App {
 public:
+	static App* GetInstance() { return s_Instance; }
+
+public:
 	Func<void, Scene&> SceneLoad;
 	Func<void, const Scene&> SceneSave;
 	Func<Ref<ScriptModule>, UIPage&> UILoad;
@@ -65,6 +68,9 @@ private:
 
 	AssetManager* m_AssetManager;
 	RuntimeSceneRenderer m_SceneRenderer;
+
+private:
+	inline static App* s_Instance;
 };
 
 }

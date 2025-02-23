@@ -39,11 +39,9 @@ Runtime::Runtime(const CommandLineArgs& args)
 
 	ScriptEngine::Init();
 	ScriptGlue::Init();
-	ScriptGlue::Load("./.scriptconfig");
 	m_App = CreateRef<App>(project);
 
 	m_App->SetAssetManager(m_AssetManager);
-
 	m_App->OnLoad();
 	VOLCANICORE_LOG_INFO("Completed Load");
 }
