@@ -76,25 +76,6 @@ struct SkyboxComponent : public Component {
 	SkyboxComponent(const SkyboxComponent& other) = default;
 };
 
-struct RigidBodyComponent : public Component {
-	Ref<Physics::RigidBody> Body;
-
-	RigidBodyComponent() = default;
-	RigidBodyComponent(Ref<Physics::RigidBody> body)
-		: Body(body) { }
-	RigidBodyComponent(const RigidBodyComponent& other) = default;
-};
-
-struct ScriptComponent : public Component {
-	std::string Class;
-	Ref<Script::ScriptObject> Instance;
-
-	ScriptComponent() = default;
-	ScriptComponent(const std::string& _class)
-		: Class(_class) { }
-	ScriptComponent(const ScriptComponent& other) = default;
-};
-
 struct SoundComponent : public Component {
 	Asset SoundAsset;
 
@@ -104,10 +85,29 @@ struct SoundComponent : public Component {
 	SoundComponent(const SoundComponent& other) = default;
 };
 
+struct ScriptComponent : public Component {
+	Ref<Script::ScriptObject> Instance;
+
+	ScriptComponent() = default;
+	ScriptComponent(Ref<ScriptObject> instance)
+		: Instance(instance) { }
+	ScriptComponent(const ScriptComponent& other) = default;
+};
+
+struct RigidBodyComponent : public Component {
+	Ref<Physics::RigidBody> Body;
+
+	RigidBodyComponent() = default;
+	RigidBodyComponent(Ref<Physics::RigidBody> body)
+		: Body(body) { }
+	RigidBodyComponent(const RigidBodyComponent& other) = default;
+};
+
 struct DirectionalLightComponent : public Component {
 	glm::vec3 Ambient;
 	glm::vec3 Diffuse;
 	glm::vec3 Specular;
+	glm::vec3 Position;
 	glm::vec3 Direction;
 
 	DirectionalLightComponent() = default;
@@ -141,7 +141,10 @@ struct SpotlightComponent : public Component {
 };
 
 struct ParticleSystemComponent : public Component {
-	float Lifetime;
+	glm::vec3 Position;
+	uint64_t MaxParticleCount;
+	float ParticleLifetime; // In milliseconds
+	Asset ImageAsset;
 
 	ParticleSystemComponent() = default;
 	ParticleSystemComponent(const ParticleSystemComponent& other) = default;

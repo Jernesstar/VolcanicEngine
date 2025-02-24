@@ -22,67 +22,141 @@ using namespace Magma::Physics;
 namespace Magma {
 
 template<>
+BinaryReader& BinaryReader::ReadObject(glm::vec3& vec) {
+	Read(vec.x);
+	Read(vec.y);
+	Read(vec.z);
+
+	return *this;
+}
+
+template<>
 BinaryReader& BinaryReader::ReadObject(CameraComponent& comp) {
+	uint32_t typeInt;
+	Read(typeInt);
+	Camera::Type type =
+		typeInt == 0 ? Camera::Type::Ortho : Camera::Type::Stereo;
+
+	float rotation_fov;
+	Read(rotation_fov);
+	glm::vec3 pos, dir;
+	Read(pos); Read(dir);
+	uint32_t w, h;
+	Read(w); Read(h);
+	float near, far;
+	Read(near); Read(far);
+
+	comp.Cam = Camera::Create(type, rotation_fov);
+	comp.Cam->SetPositionDirection(pos, dir);
+	comp.Cam->Resize(w, h);
+	comp.Cam->SetProjection(near, far);
 
 	return *this;
 }
 
 template<>
 BinaryReader& BinaryReader::ReadObject(TagComponent& comp) {
+	Read(comp.Tag);
 
 	return *this;
 }
 
 template<>
 BinaryReader& BinaryReader::ReadObject(TransformComponent& comp) {
+	Read(comp.Translation);
+	Read(comp.Rotation);
+	Read(comp.Scale);
 
 	return *this;
 }
 
 template<>
 BinaryReader& BinaryReader::ReadObject(MeshComponent& comp) {
+	uint64_t id;
+	Read(id);
+	comp.MeshAsset = { id, AssetType::Mesh };
 
 	return *this;
 }
 
 template<>
 BinaryReader& BinaryReader::ReadObject(SkyboxComponent& comp) {
+	uint64_t id;
+	Read(id);
+	comp.CubemapAsset = { id, AssetType::Cubemap };
 
 	return *this;
 }
 
 template<>
 BinaryReader& BinaryReader::ReadObject(RigidBodyComponent& comp) {
+	uint32_t typeInt;
+	Read(typeInt);
+	RigidBody::Type type = (RigidBody::Type)typeInt;
+	uint32_t shapeTypeInt;
+	Read(shapeTypeInt);
+	RigidBody::Type shapeType = (RigidBody::Type)shapeTypeInt;
+
+	Ref<Shape> shape = Shape::Create(shapeType);
+	comp.Body = RigidBody::Create(type, shape);
 
 	return *this;
 }
 
 template<>
 BinaryReader& BinaryReader::ReadObject(ScriptComponent& comp) {
+	std::string className;
+	Read(className);
+	auto _class =
+		Application::As<Runtime>()->GetScriptClass(className);
+	comp.Instance = _class->Instantiate(entity);
 
 	return *this;
 }
 
 template<>
 BinaryReader& BinaryReader::ReadObject(SoundComponent& comp) {
+	uint64_t id;
+	Read(id);
+	comp.SoundAsset = { id, AssetType::Sound };
 
 	return *this;
 }
 
 template<>
 BinaryReader& BinaryReader::ReadObject(DirectionalLightComponent& comp) {
+	Read(comp.Ambient);
+	Read(comp.Diffuse);
+	Read(comp.Specular);
+	Read(comp.Position);
+	Read(comp.Direction);
 
 	return *this;
 }
 
 template<>
 BinaryReader& BinaryReader::ReadObject(PointLightComponent& comp) {
+	Read(comp.Ambient);
+	Read(comp.Diffuse);
+	Read(comp.Specular);
+	Read(comp.Position);
+	Read(comp.Direction);
+	Read(comp.Constant);
+	Read(comp.Linear);
+	Read(comp.Quadratic);
 
 	return *this;
 }
 
 template<>
 BinaryReader& BinaryReader::ReadObject(SpotlightComponent& comp) {
+	Read(comp.Ambient);
+	Read(comp.Diffuse);
+	Read(comp.Specular);
+	Read(comp.Position);
+	Read(comp.Direction);
+	Read(comp.CutoffAngle);
+	Read(comp.OuterCutoffAngle);
 
 	return *this;
 }
@@ -90,6 +164,9 @@ BinaryReader& BinaryReader::ReadObject(SpotlightComponent& comp) {
 template<>
 BinaryReader& BinaryReader::ReadObject(ParticleSystemComponent& comp) {
 
+	uint64_t id;
+	Read(id);
+	comp.ImageAsset = { id, AssetType::Texture };
 	return *this;
 }
 
@@ -163,7 +240,7 @@ void SceneLoader::Save(const Scene& scene, const std::string& path) {
 	.ForEach(
 		[&](const Entity& entity)
 		{
-			// writer.Write(entity);
+			writer.Write(entity);
 		});
 }
 

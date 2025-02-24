@@ -26,6 +26,10 @@ public:
 		func.CallVoid(std::forward<Args>(args)...);
 	}
 
+	ScriptClass* GetClass() {
+		return m_Class;
+	}
+
 private:
 	uint32_t AddRef();
 	uint32_t Release();

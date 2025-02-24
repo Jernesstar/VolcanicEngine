@@ -60,7 +60,7 @@ public:
 	const List<uint32_t>& GetIndices() const { return m_Indices; }
 	Material& GetMaterial() { return m_Material; }
 
-protected:
+private:
 	List<Vertex> m_Vertices;
 	List<uint32_t> m_Indices;
 	Material m_Material;

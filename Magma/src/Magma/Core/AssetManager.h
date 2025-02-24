@@ -56,6 +56,7 @@ protected:
 	Map<UUID, Ref<Model>> m_MeshAssets;
 	Map<UUID, Ref<Texture>> m_TextureAssets;
 	Map<UUID, Ref<Cubemap>> m_CubemapAssets;
+	// Map<UUID, Ref<Sound>> m_SoundAssets;
 
 private:
 	Ref<Model> GetMesh(Asset asset) {

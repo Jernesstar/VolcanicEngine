@@ -102,6 +102,14 @@ void SerializeEntity(YAMLSerializer& serializer, const Entity& entity) {
 	serializer.WriteKey("Components")
 	.BeginMapping(); // Components
 
+	if(entity.Has<TagComponent>()) {
+		auto& tag = entity.Get<TagComponent>().Tag;
+
+		serializer.WriteKey("TagComponent")
+		.BeginMapping()
+			.WriteKey("Tag").Write(tag)
+		.EndMapping();
+	}
 	if(entity.Has<CameraComponent>()) {
 		auto& camera = entity.Get<CameraComponent>().Cam;
 		auto type = camera->GetType();
@@ -131,47 +139,50 @@ void SerializeEntity(YAMLSerializer& serializer, const Entity& entity) {
 		.EndMapping()
 		.EndMapping();
 	}
-
-	if(entity.Has<TagComponent>()) {
-		auto& tag = entity.Get<TagComponent>().Tag;
-
-		serializer.WriteKey("TagComponent")
-		.BeginMapping()
-			.WriteKey("Tag").Write(tag)
-		.EndMapping();
-	}
-
 	if(entity.Has<TransformComponent>()) {
-		auto& t = entity.Get<TransformComponent>().Translation;
-		auto& r = entity.Get<TransformComponent>().Rotation;
-		auto& s = entity.Get<TransformComponent>().Scale;
+		const auto& transform = entity.Get<TransformComponent>();
 
 		serializer.WriteKey("TransformComponent")
 		.BeginMapping()
 			.WriteKey("Transform").BeginMapping()
-				.WriteKey("Translation").Write(t)
-				.WriteKey("Rotation")	.Write(r)
-				.WriteKey("Scale")		.Write(s)
+				.WriteKey("Translation").Write(transform.Translation)
+				.WriteKey("Rotation")	.Write(transform.Rotation)
+				.WriteKey("Scale")		.Write(transform.Scale)
 			.EndMapping()
 		.EndMapping(); // TransformComponent
 	}
-
 	if(entity.Has<MeshComponent>()) {
 		auto asset = entity.Get<MeshComponent>().MeshAsset;
 		serializer.WriteKey("MeshComponent")
 		.BeginMapping()
-			.WriteKey("Asset").Write(asset)
+			.WriteKey("AssetID").Write((uint64_t)asset.ID)
 		.EndMapping();
 	}
-
 	if(entity.Has<SkyboxComponent>()) {
 		auto asset = entity.Get<SkyboxComponent>().CubemapAsset;
 		serializer.WriteKey("SkyboxComponent")
 		.BeginMapping()
-			.WriteKey("Asset").Write(asset)
+			.WriteKey("AssetID").Write((uint64_t)asset.ID)
 		.EndMapping();
 	}
+	if(entity.Has<SoundComponent>()) {
+		auto asset = entity.Get<SoundComponent>().SoundAsset;
+		serializer.WriteKey("SoundComponent")
+		.BeginMapping()
+			.WriteKey("AssetID").Write((uint64_t)asset.ID)
+		.EndMapping();
+	}
+	if(entity.Has<ScriptComponent>()) {
+		Ref<ScriptObject> obj = entity.Get<ScriptComponent>().Instance;
 
+		serializer.WriteKey("ScriptComponent")
+		.BeginMapping()
+			.WriteKey("Class").Write(obj->GetClass()->Name);
+			.WriteKey("Instance").BeginMapping()
+				// TODO(Implement): Reflection
+			.EndMapping()
+		.EndMapping();
+	}
 	if(entity.Has<RigidBodyComponent>()) {
 		auto body = entity.Get<RigidBodyComponent>().Body;
 		auto type = body->GetType();
@@ -209,32 +220,69 @@ void SerializeEntity(YAMLSerializer& serializer, const Entity& entity) {
 			.EndMapping() // Body
 		.EndMapping(); // RigidBodyComponent
 	}
-
-	if(entity.Has<ScriptComponent>()) {
-		std::string _class = entity.Get<ScriptComponent>().Class;
-
-		serializer.WriteKey("ScriptComponent")
-		.BeginMapping()
-			.WriteKey("Script").BeginMapping()
-				.WriteKey("Class").Write(_class)
-			.EndMapping()
-		.EndMapping();
-	}
-
 	if(entity.Has<DirectionalLightComponent>()) {
+		const auto& light = entity.Get<DirectionalLightComponent>();
 
+		serializer.WriteKey("DirectionalLightComponent")
+		.BeginMapping()
+			.WriteKey("Light")
+			.BeginMapping()
+				.WriteKey("Ambient").Write(light.Ambient)
+				.WriteKey("Diffuse").Write(light.Diffuse)
+				.WriteKey("Specular").Write(light.Specular)
+				.WriteKey("Position").Write(light.Position)
+				.WriteKey("Direction").Write(light.Direction)
+			.EndMapping()
+		.EndMapping(); // DirectionalLightComponent
 	}
-
 	if(entity.Has<PointLightComponent>()) {
-
+		const auto& light = entity.Get<PointLightComponent>();
+		
+		serializer.WriteKey("PointLightComponent")
+		.BeginMapping()
+			.WriteKey("Light")
+			.BeginMapping()
+				.WriteKey("Ambient").Write(light.Ambient)
+				.WriteKey("Diffuse").Write(light.Diffuse)
+				.WriteKey("Specular").Write(light.Specular)
+				.WriteKey("Position").Write(light.Position)
+				.WriteKey("Direction").Write(light.Direction)
+				.WriteKey("Constant").Write(light.Constant)
+				.WriteKey("Linear").Write(light.Linear)
+				.WriteKey("Quadratic").Write(light.Quadratic)
+			.EndMapping()
+		.EndMapping(); // PointLightComponent
 	}
-
 	if(entity.Has<SpotlightComponent>()) {
-
+		const auto& light = entity.Get<SpotlightComponent>();
+	
+		serializer.WriteKey("SpotlightComponent")
+		.BeginMapping()
+			.WriteKey("Light")
+			.BeginMapping()
+				.WriteKey("Ambient").Write(light.Ambient)
+				.WriteKey("Diffuse").Write(light.Diffuse)
+				.WriteKey("Specular").Write(light.Specular)
+				.WriteKey("Position").Write(light.Position)
+				.WriteKey("Direction").Write(light.Direction)
+				.WriteKey("CutoffAngle").Write(light.CutoffAngle)
+				.WriteKey("OuterCutoffAngle").Write(light.OuterCutoffAngle)
+			.EndMapping()
+		.EndMapping(); // SpotlightComponent
 	}
-
 	if(entity.Has<ParticleSystemComponent>()) {
+		const auto& system = entity.Get<ParticleSystemComponent>();
 
+		serializer.WriteKey("ParticleSystemComponent")
+		.BeginMapping()
+			.WriteKey("System")
+			.BeginMapping()
+				.WriteKey("Position").Write(system.Position)
+				.WriteKey("MaxParticleCount").Write(system.MaxParticleCount)
+				.WriteKey("ParticleLifetime").Write(system.ParticleLifetime)
+				.WriteKey("AssetID").Write((uint64_t)system.ImageAsset.ID)
+			.EndMapping()
+		.EndMapping(); // ParticleSystemComponent
 	}
 
 	serializer.EndMapping(); // Components
@@ -290,38 +338,40 @@ void DeserializeEntity(YAML::Node entityNode, Scene& scene) {
 	auto transformComponentNode = components["TransformComponent"];
 	if(transformComponentNode) {
 		auto transformNode = transformComponentNode["Transform"];
-		auto translationNode = transformNode["Translation"];
-		auto rotationNode	 = transformNode["Rotation"];
-		auto scaleNode		 = transformNode["Scale"];
-
 		entity.Add<TransformComponent>(
 			Transform
 			{
-				.Translation = translationNode.as<glm::vec3>(),
-				.Rotation	 = rotationNode.as<glm::vec3>(),
-				.Scale		 = scaleNode.as<glm::vec3>()
+				.Translation = transformNode["Translation"].as<glm::vec3>(),
+				.Rotation	 = transformNode["Rotation"].as<glm::vec3>(),
+				.Scale		 = transformNode["Scale"].as<glm::vec3>()
 			});
 	}
 
 	auto meshComponentNode = components["MeshComponent"];
 	if(meshComponentNode) {
-		auto assetNode = meshComponentNode["Asset"];
-		auto id = assetNode["ID"].as<uint64_t>();
+		auto id = meshComponentNode["AssetID"].as<uint64_t>();
 		entity.Add<MeshComponent>(Asset{ id, AssetType::Mesh });
 	}
 
 	auto skyboxComponentNode = components["SkyboxComponent"];
 	if(skyboxComponentNode) {
-		auto assetNode = skyboxComponentNode["Asset"];
-		auto id = assetNode["ID"].as<uint64_t>();
+		auto id = skyboxComponentNode["AssetID"].as<uint64_t>();
 		entity.Add<SkyboxComponent>(Asset{ id, AssetType::Cubemap });
+	}
+
+	auto soundComponentNode = components["SoundComponent"];
+	if(soundComponentNode) {
+		auto id = soundComponentNode["AssetID"].as<uint64_t>();
+		entity.Add<SoundComponent>(Asset{ id, AssetType::Sound });
 	}
 
 	auto scriptComponentNode = components["ScriptComponent"];
 	if(scriptComponentNode) {
 		auto classNode = scriptComponentNode["Class"];
-		std::string _class = classNode.as<std::string>();
-		entity.Add<ScriptComponent>(_class);
+		std::string className = classNode.as<std::string>();
+		auto _class =
+			Application::As<EditorApp>()->GetEditor().GetScriptClass(className);
+		entity.Add<ScriptComponent>(_class->Instantiate(entity));
 	}
 
 	auto rigidBodyComponentNode = components["RigidBodyComponent"];
@@ -350,29 +400,63 @@ void DeserializeEntity(YAML::Node entityNode, Scene& scene) {
 		entity.Add<RigidBodyComponent>(body);
 	}
 
-	auto soundComponent = components["SoundComponent"];
-	if(soundComponent) {
-
-	}
-
 	auto directionalLightComponentNode = components["DirectionalLightComponent"];
 	if(directionalLightComponentNode) {
-
+		auto lightNode = directionalLightComponentNode["Light"];
+		entity.Add<DirectionalLightComponent>(
+			DirectionalLightComponent
+			{
+				lightNode["Ambient"].as<glm::vec3>(),
+				lightNode["Diffuse"].as<glm::vec3>(),
+				lightNode["Specular"].as<glm::vec3>(),
+				lightNode["Position"].as<glm::vec3>(),
+				lightNode["Direction"].as<glm::vec3>(),
+			});
 	}
 
 	auto pointLightComponentNode = components["PointLightComponent"];
 	if(pointLightComponentNode) {
-
+		auto lightNode = directionalLightComponentNode["Light"];
+		entity.Add<DirectionalLightComponent>(
+			DirectionalLightComponent
+			{
+				lightNode["Ambient"].as<glm::vec3>(),
+				lightNode["Diffuse"].as<glm::vec3>(),
+				lightNode["Specular"].as<glm::vec3>(),
+				lightNode["Position"].as<glm::vec3>(),
+				lightNode["Constant"].as<float>(),
+				lightNode["Linear"].as<float>(),
+				lightNode["Quadratic"].as<float>(),
+			});
 	}
 
 	auto spotlightComponentNode = components["SpotlightComponent"];
 	if(spotlightComponentNode) {
-
+		auto lightNode = spotlightComponentNode["Light"];
+		entity.Add<SpotlightComponent>(
+			SpotlightComponent
+			{
+				lightNode["Ambient"].as<glm::vec3>(),
+				lightNode["Diffuse"].as<glm::vec3>(),
+				lightNode["Specular"].as<glm::vec3>(),
+				lightNode["Position"].as<glm::vec3>(),
+				lightNode["Direction"].as<glm::vec3>(),
+				lightNode["CutoffAngle"].as<float>(),
+				lightNode["OuterCutoffAngle"].as<float>(),
+			});
 	}
 
-	auto particleSystemComponent = components["ParticleSystemComponent"];
-	if(particleSystemComponent) {
-
+	auto particleSystemComponentNode = components["ParticleSystemComponent"];
+	if(particleSystemComponentNode) {
+		auto system = particleSystemComponentNode["System"];
+		entity.Add<ParticleSystemComponent>(
+			ParticleSystemComponent
+			{
+				system["Position"].as<glm::vec3>(),
+				system["MaxParticleCount"].as<uint64_t>(),
+				system["ParticleLifetime"].as<float>(),
+				Asset{ system["AssetID"].as<uint64_t>(), AssetType::Texture }
+			});
 	}
 }
 
@@ -381,73 +465,127 @@ void DeserializeEntity(YAML::Node entityNode, Scene& scene) {
 namespace Magma {
 
 template<>
+BinaryWriter& BinaryWriter::WriteObject(const glm::vec3& vec) {
+	Write(vec.x);
+	Write(vec.y);
+	Write(vec.z);
+	return *this;
+}
+
+template<>
 BinaryWriter& BinaryWriter::WriteObject(const CameraComponent& comp) {
+	auto camera = comp.Cam;
+
+	Write((uint32_t)camera->GetType());
+	if(camera->GetType() == Camera::Type::Stereo)
+		Write(camera->As<StereographicCamera>()->GetVerticalFOV());
+	else
+		Write(camera->As<OrthographicCamera>()->GetRotation());
+
+	Write(camera->GetPosition());
+	Write(camera->GetDirection());
+	Write(camera->GetViewportWidth());
+	Write(camera->GetViewportHeight());
+	Write(camera->GetNear());
+	Write(camera->GetFar());
 
 	return *this;
 }
 
 template<>
 BinaryWriter& BinaryWriter::WriteObject(const TagComponent& comp) {
-
+	Write(comp.Tag);
 	return *this;
 }
 
 template<>
 BinaryWriter& BinaryWriter::WriteObject(const TransformComponent& comp) {
-
+	Write(comp.Translation);
+	Write(comp.Rotation);
+	Write(comp.Scale);
 	return *this;
 }
 
 template<>
 BinaryWriter& BinaryWriter::WriteObject(const MeshComponent& comp) {
-
+	Write((uint64_t)comp.MeshAsset.ID);
 	return *this;
 }
 
 template<>
 BinaryWriter& BinaryWriter::WriteObject(const SkyboxComponent& comp) {
-
+	Write((uint64_t)comp.CubemapAsset.ID);
 	return *this;
 }
 
 template<>
-BinaryWriter& BinaryWriter::WriteObject(const RigidBodyComponent& comp) {
+BinaryWriter& BinaryWriter::WriteObject(const SoundComponent& comp) {
+	Write((uint64_t)comp.SoundAsset.ID);
 
 	return *this;
 }
 
 template<>
 BinaryWriter& BinaryWriter::WriteObject(const ScriptComponent& comp) {
+	Write(obj->GetClass()->Name);
 
 	return *this;
 }
 
 template<>
-BinaryWriter& BinaryWriter::WriteObject(const SoundComponent& comp) {
+BinaryWriter& BinaryWriter::WriteObject(const RigidBodyComponent& comp) {
+	auto body = comp.Body;
+
+	Write(body->GetType());
+	Write(body->GetShape()->GetType());
 
 	return *this;
 }
 
 template<>
 BinaryWriter& BinaryWriter::WriteObject(const DirectionalLightComponent& comp) {
+	Write(comp.Ambient);
+	Write(comp.Diffuse);
+	Write(comp.Specular);
+	Write(comp.Position);
+	Write(comp.Direction);
 
 	return *this;
 }
 
 template<>
 BinaryWriter& BinaryWriter::WriteObject(const PointLightComponent& comp) {
+	Write(comp.Ambient);
+	Write(comp.Diffuse);
+	Write(comp.Specular);
+	Write(comp.Position);
+	Write(comp.Direction);
+	Write(comp.Constant);
+	Write(comp.Linear);
+	Write(comp.Quadratic);
 
 	return *this;
 }
 
 template<>
 BinaryWriter& BinaryWriter::WriteObject(const SpotlightComponent& comp) {
+	Write(comp.Ambient);
+	Write(comp.Diffuse);
+	Write(comp.Specular);
+	Write(comp.Position);
+	Write(comp.Direction);
+	Write(comp.CutoffAngle);
+	Write(comp.OuterCutoffAngle);
 
 	return *this;
 }
 
 template<>
 BinaryWriter& BinaryWriter::WriteObject(const ParticleSystemComponent& comp) {
+	Write(system.Position);
+	Write(system.MaxParticleCount);
+	Write(system.ParticleLifetime);
+	Write((uint64_t)system.ImageAsset.ID);
 
 	return *this;
 }

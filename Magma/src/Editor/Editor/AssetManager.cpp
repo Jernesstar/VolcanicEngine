@@ -201,6 +201,21 @@ void EditorAssetManager::Save() {
 	serializer.EndSequence();
 
 	serializer.WriteKey("TextureAssets").BeginSequence();
+	for(auto& [id, texture] : m_TextureAssets) {
+		// serializer.WriteKey("Path").Write(texture->GetPath());
+	}
+	serializer.EndSequence();
+
+	serializer.WriteKey("Cubemap").BeginSequence();
+	for(auto& [id, texture] : m_Cubemap) {
+		// serializer.WriteKey("Path").Write(texture->GetPath());
+	}
+	serializer.EndSequence();
+
+	serializer.WriteKey("SoundAssets").BeginSequence();
+	for(auto& [id, texture] : m_SoundAssets) {
+		// serializer.WriteKey("Path").Write(texture->GetPath());
+	}
 	serializer.EndSequence();
 
 	serializer.EndMapping(); // AssetPack
@@ -223,6 +238,7 @@ void EditorAssetManager::RuntimeSave(const std::string& path) {
 
 	auto dataPath = (fs::path(path) / ".volc.assetpk").string();
 	BinaryWriter writer(dataPath);
+
 	
 }
 

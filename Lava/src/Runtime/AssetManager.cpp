@@ -21,6 +21,8 @@ void RuntimeAssetManager::Unload(Asset asset) {
 }
 
 void RuntimeAssetManager::Load() {
+	BinaryReader reader("./.volc.assetpk");
+
 	
 }
 
