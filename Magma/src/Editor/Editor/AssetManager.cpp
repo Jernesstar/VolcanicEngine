@@ -166,7 +166,7 @@ void EditorAssetManager::Save() {
 			serializer.WriteKey("Material")
 			.BeginMapping();
 
-			auto& mat = subMesh.Material;
+			auto& mat = subMesh.Mat;
 			if(mat.Diffuse)
 				serializer.WriteKey("Diffuse")
 				.BeginMapping()

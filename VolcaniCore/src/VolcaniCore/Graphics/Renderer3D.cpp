@@ -176,7 +176,7 @@ static void DrawSubMesh(SubMesh& mesh, const glm::mat4& tr,
 		}
 
 		if(!command->UniformData) {
-			Material& mat = mesh.Material;
+			Material& mat = mesh.Mat;
 			if(mat.Diffuse) {
 				command->UniformData
 				.SetInput("u_Material.Diffuse", TextureSlot{ mat.Diffuse, 0 });
@@ -218,7 +218,7 @@ static void DrawSubMesh(SubMesh& mesh, const glm::mat4& tr,
 void Renderer3D::DrawMesh(Ref<Mesh> mesh, const glm::mat4& tr,
 						  DrawCommand* command)
 {
-	for(auto& subMesh : *mesh)
+	for(auto& subMesh : mesh->SubMeshes)
 		DrawSubMesh(subMesh, tr, command);
 }
 

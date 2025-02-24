@@ -17,15 +17,13 @@ namespace fs = std::filesystem;
 namespace Demo {
 
 static uint8_t* ReadImage(const std::string& path,
-	int& width, int& height, int& bitsPerPixel, int desiredChannels, bool flip)
+	int& width, int& height, int& bitsPerPixel, int channels, bool flip)
 {
 	stbi_set_flip_vertically_on_load((int)flip);
 	uint8_t* pixelData =
-		stbi_load(path.c_str(), &width, &height, &bitsPerPixel, desiredChannels);
-
+		stbi_load(path.c_str(), &width, &height, &bitsPerPixel, channels);
 	VOLCANICORE_ASSERT_ARGS(pixelData, "Could not load image from path '%s'",
 										path.c_str());
-
 	return pixelData;
 }
 
@@ -68,6 +66,8 @@ Ref<Cubemap> AssetImporter::GetCubemap(const std::string& path) {
 			ReadImage(facePath, width, height, bpp, 4, false);
 		// output.Emplace(ImageData(width, height, bpp, data));
 	}
+
+	return Cubemap::Create(output);
 }
 
 static Ref<Texture> LoadTexture(const std::string& dir,

@@ -32,7 +32,7 @@ enum class MeshPrimitive { Quad, Cube, Pyramid, Sphere };
 struct SubMesh {
 	List<Vertex> Vertices;
 	List<uint32_t> Indices;
-	Material Material;
+	Material Mat;
 };
 
 class Mesh {
@@ -52,22 +52,6 @@ public:
 public:
 	Mesh() = default;
 	~Mesh() = default;
-
-	operator SubMesh() const { return SubMeshes[0]; }
-
-	List<SubMesh>::const_iterator begin() const {
-		return SubMeshes.begin();
-	}
-	List<SubMesh>::const_iterator end() const {
-		return SubMeshes.end();
-	}
-
-	List<SubMesh>::iterator begin() {
-		return SubMeshes.begin();
-	}
-	List<SubMesh>::iterator end() {
-		return SubMeshes.end();
-	}
 };
 
 }

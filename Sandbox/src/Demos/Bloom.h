@@ -60,7 +60,7 @@ Bloom::Bloom()
 	Ref<ShaderPipeline> shader;
 	shader = ShaderPipeline::Create(
 		{
-			{ "VolcaniCore/assets/shaders/Framebuffer.glsl.vert", ShaderType::Vertex },
+			{ "Magma/assets/shaders/Framebuffer.glsl.vert", ShaderType::Vertex },
 			{ "Sandbox/assets/shaders/Downsample.glsl.frag", ShaderType::Fragment }
 		});
 	downsamplePass = RenderPass::Create("Downsample", shader);
@@ -69,7 +69,7 @@ Bloom::Bloom()
 
 	shader = ShaderPipeline::Create(
 		{
-			{ "VolcaniCore/assets/shaders/Framebuffer.glsl.vert", ShaderType::Vertex },
+			{ "Magma/assets/shaders/Framebuffer.glsl.vert", ShaderType::Vertex },
 			{ "Sandbox/assets/shaders/Upsample.glsl.frag", ShaderType::Fragment }
 		});
 	upsamplePass = RenderPass::Create("Upsample", shader);
@@ -78,12 +78,12 @@ Bloom::Bloom()
 
 	shader = ShaderPipeline::Create(
 		{
-			{ "VolcaniCore/assets/shaders/Framebuffer.glsl.vert", ShaderType::Vertex },
+			{ "Magma/assets/shaders/Framebuffer.glsl.vert", ShaderType::Vertex },
 			{ "Sandbox/assets/shaders/Bloom.glsl.frag", ShaderType::Fragment }
 		});
 	bloomPass = RenderPass::Create("Bloom", shader);
 
-	shader = ShaderPipeline::Create("VolcaniCore/assets/shaders", "Mesh");
+	shader = ShaderPipeline::Create("Magma/assets/shaders", "Mesh");
 	drawPass = RenderPass::Create("Draw", shader);
 	drawPass->SetOutput(src);
 	drawPass->SetData(Renderer3D::GetMeshBuffer());

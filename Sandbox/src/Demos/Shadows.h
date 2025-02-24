@@ -39,7 +39,7 @@ Shadows::Shadows()
 
 	auto depthViewShader = ShaderPipeline::Create(
 		{
-			{ "VolcaniCore/assets/shaders/Framebuffer.glsl.vert", ShaderType::Vertex },
+			{ "Magma/assets/shaders/Framebuffer.glsl.vert", ShaderType::Vertex },
 			{ "Sandbox/assets/shaders/DepthView.glsl.frag", ShaderType::Fragment }
 		});
 	depthViewPass = RenderPass::Create("DepthView", depthViewShader);

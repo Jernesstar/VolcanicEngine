@@ -73,7 +73,7 @@ Raycast::Raycast() {
 				VOLCANICORE_LOG_INFO("No hit");
 		});
 
-	auto draw = ShaderPipeline::Create("VolcaniCore/assets/shaders", "Mesh");
+	auto draw = ShaderPipeline::Create("Magma/assets/shaders", "Mesh");
 	auto mask = ShaderPipeline::Create("Sandbox/assets/shaders", "Mask");
 	auto outline = ShaderPipeline::Create("Sandbox/assets/shaders", "Outline");
 

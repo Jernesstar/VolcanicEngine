@@ -75,7 +75,7 @@ Collision::Collision() {
 		});
 
 	Ref<ShaderPipeline> shader;
-	shader = ShaderPipeline::Create("VolcaniCore/assets/shaders", "Mesh");
+	shader = ShaderPipeline::Create("Magma/assets/shaders", "Mesh");
 	drawPass = RenderPass::Create("Draw", shader);
 	drawPass->SetData(Renderer3D::GetMeshBuffer());
 

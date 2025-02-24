@@ -154,20 +154,20 @@ void Lighting::OnUpdate(TimeStep ts) {
 		auto* cubeCommand = Renderer::NewCommand();
 		cubeCommand->UniformData
 		.SetInput("u_Material.Diffuse",
-				  TextureSlot{ cube->SubMeshes[0].Material.Diffuse, 0 });
+				  TextureSlot{ cube->SubMeshes[0].Mat.Diffuse, 0 });
 		cubeCommand->UniformData
 		.SetInput("u_Material.Specular",
-				  TextureSlot{ cube->SubMeshes[0].Material.Specular, 1 });
+				  TextureSlot{ cube->SubMeshes[0].Mat.Specular, 1 });
 		cubeCommand->UniformData
 		.SetInput("u_Material.Shininess", 32.0f);
 
 		auto* torchCommand = Renderer::NewCommand();
 		torchCommand->UniformData
 		.SetInput("u_Material.Diffuse",
-				  TextureSlot{ torch->SubMeshes[0].Material.Diffuse, 0 });
+				  TextureSlot{ torch->SubMeshes[0].Mat.Diffuse, 0 });
 		torchCommand->UniformData
 		.SetInput("u_Material.Specular",
-				  TextureSlot{ torch->SubMeshes[0].Material.Specular, 1 });
+				  TextureSlot{ torch->SubMeshes[0].Mat.Specular, 1 });
 		torchCommand->UniformData
 		.SetInput("u_Material.Shininess", 32.0f);
 

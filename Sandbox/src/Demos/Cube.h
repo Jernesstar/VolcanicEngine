@@ -80,7 +80,7 @@ Cube::Cube()
 				Application::Close();
 		});
 
-	auto shader = ShaderPipeline::Create("VolcaniCore/assets/shaders", "Mesh");
+	auto shader = ShaderPipeline::Create("Magma/assets/shaders", "Mesh");
 	auto depth = Texture::Create(480, 270, Texture::Format::Depth);
 	auto color = Texture::Create(480, 270, Texture::Format::Normal,
 								 Texture::Sampling::Nearest);
