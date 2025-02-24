@@ -65,7 +65,6 @@ project "Sandbox"
 
         "imgui",
         "yaml-cpp",
-        "ImGuiFileDialog",
         "flecs",
         -- "rapidjson",
         "angelscript",

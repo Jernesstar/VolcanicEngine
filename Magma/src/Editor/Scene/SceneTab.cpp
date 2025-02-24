@@ -6,6 +6,7 @@
 #include <ImGuiFileDialog/ImGuiFileDialog.h>
 
 #include "Editor/Tab.h"
+#include "Editor/AssetImporter.h"
 #include "Editor/SceneLoader.h"
 
 #include "SceneHierarchyPanel.h"
@@ -62,17 +63,17 @@ void SceneTab::Setup() {
 
 	Ref<Texture> image;
 
-	image = Texture::Create("Magma/assets/icons/PlayButton.png");
+	image = AssetImporter::GetTexture("Magma/assets/icons/PlayButton.png");
 	m_PlayButton.Display = CreateRef<UI::Image>(image);
 	m_PlayButton.Width = 20;
 	m_PlayButton.Height = 20;
 
-	image = Texture::Create("Magma/assets/icons/PauseButton.png");
+	image = AssetImporter::GetTexture("Magma/assets/icons/PauseButton.png");
 	m_PauseButton.Display = CreateRef<UI::Image>(image);
 	m_PauseButton.Width = 20;
 	m_PauseButton.Height = 20;
 
-	image = Texture::Create("Magma/assets/icons/StopButton.png");
+	image = AssetImporter::GetTexture("Magma/assets/icons/StopButton.png");
 	m_StopButton.Display = CreateRef<UI::Image>(image);
 	m_StopButton.Width = 20;
 	m_StopButton.Height = 20;

@@ -108,15 +108,11 @@ project "Runtime"
 
         "glfw",
         "glad",
-        "assimp",
-        "freetype",
-        "stb_image",
+
+        "yaml-cpp",
 
         "imgui",
-        "yaml-cpp",
-        "ImGuiFileDialog",
         "flecs",
-        -- "rapidjson",
         "angelscript",
         "soloud"
     }

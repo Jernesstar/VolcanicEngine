@@ -11,8 +11,10 @@
 #include <Magma/UI/UIRenderer.h>
 
 #include "Editor/EditorApp.h"
+#include "Editor/AssetImporter.h"
 
 #include "Project/AssetEditorPanel.h"
+
 
 namespace Magma {
 
@@ -21,10 +23,10 @@ ContentBrowserPanel::ContentBrowserPanel(const std::string& path)
 {
 	m_FileIcon =
 		CreateRef<UI::Image>(
-			Texture::Create("Magma/assets/icons/FileIcon.png"));
+			AssetImporter::GetTexture("Magma/assets/icons/FileIcon.png"));
 	m_FolderIcon =
 		CreateRef<UI::Image>(
-			Texture::Create("Magma/assets/icons/FolderIcon.png"));
+			AssetImporter::GetTexture("Magma/assets/icons/FolderIcon.png"));
 }
 
 void ContentBrowserPanel::Update(TimeStep ts) {
@@ -91,7 +93,6 @@ void ContentBrowserPanel::Draw() {
 				ImGui::Text("Assets");
 			}
 			ImGui::PopClipRect();
-			ImGui::SetCursorPos(windowStart);
 
 			static float padding = 18.0f;
 			static float thumbnailSize = 100.0f;
@@ -117,6 +118,8 @@ void ContentBrowserPanel::Draw() {
 					button.Width = thumbnailSize;
 					button.Height = thumbnailSize;
 					button.Display = m_FileIcon;
+					button.x = -1;
+					button.y = -1;
 					if(UI::UIRenderer::DrawButton(button).Clicked) {
 						auto panel =
 							editor.GetPanel("AssetEditor")
@@ -132,15 +135,15 @@ void ContentBrowserPanel::Draw() {
 						UI::Image image;
 						image.Content = m_FileIcon->Content;
 						image.Width = thumbnailSize;
-						image.Height = thumbnailSize + 20.0f;
+						image.Height = thumbnailSize;
 						UI::UIRenderer::DrawImage(image);
 
 						ImGui::EndDragDropSource();
 					}
 					if(display != "")
 						ImGui::TextWrapped(display.c_str());
-					else
-						ImGui::Text("Asset %lu", (uint64_t)asset.ID & 99999);
+					ImGui::Text("Asset %lu",
+								(uint64_t)asset.ID / 100000000000000);
 				}
 
 				ImGui::EndTable();
@@ -216,7 +219,7 @@ ImRect Traverse(fs::path path) {
 	}
 
 	ImColor TreeLineColor = ImGui::GetColorU32(ImGuiCol_Text);
-	float SmallOffsetX = -8.5f; // TODO: Take tree indent into account
+	float SmallOffsetX = -8.5f;
 	ImVec2 verticalLineStart = ImGui::GetCursorScreenPos();
 	verticalLineStart.x += SmallOffsetX; // Line up with the arrow
 	ImVec2 verticalLineEnd = verticalLineStart;

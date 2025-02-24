@@ -60,6 +60,8 @@ public:
 	void PushScreen(const std::string& name);
 	void PopScreen();
 
+	Ref<ScriptClass> GetScriptClass(const std::string& name);
+
 	AssetManager* GetAssetManager() { return m_AssetManager; }
 	RuntimeSceneRenderer& GetRenderer() { return m_SceneRenderer; }
 

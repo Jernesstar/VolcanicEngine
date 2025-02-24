@@ -64,9 +64,9 @@ Shadows::Shadows()
 		Mesh::Create(MeshPrimitive::Cube,
 			Material
 			{
-				.Diffuse = Texture::Create("Sandbox/assets/images/wood.png")
+				.Diffuse = AssetImporter::GetTexture("Sandbox/assets/images/wood.png")
 			});
-	torch = Mesh::Create("Sandbox/assets/models/mc-torch/Torch.obj");
+	torch = AssetImporter::GetMesh("Sandbox/assets/models/mc-torch/Torch.obj");
 
 	depthCamera = CreateRef<OrthographicCamera>(20.0f, 20.0f, 1.0f, 20.0f);
 	depthCamera->SetPosition({ -2.0f, 6.0f, -2.0f });

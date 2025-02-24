@@ -16,6 +16,8 @@
 
 #include <Magma/Scene/Component.h>
 
+#include "Runtime.h"
+
 using namespace Magma::ECS;
 using namespace Magma::Physics;
 
@@ -95,7 +97,7 @@ BinaryReader& BinaryReader::ReadObject(RigidBodyComponent& comp) {
 	RigidBody::Type type = (RigidBody::Type)typeInt;
 	uint32_t shapeTypeInt;
 	Read(shapeTypeInt);
-	RigidBody::Type shapeType = (RigidBody::Type)shapeTypeInt;
+	Shape::Type shapeType = (Shape::Type)shapeTypeInt;
 
 	Ref<Shape> shape = Shape::Create(shapeType);
 	comp.Body = RigidBody::Create(type, shape);
@@ -103,13 +105,15 @@ BinaryReader& BinaryReader::ReadObject(RigidBodyComponent& comp) {
 	return *this;
 }
 
+static Entity s_CurrentEntity;
+
 template<>
 BinaryReader& BinaryReader::ReadObject(ScriptComponent& comp) {
 	std::string className;
 	Read(className);
 	auto _class =
-		Application::As<Runtime>()->GetScriptClass(className);
-	comp.Instance = _class->Instantiate(entity);
+		Application::As<Lava::Runtime>()->GetApp()->GetScriptClass(className);
+	comp.Instance = _class->Instantiate(s_CurrentEntity);
 
 	return *this;
 }
@@ -140,7 +144,6 @@ BinaryReader& BinaryReader::ReadObject(PointLightComponent& comp) {
 	Read(comp.Diffuse);
 	Read(comp.Specular);
 	Read(comp.Position);
-	Read(comp.Direction);
 	Read(comp.Constant);
 	Read(comp.Linear);
 	Read(comp.Quadratic);
@@ -163,10 +166,10 @@ BinaryReader& BinaryReader::ReadObject(SpotlightComponent& comp) {
 
 template<>
 BinaryReader& BinaryReader::ReadObject(ParticleSystemComponent& comp) {
-
 	uint64_t id;
 	Read(id);
 	comp.ImageAsset = { id, AssetType::Texture };
+
 	return *this;
 }
 
@@ -179,6 +182,8 @@ BinaryReader& BinaryReader::ReadObject(Entity& entity) {
 	uint32_t bits;
 	Read(bits);
 	std::bitset<12> componentBits(bits);
+
+	s_CurrentEntity = entity;
 
 	if(componentBits.test(0))
 		Read(entity.Set<CameraComponent>());
@@ -240,7 +245,7 @@ void SceneLoader::Save(const Scene& scene, const std::string& path) {
 	.ForEach(
 		[&](const Entity& entity)
 		{
-			writer.Write(entity);
+			// writer.Write(entity);
 		});
 }
 

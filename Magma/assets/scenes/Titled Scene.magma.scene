@@ -27,7 +27,7 @@ Scene:
               Rotation: [0, 0, 0]
               Scale: [1, 1, 1]
           MeshComponent:
-            Model:
+            Mesh:
               Path: Sandbox/assets/models/player/Knight_Golden_Male.obj
     - Entity:
         ID: 558

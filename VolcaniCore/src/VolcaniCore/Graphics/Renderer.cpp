@@ -108,7 +108,6 @@ void Renderer::PushOptions(const DrawCall& options) {
 	s_OptionsValid = true;
 }
 
-// TODO(Implement):
 void Renderer::PopOptions(uint32_t count) {
 	s_OptionsValid = false;
 }

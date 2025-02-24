@@ -19,15 +19,4 @@ Ref<Texture> Texture::Create(uint32_t width, uint32_t height,
 	return nullptr;
 }
 
-Ref<Texture> Texture::Create(const std::string& path) {
-	RendererAPI::Backend backend = RendererAPI::Get()->GetBackend();
-
-	switch(backend) {
-		case RendererAPI::Backend::OpenGL:
-			return CreateRef<OpenGL::Texture2D>(path);
-	}
-
-	return nullptr;
-}
-
 }

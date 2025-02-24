@@ -12,7 +12,7 @@ class Application {
 public:
 	Application(uint32_t width = 800, uint32_t height = 600,
 				const std::string& title = "Application",
-				const std::string& iconPath = "");
+				const Buffer<uint8_t>& icon = { });
 	virtual ~Application() = default;
 
 	static void Close();

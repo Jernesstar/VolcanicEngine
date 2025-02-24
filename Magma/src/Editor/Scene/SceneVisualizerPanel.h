@@ -37,7 +37,7 @@ private:
 	bool Hovered = false;
 
 	DrawCommand* FirstCommand;
-	Map<Ref<Model>, DrawCommand*> Objects;
+	Map<Ref<Mesh>, DrawCommand*> Objects;
 
 	// Lighting and shadows
 	Ref<RenderPass> DepthPass;

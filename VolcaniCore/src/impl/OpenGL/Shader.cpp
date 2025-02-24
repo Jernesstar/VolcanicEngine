@@ -35,7 +35,7 @@ void ShaderProgram::Unbind() const {
 void ShaderProgram::AddShader(const ShaderFile& shader) {
 	uint32_t shaderID = CreateShader(shader);
 	glAttachShader(m_ProgramID, shaderID);
-	m_ShaderIDs.push_back(shaderID);
+	m_ShaderIDs.Add(shaderID);
 }
 
 void ShaderProgram::Compile() {

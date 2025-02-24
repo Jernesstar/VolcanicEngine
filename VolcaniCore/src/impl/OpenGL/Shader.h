@@ -21,9 +21,6 @@ public:
 	ShaderProgram(const std::vector<ShaderFile>& shaders);
 	~ShaderProgram();
 
-	void AddShader(const ShaderFile& shader) override;
-	void Compile() override;
-
 	void SetInt(const std::string& name, int32_t _int) override;
 	void SetFloat(const std::string& name, float _float) override;
 
@@ -42,8 +39,11 @@ public:
 
 private:
 	uint32_t m_ProgramID;
+	List<uint32_t> m_ShaderIDs;
 
-	std::vector<uint32_t> m_ShaderIDs;
+private:
+	void AddShader(const ShaderFile& shader);
+	void Compile();
 };
 
 }

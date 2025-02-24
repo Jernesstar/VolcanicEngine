@@ -7,6 +7,8 @@
 #include <Magma/Core/BinaryWriter.h>
 #include <Magma/Core/BinaryReader.h>
 
+#include "AssetImporter.h"
+
 namespace Magma {
 
 EditorAssetManager::EditorAssetManager() {
@@ -22,11 +24,11 @@ void EditorAssetManager::Load(Asset asset) {
 	m_AssetRegistry[asset] = true;
 
 	if(asset.Type == AssetType::Mesh)
-		m_MeshAssets[asset.ID] = Model::Create(path);
+		m_MeshAssets[asset.ID] = AssetImporter::GetMesh(path);
 	else if(asset.Type == AssetType::Texture)
-		m_TextureAssets[asset.ID] = Texture::Create(path);
+		m_TextureAssets[asset.ID] = AssetImporter::GetTexture(path);
 	else if(asset.Type == AssetType::Cubemap)
-		m_CubemapAssets[asset.ID] = Cubemap::Create(path);
+		m_CubemapAssets[asset.ID] = AssetImporter::GetCubemap(path);
 }
 
 void EditorAssetManager::Unload(Asset asset) {
@@ -46,8 +48,7 @@ Asset EditorAssetManager::Add(MeshPrimitive primitive) {
 	m_AssetRegistry[newAsset] = true;
 
 	m_Primitives[newAsset.ID] = primitive;
-	m_MeshAssets[newAsset.ID] = Model::Create("");
-	m_MeshAssets[newAsset.ID]->AddMesh(Mesh::Create(primitive));
+	m_MeshAssets[newAsset.ID] = Mesh::Create(primitive);
 
 	return newAsset;
 }
@@ -57,14 +58,14 @@ Asset EditorAssetManager::Add(const std::string& path, AssetType type) {
 	m_AssetRegistry[newAsset] = true;
 
 	m_Paths[newAsset.ID] = path;
-	m_MeshAssets[newAsset.ID] = Model::Create(path);
+	m_MeshAssets[newAsset.ID] = AssetImporter::GetMesh(path);
 
 	if(type == AssetType::Mesh)
-		m_MeshAssets[newAsset.ID] = Model::Create(path);
+		m_MeshAssets[newAsset.ID] = AssetImporter::GetMesh(path);
 	else if(type == AssetType::Texture)
-		m_TextureAssets[newAsset.ID] = Texture::Create(path);
+		m_TextureAssets[newAsset.ID] = AssetImporter::GetTexture(path);
 	else if(type == AssetType::Cubemap)
-		m_CubemapAssets[newAsset.ID] = Cubemap::Create(path);
+		m_CubemapAssets[newAsset.ID] = AssetImporter::GetCubemap(path);
 
 	return newAsset;
 }
@@ -107,7 +108,7 @@ void EditorAssetManager::Load(const std::string& path) {
 		if(meshNode["Path"]) {
 			m_AssetRegistry[newAsset] = false;
 			m_Paths[id] = meshNode["Path"].as<std::string>();
-			m_MeshAssets[id] = Model::Create(m_Paths[id]);
+			m_MeshAssets[id] = AssetImporter::GetMesh(m_Paths[id]);
 		}
 		else {
 			m_AssetRegistry[newAsset] = false;
@@ -118,15 +119,15 @@ void EditorAssetManager::Load(const std::string& path) {
 			Material mat;
 			if(materialNode["Diffuse"])
 				mat.Diffuse =
-					Texture::Create(
+					AssetImporter::GetTexture(
 						materialNode["Diffuse"]["Path"].as<std::string>());
 			if(materialNode["Specular"])
 				mat.Specular =
-					Texture::Create(
+					AssetImporter::GetTexture(
 						materialNode["Specular"]["Path"].as<std::string>());
 			if(materialNode["Emissive"])
 				mat.Emissive =
-					Texture::Create(
+					AssetImporter::GetTexture(
 						materialNode["Emissive"]["Path"].as<std::string>());
 
 			mat.DiffuseColor = materialNode["DiffuseColor"].as<glm::vec4>();
@@ -134,8 +135,7 @@ void EditorAssetManager::Load(const std::string& path) {
 			mat.EmissiveColor = materialNode["EmissiveColor"].as<glm::vec4>();
 
 			m_Primitives[id] = type;
-			m_MeshAssets[id] = Model::Create("");
-			m_MeshAssets[id]->AddMesh(Mesh::Create(type, mat));
+			m_MeshAssets[id] = Mesh::Create(type, mat);
 		}
 	}
 }
@@ -150,38 +150,39 @@ void EditorAssetManager::Save() {
 	serializer.WriteKey("AssetPack").BeginMapping();
 
 	serializer.WriteKey("MeshAssets").BeginSequence();
-	for(auto& [id, model] : m_MeshAssets) {
+	for(auto& [id, mesh] : m_MeshAssets) {
 		serializer.BeginMapping();
 		serializer.WriteKey("Mesh").BeginMapping();
 		serializer.WriteKey("ID").Write((uint64_t)id);
 
-		if(model->Path != "")
-			serializer.WriteKey("Path").Write(model->Path);
+		std::string path = GetPath(id);
+		if(path != "")
+			serializer.WriteKey("Path").Write(path);
 		else {
-			auto mesh = model->GetMesh(0);
+			auto subMesh = mesh->SubMeshes[0];
 			serializer.WriteKey("PrimitiveType")
 				.Write((uint32_t)m_Primitives[id]);
 
 			serializer.WriteKey("Material")
 			.BeginMapping();
 
-			auto& mat = mesh->GetMaterial();
+			auto& mat = subMesh.Material;
 			if(mat.Diffuse)
 				serializer.WriteKey("Diffuse")
 				.BeginMapping()
-					.WriteKey("Path").Write(mat.Diffuse->GetPath())
+					.WriteKey("Path").Write(GetPath(Find(mat.Diffuse).ID))
 				.EndMapping();
 
 			if(mat.Specular)
 				serializer.WriteKey("Specular")
 				.BeginMapping()
-					.WriteKey("Path").Write(mat.Specular->GetPath())
+					.WriteKey("Path").Write(GetPath(Find(mat.Specular).ID))
 				.EndMapping();
 
 			if(mat.Emissive)
 				serializer.WriteKey("Emissive")
 				.BeginMapping()
-					.WriteKey("Path").Write(mat.Emissive->GetPath())
+					.WriteKey("Path").Write(GetPath(Find(mat.Emissive).ID))
 				.EndMapping();
 
 			serializer
@@ -207,15 +208,15 @@ void EditorAssetManager::Save() {
 	serializer.EndSequence();
 
 	serializer.WriteKey("Cubemap").BeginSequence();
-	for(auto& [id, texture] : m_Cubemap) {
+	for(auto& [id, texture] : m_CubemapAssets) {
 		// serializer.WriteKey("Path").Write(texture->GetPath());
 	}
 	serializer.EndSequence();
 
 	serializer.WriteKey("SoundAssets").BeginSequence();
-	for(auto& [id, texture] : m_SoundAssets) {
-		// serializer.WriteKey("Path").Write(texture->GetPath());
-	}
+	// for(auto& [id, texture] : m_SoundAssets) {
+	// 	// serializer.WriteKey("Path").Write(texture->GetPath());
+	// }
 	serializer.EndSequence();
 
 	serializer.EndMapping(); // AssetPack

@@ -33,10 +33,9 @@ EditorApp::EditorApp(const CommandLineArgs& args)
 
 	Application::PushDir();
 
-	ShaderLibrary::Add("Mesh",
-		ShaderPipeline::Create("VolcaniCore/assets/shaders/", "Mesh"));
 	ShaderLibrary::Add("Framebuffer",
-		ShaderPipeline::Create("VolcaniCore/assets/shaders/", "Framebuffer"));
+		ShaderPipeline::Create("Magma/assets/shaders/", "Framebuffer"));
+
 	float fontSize = 18.0f;
 
 	ImGuiIO& io = ImGui::GetIO();

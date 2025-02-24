@@ -7,8 +7,7 @@ namespace VolcaniCore::OpenGL {
 
 class Cubemap : public VolcaniCore::Cubemap {
 public:
-	Cubemap(const std::string& cubemap_folder);
-	Cubemap(const std::vector<std::string>& faces);
+	Cubemap(const List<Buffer<uint8_t>>& faces);
 
 	void Bind() const;
 

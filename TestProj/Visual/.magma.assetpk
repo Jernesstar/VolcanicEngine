@@ -9,3 +9,7 @@ AssetPack:
           EmissiveColor: [0, 0, 0, 0]
   TextureAssets:
     []
+  Cubemap:
+    []
+  SoundAssets:
+    []

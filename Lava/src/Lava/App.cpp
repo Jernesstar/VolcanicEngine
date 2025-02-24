@@ -173,6 +173,10 @@ void App::PopScreen() {
 
 }
 
+Ref<ScriptClass> App::GetScriptClass(const std::string& name) {
+
+}
+
 RuntimeSceneRenderer::RuntimeSceneRenderer() {
 
 }

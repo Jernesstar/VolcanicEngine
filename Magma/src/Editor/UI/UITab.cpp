@@ -8,8 +8,6 @@
 #include <VolcaniCore/Core/Application.h>
 #include <VolcaniCore/Core/FileUtils.h>
 
-#include "Editor/UILoader.h"
-
 #include "UIHierarchyPanel.h"
 #include "UIVisualizerPanel.h"
 #include "UIElementEditorPanel.h"
@@ -29,7 +27,9 @@ struct {
 	} edit;
 } static menu;
 
-// static Theme s_Theme;
+static Theme s_Theme;
+
+Theme& UITab::GetTheme() { return s_Theme; }
 
 UITab::UITab()
 	: Tab(TabType::UI), m_Root("")
@@ -125,13 +125,7 @@ void UITab::Load(const std::string& path) {
 	m_UIPath = path;
 	m_Root.Clear();
 
-	auto themePath = fs::path(path).parent_path() / "theme.magma.ui.json";
-	if(fs::exists(themePath)) {
-		// s_Theme = UILoader::LoadTheme(themePath.string());
-		// m_Root.SetTheme(s_Theme);
-	}
-
-	UILoader::EditorLoad(m_Root, path);
+	UILoader::EditorLoad(m_Root, path, s_Theme);
 	m_Name = "UI: " + m_Root.Name;
 }
 

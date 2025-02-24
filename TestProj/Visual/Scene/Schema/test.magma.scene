@@ -5,6 +5,8 @@ Scene:
         Name: MainCamera
         ID: 547
         Components:
+          TagComponent:
+            Tag: Empty Tag
           CameraComponent:
             Camera:
               Type: Stereographic
@@ -15,8 +17,6 @@ Scene:
               ViewportHeight: 600
               Near: 0.00100000005
               Far: 1000
-          TagComponent:
-            Tag: Empty Tag
     - Entity:
         Name: ""
         ID: 548
@@ -29,9 +29,7 @@ Scene:
               Rotation: [0, 0, 0]
               Scale: [1, 1, 1]
           MeshComponent:
-            Asset:
-              ID: 10036008063945961451
-              Type: 0
+            AssetID: 10036008063945961451
     - Entity:
         Name: ""
         ID: 549
@@ -44,6 +42,4 @@ Scene:
               Rotation: [0, 0, 0]
               Scale: [1, 1, 1]
           MeshComponent:
-            Asset:
-              ID: 10036008063945961451
-              Type: 0
+            AssetID: 10036008063945961451

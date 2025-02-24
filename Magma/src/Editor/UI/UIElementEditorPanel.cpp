@@ -109,8 +109,8 @@ void EditElement<Button>(UIElement* element) {
 		ImGui::Text("Text: %s", display->As<Text>()->Content.c_str());
 	ImGui::Button("Set Text");
 
-	if(display->Is(UIElementType::Image))
-		ImGui::Text("Image: %s", display->As<Image>()->Content->GetPath().c_str());
+	// if(display->Is(UIElementType::Image))
+	// 	ImGui::Text("Image: %s", display->As<Image>()->Content->GetPath().c_str());
 	ImGui::Button("Set Image");
 	// ImGui::InputText("Button Text", &display->As<Text>()->Content);
 }

@@ -16,13 +16,12 @@ public:
 								  Sampling sampling = Sampling::Linear);
 
 public:
-	Texture2D(const std::string& path);
 	Texture2D(uint32_t id, uint32_t width, uint32_t height);
 	Texture2D(uint32_t width, uint32_t height, Format format, Sampling sampling);
 	~Texture2D();
 
 	void Bind(uint32_t slot = 0);
-	void SetData(const void* data);
+	void SetData(const void* data) override;
 	void SetData(const glm::ivec2& pos, const glm::ivec2& size,
 				 const void* data);
 

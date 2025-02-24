@@ -4,8 +4,8 @@ project "assimp"
     cppdialect "C++11"
     staticruntime "Off"
 
-    objdir ("%{RootPath}/build/VolcaniCore/obj")
-    targetdir ("%{RootPath}/build/VolcaniCore/lib")
+    objdir ("%{RootPath}/build/Magma/obj")
+    targetdir ("%{RootPath}/build/Magma/lib")
 
     files {
         -- "%{VendorPaths.assimp}/code/CApi/*.cpp",

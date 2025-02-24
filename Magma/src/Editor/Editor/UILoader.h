@@ -28,10 +28,11 @@ struct ThemeElement {
 };
 
 using Theme = Map<UIElementType, ThemeElement>;
-	
+
 class UILoader {
 public:
-	static void EditorLoad(UIPage& page, const std::string& path);
+	static void EditorLoad(UIPage& page, const std::string& path,
+							const Theme& theme);
 	static void EditorSave(const UIPage& page, const std::string& path);
 	static Map<UIElementType, ThemeElement> LoadTheme(const std::string& path);
 

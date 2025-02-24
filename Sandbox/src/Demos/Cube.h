@@ -97,9 +97,9 @@ Cube::Cube()
 	cube = Mesh::Create(MeshPrimitive::Cube,
 		Material
 		{
-			.Diffuse = Texture::Create("Sandbox/assets/images/wood.png"),
+			.Diffuse = AssetImporter::GetTexture("Sandbox/assets/images/wood.png"),
 		});
-	torch = Mesh::Create("Sandbox/assets/models/mc-torch/Torch.obj");
+	torch = AssetImporter::GetMesh("Sandbox/assets/models/mc-torch/Torch.obj");
 
 	camera = CreateRef<IsometricCamera>();
 	controller =

@@ -3,8 +3,6 @@
 #include <filesystem>
 #include <fstream>
 
-#include <stb_image/stb_image.h>
-
 #include "Core/Assert.h"
 
 namespace fs = std::filesystem;
@@ -80,35 +78,6 @@ std::vector<std::string> FileUtils::GetFiles(
 					files.push_back(p.path().string());
 
 	return files;
-}
-
-unsigned char* FileUtils::ReadImage(const std::string& path,
-	int& width, int& height, int& bitsPerPixel, int desiredChannels, bool flip)
-{
-	stbi_set_flip_vertically_on_load((int)flip);
-	unsigned char* pixelData =
-		stbi_load(path.c_str(), &width, &height, &bitsPerPixel, desiredChannels);
-
-	VOLCANICORE_ASSERT_ARGS(pixelData, "Could not load image from path '%s'",
-										path.c_str());
-
-	return pixelData;
-}
-
-unsigned char* FileUtils::ReadImage(const std::string& path,
-	int& width, int& height, int desiredChannels, bool flip)
-{
-	int bitsPerPixel;
-	return FileUtils::ReadImage(path, width, height, bitsPerPixel,
-								desiredChannels, flip);
-}
-
-unsigned char* FileUtils::ReadImage(const std::string& path,
-	int desiredChannels, bool flip)
-{
-	int width, height, bitsPerPixel;
-	return FileUtils::ReadImage(path, width, height, bitsPerPixel,
-								desiredChannels, flip);
 }
 
 }

@@ -214,7 +214,7 @@ ImRect UIHierarchyPanel::Traverse(UIElement* element) {
 		return nodeRect;
 
 	ImColor TreeLineColor = ImGui::GetColorU32(ImGuiCol_Text);
-	float SmallOffsetX = -8.5f; // TODO: Take tree indent into account
+	float SmallOffsetX = -8.5f; // Should take tree indent into account
 	ImVec2 verticalLineStart = ImGui::GetCursorScreenPos();
 	verticalLineStart.x += SmallOffsetX; // Line up with the arrow
 	ImVec2 verticalLineEnd = verticalLineStart;

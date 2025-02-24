@@ -15,6 +15,7 @@ public:
 	std::string ExportPath;
 	std::string Name;
 	std::string App;
+	std::string IconPath;
 	std::string StartScreen;
 	List<Screen> Screens;
 

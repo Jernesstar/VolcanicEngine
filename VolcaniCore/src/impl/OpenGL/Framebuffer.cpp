@@ -1,6 +1,6 @@
 #include "Framebuffer.h"
 
-#ifdef VOLCANICENGINE_WINDOWS
+#if defined(VOLCANICENGINE_WINDOWS) && defined(MSVC)
 #define NOMINMAX
 #endif
 #include <algorithm>
@@ -84,9 +84,9 @@ Framebuffer::Framebuffer(const Map<AttachmentTarget, List<Attachment>>& map)
 
 	CreateDepthAttachment();
 
-	// // TODO(Fix): Don't create if already have Depth-Stencil buffer
-	// if(Has(AttachmentTarget::Stencil))
-	// 	CreateStencilAttachment();
+	// TODO(Fix): Don't create if already have Depth-Stencil buffer
+	if(Has(AttachmentTarget::Stencil))
+		CreateStencilAttachment();
 
 	if(!Has(AttachmentTarget::Color)) {
 		glDrawBuffer(GL_NONE);

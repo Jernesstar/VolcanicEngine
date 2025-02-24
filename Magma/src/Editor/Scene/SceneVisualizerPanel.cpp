@@ -216,7 +216,7 @@ EditorSceneRenderer::EditorSceneRenderer() {
 	Ref<ShaderPipeline> shader;
 	Ref<Framebuffer> buffer;
 
-	shader = ShaderPipeline::Create("VolcaniCore/assets/shaders", "Mesh");
+	shader = ShaderPipeline::Create("Magma/assets/shaders", "Mesh");
 	// buffer = Framebuffer::Create(window->GetWidth(), window->GetHeight());
 	LightingPass = RenderPass::Create("Lighting", shader, m_Output);
 	LightingPass->SetData(Renderer3D::GetMeshBuffer());
@@ -317,7 +317,7 @@ void EditorSceneRenderer::SubmitMesh(Entity entity) {
 		Application::As<EditorApp>()->GetEditor().GetAssetManager();
 	auto& tc = entity.Get<TransformComponent>();
 	auto& mc = entity.Get<MeshComponent>();
-	auto mesh = assetManager.Get<Model>(mc.MeshAsset);
+	auto mesh = assetManager.Get<Mesh>(mc.MeshAsset);
 	if(!mesh)
 		return;
 
@@ -330,7 +330,7 @@ void EditorSceneRenderer::SubmitMesh(Entity entity) {
 
 	auto* command = Objects[mesh];
 
-	Renderer3D::DrawModel(mesh, tc, command);
+	Renderer3D::DrawMesh(mesh, tc, command);
 }
 
 void EditorSceneRenderer::Render() {
@@ -353,7 +353,7 @@ void EditorSceneRenderer::Render() {
 			Application::As<EditorApp>()->GetEditor().GetAssetManager();
 		auto& tc = Selected.Get<TransformComponent>();
 		auto& mc = Selected.Get<MeshComponent>();
-		auto mesh = assetManager.Get<Model>(mc.MeshAsset);
+		auto mesh = assetManager.Get<Mesh>(mc.MeshAsset);
 
 		DrawCommand* command;
 
@@ -365,7 +365,7 @@ void EditorSceneRenderer::Render() {
 		command->UniformData
 		.SetInput("u_Color", glm::vec4(1.0f));
 
-		Renderer3D::DrawModel(mesh, tc, command);
+		Renderer3D::DrawMesh(mesh, tc, command);
 
 		auto width = (float)Application::GetWindow()->GetWidth();
 		auto height = (float)Application::GetWindow()->GetHeight();
@@ -384,7 +384,7 @@ void EditorSceneRenderer::Render() {
 		Renderer::EndPass();
 
 		command = RendererAPI::Get()->NewDrawCommand(LightingPass->Get());
-		Renderer3D::DrawModel(mesh, tc, command);
+		Renderer3D::DrawMesh(mesh, tc, command);
 	}
 
 	Renderer3D::End();

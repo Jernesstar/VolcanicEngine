@@ -18,7 +18,7 @@
 
 #include <VolcaniCore/Graphics/Shader.h>
 #include <VolcaniCore/Graphics/Mesh.h>
-#include <VolcaniCore/Graphics/Model.h>
+#include <VolcaniCore/Graphics/Mesh.h>
 #include <VolcaniCore/Graphics/Texture.h>
 
 #include <imgui/imgui.h>
@@ -43,6 +43,8 @@ using namespace Magma::UI;
 using namespace Magma::ECS;
 using namespace Magma::Physics;
 
+#include "AssetImporter.h"
+
 #include "Demos/Cube.h"
 #include "Demos/Lighting.h"
 #include "Demos/Shadows.h"
@@ -62,10 +64,8 @@ Application* CreateApplication(const CommandLineArgs& args) {
 	std::string project = args["--project"];
 
 	Application::PushDir();
-	ShaderLibrary::Add("Mesh",
-		ShaderPipeline::Create("VolcaniCore/assets/shaders/", "Mesh"));
 	ShaderLibrary::Add("Framebuffer",
-		ShaderPipeline::Create("VolcaniCore/assets/shaders/", "Framebuffer"));
+		ShaderPipeline::Create("Magma/assets/shaders/", "Framebuffer"));
 	Application::PopDir();
 
 	// Isometric Camera, smooth scroll pixels, instancing

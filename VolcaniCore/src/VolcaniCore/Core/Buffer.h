@@ -46,6 +46,8 @@ public:
 			Delete();
 	}
 
+	operator bool() const { return m_Data && m_Count; }
+
 	Buffer& operator =(const Buffer& other) = delete;
 
 	Buffer& operator =(Buffer&& other) {
@@ -140,9 +142,6 @@ private:
 	T* m_Data = nullptr;
 	uint64_t m_MaxCount = 0;
 	uint64_t m_Count = 0;
-
-	// TODO(Implement): Reference counting
-	uint64_t m_RefCount = 0;
 };
 
 template<>
@@ -186,6 +185,8 @@ public:
 		if(m_MaxCount != 0) // We do in fact own this pointer
 			Delete();
 	}
+
+	operator bool() const { return m_Data && m_Count; }
 
 	Buffer& operator =(const Buffer& other) = delete;
 
@@ -261,9 +262,6 @@ private:
 	uint64_t m_SizeT = 0;
 	uint64_t m_MaxCount = 0;
 	uint64_t m_Count = 0;
-
-	// TODO(Implement): Reference counting
-	uint64_t m_RefCount = 0;
 };
 
 }

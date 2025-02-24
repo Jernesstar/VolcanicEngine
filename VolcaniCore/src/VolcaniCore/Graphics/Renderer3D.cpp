@@ -11,7 +11,7 @@ namespace VolcaniCore {
 
 static DrawBuffer* s_CubemapBuffer;
 static DrawBuffer* s_MeshBuffer;
-static Map<Ref<Mesh>, DrawCommand*> s_Meshes;
+static Map<SubMesh*, DrawCommand*> s_Meshes;
 static uint64_t s_InstancesIndex = 0;
 
 void Renderer3D::Init() {
@@ -156,19 +156,17 @@ void Renderer3D::DrawSkybox(Ref<Cubemap> cubemap) {
 	// .SetInput("u_Skybox", TextureSlot{ cubemap, 0 });
 }
 
-void Renderer3D::DrawMesh(Ref<Mesh> mesh, const glm::mat4& tr, DrawCommand* cmd)
+static void DrawSubMesh(SubMesh& mesh, const glm::mat4& tr,
+						DrawCommand* cmd)
 {
-	if(!mesh)
-		return;
-
 	DrawCommand* command;
 
 	if(cmd)
 		command = cmd;
-	else if(s_Meshes.count(mesh))
-		command = s_Meshes[mesh];
+	else if(s_Meshes.count(&mesh))
+		command = s_Meshes[&mesh];
 	else {
-		s_Meshes[mesh] = command = Renderer::NewCommand();
+		s_Meshes[&mesh] = command = Renderer::NewCommand();
 	}
 
 	if(!command->VerticesCount) {
@@ -178,7 +176,7 @@ void Renderer3D::DrawMesh(Ref<Mesh> mesh, const glm::mat4& tr, DrawCommand* cmd)
 		}
 
 		if(!command->UniformData) {
-			Material& mat = mesh->GetMaterial();
+			Material& mat = mesh.Material;
 			if(mat.Diffuse) {
 				command->UniformData
 				.SetInput("u_Material.Diffuse", TextureSlot{ mat.Diffuse, 0 });
@@ -198,8 +196,8 @@ void Renderer3D::DrawMesh(Ref<Mesh> mesh, const glm::mat4& tr, DrawCommand* cmd)
 			.SetInput("u_Material.SpecularColor", mat.DiffuseColor);
 		}
 
-		command->AddIndices(mesh->GetIndices().Get());
-		command->AddVertices(mesh->GetVertices().Get());
+		command->AddIndices(mesh.Indices.Get());
+		command->AddVertices(mesh.Vertices.Get());
 	}
 
 	if(!command->Calls || command->Calls[-1].InstanceCount >= 10'000) {
@@ -217,11 +215,11 @@ void Renderer3D::DrawMesh(Ref<Mesh> mesh, const glm::mat4& tr, DrawCommand* cmd)
 					1, call.InstanceStart + call.InstanceCount++);
 }
 
-void Renderer3D::DrawModel(Ref<Model> model, const glm::mat4& tr,
-						   DrawCommand* command)
+void Renderer3D::DrawMesh(Ref<Mesh> mesh, const glm::mat4& tr,
+						  DrawCommand* command)
 {
-	for(auto& mesh : *model)
-		DrawMesh(mesh, tr, command);
+	for(auto& subMesh : *mesh)
+		DrawSubMesh(subMesh, tr, command);
 }
 
 void Renderer3D::DrawQuad(Ref<Quad> quad, const glm::mat4& tr,

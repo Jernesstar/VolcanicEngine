@@ -5,6 +5,8 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
+#include "Buffer.h"
+
 namespace VolcaniCore {
 
 class Window {
@@ -15,7 +17,7 @@ public:
 	void Update() { glfwSwapBuffers(m_NativeWindow); }
 
 	void Resize(uint32_t width, uint32_t height);
-	void SetIcon(const std::string& path);
+	void SetIcon(const Buffer<uint8_t>& imageData);
 	void SetTitle(const std::string& title);
 
 	uint32_t GetWidth() const { return m_Width; }

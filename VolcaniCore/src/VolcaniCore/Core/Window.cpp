@@ -42,16 +42,15 @@ void Window::Resize(uint32_t width, uint32_t height) {
 	glfwSetWindowSize(m_NativeWindow, width, height);
 }
 
-void Window::SetIcon(const std::string& path) {
-	if(path == "" || path.find_first_not_of(" ") == std::string::npos) {
+void Window::SetIcon(const Buffer<uint8_t>& imageData) {
+	if(!imageData) {
 		glfwSetWindowIcon(m_NativeWindow, 0, nullptr);
 		return;
 	}
 
 	GLFWimage icon;
-	icon.pixels = FileUtils::ReadImage(path, icon.width, icon.height);
+	icon.pixels = imageData.Get();
 	glfwSetWindowIcon(m_NativeWindow, 1, &icon);
-	free(icon.pixels);
 }
 
 void Window::SetTitle(const std::string& title) {

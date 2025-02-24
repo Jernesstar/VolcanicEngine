@@ -44,7 +44,9 @@ public:
 
 		return m_Panels[idx];
 	}
+
 	EditorAssetManager& GetAssetManager() { return m_AssetManager; }
+	Ref<Lava::App> GetApp() { return m_App; }
 
 private:
 	Project m_Project;

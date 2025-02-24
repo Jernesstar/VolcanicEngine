@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Core/Defines.h"
+#include "Core/Template.h"
 #include "Core/List.h"
 
 #include <Graphics/Texture.h>
@@ -9,7 +10,7 @@ namespace VolcaniCore {
 
 enum class AttachmentTarget { Color, Depth, Stencil };
 
-class Framebuffer {
+class Framebuffer : public Derivable<Framebuffer> {
 public:
 	static Ref<Framebuffer> Create(uint32_t width, uint32_t height);
 	static Ref<Framebuffer> Create(
@@ -28,10 +29,6 @@ public:
 
 	uint32_t GetWidth() const { return m_Width; }
 	uint32_t GetHeight() const { return m_Height; }
-
-	template<typename TDerived>
-	requires std::derived_from<TDerived, Framebuffer>
-	TDerived* As() const { return (TDerived*)(this); }
 
 protected:
 	uint32_t m_Width, m_Height;

@@ -3,8 +3,8 @@ project "freetype"
     language "C"
     staticruntime "On"
 
-    objdir ("%{RootPath}/build/VolcaniCore/obj")
-    targetdir ("%{RootPath}/build/VolcaniCore/lib")
+    objdir ("%{RootPath}/build/Magma/obj")
+    targetdir ("%{RootPath}/build/Magma/lib")
 
     files {
         "%{VendorPaths.freetype}/src/base/ftinit.c",

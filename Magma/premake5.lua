@@ -22,16 +22,17 @@ project "Magma"
         "%{RootPath}/Magma/src",
         "%{RootPath}/Magma/src/Magma",
 
-        "%{Includes.imgui}/imgui",
-        "%{Includes.yaml_cpp}",
-        "%{Includes.ImGuiFileDialog}",
-        "%{Includes.flecs}",
-        "%{Includes.rapidjson}",
-        "%{Includes.PhysX}",
-
         "%{Includes.glm}",
         "%{Includes.glad}",
         "%{Includes.glfw}",
+
+        "%{Includes.yaml_cpp}",
+        "%{Includes.rapidjson}",
+
+        "%{Includes.imgui}/imgui",
+        "%{Includes.flecs}",
+        "%{Includes.PhysX}",
+
         "%{Includes.imgui}",
         "%{Includes.angelscript}",
         "%{VendorPaths.angelscript}",
@@ -41,11 +42,12 @@ project "Magma"
     links {
         "VolcaniCore",
 
+        "yaml_cpp",
+        -- "rapidjson",
+
         "imgui",
-        -- "yaml-cpp",
         "ImGuiFileDialog",
         "flecs",
-        -- "rapidjson",
         "angelscript",
         "soloud"
     }
@@ -65,10 +67,7 @@ project "Magma"
 
 
 include "Magma/.builddeps/imgui"
-include "Magma/.builddeps/yaml-cpp"
-include "Magma/.builddeps/ImGuiFileDialog"
 include "Magma/.builddeps/flecs"
-include "Magma/.builddeps/rapidjson"
 include "Magma/.builddeps/angelscript"
 include "Magma/.builddeps/PhysX"
 include "Magma/.builddeps/soloud"
@@ -102,16 +101,24 @@ project "Editor"
 
         "%{RootPath}/Lava/src",
 
+        "%{Includes.glm}",
+        "%{Includes.glad}",
+        "%{Includes.glfw}",
+
+        "%{Includes.assimp}",
+        "%{Includes.stb_image}",
+        "%{Includes.freetype}",
+
         "%{Includes.imgui}/imgui",
         "%{Includes.yaml_cpp}",
-        "%{Includes.ImGuiFileDialog}",
+        "%{Includes.rapidjson}",
+
         "%{Includes.flecs}",
         "%{Includes.rapidjson}",
         "%{Includes.PhysX}",
 
-        "%{Includes.glm}",
-        "%{Includes.glad}",
-        "%{Includes.glfw}",
+        "%{Includes.ImGuiFileDialog}",
+
         "%{Includes.imgui}",
         "%{Includes.angelscript}",
         "%{VendorPaths.angelscript}",
@@ -125,15 +132,16 @@ project "Editor"
 
         "glfw",
         "glad",
+
         "assimp",
         "freetype",
         "stb_image",
 
+        "ImGuiFileDialog",
         "imgui",
         "yaml-cpp",
-        "ImGuiFileDialog",
-        "flecs",
         -- "rapidjson",
+        "flecs",
         "angelscript",
         "soloud"
     }
@@ -164,3 +172,10 @@ project "Editor"
             "-Wno-format-security",
             "-Wno-pointer-arith"
         }
+
+include "Magma/.builddeps/ImGuiFileDialog"
+include "Magma/.builddeps/assimp"
+include "Magma/.builddeps/rapidjson"
+include "Magma/.builddeps/yaml-cpp"
+include "Magma/.builddeps/freetype"
+include "Magma/.builddeps/stb_image"

@@ -1,29 +1,14 @@
 #include "Mesh.h"
 
-#include "Graphics/RendererAPI.h"
-
-#include "Model.h"
-
 namespace VolcaniCore {
-
-Mesh::Mesh(const std::string& path)
-	: Path(path)
-{
-	Ref<Mesh> mesh = Model::Create(path)->GetMesh(0);
-	this->m_Vertices = mesh->GetVertices();
-	this->m_Indices  = mesh->GetIndices();
-	this->m_Material = mesh->GetMaterial();
-}
-
-Ref<Mesh> Mesh::Create(const std::string& path) {
-	return CreateRef<Mesh>(path);
-}
 
 Ref<Mesh> Mesh::Create(const List<Vertex>& vertices,
 						const List<uint32_t>& indices,
 						const Material& material)
 {
-	return CreateRef<Mesh>(vertices, indices, material);
+	auto mesh = CreateRef<Mesh>();
+	mesh->SubMeshes.Add({ vertices, indices, material });
+	return mesh;
 }
 
 Ref<Mesh> Mesh::Create(MeshPrimitive primitive, const Material& material) {

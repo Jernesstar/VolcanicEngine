@@ -2,8 +2,8 @@ project "stb_image"
     kind "StaticLib"
     language "C"
 
-    objdir ("%{RootPath}/build/VolcaniCore/obj")
-    targetdir ("%{RootPath}/build/VolcaniCore/lib")
+    objdir ("%{RootPath}/build/Magma/obj")
+    targetdir ("%{RootPath}/build/Magma/lib")
 
     files {
         "%{VendorPaths.stb_image}/include/stb_image/stb_image.h",

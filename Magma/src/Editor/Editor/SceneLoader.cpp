@@ -14,7 +14,11 @@
 #include <Magma/Core/BinaryWriter.h>
 #include <Magma/Core/BinaryReader.h>
 
+#include <Magma/Script/ScriptClass.h>
+
 #include <Magma/Scene/Component.h>
+
+#include "EditorApp.h"
 
 using namespace Magma::ECS;
 using namespace Magma::Physics;
@@ -173,11 +177,11 @@ void SerializeEntity(YAMLSerializer& serializer, const Entity& entity) {
 		.EndMapping();
 	}
 	if(entity.Has<ScriptComponent>()) {
-		Ref<ScriptObject> obj = entity.Get<ScriptComponent>().Instance;
+		auto obj = entity.Get<ScriptComponent>().Instance;
 
 		serializer.WriteKey("ScriptComponent")
 		.BeginMapping()
-			.WriteKey("Class").Write(obj->GetClass()->Name);
+			.WriteKey("Class").Write(obj->GetClass()->Name)
 			.WriteKey("Instance").BeginMapping()
 				// TODO(Implement): Reflection
 			.EndMapping()
@@ -246,7 +250,6 @@ void SerializeEntity(YAMLSerializer& serializer, const Entity& entity) {
 				.WriteKey("Diffuse").Write(light.Diffuse)
 				.WriteKey("Specular").Write(light.Specular)
 				.WriteKey("Position").Write(light.Position)
-				.WriteKey("Direction").Write(light.Direction)
 				.WriteKey("Constant").Write(light.Constant)
 				.WriteKey("Linear").Write(light.Linear)
 				.WriteKey("Quadratic").Write(light.Quadratic)
@@ -370,7 +373,8 @@ void DeserializeEntity(YAML::Node entityNode, Scene& scene) {
 		auto classNode = scriptComponentNode["Class"];
 		std::string className = classNode.as<std::string>();
 		auto _class =
-			Application::As<EditorApp>()->GetEditor().GetScriptClass(className);
+			Application::As<EditorApp>()->GetEditor()
+			.GetApp()->GetScriptClass(className);
 		entity.Add<ScriptComponent>(_class->Instantiate(entity));
 	}
 
@@ -404,59 +408,47 @@ void DeserializeEntity(YAML::Node entityNode, Scene& scene) {
 	if(directionalLightComponentNode) {
 		auto lightNode = directionalLightComponentNode["Light"];
 		entity.Add<DirectionalLightComponent>(
-			DirectionalLightComponent
-			{
-				lightNode["Ambient"].as<glm::vec3>(),
-				lightNode["Diffuse"].as<glm::vec3>(),
-				lightNode["Specular"].as<glm::vec3>(),
-				lightNode["Position"].as<glm::vec3>(),
-				lightNode["Direction"].as<glm::vec3>(),
-			});
+			lightNode["Ambient"].as<glm::vec3>(),
+			lightNode["Diffuse"].as<glm::vec3>(),
+			lightNode["Specular"].as<glm::vec3>(),
+			lightNode["Position"].as<glm::vec3>(),
+			lightNode["Direction"].as<glm::vec3>());
 	}
 
 	auto pointLightComponentNode = components["PointLightComponent"];
 	if(pointLightComponentNode) {
 		auto lightNode = directionalLightComponentNode["Light"];
-		entity.Add<DirectionalLightComponent>(
-			DirectionalLightComponent
-			{
-				lightNode["Ambient"].as<glm::vec3>(),
-				lightNode["Diffuse"].as<glm::vec3>(),
-				lightNode["Specular"].as<glm::vec3>(),
-				lightNode["Position"].as<glm::vec3>(),
-				lightNode["Constant"].as<float>(),
-				lightNode["Linear"].as<float>(),
-				lightNode["Quadratic"].as<float>(),
-			});
+		entity.Add<PointLightComponent>(
+			lightNode["Ambient"].as<glm::vec3>(),
+			lightNode["Diffuse"].as<glm::vec3>(),
+			lightNode["Specular"].as<glm::vec3>(),
+			lightNode["Position"].as<glm::vec3>(),
+			lightNode["Constant"].as<float>(),
+			lightNode["Linear"].as<float>(),
+			lightNode["Quadratic"].as<float>());
 	}
 
 	auto spotlightComponentNode = components["SpotlightComponent"];
 	if(spotlightComponentNode) {
 		auto lightNode = spotlightComponentNode["Light"];
 		entity.Add<SpotlightComponent>(
-			SpotlightComponent
-			{
-				lightNode["Ambient"].as<glm::vec3>(),
-				lightNode["Diffuse"].as<glm::vec3>(),
-				lightNode["Specular"].as<glm::vec3>(),
-				lightNode["Position"].as<glm::vec3>(),
-				lightNode["Direction"].as<glm::vec3>(),
-				lightNode["CutoffAngle"].as<float>(),
-				lightNode["OuterCutoffAngle"].as<float>(),
-			});
+			lightNode["Ambient"].as<glm::vec3>(),
+			lightNode["Diffuse"].as<glm::vec3>(),
+			lightNode["Specular"].as<glm::vec3>(),
+			lightNode["Position"].as<glm::vec3>(),
+			lightNode["Direction"].as<glm::vec3>(),
+			lightNode["CutoffAngle"].as<float>(),
+			lightNode["OuterCutoffAngle"].as<float>());
 	}
 
 	auto particleSystemComponentNode = components["ParticleSystemComponent"];
 	if(particleSystemComponentNode) {
 		auto system = particleSystemComponentNode["System"];
 		entity.Add<ParticleSystemComponent>(
-			ParticleSystemComponent
-			{
-				system["Position"].as<glm::vec3>(),
-				system["MaxParticleCount"].as<uint64_t>(),
-				system["ParticleLifetime"].as<float>(),
-				Asset{ system["AssetID"].as<uint64_t>(), AssetType::Texture }
-			});
+			system["Position"].as<glm::vec3>(),
+			system["MaxParticleCount"].as<uint64_t>(),
+			system["ParticleLifetime"].as<float>(),
+			Asset{ system["AssetID"].as<uint64_t>(), AssetType::Texture });
 	}
 }
 
@@ -527,7 +519,7 @@ BinaryWriter& BinaryWriter::WriteObject(const SoundComponent& comp) {
 
 template<>
 BinaryWriter& BinaryWriter::WriteObject(const ScriptComponent& comp) {
-	Write(obj->GetClass()->Name);
+	Write(comp.Instance->GetClass()->Name);
 
 	return *this;
 }
@@ -559,7 +551,6 @@ BinaryWriter& BinaryWriter::WriteObject(const PointLightComponent& comp) {
 	Write(comp.Diffuse);
 	Write(comp.Specular);
 	Write(comp.Position);
-	Write(comp.Direction);
 	Write(comp.Constant);
 	Write(comp.Linear);
 	Write(comp.Quadratic);
@@ -582,10 +573,10 @@ BinaryWriter& BinaryWriter::WriteObject(const SpotlightComponent& comp) {
 
 template<>
 BinaryWriter& BinaryWriter::WriteObject(const ParticleSystemComponent& comp) {
-	Write(system.Position);
-	Write(system.MaxParticleCount);
-	Write(system.ParticleLifetime);
-	Write((uint64_t)system.ImageAsset.ID);
+	Write(comp.Position);
+	Write(comp.MaxParticleCount);
+	Write(comp.ParticleLifetime);
+	Write((uint64_t)comp.ImageAsset.ID);
 
 	return *this;
 }

@@ -5,13 +5,13 @@
 
 #include <VolcaniCore/Graphics/Texture.h>
 #include <VolcaniCore/Graphics/Cubemap.h>
-#include <VolcaniCore/Graphics/Model.h>
+#include <VolcaniCore/Graphics/Mesh.h>
 
 using namespace VolcaniCore;
 
 namespace Magma {
 
-enum class AssetType { Mesh, Texture, Cubemap, Font, Sound, None };
+enum class AssetType { Mesh, Texture, Cubemap, Font, Shader, Sound, None };
 
 struct Asset {
 	UUID ID = 0;
@@ -53,13 +53,13 @@ public:
 
 protected:
 	Map<Asset, bool> m_AssetRegistry;
-	Map<UUID, Ref<Model>> m_MeshAssets;
+	Map<UUID, Ref<Mesh>> m_MeshAssets;
 	Map<UUID, Ref<Texture>> m_TextureAssets;
 	Map<UUID, Ref<Cubemap>> m_CubemapAssets;
 	// Map<UUID, Ref<Sound>> m_SoundAssets;
 
 private:
-	Ref<Model> GetMesh(Asset asset) {
+	Ref<Mesh> GetMesh(Asset asset) {
 		if(!m_MeshAssets.count(asset.ID))
 			return nullptr;
 		return m_MeshAssets[asset.ID];
@@ -77,15 +77,9 @@ private:
 };
 
 template<> inline
-Ref<Model> AssetManager::Get(Asset asset) {
-	VOLCANICORE_ASSERT(asset.Type == AssetType::Mesh);
-	return GetMesh(asset);
-}
-
-template<> inline
 Ref<Mesh> AssetManager::Get(Asset asset) {
 	VOLCANICORE_ASSERT(asset.Type == AssetType::Mesh);
-	return GetMesh(asset)->GetMesh(0);
+	return GetMesh(asset);
 }
 
 template<> inline

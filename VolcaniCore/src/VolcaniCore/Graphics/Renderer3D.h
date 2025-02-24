@@ -10,7 +10,6 @@
 #include "Graphics/Line.h"
 #include "Graphics/Quad.h"
 #include "Graphics/Mesh.h"
-#include "Graphics/Model.h"
 #include "Graphics/Texture.h"
 #include "Graphics/Text.h"
 
@@ -34,14 +33,6 @@ public:
 						 DrawCommand* command = nullptr)
 	{
 		DrawMesh(mesh, t.GetTransform(), command);
-	}
-
-	static void DrawModel(Ref<Model> model, const glm::mat4& tr,
-						  DrawCommand* command = nullptr);
-	static void DrawModel(Ref<Model> model, const Transform& t = { },
-						  DrawCommand* command = nullptr)
-	{
-		DrawModel(model, t.GetTransform(), command);
 	}
 
 	static void DrawQuad(Ref<Quad> quad, const glm::mat4& tr,

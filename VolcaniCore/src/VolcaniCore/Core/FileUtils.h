@@ -37,17 +37,6 @@ public:
 	static std::vector<std::string> GetFiles(const std::string& dir);
 	static std::vector<std::string> GetFiles(
 		const std::string& dir, const std::vector<std::string>& ext);
-
-	static unsigned char* ReadImage(
-		const std::string& path, int& width, int& height,
-		int desiredChannels = 4, bool flip = 0);
-
-	static unsigned char* ReadImage(
-		const std::string& path, int& width, int& height, int& bitsPerPixel,
-		int desiredChannels = 4, bool flip = 0);
-
-	static unsigned char* ReadImage(
-		const std::string& path, int desiredChannels = 4, bool flip = 0);
 };
 
 }

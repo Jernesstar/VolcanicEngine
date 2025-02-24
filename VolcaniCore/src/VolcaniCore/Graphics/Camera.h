@@ -4,10 +4,11 @@
 #include <glm/mat4x4.hpp>
 
 #include <Core/Defines.h>
+#include <Core/Template.h>
 
 namespace VolcaniCore {
 
-class Camera {
+class Camera : public Derivable<Camera> {
 public:
 	enum class Type { Ortho, Stereo };
 
@@ -41,10 +42,6 @@ public:
 	uint32_t GetViewportHeight() const { return ViewportHeight; }
 	float GetNear() const { return Near; }
 	float GetFar()	const { return Far; }
-
-	template<typename TDerived>
-	requires std::derived_from<TDerived, Camera>
-	TDerived* As() const { return (TDerived*)(this); }
 
 protected:
 	glm::vec3 Position	= { 0.0f, 0.0f, 0.0f };

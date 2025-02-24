@@ -11,6 +11,8 @@
 #include <glm/mat3x3.hpp>
 #include <glm/mat4x4.hpp>
 
+#include "Core/Template.h"
+
 #include "Texture.h"
 #include "UniformBuffer.h"
 
@@ -23,7 +25,7 @@ struct ShaderFile {
 	const ShaderType Type;
 };
 
-class ShaderPipeline {
+class ShaderPipeline : public Derivable<ShaderPipeline> {
 public:
 	static Ref<ShaderPipeline> Create(const std::vector<ShaderFile>& shaders);
 	static Ref<ShaderPipeline> Create(const std::vector<std::string>& paths);
@@ -33,11 +35,6 @@ public:
 public:
 	ShaderPipeline() = default;
 	virtual ~ShaderPipeline() = default;
-
-	// TODO(Fix): Remove
-	// TODO(Implement): Precompiled shaders
-	virtual void AddShader(const ShaderFile& shader) = 0;
-	virtual void Compile() = 0;
 
 	virtual void SetInt(const std::string& name, int32_t _int) = 0;
 	virtual void SetFloat(const std::string& name, float _float) = 0;
@@ -51,10 +48,6 @@ public:
 	virtual void SetMat4(const std::string& name, const glm::mat4& mat) = 0;
 
 	virtual void SetBuffer(const std::string& name, uint32_t binding) = 0;
-
-	template<typename TDerived>
-	requires std::derived_from<TDerived, ShaderPipeline>
-	TDerived* As() { return (TDerived*)(this); }
 };
 
 }

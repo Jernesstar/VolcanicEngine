@@ -18,6 +18,8 @@ World::World() {
 
 	// m_World.set_pipeline(pipeline);
 
+	m_World.component<Component>();
+
 	m_World.component<CameraComponent>();
 	m_World.component<TagComponent>();
 	m_World.component<TransformComponent>();
@@ -28,12 +30,9 @@ World::World() {
 	m_World.component<DirectionalLightComponent>();
 	m_World.component<PointLightComponent>();
 	m_World.component<SpotlightComponent>();
+	m_World.component<ParticleSystemComponent>();
 
-	m_AllEntitiesQuery =
-		m_World.query_builder()
-			.with<CameraComponent>().or_()
-			.with<TagComponent>()
-			.build();
+	m_AllEntitiesQuery = m_World.query_builder().with<Component>().build();
 
 	m_EventHandler = m_World.entity("WorldEventHandler");
 }
@@ -54,19 +53,19 @@ Entity World::GetEntity(VolcaniCore::UUID id) {
 
 Entity World::AddEntity() {
 	flecs::entity handle = m_World.entity();
-	handle.set<TagComponent>({ });
+	handle.set<Component>({ });
 	return Entity{ handle };
 }
 
 Entity World::AddEntity(VolcaniCore::UUID id) {
 	flecs::entity handle = m_World.make_alive((uint64_t)id);
-	handle.set<TagComponent>({ });
+	handle.set<Component>({ });
 	return Entity{ handle };
 }
 
 Entity World::AddEntity(const std::string& name) {
 	flecs::entity handle = m_World.entity(name.c_str());
-	handle.set<TagComponent>({ });
+	handle.set<Component>({ });
 	return Entity{ handle };
 }
 

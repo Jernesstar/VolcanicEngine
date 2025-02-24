@@ -26,13 +26,12 @@ using namespace Magma::UI;
 
 namespace Magma {
 
-static void GenFiles(const std::string& name, const std::string& funcPath);
-static void CompileElement(const std::string& name, const std::string& funcPath,
-						   const rapidjson::Value& elementNode);
 static void LoadElement(UIPage& page, const rapidjson::Value& elementNode, 
 						const Theme& theme);
 
-void UILoader::EditorLoad(UIPage& page, const std::string& path) {
+void UILoader::EditorLoad(UIPage& page, const std::string& path,
+						  const Theme& theme)
+{
 	using namespace rapidjson;
 
 	if(path == "") {
@@ -63,13 +62,9 @@ void UILoader::EditorLoad(UIPage& page, const std::string& path) {
 	}
 
 	if(doc.HasMember("Elements")) {
-		GenFiles(name, funcPath);
-
 		const auto& elements = doc["Elements"];
-		for(const auto& element : elements.GetArray()) {
-			LoadElement(page, element, Theme{ });
-			CompileElement(name, funcPath, element);
-		}
+		for(const auto& element : elements.GetArray())
+			LoadElement(page, element, theme);
 	}
 
 	page.Name = name;
@@ -517,7 +512,7 @@ void LoadElement(UIPage& page, const rapidjson::Value& elementNode,
 			theme = pageTheme.at(element->GetType());
 		else
 			theme = { };
-		}
+	}
 	if(typeStr == "Text") {
 			node = page.Add(UIElementType::Text, id);
 			element = page.Get(node);
@@ -587,110 +582,6 @@ void LoadElement(UIPage& page, const rapidjson::Value& elementNode,
 				elementNode["Color"][2].Get<float>(),
 				elementNode["Color"][3].Get<float>()
 			};
-}
-
-void CompileElement(const std::string& name, const std::string& funcPath,
-					const rapidjson::Value& elementNode)
-{
-	if(!elementNode.HasMember("OnUpdate")
-	&& !elementNode.HasMember("OnClick")
-	&& !elementNode.HasMember("OnHover")
-	&& !elementNode.HasMember("OnMouseUp")
-	&& !elementNode.HasMember("OnMouseDown"))
-		return;
-
-	auto genPath = fs::path("Lava") / "projects" / "UI" / "gen";
-	auto script = File((genPath / name).string() + ".as");
-
-	std::string funcFileStr = "";
-	if(FileUtils::FileExists(funcPath))
-		funcFileStr = File(funcPath).Get();
-
-	std::string id = elementNode["ID"].Get<std::string>();
-
-	script
-	.Write("class " + id + " : IUIObject")
-	.Write("{");
-
-	script
-	.Write("\t" + id + "() { }\n");
-
-	for(std::string name :
-		{ "OnUpdate", "OnClick", "OnHover", "OnMouseUp", "OnMouseDown" })
-	{
-		script.Write("\tvoid " + name + "(" +
-					(name == "OnUpdate" ? "float ts" : "") + ") {");
-
-		if(!elementNode.HasMember(name)) {
-			script.Write("\t}");
-			continue;
-		}
-
-		const auto& element = elementNode[name];
-
-		if(element.IsObject()) {
-			// TODO(Implement): Animation
-		}
-		if(element.IsString()) {
-			auto string = element.Get<std::string>();
-
-			if(string.substr(0, 7) == "@script") {
-				uint32_t left = string.find_first_of('{');
-				uint32_t right = string.find_last_of('}');
-				if(string.find_first_not_of(' ') != right)
-					script.Write("\t\t" +
-								string.substr(left + 2, right - left - 3));
-			}
-			else if(string == "Default" && funcFileStr != "") {
-				auto elementIdx = funcFileStr.find(id);
-				uint32_t funcIdx = funcFileStr.find(name, elementIdx);
-				uint32_t start = funcFileStr.find_first_of('{', funcIdx);
-				uint32_t left = start;
-				uint32_t right = start;
-				uint32_t max = left + 1;
-				List<uint32_t> scopeStack;
-				scopeStack.Push(left);
-
-				while(scopeStack) {
-					left = funcFileStr.find_first_of('{', max);
-					right = funcFileStr.find_first_of('}', max);
-
-					if(left < right) {
-						scopeStack.Push(left);
-						max = scopeStack[-1] + 1;
-					}
-					else {
-						scopeStack.Pop();
-						max = right + 1;
-					}
-				}
-
-				script.Write(funcFileStr.substr(start + 2, max - start - 5));
-			}
-		}
-
-		script.Write("\t}");
-	}
-
-	script.Write("}");
-}
-
-void GenFiles(const std::string& name, const std::string& funcPath) {
-	auto genPath = fs::path("Lava") / "projects" / "UI" / "gen";
-	auto script = File((genPath / name).string() + ".as");
-	// auto contextIncludes = File("Lava/projects/UI/gen/Context.h");
-
-	// if(FileUtils::FileExists(funcPath)) {
-	// 	auto funcFileStr = File(funcPath).Get();
-	// 	uint64_t elementsIdx = funcFileStr.find("namespace UIObjects");
-	// 	std::string includes = funcFileStr.substr(0, elementsIdx - 1);
-	// 	contextIncludes.Write(includes);
-	// }
-
-	// script
-	// .Write("#include \"Context.h\"")
-	// .Write("\n")
-	// .Write("namespace UIElements {\n");
 }
 
 }

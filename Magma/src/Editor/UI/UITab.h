@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Editor/Tab.h"
+#include "Editor/UILoader.h"
 
 #include "UI/UIPage.h"
 
@@ -9,6 +10,9 @@ using namespace VolcaniCore;
 namespace Magma {
 
 class UITab : public Tab {
+public:
+	static Theme& GetTheme();
+
 public:
 	UITab();
 	UITab(const std::string& path);
@@ -23,6 +27,7 @@ public:
 
 private:
 	UI::UIPage m_Root;
+	Theme m_Theme;
 	std::string m_UIPath;
 
 private:

@@ -68,6 +68,11 @@ Editor::Editor(const CommandLineArgs& args) {
 		m_Panels.Add(panel2);
 
 		m_AssetManager.Load(m_Project.Path);
+
+		auto themePath =
+			fs::path(m_Project.Path) / "Visual" / "UI" / "theme.magma.ui.json";
+		if(fs::exists(themePath))
+			UITab::GetTheme() = UILoader::LoadTheme(themePath.string());
 	}
 	for(auto& path : args["--scene"])
 		NewTab(CreateRef<SceneTab>(path));
@@ -381,7 +386,8 @@ void Editor::ExportProject() {
 				fs::path(m_Project.Path) / "Visual" / "UI" / "Page"
 					/ screen.Page;
 			UIPage ui;
-			UILoader::EditorLoad(ui, uiPath.string() + ".magma.ui.json");
+			UILoader::EditorLoad(ui, uiPath.string() + ".magma.ui.json",
+								 UITab::GetTheme());
 			UILoader::RuntimeSave(ui, m_Project.Path, exportPath);
 		}
 	}

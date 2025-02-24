@@ -41,7 +41,7 @@ private:
 
 	Ref<Mesh> cube;
 	Ref<Mesh> torch;
-	Ref<Model> player;
+	Ref<Mesh> player;
 
 	PointLight light;
 	SpotLight spot;
@@ -99,11 +99,11 @@ Lighting::Lighting() {
 		Mesh::Create(MeshPrimitive::Cube,
 			Material
 			{
-				.Diffuse = Texture::Create(assetPath + "images/wood.png"),
-				.Specular = Texture::Create(assetPath + "images/wood_specular.png"),
+				.Diffuse = AssetImporter::GetTexture(assetPath + "images/wood.png"),
+				.Specular = AssetImporter::GetTexture(assetPath + "images/wood_specular.png"),
 			});
-	torch = Mesh::Create(assetPath + "models/mc-torch/Torch.obj");
-	player = Model::Create(assetPath + "models/player/Knight_Golden_Male.obj");
+	torch = AssetImporter::GetMesh(assetPath + "models/mc-torch/Torch.obj");
+	player = AssetImporter::GetMesh(assetPath + "models/player/Knight_Golden_Male.obj");
 
 	camera = CreateRef<StereographicCamera>(75.0f);
 	camera->SetPosition({ 2.5f, 2.5f, 2.5f });
@@ -154,20 +154,20 @@ void Lighting::OnUpdate(TimeStep ts) {
 		auto* cubeCommand = Renderer::NewCommand();
 		cubeCommand->UniformData
 		.SetInput("u_Material.Diffuse",
-				  TextureSlot{ cube->GetMaterial().Diffuse, 0 });
+				  TextureSlot{ cube->SubMeshes[0].Material.Diffuse, 0 });
 		cubeCommand->UniformData
 		.SetInput("u_Material.Specular",
-				  TextureSlot{ cube->GetMaterial().Specular, 1 });
+				  TextureSlot{ cube->SubMeshes[0].Material.Specular, 1 });
 		cubeCommand->UniformData
 		.SetInput("u_Material.Shininess", 32.0f);
 
 		auto* torchCommand = Renderer::NewCommand();
 		torchCommand->UniformData
 		.SetInput("u_Material.Diffuse",
-				  TextureSlot{ torch->GetMaterial().Diffuse, 0 });
+				  TextureSlot{ torch->SubMeshes[0].Material.Diffuse, 0 });
 		torchCommand->UniformData
 		.SetInput("u_Material.Specular",
-				  TextureSlot{ torch->GetMaterial().Specular, 1 });
+				  TextureSlot{ torch->SubMeshes[0].Material.Specular, 1 });
 		torchCommand->UniformData
 		.SetInput("u_Material.Shininess", 32.0f);
 
@@ -177,7 +177,7 @@ void Lighting::OnUpdate(TimeStep ts) {
 				Renderer3D::DrawMesh(torch, { .Translation = { x, 1.0f, y } }, torchCommand);
 			}
 
-		Renderer3D::DrawModel(player);
+		Renderer3D::DrawMesh(player);
 
 		Renderer3D::End();
 	}

@@ -29,13 +29,14 @@ struct Material {
 
 enum class MeshPrimitive { Quad, Cube, Pyramid, Sphere };
 
+struct SubMesh {
+	List<Vertex> Vertices;
+	List<uint32_t> Indices;
+	Material Material;
+};
+
 class Mesh {
 public:
-	const std::string Path;
-
-public:
-	static Ref<Mesh> Create(const std::string& path);
-
 	static Ref<Mesh> Create(const List<Vertex>& vertices,
 							const List<uint32_t>& indices,
 							const Material& material = { });
@@ -46,24 +47,27 @@ public:
 	static Ref<Mesh> Create(MeshPrimitive primitive, const glm::vec4& color);
 
 public:
-	Mesh() = default;
-	Mesh(const std::string& path);
+	List<SubMesh> SubMeshes;
 
-	Mesh(const List<Vertex>& vertices,
-		 const List<uint32_t>& indices,
-		 const Material& material = { })
-			: m_Vertices(vertices), m_Indices(indices), m_Material(material),
-				Path("") { }
+public:
+	Mesh() = default;
 	~Mesh() = default;
 
-	const List<Vertex>& GetVertices() const { return m_Vertices; }
-	const List<uint32_t>& GetIndices() const { return m_Indices; }
-	Material& GetMaterial() { return m_Material; }
+	operator SubMesh() const { return SubMeshes[0]; }
 
-private:
-	List<Vertex> m_Vertices;
-	List<uint32_t> m_Indices;
-	Material m_Material;
+	List<SubMesh>::const_iterator begin() const {
+		return SubMeshes.begin();
+	}
+	List<SubMesh>::const_iterator end() const {
+		return SubMeshes.end();
+	}
+
+	List<SubMesh>::iterator begin() {
+		return SubMeshes.begin();
+	}
+	List<SubMesh>::iterator end() {
+		return SubMeshes.end();
+	}
 };
 
 }

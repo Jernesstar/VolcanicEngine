@@ -1,10 +1,11 @@
 #pragma once
 
 #include "Core/Defines.h"
+#include "Core/Template.h"
 
 namespace VolcaniCore {
 
-class Texture {
+class Texture : public Derivable<Texture> {
 public:
 	enum class Type { RGBA, Depth, Stencil };
 	enum class Format { Normal, Float, Depth };
@@ -14,27 +15,18 @@ public:
 	static Ref<Texture> Create(uint32_t width, uint32_t height,
 		Format format = Format::Normal,
 		Sampling sampling = Sampling::Linear);
-	static Ref<Texture> Create(const std::string& path);
 
 public:
 	Texture() = default;
-	Texture(const std::string& path)
-		: m_Path(path) { }
 	Texture(uint32_t width, uint32_t height)
 		: m_Width(width), m_Height(height) { }
 
 	uint32_t GetWidth() const { return m_Width; }
 	uint32_t GetHeight() const { return m_Height; }
 
-	bool HasPath() const { return m_Path != ""; }
-	const std::string& GetPath() const { return m_Path; }
-
-	template<typename TDerived>
-	requires std::derived_from<TDerived, Texture>
-	TDerived* As() const { return (TDerived*)(this); }
+	virtual void SetData(const void* data) = 0;
 
 protected:
-	std::string m_Path = "";
 	uint32_t m_Width = 0, m_Height = 0;
 };
 

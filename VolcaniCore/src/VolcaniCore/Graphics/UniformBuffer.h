@@ -1,13 +1,14 @@
 #pragma once
 
 #include "Core/Defines.h"
+#include "Core/Template.h"
 #include "Core/Buffer.h"
 
 #include "Graphics/BufferLayout.h"
 
 namespace VolcaniCore {
 
-class UniformBuffer {
+class UniformBuffer : public Derivable<UniformBuffer> {
 public:
 	static Ref<UniformBuffer> Create(const BufferLayout& layout,
 									 uint64_t count = 1);
@@ -29,10 +30,6 @@ public:
 
 	virtual void SetData(const void* data, uint64_t count = 1,
 						 uint64_t offset = 0) = 0;
-
-	template<typename TDerived>
-	requires std::derived_from<TDerived, UniformBuffer>
-	TDerived* As() const { return (TDerived*)(this); }
 };
 
 }

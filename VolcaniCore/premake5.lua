@@ -22,17 +22,11 @@ project "VolcaniCore"
         "%{Includes.glfw}",
         "%{Includes.glad}",
         "%{Includes.glm}",
-        "%{Includes.freetype}",
-        "%{Includes.assimp}",
-        "%{Includes.stb_image}"
     }
 
     links {
         "glfw",
         "glad",
-        "assimp",
-        "freetype",
-        "stb_image"
     }
 
     filter "toolset:gcc or toolset:clang"
@@ -47,6 +41,3 @@ project "VolcaniCore"
 
 include "VolcaniCore/.builddeps/glfw"
 include "VolcaniCore/.builddeps/glad"
-include "VolcaniCore/.builddeps/assimp"
-include "VolcaniCore/.builddeps/freetype"
-include "VolcaniCore/.builddeps/stb_image"

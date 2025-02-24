@@ -1,7 +1,6 @@
 #include "Texture2D.h"
 
 #include <glad/glad.h>
-#include <stb_image/stb_image.h>
 
 #include "Core/Assert.h"
 #include "Core/FileUtils.h"
@@ -24,22 +23,6 @@ Texture2D::Texture2D(uint32_t width, uint32_t height,
 {
 	m_TextureID = CreateTexture(width, height, format, sampling);
 	m_Owns = true;
-}
-
-Texture2D::Texture2D(const std::string& path)
-	: Texture(path), m_DataFormat(GL_RGBA)
-{
-	int32_t width, height;
-	unsigned char* pixelData = FileUtils::ReadImage(path, width, height, 4);
-	m_Width = (uint32_t)width;
-	m_Height = (uint32_t)height;
-
-	m_TextureID = CreateTexture(m_Width, m_Height);
-	m_Owns = true;
-
-	SetData(pixelData);
-
-	stbi_image_free(pixelData);
 }
 
 Texture2D::~Texture2D() {

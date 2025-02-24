@@ -9,13 +9,13 @@
 	url = https://github.com/Dav1dde/glad.git
 	branch = c
 [submodule "VolcaniCore/vendor/stb_image"]
-	path = VolcaniCore/vendor/stb_image
+	path = Magma/vendor/stb_image
 	url = https://github.com/Jernesstar/stb_image
 [submodule "VolcaniCore/vendor/assimp"]
-	path = VolcaniCore/vendor/assimp
+	path = Magma/vendor/assimp
 	url = https://github.com/Jernesstar/assimp.git
 [submodule "VolcaniCore/vendor/freetype"]
-	path = VolcaniCore/vendor/freetype
+	path = Magma/vendor/freetype
 	url = https://github.com/Jernesstar/freetype.git
 [submodule "Magma/vendor/yaml-cpp"]
 	path = Magma/vendor/yaml-cpp

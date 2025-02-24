@@ -1,19 +1,20 @@
 #pragma once
 
 #include "Core/Defines.h"
+#include "Core/List.h"
+#include "Core/Template.h"
+
+#include "Texture.h"
 
 namespace VolcaniCore {
 
-class Cubemap {
+class Cubemap : public Derivable<Cubemap> {
 public:
-	Cubemap(const std::string& cubemap_folder) { }
-	Cubemap(const std::vector<std::string>& faces) { }
+	static Ref<Cubemap> Create(const List<Buffer<uint8_t>>& faces);
 
-	static Ref<Cubemap> Create(const std::string& cubemap_folder);
-	static Ref<Cubemap> Create(const std::vector<std::string>& faces);
-
-	template<typename Derived>
-	Derived* As() const { return ((Derived*)(this)); }
+public:
+	Cubemap() = default;
+	virtual ~Cubemap() = default;
 };
 
 }

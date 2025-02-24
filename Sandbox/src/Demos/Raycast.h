@@ -94,7 +94,7 @@ Raycast::Raycast() {
 	cube = Mesh::Create(MeshPrimitive::Cube,
 		Material
 		{
-			.Diffuse = Texture::Create("Sandbox/assets/images/wood.png")
+			.Diffuse = AssetImporter::GetTexture("Sandbox/assets/images/wood.png")
 		});
 
 	Physics::Init();
