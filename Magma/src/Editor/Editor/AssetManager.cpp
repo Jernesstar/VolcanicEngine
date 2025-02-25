@@ -144,11 +144,15 @@ void EditorAssetManager::Load(const std::string& path) {
 }
 
 void EditorAssetManager::Reload() {
+	namespace fs = std::filesystem;
+
 	auto rootPath = fs::path(m_Path).parent_path() / "Asset";
 	List<std::string> paths
 		{
 			(rootPath / "Mesh").string(),
 			(rootPath / "Image").string(),
+			(rootPath / "Cubemap").string(),
+			(rootPath / "Font").string(),
 			(rootPath / "Audio").string()
 		};
 
@@ -225,21 +229,27 @@ void EditorAssetManager::Save() {
 
 	serializer.WriteKey("TextureAssets").BeginSequence();
 	for(auto& [id, texture] : m_TextureAssets) {
-		// serializer.WriteKey("Path").Write(texture->GetPath());
+		serializer.WriteKey("Path").Write(m_Paths[id]);
 	}
 	serializer.EndSequence();
 
 	serializer.WriteKey("CubemapAssets").BeginSequence();
 	for(auto& [id, texture] : m_CubemapAssets) {
-		// serializer.WriteKey("Path").Write(texture->GetPath());
+		serializer.WriteKey("Path").Write(m_Paths[id]);
 	}
 	serializer.EndSequence();
 
-	serializer.WriteKey("AudioAssets").BeginSequence();
-	// for(auto& [id, texture] : m_AudioAssets) {
-	// 	// serializer.WriteKey("Path").Write(texture->GetPath());
+	// serializer.WriteKey("FontAssets").BeginSequence();
+	// for(auto& [id, texture] : m_FontAssets) {
+	// 	serializer.WriteKey("Path").Write(m_Paths[id]);
 	// }
-	serializer.EndSequence();
+	// serializer.EndSequence();
+
+	// serializer.WriteKey("AudioAssets").BeginSequence();
+	// for(auto& [id, texture] : m_AudioAssets) {
+	// 	serializer.WriteKey("Path").Write(m_Paths[id]);
+	// }
+	// serializer.EndSequence();
 
 	serializer.EndMapping(); // AssetPack
 	serializer.EndMapping();

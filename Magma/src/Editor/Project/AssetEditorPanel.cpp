@@ -46,13 +46,13 @@ static void EditAsset(Asset asset) {
 		case AssetType::Font:
 			type = "Font";
 			break;
-		case AssetType::Sound:
-			type = "Sound";
+		case AssetType::Audio:
+			type = "Audio";
 			break;
 	}
 
 	ImGui::Text("Type: %s", type.c_str());
-	ImGui::Text("ID: %lu", (uint64_t)asset.ID & 99999);
+	ImGui::Text("ID: %lu", asset.ID / (uint64_t)1e15);
 }
 
 void AssetEditorPanel::Draw() {

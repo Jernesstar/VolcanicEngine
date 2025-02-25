@@ -122,7 +122,7 @@ template<>
 BinaryReader& BinaryReader::ReadObject(AudioComponent& comp) {
 	uint64_t id;
 	Read(id);
-	comp.AudioAsset = { id, AssetType::Sound };
+	comp.AudioAsset = { id, AssetType::Audio };
 
 	return *this;
 }

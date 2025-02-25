@@ -142,7 +142,7 @@ void ContentBrowserPanel::Draw() {
 					}
 					if(display != "")
 						ImGui::TextWrapped(display.c_str());
-					ImGui::Text("Asset %lu", (uint64_t)asset.ID / 1e15);
+					ImGui::Text("Asset %lu", asset.ID / (uint64_t)1e15);
 				}
 
 				ImGui::EndTable();

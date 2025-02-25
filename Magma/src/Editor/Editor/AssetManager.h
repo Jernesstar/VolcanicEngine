@@ -15,7 +15,7 @@ public:
 	Asset Add(MeshPrimitive primitive);
 	Asset Add(const std::string& path, AssetType type);
 
-	Asset GetFromPath(const std::string& path);
+	UUID GetFromPath(const std::string& path);
 
 	std::string GetPath(UUID id);
 

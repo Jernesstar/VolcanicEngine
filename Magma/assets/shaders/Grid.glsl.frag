@@ -1,6 +1,7 @@
 #version 450 core
 
 uniform vec3 u_CameraPosition;
+
 uniform float u_GridSize = 100.0;
 uniform float u_GridMinPixelsBetweenCells = 2.0;
 uniform float u_GridCellSize = 0.025;
@@ -9,7 +10,7 @@ uniform vec4 u_GridColorThick = vec4(1.0);
 
 layout(location = 0) in vec3 v_Position;
 
-layout(location = 0) out vec4 FragColor;
+out vec4 FragColor;
 
 float log10(float x)
 {
@@ -17,13 +18,11 @@ float log10(float x)
     return f;
 }
 
-
 float satf(float x)
 {
     float f = clamp(x, 0.0, 1.0);
     return f;
 }
-
 
 vec2 satv(vec2 x)
 {
@@ -31,13 +30,11 @@ vec2 satv(vec2 x)
     return v;
 }
 
-
 float max2(vec2 v)
 {
     float f = max(v.x, v.y);
     return f;
 }
-
 
 void main()
 {

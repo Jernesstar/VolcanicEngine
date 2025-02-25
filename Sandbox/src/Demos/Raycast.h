@@ -74,8 +74,8 @@ Raycast::Raycast() {
 		});
 
 	auto draw = ShaderPipeline::Create("Magma/assets/shaders", "Mesh");
-	auto mask = ShaderPipeline::Create("Sandbox/assets/shaders", "Mask");
-	auto outline = ShaderPipeline::Create("Sandbox/assets/shaders", "Outline");
+	auto mask = ShaderPipeline::Create("Magma/assets/shaders", "Mask");
+	auto outline = ShaderPipeline::Create("Magma/assets/shaders", "Outline");
 
 	drawPass = RenderPass::Create("Draw", draw);
 	drawPass->SetData(Renderer3D::GetMeshBuffer());

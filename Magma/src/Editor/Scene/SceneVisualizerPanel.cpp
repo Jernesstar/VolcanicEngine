@@ -162,8 +162,7 @@ void SceneVisualizerPanel::Draw() {
 		}
 
 		if(ImGui::IsMouseClicked(0) && ImGui::IsWindowHovered()) {
-			auto& cameraController = m_Renderer.GetCameraController();
-			auto camera = cameraController.GetCamera();
+			auto camera = m_Renderer.GetCameraController().GetCamera();
 
 			glm::vec2 pos = { ImGui::GetMousePos().x, ImGui::GetMousePos().y };
 			glm::vec4 originNDC
@@ -216,7 +215,7 @@ EditorSceneRenderer::EditorSceneRenderer() {
 	Ref<ShaderPipeline> shader;
 	Ref<Framebuffer> buffer;
 
-	shader = ShaderPipeline::Create("Magma/asset/shaders", "Grid");
+	shader = ShaderPipeline::Create("Magma/assets/shaders", "Grid");
 	GridPass = RenderPass::Create("Grid", shader, m_Output);
 	GridPass->SetData(Renderer3D::GetMeshBuffer());
 
@@ -281,8 +280,27 @@ void EditorSceneRenderer::Begin() {
 	FirstCommand = RendererAPI::Get()->NewDrawCommand(LightingPass->Get());
 	FirstCommand->Clear = true;
 
-	// auto* command = RendererAPI::Get()->NewDrawCommand(GridPass->Get());
-	// command->
+	if(State != SceneState::Edit)
+		return;
+
+	FirstCommand->UniformData
+	.SetInput("u_ViewProj", m_Controller.GetCamera()->GetViewProjection());
+	FirstCommand->UniformData
+	.SetInput("u_CameraPosition", m_Controller.GetCamera()->GetPosition());
+
+	auto* command = RendererAPI::Get()->NewDrawCommand(GridPass->Get());
+	command->UniformData
+	.SetInput("u_CameraPosition", m_Controller.GetCamera()->GetPosition());
+	command->UniformData
+	.SetInput("u_ViewProj", m_Controller.GetCamera()->GetViewProjection());
+
+	auto& call = command->NewDrawCall();
+	call.VertexCount = 6;
+	call.Primitive = PrimitiveType::Triangle;
+	call.Partition = PartitionType::Single;
+	call.DepthTest = DepthTestingMode::Off;
+	call.Culling = CullingMode::Off;
+	call.Blending = BlendingMode::Greatest;
 }
 
 void EditorSceneRenderer::SubmitCamera(Entity entity) {
@@ -341,13 +359,6 @@ void EditorSceneRenderer::SubmitMesh(Entity entity) {
 }
 
 void EditorSceneRenderer::Render() {
-	if(State == SceneState::Edit) {
-		FirstCommand->UniformData
-		.SetInput("u_ViewProj", m_Controller.GetCamera()->GetViewProjection());
-		FirstCommand->UniformData
-		.SetInput("u_CameraPosition", m_Controller.GetCamera()->GetPosition());
-	}
-
 	FirstCommand->UniformData
 	.SetInput("u_DirectionalLightCount", (int32_t)HasDirectionalLight);
 	FirstCommand->UniformData
