@@ -39,6 +39,9 @@ private:
 	DrawCommand* FirstCommand;
 	Map<Ref<Mesh>, DrawCommand*> Objects;
 
+	// Grid
+	Ref<RenderPass> GridPass;
+
 	// Lighting and shadows
 	Ref<RenderPass> DepthPass;
 	Ref<RenderPass> LightingPass;

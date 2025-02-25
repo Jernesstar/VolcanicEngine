@@ -119,10 +119,10 @@ BinaryReader& BinaryReader::ReadObject(ScriptComponent& comp) {
 }
 
 template<>
-BinaryReader& BinaryReader::ReadObject(SoundComponent& comp) {
+BinaryReader& BinaryReader::ReadObject(AudioComponent& comp) {
 	uint64_t id;
 	Read(id);
-	comp.SoundAsset = { id, AssetType::Sound };
+	comp.AudioAsset = { id, AssetType::Sound };
 
 	return *this;
 }
@@ -200,7 +200,7 @@ BinaryReader& BinaryReader::ReadObject(Entity& entity) {
 	if(componentBits.test(6))
 		Read(entity.Set<ScriptComponent>());
 	if(componentBits.test(7))
-		Read(entity.Set<SoundComponent>());
+		Read(entity.Set<AudioComponent>());
 	if(componentBits.test(8))
 		Read(entity.Set<DirectionalLightComponent>());
 	if(componentBits.test(9))

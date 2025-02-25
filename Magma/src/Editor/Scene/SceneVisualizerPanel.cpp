@@ -216,6 +216,10 @@ EditorSceneRenderer::EditorSceneRenderer() {
 	Ref<ShaderPipeline> shader;
 	Ref<Framebuffer> buffer;
 
+	shader = ShaderPipeline::Create("Magma/asset/shaders", "Grid");
+	GridPass = RenderPass::Create("Grid", shader, m_Output);
+	GridPass->SetData(Renderer3D::GetMeshBuffer());
+
 	shader = ShaderPipeline::Create("Magma/assets/shaders", "Mesh");
 	// buffer = Framebuffer::Create(window->GetWidth(), window->GetHeight());
 	LightingPass = RenderPass::Create("Lighting", shader, m_Output);
@@ -276,6 +280,9 @@ void EditorSceneRenderer::Update(TimeStep ts) {
 void EditorSceneRenderer::Begin() {
 	FirstCommand = RendererAPI::Get()->NewDrawCommand(LightingPass->Get());
 	FirstCommand->Clear = true;
+
+	// auto* command = RendererAPI::Get()->NewDrawCommand(GridPass->Get());
+	// command->
 }
 
 void EditorSceneRenderer::SubmitCamera(Entity entity) {

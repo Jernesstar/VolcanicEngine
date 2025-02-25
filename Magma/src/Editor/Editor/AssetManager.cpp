@@ -46,7 +46,6 @@ void EditorAssetManager::Unload(Asset asset) {
 Asset EditorAssetManager::Add(MeshPrimitive primitive) {
 	Asset newAsset{ UUID(), AssetType::Mesh };
 	m_AssetRegistry[newAsset] = true;
-
 	m_Primitives[newAsset.ID] = primitive;
 	m_MeshAssets[newAsset.ID] = Mesh::Create(primitive);
 
@@ -55,23 +54,18 @@ Asset EditorAssetManager::Add(MeshPrimitive primitive) {
 
 Asset EditorAssetManager::Add(const std::string& path, AssetType type) {
 	Asset newAsset{ UUID(), type };
-	m_AssetRegistry[newAsset] = true;
-
+	m_AssetRegistry[newAsset] = false;
 	m_Paths[newAsset.ID] = path;
-	m_MeshAssets[newAsset.ID] = AssetImporter::GetMesh(path);
-
-	if(type == AssetType::Mesh)
-		m_MeshAssets[newAsset.ID] = AssetImporter::GetMesh(path);
-	else if(type == AssetType::Texture)
-		m_TextureAssets[newAsset.ID] = AssetImporter::GetTexture(path);
-	else if(type == AssetType::Cubemap)
-		m_CubemapAssets[newAsset.ID] = AssetImporter::GetCubemap(path);
 
 	return newAsset;
 }
 
-Asset EditorAssetManager::GetFromPath(const std::string& path) {
-	return { };
+UUID EditorAssetManager::GetFromPath(const std::string& path) {
+	for(auto [id, assetPath] : m_Paths)
+		if(path == assetPath)
+			return id;
+
+	return 0;
 }
 
 std::string EditorAssetManager::GetPath(UUID id) {
@@ -137,6 +131,34 @@ void EditorAssetManager::Load(const std::string& path) {
 			m_Primitives[id] = type;
 			m_MeshAssets[id] = Mesh::Create(type, mat);
 		}
+	}
+	for(auto textureAssetNode : assetPackNode["TextureAssets"]) {
+
+	}
+	for(auto cubemapAssetNode : assetPackNode["CubemapAssets"]) {
+
+	}
+	for(auto audioAssetNode : assetPackNode["AudioAssets"]) {
+
+	}
+}
+
+void EditorAssetManager::Reload() {
+	auto rootPath = fs::path(m_Path).parent_path() / "Asset";
+	List<std::string> paths
+		{
+			(rootPath / "Mesh").string(),
+			(rootPath / "Image").string(),
+			(rootPath / "Audio").string()
+		};
+
+	uint32_t i = 0;
+	for(auto folder : paths) {
+		for(auto path : FileUtils::GetFiles(folder))
+			if(!GetFromPath(path))
+				Add(path, (AssetType)i);
+
+		i++;
 	}
 }
 
@@ -207,14 +229,14 @@ void EditorAssetManager::Save() {
 	}
 	serializer.EndSequence();
 
-	serializer.WriteKey("Cubemap").BeginSequence();
+	serializer.WriteKey("CubemapAssets").BeginSequence();
 	for(auto& [id, texture] : m_CubemapAssets) {
 		// serializer.WriteKey("Path").Write(texture->GetPath());
 	}
 	serializer.EndSequence();
 
-	serializer.WriteKey("SoundAssets").BeginSequence();
-	// for(auto& [id, texture] : m_SoundAssets) {
+	serializer.WriteKey("AudioAssets").BeginSequence();
+	// for(auto& [id, texture] : m_AudioAssets) {
 	// 	// serializer.WriteKey("Path").Write(texture->GetPath());
 	// }
 	serializer.EndSequence();

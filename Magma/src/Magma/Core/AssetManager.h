@@ -11,7 +11,7 @@ using namespace VolcaniCore;
 
 namespace Magma {
 
-enum class AssetType { Mesh, Texture, Cubemap, Font, Shader, Sound, None };
+enum class AssetType { Mesh, Texture, Cubemap, Font, Audio, Shader, None };
 
 struct Asset {
 	UUID ID = 0;
@@ -56,7 +56,7 @@ protected:
 	Map<UUID, Ref<Mesh>> m_MeshAssets;
 	Map<UUID, Ref<Texture>> m_TextureAssets;
 	Map<UUID, Ref<Cubemap>> m_CubemapAssets;
-	// Map<UUID, Ref<Sound>> m_SoundAssets;
+	// Map<UUID, Ref<Sound>> m_AudioAssets;
 
 private:
 	Ref<Mesh> GetMesh(Asset asset) {

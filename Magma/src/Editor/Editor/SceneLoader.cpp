@@ -169,9 +169,9 @@ void SerializeEntity(YAMLSerializer& serializer, const Entity& entity) {
 			.WriteKey("AssetID").Write((uint64_t)asset.ID)
 		.EndMapping();
 	}
-	if(entity.Has<SoundComponent>()) {
-		auto asset = entity.Get<SoundComponent>().SoundAsset;
-		serializer.WriteKey("SoundComponent")
+	if(entity.Has<AudioComponent>()) {
+		auto asset = entity.Get<AudioComponent>().AudioAsset;
+		serializer.WriteKey("AudioComponent")
 		.BeginMapping()
 			.WriteKey("AssetID").Write((uint64_t)asset.ID)
 		.EndMapping();
@@ -362,10 +362,10 @@ void DeserializeEntity(YAML::Node entityNode, Scene& scene) {
 		entity.Add<SkyboxComponent>(Asset{ id, AssetType::Cubemap });
 	}
 
-	auto soundComponentNode = components["SoundComponent"];
-	if(soundComponentNode) {
-		auto id = soundComponentNode["AssetID"].as<uint64_t>();
-		entity.Add<SoundComponent>(Asset{ id, AssetType::Sound });
+	auto audioComponentNode = components["AudioComponent"];
+	if(audioComponentNode) {
+		auto id = audioComponentNode["AssetID"].as<uint64_t>();
+		entity.Add<AudioComponent>(Asset{ id, AssetType::Sound });
 	}
 
 	auto scriptComponentNode = components["ScriptComponent"];
@@ -511,8 +511,8 @@ BinaryWriter& BinaryWriter::WriteObject(const SkyboxComponent& comp) {
 }
 
 template<>
-BinaryWriter& BinaryWriter::WriteObject(const SoundComponent& comp) {
-	Write((uint64_t)comp.SoundAsset.ID);
+BinaryWriter& BinaryWriter::WriteObject(const AudioComponent& comp) {
+	Write((uint64_t)comp.AudioAsset.ID);
 
 	return *this;
 }
@@ -594,7 +594,7 @@ BinaryWriter& BinaryWriter::WriteObject(const Entity& entity) {
 	componentBits |= (entity.Has<SkyboxComponent>()			<< 4);
 	componentBits |= (entity.Has<RigidBodyComponent>()		<< 5);
 	componentBits |= (entity.Has<ScriptComponent>()			<< 6);
-	componentBits |= (entity.Has<SoundComponent>()			<< 7);
+	componentBits |= (entity.Has<AudioComponent>()			<< 7);
 	componentBits |= (entity.Has<DirectionalLightComponent>() << 8);
 	componentBits |= (entity.Has<PointLightComponent>()		<< 9);
 	componentBits |= (entity.Has<SpotlightComponent>()		<< 10);
@@ -616,8 +616,8 @@ BinaryWriter& BinaryWriter::WriteObject(const Entity& entity) {
 		Write(entity.Get<RigidBodyComponent>());
 	if(entity.Has<ScriptComponent>())
 		Write(entity.Get<ScriptComponent>());
-	if(entity.Has<SoundComponent>())
-		Write(entity.Get<SoundComponent>());
+	if(entity.Has<AudioComponent>())
+		Write(entity.Get<AudioComponent>());
 	if(entity.Has<DirectionalLightComponent>())
 		Write(entity.Get<DirectionalLightComponent>());
 	if(entity.Has<PointLightComponent>())

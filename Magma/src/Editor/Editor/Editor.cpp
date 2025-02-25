@@ -68,6 +68,7 @@ Editor::Editor(const CommandLineArgs& args) {
 		m_Panels.Add(panel2);
 
 		m_AssetManager.Load(m_Project.Path);
+		m_AssetManager.Reload();
 
 		auto themePath =
 			fs::path(m_Project.Path) / "Visual" / "UI" / "theme.magma.ui.json";

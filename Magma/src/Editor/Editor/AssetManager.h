@@ -27,6 +27,8 @@ public:
 	const Map<Asset, bool>& GetRegistry() const { return m_AssetRegistry; }
 
 	void Load(const std::string& path);
+	void Reload();
+
 	void Save();
 	void RuntimeSave(const std::string& exportPath);
 

@@ -75,13 +75,13 @@ struct SkyboxComponent : public Component {
 	SkyboxComponent(const SkyboxComponent& other) = default;
 };
 
-struct SoundComponent : public Component {
-	Asset SoundAsset;
+struct AudioComponent : public Component {
+	Asset AudioAsset;
 
-	SoundComponent() = default;
-	SoundComponent(const Asset& asset)
-		: SoundAsset(asset) { }
-	SoundComponent(const SoundComponent& other) = default;
+	AudioComponent() = default;
+	AudioComponent(const Asset& asset)
+		: AudioAsset(asset) { }
+	AudioComponent(const AudioComponent& other) = default;
 };
 
 struct ScriptComponent : public Component {

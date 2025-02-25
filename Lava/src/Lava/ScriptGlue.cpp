@@ -82,8 +82,8 @@ void ScriptGlue::Init() {
 		asMETHODPR(Entity, Has<RigidBodyComponent>, () const, bool), asCALL_THISCALL);
 	engine->RegisterObjectMethod("Entity", "bool HasScriptComponent() const",
 		asMETHODPR(Entity, Has<ScriptComponent>, () const, bool), asCALL_THISCALL);
-	engine->RegisterObjectMethod("Entity", "bool HasSoundComponent() const",
-		asMETHODPR(Entity, Has<SoundComponent>, () const, bool), asCALL_THISCALL);
+	engine->RegisterObjectMethod("Entity", "bool HasAudioComponent() const",
+		asMETHODPR(Entity, Has<AudioComponent>, () const, bool), asCALL_THISCALL);
 	engine->RegisterObjectMethod("Entity", "bool HasDirectionalLightComponent() const",
 		asMETHODPR(Entity, Has<DirectionalLightComponent>, () const, bool), asCALL_THISCALL);
 	engine->RegisterObjectMethod("Entity", "bool HasPointLightComponent() const",
