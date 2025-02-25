@@ -46,7 +46,6 @@ project "Magma"
         -- "rapidjson",
 
         "imgui",
-        "ImGuiFileDialog",
         "flecs",
         "angelscript",
         "soloud"
@@ -71,7 +70,8 @@ include "Magma/.builddeps/flecs"
 include "Magma/.builddeps/angelscript"
 include "Magma/.builddeps/PhysX"
 include "Magma/.builddeps/soloud"
-
+include "Magma/.builddeps/rapidjson"
+include "Magma/.builddeps/yaml-cpp"
 
 project "Editor"
     kind "ConsoleApp"
@@ -137,8 +137,10 @@ project "Editor"
         "freetype",
         "stb_image",
 
-        "ImGuiFileDialog",
         "imgui",
+        "ImGuiFileDialog",
+        "ImGuizmo",
+
         "yaml-cpp",
         -- "rapidjson",
         "flecs",
@@ -174,8 +176,7 @@ project "Editor"
         }
 
 include "Magma/.builddeps/ImGuiFileDialog"
+include "Magma/.builddeps/ImGuizmo"
 include "Magma/.builddeps/assimp"
-include "Magma/.builddeps/rapidjson"
-include "Magma/.builddeps/yaml-cpp"
 include "Magma/.builddeps/freetype"
 include "Magma/.builddeps/stb_image"

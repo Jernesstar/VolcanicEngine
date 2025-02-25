@@ -42,3 +42,6 @@
 [submodule "Magma/vendor/soloud"]
 	path = Magma/vendor/soloud
 	url = https://github.com/jarikomppa/soloud.git
+[submodule "Magma/vendor/ImGuizmo"]
+	path = Magma/vendor/ImGuizmo
+	url = https://github.com/CedricGuillemet/ImGuizmo.git
