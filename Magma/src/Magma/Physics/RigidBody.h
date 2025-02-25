@@ -14,10 +14,13 @@ class RigidBody {
 public:
 	enum class Type { Static, Dynamic };
 
-public:
 	static Ref<RigidBody> Create(RigidBody::Type type,
 								 Ref<Shape> shape = nullptr,
 								 const Transform& t = { });
+
+public:
+	void* Data;
+
 public:
 	RigidBody(RigidBody::Type type, Ref<Shape> shape, const Transform& t = { });
 	~RigidBody();

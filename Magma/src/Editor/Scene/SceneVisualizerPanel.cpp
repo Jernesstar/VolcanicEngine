@@ -26,6 +26,7 @@
 #include "SceneHierarchyPanel.h"
 
 using namespace Magma::ECS;
+using namespace Magma::Physics;
 
 namespace Magma {
 
@@ -34,8 +35,7 @@ SceneVisualizerPanel::SceneVisualizerPanel(Scene* context)
 {
 	m_Image.Width = Application::GetWindow()->GetWidth();
 	m_Image.Height = Application::GetWindow()->GetHeight();
-	m_Image.Content =
-		m_Renderer.GetOutput()->Get(AttachmentTarget::Color);
+	m_Image.Content = m_Renderer.GetOutput()->Get(AttachmentTarget::Color);
 
 	SetContext(context);
 }
@@ -44,6 +44,24 @@ void SceneVisualizerPanel::SetContext(Scene* context) {
 	m_Context = context;
 	m_Selected.Handle = Entity{ };
 	// m_Selected.Collider = CreateRef<Physics::RigidBody>();
+	VOLCANICORE_LOG_INFO("Here");
+
+	context->EntityWorld
+	.ForEach<TransformComponent, MeshComponent>(
+		[&](Entity& entity)
+		{
+			VOLCANICORE_LOG_INFO("Here");
+			const auto& tc = entity.Get<TransformComponent>();
+			const auto& mc = entity.Get<MeshComponent>();
+			auto& assetManager =
+				Application::As<EditorApp>()->GetEditor().GetAssetManager();
+			auto mesh = assetManager.Get<Mesh>(mc.MeshAsset);
+
+			auto shape = Shape::Create(mesh);
+			auto body = RigidBody::Create(RigidBody::Type::Static, shape);
+			body->Data = (void*)(uint64_t)(uint32_t)entity.GetHandle();
+			m_World.AddActor(body);
+		});
 }
 
 static bool s_Hovered = false;
@@ -115,8 +133,6 @@ void SceneVisualizerPanel::Draw() {
 		}
 		ImGui::EndChild();
 
-		auto& world = m_Context->EntityWorld;
-
 		bool open = false;
 		open = ImGui::BeginPopupModal("Create Entity with MeshComponent");
 		if(!open)
@@ -134,6 +150,7 @@ void SceneVisualizerPanel::Draw() {
 				if(ImGui::Button("Create")
 				|| ImGui::IsKeyPressed(ImGuiKey_Enter, false))
 				{
+					auto& world = m_Context->EntityWorld;
 					Entity newEntity;
 					bool exit = true;
 					if(str == "")
@@ -163,6 +180,7 @@ void SceneVisualizerPanel::Draw() {
 
 		if(ImGui::IsMouseClicked(0) && ImGui::IsWindowHovered()) {
 			auto camera = m_Renderer.GetCameraController().GetCamera();
+			// auto& world = m_Context->EntityWorld;
 
 			glm::vec2 pos = { ImGui::GetMousePos().x, ImGui::GetMousePos().y };
 			glm::vec4 originNDC
@@ -190,13 +208,13 @@ void SceneVisualizerPanel::Draw() {
 			if(hitInfo) {
 				VOLCANICORE_LOG_INFO("Hit something");
 				m_Selected.Collider = hitInfo.Actor;
-				// m_Renderer.Select(entity);
+				m_Selected.Handle =
+					m_Context->EntityWorld.GetEntity(
+						(uint64_t)hitInfo.Actor->Data);
+				m_Renderer.Select(m_Selected.Handle);
 				auto hierarchy =
 					m_Tab->GetPanel("SceneHierarchy")->As<SceneHierarchyPanel>();
 				// hierarchy->Select(entity);
-			}
-			else {
-				VOLCANICORE_LOG_INFO("Void and Emptiness");
 			}
 		}
 	}
@@ -343,8 +361,6 @@ void EditorSceneRenderer::SubmitMesh(Entity entity) {
 	auto& tc = entity.Get<TransformComponent>();
 	auto& mc = entity.Get<MeshComponent>();
 	auto mesh = assetManager.Get<Mesh>(mc.MeshAsset);
-	if(!mesh)
-		return;
 
 	if(entity == Selected)
 		return;

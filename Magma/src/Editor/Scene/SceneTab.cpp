@@ -33,17 +33,11 @@ SceneTab::SceneTab()
 	Setup();
 }
 
-SceneTab::SceneTab(const Scene& scene)
-	: Tab(TabType::Scene), m_Scene(scene)
-{
-	Setup();
-}
-
 SceneTab::SceneTab(const std::string& path)
 	: Tab(TabType::Scene)
 {
-	Setup();
 	SetScene(path);
+	Setup();
 }
 
 SceneTab::~SceneTab() {
@@ -61,26 +55,15 @@ void SceneTab::Setup() {
 	GetPanel("SceneVisualizer")->Open();
 	GetPanel("ComponentEditor")->Open();
 
-	Ref<Texture> image;
-
-	image = AssetImporter::GetTexture("Magma/assets/icons/PlayButton.png");
-	m_PlayButton.Display = CreateRef<UI::Image>(image);
-	m_PlayButton.Width = 20;
-	m_PlayButton.Height = 20;
-
-	image = AssetImporter::GetTexture("Magma/assets/icons/PauseButton.png");
-	m_PauseButton.Display = CreateRef<UI::Image>(image);
-	m_PauseButton.Width = 20;
-	m_PauseButton.Height = 20;
-
-	image = AssetImporter::GetTexture("Magma/assets/icons/StopButton.png");
-	m_StopButton.Display = CreateRef<UI::Image>(image);
-	m_StopButton.Width = 20;
-	m_StopButton.Height = 20;
-}
-
-void SceneTab::SetScene(const Scene& scene) {
-	m_Scene = scene;
+	m_PlayButton.Display =
+		CreateRef<UI::Image>(
+			AssetImporter::GetTexture("Magma/assets/icons/PlayButton.png"));
+	m_PauseButton.Display =
+		CreateRef<UI::Image>(
+			AssetImporter::GetTexture("Magma/assets/icons/PauseButton.png"));
+	m_StopButton.Display =
+		CreateRef<UI::Image>(
+			AssetImporter::GetTexture("Magma/assets/icons/StopButton.png"));
 }
 
 void SceneTab::SetScene(const std::string& path) {
@@ -158,7 +141,7 @@ void SceneTab::Render() {
 }
 
 void SceneTab::NewScene() {
-	SetScene(Scene("New Scene"));
+	m_Scene = Scene("New Scene");
 	m_ScenePath = "";
 	menu.file.newScene = false;
 }

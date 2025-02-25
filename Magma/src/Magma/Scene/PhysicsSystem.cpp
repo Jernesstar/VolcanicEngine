@@ -21,18 +21,18 @@ void PhysicsSystem::Update(TimeStep ts) {
 
 void PhysicsSystem::Run(Phase phase) {
 	if(phase == Phase::PreUpdate) {
-		m_EntityWorld->ForEach<RigidBodyComponent, TransformComponent>(
+		m_EntityWorld
+		->ForEach<RigidBodyComponent, TransformComponent>(
 			[this](Entity& entity)
 			{
 				auto [rc] = GetRequired(entity);
 				auto t = entity.Get<TransformComponent>();
-
-				rc.Body->UpdateTransform({ t.Translation, t.Rotation, t.Scale });
+				rc.Body->UpdateTransform(t);
 			});
 	}
-
 	if(phase == Phase::PostUpdate) {
-		m_EntityWorld->ForEach<RigidBodyComponent, TransformComponent>(
+		m_EntityWorld
+		->ForEach<RigidBodyComponent, TransformComponent>(
 			[this](Entity& entity)
 			{
 				auto [rc] = GetRequired(entity);
@@ -47,13 +47,16 @@ void PhysicsSystem::Run(Phase phase) {
 }
 
 void PhysicsSystem::OnComponentAdd(Entity& entity) {
-	// auto& r = entity.Get<RigidBodyComponent>();
+	auto& rc = entity.Get<RigidBodyComponent>();
+	rc.Body->Data = (void*)(uint64_t)(uint32_t)entity.GetHandle();
+	m_World.AddActor(rc.Body);
 
-	// Creating RigidBodyComponent then MeshComponent ==> bounding volume
-	// Creating MeshComponent then RigidBodyComponent ==> tightly-fitting volume
+	// // Creating RigidBodyComponent then MeshComponent ==> bounding volume
+	// // Creating MeshComponent then RigidBodyComponent ==> tightly-fitting volume
 
-	// If the RigidBody was created without a shape,
-	// inherit the shape of the current MeshComponent
+	// // If the RigidBody was created without a shape,
+	// // inherit the shape of the current MeshComponent
+	
 	// if(entity.Has<MeshComponent>() && !r.Body->HasShape()) {
 	// 	auto mesh = entity.Get<MeshComponent>().Mesh;
 	// 	Ref<Shape> shape = Shape::Create(mesh);
@@ -61,16 +64,8 @@ void PhysicsSystem::OnComponentAdd(Entity& entity) {
 	// }
 	// if(entity.Has<TransformComponent>()) {
 	// 	auto& t = entity.Get<TransformComponent>();
-
-	// 	Transform tr{
-	// 		.Translation = t.Translation,
-	// 		.Rotation	 = t.Rotation,
-	// 		.Scale		 = t.Scale
-	// 	};
-	// 	r.Body->UpdateTransform(tr);
+	// 	r.Body->UpdateTransform(t);
 	// }
-
-	// m_World.AddActor(r.Body);
 }
 
 void PhysicsSystem::OnComponentSet(Entity& entity) {

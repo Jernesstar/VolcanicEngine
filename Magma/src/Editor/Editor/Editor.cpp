@@ -230,16 +230,6 @@ void Editor::NewTab(Ref<Tab> tab) {
 	SetTab(tab);
 }
 
-void Editor::NewTab(const Scene& scene) {
-	Ref<Tab> newTab = CreateRef<SceneTab>(scene);
-	NewTab(newTab);
-}
-
-void Editor::NewTab(const UI::UIPage& page) {
-	Ref<Tab> newTab = CreateRef<UITab>(page);
-	NewTab(newTab);
-}
-
 void Editor::NewTab() {
 	menu.tab.newTab = false;
 	Ref<Tab> newTab = CreateRef<Tab>();

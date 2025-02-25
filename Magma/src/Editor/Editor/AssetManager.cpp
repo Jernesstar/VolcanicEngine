@@ -102,7 +102,6 @@ void EditorAssetManager::Load(const std::string& path) {
 		if(meshNode["Path"]) {
 			m_AssetRegistry[newAsset] = false;
 			m_Paths[id] = meshNode["Path"].as<std::string>();
-			m_MeshAssets[id] = AssetImporter::GetMesh(m_Paths[id]);
 		}
 		else {
 			m_AssetRegistry[newAsset] = false;
@@ -133,13 +132,28 @@ void EditorAssetManager::Load(const std::string& path) {
 		}
 	}
 	for(auto textureAssetNode : assetPackNode["TextureAssets"]) {
-
+		auto node = textureAssetNode["Texture"];
+		auto id = node["ID"].as<uint64_t>();
+		auto path = node["Path"].as<std::string>();
+		Asset asset{ id, AssetType::Texture };
+		m_Paths[id] = path;
+		m_AssetRegistry[asset] = false;
 	}
 	for(auto cubemapAssetNode : assetPackNode["CubemapAssets"]) {
-
+		auto node = cubemapAssetNode["Cubemap"];
+		auto id = node["ID"].as<uint64_t>();
+		auto path = node["Path"].as<std::string>();
+		Asset asset{ id, AssetType::Cubemap };
+		m_Paths[id] = path;
+		m_AssetRegistry[asset] = false;
 	}
 	for(auto audioAssetNode : assetPackNode["AudioAssets"]) {
-
+		auto node = audioAssetNode["Audio"];
+		auto id = node["ID"].as<uint64_t>();
+		auto path = node["Path"].as<std::string>();
+		Asset asset{ id, AssetType::Audio };
+		m_Paths[id] = path;
+		m_AssetRegistry[asset] = false;
 	}
 }
 
@@ -229,7 +243,11 @@ void EditorAssetManager::Save() {
 
 	serializer.WriteKey("TextureAssets").BeginSequence();
 	for(auto& [id, texture] : m_TextureAssets) {
-		serializer.WriteKey("Path").Write(m_Paths[id]);
+		serializer
+			.WriteKey("Texture").BeginMapping()
+				.WriteKey("Path").Write(m_Paths[id])
+			.EndMapping()
+		.EndMapping();
 	}
 	serializer.EndSequence();
 

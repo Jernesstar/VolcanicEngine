@@ -21,11 +21,6 @@ public:
 
 	static asIScriptEngine* Get();
 
-	template<class TFunction>
-	static void RegisterFunction(TFunction func) {
-
-	}
-
 	static void RegisterSingleton(const std::string& className,
 								  const std::string& instanceName,
 								  void* instance);

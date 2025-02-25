@@ -15,14 +15,12 @@ enum class SceneState { Edit, Play, Pause };
 class SceneTab : public Tab {
 public:
 	SceneTab();
-	SceneTab(const Scene& scene);
 	SceneTab(const std::string& path);
 	~SceneTab();
 
 	void Update(TimeStep ts) override;
 	void Render() override;
 
-	void SetScene(const Scene& scene);
 	void SetScene(const std::string& path);
 
 	SceneState GetState() const { return m_SceneState; }
