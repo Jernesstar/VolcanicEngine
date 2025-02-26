@@ -56,7 +56,7 @@ static void EditAsset(Asset asset) {
 }
 
 void AssetEditorPanel::Draw() {
-	ImGui::Begin("Asset Editor", &m_Open);
+	ImGui::Begin("Asset Editor");
 	{
 		if(m_CurrentAsset.Type != AssetType::None)
 			EditAsset(m_CurrentAsset);

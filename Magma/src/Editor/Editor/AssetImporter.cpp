@@ -6,6 +6,9 @@
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 
+#include <soloud.h>
+#include <soloud_wav.h>
+
 #include "Core/Log.h"
 #include "Core/Assert.h"
 #include "Core/FileUtils.h"
@@ -173,6 +176,10 @@ Ref<Mesh> AssetImporter::GetMesh(const std::string& path) {
 		mesh->SubMeshes.Add(LoadMesh(path, scene, i));
 
 	return mesh;
+}
+
+Ref<Sound> AssetImporter::GetSound(const std::string& path) {
+
 }
 
 }

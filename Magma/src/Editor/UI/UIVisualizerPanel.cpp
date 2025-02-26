@@ -87,7 +87,7 @@ void UIVisualizerPanel::Draw() {
 	ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4{ 0.0f, 0.0f, 0.0f, 1.0f });
 	auto windowFlags = ImGuiWindowFlags_NoScrollbar
 					 | ImGuiWindowFlags_NoScrollWithMouse;
-	ImGui::Begin("UI Visualizer", &m_Open, windowFlags);
+	ImGui::Begin("UI Visualizer", &Open, windowFlags);
 	{
 		ImGui::PopStyleColor();
 

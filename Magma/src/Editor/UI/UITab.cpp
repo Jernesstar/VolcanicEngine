@@ -58,7 +58,7 @@ UITab::~UITab() {
 
 void UITab::Update(TimeStep ts) {
 	for(auto& panel : m_Panels)
-		if(panel->IsOpen())
+		if(panel->Open)
 			panel->Update(ts);
 }
 
@@ -84,12 +84,12 @@ void UITab::Render() {
 			ImGui::EndMenu();
 		}
 		for(auto panel : m_Panels) {
-			if(panel->IsOpen())
+			if(panel->Open)
 				continue;
 
 			if(ImGui::BeginMenu("View")) {
 				if(ImGui::MenuItem(panel->Name.c_str()))
-					panel->Open();
+					panel->Open = true;
 				ImGui::EndMenu();
 			}
 		}
@@ -109,7 +109,7 @@ void UITab::Render() {
 		AddButton();
 
 	for(auto& panel : m_Panels)
-		if(panel->IsOpen())
+		if(panel->Open)
 			panel->Draw();
 }
 

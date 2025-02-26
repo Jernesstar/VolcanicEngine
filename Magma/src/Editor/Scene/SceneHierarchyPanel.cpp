@@ -45,7 +45,7 @@ struct {
 } static options;
 
 void SceneHierarchyPanel::Draw() {
-	ImGui::Begin("Scene Hierarchy", &m_Open);
+	ImGui::Begin("Scene Hierarchy", &Open);
 	{
 		if(ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
 			m_Selected = { };

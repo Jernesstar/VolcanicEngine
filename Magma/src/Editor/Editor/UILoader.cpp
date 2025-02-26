@@ -221,8 +221,6 @@ void UILoader::EditorSave(const UIPage& page, const std::string& path) {
 	JSONSerializer serializer;
 	serializer.BeginMapping(); // File
 
-	// TODO(Implement): Serialize theme
-
 	serializer.WriteKey("Elements")
 	.BeginSequence();
 
@@ -241,8 +239,10 @@ Theme UILoader::LoadTheme(const std::string& path) {
 	doc.Parse(file);
 
 	Theme res;
-	if(!doc.HasMember("Theme"))
+	if(!doc.HasMember("Theme")) {
+		VOLCANICORE_LOG_WARNING("Failed to load theme '%s'", path.c_str());
 		return res;
+	}
 
 	const auto& themeNode = doc["Theme"];
 
@@ -441,8 +441,8 @@ T TryGet(const rapidjson::Value& node, const std::string& name, const T& alt) {
 void LoadElement(UIPage& page, const rapidjson::Value& elementNode,
 				 const Theme& pageTheme)
 {
-	std::string id = elementNode["ID"].GetString();
-	std::string typeStr = elementNode["Type"].GetString();
+	std::string id = elementNode["ID"].Get<std::string>();
+	std::string typeStr = elementNode["Type"].Get<std::string>();
 	std::string parent = "";
 
 	if(elementNode.HasMember("Parent"))
@@ -522,6 +522,8 @@ void LoadElement(UIPage& page, const rapidjson::Value& elementNode,
 			theme = pageTheme.at(element->GetType());
 		else
 			theme = { };
+		auto text = element->As<Text>();
+		text->Content = elementNode["Text"].Get<std::string>();
 	}
 	if(typeStr == "TextInput") {
 		node = page.Add(UIElementType::TextInput, id);

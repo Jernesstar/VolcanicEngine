@@ -51,19 +51,9 @@ void SceneTab::Setup() {
 	AddPanel<SceneVisualizerPanel>(&m_Scene)->SetTab(this);
 	AddPanel<ComponentEditorPanel>()->SetTab(this);
 
-	GetPanel("SceneHierarchy")->Open();
-	GetPanel("SceneVisualizer")->Open();
-	GetPanel("ComponentEditor")->Open();
-
-	m_PlayButton.Display =
-		CreateRef<UI::Image>(
-			AssetImporter::GetTexture("Magma/assets/icons/PlayButton.png"));
-	m_PauseButton.Display =
-		CreateRef<UI::Image>(
-			AssetImporter::GetTexture("Magma/assets/icons/PauseButton.png"));
-	m_StopButton.Display =
-		CreateRef<UI::Image>(
-			AssetImporter::GetTexture("Magma/assets/icons/StopButton.png"));
+	GetPanel("SceneHierarchy")->Open = true;
+	GetPanel("SceneVisualizer")->Open = true;
+	GetPanel("ComponentEditor")->Open = true;
 }
 
 void SceneTab::SetScene(const std::string& path) {
@@ -73,11 +63,8 @@ void SceneTab::SetScene(const std::string& path) {
 }
 
 void SceneTab::Update(TimeStep ts) {
-	if(m_SceneState == SceneState::Play)
-		m_Scene.OnUpdate(ts);
-
 	for(auto panel : m_Panels)
-		if(panel->IsOpen())
+		if(panel->Open)
 			panel->Update(ts);
 }
 
@@ -103,20 +90,18 @@ void SceneTab::Render() {
 			ImGui::EndMenu();
 		}
 		for(auto panel : m_Panels) {
-			if(panel->IsOpen())
+			if(panel->Open)
 				continue;
 
 			if(ImGui::BeginMenu("View")) {
 				if(ImGui::MenuItem(panel->Name.c_str()))
-					panel->Open();
+					panel->Open = true;
 
 				ImGui::EndMenu();
 			}
 		}
 	}
 	ImGui::EndMainMenuBar();
-
-	ToolbarUI();
 
 	if(menu.file.newScene)
 		NewScene();
@@ -136,7 +121,7 @@ void SceneTab::Render() {
 		AddEntity();
 
 	for(auto panel : m_Panels)
-		if(panel->IsOpen())
+		if(panel->Open)
 			panel->Draw();
 }
 
@@ -183,68 +168,6 @@ void SceneTab::SaveScene() {
 
 void SceneTab::AddEntity() {
 	menu.edit.addEntity = false;
-}
-
-void SceneTab::OnScenePlay() {
-	m_SceneState = SceneState::Play;
-
-}
-
-void SceneTab::OnScenePause() {
-	m_SceneState = SceneState::Pause;
-
-}
-
-void SceneTab::OnSceneStop() {
-	m_SceneState = SceneState::Edit;
-
-}
-
-void SceneTab::ToolbarUI() {
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-	ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(0, 0));
-
-	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.f, 0.f, 0.f, 0.f));
-	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.f, 0.f, 0.f, 0.f));
-	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.f, 0.f, 0.f, 0.f));
-
-	auto flags = ImGuiWindowFlags_NoDecoration
-			   | ImGuiWindowFlags_NoScrollWithMouse
-			   | ImGuiWindowFlags_NoScrollbar
-			   | ImGuiWindowFlags_NoResize
-			   | ImGuiWindowFlags_NoMove
-			   | ImGuiWindowFlags_NoTitleBar;
-	ImGui::Begin("##toolbar", nullptr, flags);
-	{
-		float size = ImGui::GetWindowHeight() - 2.0f;
-		auto x = 0.5f * (ImGui::GetWindowContentRegionMax().x - size);
-		UI::Button* button = &m_PlayButton;
-		if(m_SceneState == SceneState::Play)
-			button = &m_PauseButton;
-
-		button->x = x;
-		button->y = ImGui::GetCursorPosY();
-		button->SetSize(size, size);
-		button->Render();
-
-		ImGui::SameLine();
-		m_StopButton.x = ImGui::GetCursorPosX() + 5.0f;
-		m_StopButton.y = ImGui::GetCursorPosY();
-		m_StopButton.SetSize(size, size);
-		m_StopButton.Render();
-
-		if(button->GetState().Clicked)
-			if(button == &m_PlayButton)
-				OnScenePlay();
-			else
-				OnScenePause();
-		if(m_StopButton.GetState().Clicked)
-			OnSceneStop();
-	}
-	ImGui::End();
-
-	ImGui::PopStyleColor(3);
-	ImGui::PopStyleVar(2);
 }
 
 }

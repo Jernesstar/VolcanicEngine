@@ -35,7 +35,7 @@ public:
 	static UIState DrawMenu(const std::string& name);
 
 	static UIState DrawTabBar(const std::string& name);
-	static TabState DrawTab(const std::string& name);
+	static TabState DrawTab(const std::string& name, bool closeButton = true);
 
 	static void ShowPopupLabel(const std::string& str);
 };

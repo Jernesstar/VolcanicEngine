@@ -10,7 +10,7 @@ using namespace physx;
 
 namespace Magma::Physics {
 
-class RigidBody {
+class RigidBody : public Derivable<RigidBody> {
 public:
 	enum class Type { Static, Dynamic };
 
@@ -43,10 +43,6 @@ public:
 	void UpdateTransform();
 	void SetTransform(const Transform& t);
 	const Transform& GetTransform() const { return m_Transform; }
-
-	template<typename TDerived>
-	requires std::derived_from<TDerived, RigidBody>
-	TDerived* As() const { return (TDerived*)(this); }
 
 protected:
 #ifdef MAGMA_PHYSICS

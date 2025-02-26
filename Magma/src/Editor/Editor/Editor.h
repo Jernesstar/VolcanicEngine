@@ -26,35 +26,20 @@ public:
 	void Render();
 
 	void NewTab(Ref<Tab> tab);
+	Ref<Tab> GetProjectTab() { return m_Tabs[0]; }
 
-	const Project& GetProject() const { return m_Project; }
-
-	Ref<Panel> GetPanel(const std::string& name) {
-		auto [found, idx] =
-			m_Panels.Find(
-				[&](auto& panel)
-				{
-					return panel->Name == name;
-				});
-
-		if(!found)
-			return nullptr;
-
-		return m_Panels[idx];
-	}
-
+	Project& GetProject() { return m_Project; }
 	EditorAssetManager& GetAssetManager() { return m_AssetManager; }
-	Ref<Lava::App> GetApp() { return m_App; }
+	Ref<Lava::App>& GetApp() { return m_App; }
 
 private:
 	Project m_Project;
+	EditorAssetManager m_AssetManager;
+	Ref<Lava::App> m_App;
+
 	Ref<Tab> m_CurrentTab;
 	List<Ref<Tab>> m_Tabs;
 	List<Ref<Tab>> m_ClosedTabs;
-	List<Ref<Panel>> m_Panels;
-
-	EditorAssetManager m_AssetManager;
-	Ref<Lava::App> m_App;
 
 	void SetTab(Ref<Tab> tab);
 	void NewTab();

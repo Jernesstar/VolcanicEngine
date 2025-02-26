@@ -4,8 +4,9 @@
 
 namespace Magma::UI {
 
-	void Text::Draw() {
+void Text::Draw() {
 	m_State = UIRenderer::DrawText(*this);
+	
 }
 
 }

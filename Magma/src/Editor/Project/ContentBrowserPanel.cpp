@@ -45,7 +45,7 @@ static bool HasExtension(fs::path path, const List<std::string>& extensions) {
 static ImRect Traverse(fs::path folder);
 
 void ContentBrowserPanel::Draw() {
-	ImGui::Begin("Content Browser", &m_Open);
+	ImGui::Begin("Content Browser", &Open);
 	{
 		auto windowFlags = ImGuiWindowFlags_MenuBar;
 		auto childFlags = ImGuiChildFlags_Border;
@@ -122,8 +122,8 @@ void ContentBrowserPanel::Draw() {
 					button.y = -1;
 					if(UI::UIRenderer::DrawButton(button).Clicked) {
 						auto panel =
-							editor.GetPanel("AssetEditor")
-								->As<AssetEditorPanel>();
+							m_Tab->GetPanel("AssetEditor")
+							->As<AssetEditorPanel>();
 						panel->Select(asset);
 					}
 
@@ -136,6 +136,8 @@ void ContentBrowserPanel::Draw() {
 						image.Content = m_FileIcon->Content;
 						image.Width = thumbnailSize;
 						image.Height = thumbnailSize;
+						image.x = -1;
+						image.y = -1;
 						UI::UIRenderer::DrawImage(image);
 
 						ImGui::EndDragDropSource();

@@ -23,29 +23,18 @@ public:
 
 	void SetScene(const std::string& path);
 
-	SceneState GetState() const { return m_SceneState; }
-
 private:
 	Scene m_Scene;
 	std::string m_ScenePath;
-	UI::Button m_PlayButton, m_PauseButton, m_StopButton;
-
-	SceneState m_SceneState = SceneState::Edit;
 
 private:
 	void Setup();
-
-	void ToolbarUI();
 
 	void NewScene();
 	void OpenScene();
 	void SaveScene();
 
 	void AddEntity();
-
-	void OnScenePlay();
-	void OnScenePause();
-	void OnSceneStop();
 };
 
 }

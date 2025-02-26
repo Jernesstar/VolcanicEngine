@@ -47,7 +47,7 @@ struct {
 static UIElement* s_AddToElement;
 
 void UIHierarchyPanel::Draw() {
-	ImGui::Begin("UI Hierarchy", &m_Open);
+	ImGui::Begin("UI Hierarchy", &Open);
 	{
 		for(UIElement* element : m_Context->GetFirstOrderElements())
 			Traverse(element);

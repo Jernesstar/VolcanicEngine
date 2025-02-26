@@ -4,6 +4,8 @@
 #include <imgui/imgui_internal.h>
 #include <imgui/misc/cpp/imgui_stdlib.h>
 
+#include <ImGuizmo/ImGuizmo.h>
+
 #include <VolcaniCore/Core/Application.h>
 #include <VolcaniCore/Core/Input.h>
 
@@ -59,13 +61,13 @@ void SceneVisualizerPanel::SetContext(Scene* context) {
 			body->SetTransform(tc);
 			body->Data = (void*)(uint64_t)entity.GetHandle();
 			m_World.AddActor(body);
+			m_Selected = entity;
 		});
 }
 
 static bool s_Hovered = false;
 
 void SceneVisualizerPanel::Update(TimeStep ts) {
-	m_Renderer.SetState(m_Tab->As<SceneTab>()->GetState());
 	m_Renderer.IsHovered(s_Hovered);
 	m_Renderer.Update(ts);
 }
@@ -77,13 +79,22 @@ struct {
 } static options;
 
 void SceneVisualizerPanel::Draw() {
+	auto& editor = Application::As<EditorApp>()->GetEditor();
+	auto tab = editor.GetProjectTab()->As<ProjectTab>();
+
+	if(tab->GetState() == ScreenState::Play) {
+		// m_Image.Content = tab->GetOutput();
+	}
+	else
+		m_Image.Content = m_Renderer.GetOutput()->Get(AttachmentTarget::Color);
+
 	m_Context->OnRender(m_Renderer);
 
 	auto flags = ImGuiWindowFlags_NoScrollbar
 			   | ImGuiWindowFlags_NoScrollWithMouse;
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0, 0 });
 	ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4{ 0.0f, 0.0f, 0.0f, 1.0f });
-	ImGui::Begin("Scene Visualizer", &m_Open, flags);
+	ImGui::Begin("Scene Visualizer", &Open, flags);
 	{
 		ImGui::PopStyleVar();
 		ImGui::PopStyleColor();
@@ -120,7 +131,7 @@ void SceneVisualizerPanel::Draw() {
 
 		auto windowFlags = ImGuiWindowFlags_MenuBar;
 		auto childFlags = ImGuiChildFlags_Border;
-		ImGui::BeginChild("Debug", { 200, 200 }, childFlags, windowFlags);
+		ImGui::BeginChild("Debug", { 150, 160 }, childFlags, windowFlags);
 		{
 			auto info = Renderer::GetDebugInfo();
 			ImGui::Text("FPS: %0.1f", info.FPS);
@@ -176,8 +187,8 @@ void SceneVisualizerPanel::Draw() {
 			ImGui::EndPopup();
 		}
 
+		auto camera = m_Renderer.GetCameraController().GetCamera();
 		if(ImGui::IsMouseClicked(1) && ImGui::IsWindowHovered()) {
-			auto camera = m_Renderer.GetCameraController().GetCamera();
 			// auto& world = m_Context->EntityWorld;
 
 			glm::vec2 pos = { ImGui::GetMousePos().x, ImGui::GetMousePos().y };
@@ -221,6 +232,16 @@ void SceneVisualizerPanel::Draw() {
 				VOLCANICORE_LOG_INFO("Not hit");
 		}
 
+		if(m_Selected) {
+			auto view = glm::value_ptr(camera->GetView());
+			auto proj = glm::value_ptr(camera->GetProjection());
+			auto oper = ImGuizmo::OPERATION::ROTATE;
+			auto mode = ImGuizmo::MODE::WORLD;
+			auto mat = (glm::mat4)(Transform)m_Selected.Get<TransformComponent>();
+			auto ptr = glm::value_ptr(mat);
+			ImGuizmo::Enable(true);
+			ImGuizmo::Manipulate(view, proj, oper, mode, ptr);
+		}
 	}
 	ImGui::End();
 }
@@ -294,16 +315,13 @@ EditorSceneRenderer::EditorSceneRenderer() {
 }
 
 void EditorSceneRenderer::Update(TimeStep ts) {
-	if(State == SceneState::Edit && Hovered)
+	if(Hovered)
 		m_Controller.OnUpdate(ts);
 }
 
 void EditorSceneRenderer::Begin() {
 	FirstCommand = RendererAPI::Get()->NewDrawCommand(LightingPass->Get());
 	FirstCommand->Clear = true;
-
-	if(State != SceneState::Edit)
-		return;
 
 	FirstCommand->UniformData
 	.SetInput("u_ViewProj", m_Controller.GetCamera()->GetViewProjection());
@@ -326,9 +344,6 @@ void EditorSceneRenderer::Begin() {
 }
 
 void EditorSceneRenderer::SubmitCamera(Entity entity) {
-	if(State == SceneState::Edit)
-		return;
-
 	auto camera = entity.Get<CameraComponent>().Cam;
 	FirstCommand->UniformData
 	.SetInput("u_ViewProj", camera->GetViewProjection());
@@ -386,7 +401,7 @@ void EditorSceneRenderer::Render() {
 	FirstCommand->UniformData
 	.SetInput("u_SpotlightCount", (int32_t)SpotlightCount);
 
-	if(Selected && State == SceneState::Edit) {
+	if(Selected) {
 		auto& assetManager =
 			Application::As<EditorApp>()->GetEditor().GetAssetManager();
 		auto& tc = Selected.Get<TransformComponent>();

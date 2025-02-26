@@ -184,7 +184,8 @@ UIState UIRenderer::DrawImage(UI::Image& image) {
 	auto texture = image.Content->As<OpenGL::Texture2D>();
 
 	ImVec2 dim = ImVec2(image.Width, image.Height);
-	ImGui::SetCursorPos(ImVec2(image.x, image.y));
+	if(image.x != -1 && image.y != -1)
+		ImGui::SetCursorPos(ImVec2(image.x, image.y));
 	ImGui::Image((ImTextureID)(intptr_t)texture->GetID(), dim);
 
 	return {
@@ -293,23 +294,23 @@ UIState UIRenderer::DrawTabBar(const std::string& name) {
 	};
 }
 
-TabState UIRenderer::DrawTab(const std::string& name) {
+TabState UIRenderer::DrawTab(const std::string& name, bool closeButton) {
 	s_Stack.Add(UIType::Tab);
 
 	ImVec2 size = ImGui::CalcTextSize(name.c_str());
-	float padding = 14.0f;
-	float tabHeight = 6.5f;
-	float radius = tabHeight * 0.5f - padding;
+	float padding = closeButton ? 24.0f : 10.0f;
+	float tabHeight = 7.0f;
+	float radius = closeButton ? tabHeight * 0.5f : 0;
 
-	ImGui::SetNextItemWidth(size.x + 2.0f*padding);
+	ImGui::SetNextItemWidth(size.x + (2.0f*radius + padding));
 
 	ImGui::PushID(s_Stack.Count());
 	bool tabItem = ImGui::BeginTabItem(name.c_str());
 	ImGui::PopID();
 
 	ImVec2 pos;
-	pos.x = ImGui::GetItemRectMax().x - radius - 2.2f*padding;
-	pos.y = ImGui::GetItemRectMin().y + radius + padding;
+	pos.x = ImGui::GetItemRectMax().x - 6.0f*radius;
+	pos.y = ImGui::GetItemRectMin().y + radius;
 
 	ImGuiTabBar* tabBar = ImGui::GetCurrentTabBar();
 
@@ -320,8 +321,10 @@ TabState UIRenderer::DrawTab(const std::string& name) {
 		ImGui::EndTabItem();
 	}
 
-	auto closeButtonID = ImGui::GetID((int*)s_Stack.Count());
-	state.Closed = ImGui::CloseButton(closeButtonID, pos);
+	if(closeButton) {
+		auto closeButtonID = ImGui::GetID((int*)s_Stack.Count());
+		state.Closed = ImGui::CloseButton(closeButtonID, pos);
+	}
 
 	return state;
 }

@@ -2,9 +2,10 @@
 
 #include <glm/vec4.hpp>
 
-#include <Core/Defines.h>
-#include <Core/List.h>
-#include <Core/UUID.h>
+#include <VolcaniCore/Core/Defines.h>
+#include <VolcaniCore/Core/Template.h>
+#include <VolcaniCore/Core/List.h>
+#include <VolcaniCore/Core/UUID.h>
 
 using namespace VolcaniCore;
 
@@ -35,7 +36,7 @@ enum class UIElementType {
 
 using UINode = std::pair<UIElementType, uint32_t>;
 
-class UIElement {
+class UIElement : public Derivable<UIElement> {
 public:
 	uint32_t Width = 0;
 	uint32_t Height = 0;
@@ -81,10 +82,6 @@ public:
 	UIElement* GetChild(const UINode& node) const;
 	UIElement* GetChild(const std::string& id) const;
 	List<UIElement*> GetChildren() const;
-
-	template<typename TUIElement>
-	requires std::derived_from<TUIElement, UIElement>
-	TUIElement* As() const { return (TUIElement*)(this); }
 
 protected:
 	const UIElementType m_Type;

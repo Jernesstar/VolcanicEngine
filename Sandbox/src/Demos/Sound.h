@@ -28,10 +28,10 @@ Sound::Sound() {
 				Application::Close();
 		});
 	Events::RegisterListener<KeyPressedEvent>(
-		[](const KeyPressedEvent& event)
+		[&](const KeyPressedEvent& event)
 		{
 			if(event.Key == Key::K)
-				VOLCANICORE_LOG_INFO("Test Key K");
+				s_SoundEngine.play(sound, 10.0f);
 		});
 
 	camera = CreateRef<StereographicCamera>(75.0f);
@@ -39,6 +39,7 @@ Sound::Sound() {
 	controller = CameraController{ camera };
 
 	s_SoundEngine.init();
+	VOLCANICORE_ASSERT(sound.load("TestProj/Visual/Asset/Audio/Woosh2.wav") == 0);
 }
 
 Sound::~Sound() {

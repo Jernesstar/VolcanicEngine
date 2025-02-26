@@ -1,13 +1,14 @@
 AssetPack:
-  MeshAssets:
-    - Mesh:
+  Assets:
+    - Asset:
         ID: 10036008063945961451
+        Type: 0
         PrimitiveType: 1
         Material:
           DiffuseColor: [1, 1, 1, 1]
           SpecularColor: [0, 0, 0, 0]
           EmissiveColor: [0, 0, 0, 0]
-  TextureAssets:
-    []
-  CubemapAssets:
-    []
+    - Asset:
+        ID: 5802757838292007671
+        Type: 4
+        Path: C:\Users\JMukala\Code\VolcanicEngine\TestProj\Visual\Asset\Audio\Woosh2.wav

@@ -4,6 +4,8 @@
 #include <imgui/imgui_internal.h>
 #include <imgui/misc/cpp/imgui_stdlib.h>
 
+#include <ImGuizmo/ImGuizmo.h>
+
 #include <VolcaniCore/Core/Log.h>
 #include <VolcaniCore/Event/Events.h>
 #include <VolcaniCore/Graphics/Renderer.h>
@@ -56,8 +58,11 @@ void EditorApp::OnUpdate(TimeStep ts) {
 	Renderer::Clear();
 
 	UIRenderer::BeginFrame();
+	ImGuizmo::BeginFrame();
+
 	m_Editor.Update(ts);
 	m_Editor.Render();
+
 	UIRenderer::EndFrame();
 }
 

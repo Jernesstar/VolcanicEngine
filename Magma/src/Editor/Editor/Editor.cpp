@@ -9,6 +9,7 @@
 #include <ImGuiFileDialog/ImGuiFileDialog.h>
 
 #include <VolcaniCore/Core/Application.h>
+#include <VolcaniCore/Core/FileUtils.h>
 #include <VolcaniCore/Core/Log.h>
 #include <VolcaniCore/Core/Input.h>
 #include <VolcaniCore/Graphics/RendererAPI.h>
@@ -22,8 +23,7 @@
 
 #include <Lava/ScriptGlue.h>
 
-#include "Project/AssetEditorPanel.h"
-#include "Project/ContentBrowserPanel.h"
+#include "Project/ProjectTab.h"
 
 #include "SceneLoader.h"
 #include "UILoader.h"
@@ -51,6 +51,8 @@ struct {
 } static menu;
 
 Editor::Editor(const CommandLineArgs& args) {
+	namespace fs = std::filesystem;
+
 	Physics::Init();
 	ScriptEngine::Init();
 	Lava::ScriptGlue::Init();
@@ -58,22 +60,17 @@ Editor::Editor(const CommandLineArgs& args) {
 	if(args["--project"]) {
 		m_Project.Load(args["--project"]);
 		m_App = CreateRef<Lava::App>(m_Project);
-		SetTab(nullptr);
-
-		auto panel1 = CreateRef<AssetEditorPanel>();
-		auto panel2 = CreateRef<ContentBrowserPanel>(m_Project.Path);
-		panel1->Open();
-		panel2->Open();
-		m_Panels.Add(panel1);
-		m_Panels.Add(panel2);
 
 		m_AssetManager.Load(m_Project.Path);
 		m_AssetManager.Reload();
 
 		auto themePath =
-			fs::path(m_Project.Path) / "Visual" / "UI" / "theme.magma.ui.json";
+			fs::path(m_Project.Path) / "Visual" / "UI" / "Page"
+									/ "theme.magma.ui.json";
 		if(fs::exists(themePath))
 			UITab::GetTheme() = UILoader::LoadTheme(themePath.string());
+
+		NewTab(CreateRef<ProjectTab>(m_Project.Path));
 	}
 	for(auto& path : args["--scene"])
 		NewTab(CreateRef<SceneTab>(path));
@@ -83,7 +80,6 @@ Editor::Editor(const CommandLineArgs& args) {
 
 Editor::~Editor() {
 	m_Tabs.Clear();
-	m_Panels.Clear();
 
 	// Physics::Close();
 	ScriptEngine::Shutdown();
@@ -92,8 +88,6 @@ Editor::~Editor() {
 void Editor::Update(TimeStep ts) {
 	for(auto tab : m_Tabs)
 		tab->Update(ts);
-	for(auto panel : m_Panels)
-		panel->Update(ts);
 }
 
 void Editor::Render() {
@@ -146,6 +140,14 @@ void Editor::Render() {
 				if(ImGui::MenuItem("New", "Ctrl+T")
 				|| Input::KeysPressed(Key::Ctrl, Key::T))
 					menu.tab.newTab = true;
+				if(ImGui::MenuItem("New Scene Tab")
+				|| Input::KeysPressed(Key::Ctrl, Key::T))
+					menu.tab.newTab = true;
+				if(ImGui::MenuItem("New UI Tab")
+				|| Input::KeysPressed(Key::Ctrl, Key::T))
+					menu.tab.newTab = true;
+				ImGui::Separator();
+
 				if(ImGui::MenuItem("Open", "Ctrl+O")
 				|| Input::KeyPressed(Key::O))
 					menu.tab.openTab = true;
@@ -172,7 +174,9 @@ void Editor::Render() {
 
 			Ref<Tab> tabToDelete = nullptr;
 			for(auto tab : m_Tabs) {
-				TabState state = UIRenderer::DrawTab(tab->GetName());
+				bool closeButton = tab->Type != TabType::Project;
+				TabState state =
+					UIRenderer::DrawTab(tab->GetName(), closeButton);
 				if(state.Closed)
 					tabToDelete = tab;
 				else if(state.Clicked)
@@ -187,9 +191,7 @@ void Editor::Render() {
 		ImGuiID dockspaceID = ImGui::GetID("DockSpace");
 		ImGui::DockSpace(dockspaceID, ImVec2(0.0f, 0.0f), dockspaceFlags);
 
-		for(auto panel : m_Panels)
-			panel->Draw();
-
+		m_Tabs[0]->As<ProjectTab>()->RenderEssentialPanels();
 		if(m_CurrentTab)
 			m_CurrentTab->Render();
 	}
@@ -206,7 +208,7 @@ void Editor::Render() {
 	if(menu.project.exportProject)
 		ExportProject();
 
-	if(menu.tab.newTab)
+	if(menu.tab.newTab )
 		NewTab();
 	if(menu.tab.openTab)
 		OpenTab();
@@ -326,6 +328,8 @@ void Editor::RunProject() {
 }
 
 void Editor::ExportProject() {
+	namespace fs = std::filesystem;
+
 	IGFD::FileDialogConfig config;
 	config.path = ".";
 	auto instance = ImGuiFileDialog::Instance();

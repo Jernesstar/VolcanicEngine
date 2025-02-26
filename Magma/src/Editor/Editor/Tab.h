@@ -1,6 +1,7 @@
 #pragma once
 
 #include <VolcaniCore/Core/Defines.h>
+#include <VolcaniCore/Core/Template.h>
 #include <VolcaniCore/Core/List.h>
 #include <VolcaniCore/Core/Time.h>
 
@@ -10,9 +11,9 @@ using namespace VolcaniCore;
 
 namespace Magma {
 
-enum class TabType { Scene, UI, None };
+enum class TabType { Project, Scene, UI, None };
 
-class Tab {
+class Tab : public Derivable<Tab> {
 public:
 	const TabType Type;
 
@@ -29,7 +30,9 @@ public:
 	void SetName(const std::string& name) { m_Name = name; }
 	std::string GetName() const { return m_Name; }
 
-	void AddPanel(Ref<Panel> panel);
+	void AddPanel(Ref<Panel> panel) {
+		m_Panels.Add(panel);
+	}
 
 	template<typename TPanel, typename ...Args>
 	requires std::derived_from<TPanel, Panel>
@@ -39,11 +42,12 @@ public:
 		return panel;
 	}
 
-	Ref<Panel> GetPanel(const std::string& name);
-
-	template<typename TTab>
-	requires std::derived_from<TTab, Tab>
-	TTab* As() const { return (TTab*)(this); }
+	Ref<Panel> GetPanel(const std::string& name) {
+		for(auto panel : m_Panels)
+			if(panel->Name == name)
+				return panel;
+		return nullptr;
+	}
 
 protected:
 	std::string m_Name;

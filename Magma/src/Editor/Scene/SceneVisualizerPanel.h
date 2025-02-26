@@ -28,12 +28,10 @@ public:
 	void Render() override;
 
 	void Select(Entity entity) { Selected = entity; }
-	void SetState(SceneState state) { State = state; }
 	void IsHovered(bool hovered) { Hovered = hovered; }
 
 private:
 	Entity Selected;
-	SceneState State;
 	bool Hovered = false;
 
 	DrawCommand* FirstCommand;

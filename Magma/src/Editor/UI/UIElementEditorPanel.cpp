@@ -217,7 +217,7 @@ void EditElement<UIElement>(UIElement* element) {
 }
 
 void UIElementEditorPanel::Draw() {
-	ImGui::Begin("UI Element Editor", &m_Open);
+	ImGui::Begin("UI Element Editor", &Open);
 	{
 		if(m_Selected)
 			EditElement<UIElement>(m_Selected);

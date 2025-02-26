@@ -1,14 +1,14 @@
 Project:
-  ExportPath: /workspaces/VolcanicEngine/TestGame
-  Name: TestProj
-  App: TestGame
-  StartScreen: TestHome
+  ExportPath: C:\Users\JMukala\Code\VolcanicEngine\TestGame
+  Name: TheMazeIsLava
+  App: TheMazeIsLava
+  StartScreen: HomeScreen
   Screens:
     - Screen:
-        Name: TestHome
+        Name: HomeScreen
         Scene: ""
-        UI: test
+        UI: Home
     - Screen:
-        Name: TestScreen2
-        Scene: test
-        UI: ""
+        Name: SelectScreen
+        Scene: ""
+        UI: Level

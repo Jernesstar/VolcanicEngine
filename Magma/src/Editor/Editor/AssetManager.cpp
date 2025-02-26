@@ -94,20 +94,21 @@ void EditorAssetManager::Load(const std::string& path) {
 	if(!assetPackNode)
 		return;
 
-	for(auto meshAssetNode : assetPackNode["MeshAssets"]) {
-		auto meshNode = meshAssetNode["Mesh"];
-		UUID id = meshNode["ID"].as<uint64_t>();
-		Asset newAsset = { id, AssetType::Mesh };
+	for(auto assetNode : assetPackNode["Assets"]) {
+		auto node = assetNode["Asset"];
+		UUID id = node["ID"].as<uint64_t>();
+		AssetType type = (AssetType)node["Type"].as<uint32_t>();
+		Asset newAsset = { id, type };
 
-		if(meshNode["Path"]) {
+		if(node["Path"]) {
 			m_AssetRegistry[newAsset] = false;
-			m_Paths[id] = meshNode["Path"].as<std::string>();
+			m_Paths[id] = node["Path"].as<std::string>();
 		}
 		else {
 			m_AssetRegistry[newAsset] = false;
 			auto type =
-				(MeshPrimitive)meshNode["PrimitiveType"].as<uint32_t>();
-			auto materialNode = meshNode["Material"];
+				(MeshPrimitive)node["PrimitiveType"].as<uint32_t>();
+			auto materialNode = node["Material"];
 
 			Material mat;
 			if(materialNode["Diffuse"])
@@ -131,30 +132,6 @@ void EditorAssetManager::Load(const std::string& path) {
 			m_MeshAssets[id] = Mesh::Create(type, mat);
 		}
 	}
-	for(auto textureAssetNode : assetPackNode["TextureAssets"]) {
-		auto node = textureAssetNode["Texture"];
-		auto id = node["ID"].as<uint64_t>();
-		auto path = node["Path"].as<std::string>();
-		Asset asset{ id, AssetType::Texture };
-		m_Paths[id] = path;
-		m_AssetRegistry[asset] = false;
-	}
-	for(auto cubemapAssetNode : assetPackNode["CubemapAssets"]) {
-		auto node = cubemapAssetNode["Cubemap"];
-		auto id = node["ID"].as<uint64_t>();
-		auto path = node["Path"].as<std::string>();
-		Asset asset{ id, AssetType::Cubemap };
-		m_Paths[id] = path;
-		m_AssetRegistry[asset] = false;
-	}
-	for(auto audioAssetNode : assetPackNode["AudioAssets"]) {
-		auto node = audioAssetNode["Audio"];
-		auto id = node["ID"].as<uint64_t>();
-		auto path = node["Path"].as<std::string>();
-		Asset asset{ id, AssetType::Audio };
-		m_Paths[id] = path;
-		m_AssetRegistry[asset] = false;
-	}
 }
 
 void EditorAssetManager::Reload() {
@@ -167,7 +144,8 @@ void EditorAssetManager::Reload() {
 			(rootPath / "Image").string(),
 			(rootPath / "Cubemap").string(),
 			(rootPath / "Font").string(),
-			(rootPath / "Audio").string()
+			(rootPath / "Audio").string(),
+			(rootPath / "Shader").string()
 		};
 
 	uint32_t i = 0;
@@ -189,19 +167,21 @@ void EditorAssetManager::Save() {
 
 	serializer.WriteKey("AssetPack").BeginMapping();
 
-	serializer.WriteKey("MeshAssets").BeginSequence();
-	for(auto& [id, mesh] : m_MeshAssets) {
+	serializer.WriteKey("Assets").BeginSequence();
+	for(auto& [asset, _] : m_AssetRegistry) {
 		serializer.BeginMapping();
-		serializer.WriteKey("Mesh").BeginMapping();
-		serializer.WriteKey("ID").Write((uint64_t)id);
+		serializer.WriteKey("Asset").BeginMapping();
+		serializer.WriteKey("ID").Write((uint64_t)asset.ID);
+		serializer.WriteKey("Type").Write((uint32_t)asset.Type);
 
-		std::string path = GetPath(id);
+		std::string path = GetPath(asset.ID);
 		if(path != "")
 			serializer.WriteKey("Path").Write(path);
 		else {
+			auto mesh = m_MeshAssets[asset.ID];
 			auto subMesh = mesh->SubMeshes[0];
 			serializer.WriteKey("PrimitiveType")
-				.Write((uint32_t)m_Primitives[id]);
+				.Write((uint32_t)m_Primitives[asset.ID]);
 
 			serializer.WriteKey("Material")
 			.BeginMapping();
@@ -236,38 +216,10 @@ void EditorAssetManager::Save() {
 			.EndMapping(); // Material
 		}
 
-		serializer.EndMapping(); // Mesh
+		serializer.EndMapping(); // Asset
 		serializer.EndMapping();
 	}
 	serializer.EndSequence();
-
-	serializer.WriteKey("TextureAssets").BeginSequence();
-	for(auto& [id, texture] : m_TextureAssets) {
-		serializer
-			.WriteKey("Texture").BeginMapping()
-				.WriteKey("Path").Write(m_Paths[id])
-			.EndMapping()
-		.EndMapping();
-	}
-	serializer.EndSequence();
-
-	serializer.WriteKey("CubemapAssets").BeginSequence();
-	for(auto& [id, texture] : m_CubemapAssets) {
-		serializer.WriteKey("Path").Write(m_Paths[id]);
-	}
-	serializer.EndSequence();
-
-	// serializer.WriteKey("FontAssets").BeginSequence();
-	// for(auto& [id, texture] : m_FontAssets) {
-	// 	serializer.WriteKey("Path").Write(m_Paths[id]);
-	// }
-	// serializer.EndSequence();
-
-	// serializer.WriteKey("AudioAssets").BeginSequence();
-	// for(auto& [id, texture] : m_AudioAssets) {
-	// 	serializer.WriteKey("Path").Write(m_Paths[id]);
-	// }
-	// serializer.EndSequence();
 
 	serializer.EndMapping(); // AssetPack
 	serializer.EndMapping();

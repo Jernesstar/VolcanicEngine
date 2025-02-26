@@ -173,7 +173,7 @@ void DrawComponent<ScriptComponent>(Entity& entity) {
 }
 
 void ComponentEditorPanel::Draw() {
-	ImGui::Begin("Component Editor", &m_Open);
+	ImGui::Begin("Component Editor", &Open);
 	{
 		if(m_Context) {
 			if(IsFocused<CameraComponent>(m_Context))

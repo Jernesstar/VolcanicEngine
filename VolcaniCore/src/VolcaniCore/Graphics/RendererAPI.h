@@ -234,8 +234,7 @@ struct DrawCommand {
 	}
 
 	DrawCall& NewDrawCall() {
-		return
-			Calls.Emplace(0, IndicesCount, 0, VerticesCount, 0, 0);
+		return Calls.Emplace(0, IndicesCount, 0, VerticesCount, 0, 0);
 	}
 };
 

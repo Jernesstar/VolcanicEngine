@@ -237,6 +237,8 @@ void FlushCommand(DrawCommand& command) {
 		array->Bind();
 		for(auto& call : command.Calls) {
 			FlushCall(command, call);
+			s_Info.IndexCount += call.IndexCount;
+			s_Info.VertexCount += call.VertexCount;
 			s_Info.InstanceCount += call.InstanceCount;
 			s_Info.DrawCallCount++;
 		}
