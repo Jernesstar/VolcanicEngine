@@ -31,7 +31,7 @@ void RigidBody::UpdateTransform() {
 #endif
 }
 
-void RigidBody::UpdateTransform(const Transform& t) {
+void RigidBody::SetTransform(const Transform& t) {
 #ifdef MAGMA_PHYSICS
 	m_Transform = t;
 	PxTransform pose;
@@ -50,7 +50,7 @@ StaticBody::StaticBody(Ref<Shape> shape, const Transform& t)
 #endif
 
 	SetShape(shape);
-	UpdateTransform(t);
+	SetTransform(t);
 }
 
 void StaticBody::SetShape(Ref<Shape> shape) {
@@ -74,7 +74,7 @@ DynamicBody::DynamicBody(Ref<Shape> shape, const Transform& t)
 #endif
 
 	SetShape(shape);
-	UpdateTransform(t);
+	SetTransform(t);
 }
 
 void DynamicBody::SetShape(Ref<Shape> shape) {

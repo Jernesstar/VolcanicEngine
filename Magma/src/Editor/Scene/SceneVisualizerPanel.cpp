@@ -42,15 +42,12 @@ SceneVisualizerPanel::SceneVisualizerPanel(Scene* context)
 
 void SceneVisualizerPanel::SetContext(Scene* context) {
 	m_Context = context;
-	m_Selected.Handle = Entity{ };
-	// m_Selected.Collider = CreateRef<Physics::RigidBody>();
-	VOLCANICORE_LOG_INFO("Here");
+	m_Selected = Entity{ };
 
-	context->EntityWorld
+	m_Context->EntityWorld
 	.ForEach<TransformComponent, MeshComponent>(
-		[&](Entity& entity)
+		[this](Entity& entity)
 		{
-			VOLCANICORE_LOG_INFO("Here");
 			const auto& tc = entity.Get<TransformComponent>();
 			const auto& mc = entity.Get<MeshComponent>();
 			auto& assetManager =
@@ -59,7 +56,8 @@ void SceneVisualizerPanel::SetContext(Scene* context) {
 
 			auto shape = Shape::Create(mesh);
 			auto body = RigidBody::Create(RigidBody::Type::Static, shape);
-			body->Data = (void*)(uint64_t)(uint32_t)entity.GetHandle();
+			body->SetTransform(tc);
+			body->Data = (void*)(uint64_t)entity.GetHandle();
 			m_World.AddActor(body);
 		});
 }
@@ -178,21 +176,21 @@ void SceneVisualizerPanel::Draw() {
 			ImGui::EndPopup();
 		}
 
-		if(ImGui::IsMouseClicked(0) && ImGui::IsWindowHovered()) {
+		if(ImGui::IsMouseClicked(1) && ImGui::IsWindowHovered()) {
 			auto camera = m_Renderer.GetCameraController().GetCamera();
 			// auto& world = m_Context->EntityWorld;
 
 			glm::vec2 pos = { ImGui::GetMousePos().x, ImGui::GetMousePos().y };
 			glm::vec4 originNDC
 			{
-				(pos.x/width - 0.5f) * 2.0f,
-				(pos.y/height - 0.5f) * 2.0f,
+				(pos.x / width - 0.5f) * 2.0f,
+				(pos.y / height - 0.5f) * 2.0f,
 				-1.0f, 1.0f
 			};
 			glm::vec4 endNDC
 			{
-				(pos.x/width - 0.5f) * 2.0f,
-				(pos.y/height - 0.5f) * 2.0f,
+				(pos.x / width - 0.5f) * 2.0f,
+				(pos.y / height - 0.5f) * 2.0f,
 				1.0f, 1.0f
 			};
 
@@ -205,29 +203,35 @@ void SceneVisualizerPanel::Draw() {
 			float maxDist = 10000.0f;
 
 			auto hitInfo = m_World.Raycast(worldStart, rayDir, maxDist);
-			if(hitInfo) {
-				VOLCANICORE_LOG_INFO("Hit something");
-				m_Selected.Collider = hitInfo.Actor;
-				m_Selected.Handle =
+			if(hitInfo)
+				m_Selected =
 					m_Context->EntityWorld.GetEntity(
 						(uint64_t)hitInfo.Actor->Data);
-				m_Renderer.Select(m_Selected.Handle);
-				auto hierarchy =
-					m_Tab->GetPanel("SceneHierarchy")->As<SceneHierarchyPanel>();
-				// hierarchy->Select(entity);
-			}
+			else
+				m_Selected = Entity{ };
+
+			m_Renderer.Select(m_Selected);
+			auto hierarchy =
+				m_Tab->GetPanel("SceneHierarchy")->As<SceneHierarchyPanel>();
+			hierarchy->Select(m_Selected);
+
+			if(hitInfo)
+				VOLCANICORE_LOG_INFO("Hit something");
+			else
+				VOLCANICORE_LOG_INFO("Not hit");
 		}
+
 	}
 	ImGui::End();
 }
 
 EditorSceneRenderer::EditorSceneRenderer() {
 	auto camera = CreateRef<StereographicCamera>(75.0f);
+	// camera->SetPosition({ -2.0f, -3.0f, -3.0f });
 	m_Controller.SetCamera(camera);
 	m_Controller.TranslationSpeed = 10.0f;
 
 	auto window = Application::GetWindow();
-
 	m_Output = Framebuffer::Create(window->GetWidth(), window->GetHeight());
 
 	Ref<ShaderPipeline> shader;
@@ -308,9 +312,9 @@ void EditorSceneRenderer::Begin() {
 
 	auto* command = RendererAPI::Get()->NewDrawCommand(GridPass->Get());
 	command->UniformData
-	.SetInput("u_CameraPosition", m_Controller.GetCamera()->GetPosition());
-	command->UniformData
 	.SetInput("u_ViewProj", m_Controller.GetCamera()->GetViewProjection());
+	command->UniformData
+	.SetInput("u_CameraPosition", m_Controller.GetCamera()->GetPosition());
 
 	auto& call = command->NewDrawCall();
 	call.VertexCount = 6;

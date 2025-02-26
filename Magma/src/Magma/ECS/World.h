@@ -50,9 +50,10 @@ public:
 
 	template<typename ...TComponents>
 	void ForEach(const Func<void, Entity&>& func) {
-		flecs::query<TComponents...> query = GetQuery<TComponents...>();
+		flecs::query<TComponents...> q = 
+			m_World.query_builder<TComponents...>().build();
 
-		query.each(
+		q.each(
 			[func](flecs::entity handle, TComponents&...)
 			{
 				Entity entity{ handle };
@@ -112,15 +113,6 @@ private:
 
 	Map<uint64_t, void*> m_Systems;
 	Map<uint64_t, List<Func<void, const Event&>>> m_Events;
-
-private:
-	template<typename ...TComponents>
-	flecs::query<TComponents...> GetQuery() {
-		return m_World.query_builder<TComponents...>()
-		.template with<TComponents...>()
-		// .cached()
-		.build();
-	}
 };
 
 }

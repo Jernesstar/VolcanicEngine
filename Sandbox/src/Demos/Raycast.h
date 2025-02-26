@@ -125,7 +125,7 @@ void Raycast::CreateActors() {
 
 void Raycast::OnUpdate(TimeStep ts) {
 	controller.OnUpdate(ts);
-	world->OnUpdate(ts);
+	// world->OnUpdate(ts);
 
 	// 1. Draw scene without selected object
 	Renderer::StartPass(drawPass);

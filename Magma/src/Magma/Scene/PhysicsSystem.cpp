@@ -27,7 +27,7 @@ void PhysicsSystem::Run(Phase phase) {
 			{
 				auto [rc] = GetRequired(entity);
 				auto t = entity.Get<TransformComponent>();
-				rc.Body->UpdateTransform(t);
+				rc.Body->SetTransform(t);
 			});
 	}
 	if(phase == Phase::PostUpdate) {

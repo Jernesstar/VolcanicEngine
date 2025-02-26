@@ -41,7 +41,7 @@ public:
 	bool HasShape() const { return m_Shape != nullptr; }
 
 	void UpdateTransform();
-	void UpdateTransform(const Transform& t);
+	void SetTransform(const Transform& t);
 	const Transform& GetTransform() const { return m_Transform; }
 
 	template<typename TDerived>

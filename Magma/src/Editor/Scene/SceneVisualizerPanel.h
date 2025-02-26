@@ -63,11 +63,6 @@ private:
 	Ref<RenderPass> BloomPass;
 };
 
-struct EditorEntity {
-	ECS::Entity Handle;
-	Physics::RigidBody* Collider;
-};
-
 class SceneVisualizerPanel : public Panel {
 public:
 	SceneVisualizerPanel(Scene* scene);
@@ -79,14 +74,14 @@ public:
 	void Draw() override;
 
 	void Select(ECS::Entity entity) {
-		m_Selected.Handle = entity;
+		m_Selected = entity;
 	}
-	ECS::Entity GetSelected() { return m_Selected.Handle; }
+	ECS::Entity GetSelected() { return m_Selected; }
 
 private:
 	Scene* m_Context;
-	EditorEntity m_Selected;
 	Physics::World m_World;
+	Entity m_Selected;
 	UI::Image m_Image;
 
 private:

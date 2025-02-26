@@ -18,7 +18,7 @@ Ref<Shape> Shape::Create(Shape::Type type) {
 			shape = CreateBox(0.5f);
 			break;
 		case Shape::Type::Sphere:
-			shape = CreateBox(0.5f);
+			shape = CreateSphere(0.5f);
 			break;
 		case Shape::Type::Plane:
 			shape = CreatePlane(Transform{ });
@@ -158,8 +158,10 @@ PxShape* CookMesh(Ref<Mesh> mesh) {
 	PxTriangleMeshCookingResult::Enum result;
 
 	bool success = PxCookTriangleMesh(params, desc, buf, &result);
-	if(!success)
+	if(!success) {
 		VOLCANICORE_LOG_ERROR("Failed to create triangle mesh");
+		return nullptr;
+	}
 
 	PxDefaultMemoryInputData input(buf.getData(), buf.getSize());
 	PxTriangleMesh* m = GetPhysicsLib()->createTriangleMesh(input);
