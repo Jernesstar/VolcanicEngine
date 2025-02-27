@@ -61,7 +61,7 @@ Shadows::Shadows()
 	shadowPass->SetData(Renderer3D::GetMeshBuffer());
 
 	cube =
-		Mesh::Create(MeshPrimitive::Cube,
+		Mesh::Create(MeshType::Cube,
 			Material
 			{
 				.Diffuse = AssetImporter::GetTexture("Sandbox/assets/images/wood.png")

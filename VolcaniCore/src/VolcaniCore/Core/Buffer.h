@@ -36,14 +36,15 @@ public:
 		Set(list.data(), list.size());
 	}
 	Buffer(T* buffer, uint64_t count, uint64_t maxCount = 0)
-		: m_MaxCount(maxCount), m_Count(count)
+		: m_MaxCount(count), m_Count(count)
 	{
+		if(!m_MaxCount)
+			m_MaxCount = m_Count;
 		m_Data = buffer;
 	}
 
 	~Buffer() {
-		if(m_MaxCount != 0) // We do in fact own this pointer
-			Delete();
+		Delete();
 	}
 
 	operator bool() const { return m_Data && m_Count; }
@@ -57,7 +58,12 @@ public:
 		return *this;
 	}
 
-	T* Get() const { return m_Data; }
+	T* Get(uint64_t i = 0) const { return m_Data + i; }
+
+	template<typename ...Args>
+	void New(uint64_t i, Args... args) {
+		new (Get(i)) T(std::forward<Args>(args)...);
+	}
 
 	std::vector<T> GetList() const {
 		return std::vector<T>(m_Data, m_Data + m_Count);
@@ -69,12 +75,6 @@ public:
 	uint64_t GetMaxSize()  const { return m_MaxCount * sizeof(T); }
 
 	Buffer<T> Copy() const { return Buffer<T>(*this); }
-
-	Buffer<T> Partition(uint64_t count = 0) {
-		if(count == 0)
-			count = m_MaxCount;
-		return Buffer<T>(m_Data + (m_Count += count), count, 0);
-	}
 
 	void Add(const T& element) {
 		if(m_MaxCount != 0 && m_Count >= m_MaxCount)

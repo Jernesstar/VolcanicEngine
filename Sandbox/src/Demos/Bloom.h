@@ -88,7 +88,7 @@ Bloom::Bloom()
 	drawPass->SetOutput(src);
 	drawPass->SetData(Renderer3D::GetMeshBuffer());
 
-	cube = Mesh::Create(MeshPrimitive::Cube, { 0.98f, 0.92f, 0.0f, 1.0f });
+	cube = Mesh::Create(MeshType::Cube, { 0.98f, 0.92f, 0.0f, 1.0f });
 
 	camera = CreateRef<StereographicCamera>(75.0f);
 	camera->SetPosition({ 2.5f, 2.5f, 2.5f });

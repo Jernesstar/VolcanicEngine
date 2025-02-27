@@ -79,7 +79,7 @@ Collision::Collision() {
 	drawPass = RenderPass::Create("Draw", shader);
 	drawPass->SetData(Renderer3D::GetMeshBuffer());
 
-	cube = Mesh::Create(MeshPrimitive::Cube,
+	cube = Mesh::Create(MeshType::Cube,
 		Material
 		{
 			.Diffuse = AssetImporter::GetTexture("Sandbox/assets/images/wood.png")

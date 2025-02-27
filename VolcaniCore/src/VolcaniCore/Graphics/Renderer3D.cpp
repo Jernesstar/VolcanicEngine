@@ -156,7 +156,7 @@ void Renderer3D::DrawSkybox(Ref<Cubemap> cubemap) {
 	// .SetInput("u_Skybox", TextureSlot{ cubemap, 0 });
 }
 
-static void DrawSubMesh(SubMesh& mesh, const glm::mat4& tr,
+static void DrawSubMesh(Ref<Mesh> root, SubMesh& mesh, const glm::mat4& tr,
 						DrawCommand* cmd)
 {
 	DrawCommand* command;
@@ -175,8 +175,8 @@ static void DrawSubMesh(SubMesh& mesh, const glm::mat4& tr,
 			command->IndicesIndex = s_MeshBuffer->IndicesCount;
 		}
 
-		if(!command->UniformData) {
-			Material& mat = mesh.Mat;
+		if(!command->UniformData && mesh.MaterialIndex != -1) {
+			Material& mat = root->Materials[mesh.MaterialIndex];
 			if(mat.Diffuse) {
 				command->UniformData
 				.SetInput("u_Material.Diffuse", TextureSlot{ mat.Diffuse, 0 });
@@ -219,7 +219,7 @@ void Renderer3D::DrawMesh(Ref<Mesh> mesh, const glm::mat4& tr,
 						  DrawCommand* command)
 {
 	for(auto& subMesh : mesh->SubMeshes)
-		DrawSubMesh(subMesh, tr, command);
+		DrawSubMesh(mesh, subMesh, tr, command);
 }
 
 void Renderer3D::DrawQuad(Ref<Quad> quad, const glm::mat4& tr,
@@ -228,10 +228,10 @@ void Renderer3D::DrawQuad(Ref<Quad> quad, const glm::mat4& tr,
 	Ref<Mesh> mesh;
 	if(quad->IsTextured)
 		mesh =
-			Mesh::Create(MeshPrimitive::Quad,
+			Mesh::Create(MeshType::Quad,
 						 Material{ .Diffuse = quad->GetTexture() });
 	else
-		mesh = Mesh::Create(MeshPrimitive::Quad, quad->GetColor());
+		mesh = Mesh::Create(MeshType::Quad, quad->GetColor());
 
 	DrawMesh(mesh, tr, command);
 }

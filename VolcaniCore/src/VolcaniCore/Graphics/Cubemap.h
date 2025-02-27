@@ -8,9 +8,14 @@
 
 namespace VolcaniCore {
 
+struct ImageData {
+	uint32_t Width, Height;
+	Buffer<uint8_t> Data;
+};
+
 class Cubemap : public Derivable<Cubemap> {
 public:
-	static Ref<Cubemap> Create(const List<Buffer<uint8_t>>& faces);
+	static Ref<Cubemap> Create(const List<ImageData>& faces);
 
 public:
 	Cubemap() = default;

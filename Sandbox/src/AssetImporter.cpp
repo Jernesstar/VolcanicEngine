@@ -64,7 +64,7 @@ Ref<Cubemap> AssetImporter::GetCubemap(const std::string& path) {
 		int width, height, bpp;
 		uint8_t* data =
 			ReadImage(facePath, width, height, bpp, 4, false);
-		// output.Emplace(ImageData(width, height, bpp, data));
+		output.Emplace(ImageData(width, height, bpp, data));
 	}
 
 	return Cubemap::Create(output);

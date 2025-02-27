@@ -20,7 +20,7 @@ EditorAssetManager::~EditorAssetManager() {
 }
 
 void EditorAssetManager::Load(Asset asset) {
-	std::string path = m_Paths[asset.ID];
+	std::string path = GetPath(asset.ID);
 	m_AssetRegistry[asset] = true;
 
 	if(asset.Type == AssetType::Mesh)
@@ -29,6 +29,8 @@ void EditorAssetManager::Load(Asset asset) {
 		m_TextureAssets[asset.ID] = AssetImporter::GetTexture(path);
 	else if(asset.Type == AssetType::Cubemap)
 		m_CubemapAssets[asset.ID] = AssetImporter::GetCubemap(path);
+	else if(asset.Type == AssetType::Cubemap)
+		m_AudioAssets[asset.ID] = AssetImporter::GetAudio(path);
 }
 
 void EditorAssetManager::Unload(Asset asset) {
@@ -41,15 +43,8 @@ void EditorAssetManager::Unload(Asset asset) {
 		m_TextureAssets.erase(asset.ID);
 	else if(asset.Type == AssetType::Cubemap)
 		m_CubemapAssets.erase(asset.ID);
-}
-
-Asset EditorAssetManager::Add(MeshPrimitive primitive) {
-	Asset newAsset{ UUID(), AssetType::Mesh };
-	m_AssetRegistry[newAsset] = true;
-	m_Primitives[newAsset.ID] = primitive;
-	m_MeshAssets[newAsset.ID] = Mesh::Create(primitive);
-
-	return newAsset;
+	else if(asset.Type == AssetType::Audio)
+		m_AudioAssets.erase(asset.ID);
 }
 
 Asset EditorAssetManager::Add(const std::string& path, AssetType type) {
@@ -91,8 +86,16 @@ void EditorAssetManager::Load(const std::string& path) {
 	}
 	auto assetPackNode = file["AssetPack"];
 
-	if(!assetPackNode)
+	if(!assetPackNode) {
+		Asset asset{ UUID(), AssetType::Mesh };
+		m_AssetRegistry[asset] = true;
+		m_MeshAssets[asset.ID] = Mesh::Create(MeshType::Quad);
+
+		Asset asset{ UUID(), AssetType::Mesh };
+		m_AssetRegistry[asset] = true;
+		m_MeshAssets[asset.ID] = Mesh::Create(MeshType::Cube);
 		return;
+	}
 
 	for(auto assetNode : assetPackNode["Assets"]) {
 		auto node = assetNode["Asset"];
@@ -107,7 +110,7 @@ void EditorAssetManager::Load(const std::string& path) {
 		else {
 			m_AssetRegistry[newAsset] = false;
 			auto type =
-				(MeshPrimitive)node["PrimitiveType"].as<uint32_t>();
+				(MeshType)node["Type"].as<uint32_t>();
 			auto materialNode = node["Material"];
 
 			Material mat;
@@ -128,7 +131,6 @@ void EditorAssetManager::Load(const std::string& path) {
 			mat.SpecularColor = materialNode["SpecularColor"].as<glm::vec4>();
 			mat.EmissiveColor = materialNode["EmissiveColor"].as<glm::vec4>();
 
-			m_Primitives[id] = type;
 			m_MeshAssets[id] = Mesh::Create(type, mat);
 		}
 	}
@@ -239,10 +241,24 @@ namespace Magma {
 void EditorAssetManager::RuntimeSave(const std::string& path) {
 	namespace fs = std::filesystem;
 
-	auto dataPath = (fs::path(path) / ".volc.assetpk").string();
-	BinaryWriter writer(dataPath);
+	BinaryWriter pack((fs::path(path) / ".volc.assetpk").string());
+	BinaryWriter meshFile((fs::path(path) / "Asset" / "Mesh").string());
+	BinaryWriter textureFile((fs::path(path) / "Asset" / "Texture").string());
+	BinaryWriter soundFile((fs::path(path) / "Asset" / "Sound").string());
 
-	
+	for(auto [asset, _] : m_AssetRegistry) {
+		if(asset.Type == AssetType::Mesh) {
+			auto mesh = Get<Mesh>(asset);
+			meshFile.Write(mesh->SubMeshes);
+			meshFile.Write(m_Materials[asset.ID][0]);
+			meshFile.Write(m_Materials[asset.ID][1]);
+			meshFile.Write(m_Materials[asset.ID][2]);
+		}
+		if(asset.Type == AssetType::Texture) {
+			auto texture = Get<Texture>(asset);
+			
+		}
+	}
 }
 
 }

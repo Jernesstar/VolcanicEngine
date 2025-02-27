@@ -27,30 +27,32 @@ struct Material {
 	glm::vec4 EmissiveColor = glm::vec4(0.0f);
 };
 
-enum class MeshPrimitive { Quad, Cube, Pyramid, Sphere };
-
 struct SubMesh {
 	List<Vertex> Vertices;
 	List<uint32_t> Indices;
-	Material Mat;
+	int32_t MaterialIndex = -1;
 };
+
+enum class MeshType { Quad, Cube, Model };
 
 class Mesh {
 public:
-	static Ref<Mesh> Create(const List<Vertex>& vertices,
+	static Ref<Mesh> Create(MeshType type,
+							const List<Vertex>& vertices,
 							const List<uint32_t>& indices,
 							const Material& material = { });
-
-	static Ref<Mesh> Create(MeshPrimitive primitive,
+	static Ref<Mesh> Create(MeshType type,
 							const Material& material = { });
-
-	static Ref<Mesh> Create(MeshPrimitive primitive, const glm::vec4& color);
+	static Ref<Mesh> Create(MeshType type, const glm::vec4& color);
 
 public:
+	const MeshType Type;
 	List<SubMesh> SubMeshes;
+	List<Material> Materials;
 
 public:
-	Mesh() = default;
+	Mesh(MeshType type)
+		: Type(type) { }
 	~Mesh() = default;
 };
 

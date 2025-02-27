@@ -11,7 +11,7 @@ Sound::Sound(SoLoud::AudioSource* source)
 }
 
 Sound::~Sound() {
-	
+	delete m_Source;
 }
 
 void Sound::Play() {

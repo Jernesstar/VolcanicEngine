@@ -2,21 +2,23 @@
 
 namespace VolcaniCore {
 
-Ref<Mesh> Mesh::Create(const List<Vertex>& vertices,
+Ref<Mesh> Mesh::Create(MeshType type,
+						const List<Vertex>& vertices,
 						const List<uint32_t>& indices,
 						const Material& material)
 {
-	auto mesh = CreateRef<Mesh>();
-	mesh->SubMeshes.Add({ vertices, indices, material });
+	auto mesh = CreateRef<Mesh>(type);
+	mesh->SubMeshes.Add({ vertices, indices, 0 });
+	mesh->Materials.Add(material);
 	return mesh;
 }
 
-Ref<Mesh> Mesh::Create(MeshPrimitive primitive, const Material& material) {
+Ref<Mesh> Mesh::Create(MeshType type, const Material& material) {
 	List<uint32_t> indices;
 	List<Vertex> vertices;
 
-	switch(primitive) {
-		case MeshPrimitive::Cube:
+	switch(type) {
+		case MeshType::Cube:
 		{
 			vertices =
 			{
@@ -72,7 +74,7 @@ Ref<Mesh> Mesh::Create(MeshPrimitive primitive, const Material& material) {
 			break;
 		}
 
-		case MeshPrimitive::Quad:
+		case MeshType::Quad:
 		{
 			vertices =
 			{
@@ -92,11 +94,11 @@ Ref<Mesh> Mesh::Create(MeshPrimitive primitive, const Material& material) {
 		}
 	}
 
-	return Create(vertices, indices, material);
+	return Create(type, vertices, indices, material);
 }
 
-Ref<Mesh> Mesh::Create(MeshPrimitive primitive, const glm::vec4& color) {
-	return Create(primitive, Material{ .DiffuseColor = color });
+Ref<Mesh> Mesh::Create(MeshType type, const glm::vec4& color) {
+	return Create(type, Material{ .DiffuseColor = color });
 }
 
 }

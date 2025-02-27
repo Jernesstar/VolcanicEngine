@@ -13,10 +13,12 @@ namespace Magma {
 
 class AssetImporter {
 public:
+	static ImageData GetImageData(const std::string& path, bool flip);
+
 	static Ref<Mesh> GetMesh(const std::string& path);
 	static Ref<Texture> GetTexture(const std::string& path);
 	static Ref<Cubemap> GetCubemap(const std::string& path);
-	static Ref<Sound> GetSound(const std::string& path);
+	static Ref<Sound> GetAudio(const std::string& path);
 };
 
 }

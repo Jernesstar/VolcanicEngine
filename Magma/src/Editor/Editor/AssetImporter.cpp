@@ -19,74 +19,50 @@ namespace fs = std::filesystem;
 
 namespace Magma {
 
-static uint8_t* ReadImage(const std::string& path,
-	int& width, int& height, int& bitsPerPixel, int desiredChannels, bool flip)
-{
+static ImageData GetImageData(const std::string& path, bool flip) {
 	stbi_set_flip_vertically_on_load((int)flip);
-	uint8_t* pixelData =
-		stbi_load(path.c_str(), &width, &height, &bitsPerPixel, desiredChannels);
-
-	VOLCANICORE_ASSERT_ARGS(pixelData, "Could not load image from path '%s'",
-										path.c_str());
-
-	return pixelData;
+	ImageData data;
+	uint8_t* pixels =
+		stbi_load(path.c_str(), &data.Width, &data.Height, nullptr, 4);
+	VOLCANICORE_ASSERT_ARGS(pixels, "Could not load image from path '%s'",
+							path.c_str());
+	data.Data = Buffer(pixels, data.Width * data.Height * 4);
+	return data;
 }
 
 Ref<Texture> AssetImporter::GetTexture(const std::string& path) {
-	int width, height, bpp;
-	auto data = ReadImage(path, width, height, bpp, 4, 0);
-	auto texture = Texture::Create(width, height);
-	texture->SetData(data);
+	ImageData data = GetImageData(path);
+	auto texture = Texture::Create(data.Width, data.Height);
+	texture->SetData(data.Get());
 	return texture;
 }
 
-static List<std::string> GetImagePaths(const std::string& folder) {
-	List<std::string> paths;
-	for(auto path : FileUtils::GetFiles(folder, { ".png", ".jpg", ".jpeg" })) {
-		paths.Add(path);
-		if(paths.Count() == 6) break;
-	}
+Ref<Cubemap> AssetImporter::GetCubemap(const std::string& path) {
+	List<fs::path> paths;
+	for(auto path : FileUtils::GetFiles(folder, { ".png", ".jpg", ".jpeg" }))
+		paths.Add(fs::path(path));
 
 	if(paths.Count() < 6)
 		VOLCANICORE_LOG_WARNING(
 			"Cubemap folder %s does not have at least 6 images",
 			folder.c_str());
 
-	return paths;
-}
-
-Ref<Cubemap> AssetImporter::GetCubemap(const std::string& path) {
-	auto facePaths = GetImagePaths(path);
 	Map<std::string, int> map =
 	{
 		{ "right", 0 }, { "left",	1 },
 		{ "top",   2 }, { "bottom", 3 },
 		{ "front", 4 }, { "back",	5 }
 	};
-	List<Buffer<uint8_t>> output(6);
+	List<ImageData> output(6);
 
-	for(auto& facePath : facePaths) {
-		int width, height, bpp;
-		uint8_t* data =
-			ReadImage(facePath, width, height, bpp, 4, false);
-		// output.Emplace(ImageData(width, height, bpp, data));
-	}
+	for(auto& facePath : facePaths)
+		output.Insert(map[facePath.filename().string()],
+					  GetImageData(facePath));
 }
 
-static Ref<Texture> LoadTexture(const std::string& dir,
-								const aiMaterial* mat, aiTextureType type);
-
-static SubMesh LoadMesh(const std::string& path,
-						const aiScene* scene, uint32_t meshIndex)
-{
-	auto mesh = scene->mMeshes[meshIndex];
-	auto mat = scene->mMaterials[mesh->mMaterialIndex];
-
-	List<Vertex> vertices;
-	List<uint32_t> indices;
-
-	vertices.Reallocate(mesh->mNumVertices);
-	indices.Reallocate(mesh->mNumFaces * 3);
+static SubMesh LoadMesh(const std::string& path, const aiMesh* mesh) {
+	List<Vertex> vertices(mesh->mNumVertices);
+	List<uint32_t> indices(mesh->mNumFaces * 3);
 
 	for(uint32_t i = 0; i < mesh->mNumVertices; i++) {
 		const aiVector3D& pos	   = mesh->mVertices[i];
@@ -111,44 +87,14 @@ static SubMesh LoadMesh(const std::string& path,
 		indices.Add(face.mIndices[2]);
 	}
 
-	glm::vec4 diffuse = glm::vec4(0.0f);
-	glm::vec4 specular = glm::vec4(0.0f);
-	glm::vec4 emissive = glm::vec4(0.0f);
-
-	auto material = scene->mMaterials[mesh->mMaterialIndex];
-	aiColor4D color;
-	if(material->Get(AI_MATKEY_COLOR_DIFFUSE, color) == AI_SUCCESS)
-		diffuse = glm::vec4(color.r, color.g, color.b, color.a);
-	if(material->Get(AI_MATKEY_COLOR_SPECULAR, color) == AI_SUCCESS)
-		specular = glm::vec4(color.r, color.g, color.b, color.a);
-	if(material->Get(AI_MATKEY_COLOR_EMISSIVE, color) == AI_SUCCESS)
-		emissive = glm::vec4(color.r, color.g, color.b, color.a);
-
-	namespace fs = std::filesystem;
-
-	std::string dir = (fs::path(path).parent_path() / "textures").string();
-
-	auto subMesh = SubMesh(vertices, indices,
-		Material{
-			.Diffuse  = LoadTexture(dir, mat, aiTextureType_DIFFUSE),
-			.Specular = LoadTexture(dir, mat, aiTextureType_SPECULAR),
-			.Emissive = LoadTexture(dir, mat, aiTextureType_EMISSIVE),
-			// .Roughness = LoadTexture(dir, mat, aiTextureType_DIFFUSE_ROUGHNESS)
-
-			.DiffuseColor  = diffuse,
-			.SpecularColor = specular,
-			.EmissiveColor = emissive
-		});
-
-	return subMesh;
+	return { vertices, indices, mesh->mMaterialIndex };
 }
 
-Ref<Texture> LoadTexture(const std::string& dir,
-						 const aiMaterial* material, aiTextureType type)
+static Ref<Texture> LoadTexture(const std::string& dir,
+	const aiMaterial* material, aiTextureType type)
 {
 	if(material->GetTextureCount(type) == 0)
 		return nullptr;
-
 	aiString path;
 	if(material->GetTexture(type, 0, &path) == AI_FAILURE)
 		return nullptr;
@@ -156,7 +102,33 @@ Ref<Texture> LoadTexture(const std::string& dir,
 	return AssetImporter::GetTexture(std::string(path.data));
 }
 
+static Material LoadMaterial(const std::string& dir, const aiMaterial* mat) {
+	glm::vec4 diffuse = glm::vec4(0.0f);
+	glm::vec4 specular = glm::vec4(0.0f);
+	glm::vec4 emissive = glm::vec4(0.0f);
+
+	aiColor4D color;
+	if(mat->Get(AI_MATKEY_COLOR_DIFFUSE, color) == AI_SUCCESS)
+		diffuse = glm::vec4(color.r, color.g, color.b, color.a);
+	if(mat->Get(AI_MATKEY_COLOR_SPECULAR, color) == AI_SUCCESS)
+		specular = glm::vec4(color.r, color.g, color.b, color.a);
+	if(mat->Get(AI_MATKEY_COLOR_EMISSIVE, color) == AI_SUCCESS)
+		emissive = glm::vec4(color.r, color.g, color.b, color.a);
+
+	return Material{
+		.Diffuse  = LoadTexture(dir, mat, aiTextureType_DIFFUSE),
+		.Specular = LoadTexture(dir, mat, aiTextureType_SPECULAR),
+		.Emissive = LoadTexture(dir, mat, aiTextureType_EMISSIVE),
+		// .Roughness = LoadTexture(dir, mat, aiTextureType_DIFFUSE_ROUGHNESS)
+
+		.DiffuseColor  = diffuse,
+		.SpecularColor = specular,
+		.EmissiveColor = emissive
+	}
+}
+
 Ref<Mesh> AssetImporter::GetMesh(const std::string& path) {
+	namespace fs = std::filesystem;
 	if(path == "")
 		return nullptr;
 
@@ -167,19 +139,28 @@ Ref<Mesh> AssetImporter::GetMesh(const std::string& path) {
 						| aiProcess_JoinIdenticalVertices;
 	const aiScene* scene = importer.ReadFile(path.c_str(), loadFlags);
 
-	VOLCANICORE_ASSERT_ARGS(scene, "Error importing model(s) from %s: %s",
-									path.c_str(), importer.GetErrorString());
+	VOLCANICORE_ASSERT_ARGS(scene, "Error importing mesh from %s: %s",
+							path.c_str(), importer.GetErrorString());
 
-	Ref<Mesh> mesh = CreateRef<Mesh>();
-	mesh->SubMeshes.Reallocate(scene->mNumMeshes);
+	Ref<Mesh> mesh = CreateRef<Mesh>(MeshType::Model);
+	mesh->SubMeshes.Allocate(scene->mNumMeshes);
+	mesh->Materials.Allocate(scene->mNumMaterials);
+
 	for(uint32_t i = 0; i < scene->mNumMeshes; i++)
-		mesh->SubMeshes.Add(LoadMesh(path, scene, i));
+		mesh->SubMeshes.Add(LoadMesh(path, scene->mMeshes[meshIndex]));
+
+	auto dir = (fs::path(path).parent_path() / "textures").string();
+	for(uint32_t i = 0; i < scene->mNumMaterials; i++)
+		mesh->Materials
+			.Add(LoadMaterial(dir, scene->mMaterials[mesh->mMaterialIndex]));
 
 	return mesh;
 }
 
-Ref<Sound> AssetImporter::GetSound(const std::string& path) {
-
+Ref<Sound> AssetImporter::GetAudio(const std::string& path) {
+	auto source = new SoLoud::Wav;
+	VOLCANICORE_ASSERT(source->load(path) == 0);
+	return CreateRef<Sound>(source);
 }
 
 }

@@ -91,7 +91,7 @@ Raycast::Raycast() {
 	camera->SetPosition({ 0.0f, 0.0f, 3.0f });
 	controller = CameraController{ camera };
 
-	cube = Mesh::Create(MeshPrimitive::Cube,
+	cube = Mesh::Create(MeshType::Cube,
 		Material
 		{
 			.Diffuse = AssetImporter::GetTexture("Sandbox/assets/images/wood.png")

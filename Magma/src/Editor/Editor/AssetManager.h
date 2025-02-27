@@ -4,6 +4,10 @@
 
 namespace Magma {
 
+struct AssetMetadata {
+	std::string Path;
+};
+
 class EditorAssetManager : public AssetManager {
 public:
 	EditorAssetManager();
@@ -12,17 +16,11 @@ public:
 	void Load(Asset asset) override;
 	void Unload(Asset asset) override;
 
-	Asset Add(MeshPrimitive primitive);
 	Asset Add(const std::string& path, AssetType type);
 
 	UUID GetFromPath(const std::string& path);
 
 	std::string GetPath(UUID id);
-
-	template<typename T>
-	Asset Find(Ref<T> data) {
-		return { };
-	}
 
 	const Map<Asset, bool>& GetRegistry() const { return m_AssetRegistry; }
 
@@ -34,8 +32,8 @@ public:
 
 public:
 	std::string m_Path;
-	Map<UUID, MeshPrimitive> m_Primitives;
 	Map<UUID, std::string> m_Paths;
+	Map<UUID, UUID[3]> m_Materials;
 };
 
 }

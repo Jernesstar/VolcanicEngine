@@ -94,7 +94,7 @@ Cube::Cube()
 	drawPass->SetData(Renderer3D::GetMeshBuffer());
 	drawPass->SetOutput(framebuffer);
 
-	cube = Mesh::Create(MeshPrimitive::Cube,
+	cube = Mesh::Create(MeshType::Cube,
 		Material
 		{
 			.Diffuse = AssetImporter::GetTexture("Sandbox/assets/images/wood.png"),

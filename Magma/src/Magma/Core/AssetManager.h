@@ -7,6 +7,8 @@
 #include <VolcaniCore/Graphics/Cubemap.h>
 #include <VolcaniCore/Graphics/Mesh.h>
 
+#include <Magma/Audio/Sound.h>
+
 using namespace VolcaniCore;
 
 namespace Magma {
@@ -56,7 +58,7 @@ protected:
 	Map<UUID, Ref<Mesh>> m_MeshAssets;
 	Map<UUID, Ref<Texture>> m_TextureAssets;
 	Map<UUID, Ref<Cubemap>> m_CubemapAssets;
-	// Map<UUID, Ref<Sound>> m_AudioAssets;
+	Map<UUID, Ref<Sound>> m_AudioAssets;
 
 private:
 	Ref<Mesh> GetMesh(Asset asset) {
@@ -73,6 +75,11 @@ private:
 		if(!m_CubemapAssets.count(asset.ID))
 			return nullptr;
 		return m_CubemapAssets[asset.ID];
+	}
+	Ref<Sound> GetSound(Asset asset) {
+		if(!m_AudioAssets.count(asset.ID))
+			return nullptr;
+		return m_AudioAssets[asset.ID];
 	}
 };
 
@@ -92,6 +99,12 @@ template<> inline
 Ref<Cubemap> AssetManager::Get(Asset asset) {
 	VOLCANICORE_ASSERT(asset.Type == AssetType::Cubemap);
 	return GetCubemap(asset);
+}
+
+template<> inline
+Ref<Sound> AssetManager::Get(Asset asset) {
+	VOLCANICORE_ASSERT(asset.Type == AssetType::Audio);
+	return GetSound(asset);
 }
 
 }
