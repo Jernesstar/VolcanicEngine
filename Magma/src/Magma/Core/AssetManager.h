@@ -10,6 +10,7 @@
 #include <Magma/Audio/Sound.h>
 
 using namespace VolcaniCore;
+using namespace Magma::Audio;
 
 namespace Magma {
 

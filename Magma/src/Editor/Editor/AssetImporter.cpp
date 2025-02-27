@@ -19,33 +19,37 @@ namespace fs = std::filesystem;
 
 namespace Magma {
 
-static ImageData GetImageData(const std::string& path, bool flip) {
+ImageData AssetImporter::GetImageData(const std::string& path, bool flip) {
 	stbi_set_flip_vertically_on_load((int)flip);
-	ImageData data;
-	uint8_t* pixels =
-		stbi_load(path.c_str(), &data.Width, &data.Height, nullptr, 4);
-	VOLCANICORE_ASSERT_ARGS(pixels, "Could not load image from path '%s'",
-							path.c_str());
-	data.Data = Buffer(pixels, data.Width * data.Height * 4);
-	return data;
+	ImageData image;
+	int width, height, bpp;
+	uint8_t* pixels = stbi_load(path.c_str(), &width, &height, &bpp, 4);
+	if(!pixels) {
+		VOLCANICORE_LOG_WARNING("Could not load image '%s'", path.c_str());
+		return { };
+	}
+
+	image.Width = (uint32_t)width;
+	image.Height = (uint32_t)height;
+	image.Data = Buffer(pixels, image.Width * image.Height * 4);
+	return image;
 }
 
 Ref<Texture> AssetImporter::GetTexture(const std::string& path) {
-	ImageData data = GetImageData(path);
-	auto texture = Texture::Create(data.Width, data.Height);
-	texture->SetData(data.Get());
+	ImageData image = GetImageData(path, false);
+	auto texture = Texture::Create(image.Width, image.Height);
+	texture->SetData(image.Data);
 	return texture;
 }
 
-Ref<Cubemap> AssetImporter::GetCubemap(const std::string& path) {
+Ref<Cubemap> AssetImporter::GetCubemap(const std::string& folder) {
 	List<fs::path> paths;
 	for(auto path : FileUtils::GetFiles(folder, { ".png", ".jpg", ".jpeg" }))
 		paths.Add(fs::path(path));
 
 	if(paths.Count() < 6)
 		VOLCANICORE_LOG_WARNING(
-			"Cubemap folder %s does not have at least 6 images",
-			folder.c_str());
+			"Folder %s does not have at least 6 images", folder.c_str());
 
 	Map<std::string, int> map =
 	{
@@ -55,9 +59,10 @@ Ref<Cubemap> AssetImporter::GetCubemap(const std::string& path) {
 	};
 	List<ImageData> output(6);
 
-	for(auto& facePath : facePaths)
-		output.Insert(map[facePath.filename().string()],
-					  GetImageData(facePath));
+	for(auto& path : paths)
+		output.Insert(map[path.filename().string()], GetImageData(path));
+
+	return Cubemap::Create(output);
 }
 
 static SubMesh LoadMesh(const std::string& path, const aiMesh* mesh) {
@@ -87,7 +92,7 @@ static SubMesh LoadMesh(const std::string& path, const aiMesh* mesh) {
 		indices.Add(face.mIndices[2]);
 	}
 
-	return { vertices, indices, mesh->mMaterialIndex };
+	return { vertices, indices, (int32_t)mesh->mMaterialIndex };
 }
 
 static Ref<Texture> LoadTexture(const std::string& dir,
@@ -124,7 +129,7 @@ static Material LoadMaterial(const std::string& dir, const aiMaterial* mat) {
 		.DiffuseColor  = diffuse,
 		.SpecularColor = specular,
 		.EmissiveColor = emissive
-	}
+	};
 }
 
 Ref<Mesh> AssetImporter::GetMesh(const std::string& path) {
@@ -147,19 +152,21 @@ Ref<Mesh> AssetImporter::GetMesh(const std::string& path) {
 	mesh->Materials.Allocate(scene->mNumMaterials);
 
 	for(uint32_t i = 0; i < scene->mNumMeshes; i++)
-		mesh->SubMeshes.Add(LoadMesh(path, scene->mMeshes[meshIndex]));
+		mesh->SubMeshes.Add(LoadMesh(path, scene->mMeshes[i]));
 
 	auto dir = (fs::path(path).parent_path() / "textures").string();
 	for(uint32_t i = 0; i < scene->mNumMaterials; i++)
 		mesh->Materials
-			.Add(LoadMaterial(dir, scene->mMaterials[mesh->mMaterialIndex]));
+			.Add(
+				LoadMaterial(
+					dir, scene->mMaterials[scene->mMeshes[i]->mMaterialIndex]));
 
 	return mesh;
 }
 
 Ref<Sound> AssetImporter::GetAudio(const std::string& path) {
 	auto source = new SoLoud::Wav;
-	VOLCANICORE_ASSERT(source->load(path) == 0);
+	VOLCANICORE_ASSERT(source->load(path.c_str()) == 0);
 	return CreateRef<Sound>(source);
 }
 

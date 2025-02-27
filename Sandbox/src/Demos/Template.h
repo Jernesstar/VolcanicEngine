@@ -94,8 +94,10 @@ Template::Template() {
 	camera->SetPosition({ 0.0f, 0.0f, 3.0f });
 	controller = CameraController{ camera };
 
-	Write();
-	Read();
+	VOLCANICORE_LOG_INFO("Template Project Started");
+
+	// Write();
+	// Read();
 
 	VOLCANICORE_LOG_INFO("Success");
 }

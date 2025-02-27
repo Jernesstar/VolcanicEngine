@@ -20,12 +20,6 @@ public:
 		return *this;
 	}
 
-	template<typename T>
-	BinaryWriter& WriteData(const Buffer<T>& buffer) {
-		Write(buffer.GetCount());
-		return WriteData(buffer.Get(), buffer.GetSize());
-	}
-
 	template<typename TPrimitive>
 	BinaryWriter& WriteRaw(const TPrimitive& value) {
 		WriteData((void*)&value, sizeof(TPrimitive));
@@ -42,6 +36,12 @@ public:
 		else
 			WriteObject<TData>(value);
 		return *this;
+	}
+
+	template<typename T>
+	BinaryWriter& Write(const Buffer<T>& buffer) {
+		Write(buffer.GetCount());
+		return WriteData(buffer.Get(), buffer.GetSize());
 	}
 
 	template<typename TData>

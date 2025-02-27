@@ -102,11 +102,7 @@ void Serialize(const TextInput* ui, JSONSerializer& serializer) {
 
 template<>
 void Serialize(const Image* ui, JSONSerializer& serializer) {
-	auto& assetManager =
-		Application::As<EditorApp>()->GetEditor().GetAssetManager();
-	UUID id = assetManager.Find(ui->Content).ID;
-
-	serializer.WriteKey("Asset").Write((uint64_t)id);
+	serializer.WriteKey("Asset").Write((uint64_t)ui->ImageID);
 }
 
 template<>
@@ -372,10 +368,7 @@ BinaryWriter& BinaryWriter::WriteObject(const UI::TextInput& textInput) {
 template<>
 BinaryWriter& BinaryWriter::WriteObject(const UI::Image& image) {
 	WriteUI(this, &image);
-	EditorAssetManager& assetManager =
-		Application::As<EditorApp>()->GetEditor().GetAssetManager();
-	UUID id = assetManager.Find(image.Content).ID;
-	Write((uint64_t)id);
+	Write((uint64_t)image.ImageID);
 
 	return *this;
 }

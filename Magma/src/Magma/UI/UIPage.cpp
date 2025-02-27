@@ -67,11 +67,11 @@ void UIPage::Traverse(const Func<void, UIElement*>& func, bool dfs) {
 		q.Add(element);
 
 	while(q) {
-		UIElement* element = q.Pop(false);
+		UIElement* element = q.Pop(-1);
 		func(element);
 
 		for(UIElement* child : element->GetChildren())
-			q.Queue(child, true);
+			q.Queue(child);
 	}
 }
 

@@ -89,10 +89,6 @@ void EditorAssetManager::Load(const std::string& path) {
 	if(!assetPackNode) {
 		Asset asset{ UUID(), AssetType::Mesh };
 		m_AssetRegistry[asset] = true;
-		m_MeshAssets[asset.ID] = Mesh::Create(MeshType::Quad);
-
-		Asset asset{ UUID(), AssetType::Mesh };
-		m_AssetRegistry[asset] = true;
 		m_MeshAssets[asset.ID] = Mesh::Create(MeshType::Cube);
 		return;
 	}
@@ -182,29 +178,28 @@ void EditorAssetManager::Save() {
 		else {
 			auto mesh = m_MeshAssets[asset.ID];
 			auto subMesh = mesh->SubMeshes[0];
-			serializer.WriteKey("PrimitiveType")
-				.Write((uint32_t)m_Primitives[asset.ID]);
+			serializer.WriteKey("Type").Write((uint32_t)mesh->Type);
 
 			serializer.WriteKey("Material")
 			.BeginMapping();
 
-			auto& mat = subMesh.Mat;
+			auto& mat = mesh->Materials[subMesh.MaterialIndex];
 			if(mat.Diffuse)
 				serializer.WriteKey("Diffuse")
 				.BeginMapping()
-					.WriteKey("Path").Write(GetPath(Find(mat.Diffuse).ID))
+					// .WriteKey("Path").Write(mat.Diffuse)
 				.EndMapping();
 
 			if(mat.Specular)
 				serializer.WriteKey("Specular")
 				.BeginMapping()
-					.WriteKey("Path").Write(GetPath(Find(mat.Specular).ID))
+					// .WriteKey("Path").Write(mat.Specular)
 				.EndMapping();
 
 			if(mat.Emissive)
 				serializer.WriteKey("Emissive")
 				.BeginMapping()
-					.WriteKey("Path").Write(GetPath(Find(mat.Emissive).ID))
+					// .WriteKey("Path").Write(mat.Emissive)
 				.EndMapping();
 
 			serializer
@@ -235,8 +230,8 @@ namespace Magma {
 
 template<>
 BinaryWriter& BinaryWriter::WriteObject(const SubMesh& mesh) {
-	WriteData(mesh.Vertices.GetBuffer());
-	WriteData(mesh.Indices.GetBuffer());
+	Write(mesh.Vertices.GetBuffer());
+	Write(mesh.Indices.GetBuffer());
 	Write(mesh.MaterialIndex);
 
 	return *this;
@@ -272,7 +267,7 @@ void EditorAssetManager::RuntimeSave(const std::string& path) {
 			textureFile.Write(image.Height);
 			textureFile.Write(image.Data);
 		}
-		else if(asset.Type == AssetType::Sound) {
+		else if(asset.Type == AssetType::Audio) {
 			auto sound = Get<Sound>(asset);
 			pack.Write(soundFile.GetPosition());
 			soundFile.Write(sound->GetData());

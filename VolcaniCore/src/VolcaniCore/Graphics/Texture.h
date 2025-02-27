@@ -1,7 +1,8 @@
 #pragma once
 
-#include "Core/Defines.h"
 #include "Core/Template.h"
+#include "Core/Defines.h"
+#include "Core/Buffer.h"
 
 namespace VolcaniCore {
 
@@ -25,6 +26,11 @@ public:
 	uint32_t GetHeight() const { return m_Height; }
 
 	virtual void SetData(const void* data) = 0;
+
+	template<typename T>
+	void SetData(const Buffer<T>& buffer) {
+		SetData(buffer.Get());
+	}
 
 protected:
 	uint32_t m_Width = 0, m_Height = 0;

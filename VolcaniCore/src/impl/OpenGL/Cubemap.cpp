@@ -19,8 +19,8 @@ Cubemap::Cubemap(const List<ImageData>& faces)
 
 	for(int i = 0; i < 6; i++)
 	{
-		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB,
-					 faces[i].Width, faces[i].Height, 0, GL_RGBA
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0,
+					 GL_RGBA, faces[i].Width, faces[i].Height, 0, GL_RGBA,
 					 GL_UNSIGNED_BYTE, faces[i].Data.Get());
 	}
 

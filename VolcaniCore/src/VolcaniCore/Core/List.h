@@ -109,10 +109,26 @@ public:
 		Insert(-1, element);
 	}
 
-	T Pop(int64_t pos = -1) {
+	T Pop(int64_t idx = -1) {
 		VOLCANICORE_ASSERT(Count());
 		T val = *At(idx);
 		Remove(idx);
+		auto abs = Absolute(idx);
+
+		if(abs == m_Front) {
+			m_Front++;
+			return val;
+		}
+		if(abs == m_Back) {
+			m_Back--;
+			return val;
+		}
+		else {
+			ShiftLeft(abs, m_Back, 1);
+		}
+		if(m_Front == m_Back)
+			m_Front = m_Back = 0;
+
 		return val;
 	}
 
@@ -154,25 +170,9 @@ public:
 		new (At(pos)) T(element);
 	}
 
-	// Opposite of Insert
 	void Remove(int64_t idx) {
 		m_Buffer.Remove();
 		At(idx)->~T();
-		auto abs = Absolute(idx);
-
-		if(abs == m_Front) {
-			m_Front++;
-			return;
-		}
-		if(abs == m_Back) {
-			m_Back--;
-			return;
-		}
-		else {
-			ShiftLeft(abs, m_Back, 1);
-		}
-		if(m_Front == m_Back)
-			m_Front = m_Back = 0;
 	}
 
 	template<typename TOut, class TPredicate>
