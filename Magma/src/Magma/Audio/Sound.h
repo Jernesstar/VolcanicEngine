@@ -16,6 +16,8 @@ public:
 
 	void Play();
 
+	Buffer<float> GetData();
+
 private:
 	SoLoud::AudioSource* m_Source;
 };

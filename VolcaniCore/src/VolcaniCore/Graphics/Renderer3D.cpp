@@ -196,8 +196,8 @@ static void DrawSubMesh(Ref<Mesh> root, SubMesh& mesh, const glm::mat4& tr,
 			.SetInput("u_Material.SpecularColor", mat.DiffuseColor);
 		}
 
-		command->AddIndices(mesh.Indices.Get());
-		command->AddVertices(mesh.Vertices.Get());
+		command->AddIndices(mesh.Indices.GetBuffer());
+		command->AddVertices(mesh.Vertices.GetBuffer());
 	}
 
 	if(!command->Calls || command->Calls[-1].InstanceCount >= 10'000) {

@@ -222,7 +222,7 @@ public:
 		m_Back = 0;
 	}
 
-	const Buffer<T>& Get() const { return m_Buffer; }
+	const Buffer<T>& GetBuffer() const { return m_Buffer; }
 
 	using iterator = T*;
 	using const_iterator = const T*;

@@ -233,6 +233,14 @@ void EditorAssetManager::Save() {
 
 namespace Magma {
 
+template<>
+BinaryWriter& BinaryWriter::WriteObject(const SubMesh& mesh) {
+	WriteData(mesh.Vertices.GetBuffer());
+	WriteData(mesh.Indices.GetBuffer());
+	Write(mesh.MaterialIndex);
+
+	return *this;
+}
 
 }
 
@@ -247,16 +255,27 @@ void EditorAssetManager::RuntimeSave(const std::string& path) {
 	BinaryWriter soundFile((fs::path(path) / "Asset" / "Sound").string());
 
 	for(auto [asset, _] : m_AssetRegistry) {
+		pack.Write((uint64_t)asset.ID);
+
 		if(asset.Type == AssetType::Mesh) {
 			auto mesh = Get<Mesh>(asset);
+			auto ref = m_References[asset.ID];
+
+			pack.Write(meshFile.GetPosition());
 			meshFile.Write(mesh->SubMeshes);
-			meshFile.Write(m_Materials[asset.ID][0]);
-			meshFile.Write(m_Materials[asset.ID][1]);
-			meshFile.Write(m_Materials[asset.ID][2]);
 		}
-		if(asset.Type == AssetType::Texture) {
-			auto texture = Get<Texture>(asset);
-			
+		else if(asset.Type == AssetType::Texture) {
+			ImageData image = AssetImporter::GetImageData(m_Paths[asset.ID]);
+
+			pack.Write(textureFile.GetPosition());
+			textureFile.Write(image.Width);
+			textureFile.Write(image.Height);
+			textureFile.Write(image.Data);
+		}
+		else if(asset.Type == AssetType::Sound) {
+			auto sound = Get<Sound>(asset);
+			pack.Write(soundFile.GetPosition());
+			soundFile.Write(sound->GetData());
 		}
 	}
 }

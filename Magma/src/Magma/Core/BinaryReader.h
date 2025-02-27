@@ -21,6 +21,14 @@ public:
 		return *this;
 	}
 
+	template<typename T>
+	BinaryReader& ReadData(Buffer<T>& buffer) {
+		uint64_t count;
+		Read(count);
+		buffer.Allocate(count);
+		return Read(buffer.Get(), count * sizeof(T));
+	}
+
 	template<typename TPrimitive>
 	BinaryReader& ReadRaw(TPrimitive& value) {
 		ReadData((void*)&value, sizeof(TPrimitive));

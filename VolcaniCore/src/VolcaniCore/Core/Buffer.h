@@ -129,9 +129,17 @@ public:
 		m_MaxCount = 0;
 	}
 
-	void Reallocate(uint64_t surplus) {
-		m_MaxCount += surplus;
+	void Reallocate(uint64_t additional) {
+		if(additional == 0)
+			return;
+		Allocate(m_MaxCount + additional);
+	}
 
+	void Allocate(uint64_t count) {
+		if(count == 0 && m_MaxCount == count)
+			return;
+
+		m_MaxCount = count;
 		T* newData = (T*)malloc(GetMaxSize());
 		memcpy(newData, m_Data, GetSize());
 		free(m_Data);

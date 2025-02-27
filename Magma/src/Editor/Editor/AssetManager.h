@@ -4,10 +4,6 @@
 
 namespace Magma {
 
-struct AssetMetadata {
-	std::string Path;
-};
-
 class EditorAssetManager : public AssetManager {
 public:
 	EditorAssetManager();
@@ -33,7 +29,7 @@ public:
 public:
 	std::string m_Path;
 	Map<UUID, std::string> m_Paths;
-	Map<UUID, UUID[3]> m_Materials;
+	Map<UUID, Asset[6]> m_References;
 };
 
 }

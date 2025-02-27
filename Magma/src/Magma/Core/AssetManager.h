@@ -18,6 +18,7 @@ enum class AssetType { Mesh, Texture, Cubemap, Font, Audio, Shader, None };
 struct Asset {
 	UUID ID = 0;
 	AssetType Type = AssetType::None;
+	bool Primary = true;
 
 	operator uint64_t() const { return ID; }
 };
