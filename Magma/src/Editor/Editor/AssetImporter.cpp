@@ -59,13 +59,13 @@ Ref<Cubemap> AssetImporter::GetCubemap(const std::string& folder) {
 	};
 	List<ImageData> output(6);
 
-	for(auto& path : paths)
-		output.Insert(map[path.filename().string()], GetImageData(path));
+	// for(auto& path : paths)
+	// 	output.Insert(map[path.filename().string()], GetImageData(path.string()));
 
 	return Cubemap::Create(output);
 }
 
-static SubMesh LoadMesh(const std::string& path, const aiMesh* mesh) {
+static SubMesh LoadMesh(const aiMesh* mesh) {
 	List<Vertex> vertices(mesh->mNumVertices);
 	List<uint32_t> indices(mesh->mNumFaces * 3);
 
@@ -152,7 +152,7 @@ Ref<Mesh> AssetImporter::GetMesh(const std::string& path) {
 	mesh->Materials.Allocate(scene->mNumMaterials);
 
 	for(uint32_t i = 0; i < scene->mNumMeshes; i++)
-		mesh->SubMeshes.Add(LoadMesh(path, scene->mMeshes[i]));
+		mesh->SubMeshes.Add(LoadMesh(scene->mMeshes[i]));
 
 	auto dir = (fs::path(path).parent_path() / "textures").string();
 	for(uint32_t i = 0; i < scene->mNumMaterials; i++)

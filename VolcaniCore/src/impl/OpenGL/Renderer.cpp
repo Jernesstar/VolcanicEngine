@@ -63,8 +63,8 @@ void Renderer::Init() {
 	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS); // Smooth cubemap edges
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
-	s_Data.Commands.Reallocate(120);
-	s_Data.Passes.Reallocate(10);
+	s_Data.Commands.Allocate(120);
+	s_Data.Passes.Allocate(10);
 }
 
 void Renderer::Close() {

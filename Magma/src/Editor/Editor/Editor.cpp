@@ -271,13 +271,11 @@ void Editor::ReopenTab() {
 
 void Editor::CloseTab(Ref<Tab> tabToDelete) {
 	menu.tab.closeTab = false;
-
 	if(tabToDelete == nullptr)
 		return;
 
 	auto [_, idx] = m_Tabs.Find([&](auto& val) { return val == tabToDelete; });
-	m_Tabs.Remove(idx);
-	m_ClosedTabs.Add(tabToDelete);
+	m_ClosedTabs.Add(m_Tabs.Pop(idx));
 
 	if(tabToDelete == m_CurrentTab)
 		SetTab(idx > 0 ? m_Tabs[idx - 1] : nullptr);

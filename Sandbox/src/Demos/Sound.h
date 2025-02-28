@@ -30,7 +30,7 @@ Sound::Sound() {
 	Events::RegisterListener<KeyPressedEvent>(
 		[&](const KeyPressedEvent& event)
 		{
-			if(event.Key == Key::K)
+			if(event.Key == Key::K && !event.IsRepeat)
 				s_SoundEngine.play(sound, 10.0f);
 		});
 

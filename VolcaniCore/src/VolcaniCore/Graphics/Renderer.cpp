@@ -66,7 +66,7 @@ Ref<RenderPass> Renderer::GetPass() {
 }
 
 DrawCommand* Renderer::PushCommand() {
-	s_Stack.Stack(NewCommand());
+	s_Stack.Add(NewCommand());
 	return GetCommand();
 }
 
