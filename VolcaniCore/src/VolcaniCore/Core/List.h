@@ -109,22 +109,29 @@ public:
 		Insert(-1, element);
 	}
 
-	T Pop(int64_t idx = -1) {
+	T Pop() {
+		return Pop(-1);
+	}
+
+	T PopFront() {
+		return Pop(0);
+	}
+
+	T Pop(int64_t idx) {
 		VOLCANICORE_ASSERT(Count());
 		T val = *At(idx);
 		Remove(idx);
-		auto abs = Absolute(idx);
 
-		if(abs == m_Front) {
+		if(idx == 0) {
 			m_Front++;
 			return val;
 		}
-		if(abs == m_Back) {
+		if(idx == -1) {
 			m_Back--;
 			return val;
 		}
 		else {
-			ShiftLeft(abs, m_Back, 1);
+			ShiftLeft(Absolute(idx), m_Back, 1);
 		}
 		if(m_Front == m_Back)
 			m_Front = m_Back = 0;
@@ -132,42 +139,53 @@ public:
 		return val;
 	}
 
-	void Insert(int64_t pos, const T& element) {
-		uint64_t abs = Absolute(pos);
-
+	void Insert(int64_t idx, const T& element) {
 		if(Count() >= m_Buffer.GetMaxCount()) {
 			auto newMax = m_Buffer.GetMaxCount() + 5;
 			T* newData = (T*)malloc(newMax * sizeof(T));
 
-			for(uint64_t i = 0; i < Count() + 1; i++) {
-				if(i == abs)
-					new (newData + m_Front + i) T(element);
-				else {
-					new (newData + m_Front + i) T(*At(i));
-					Remove(i);
-				}
+			uint64_t pos;
+			if(idx < 0)
+				pos = (uint64_t)(((int32_t)m_Back + idx) - (int32_t)m_Front);
+			else
+				pos = (uint64_t)idx;
+			new (newData + pos) T(element);
+
+			uint64_t delta = 0;
+			for(uint64_t i = 0; i < Count(); i++) {
+				if(i == pos)
+					delta = 1;
+
+				new (newData + i + delta) T(*At(i));
+				Remove(i);
 			}
-	
+
+			m_Front = 0;
+			m_Back = Count() + 1;
 			m_Buffer.Delete();
-			m_Buffer = Buffer<T>(newData, Count() + 1, newMax);
+			m_Buffer = Buffer<T>(newData, m_Back, newMax);
 			return;
 		}
-		
+
+		auto abs = Absolute(idx);
 		if(abs == m_Front) {
 			if(m_Front == 0)
 				ShiftRight(abs, m_Back, 1);
 			else
 				m_Front--;
 		}
-		else if(abs == m_Back) {
+		else if(abs == m_Back - 1) {
 			if(m_Back == m_Buffer.GetMaxCount())
 				ShiftLeft(m_Front, abs, 1);
 			else
-				m_Back--;
+				m_Back++;
+		}
+		else {
+			ShiftRight(abs, m_Back, 1);
 		}
 
 		m_Buffer.Add();
-		new (At(pos)) T(element);
+		new (At(idx)) T(element);
 	}
 
 	void Remove(int64_t idx) {
