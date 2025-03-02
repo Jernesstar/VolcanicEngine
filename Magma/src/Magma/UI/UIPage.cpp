@@ -71,7 +71,7 @@ void UIPage::Traverse(const Func<void, UIElement*>& func, bool dfs) {
 		func(element);
 
 		for(UIElement* child : element->GetChildren())
-			q.Queue(child);
+			q.Push(child);
 	}
 }
 

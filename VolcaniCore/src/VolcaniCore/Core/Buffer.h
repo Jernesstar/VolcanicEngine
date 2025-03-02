@@ -36,7 +36,7 @@ public:
 		Set(list.data(), list.size());
 	}
 	Buffer(T* buffer, uint64_t count, uint64_t maxCount = 0)
-		: m_MaxCount(count), m_Count(count)
+		: m_MaxCount(maxCount), m_Count(count)
 	{
 		if(!m_MaxCount)
 			m_MaxCount = m_Count;
@@ -130,13 +130,11 @@ public:
 	}
 
 	void Reallocate(uint64_t additional) {
-		if(additional == 0)
-			return;
 		Allocate(m_MaxCount + additional);
 	}
 
 	void Allocate(uint64_t count) {
-		if(count == 0 && m_MaxCount == count)
+		if(count <= m_MaxCount)
 			return;
 
 		m_MaxCount = count;

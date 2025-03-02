@@ -44,7 +44,6 @@ public:
 
 	List& operator =(const std::initializer_list<T>& list) {
 		Clear();
-		m_Buffer.Delete();
 		m_Buffer = Buffer<T>(list.size());
 
 		for(auto& val : list)
@@ -55,7 +54,6 @@ public:
 
 	List& operator =(List&& other) {
 		Clear();
-		m_Buffer.Delete();
 		m_Buffer = Buffer<T>(other.m_Buffer.GetMaxCount());
 
 		for(auto& val : other)
@@ -66,7 +64,6 @@ public:
 
 	List& operator =(const List& other) {
 		Clear();
-		m_Buffer.Delete();
 		m_Buffer = Buffer<T>(other.m_Buffer.GetMaxCount());
 
 		for(auto& val : other)
@@ -88,24 +85,34 @@ public:
 
 	template<typename ...Args>
 	T& Emplace(Args&&... args) {
-		return EmplaceAt(m_Back, std::forward<Args>(args)...);
+		return EmplaceAt(-1, std::forward<Args>(args)...);
 	}
 
 	template<typename ...Args>
-	T& EmplaceAt(int64_t location, Args&&... args) {
-		Insert(location, T(std::forward<Args>(args)...));
-		return *At(location);
+	T& EmplaceAt(int64_t idx, Args&&... args) {
+		Free(idx);
+		if constexpr(std::is_trivial<T>()) {
+			T element{ std::forward<Args>(args)... };
+			memcpy(At(idx), &element, sizeof(T));
+		}
+		else if constexpr(std::is_aggregate<T>()) {
+			new (At(idx)) T{ std::forward<Args>(args)... };
+		}
+		else
+			new (At(idx)) T(std::forward<Args>(args)...);
+
+		return *At(idx);
 	}
 
 	void Add(const T& element) {
 		Insert(-1, element);
 	}
 
-	void Stack(const T& element) {
+	void Queue(const T& element) {
 		Insert(0, element);
 	}
 
-	void Queue(const T& element) {
+	void Push(const T& element) {
 		Insert(-1, element);
 	}
 
@@ -118,24 +125,18 @@ public:
 	}
 
 	T Pop(int64_t idx) {
-		// VOLCANICORE_ASSERT(Count());
+		VOLCANICORE_ASSERT(Count());
 		T val = *At(idx);
 		Remove(idx);
-		*At(idx) = 1000;
 		auto abs = Absolute(idx);
 
-		if(abs == m_Front) {
+		if(abs == m_Front)
 			m_Front++;
-			return val;
-		}
-		if(abs == m_Back - 1) {
+		else if(abs == m_Back - 1)
 			m_Back--;
-			return val;
-		}
-		else {
-			std::cout << "Abs: " << abs << "\n";
-			// ShiftRight(m_Front++, abs, 1);
-		}
+		else
+			ShiftRight(m_Front++, abs, 1);
+
 		if(m_Front == m_Back)
 			m_Front = m_Back = 0;
 
@@ -143,63 +144,7 @@ public:
 	}
 
 	void Insert(int64_t idx, const T& element) {
-		if(Count() >= m_Buffer.GetMaxCount()) {
-			auto newMax = m_Buffer.GetMaxCount() + 6;
-			T* newData = (T*)malloc(newMax * sizeof(T));
-
-			uint64_t pos;
-			if(idx < 0)
-				pos = (uint64_t)(((int64_t)m_Back + 1 + idx) - (int64_t)m_Front);
-			else
-				pos = (uint64_t)idx;
-
-			uint64_t delta = 0;
-			for(uint64_t i = 0; i < Count() + 1; i++) {
-				if(i == pos) {
-					new (newData + i) T(element);
-					delta = 1;
-				}
-				else
-					new (newData + i) T(*At(i - delta));
-
-				Remove(i - delta);
-			}
-
-			m_Front = 0;
-			m_Back = Count() + 1;
-			m_Buffer.Delete();
-			m_Buffer = Buffer<T>(newData, m_Back, newMax);
-			return;
-		}
-
-		m_Buffer.Add();
-
-		if(!Count()) {
-			new (At(0)) T(element);
-			m_Back++;
-			return;
-		}
-
-		auto abs = Absolute(idx);
-		if(idx == 0) {
-			if(m_Front == 0) {
-				ShiftRight(0, m_Back - 1, 1);
-				m_Back++;
-			}
-			else
-				m_Front--;
-		}
-		if(idx == -1) {
-			if(m_Back == m_Buffer.GetMaxCount())
-				ShiftLeft(m_Front, abs, 1);
-			else
-				m_Back++;
-		}
-		else {
-			ShiftRight(abs, m_Back - 1, 1);
-			m_Back++;
-		}
-
+		Free(idx);
 		new (At(idx)) T(element);
 	}
 
@@ -209,37 +154,38 @@ public:
 			func(val);
 	}
 
-	// template<typename TOut, class TPredicate>
-	// List<TOut> Apply(TPredicate&& func) {
-	// 	List<TOut> out;
-	// 	for(auto& val : *this)
-	// 		out.Add(func(val));
-	// 	return out;
-	// }
+	template<typename TOut, class TPredicate>
+	List<TOut> Apply(TPredicate&& func) {
+		List<TOut> out;
+		for(auto& val : *this)
+			out.Add(func(val));
+		return out;
+	}
 
-	// SearchResult Find(Func<bool, const T&> func) const {
-	// 	for(uint64_t i = 0; i < Count(); i++)
-	// 		if(func(*At(i)))
-	// 			return { true, i };
-	// 	return { false, 0 };
-	// }
+	SearchResult Find(Func<bool, const T&> func) const {
+		for(uint64_t i = 0; i < Count(); i++)
+			if(func(*At(i)))
+				return { true, i };
+		return { false, 0 };
+	}
 
 	void Reallocate(uint64_t additional) {
 		Allocate(m_Buffer.GetMaxCount() + additional);
 	}
 
 	void Allocate(uint64_t maxCount) {
-		if(maxCount == 0 && maxCount == m_Buffer.GetMaxCount())
+		if(maxCount <= m_Buffer.GetMaxCount())
 			return;
 
 		T* newData = (T*)malloc(maxCount * sizeof(T));
-		for(uint64_t i = 0; i < Count() && i < maxCount; i++) {
+		for(uint64_t i = 0; i < Count(); i++) {
 			new (newData + i) T(*At(i));
 			Remove(i);
 		}
 
-		m_Buffer.Delete();
-		m_Buffer = Buffer<T>(newData, Count());
+		m_Front = 0;
+		m_Back = Count();
+		m_Buffer = Buffer<T>(newData, m_Back, maxCount);
 	}
 
 	void Clear() {
@@ -278,22 +224,66 @@ private:
 	}
 
 	void ShiftLeft(uint64_t beg, uint64_t end, uint64_t dx) {
-		for(auto i = beg; i < end; i++)
+		for(int64_t i = (int64_t)beg; i <= (int64_t)end; i++) {
 			new (m_Buffer.Get(i) - dx) T(*m_Buffer.Get(i));
+			m_Buffer.Get(i)->~T();
+		}
 	}
 
 	void ShiftRight(uint64_t beg, uint64_t end, uint64_t dx) {
-		std::cout << beg << "," << end << "\n";
-		for(auto i = end; i >= beg; i--) {
-			new (m_Buffer.Get(i) + dx) T(*m_Buffer.Get(i));
+		for(int64_t i = (int64_t)end; i >= (int64_t)beg; --i) {
+			new (m_Buffer.Get(i + dx)) T(*m_Buffer.Get(i));
 			m_Buffer.Get(i)->~T();
 		}
-		// // Since m_Back points at the next available block of memory
-		// // The condition checks for a hard inequality
-		// if(end + dx > m_Buffer.GetMaxCount()) {
-		// 	Reallocate(dx + 1);
-		// 	return;
-		// }
+	}
+
+	void Free(int64_t idx) {
+		if(Count() >= m_Buffer.GetMaxCount()) {
+			auto newMax = m_Buffer.GetMaxCount() + 6;
+			T* newData = (T*)malloc(newMax * sizeof(T));
+
+			uint64_t pos;
+			if(idx < 0)
+				pos = (uint64_t)(((int64_t)m_Back + 1 + idx) - (int64_t)m_Front);
+			else
+				pos = (uint64_t)idx;
+
+			uint64_t delta = 0;
+			for(uint64_t i = 0; i < Count() + 1; i++) {
+				if(i == pos)
+					delta = 1;
+				else
+					new (newData + i) T(*At(i - delta));
+
+				Remove(i - delta);
+			}
+
+			m_Front = 0;
+			m_Back = Count() + 1;
+			m_Buffer = Buffer<T>(newData, m_Back, newMax);
+			return;
+		}
+
+		if(!Count()) {
+			m_Back++;
+			return;
+		}
+
+		auto abs = Absolute(idx);
+		if(idx == 0) {
+			if(m_Front != 0)
+				m_Front--;
+			else
+				ShiftRight(0, (m_Back++) - 1, 1);
+		}
+		else if(idx == -1) {
+			if(m_Back != m_Buffer.GetMaxCount())
+				m_Back++;
+			else
+				ShiftLeft((m_Front--), m_Back - 1, 1);
+		}
+		else
+			ShiftRight(abs, (m_Back++) - 1, 1);
 	}
 };
 

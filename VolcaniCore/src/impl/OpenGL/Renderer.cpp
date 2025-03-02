@@ -63,7 +63,7 @@ void Renderer::Init() {
 	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS); // Smooth cubemap edges
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
-	s_Data.Commands.Allocate(120);
+	s_Data.Commands.Allocate(50);
 	s_Data.Passes.Allocate(10);
 }
 
@@ -79,7 +79,7 @@ void Renderer::StartFrame() {
 }
 
 void Renderer::EndFrame() {
-	if(!s_Data.Commands) // EndFrame already called
+	if(!s_Data.Commands)
 		return;
 
 	for(auto& [buffer, backend] : s_Data.Arrays) {
