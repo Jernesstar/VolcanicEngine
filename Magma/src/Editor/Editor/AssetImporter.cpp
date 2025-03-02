@@ -72,14 +72,14 @@ static SubMesh LoadMesh(const aiMesh* mesh) {
 	for(uint32_t i = 0; i < mesh->mNumVertices; i++) {
 		const aiVector3D& pos	   = mesh->mVertices[i];
 		const aiVector3D& normal   = mesh->mNormals[i];
-		const aiVector3D& texCoord = mesh->HasTextureCoords(0)
-									? mesh->mTextureCoords[0][i]
-									: aiVector3D(0.0f, 0.0f, 0.0f);
+		const aiVector3D& texCoord =
+			mesh->HasTextureCoords(0) ? mesh->mTextureCoords[0][i]
+									  : aiVector3D(0.0f, 0.0f, 0.0f);
 		Vertex v
 		{
-			.Position		= glm::vec3(pos.x, pos.y, pos.z),
-			.Normal			= glm::vec3(normal.x, normal.y, normal.z),
-			.TexCoord		= glm::vec2(texCoord.x, texCoord.y)
+			.Position = glm::vec3(pos.x, pos.y, pos.z),
+			.Normal   = glm::vec3(normal.x, normal.y, normal.z),
+			.TexCoord = glm::vec2(texCoord.x, texCoord.y)
 		};
 		vertices.Add(v);
 	}
@@ -91,7 +91,7 @@ static SubMesh LoadMesh(const aiMesh* mesh) {
 		indices.Add(face.mIndices[2]);
 	}
 
-	return { vertices, indices, (int32_t)mesh->mMaterialIndex };
+	return { vertices, indices, mesh->mMaterialIndex };
 }
 
 static Ref<Texture> LoadTexture(const std::string& dir,

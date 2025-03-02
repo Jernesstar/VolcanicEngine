@@ -23,10 +23,9 @@ void func() {
 
 void func2() {
 	theList.Emplace();
-	// theList.Emplace();
-	// theList.Emplace();
-	// theList.Emplace();
-	auto* ptr = &theList.Emplace(1);
+	theList.Emplace();
+	theList.Emplace();
+	theList.Emplace();
 
 	for(auto& val : theList)
 		std::cout << val.Val << "\n";

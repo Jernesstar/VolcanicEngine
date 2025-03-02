@@ -64,7 +64,7 @@ void Renderer::Init() {
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
 	s_Data.Commands.Allocate(50);
-	s_Data.Passes.Allocate(10);
+	// s_Data.Passes.Allocate(10);
 }
 
 void Renderer::Close() {
@@ -244,9 +244,6 @@ void FlushCommand(DrawCommand& command) {
 		}
 		array->Unbind();
 	}
-
-	s_Info.IndexCount += command.IndicesIndex;
-	s_Info.VertexCount += command.VerticesIndex;
 
 	if(command.Pass && command.Pass->Output)
 		command.Pass->Output->As<OpenGL::Framebuffer>()->Unbind();

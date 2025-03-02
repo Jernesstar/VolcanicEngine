@@ -8,7 +8,7 @@ Ref<Mesh> Mesh::Create(MeshType type,
 						const Material& material)
 {
 	auto mesh = CreateRef<Mesh>(type);
-	mesh->SubMeshes.Add({ vertices, indices, 0 });
+	mesh->SubMeshes.Emplace(vertices, indices, 0U);
 	mesh->Materials.Add(material);
 	return mesh;
 }

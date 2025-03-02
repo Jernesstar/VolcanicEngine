@@ -30,7 +30,7 @@ struct Material {
 struct SubMesh {
 	List<Vertex> Vertices;
 	List<uint32_t> Indices;
-	int32_t MaterialIndex = -1;
+	uint32_t MaterialIndex;
 };
 
 enum class MeshType { Quad, Cube, Model };

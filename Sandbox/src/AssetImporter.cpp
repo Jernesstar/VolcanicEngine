@@ -81,7 +81,7 @@ static SubMesh LoadMesh(const aiMesh* mesh) {
 			.Normal   = glm::vec3(normal.x, normal.y, normal.z),
 			.TexCoord = glm::vec2(texCoord.x, texCoord.y)
 		};
-		vertices.Emplace(v);
+		vertices.Add(v);
 	}
 
 	for(uint32_t i = 0; i < mesh->mNumFaces; i++) {
@@ -91,7 +91,7 @@ static SubMesh LoadMesh(const aiMesh* mesh) {
 		indices.Add(face.mIndices[2]);
 	}
 
-	return { vertices, indices, (int32_t)mesh->mMaterialIndex };
+	return { vertices, indices, mesh->mMaterialIndex };
 }
 
 static Ref<Texture> LoadTexture(const std::string& dir,

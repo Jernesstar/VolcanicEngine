@@ -60,7 +60,7 @@ Lighting::Lighting() {
 				Application::Close();
 		});
 
-	auto shader = ShaderPipeline::Create("Sandbox/assets/shaders", "Lighting");
+	auto shader = ShaderPipeline::Create("Magma/assets/shaders", "Lighting");
 	lightingPass = RenderPass::Create("Lighting", shader);
 	lightingPass->SetData(Renderer3D::GetMeshBuffer());
 
@@ -148,35 +148,31 @@ void Lighting::OnUpdate(TimeStep ts) {
 		auto* command = Renderer::GetCommand();
 		command->UniformData
 		.SetInput(UniformSlot{ buffer, "", 0 });
-		command->UniformData
-		.SetInput("u_PointLightCount", 2 * width * 2 * length);
+		// command->UniformData
+		// .SetInput("u_PointLightCount", 2 * width * 2 * length);
 
 		auto& mat1 = cube->Materials[0];
 		auto& mat2 = torch->Materials[0];
 
-		auto* cubeCommand = Renderer::NewCommand();
-		cubeCommand->UniformData
-		.SetInput("u_Material.Diffuse",
-				  TextureSlot{ mat1.Diffuse, 0 });
-		cubeCommand->UniformData
-		.SetInput("u_Material.Specular",
-				  TextureSlot{ mat1.Specular, 1 });
-		cubeCommand->UniformData
-		.SetInput("u_Material.Shininess", 32.0f);
+		// auto* cubeCommand = Renderer::NewCommand();
+		// cubeCommand->UniformData
+		// .SetInput("u_Material.Diffuse", TextureSlot{ mat1.Diffuse, 0 });
+		// cubeCommand->UniformData
+		// .SetInput("u_Material.Specular", TextureSlot{ mat1.Specular, 1 });
+		// cubeCommand->UniformData
+		// .SetInput("u_Material.Shininess", 32.0f);
 
 		auto* torchCommand = Renderer::NewCommand();
 		torchCommand->UniformData
-		.SetInput("u_Material.Diffuse",
-				  TextureSlot{ mat2.Diffuse, 0 });
+		.SetInput("u_Material.Diffuse", TextureSlot{ mat2.Diffuse, 0 });
 		torchCommand->UniformData
-		.SetInput("u_Material.Specular",
-				  TextureSlot{ mat2.Specular, 1 });
+		.SetInput("u_Material.Specular", TextureSlot{ mat2.Specular, 1 });
 		torchCommand->UniformData
 		.SetInput("u_Material.Shininess", 32.0f);
 
 		for(int y = -50; y < 50; y++)
 			for(int x = -50; x < 50; x++) {
-				Renderer3D::DrawMesh(cube, { .Translation = { x, 0.0f, y } }, cubeCommand);
+				// Renderer3D::DrawMesh(cube, { .Translation = { x, 0.0f, y } }, cubeCommand);
 				Renderer3D::DrawMesh(torch, { .Translation = { x, 1.0f, y } }, torchCommand);
 			}
 

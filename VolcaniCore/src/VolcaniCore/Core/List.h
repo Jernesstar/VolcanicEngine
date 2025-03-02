@@ -91,13 +91,8 @@ public:
 	template<typename ...Args>
 	T& EmplaceAt(int64_t idx, Args&&... args) {
 		Free(idx);
-		if constexpr(std::is_trivial<T>()) {
-			T element{ std::forward<Args>(args)... };
-			memcpy(At(idx), &element, sizeof(T));
-		}
-		else if constexpr(std::is_aggregate<T>()) {
+		if constexpr(std::is_aggregate<T>())
 			new (At(idx)) T{ std::forward<Args>(args)... };
-		}
 		else
 			new (At(idx)) T(std::forward<Args>(args)...);
 
@@ -263,6 +258,8 @@ private:
 			m_Buffer = Buffer<T>(newData, m_Back, newMax);
 			return;
 		}
+
+		m_Buffer.Add();
 
 		if(!Count()) {
 			m_Back++;

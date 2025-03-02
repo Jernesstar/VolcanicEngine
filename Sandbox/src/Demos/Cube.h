@@ -99,7 +99,7 @@ Cube::Cube()
 		{
 			.Diffuse = AssetImporter::GetTexture("Sandbox/assets/images/wood.png"),
 		});
-	// torch = AssetImporter::GetMesh("Sandbox/assets/models/mc-torch/Torch.obj");
+	torch = AssetImporter::GetMesh("Sandbox/assets/models/mc-torch/Torch.obj");
 
 	camera = CreateRef<IsometricCamera>();
 	controller =
@@ -146,8 +146,6 @@ void Cube::OnUpdate(TimeStep ts) {
 		ImGui::Text("Indices: %li", info.Indices);
 		ImGui::Text("Vertices: %li", info.Vertices);
 		ImGui::Text("Instances: %li", info.Instances);
-		ImGui::Text("Triangles: %li",
-			info.Instances * uint64_t(info.Vertices / 3));
 	}
 	ImGui::End();
 
@@ -160,7 +158,7 @@ void Cube::OnUpdate(TimeStep ts) {
 		for(int y = -50; y < 50; y++)
 			for(int x = -50; x < 50; x++) {
 				Renderer3D::DrawMesh(cube, { .Translation = { x, 0.0f, y } });
-				// Renderer3D::DrawMesh(torch, { .Translation = { x, 1.0f, y } });
+				Renderer3D::DrawMesh(torch, { .Translation = { x, 1.0f, y } });
 			}
 
 		Renderer3D::End();

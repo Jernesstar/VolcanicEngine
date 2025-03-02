@@ -160,14 +160,12 @@ static void DrawSubMesh(Ref<Mesh> root, SubMesh& mesh, const glm::mat4& tr,
 						DrawCommand* cmd)
 {
 	DrawCommand* command;
-
 	if(cmd)
 		command = cmd;
 	else if(s_Meshes.count(&mesh))
 		command = s_Meshes[&mesh];
-	else {
+	else
 		s_Meshes[&mesh] = command = Renderer::NewCommand();
-	}
 
 	if(!command->VerticesCount) {
 		if(cmd) {
@@ -175,7 +173,7 @@ static void DrawSubMesh(Ref<Mesh> root, SubMesh& mesh, const glm::mat4& tr,
 			command->IndicesIndex = s_MeshBuffer->IndicesCount;
 		}
 
-		if(!command->UniformData && mesh.MaterialIndex != -1) {
+		if(!command->UniformData) {
 			Material& mat = root->Materials[mesh.MaterialIndex];
 			if(mat.Diffuse) {
 				command->UniformData

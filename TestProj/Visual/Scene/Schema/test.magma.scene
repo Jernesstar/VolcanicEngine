@@ -38,7 +38,7 @@ Scene:
             Tag: Empty Tag
           TransformComponent:
             Transform:
-              Translation: [2.4000001, 0, 0]
+              Translation: [2.4000001, 4.5, 0]
               Rotation: [0, 0, 0]
               Scale: [1, 1, 1]
           MeshComponent:
