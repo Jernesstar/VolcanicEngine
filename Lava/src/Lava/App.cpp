@@ -50,14 +50,14 @@ App::App(const Project& project)
 	: m_Project(project)
 {
 	s_Instance = this;
-	ScriptEngine::RegisterSingleton("App", "s_App", this);
+	ScriptEngine::RegisterSingleton("AppClass", "App", this);
 
 	ScriptEngine::RegisterMethod<App>(
-		"App", "void SetScreen(const string &in)", &App::SetScreen);
+		"AppClass", "void SetScreen(const string &in)", &App::SetScreen);
 	ScriptEngine::RegisterMethod<App>(
-		"App", "void PushScreen(const string &in)", &App::PushScreen);
+		"AppClass", "void PushScreen(const string &in)", &App::PushScreen);
 	ScriptEngine::RegisterMethod<App>(
-		"App", "void PopScreen()", &App::PopScreen);
+		"AppClass", "void PopScreen()", &App::PopScreen);
 }
 
 void App::OnLoad() {
@@ -132,6 +132,11 @@ void App::OnUpdate(TimeStep ts) {
 }
 
 void App::SetScreen(const std::string& name) {
+	if(!ChangeScreen) {
+		Running = false;
+		return;
+	}
+
 	auto [found, idx] =
 		m_Project.Screens.Find(
 			[name](const Screen& screen) -> bool
@@ -148,7 +153,6 @@ void App::SetScreen(const std::string& name) {
 	s_CurrentScreen = new RuntimeScreen(screen);
 
 	// SceneLoad(s_CurrentScreen->CurrentScene);
-
 	// s_Module = UILoad(s_CurrentScreen->CurrentPage);
 
 	// s_CurrentScreen->CurrentPage.Traverse(
@@ -166,10 +170,20 @@ void App::SetScreen(const std::string& name) {
 }
 
 void App::PushScreen(const std::string& name) {
+	if(!ChangeScreen) {
+		Running = false;
+		return;
+	}
+
 
 }
 
 void App::PopScreen() {
+	if(!ChangeScreen) {
+		Running = false;
+		return;
+	}
+
 
 }
 

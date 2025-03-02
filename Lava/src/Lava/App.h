@@ -39,6 +39,9 @@ public:
 	static App* GetInstance() { return s_Instance; }
 
 public:
+	bool ChangeScreen;
+	bool Running;
+
 	Func<void, Scene&> SceneLoad;
 	Func<void, const Scene&> SceneSave;
 	Func<Ref<ScriptModule>, UIPage&> UILoad;
@@ -47,10 +50,6 @@ public:
 public:
 	App(const Project& project);
 	~App() = default;
-
-	void SetAssetManager(AssetManager& manager) {
-		m_AssetManager = &manager;
-	}
 
 	void OnLoad();
 	void OnClose();
@@ -61,6 +60,10 @@ public:
 	void PopScreen();
 
 	Ref<ScriptClass> GetScriptClass(const std::string& name);
+
+	void SetAssetManager(AssetManager& manager) {
+		m_AssetManager = &manager;
+	}
 
 	AssetManager* GetAssetManager() { return m_AssetManager; }
 	RuntimeSceneRenderer& GetRenderer() { return m_SceneRenderer; }

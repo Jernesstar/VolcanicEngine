@@ -3,7 +3,7 @@ class TestGame : IApp
 	void OnLoad()
 	{
 		print("OnLoad");
-		s_App.SetScreen("This is a test");
+		App.SetScreen("This is a test");
 	}
 
 	void OnClose()
