@@ -37,8 +37,8 @@ struct {
 	struct {
 		bool newProject    = false;
 		bool openProject   = false;
-		bool reloadProject = false;
 		bool runProject    = false;
+		bool saveProject   = false;
 		bool exportProject = false;
 	} project;
 
@@ -58,18 +58,7 @@ Editor::Editor(const CommandLineArgs& args) {
 	Lava::ScriptGlue::Init();
 
 	if(args["--project"]) {
-		m_Project.Load(args["--project"]);
-		m_App = CreateRef<Lava::App>(m_Project);
-
-		m_AssetManager.Load(m_Project.Path);
-		m_AssetManager.Reload();
-
-		auto themePath =
-			fs::path(m_Project.Path) / "Visual" / "UI" / "Page"
-									/ "theme.magma.ui.json";
-		if(fs::exists(themePath))
-			UITab::GetTheme() = UILoader::LoadTheme(themePath.string());
-
+		NewProject(args["--project"]);
 		NewTab(CreateRef<ProjectTab>(m_Project.Path));
 	}
 	for(auto& path : args["--scene"])
@@ -123,9 +112,9 @@ void Editor::Render() {
 					menu.project.newProject = true;
 				if(ImGui::MenuItem("Open", "Ctrl+P"))
 					menu.project.openProject = true;
-				if(ImGui::MenuItem("Reload", "Ctrl+S")
+				if(ImGui::MenuItem("Save", "Ctrl+S")
 				|| Input::KeysPressed(Key::Ctrl, Key::S))
-					menu.project.reloadProject = true;
+					menu.project.saveProject = true;
 				if(ImGui::MenuItem("Run", "Ctrl+R"))
 					menu.project.runProject = true;
 
@@ -201,14 +190,14 @@ void Editor::Render() {
 		NewProject();
 	if(menu.project.openProject)
 		OpenProject();
-	if(menu.project.reloadProject)
-		ReloadProject();
 	if(menu.project.runProject)
 		RunProject();
+	if(menu.project.saveProject)
+		SaveProject();
 	if(menu.project.exportProject)
 		ExportProject();
 
-	if(menu.tab.newTab )
+	if(menu.tab.newTab)
 		NewTab();
 	if(menu.tab.openTab)
 		OpenTab();
@@ -287,6 +276,20 @@ void Editor::NewProject() {
 	Application::GetWindow()->SetTitle("Magma Editor");
 }
 
+void Editor::NewProject(const std::string& path) {
+	namespace fs = std::filesystem;
+
+	m_Project.Load(path);
+	m_App = CreateRef<Lava::App>(m_Project);
+	m_AssetManager.Load(path);
+	m_AssetManager.Reload();
+
+	auto themePath =
+		fs::path(path) / "Visual" / "UI" / "Page" / "theme.magma.ui.json";
+	if(fs::exists(themePath))
+		UITab::GetTheme() = UILoader::LoadTheme(themePath.string());
+}
+
 void Editor::OpenProject() {
 	IGFD::FileDialogConfig config;
 	config.path = m_Project.Path;
@@ -296,19 +299,13 @@ void Editor::OpenProject() {
 	if(instance->Display("ChooseFile")) {
 		if(instance->IsOk()) {
 			std::string path = instance->GetFilePathName();
-			m_Project.Load(path);
-			m_App = CreateRef<Lava::App>(m_Project);
+			NewProject(path);
 		}
 
 		instance->Close();
 		menu.project.openProject = false;
 		SetTab(nullptr);
 	}
-}
-
-void Editor::ReloadProject() {
-	menu.project.reloadProject = false;
-
 }
 
 void Editor::RunProject() {
@@ -323,6 +320,11 @@ void Editor::RunProject() {
 	command += m_Project.Path + "/.magma.proj";
 #endif
 	system(command.c_str());
+}
+
+void Editor::SaveProject() {
+	menu.project.saveProject = false;
+
 }
 
 void Editor::ExportProject() {

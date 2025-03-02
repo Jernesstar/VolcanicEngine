@@ -74,7 +74,7 @@ Lighting::Lighting() {
 	// light.Position = { 0.0f, 0.001f, 0.0f };
 	// light.Ambient  = { 0.002f, 0.002f, 0.002f };
 	// light.Diffuse  = { 0.005f, 0.005f, 0.005f };
-	// // light.Specular = { 0.001f, 0.001f, 0.001f };
+	// light.Specular = { 0.001f, 0.001f, 0.001f };
 
 	spot = SpotLight
 		{
@@ -95,15 +95,15 @@ Lighting::Lighting() {
 			});
 
 	std::string assetPath = "Sandbox/assets/";
-	cube =
-		Mesh::Create(MeshType::Cube,
-			Material
-			{
-				.Diffuse = AssetImporter::GetTexture(assetPath + "images/wood.png"),
-				.Specular = AssetImporter::GetTexture(assetPath + "images/wood_specular.png"),
-			});
+	// cube =
+	// 	Mesh::Create(MeshType::Cube,
+	// 		Material
+	// 		{
+	// 			.Diffuse = AssetImporter::GetTexture(assetPath + "images/wood.png"),
+	// 			.Specular = AssetImporter::GetTexture(assetPath + "images/wood_specular.png"),
+	// 		});
+	// player = AssetImporter::GetMesh(assetPath + "models/player/Knight_Golden_Male.obj");
 	torch = AssetImporter::GetMesh(assetPath + "models/mc-torch/Torch.obj");
-	player = AssetImporter::GetMesh(assetPath + "models/player/Knight_Golden_Male.obj");
 
 	camera = CreateRef<StereographicCamera>(75.0f);
 	camera->SetPosition({ 2.5f, 2.5f, 2.5f });
@@ -151,7 +151,7 @@ void Lighting::OnUpdate(TimeStep ts) {
 		// command->UniformData
 		// .SetInput("u_PointLightCount", 2 * width * 2 * length);
 
-		auto& mat1 = cube->Materials[0];
+		// auto& mat1 = cube->Materials[0];
 		auto& mat2 = torch->Materials[0];
 
 		// auto* cubeCommand = Renderer::NewCommand();
@@ -176,7 +176,7 @@ void Lighting::OnUpdate(TimeStep ts) {
 				Renderer3D::DrawMesh(torch, { .Translation = { x, 1.0f, y } }, torchCommand);
 			}
 
-		Renderer3D::DrawMesh(player);
+		// Renderer3D::DrawMesh(player);
 
 		Renderer3D::End();
 	}

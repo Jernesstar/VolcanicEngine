@@ -48,9 +48,10 @@ private:
 	void CloseTab(Ref<Tab> tab);
 
 	void NewProject();
+	void NewProject(const std::string& path);
 	void OpenProject();
-	void ReloadProject();
 	void RunProject();
+	void SaveProject();
 	void ExportProject();
 };
 

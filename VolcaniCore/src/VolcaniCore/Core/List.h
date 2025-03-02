@@ -195,10 +195,10 @@ public:
 
 	using iterator = T*;
 	using const_iterator = const T*;
-	iterator begin() { return m_Buffer.Get() + m_Front; }
-	iterator end() { return m_Buffer.Get() + m_Back; }
-	const_iterator cbegin() const { return m_Buffer.Get() + m_Front; }
-	const_iterator cend()	const { return m_Buffer.Get() + m_Back; }
+	iterator begin() { return m_Buffer.Get(m_Front); }
+	iterator end() { return m_Buffer.Get(m_Back); }
+	const_iterator cbegin() const { return m_Buffer.Get(m_Front); }
+	const_iterator cend()	const { return m_Buffer.Get(m_Back); }
 	const_iterator begin()	const { return cbegin(); }
 	const_iterator end()	const { return cend(); }
 

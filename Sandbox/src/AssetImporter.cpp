@@ -99,11 +99,12 @@ static Ref<Texture> LoadTexture(const std::string& dir,
 {
 	if(material->GetTextureCount(type) == 0)
 		return nullptr;
-	aiString path;
-	if(material->GetTexture(type, 0, &path) == AI_FAILURE)
+	aiString filename;
+	if(material->GetTexture(type, 0, &filename) == AI_FAILURE)
 		return nullptr;
-
-	return AssetImporter::GetTexture(std::string(path.data));
+	
+	auto fullPath = fs::path(dir) / std::string(filename.data);
+	return AssetImporter::GetTexture(fullPath.string());
 }
 
 static Material LoadMaterial(const std::string& dir, const aiMaterial* mat) {
