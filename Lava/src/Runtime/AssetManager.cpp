@@ -1,5 +1,7 @@
 #include "AssetManager.h"
 
+#include <bitset>
+
 #include <Magma/Core/BinaryReader.h>
 
 namespace Lava {
@@ -37,28 +39,30 @@ void RuntimeAssetManager::Load(Asset asset) {
 		BinaryReader reader("Asset/Mesh/mesh.bin");
 		reader.SetPosition(offset);
 		reader.Read(mesh->SubMeshes);
-		List<std::bitset> materials;
-		Read(materials);
+		List<uint64_t> materialFlags;
+		reader.Read(materialFlags);
 
-		auto& refs = m_Referenes[asset.ID];
+		auto& refs = m_References[asset.ID];
 		uint64_t i = 0;
-		for(auto mat : materials) {
-			if(mat.test(2))
+		for(auto mat : materialFlags) {
+			std::bitset<3> flags(mat);
+			if(flags.test(2))
 				Load(refs[i++]);
-			if(mat.test(1))
+			if(flags.test(1))
 				Load(refs[i++]);
-			if(mat.test(0))
+			if(flags.test(0))
 				Load(refs[i++]);
 		}
 
 		m_MeshAssets[asset.ID] = mesh;
 	}
 	else if(asset.Type == AssetType::Texture) {
-		BinaryReader textureFile("Asset/Image/image.bin");
+		BinaryReader reader("Asset/Image/image.bin");
 		uint32_t width, height;
 		Buffer<uint8_t> data;
-		Read(width); Read(height);
-		Read(data);
+		reader.Read(width);
+		reader.Read(height);
+		reader.Read(data);
 		Ref<Texture> texture = Texture::Create(width, height);
 		texture->SetData(data);
 		m_TextureAssets[asset.ID] = texture;
@@ -88,22 +92,22 @@ void RuntimeAssetManager::Load() {
 	for(uint64_t i = 0; i < count; i++) {
 		uint64_t id;
 		uint32_t typeInt;
-		Read(id);
-		Read(typeInt);
+		reader.Read(id);
+		reader.Read(typeInt);
 		Asset asset{ id, (AssetType)typeInt };
 		uint64_t offset;
-		Read(offset);
+		reader.Read(offset);
+		m_AssetRegistry[asset] = false;
 		m_AssetOffsets[asset.ID] = offset;
-		m_AssetRegistry[asset.ID] = false;
 
 		uint64_t refCount;
-		Read(refCount);
+		reader.Read(refCount);
 		m_References[asset.ID].Allocate(refCount);
 		for(uint64_t i = 0; i < refCount; i++) {
-			uint64_t refId;
+			uint64_t refID;
 			uint32_t refType;
-			Read(refID);
-			Read(refType);
+			reader.Read(refID);
+			reader.Read(refType);
 			Asset asset{ refID, (AssetType)refType };
 			m_References[asset.ID].Add(asset);
 		}

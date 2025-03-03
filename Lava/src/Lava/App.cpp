@@ -18,11 +18,14 @@
 
 #include <Magma/UI/UIRenderer.h>
 
+#include <Magma/Physics/Physics.h>
+
 #include "ScriptGlue.h"
 
 using namespace Magma::UI;
 using namespace Magma::ECS;
 using namespace Magma::Script;
+using namespace Magma::Physics;
 
 namespace fs = std::filesystem;
 

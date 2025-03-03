@@ -397,15 +397,15 @@ void Editor::ExportProject() {
 
 	m_Project.Save((fs::path(exportPath) / ".volc.proj").string());
 
-	auto runtimeEnv = getenv("VOLC_RUNTIME");
-	VOLCANICORE_ASSERT(runtimeEnv);
-	std::string runtimePath = runtimeEnv;
-	auto target = (fs::path(exportPath) / m_Project.App).string() + ".exe";
+	// auto runtimeEnv = getenv("VOLC_RUNTIME");
+	// VOLCANICORE_ASSERT(runtimeEnv);
+	// std::string runtimePath = runtimeEnv;
+	// auto target = (fs::path(exportPath) / m_Project.App).string() + ".exe";
 
-	if(FileUtils::FileExists(target))
-		fs::remove(target);
+	// if(FileUtils::FileExists(target))
+	// 	fs::remove(target);
 
-	fs::copy_file(runtimePath, target, fs::copy_options::overwrite_existing);
+	// fs::copy_file(runtimePath, target, fs::copy_options::overwrite_existing);
 }
 
 }

@@ -9,12 +9,25 @@
 
 #include <Magma/Audio/Sound.h>
 
+#include <Magma/Script/ScriptModule.h>
+#include <Magma/Script/ScriptClass.h>
+
 using namespace VolcaniCore;
 using namespace Magma::Audio;
+using namespace Magma::Script;
 
 namespace Magma {
 
-enum class AssetType { Mesh, Texture, Cubemap, Font, Audio, Shader, None };
+enum class AssetType {
+	Mesh,
+	Texture,
+	Cubemap,
+	// Font,
+	Audio,
+	Script,
+	Shader,
+	None
+};
 
 struct Asset {
 	UUID ID = 0;
@@ -63,6 +76,7 @@ protected:
 	Map<UUID, Ref<Texture>> m_TextureAssets;
 	Map<UUID, Ref<Cubemap>> m_CubemapAssets;
 	Map<UUID, Ref<Sound>> m_AudioAssets;
+	Map<UUID, Ref<ScriptClass>> m_ScriptAssets;
 
 private:
 	Ref<Mesh> GetMesh(Asset asset) {

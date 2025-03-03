@@ -85,8 +85,8 @@ void ProjectTab::Render() {
 			ImGui::EndMenu();
 		}
 		if(ImGui::BeginMenu("Edit")) {
-			if(ImGui::MenuItem("Add Entity", "Ctrl+N"))
-				menu.edit.addEntity = true;
+			// if(ImGui::MenuItem("Add Entity", "Ctrl+N"))
+			// 	menu.edit.addEntity = true;
 
 			ImGui::EndMenu();
 		}

@@ -492,7 +492,7 @@ void LoadElement(UIPage& page, const rapidjson::Value& elementNode,
 			auto image = assetManager.Get<Texture>(asset);
 
 			button->Display = CreateRef<Image>(image);
-			button->ImageID = asset;
+			button->Display->As<Image>()->ImageID = (uint64_t)id;
 		}
 		else if(elementNode.HasMember("Text"))
 			button->Display

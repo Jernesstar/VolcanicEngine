@@ -66,8 +66,8 @@ Ref<Cubemap> AssetImporter::GetCubemap(const std::string& folder) {
 }
 
 static SubMesh LoadMesh(const aiMesh* mesh) {
-	List<Vertex> vertices(mesh->mNumVertices);
-	List<uint32_t> indices(mesh->mNumFaces * 3);
+	Buffer<Vertex> vertices(mesh->mNumVertices);
+	Buffer<uint32_t> indices(mesh->mNumFaces * 3);
 
 	for(uint32_t i = 0; i < mesh->mNumVertices; i++) {
 		const aiVector3D& pos	   = mesh->mVertices[i];
@@ -102,7 +102,7 @@ static Ref<Texture> LoadTexture(const std::string& dir,
 	aiString filename;
 	if(material->GetTexture(type, 0, &filename) == AI_FAILURE)
 		return nullptr;
-	
+
 	auto fullPath = fs::path(dir) / std::string(filename.data);
 	return AssetImporter::GetTexture(fullPath.string());
 }

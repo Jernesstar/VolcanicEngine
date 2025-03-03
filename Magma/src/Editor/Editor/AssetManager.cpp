@@ -73,8 +73,9 @@ std::string EditorAssetManager::GetPath(UUID id) {
 void EditorAssetManager::Load(const std::string& path) {
 	namespace fs = std::filesystem;
 
-	auto packPath = (fs::path(path) / "Visual" / ".magma.assetpk").string();
-	auto rootPath = fs::path(path) / "Visual" / "Asset";
+	auto packPath =
+		(fs::path(path).parent_path() / "Visual" / ".magma.assetpk").string();
+	auto rootPath = fs::path(path).parent_path() / "Visual" / "Asset";
 	m_Path = packPath;
 
 	YAML::Node file;
@@ -94,8 +95,8 @@ void EditorAssetManager::Load(const std::string& path) {
 		auto node = assetNode["Asset"];
 		UUID id = node["ID"].as<uint64_t>();
 		AssetType type = (AssetType)node["Type"].as<uint32_t>();
-		Asset newAsset = { id, type };
-		m_AssetRegisstry[newAsset] = false;
+		Asset asset = { id, type };
+		m_AssetRegistry[asset] = false;
 
 		if(node["Path"])
 			m_Paths[id] = (rootPath / node["Path"].as<std::string>()).string();
@@ -108,7 +109,7 @@ void EditorAssetManager::Load(const std::string& path) {
 						if(path == "")
 							continue;
 						auto& secondary =
-							m_References[newAsset.ID].Emplace(
+							m_References[asset.ID].Emplace(
 								UUID(), AssetType::Texture, false);
 						m_AssetRegistry[secondary] = false;
 						m_Paths[secondary.ID] = path;
@@ -148,21 +149,26 @@ void EditorAssetManager::Reload() {
 	namespace fs = std::filesystem;
 
 	auto rootPath = fs::path(m_Path).parent_path() / "Asset";
-	List<std::string> paths
+	List<fs::path> paths
 		{
-			(rootPath / "Mesh").string(),
-			(rootPath / "Image").string(),
-			(rootPath / "Cubemap").string(),
-			(rootPath / "Font").string(),
-			(rootPath / "Audio").string(),
-			(rootPath / "Shader").string()
+			(rootPath / "Mesh"),
+			(rootPath / "Image"),
+			(rootPath / "Cubemap"),
+			(rootPath / "Font"),
+			(rootPath / "Audio"),
+			(rootPath / "Shader")
 		};
 
 	uint32_t i = 0;
 	for(auto folder : paths) {
-		for(auto path : FileUtils::GetFiles(folder))
+		for(auto p : FileUtils::GetFiles(folder.string())) {
+			std::string path;
+			// if(folder.stem() == "Mesh")
+			// 	path =
+			// 		fs::path(FileUtils::GetFiles(p.string(), { ".obj", "."}));
 			if(!GetFromPath(path))
 				Add(path, (AssetType)i);
+		}
 		i++;
 	}
 }
@@ -188,7 +194,8 @@ void EditorAssetManager::Save() {
 
 		std::string path = GetPath(asset.ID);
 		if(path != "")
-			serializer.WriteKey("Path").Write(fs::relative(path, rootPath));
+			serializer.WriteKey("Path")
+				.Write(fs::relative(path, rootPath).string());
 		else {
 			auto& refs = m_References[asset.ID];
 			auto mesh = m_MeshAssets[asset.ID];
@@ -283,7 +290,8 @@ void EditorAssetManager::RuntimeSave(const std::string& path) {
 			if(path != "") {
 				auto meshes = AssetImporter::GetMeshData(path);
 				meshFile.Write(meshes);
-				auto materials = AssetImporter::GetMeshMaterials(m_Paths[id]);
+				auto materials =
+					AssetImporter::GetMeshMaterials(m_Paths[asset.ID]);
 				for(auto mat : materials) {
 					meshFile.Write(mat[0] != "");
 					meshFile.Write(mat[1] != "");
@@ -297,7 +305,7 @@ void EditorAssetManager::RuntimeSave(const std::string& path) {
 		}
 		else if(asset.Type == AssetType::Texture) {
 			pack.Write(textureFile.GetPosition());
-			
+
 			ImageData image = AssetImporter::GetImageData(path);
 			textureFile.Write(image.Width);
 			textureFile.Write(image.Height);
@@ -310,7 +318,7 @@ void EditorAssetManager::RuntimeSave(const std::string& path) {
 			pack.Write(soundFile.GetPosition());
 
 			auto sound = Get<Sound>(asset);
-			soundFile.Write(sound->GetData());
+			// soundFile.Write(sound->GetData());
 		}
 	}
 }

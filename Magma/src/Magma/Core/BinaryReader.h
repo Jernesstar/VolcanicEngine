@@ -43,8 +43,9 @@ public:
 	BinaryReader& Read(Buffer<T>& buffer) {
 		uint64_t count;
 		Read(count);
-		buffer.Allocate(count);
-		return Read(buffer.Get(), count * sizeof(T));
+		buffer.Clear();
+		buffer.AddRange(count);
+		return ReadData(buffer.Get(), count * sizeof(T));
 	}
 
 	template<typename TData, typename... Args>

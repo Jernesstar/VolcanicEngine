@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstring>
+#include <initializer_list>
 
 #include "Core/Defines.h"
 #include "Core/Assert.h"
@@ -29,11 +30,11 @@ public:
 		m_Data = (T*)malloc(GetMaxSize());
 		Set(other.Get(), other.GetCount());
 	}
-	Buffer(const std::initializer_list<T>& list)
+	Buffer(std::initializer_list<T> list)
 		: m_MaxCount(list.size())
 	{
 		m_Data = (T*)malloc(GetMaxSize());
-		Set(list.data(), list.size());
+		Set(list.begin(), list.size());
 	}
 	Buffer(T* buffer, uint64_t count, uint64_t maxCount = 0)
 		: m_MaxCount(maxCount), m_Count(count)
@@ -112,6 +113,10 @@ public:
 
 	void Add() {
 		m_Count++;
+	}
+
+	void AddRange(uint64_t count) {
+		m_Count += count;
 	}
 
 	void Remove() {

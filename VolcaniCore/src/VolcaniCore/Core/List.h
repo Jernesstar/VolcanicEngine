@@ -20,7 +20,7 @@ public:
 		: m_Buffer(size) { }
 	// List(const Buffer<T>& buffer)
 	// 	: m_Buffer(buffer), m_Back(buffer.GetCount()) { }
-	List(const std::initializer_list<T>& list)
+	List(std::initializer_list<T> list)
 		: m_Buffer(list.size())
 	{
 		for(auto& element : list)

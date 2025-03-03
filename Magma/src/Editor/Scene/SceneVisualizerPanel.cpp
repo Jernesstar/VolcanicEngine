@@ -50,18 +50,18 @@ void SceneVisualizerPanel::SetContext(Scene* context) {
 	.ForEach<TransformComponent, MeshComponent>(
 		[this](Entity& entity)
 		{
-			const auto& tc = entity.Get<TransformComponent>();
-			const auto& mc = entity.Get<MeshComponent>();
-			auto& assetManager =
-				Application::As<EditorApp>()->GetEditor().GetAssetManager();
-			auto mesh = assetManager.Get<Mesh>(mc.MeshAsset);
+			// const auto& tc = entity.Get<TransformComponent>();
+			// const auto& mc = entity.Get<MeshComponent>();
+			// auto& assetManager =
+			// 	Application::As<EditorApp>()->GetEditor().GetAssetManager();
+			// auto mesh = assetManager.Get<Mesh>(mc.MeshAsset);
 
-			auto shape = Shape::Create(mesh);
-			auto body = RigidBody::Create(RigidBody::Type::Static, shape);
-			body->SetTransform(tc);
-			body->Data = (void*)(uint64_t)entity.GetHandle();
-			m_World.AddActor(body);
-			m_Selected = entity;
+			// auto shape = Shape::Create(mesh);
+			// auto body = RigidBody::Create(RigidBody::Type::Static, shape);
+			// body->SetTransform(tc);
+			// body->Data = (void*)(uint64_t)entity.GetHandle();
+			// m_World.AddActor(body);
+			// m_Selected = entity;
 		});
 }
 

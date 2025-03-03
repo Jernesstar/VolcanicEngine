@@ -99,11 +99,12 @@ static std::string GetMaterialPath(const std::string& dir,
 {
 	if(material->GetTextureCount(type) == 0)
 		return "";
-	aiString path;
-	if(material->GetTexture(type, 0, &path) == AI_FAILURE)
+	aiString filename;
+	if(material->GetTexture(type, 0, &filename) == AI_FAILURE)
 		return "";
 
-	return std::string(path.data);
+	auto fullPath = fs::path(dir) / std::string(filename.data);
+	return fullPath.string();
 }
 
 static Ref<Texture> LoadTexture(const std::string& dir,
@@ -165,7 +166,7 @@ Ref<Mesh> AssetImporter::GetMesh(const std::string& path) {
 	return mesh;
 }
 
-List<std::string[3]> AssetImporter::GetMeshMaterials(const std::string& path) {
+List<MaterialPaths> AssetImporter::GetMeshMaterials(const std::string& path) {
 	Assimp::Importer importer;
 	uint32_t loadFlags = aiProcess_Triangulate
 						| aiProcess_GenSmoothNormals
@@ -176,7 +177,7 @@ List<std::string[3]> AssetImporter::GetMeshMaterials(const std::string& path) {
 	VOLCANICORE_ASSERT_ARGS(scene, "Error importing mesh from %s: %s",
 							path.c_str(), importer.GetErrorString());
 
-	List<std::string[3]> list(scene->mNumMaterials);
+	List<MaterialPaths> list(scene->mNumMaterials);
 	auto dir = (fs::path(path).parent_path() / "textures").string();
 	for(uint32_t i = 0; i < scene->mNumMaterials; i++) {
 		auto diffusePath =
@@ -186,8 +187,10 @@ List<std::string[3]> AssetImporter::GetMeshMaterials(const std::string& path) {
 		auto emissivePath =
 			GetMaterialPath(dir, scene->mMaterials[i], aiTextureType_EMISSIVE);
 
-		mesh->Materials.Add({ diffusePath, specularPath, emissivePath });
+		list.Emplace(diffusePath, specularPath, emissivePath);
 	}
+
+	return list;
 }
 
 List<SubMesh> AssetImporter::GetMeshData(const std::string& path) {
@@ -204,6 +207,8 @@ List<SubMesh> AssetImporter::GetMeshData(const std::string& path) {
 	List<SubMesh> meshes;
 	for(uint32_t i = 0; i < scene->mNumMeshes; i++)
 		meshes.Add(LoadMesh(scene->mMeshes[i]));
+
+	return meshes;
 }
 
 Ref<Sound> AssetImporter::GetAudio(const std::string& path) {

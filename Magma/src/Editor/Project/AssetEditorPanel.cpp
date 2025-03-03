@@ -43,9 +43,9 @@ static void EditAsset(Asset asset) {
 		case AssetType::Cubemap:
 			type = "Cubemap";
 			break;
-		case AssetType::Font:
-			type = "Font";
-			break;
+		// case AssetType::Font:
+		// 	type = "Font";
+		// 	break;
 		case AssetType::Audio:
 			type = "Audio";
 			break;

@@ -1,13 +1,9 @@
 AssetPack:
   Assets:
     - Asset:
-        ID: 5802757838292007671
+        ID: 15079658181338123941
         Type: 4
-        Path: C:\Users\JMukala\Code\VolcanicEngine\TestProj\Visual\Asset\Audio\Woosh2.wav
-    - Asset:
-        ID: 9222963900849741721
-        Type: 4
-        Path: /workspace/src/github.com/Jernesstar/VolcanicEngine/TestProj/Visual/Asset/Audio/Woosh2.wav
+        Path: Audio/Woosh2.wav
     - Asset:
         ID: 10036008063945961451
         Type: 0
