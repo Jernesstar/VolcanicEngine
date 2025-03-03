@@ -29,7 +29,7 @@ void EditorAssetManager::Load(Asset asset) {
 		m_TextureAssets[asset.ID] = AssetImporter::GetTexture(path);
 	else if(asset.Type == AssetType::Cubemap)
 		m_CubemapAssets[asset.ID] = AssetImporter::GetCubemap(path);
-	else if(asset.Type == AssetType::Cubemap)
+	else if(asset.Type == AssetType::Audio)
 		m_AudioAssets[asset.ID] = AssetImporter::GetAudio(path);
 }
 
@@ -74,6 +74,7 @@ void EditorAssetManager::Load(const std::string& path) {
 	namespace fs = std::filesystem;
 
 	auto packPath = (fs::path(path) / "Visual" / ".magma.assetpk").string();
+	auto rootPath = fs::path(path) / "Visual" / "Asset";
 	m_Path = packPath;
 
 	YAML::Node file;
@@ -86,27 +87,38 @@ void EditorAssetManager::Load(const std::string& path) {
 	}
 	auto assetPackNode = file["AssetPack"];
 
-	if(!assetPackNode) {
-		Asset asset{ UUID(), AssetType::Mesh };
-		m_AssetRegistry[asset] = true;
-		m_MeshAssets[asset.ID] = Mesh::Create(MeshType::Cube);
+	if(!assetPackNode)
 		return;
-	}
 
 	for(auto assetNode : assetPackNode["Assets"]) {
 		auto node = assetNode["Asset"];
 		UUID id = node["ID"].as<uint64_t>();
 		AssetType type = (AssetType)node["Type"].as<uint32_t>();
 		Asset newAsset = { id, type };
+		m_AssetRegisstry[newAsset] = false;
 
-		if(node["Path"]) {
-			m_AssetRegistry[newAsset] = false;
-			m_Paths[id] = node["Path"].as<std::string>();
-		}
-		else {
-			m_AssetRegistry[newAsset] = false;
-			auto type =
-				(MeshType)node["Type"].as<uint32_t>();
+		if(node["Path"])
+			m_Paths[id] = (rootPath / node["Path"].as<std::string>()).string();
+
+		if(asset.Type == AssetType::Mesh) {
+			if(node["Path"]) {
+				auto materials = AssetImporter::GetMeshMaterials(m_Paths[id]);
+				for(auto matPaths : materials) {
+					for(auto path : matPaths) {
+						if(path == "")
+							continue;
+						auto& secondary =
+							m_References[newAsset.ID].Emplace(
+								UUID(), AssetType::Texture, false);
+						m_AssetRegistry[secondary] = false;
+						m_Paths[secondary.ID] = path;
+					}
+				}
+
+				continue;
+			}
+
+			auto type = (MeshType)node["Type"].as<uint32_t>();
 			auto materialNode = node["Material"];
 
 			Material mat;
@@ -151,14 +163,16 @@ void EditorAssetManager::Reload() {
 		for(auto path : FileUtils::GetFiles(folder))
 			if(!GetFromPath(path))
 				Add(path, (AssetType)i);
-
 		i++;
 	}
 }
 
 void EditorAssetManager::Save() {
+	namespace fs = std::filesystem;
+
 	if(m_Path == "")
 		return;
+	auto rootPath = fs::path(m_Path).parent_path() / "Asset";
 
 	YAMLSerializer serializer;
 	serializer.BeginMapping();
@@ -174,8 +188,9 @@ void EditorAssetManager::Save() {
 
 		std::string path = GetPath(asset.ID);
 		if(path != "")
-			serializer.WriteKey("Path").Write(path);
+			serializer.WriteKey("Path").Write(fs::relative(path, rootPath));
 		else {
+			auto& refs = m_References[asset.ID];
 			auto mesh = m_MeshAssets[asset.ID];
 			auto subMesh = mesh->SubMeshes[0];
 			serializer.WriteKey("Type").Write((uint32_t)mesh->Type);
@@ -187,19 +202,19 @@ void EditorAssetManager::Save() {
 			if(mat.Diffuse)
 				serializer.WriteKey("Diffuse")
 				.BeginMapping()
-					// .WriteKey("Path").Write(mat.Diffuse)
+					.WriteKey("Path").Write(m_Paths[refs[0].ID])
 				.EndMapping();
 
 			if(mat.Specular)
 				serializer.WriteKey("Specular")
 				.BeginMapping()
-					// .WriteKey("Path").Write(mat.Specular)
+					.WriteKey("Path").Write(m_Paths[refs[1].ID])
 				.EndMapping();
 
 			if(mat.Emissive)
 				serializer.WriteKey("Emissive")
 				.BeginMapping()
-					// .WriteKey("Path").Write(mat.Emissive)
+					.WriteKey("Path").Write(m_Paths[refs[2].ID])
 				.EndMapping();
 
 			serializer
@@ -230,8 +245,8 @@ namespace Magma {
 
 template<>
 BinaryWriter& BinaryWriter::WriteObject(const SubMesh& mesh) {
-	Write(mesh.Vertices.GetBuffer());
-	Write(mesh.Indices.GetBuffer());
+	Write(mesh.Vertices);
+	Write(mesh.Indices);
 	Write(mesh.MaterialIndex);
 
 	return *this;
@@ -245,31 +260,56 @@ void EditorAssetManager::RuntimeSave(const std::string& path) {
 	namespace fs = std::filesystem;
 
 	BinaryWriter pack((fs::path(path) / ".volc.assetpk").string());
-	BinaryWriter meshFile((fs::path(path) / "Asset" / "Mesh").string());
-	BinaryWriter textureFile((fs::path(path) / "Asset" / "Texture").string());
-	BinaryWriter soundFile((fs::path(path) / "Asset" / "Sound").string());
-
+	BinaryWriter meshFile((fs::path(path) / "Asset" / "Mesh" / "mesh.bin").string());
+	BinaryWriter textureFile((fs::path(path) / "Asset" / "Texture" / "image.bin").string());
+	BinaryWriter soundFile((fs::path(path) / "Asset" / "Sound" / "sound.bin").string());
+	
+	pack.Write("VOLC_PACK");
+	pack.Write(m_AssetRegistry.size());
 	for(auto [asset, _] : m_AssetRegistry) {
 		pack.Write((uint64_t)asset.ID);
+		pack.Write((uint32_t)asset.Type);
+		auto& refs = m_References[asset.ID];
+		pack.Write(refs.Count());
+		for(auto& ref : refs) {
+			pack.Write((uint64_t)ref.ID);
+			pack.Write((uint32_t)ref.Type);
+		}
 
+		auto path = m_Paths[asset.ID];
 		if(asset.Type == AssetType::Mesh) {
-			auto mesh = Get<Mesh>(asset);
-			auto ref = m_References[asset.ID];
-
 			pack.Write(meshFile.GetPosition());
-			meshFile.Write(mesh->SubMeshes);
+
+			if(path != "") {
+				auto meshes = AssetImporter::GetMeshData(path);
+				meshFile.Write(meshes);
+				auto materials = AssetImporter::GetMeshMaterials(m_Paths[id]);
+				for(auto mat : materials) {
+					meshFile.Write(mat[0] != "");
+					meshFile.Write(mat[1] != "");
+					meshFile.Write(mat[2] != "");
+				}
+			}
+			else {
+
+				// mesh = Get<Mesh>(asset);
+			}
 		}
 		else if(asset.Type == AssetType::Texture) {
-			ImageData image = AssetImporter::GetImageData(m_Paths[asset.ID]);
-
 			pack.Write(textureFile.GetPosition());
+			
+			ImageData image = AssetImporter::GetImageData(path);
 			textureFile.Write(image.Width);
 			textureFile.Write(image.Height);
 			textureFile.Write(image.Data);
 		}
+		else if(asset.Type == AssetType::Cubemap) {
+			// pack.Write(textureFile.GetPosition());
+		}
 		else if(asset.Type == AssetType::Audio) {
-			auto sound = Get<Sound>(asset);
 			pack.Write(soundFile.GetPosition());
+
+			auto sound = Get<Sound>(asset);
 			soundFile.Write(sound->GetData());
 		}
 	}

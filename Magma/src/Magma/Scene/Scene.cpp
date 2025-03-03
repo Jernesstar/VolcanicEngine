@@ -2,7 +2,6 @@
 
 #include "PhysicsSystem.h"
 #include "ScriptSystem.h"
-#include "TransformSystem.h"
 
 #include "SceneRenderer.h"
 
@@ -18,7 +17,6 @@ Scene::Scene(const std::string& name)
 }
 
 Scene::~Scene() {
-	EntityWorld.Remove<TransformSystem>();
 	EntityWorld.Remove<PhysicsSystem>();
 	EntityWorld.Remove<ScriptSystem>();
 }
@@ -75,34 +73,8 @@ void Scene::OnRender(SceneRenderer& renderer) {
 }
 
 void Scene::RegisterSystems() {
-	EntityWorld.Add<ScriptSystem>();
 	EntityWorld.Add<PhysicsSystem>();
-	EntityWorld.Add<TransformSystem>();
-
-	for(auto phase : { flecs::PreUpdate }) {
-		Phase ourPhase;
-		if(phase == flecs::PreUpdate)
-			ourPhase = Phase::PreUpdate;
-		if(phase == flecs::OnUpdate)
-			ourPhase = Phase::OnUpdate;
-		if(phase == flecs::PostUpdate)
-			ourPhase = Phase::PostUpdate;
-
-		EntityWorld.GetNative()
-		.system<ScriptComponent>()
-		.kind(phase)
-		.run(
-			[&](flecs::iter& it)
-			{
-				auto sys = EntityWorld.Get<PhysicsSystem>();
-				if(!sys)
-					return;
-
-				if(ourPhase == Phase::OnUpdate)
-					sys->Update(it.delta_time());
-				sys->Run(ourPhase);
-			});
-	}
+	EntityWorld.Add<ScriptSystem>();
 
 	for(auto phase : { flecs::PreUpdate, flecs::OnUpdate, flecs::PostUpdate }) {
 		Phase ourPhase;
@@ -129,14 +101,39 @@ void Scene::RegisterSystems() {
 			});
 	}
 
+	for(auto phase : { flecs::PreUpdate }) {
+		Phase ourPhase;
+		if(phase == flecs::PreUpdate)
+			ourPhase = Phase::PreUpdate;
+		if(phase == flecs::OnUpdate)
+			ourPhase = Phase::OnUpdate;
+		if(phase == flecs::PostUpdate)
+			ourPhase = Phase::PostUpdate;
+
+		EntityWorld.GetNative()
+		.system<ScriptComponent>()
+		.kind(phase)
+		.run(
+			[&](flecs::iter& it)
+			{
+				auto sys = EntityWorld.Get<PhysicsSystem>();
+				if(!sys)
+					return;
+
+				if(ourPhase == Phase::OnUpdate)
+					sys->Update(it.delta_time());
+				sys->Run(ourPhase);
+			});
+	}
+
 	EntityWorld.GetNative()
 	.observer()
-	.with<ScriptComponent>()
+	.with<RigidBodyComponent>()
 	.event(flecs::Monitor)
 	.each(
 		[&](flecs::iter& it, size_t i)
 		{
-			auto sys = EntityWorld.Get<ScriptSystem>();
+			auto sys = EntityWorld.Get<PhysicsSystem>();
 			if(!sys)
 				return;
 
@@ -152,12 +149,12 @@ void Scene::RegisterSystems() {
 
 	EntityWorld.GetNative()
 	.observer()
-	.with<RigidBodyComponent>()
+	.with<ScriptComponent>()
 	.event(flecs::Monitor)
 	.each(
 		[&](flecs::iter& it, size_t i)
 		{
-			auto sys = EntityWorld.Get<PhysicsSystem>();
+			auto sys = EntityWorld.Get<ScriptSystem>();
 			if(!sys)
 				return;
 

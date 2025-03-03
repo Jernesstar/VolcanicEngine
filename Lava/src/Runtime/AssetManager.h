@@ -15,6 +15,9 @@ public:
 	void Unload(Asset asset) override;
 
 	void Load();
+
+private:
+	Map<UUID, uint64_t> m_AssetOffsets;
 };
 
 }

@@ -29,7 +29,6 @@ public:
 public:
 	std::string m_Path;
 	Map<UUID, std::string> m_Paths;
-	Map<UUID, Asset[6]> m_References;
 };
 
 }

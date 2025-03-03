@@ -485,13 +485,14 @@ void LoadElement(UIPage& page, const rapidjson::Value& elementNode,
 		if(elementNode.HasMember("Image")) {
 			auto& assetManager =
 				Application::As<EditorApp>()->GetEditor().GetAssetManager();
-
 			auto id =
 				assetManager.GetFromPath(
 					elementNode["Image"].Get<std::string>());
-			auto image =
-				assetManager.Get<Texture>(Asset{ id, AssetType::Texture });
+			auto asset = Asset{ id, AssetType::Texture };
+			auto image = assetManager.Get<Texture>(asset);
+
 			button->Display = CreateRef<Image>(image);
+			button->ImageID = asset;
 		}
 		else if(elementNode.HasMember("Text"))
 			button->Display

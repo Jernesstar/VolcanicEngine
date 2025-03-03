@@ -58,9 +58,14 @@ App::App(const Project& project)
 		"AppClass", "void PushScreen(const string &in)", &App::PushScreen);
 	ScriptEngine::RegisterMethod<App>(
 		"AppClass", "void PopScreen()", &App::PopScreen);
+
+	// ScriptEngine::RegisterMethod<App>(
+	// 	"InputClass", "bool KeyPressed(Key key)", &App::PopScreen);
 }
 
 void App::OnLoad() {
+	Physics::Init();
+
 	s_AppModule = CreateRef<ScriptModule>(m_Project.App);
 	s_AppModule->Reload("./.volc.class");
 
@@ -88,6 +93,8 @@ void App::OnClose() {
 	s_AppObject.reset();
 	s_AppModule.reset();
 	ScriptEngine::Shutdown();
+
+	// Physics::Close();
 }
 
 void App::OnUpdate(TimeStep ts) {

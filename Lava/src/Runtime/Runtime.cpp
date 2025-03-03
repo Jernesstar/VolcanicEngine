@@ -3,8 +3,6 @@
 #include <VolcaniCore/Event/Events.h>
 #include <VolcaniCore/Graphics/Renderer.h>
 
-#include <Magma/Physics/Physics.h>
-
 #include <Lava/ScriptGlue.h>
 
 namespace fs = std::filesystem;
@@ -37,19 +35,19 @@ Runtime::Runtime(const CommandLineArgs& args)
 	project.Load("./.volc.proj");
 	m_AssetManager.Load();
 
-	Physics::Init();
 	ScriptEngine::Init();
 	ScriptGlue::Init();
-	m_App = CreateRef<App>(project);
 
+	m_App = CreateRef<App>(project);
+	m_App->ChangeScreen = true;
+	m_App->Running = true;
 	m_App->SetAssetManager(m_AssetManager);
+
 	m_App->OnLoad();
 }
 
 Runtime::~Runtime() {
 	m_App->OnClose();
-
-	Physics::Close();
 }
 
 void Runtime::OnUpdate(TimeStep ts) {

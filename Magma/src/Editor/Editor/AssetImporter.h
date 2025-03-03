@@ -16,8 +16,12 @@ public:
 	static ImageData GetImageData(const std::string& path, bool flip = false);
 
 	static Ref<Mesh> GetMesh(const std::string& path);
+	static List<std::string[3]> GetMeshMaterials(const std::string& path);
+	static List<SubMesh> GetMeshData(const std::string& path);
+
 	static Ref<Texture> GetTexture(const std::string& path);
 	static Ref<Cubemap> GetCubemap(const std::string& path);
+
 	static Ref<Sound> GetAudio(const std::string& path);
 };
 

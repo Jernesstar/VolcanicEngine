@@ -55,16 +55,15 @@ public:
 	void OnClose();
 	void OnUpdate(TimeStep ts);
 
+	Ref<ScriptClass> GetScriptClass(const std::string& name);
+
 	void SetScreen(const std::string& name);
 	void PushScreen(const std::string& name);
 	void PopScreen();
 
-	Ref<ScriptClass> GetScriptClass(const std::string& name);
+	void OnKeyPressed();
 
-	void SetAssetManager(AssetManager& manager) {
-		m_AssetManager = &manager;
-	}
-
+	void SetAssetManager(AssetManager& manager) { m_AssetManager = &manager; }
 	AssetManager* GetAssetManager() { return m_AssetManager; }
 	RuntimeSceneRenderer& GetRenderer() { return m_SceneRenderer; }
 

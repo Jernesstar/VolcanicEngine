@@ -57,6 +57,8 @@ public:
 
 protected:
 	Map<Asset, bool> m_AssetRegistry;
+	Map<UUID, List<Asset>> m_References;
+
 	Map<UUID, Ref<Mesh>> m_MeshAssets;
 	Map<UUID, Ref<Texture>> m_TextureAssets;
 	Map<UUID, Ref<Cubemap>> m_CubemapAssets;

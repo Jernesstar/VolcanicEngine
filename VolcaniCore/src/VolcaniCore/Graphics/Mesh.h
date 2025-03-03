@@ -28,8 +28,8 @@ struct Material {
 };
 
 struct SubMesh {
-	List<Vertex> Vertices;
-	List<uint32_t> Indices;
+	Buffer<Vertex> Vertices;
+	Buffer<uint32_t> Indices;
 	uint32_t MaterialIndex;
 };
 
@@ -38,8 +38,8 @@ enum class MeshType { Quad, Cube, Model };
 class Mesh {
 public:
 	static Ref<Mesh> Create(MeshType type,
-							const List<Vertex>& vertices,
-							const List<uint32_t>& indices,
+							const Buffer<Vertex>& vertices,
+							const Buffer<uint32_t>& indices,
 							const Material& material = { });
 	static Ref<Mesh> Create(MeshType type,
 							const Material& material = { });

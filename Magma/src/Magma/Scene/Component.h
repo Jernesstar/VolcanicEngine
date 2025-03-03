@@ -57,6 +57,15 @@ struct TransformComponent : public Component {
 	operator Transform() const { return { Translation, Rotation, Scale }; }
 };
 
+struct AudioComponent : public Component {
+	Asset AudioAsset;
+
+	AudioComponent() = default;
+	AudioComponent(const Asset& asset)
+		: AudioAsset(asset) { }
+	AudioComponent(const AudioComponent& other) = default;
+};
+
 struct MeshComponent : public Component {
 	Asset MeshAsset;
 
@@ -73,15 +82,6 @@ struct SkyboxComponent : public Component {
 	SkyboxComponent(const Asset& asset)
 		: CubemapAsset(asset) { }
 	SkyboxComponent(const SkyboxComponent& other) = default;
-};
-
-struct AudioComponent : public Component {
-	Asset AudioAsset;
-
-	AudioComponent() = default;
-	AudioComponent(const Asset& asset)
-		: AudioAsset(asset) { }
-	AudioComponent(const AudioComponent& other) = default;
 };
 
 struct ScriptComponent : public Component {

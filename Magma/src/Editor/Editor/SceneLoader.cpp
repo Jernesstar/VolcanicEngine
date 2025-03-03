@@ -350,6 +350,12 @@ void DeserializeEntity(YAML::Node entityNode, Scene& scene) {
 			});
 	}
 
+	auto audioComponentNode = components["AudioComponent"];
+	if(audioComponentNode) {
+		auto id = audioComponentNode["AssetID"].as<uint64_t>();
+		entity.Add<AudioComponent>(Asset{ id, AssetType::Audio });
+	}
+
 	auto meshComponentNode = components["MeshComponent"];
 	if(meshComponentNode) {
 		auto id = meshComponentNode["AssetID"].as<uint64_t>();
@@ -360,12 +366,6 @@ void DeserializeEntity(YAML::Node entityNode, Scene& scene) {
 	if(skyboxComponentNode) {
 		auto id = skyboxComponentNode["AssetID"].as<uint64_t>();
 		entity.Add<SkyboxComponent>(Asset{ id, AssetType::Cubemap });
-	}
-
-	auto audioComponentNode = components["AudioComponent"];
-	if(audioComponentNode) {
-		auto id = audioComponentNode["AssetID"].as<uint64_t>();
-		entity.Add<AudioComponent>(Asset{ id, AssetType::Audio });
 	}
 
 	auto scriptComponentNode = components["ScriptComponent"];

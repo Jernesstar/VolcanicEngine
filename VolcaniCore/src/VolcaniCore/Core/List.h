@@ -18,6 +18,8 @@ public:
 		: m_Buffer(5) { }
 	List(uint64_t size)
 		: m_Buffer(size) { }
+	// List(const Buffer<T>& buffer)
+	// 	: m_Buffer(buffer), m_Back(buffer.GetCount()) { }
 	List(const std::initializer_list<T>& list)
 		: m_Buffer(list.size())
 	{

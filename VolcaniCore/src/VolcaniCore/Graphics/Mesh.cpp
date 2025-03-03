@@ -3,8 +3,8 @@
 namespace VolcaniCore {
 
 Ref<Mesh> Mesh::Create(MeshType type,
-						const List<Vertex>& vertices,
-						const List<uint32_t>& indices,
+						const Buffer<Vertex>& vertices,
+						const Buffer<uint32_t>& indices,
 						const Material& material)
 {
 	auto mesh = CreateRef<Mesh>(type);
@@ -14,8 +14,8 @@ Ref<Mesh> Mesh::Create(MeshType type,
 }
 
 Ref<Mesh> Mesh::Create(MeshType type, const Material& material) {
-	List<uint32_t> indices;
-	List<Vertex> vertices;
+	Buffer<uint32_t> indices;
+	Buffer<Vertex> vertices;
 
 	switch(type) {
 		case MeshType::Cube:

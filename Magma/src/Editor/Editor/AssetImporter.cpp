@@ -66,8 +66,8 @@ Ref<Cubemap> AssetImporter::GetCubemap(const std::string& folder) {
 }
 
 static SubMesh LoadMesh(const aiMesh* mesh) {
-	List<Vertex> vertices(mesh->mNumVertices);
-	List<uint32_t> indices(mesh->mNumFaces * 3);
+	Buffer<Vertex> vertices(mesh->mNumVertices);
+	Buffer<uint32_t> indices(mesh->mNumFaces * 3);
 
 	for(uint32_t i = 0; i < mesh->mNumVertices; i++) {
 		const aiVector3D& pos	   = mesh->mVertices[i];
@@ -94,16 +94,25 @@ static SubMesh LoadMesh(const aiMesh* mesh) {
 	return { vertices, indices, mesh->mMaterialIndex };
 }
 
-static Ref<Texture> LoadTexture(const std::string& dir,
+static std::string GetMaterialPath(const std::string& dir,
 	const aiMaterial* material, aiTextureType type)
 {
 	if(material->GetTextureCount(type) == 0)
-		return nullptr;
+		return "";
 	aiString path;
 	if(material->GetTexture(type, 0, &path) == AI_FAILURE)
-		return nullptr;
+		return "";
 
-	return AssetImporter::GetTexture(std::string(path.data));
+	return std::string(path.data);
+}
+
+static Ref<Texture> LoadTexture(const std::string& dir,
+	const aiMaterial* material, aiTextureType type)
+{
+	auto path = GetMaterialPath(dir, material, type);
+	if(path == "")
+		return nullptr;
+	return AssetImporter::GetTexture(path);
 }
 
 static Material LoadMaterial(const std::string& dir, const aiMaterial* mat) {
@@ -132,10 +141,6 @@ static Material LoadMaterial(const std::string& dir, const aiMaterial* mat) {
 }
 
 Ref<Mesh> AssetImporter::GetMesh(const std::string& path) {
-	namespace fs = std::filesystem;
-	if(path == "")
-		return nullptr;
-
 	Assimp::Importer importer;
 	uint32_t loadFlags = aiProcess_Triangulate
 						| aiProcess_GenSmoothNormals
@@ -158,6 +163,47 @@ Ref<Mesh> AssetImporter::GetMesh(const std::string& path) {
 		mesh->Materials.Add(LoadMaterial(dir, scene->mMaterials[i]));
 
 	return mesh;
+}
+
+List<std::string[3]> AssetImporter::GetMeshMaterials(const std::string& path) {
+	Assimp::Importer importer;
+	uint32_t loadFlags = aiProcess_Triangulate
+						| aiProcess_GenSmoothNormals
+						| aiProcess_FlipUVs
+						| aiProcess_JoinIdenticalVertices;
+	const aiScene* scene = importer.ReadFile(path.c_str(), loadFlags);
+
+	VOLCANICORE_ASSERT_ARGS(scene, "Error importing mesh from %s: %s",
+							path.c_str(), importer.GetErrorString());
+
+	List<std::string[3]> list(scene->mNumMaterials);
+	auto dir = (fs::path(path).parent_path() / "textures").string();
+	for(uint32_t i = 0; i < scene->mNumMaterials; i++) {
+		auto diffusePath =
+			GetMaterialPath(dir, scene->mMaterials[i], aiTextureType_DIFFUSE);
+		auto specularPath =
+			GetMaterialPath(dir, scene->mMaterials[i], aiTextureType_SPECULAR);
+		auto emissivePath =
+			GetMaterialPath(dir, scene->mMaterials[i], aiTextureType_EMISSIVE);
+
+		mesh->Materials.Add({ diffusePath, specularPath, emissivePath });
+	}
+}
+
+List<SubMesh> AssetImporter::GetMeshData(const std::string& path) {
+	Assimp::Importer importer;
+	uint32_t loadFlags = aiProcess_Triangulate
+						| aiProcess_GenSmoothNormals
+						| aiProcess_FlipUVs
+						| aiProcess_JoinIdenticalVertices;
+	const aiScene* scene = importer.ReadFile(path.c_str(), loadFlags);
+
+	VOLCANICORE_ASSERT_ARGS(scene, "Error importing mesh from %s: %s",
+							path.c_str(), importer.GetErrorString());
+
+	List<SubMesh> meshes;
+	for(uint32_t i = 0; i < scene->mNumMeshes; i++)
+		meshes.Add(LoadMesh(scene->mMeshes[i]));
 }
 
 Ref<Sound> AssetImporter::GetAudio(const std::string& path) {

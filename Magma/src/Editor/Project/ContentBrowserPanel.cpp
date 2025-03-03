@@ -108,6 +108,9 @@ void ContentBrowserPanel::Draw() {
 			if(ImGui::BeginTable("AssetsTable", columnCount))
 			{
 				for(auto& [asset, _] : assetManager.GetRegistry()) {
+					if(!asset.Primary)
+						continue;
+
 					ImGui::TableNextColumn();
 
 					std::string display = assetManager.GetPath(asset.ID);

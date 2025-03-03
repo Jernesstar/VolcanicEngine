@@ -29,7 +29,7 @@ public:
 		m_Data = (T*)malloc(GetMaxSize());
 		Set(other.Get(), other.GetCount());
 	}
-	Buffer(const std::vector<T>& list)
+	Buffer(const std::initializer_list<T>& list)
 		: m_MaxCount(list.size())
 	{
 		m_Data = (T*)malloc(GetMaxSize());
