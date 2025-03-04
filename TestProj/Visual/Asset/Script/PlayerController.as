@@ -1,9 +1,11 @@
 
 class PlayerController : IEntity
 {
+    Entity handle;
+
     PlayerController(Entity entity)
     {
-        m_Handle = entity;
+        handle = entity;
     }
 
     void OnUpdate(float ts)
@@ -15,6 +17,4 @@ class PlayerController : IEntity
         if(Input.KeyPressed(Key::Right))
             component.Translation.x += 4.0 * ts;
     }
-
-    Entity m_Handle;
 }

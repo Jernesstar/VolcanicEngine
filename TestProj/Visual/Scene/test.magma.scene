@@ -1,0 +1,45 @@
+Scene:
+  Name: test
+  Entities:
+    - Entity:
+        Name: MainCamera
+        ID: 547
+        Components:
+          TagComponent:
+            Tag: Empty Tag
+          CameraComponent:
+            Camera:
+              Type: Stereographic
+              VerticalFOV: 45
+              Position: [0, 0, 0]
+              Direction: [0, 0, -1]
+              ViewportWidth: 800
+              ViewportHeight: 600
+              Near: 0.00100000005
+              Far: 1000
+    - Entity:
+        Name: ""
+        ID: 548
+        Components:
+          TagComponent:
+            Tag: Empty Tag
+          TransformComponent:
+            Transform:
+              Translation: [0, 0, 0]
+              Rotation: [0, 0, 0]
+              Scale: [2.0999999, 6.69999981, 8.39999962]
+          MeshComponent:
+            AssetID: 10036008063945961451
+    - Entity:
+        Name: ""
+        ID: 549
+        Components:
+          TagComponent:
+            Tag: Empty Tag
+          TransformComponent:
+            Transform:
+              Translation: [9.60000038, -19.1000004, -114]
+              Rotation: [0, 0, 0]
+              Scale: [9.30000019, 28.1000004, 1.89999998]
+          MeshComponent:
+            AssetID: 10036008063945961451

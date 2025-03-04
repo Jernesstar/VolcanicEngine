@@ -80,7 +80,6 @@ Cube::Cube()
 				Application::Close();
 		});
 
-	auto shader = ShaderPipeline::Create("Magma/assets/shaders", "Mesh");
 	auto depth = Texture::Create(480, 270, Texture::Format::Depth);
 	auto color = Texture::Create(480, 270, Texture::Format::Normal,
 								 Texture::Sampling::Nearest);
@@ -90,6 +89,7 @@ Cube::Cube()
 			{ AttachmentTarget::Depth, { depth } },
 		});
 
+	auto shader = ShaderPipeline::Create("Magma/assets/shaders", "Mesh");
 	drawPass = RenderPass::Create("Draw", shader);
 	drawPass->SetData(Renderer3D::GetMeshBuffer());
 	drawPass->SetOutput(framebuffer);

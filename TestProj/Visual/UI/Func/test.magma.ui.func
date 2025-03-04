@@ -1,8 +1,0 @@
-namespace UIElements {
-
-class Button1 : IUIObject
-{
-
-}
-
-}

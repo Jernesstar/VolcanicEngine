@@ -1,22 +1,21 @@
 #include "Sound.h"
 
+#include <soloud_wav.h>
+
 #include "AudioEngine.h"
 
 namespace Magma::Audio {
 
-Sound::Sound(SoLoud::AudioSource* source)
-	: m_Source(source) { }
+Sound::Sound(Buffer<float> data) {
+
+}
 
 Sound::~Sound() {
-	delete m_Source;
+	// delete m_Source;
 }
 
 void Sound::Play() {
-	AudioEngine::Get()->play(*m_Source, Volume);
-}
-
-Buffer<float> Sound::GetData() {
-
+	AudioEngine::Get()->play(m_Sound, Volume);
 }
 
 }

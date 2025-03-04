@@ -133,10 +133,6 @@ static Material LoadMaterial(const std::string& dir, const aiMaterial* mat) {
 }
 
 Ref<Mesh> AssetImporter::GetMesh(const std::string& path) {
-	namespace fs = std::filesystem;
-	if(path == "")
-		return nullptr;
-
 	Assimp::Importer importer;
 	uint32_t loadFlags = aiProcess_Triangulate
 						| aiProcess_GenSmoothNormals
@@ -162,9 +158,9 @@ Ref<Mesh> AssetImporter::GetMesh(const std::string& path) {
 }
 
 Ref<Sound> AssetImporter::GetAudio(const std::string& path) {
-	auto source = new SoLoud::Wav;
-	VOLCANICORE_ASSERT(source->load(path.c_str()) == 0);
-	return CreateRef<Sound>(source);
+	// auto source = new SoLoud::Wav;
+	// VOLCANICORE_ASSERT(source->load(path.c_str()) == 0);
+	// return CreateRef<Sound>(source);
 }
 
 }

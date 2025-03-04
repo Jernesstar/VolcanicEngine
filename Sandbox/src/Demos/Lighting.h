@@ -95,15 +95,15 @@ Lighting::Lighting() {
 			});
 
 	std::string assetPath = "Sandbox/assets/";
-	// cube =
-	// 	Mesh::Create(MeshType::Cube,
-	// 		Material
-	// 		{
-	// 			.Diffuse = AssetImporter::GetTexture(assetPath + "images/wood.png"),
-	// 			.Specular = AssetImporter::GetTexture(assetPath + "images/wood_specular.png"),
-	// 		});
-	// player = AssetImporter::GetMesh(assetPath + "models/player/Knight_Golden_Male.obj");
+	cube =
+		Mesh::Create(MeshType::Cube,
+			Material
+			{
+				.Diffuse = AssetImporter::GetTexture(assetPath + "images/wood.png"),
+				.Specular = AssetImporter::GetTexture(assetPath + "images/wood_specular.png"),
+			});
 	torch = AssetImporter::GetMesh(assetPath + "models/mc-torch/Torch.obj");
+	player = AssetImporter::GetMesh(assetPath + "models/player/Knight_Golden_Male.obj");
 
 	camera = CreateRef<StereographicCamera>(75.0f);
 	camera->SetPosition({ 2.5f, 2.5f, 2.5f });
@@ -151,20 +151,26 @@ void Lighting::OnUpdate(TimeStep ts) {
 		// command->UniformData
 		// .SetInput("u_PointLightCount", 2 * width * 2 * length);
 
-		// auto& mat1 = cube->Materials[0];
-		auto& mat2 = torch->Materials[0];
+		auto& mat1 = cube->Materials[0];
+		auto& mat2 = torch->Materials[1];
 
-		// auto* cubeCommand = Renderer::NewCommand();
-		// cubeCommand->UniformData
-		// .SetInput("u_Material.Diffuse", TextureSlot{ mat1.Diffuse, 0 });
-		// cubeCommand->UniformData
-		// .SetInput("u_Material.Specular", TextureSlot{ mat1.Specular, 1 });
-		// cubeCommand->UniformData
-		// .SetInput("u_Material.Shininess", 32.0f);
+		auto* cubeCommand = Renderer::NewCommand();
+		cubeCommand->UniformData
+		.SetInput("u_Material.IsTextured", 1);
+		cubeCommand->UniformData
+		.SetInput("u_Material.Diffuse", TextureSlot{ mat1.Diffuse, 0 });
+		cubeCommand->UniformData
+		.SetInput("u_Material.Specular", TextureSlot{ mat1.Specular, 1 });
+		cubeCommand->UniformData
+		.SetInput("u_Material.Shininess", 32.0f);
 
 		auto* torchCommand = Renderer::NewCommand();
 		torchCommand->UniformData
+		.SetInput("u_Material.IsTextured", 1);
+		torchCommand->UniformData
 		.SetInput("u_Material.Diffuse", TextureSlot{ mat2.Diffuse, 0 });
+		torchCommand->UniformData
+		.SetInput("u_Material.DiffuseColor", glm::vec4(1.0f));
 		torchCommand->UniformData
 		.SetInput("u_Material.Specular", TextureSlot{ mat2.Specular, 1 });
 		torchCommand->UniformData
@@ -172,11 +178,11 @@ void Lighting::OnUpdate(TimeStep ts) {
 
 		for(int y = -50; y < 50; y++)
 			for(int x = -50; x < 50; x++) {
-				// Renderer3D::DrawMesh(cube, { .Translation = { x, 0.0f, y } }, cubeCommand);
+				Renderer3D::DrawMesh(cube, { .Translation = { x, 0.0f, y } }, cubeCommand);
 				Renderer3D::DrawMesh(torch, { .Translation = { x, 1.0f, y } }, torchCommand);
 			}
 
-		// Renderer3D::DrawMesh(player);
+		Renderer3D::DrawMesh(player);
 
 		Renderer3D::End();
 	}

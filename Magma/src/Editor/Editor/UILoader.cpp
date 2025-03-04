@@ -401,14 +401,10 @@ void UILoader::RuntimeSave(const UIPage& page, const std::string& projectPath,
 						   const std::string& exportPath)
 {
 	auto pagePath =
-		(fs::path(projectPath) / "Visual" / "UI" / "Page" / page.Name
+		(fs::path(projectPath) / "Visual" / "UI" / page.Name
 		).string() + ".magma.ui.json";
-	auto funcPath =
-		(fs::path(projectPath) / "Visual" / "UI" / "Func" / page.Name
-		).string() + ".magma.ui.func";
 
-	auto dataPath =
-		(fs::path(exportPath) / "UI" / "Data" / page.Name).string() + ".bin";
+	auto dataPath = (fs::path(exportPath) / "UI" / page.Name).string() + ".bin";
 	BinaryWriter writer(dataPath);
 
 	writer.Write(page.Name);

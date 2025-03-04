@@ -285,7 +285,7 @@ void Editor::NewProject(const std::string& path) {
 	m_AssetManager.Reload();
 
 	auto themePath =
-		fs::path(path) / "Visual" / "UI" / "Page" / "theme.magma.ui.json";
+		fs::path(path) / "Visual" / "UI" / "theme.magma.ui.json";
 	if(fs::exists(themePath))
 		UITab::GetTheme() = UILoader::LoadTheme(themePath.string());
 }
@@ -353,12 +353,7 @@ void Editor::ExportProject() {
 
 	fs::create_directories(fs::path(exportPath) / "Class");
 	fs::create_directories(fs::path(exportPath) / "Scene");
-	fs::create_directories(fs::path(exportPath) / "Scene" / "Data");
-	fs::create_directories(fs::path(exportPath) / "Scene" / "Script");
-	fs::create_directories(fs::path(exportPath) / "Scene" / "Shader");
 	fs::create_directories(fs::path(exportPath) / "UI");
-	fs::create_directories(fs::path(exportPath) / "UI" / "Data");
-	fs::create_directories(fs::path(exportPath) / "UI" / "Script");
 
 	for(auto& screen : m_Project.Screens) {
 		auto mod = CreateRef<ScriptModule>(screen.Name);
@@ -370,16 +365,14 @@ void Editor::ExportProject() {
 
 		if(screen.Scene != "") {
 			auto scenePath =
-				fs::path(m_Project.Path) / "Visual" / "Scene" / "Schema"
-					/ screen.Scene;
+				fs::path(m_Project.Path) / "Visual" / "Scene" / screen.Scene;
 			Scene scene;
 			SceneLoader::EditorLoad(scene, scenePath.string() + ".magma.scene");
 			SceneLoader::RuntimeSave(scene, m_Project.Path, exportPath);
 		}
 		if(screen.Page != "") {
 			auto uiPath =
-				fs::path(m_Project.Path) / "Visual" / "UI" / "Page"
-					/ screen.Page;
+				fs::path(m_Project.Path) / "Visual" / "UI" / screen.Page;
 			UIPage ui;
 			UILoader::EditorLoad(ui, uiPath.string() + ".magma.ui.json",
 								 UITab::GetTheme());
@@ -397,15 +390,15 @@ void Editor::ExportProject() {
 
 	m_Project.Save((fs::path(exportPath) / ".volc.proj").string());
 
-	// auto runtimeEnv = getenv("VOLC_RUNTIME");
-	// VOLCANICORE_ASSERT(runtimeEnv);
-	// std::string runtimePath = runtimeEnv;
-	// auto target = (fs::path(exportPath) / m_Project.App).string() + ".exe";
+	auto runtimeEnv = getenv("VOLC_RUNTIME");
+	VOLCANICORE_ASSERT(runtimeEnv);
+	std::string runtimePath = runtimeEnv;
+	auto target = (fs::path(exportPath) / m_Project.App).string() + ".exe";
 
-	// if(FileUtils::FileExists(target))
-	// 	fs::remove(target);
+	if(FileUtils::FileExists(target))
+		fs::remove(target);
 
-	// fs::copy_file(runtimePath, target, fs::copy_options::overwrite_existing);
+	fs::copy_file(runtimePath, target, fs::copy_options::overwrite_existing);
 }
 
 }

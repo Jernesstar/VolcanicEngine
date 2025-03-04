@@ -1,14 +1,18 @@
 AssetPack:
   Assets:
     - Asset:
-        ID: 15079658181338123941
-        Type: 4
-        Path: Audio/Woosh2.wav
+        ID: 10556504260221527973
+        Type: 0
+        Path: Mesh\sphere\wooden_sphere.obj
     - Asset:
         ID: 10036008063945961451
         Type: 0
-        Type: 0
+        MeshType: 1
         Material:
-          DiffuseColor: [1, 1, 1, 1]
+          DiffuseColor: [1, 0, 1, 1]
           SpecularColor: [0, 0, 0, 0]
           EmissiveColor: [0, 0, 0, 0]
+    - Asset:
+        ID: 3055458966182997096
+        Type: 4
+        Path: Audio\Woosh2.wav

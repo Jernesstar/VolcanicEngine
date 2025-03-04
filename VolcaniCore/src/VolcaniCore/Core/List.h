@@ -82,7 +82,9 @@ public:
 	const T& operator[](int64_t idx) const { return *At(idx); }
 
 	T* At(int64_t idx) const {
-		return m_Buffer.Get(Absolute(idx));
+		auto abs = Absolute(idx);
+		VOLCANICORE_ASSERT(abs < Count())
+		return m_Buffer.Get(abs);
 	}
 
 	template<typename ...Args>

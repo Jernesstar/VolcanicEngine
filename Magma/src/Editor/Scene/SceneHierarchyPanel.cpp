@@ -130,7 +130,8 @@ void SceneHierarchyPanel::DrawEntityNode(Entity& entity) {
 		flags |= ImGuiTreeNodeFlags_Selected;
 
 	void* id = (void*)(uint64_t)(uint32_t)entity.GetHandle();
-	auto name = entity.GetName() != "" ? entity.GetName() : "Unnamed Entity";
+	std::string name =
+		entity.GetName() != "" ? entity.GetName() : "Unnamed Entity";
 	if(ImGui::TreeNodeEx(id, flags, name.c_str())) {
 		auto editor =
 			m_Tab->GetPanel("ComponentEditor")->As<ComponentEditorPanel>();

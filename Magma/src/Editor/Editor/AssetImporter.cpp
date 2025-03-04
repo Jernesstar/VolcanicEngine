@@ -212,9 +212,9 @@ List<SubMesh> AssetImporter::GetMeshData(const std::string& path) {
 }
 
 Ref<Sound> AssetImporter::GetAudio(const std::string& path) {
-	auto source = new SoLoud::Wav;
-	VOLCANICORE_ASSERT(source->load(path.c_str()) == 0);
-	return CreateRef<Sound>(source);
+	// auto source = new SoLoud::Wav;
+	// VOLCANICORE_ASSERT(source->load(path.c_str()) == 0);
+	// return CreateRef<Sound>(source);
 }
 
 }

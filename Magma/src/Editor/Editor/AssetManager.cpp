@@ -1,5 +1,7 @@
 #include "AssetManager.h"
 
+#include <bitset>
+
 #include <VolcaniCore/Core/FileUtils.h>
 
 #include <Magma/Core/YAMLSerializer.h>
@@ -105,7 +107,8 @@ void EditorAssetManager::Load(const std::string& path) {
 			if(node["Path"]) {
 				auto materials = AssetImporter::GetMeshMaterials(m_Paths[id]);
 				for(auto matPaths : materials) {
-					for(auto path : matPaths) {
+					for(uint32_t i = 0; i < 3; i++) {
+						auto path = matPaths[i];
 						if(path == "")
 							continue;
 						auto& secondary =
@@ -119,7 +122,7 @@ void EditorAssetManager::Load(const std::string& path) {
 				continue;
 			}
 
-			auto type = (MeshType)node["Type"].as<uint32_t>();
+			auto type = (MeshType)node["MeshType"].as<uint32_t>();
 			auto materialNode = node["Material"];
 
 			Material mat;
@@ -164,7 +167,7 @@ void EditorAssetManager::Reload() {
 		for(auto p : FileUtils::GetFiles(folder.string())) {
 			std::string path = p;
 			if(folder.stem() == "Mesh")
-				path = FileUtils::GetFiles(p.string(), { ".obj" })[0];
+				path = FileUtils::GetFiles(p, { ".obj" })[0];
 			if(!GetFromPath(path))
 				Add(path, (AssetType)i);
 		}
@@ -186,6 +189,9 @@ void EditorAssetManager::Save() {
 
 	serializer.WriteKey("Assets").BeginSequence();
 	for(auto& [asset, _] : m_AssetRegistry) {
+		if(!asset.Primary)
+			continue;
+
 		serializer.BeginMapping();
 		serializer.WriteKey("Asset").BeginMapping();
 		serializer.WriteKey("ID").Write((uint64_t)asset.ID);
@@ -199,7 +205,7 @@ void EditorAssetManager::Save() {
 			auto& refs = m_References[asset.ID];
 			auto mesh = m_MeshAssets[asset.ID];
 			auto subMesh = mesh->SubMeshes[0];
-			serializer.WriteKey("Type").Write((uint32_t)mesh->Type);
+			serializer.WriteKey("MeshType").Write((uint32_t)mesh->Type);
 
 			serializer.WriteKey("Material")
 			.BeginMapping();
@@ -265,22 +271,21 @@ namespace Magma {
 void EditorAssetManager::RuntimeSave(const std::string& path) {
 	namespace fs = std::filesystem;
 
+	fs::create_directories(fs::path(path) / "Asset");
+	fs::create_directories(fs::path(path) / "Asset" / "Mesh");
+	fs::create_directories(fs::path(path) / "Asset" / "Texture");
+	fs::create_directories(fs::path(path) / "Asset" / "Sound");
+
 	BinaryWriter pack((fs::path(path) / ".volc.assetpk").string());
 	BinaryWriter meshFile((fs::path(path) / "Asset" / "Mesh" / "mesh.bin").string());
 	BinaryWriter textureFile((fs::path(path) / "Asset" / "Texture" / "image.bin").string());
 	BinaryWriter soundFile((fs::path(path) / "Asset" / "Sound" / "sound.bin").string());
 	
-	pack.Write("VOLC_PACK");
+	pack.Write(std::string("VOLC_PACK"));
 	pack.Write(m_AssetRegistry.size());
 	for(auto [asset, _] : m_AssetRegistry) {
 		pack.Write((uint64_t)asset.ID);
 		pack.Write((uint32_t)asset.Type);
-		auto& refs = m_References[asset.ID];
-		pack.Write(refs.Count());
-		for(auto& ref : refs) {
-			pack.Write((uint64_t)ref.ID);
-			pack.Write((uint32_t)ref.Type);
-		}
 
 		auto path = m_Paths[asset.ID];
 		if(asset.Type == AssetType::Mesh) {
@@ -297,7 +302,7 @@ void EditorAssetManager::RuntimeSave(const std::string& path) {
 					flags |= (mat[0] != "") << 0; // Diffuse
 					flags |= (mat[1] != "") << 1; // Specular
 					flags |= (mat[2] != "") << 2; // Emissive
-					meshFile.Write(flags.toulong());
+					meshFile.Write(flags.to_ullong());
 				}
 			}
 			else {
@@ -324,6 +329,13 @@ void EditorAssetManager::RuntimeSave(const std::string& path) {
 		}
 		else if(asset.Type == AssetType::Script) {
 
+		}
+
+		auto& refs = m_References[asset.ID];
+		pack.Write(refs.Count());
+		for(auto& ref : refs) {
+			pack.Write((uint64_t)ref.ID);
+			pack.Write((uint32_t)ref.Type);
 		}
 	}
 }

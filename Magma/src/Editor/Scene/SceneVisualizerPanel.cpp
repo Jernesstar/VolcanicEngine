@@ -177,7 +177,7 @@ void SceneVisualizerPanel::Draw() {
 					if(exit) {
 						if(options.add.asset.Type == AssetType::Mesh)
 							newEntity.Add<MeshComponent>(options.add.asset);
-						if(options.add.asset.Type == AssetType::Cubemap)
+						else if(options.add.asset.Type == AssetType::Cubemap)
 							newEntity.Add<SkyboxComponent>(options.add.asset);
 
 						ImGui::CloseCurrentPopup();
@@ -232,13 +232,14 @@ void SceneVisualizerPanel::Draw() {
 				VOLCANICORE_LOG_INFO("Not hit");
 		}
 
-		if(m_Selected) {
+		if(m_Selected && m_Selected.Has<TransformComponent>()) {
 			auto view = glm::value_ptr(camera->GetView());
 			auto proj = glm::value_ptr(camera->GetProjection());
 			auto oper = ImGuizmo::OPERATION::ROTATE;
 			auto mode = ImGuizmo::MODE::WORLD;
 			auto mat = (glm::mat4)(Transform)m_Selected.Get<TransformComponent>();
 			auto ptr = glm::value_ptr(mat);
+			// ImGuizmo::SetDrawlist();
 			ImGuizmo::Enable(true);
 			ImGuizmo::Manipulate(view, proj, oper, mode, ptr);
 		}
@@ -320,19 +321,13 @@ void EditorSceneRenderer::Update(TimeStep ts) {
 }
 
 void EditorSceneRenderer::Begin() {
-	FirstCommand = RendererAPI::Get()->NewDrawCommand(LightingPass->Get());
-	FirstCommand->Clear = true;
-
-	FirstCommand->UniformData
-	.SetInput("u_ViewProj", m_Controller.GetCamera()->GetViewProjection());
-	FirstCommand->UniformData
-	.SetInput("u_CameraPosition", m_Controller.GetCamera()->GetPosition());
-
+	auto camera = m_Controller.GetCamera();
 	auto* command = RendererAPI::Get()->NewDrawCommand(GridPass->Get());
+	command->Clear = true;
 	command->UniformData
-	.SetInput("u_ViewProj", m_Controller.GetCamera()->GetViewProjection());
+	.SetInput("u_ViewProj", camera->GetViewProjection());
 	command->UniformData
-	.SetInput("u_CameraPosition", m_Controller.GetCamera()->GetPosition());
+	.SetInput("u_CameraPosition", camera->GetPosition());
 
 	auto& call = command->NewDrawCall();
 	call.VertexCount = 6;
@@ -341,14 +336,16 @@ void EditorSceneRenderer::Begin() {
 	call.DepthTest = DepthTestingMode::Off;
 	call.Culling = CullingMode::Off;
 	call.Blending = BlendingMode::Greatest;
-}
 
-void EditorSceneRenderer::SubmitCamera(Entity entity) {
-	auto camera = entity.Get<CameraComponent>().Cam;
+	FirstCommand = RendererAPI::Get()->NewDrawCommand(LightingPass->Get());
 	FirstCommand->UniformData
 	.SetInput("u_ViewProj", camera->GetViewProjection());
 	FirstCommand->UniformData
 	.SetInput("u_CameraPosition", camera->GetPosition());
+}
+
+void EditorSceneRenderer::SubmitCamera(Entity entity) {
+
 }
 
 void EditorSceneRenderer::SubmitSkybox(Entity entity) {
@@ -405,7 +402,8 @@ void EditorSceneRenderer::Render() {
 	FirstCommand->UniformData
 	.SetInput("u_SpotlightCount", (int32_t)SpotlightCount);
 
-	if(Selected) {
+	// if(Selected) {
+	if(false) {
 		auto& assetManager =
 			Application::As<EditorApp>()->GetEditor().GetAssetManager();
 		auto& tc = Selected.Get<TransformComponent>();

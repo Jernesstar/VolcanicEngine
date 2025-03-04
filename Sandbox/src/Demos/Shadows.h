@@ -46,7 +46,7 @@ Shadows::Shadows()
 	depthViewPass->SetData(Renderer2D::GetScreenBuffer());
 
 	auto depth = ShaderPipeline::Create("Sandbox/assets/shaders", "Depth");
-	auto shadow = ShaderPipeline::Create("Sandbox/assets/shaders", "Shadow");
+	auto shadow = ShaderPipeline::Create("Magma/assets/shaders", "Shadow");
 
 	auto depthTexture = Texture::Create(2048, 2048, Texture::Format::Depth);
 	depthMap = Framebuffer::Create(

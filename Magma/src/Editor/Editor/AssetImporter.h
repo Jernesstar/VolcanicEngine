@@ -16,11 +16,6 @@ struct MaterialPaths {
 	std::string Emissive;
 
 	std::string operator[](uint32_t i) { return *(&this->Diffuse + i); }
-
-	List<std::string>::iterator begin() { return begin(); }
-	List<std::string>::iterator end() { return end(); }
-	List<std::string>::const_iterator begin() const { return &this->Diffuse; }
-	List<std::string>::const_iterator end()	const { return &this->Diffuse + 3; }
 };
 
 class AssetImporter {

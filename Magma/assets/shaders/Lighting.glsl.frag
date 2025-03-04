@@ -52,6 +52,9 @@ layout(std140, binding = 0) uniform SpotLight
 struct Material {
     sampler2D Diffuse;
     sampler2D Specular;
+    vec4 DiffuseColor;
+    vec4 SpecularColor;
+    int IsTextured;
     float Shininess;
 };
 
@@ -128,9 +131,15 @@ vec3 CalcSpotLight(vec3 normal, vec3 viewDir)
     float epsilon = cutoff - outer;
     float intensity = clamp((theta - outer) / epsilon, 0.0, 1.0);
 
-    vec3 ambient  = vec3(1.0) * 1.0  * vec3(texture(u_Material.Diffuse, v_TexCoords.xy));
-    vec3 diffuse  = vec3(1.0) * diff * vec3(texture(u_Material.Diffuse, v_TexCoords.xy));
-    vec3 specular = vec3(1.0) * spec * vec3(texture(u_Material.Specular, v_TexCoords.xy));
+    vec3 color;
+    if(u_Material.IsTextured == 1)
+        color = texture(u_Material.Diffuse, v_TexCoords.xy).rgb;
+    else
+        color = u_Material.DiffuseColor.rgb;
+    vec3 ambient  = vec3(1.0) * 1.0  * color;
+    vec3 diffuse  = vec3(1.0) * diff * color;
+    // vec3 specular = vec3(1.0) * spec * vec3(texture(u_Material.Specular, v_TexCoords.xy));
+    vec3 specular = vec3(0.0);
 
     return (ambient + diffuse + specular) * intensity;
 }

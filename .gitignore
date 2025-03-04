@@ -12,3 +12,4 @@ gen/
 
 # Binaries
 *.exe
+*.bin

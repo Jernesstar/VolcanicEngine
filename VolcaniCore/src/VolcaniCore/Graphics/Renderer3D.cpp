@@ -202,6 +202,9 @@ static void DrawSubMesh(Ref<Mesh> root, SubMesh& mesh, const glm::mat4& tr,
 		auto& call = command->NewDrawCall();
 		call.Primitive = PrimitiveType::Triangle;
 		call.Partition = PartitionType::Instanced;
+		call.DepthTest = DepthTestingMode::On;
+		call.Blending = BlendingMode::Greatest;
+		call.Culling = CullingMode::Back;
 		call.InstanceStart = s_InstancesIndex;
 		s_InstancesIndex += 10'000;
 	}

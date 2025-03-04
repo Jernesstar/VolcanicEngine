@@ -8,17 +8,12 @@ using namespace Magma::Physics;
 
 namespace Magma {
 
-ParticleSystem::ParticleSystem(ECS::World* world)
-	: System(world)
-{
-}
-
 void ParticleSystem::Update(TimeStep ts) {
 	m_TimeStep = ts;
 }
 
 void ParticleSystem::Run(Phase phase) {
-	if(phase == Phase::Update) {
+	if(phase == Phase::OnUpdate) {
 		m_EntityWorld
 		->ForEach<ParticleSystemComponent>(
 			[this](Entity& entity)

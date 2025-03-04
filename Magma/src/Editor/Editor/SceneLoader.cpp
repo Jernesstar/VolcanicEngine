@@ -641,10 +641,10 @@ void SceneLoader::RuntimeSave(const Scene& scene,
 	namespace fs = std::filesystem;
 
 	auto scenePath =
-		(fs::path(projectPath) / "Visual" / "Scene" / "Schema" / scene.Name
+		(fs::path(projectPath) / "Visual" / "Scene" / scene.Name
 		).string() + ".magma.scene";
 	auto binPath =
-		(fs::path(exportPath) / "Scene" / "Data" / scene.Name).string() + ".bin";
+		(fs::path(exportPath) / "Scene" / scene.Name).string() + ".bin";
 
 	BinaryWriter writer(binPath);
 
