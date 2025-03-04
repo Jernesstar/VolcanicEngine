@@ -1,5 +1,6 @@
 #include "Scene.h"
 
+#include "ParticleSystem.h"
 #include "PhysicsSystem.h"
 #include "ScriptSystem.h"
 
@@ -17,6 +18,7 @@ Scene::Scene(const std::string& name)
 }
 
 Scene::~Scene() {
+	EntityWorld.Remove<ParticleSystem>();
 	EntityWorld.Remove<PhysicsSystem>();
 	EntityWorld.Remove<ScriptSystem>();
 }
@@ -30,6 +32,7 @@ void Scene::OnRender(SceneRenderer& renderer) {
 
 	renderer.Begin();
 
+	// TODO(Change): Cache queries
 	world.query_builder()
 	.with<CameraComponent>()
 	.build()
@@ -60,6 +63,15 @@ void Scene::OnRender(SceneRenderer& renderer) {
 		});
 
 	world.query_builder()
+	.with<ParticleSystemComponent>()
+	.build()
+	.each(
+		[&](flecs::entity id)
+		{
+			renderer.SubmitParticles(Entity{ id });
+		});
+
+	world.query_builder()
 	.with<MeshComponent>().and_()
 	.with<TransformComponent>()
 	.build()
@@ -73,8 +85,35 @@ void Scene::OnRender(SceneRenderer& renderer) {
 }
 
 void Scene::RegisterSystems() {
+	// TODO(Change): Move to each system's constructor
+	EntityWorld.Add<ParticleSystem>();
 	EntityWorld.Add<PhysicsSystem>();
 	EntityWorld.Add<ScriptSystem>();
+
+	for(auto phase : { flecs::OnUpdate }) {
+		Phase ourPhase;
+		if(phase == flecs::PreUpdate)
+			ourPhase = Phase::PreUpdate;
+		if(phase == flecs::OnUpdate)
+			ourPhase = Phase::OnUpdate;
+		if(phase == flecs::PostUpdate)
+			ourPhase = Phase::PostUpdate;
+
+		EntityWorld.GetNative()
+		.system<ParticleSystemComponent>()
+		.kind(phase)
+		.run(
+			[&](flecs::iter& it)
+			{
+				auto sys = EntityWorld.Get<ParticleSystem>();
+				if(!sys)
+					return;
+
+				if(ourPhase == Phase::OnUpdate)
+					sys->Update(it.delta_time());
+				// sys->Run(ourPhase);
+			});
+	}
 
 	for(auto phase : { flecs::PreUpdate, flecs::OnUpdate, flecs::PostUpdate }) {
 		Phase ourPhase;
@@ -125,6 +164,27 @@ void Scene::RegisterSystems() {
 				sys->Run(ourPhase);
 			});
 	}
+
+	EntityWorld.GetNative()
+	.observer()
+	.with<RigidBodyComponent>()
+	.event(flecs::Monitor)
+	.each(
+		[&](flecs::iter& it, size_t i)
+		{
+			auto sys = EntityWorld.Get<PhysicsSystem>();
+			if(!sys)
+				return;
+
+			Entity entity{ it.entity(i) };
+
+			if(it.event() == flecs::OnAdd)
+				sys->OnComponentAdd(entity);
+			else if(it.event() == flecs::OnSet)
+				sys->OnComponentSet(entity);
+			else if(it.event() == flecs::OnRemove)
+				sys->OnComponentRemove(entity);
+		});
 
 	EntityWorld.GetNative()
 	.observer()

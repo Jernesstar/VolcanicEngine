@@ -46,11 +46,11 @@ void RuntimeAssetManager::Load(Asset asset) {
 		uint64_t i = 0;
 		for(auto mat : materialFlags) {
 			std::bitset<3> flags(mat);
-			if(flags.test(2))
+			if(flags.test(0)) // Diffuse
 				Load(refs[i++]);
-			if(flags.test(1))
+			if(flags.test(1)) // Specular
 				Load(refs[i++]);
-			if(flags.test(0))
+			if(flags.test(2)) // Emissive
 				Load(refs[i++]);
 		}
 
@@ -72,6 +72,9 @@ void RuntimeAssetManager::Load(Asset asset) {
 	}
 	else if(asset.Type == AssetType::Audio) {
 
+	}
+	else if(asset.Type == AssetType::Script) {
+		
 	}
 }
 

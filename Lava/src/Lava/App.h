@@ -30,6 +30,7 @@ class RuntimeSceneRenderer : public SceneRenderer {
 		void SubmitCamera(Entity entity) override;
 		void SubmitSkybox(Entity entity) override;
 		void SubmitLight(Entity entity) override;
+		void SubmitParticles(Entity entity) override;
 		void SubmitMesh(Entity entity) override;
 		void Render() override;
 	};

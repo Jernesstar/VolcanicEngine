@@ -162,10 +162,9 @@ void EditorAssetManager::Reload() {
 	uint32_t i = 0;
 	for(auto folder : paths) {
 		for(auto p : FileUtils::GetFiles(folder.string())) {
-			std::string path;
-			// if(folder.stem() == "Mesh")
-			// 	path =
-			// 		fs::path(FileUtils::GetFiles(p.string(), { ".obj", "."}));
+			std::string path = p;
+			if(folder.stem() == "Mesh")
+				path = FileUtils::GetFiles(p.string(), { ".obj" })[0];
 			if(!GetFromPath(path))
 				Add(path, (AssetType)i);
 		}
@@ -293,9 +292,12 @@ void EditorAssetManager::RuntimeSave(const std::string& path) {
 				auto materials =
 					AssetImporter::GetMeshMaterials(m_Paths[asset.ID]);
 				for(auto mat : materials) {
-					meshFile.Write(mat[0] != "");
-					meshFile.Write(mat[1] != "");
-					meshFile.Write(mat[2] != "");
+					std::bitset<3> flags;
+					
+					flags |= (mat[0] != "") << 0; // Diffuse
+					flags |= (mat[1] != "") << 1; // Specular
+					flags |= (mat[2] != "") << 2; // Emissive
+					meshFile.Write(flags.toulong());
 				}
 			}
 			else {
@@ -319,6 +321,9 @@ void EditorAssetManager::RuntimeSave(const std::string& path) {
 
 			auto sound = Get<Sound>(asset);
 			// soundFile.Write(sound->GetData());
+		}
+		else if(asset.Type == AssetType::Script) {
+
 		}
 	}
 }

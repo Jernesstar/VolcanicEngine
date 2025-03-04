@@ -141,6 +141,10 @@ void App::OnUpdate(TimeStep ts) {
 	UIRenderer::EndFrame();
 }
 
+Ref<ScriptClass> App::GetScriptClass(const std::string& name) {
+
+}
+
 void App::SetScreen(const std::string& name) {
 	if(!ChangeScreen) {
 		Running = false;
@@ -197,10 +201,6 @@ void App::PopScreen() {
 
 }
 
-Ref<ScriptClass> App::GetScriptClass(const std::string& name) {
-
-}
-
 RuntimeSceneRenderer::RuntimeSceneRenderer() {
 
 }
@@ -222,6 +222,10 @@ void RuntimeSceneRenderer::SubmitSkybox(Entity entity) {
 }
 
 void RuntimeSceneRenderer::SubmitLight(Entity entity) {
+
+}
+
+void RuntimeSceneRenderer::SubmitParticles(Entity entity) {
 
 }
 

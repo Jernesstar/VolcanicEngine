@@ -28,6 +28,7 @@ public:
 	virtual void SubmitCamera(Entity entity) = 0;
 	virtual void SubmitSkybox(Entity entity) = 0;
 	virtual void SubmitLight(Entity entity) = 0;
+	virtual void SubmitParticles(Entity entity) = 0;
 	virtual void SubmitMesh(Entity entity) = 0;
 	virtual void Render() = 0;
 

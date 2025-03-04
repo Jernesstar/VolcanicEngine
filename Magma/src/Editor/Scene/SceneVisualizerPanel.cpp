@@ -374,6 +374,10 @@ void EditorSceneRenderer::SubmitLight(Entity entity) {
 	}
 }
 
+void EditorSceneRenderer::SubmitParticles(Entity entity) {
+
+}
+
 void EditorSceneRenderer::SubmitMesh(Entity entity) {
 	auto& assetManager =
 		Application::As<EditorApp>()->GetEditor().GetAssetManager();
