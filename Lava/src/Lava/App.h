@@ -33,11 +33,31 @@ class RuntimeSceneRenderer : public SceneRenderer {
 		void SubmitParticles(Entity entity) override;
 		void SubmitMesh(Entity entity) override;
 		void Render() override;
+	
+	private:	
+		DrawCommand* FirstCommand;
+		Map<Ref<Mesh>, DrawCommand*> Objects;
+
+		// Lighting and shadows
+		Ref<RenderPass> DepthPass;
+		Ref<RenderPass> LightingPass;
+		Ref<UniformBuffer> DirectionalLightBuffer;
+		Ref<UniformBuffer> PointLightBuffer;
+		Ref<UniformBuffer> SpotlightBuffer;
+		bool HasDirectionalLight = false;
+		uint32_t PointLightCount = 0;
+		uint32_t SpotlightCount = 0;
+
+		// Bloom
+		Ref<Framebuffer> Mips;
+		Ref<RenderPass> DownsamplePass;
+		Ref<RenderPass> UpsamplePass;
+		Ref<RenderPass> BloomPass;
 	};
 
 class App {
 public:
-	static App* GetInstance() { return s_Instance; }
+	static App* Get() { return s_Instance; }
 
 public:
 	bool ChangeScreen;
@@ -45,18 +65,16 @@ public:
 
 	Func<void, Scene&> SceneLoad;
 	Func<void, const Scene&> SceneSave;
-	Func<Ref<ScriptModule>, UIPage&> UILoad;
-	Func<void, const UIPage&> UISave;
+	Func<void, UIPage&> UILoad;
+	Func<void, Ref<ScriptModule>> ScreenLoad;
 
 public:
 	App(const Project& project);
-	~App() = default;
+	~App();
 
 	void OnLoad();
 	void OnClose();
 	void OnUpdate(TimeStep ts);
-
-	Ref<ScriptClass> GetScriptClass(const std::string& name);
 
 	void SetScreen(const std::string& name);
 	void PushScreen(const std::string& name);
@@ -65,7 +83,7 @@ public:
 	void OnKeyPressed();
 
 	void SetAssetManager(AssetManager& manager) { m_AssetManager = &manager; }
-	AssetManager* GetAssetManager() { return m_AssetManager; }
+	AssetManager& GetAssetManager() { return *m_AssetManager; }
 	RuntimeSceneRenderer& GetRenderer() { return m_SceneRenderer; }
 
 private:

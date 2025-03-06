@@ -19,7 +19,7 @@ public:
 	ScriptModule(const std::string& name);
 	~ScriptModule();
 
-	void Reload(const std::string& path = "");
+	void Load(const std::string& path);
 	void Save(const std::string& path);
 
 	Ref<ScriptClass> GetScriptClass(const std::string& name);
@@ -27,10 +27,10 @@ public:
 	asIScriptContext* GetContext() { return m_Ctx; }
 
 private:
-	std::string m_Path;
-
 	asIScriptModule* m_Handle;
 	asIScriptContext* m_Ctx;
+
+	Map<std::string, Ref<ScriptClass>> m_Classes;
 };
 
 }

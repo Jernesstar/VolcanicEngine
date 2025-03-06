@@ -15,12 +15,15 @@
 #include <VolcaniCore/Graphics/Renderer3D.h>
 #include <VolcaniCore/Graphics/StereographicCamera.h>
 
-#include <Magma/Scene/SceneRenderer.h>
+#include <Magma/Script/ScriptModule.h>
+
 #include <Magma/UI/UIRenderer.h>
 
 #include <Magma/Scene/Component.h>
 #include <Magma/Scene/PhysicsSystem.h>
+#include <Magma/Scene/SceneRenderer.h>
 
+#include "Editor/AssetManager.h"
 #include "Editor/EditorApp.h"
 #include "Editor/Tab.h"
 
@@ -28,8 +31,8 @@
 #include "SceneHierarchyPanel.h"
 
 using namespace Magma::ECS;
+using namespace Magma::Script;
 using namespace Magma::Physics;
-
 namespace Magma {
 
 SceneVisualizerPanel::SceneVisualizerPanel(Scene* context)
@@ -78,6 +81,8 @@ struct {
 	} add;
 } static options;
 
+static std::string SelectScriptClass(Ref<ScriptModule> mod);
+
 void SceneVisualizerPanel::Draw() {
 	auto& editor = Application::As<EditorApp>()->GetEditor();
 	auto tab = editor.GetProjectTab()->As<ProjectTab>();
@@ -119,8 +124,11 @@ void SceneVisualizerPanel::Draw() {
 					case AssetType::Mesh:
 						ImGui::OpenPopup("Create Entity with MeshComponent");
 						break;
-					case AssetType::Cubemap:
-						ImGui::OpenPopup("Create Entity with SkyboxComponent");
+					case AssetType::Audio:
+						ImGui::OpenPopup("Create Entity with AudioComponent");
+						break;
+					case AssetType::Script:
+						ImGui::OpenPopup("Create Entity with ScriptComponent");
 						break;
 				}
 			}
@@ -145,9 +153,12 @@ void SceneVisualizerPanel::Draw() {
 		bool open = false;
 		open = ImGui::BeginPopupModal("Create Entity with MeshComponent");
 		if(!open)
-			open = ImGui::BeginPopupModal("Create Entity with SkyboxComponent");
+			open = ImGui::BeginPopupModal("Create Entity with AudioComponent");
+		if(!open)
+			open = ImGui::BeginPopupModal("Create Entity with ScriptComponent");
 
 		if(open) {
+			auto asset = options.add.asset;
 			static std::string str;
 			static std::string hint = "Enter entity name";
 			ImGui::InputTextWithHint("##Input", hint.c_str(), &str);
@@ -175,10 +186,19 @@ void SceneVisualizerPanel::Draw() {
 					}
 
 					if(exit) {
-						if(options.add.asset.Type == AssetType::Mesh)
-							newEntity.Add<MeshComponent>(options.add.asset);
-						else if(options.add.asset.Type == AssetType::Cubemap)
-							newEntity.Add<SkyboxComponent>(options.add.asset);
+						if(asset.Type == AssetType::Mesh)
+							newEntity.Add<MeshComponent>(asset);
+						else if(asset.Type == AssetType::Audio)
+							newEntity.Add<AudioComponent>(asset);
+						else if(asset.Type == AssetType::Script) {
+							auto mod =
+								editor.GetAssetManager().Get<ScriptModule>(asset);
+							std::string name = SelectScriptClass(mod);
+							auto _class = mod->GetScriptClass(name);
+							_class->SetInstanceMethod({ "Entity entity" });
+							auto obj = _class->Instantiate(newEntity);
+							newEntity.Add<ScriptComponent>(asset, obj);
+						}
 
 						ImGui::CloseCurrentPopup();
 					}
@@ -244,7 +264,13 @@ void SceneVisualizerPanel::Draw() {
 			ImGuizmo::Manipulate(view, proj, oper, mode, ptr);
 		}
 	}
+
 	ImGui::End();
+}
+
+std::string SelectScriptClass(Ref<ScriptModule> mod) {
+
+	return "";
 }
 
 EditorSceneRenderer::EditorSceneRenderer() {
@@ -356,19 +382,19 @@ void EditorSceneRenderer::SubmitSkybox(Entity entity) {
 }
 
 void EditorSceneRenderer::SubmitLight(Entity entity) {
-	if(entity.Has<DirectionalLightComponent>()) {
-		auto& dc = entity.Get<DirectionalLightComponent>();
-		DirectionalLightBuffer->SetData(&dc);
-		HasDirectionalLight = true;
-	}
-	else if(entity.Has<PointLightComponent>()) {
-		auto& pc = entity.Get<PointLightComponent>();
-		PointLightBuffer->SetData(&pc, 1, PointLightCount++);
-	}
-	else if(entity.Has<SpotlightComponent>()) {
-		auto& sc = entity.Get<SpotlightComponent>();
-		SpotlightBuffer->SetData(&sc, 1, SpotlightCount++);
-	}
+	// if(entity.Has<DirectionalLightComponent>()) {
+	// 	auto& dc = entity.Get<DirectionalLightComponent>();
+	// 	DirectionalLightBuffer->SetData(&dc);
+	// 	HasDirectionalLight = true;
+	// }
+	// else if(entity.Has<PointLightComponent>()) {
+	// 	auto& pc = entity.Get<PointLightComponent>();
+	// 	PointLightBuffer->SetData(&pc, 1, PointLightCount++);
+	// }
+	// else if(entity.Has<SpotlightComponent>()) {
+	// 	auto& sc = entity.Get<SpotlightComponent>();
+	// 	SpotlightBuffer->SetData(&sc, 1, SpotlightCount++);
+	// }
 }
 
 void EditorSceneRenderer::SubmitParticles(Entity entity) {

@@ -1,5 +1,13 @@
 class TestHomeScreen : IScreen
 {
+    Scene @SceneHandle;
+    UIPage @PageHandle;
+
+    TestHomeScreen(Scene @scene, UIPage @page)
+    {
+        
+    }
+
     void OnLoad()
     {
 
@@ -14,7 +22,4 @@ class TestHomeScreen : IScreen
     {
 
     }
-
-    Scene @m_Scene;
-    UIPage @m_Page;
 }

@@ -320,10 +320,9 @@ static void WriteUI(BinaryWriter* writer, const UIElement* element) {
 	writer->Write(element->y);
 	writer->Write((uint32_t)element->xAlignment);
 	writer->Write((uint32_t)element->yAlignment);
-	writer->Write(element->Color.r);
-	writer->Write(element->Color.g);
-	writer->Write(element->Color.b);
-	writer->Write(element->Color.a);
+	writer->WriteData(&element->Color.r, sizeof(glm::vec4));
+	writer->Write((uint64_t)element->ModuleID);
+	writer->Write(element->Class);
 }
 
 template<>
@@ -331,11 +330,8 @@ BinaryWriter& BinaryWriter::WriteObject(const UI::Window& window) {
 	WriteUI(this, &window);
 	Write(window.BorderWidth);
 	Write(window.BorderHeight);
-	Write(window.BorderColor.r);
-	Write(window.BorderColor.g);
-	Write(window.BorderColor.b);
-	Write(window.BorderColor.a);
-	
+	WriteData(&window.BorderColor.r, sizeof(glm::vec4));
+
 	return *this;
 }
 

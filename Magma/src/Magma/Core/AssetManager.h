@@ -22,7 +22,7 @@ enum class AssetType {
 	Mesh,
 	Texture,
 	Cubemap,
-	// Font,
+	Font,
 	Audio,
 	Script,
 	Shader,
@@ -76,7 +76,7 @@ protected:
 	Map<UUID, Ref<Texture>> m_TextureAssets;
 	Map<UUID, Ref<Cubemap>> m_CubemapAssets;
 	Map<UUID, Ref<Sound>> m_AudioAssets;
-	Map<UUID, Ref<ScriptClass>> m_ScriptAssets;
+	Map<UUID, Ref<ScriptModule>> m_ScriptAssets;
 
 private:
 	Ref<Mesh> GetMesh(Asset asset) {
@@ -98,6 +98,11 @@ private:
 		if(!m_AudioAssets.count(asset.ID))
 			return nullptr;
 		return m_AudioAssets[asset.ID];
+	}
+	Ref<ScriptModule> GetScript(Asset asset) {
+		if(!m_ScriptAssets.count(asset.ID))
+			return nullptr;
+		return m_ScriptAssets[asset.ID];
 	}
 };
 
@@ -123,6 +128,12 @@ template<> inline
 Ref<Sound> AssetManager::Get(Asset asset) {
 	VOLCANICORE_ASSERT(asset.Type == AssetType::Audio);
 	return GetSound(asset);
+}
+
+template<> inline
+Ref<ScriptModule> AssetManager::Get(Asset asset) {
+	VOLCANICORE_ASSERT(asset.Type == AssetType::Script);
+	return GetScript(asset);
 }
 
 }

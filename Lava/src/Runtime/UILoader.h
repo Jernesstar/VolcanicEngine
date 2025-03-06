@@ -12,7 +12,7 @@ namespace Lava {
 
 class UILoader {
 public:
-	static Ref<ScriptModule> Load(UIPage& page, const std::string& path);
+	static void Load(UIPage& page, const std::string& path);
 };
 
 }

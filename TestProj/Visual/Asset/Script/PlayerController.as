@@ -10,7 +10,7 @@ class PlayerController : IEntity
 
     void OnUpdate(float ts)
     {
-        ref component = m_Handle.GetTransformComponent();
+        ref component = handle.GetTransformComponent();
 
         if(Input.KeyPressed(Key::Left))
             component.Translation.x -= 4.0 * ts;

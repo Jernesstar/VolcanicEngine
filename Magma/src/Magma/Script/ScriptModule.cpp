@@ -55,34 +55,31 @@ ScriptModule::~ScriptModule() {
 	m_Ctx->Release();
 }
 
-void ScriptModule::Reload(const std::string& path) {
+void ScriptModule::Load(const std::string& path) {
 	namespace fs = std::filesystem;
 
 	auto* engine = ScriptEngine::Get();
 
-	if(path != "") {
-		m_Path = path;
-
-		if(fs::path(path).extension() == ".as") {
-			CScriptBuilder builder;
-			builder.StartNewModule(engine, Name.c_str());
-			builder.AddSectionFromFile(m_Path.c_str());
-			builder.BuildModule();
-			m_Handle = builder.GetModule();
-		}
-		else {
-			m_Handle = engine->GetModule(Name.c_str(), asGM_ALWAYS_CREATE);
-			ByteCodeStream stream(path, 0);
-			m_Handle->LoadByteCode(&stream);
-		}
-
-		return;
+	if(fs::path(path).extension() == ".as") {
+		CScriptBuilder builder;
+		builder.StartNewModule(engine, Name.c_str());
+		builder.AddSectionFromFile(path.c_str());
+		builder.BuildModule();
+		m_Handle = builder.GetModule();
+	}
+	else {
+		m_Handle = engine->GetModule(Name.c_str(), asGM_ALWAYS_CREATE);
+		ByteCodeStream stream(path, 0);
+		m_Handle->LoadByteCode(&stream);
 	}
 
-	if(m_Path != "")
-		return;
-
-	// TODO(Implement): Hot reload
+	for(uint32_t i = 0; i < m_Handle->GetObjectTypeCount(); i++) {
+		asITypeInfo* type = m_Handle->GetObjectTypeByIndex(i);
+		std::string name = type->GetName();
+		auto scriptClass = CreateRef<ScriptClass>(name, type);
+		scriptClass->m_Module = this;
+		m_Classes[name] = scriptClass;
+	}
 }
 
 void ScriptModule::Save(const std::string& path) {
@@ -91,14 +88,9 @@ void ScriptModule::Save(const std::string& path) {
 }
 
 Ref<ScriptClass> ScriptModule::GetScriptClass(const std::string& name) {
-	asITypeInfo* type = m_Handle->GetTypeInfoByDecl(name.c_str());
-	if(!type)
+	if(!m_Classes.count(name))
 		return nullptr;
-
-	auto scriptClass = CreateRef<ScriptClass>(name, type);
-	scriptClass->m_Module = this;
-
-	return scriptClass;
+	return m_Classes[name];
 }
 
 }

@@ -20,6 +20,7 @@ public:
 	void OnUpdate(TimeStep ts) override;
 
 	Ref<App> GetApp() const { return m_App; }
+	RuntimeAssetManager& GetAssetManager() { return m_AssetManager; }
 
 public:
 	Ref<App> m_App;

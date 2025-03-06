@@ -1,3 +1,4 @@
+
 class TestGame : IApp
 {
 	void OnLoad()

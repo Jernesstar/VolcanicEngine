@@ -5,6 +5,7 @@
 
 #include "Graphics/Shader.h"
 #include "Graphics/Texture.h"
+#include "Graphics/Cubemap.h"
 #include "Graphics/UniformBuffer.h"
 #include "Graphics/Framebuffer.h"
 
@@ -131,6 +132,11 @@ struct TextureSlot {
 	uint32_t Index = 0;
 };
 
+struct CubemapSlot {
+	Ref<Cubemap> Sampler = nullptr;
+	uint32_t Index = 0;
+};
+
 struct UniformSlot {
 	Ref<UniformBuffer> Buffer = nullptr;
 	std::string Name = "";
@@ -141,6 +147,7 @@ struct DrawUniforms {
 	Map<std::string, int32_t> IntUniforms;
 	Map<std::string, float> FloatUniforms;
 	Map<std::string, TextureSlot> TextureUniforms;
+	Map<std::string, CubemapSlot> CubemapUniforms;
 
 	Map<std::string, glm::vec2> Vec2Uniforms;
 	Map<std::string, glm::vec3> Vec3Uniforms;
@@ -153,8 +160,8 @@ struct DrawUniforms {
 	List<UniformSlot> UniformBuffers;
 
 	operator bool () const {
-		return UniformBuffers
-		|| IntUniforms.size() || FloatUniforms.size() || TextureUniforms.size()
+		return UniformBuffers || IntUniforms.size() || FloatUniforms.size()
+		|| TextureUniforms.size() || CubemapUniforms.size()
 		|| Vec2Uniforms.size() || Vec3Uniforms.size() || Vec4Uniforms.size()
 		|| Mat2Uniforms.size() || Mat3Uniforms.size() || Mat4Uniforms.size();
 	}
@@ -167,6 +174,9 @@ struct DrawUniforms {
 	}
 	void SetInput(const std::string& name, const TextureSlot& data) {
 		TextureUniforms[name] = data;
+	}
+	void SetInput(const std::string& name, const CubemapSlot& data) {
+		CubemapUniforms[name] = data;
 	}
 	void SetInput(const std::string& name, const glm::vec2& data) {
 		Vec2Uniforms[name] = data;

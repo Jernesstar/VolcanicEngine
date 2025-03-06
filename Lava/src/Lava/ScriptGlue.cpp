@@ -33,14 +33,15 @@ static void print(const std::string& str) {
 	std::cout << str << "\n";
 }
 
-void ScriptGlue::Init() {
+static void RegisterStaticFunctions();
+static void RegisterTypes();
+static void RegisterECS();
+
+void ScriptGlue::RegisterInterface() {
 	auto* engine = ScriptEngine::Get();
 
 	RegisterStdString(engine);
 	RegisterScriptHandle(engine);
-
-	engine->RegisterGlobalFunction(
-		"void print(const string &in)", asFUNCTION(print), asCALL_CDECL);
 
 	ScriptEngine::RegisterInterface("IApp")
 		.AddMethod("void OnLoad()")
@@ -52,11 +53,48 @@ void ScriptGlue::Init() {
 		.AddMethod("void OnClose()")
 		.AddMethod("void OnUpdate(float ts)");
 
+	ScriptEngine::RegisterInterface("IEntity")
+		.AddMethod("void OnUpdate(float ts)")
+		// .AddMethod("void OnEvent()")
+		;
+
 	ScriptEngine::RegisterInterface("IUIObject")
 		.AddMethod("void OnClick()")
 		.AddMethod("void OnHover()")
 		.AddMethod("void OnMouseUp()")
 		.AddMethod("void OnMouseDown()");
+
+	RegisterStaticFunctions();
+	RegisterECS();
+
+	engine->RegisterObjectType("Scene", 0, asOBJ_REF | asOBJ_NOCOUNT);
+	engine->RegisterObjectMethod("Scene", "Entity GetEntity(const uint64 &in)",
+		asMETHODPR(ECS::World, GetEntity, (UUID), Entity), asCALL_THISCALL, 0,
+		asOFFSET(Scene, EntityWorld));
+
+	engine->RegisterObjectType("UIElement", 0, asOBJ_REF | asOBJ_NOCOUNT);
+	// engine->RegisterObjectProperty("UIElement", "")
+
+	engine->RegisterObjectType("UIPage", 0, asOBJ_REF | asOBJ_NOCOUNT);
+	engine->RegisterObjectMethod("UIPage", "UIElement@ Get(const string &in)",
+		asMETHODPR(UIPage, Get, (const std::string&) const, UIElement*),
+		asCALL_THISCALL);
+}
+
+void RegisterStaticFunctions() {
+	auto* engine = ScriptEngine::Get();
+
+	engine->RegisterGlobalFunction(
+		"void print(const string &in)", asFUNCTION(print), asCALL_CDECL);
+}
+
+void RegisterTypes() {
+	// Vec
+	// 
+}
+
+void RegisterECS() {
+	auto* engine = ScriptEngine::Get();
 
 	engine->RegisterObjectType("CameraComponent", sizeof(CameraComponent),
 		asOBJ_VALUE | asOBJ_APP_CLASS_MORE_CONSTRUCTORS | asOBJ_POD
@@ -93,18 +131,6 @@ void ScriptGlue::Init() {
 	engine->RegisterObjectMethod("Entity", "bool HasParticleSystemComponent() const",
 		asMETHODPR(Entity, Has<ParticleSystemComponent>, () const, bool), asCALL_THISCALL);
 
-	engine->RegisterObjectType("Scene", 0, asOBJ_REF | asOBJ_NOCOUNT);
-	engine->RegisterObjectMethod("Scene", "Entity GetEntity(const uint64 &in)",
-		asMETHODPR(ECS::World, GetEntity, (UUID), Entity), asCALL_THISCALL, 0,
-		asOFFSET(Scene, EntityWorld));
-
-	engine->RegisterObjectType("UIElement", 0, asOBJ_REF | asOBJ_NOCOUNT);
-	// engine->RegisterObjectProperty("UIElement", "")
-
-	engine->RegisterObjectType("UIPage", 0, asOBJ_REF | asOBJ_NOCOUNT);
-	engine->RegisterObjectMethod("UIPage", "UIElement@ Get(const string &in)",
-		asMETHODPR(UIPage, Get, (const std::string&) const, UIElement*),
-		asCALL_THISCALL);
 }
 
 }

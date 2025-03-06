@@ -85,11 +85,12 @@ struct SkyboxComponent : public Component {
 };
 
 struct ScriptComponent : public Component {
+	Asset ModuleAsset;
 	Ref<Script::ScriptObject> Instance;
 
 	ScriptComponent() = default;
-	ScriptComponent(Ref<Script::ScriptObject> instance)
-		: Instance(instance) { }
+	ScriptComponent(const Asset& asset, Ref<Script::ScriptObject> instance)
+		: ModuleAsset(asset), Instance(instance) { }
 	ScriptComponent(const ScriptComponent& other) = default;
 };
 
@@ -152,16 +153,19 @@ struct SpotlightComponent : public Component {
 };
 
 struct ParticleSystemComponent : public Component {
+	struct Particle { Vec3 Position, Velocity; float Life; };
+
 	Vec3 Position;
 	uint64_t MaxParticleCount;
 	float ParticleLifetime; // In milliseconds
 	Asset ImageAsset;
+	List<Particle> Particles;
 
 	ParticleSystemComponent() = default;
 	ParticleSystemComponent(const Vec3& pos, uint64_t max, float lifetime,
 							const Asset& asset)
 		: Position(pos), MaxParticleCount(max), ParticleLifetime(lifetime),
-			ImageAsset(asset) { }
+			ImageAsset(asset), Particles(max) { }
 	ParticleSystemComponent(const ParticleSystemComponent& other) = default;
 };
 

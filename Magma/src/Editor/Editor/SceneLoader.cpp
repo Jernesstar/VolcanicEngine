@@ -18,10 +18,13 @@
 
 #include <Magma/Scene/Component.h>
 
+#include <Lava/App.h>
+
 #include "EditorApp.h"
 
 using namespace Magma::ECS;
 using namespace Magma::Physics;
+using namespace Lava;
 
 namespace Magma {
 
@@ -177,11 +180,14 @@ void SerializeEntity(YAMLSerializer& serializer, const Entity& entity) {
 		.EndMapping();
 	}
 	if(entity.Has<ScriptComponent>()) {
-		auto obj = entity.Get<ScriptComponent>().Instance;
+		const auto& comp = entity.Get<ScriptComponent>();
+		auto asset = comp.ModuleAsset;
+		auto obj = comp.Instance;
 
 		serializer.WriteKey("ScriptComponent")
 		.BeginMapping()
-			.WriteKey("Class").Write(obj->GetClass()->Name)
+			.WriteKey("ModuleAsset").Write((uint64_t)asset.ID)
+			.WriteKey("Class").Write(obj ? obj->GetClass()->Name : "")
 			.WriteKey("Instance").BeginMapping()
 				// TODO(Implement): Reflection
 			.EndMapping()
@@ -217,8 +223,7 @@ void SerializeEntity(YAMLSerializer& serializer, const Entity& entity) {
 					break;
 			}
 
-			serializer
-				.WriteKey("ShapeType").Write(shapeType);
+			serializer.WriteKey("ShapeType").Write(shapeType);
 		}
 		serializer
 			.EndMapping() // Body
@@ -300,6 +305,7 @@ void DeserializeEntity(YAML::Node entityNode, Scene& scene) {
 	if(name != "")
 		entity.SetName(name);
 
+	auto& assetManager = App::Get()->GetAssetManager();
 	auto components = entityNode["Components"];
 
 	auto cameraComponentNode = components["CameraComponent"];
@@ -370,12 +376,17 @@ void DeserializeEntity(YAML::Node entityNode, Scene& scene) {
 
 	auto scriptComponentNode = components["ScriptComponent"];
 	if(scriptComponentNode) {
+		auto id = scriptComponentNode["ModuleAsset"].as<uint64_t>();
+		Asset asset = { id, AssetType::Script };
 		auto classNode = scriptComponentNode["Class"];
 		std::string className = classNode.as<std::string>();
-		auto _class =
-			Application::As<EditorApp>()->GetEditor()
-			.GetApp()->GetScriptClass(className);
-		entity.Add<ScriptComponent>(_class->Instantiate(entity));
+		if(className != "") {
+			auto mod = assetManager.Get<ScriptModule>(asset);
+			auto _class = mod->GetScriptClass(className);
+			entity.Add<ScriptComponent>(asset, _class->Instantiate(entity));
+		}
+		else
+			entity.Add<ScriptComponent>();
 	}
 
 	auto rigidBodyComponentNode = components["RigidBodyComponent"];
@@ -519,7 +530,8 @@ BinaryWriter& BinaryWriter::WriteObject(const AudioComponent& comp) {
 
 template<>
 BinaryWriter& BinaryWriter::WriteObject(const ScriptComponent& comp) {
-	Write(comp.Instance->GetClass()->Name);
+	Write((uint64_t)comp.ModuleAsset.ID);
+	Write(comp.Instance ? comp.Instance->GetClass()->Name : std::string(""));
 
 	return *this;
 }

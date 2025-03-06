@@ -52,7 +52,7 @@ void Project::Save(const std::string& exportPath) {
 		.BeginMapping()
 			.WriteKey("Name").Write(screen.Name)
 			.WriteKey("Scene").Write(screen.Scene)
-			.WriteKey("UI").Write(screen.Page)
+			.WriteKey("UI").Write(screen.UI)
 		.EndMapping()
 		.EndMapping();
 

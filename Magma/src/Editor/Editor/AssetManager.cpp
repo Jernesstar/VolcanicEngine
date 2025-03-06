@@ -2,6 +2,9 @@
 
 #include <bitset>
 
+#include <angelscript/add_on/scriptbuilder/scriptbuilder.h>
+
+#include <VolcaniCore/Core/Application.h>
 #include <VolcaniCore/Core/FileUtils.h>
 
 #include <Magma/Core/YAMLSerializer.h>
@@ -159,14 +162,14 @@ void EditorAssetManager::Reload() {
 			(rootPath / "Cubemap"),
 			(rootPath / "Font"),
 			(rootPath / "Audio"),
-			(rootPath / "Shader")
+			(rootPath / "Script")
 		};
 
 	uint32_t i = 0;
 	for(auto folder : paths) {
 		for(auto p : FileUtils::GetFiles(folder.string())) {
 			std::string path = p;
-			if(folder.stem() == "Mesh")
+			if(i == 0)
 				path = FileUtils::GetFiles(p, { ".obj" })[0];
 			if(!GetFromPath(path))
 				Add(path, (AssetType)i);
@@ -200,7 +203,7 @@ void EditorAssetManager::Save() {
 		std::string path = GetPath(asset.ID);
 		if(path != "")
 			serializer.WriteKey("Path")
-				.Write(fs::relative(path, rootPath).string());
+				.Write(fs::relative(path, rootPath).generic_string());
 		else {
 			auto& refs = m_References[asset.ID];
 			auto mesh = m_MeshAssets[asset.ID];
@@ -274,15 +277,19 @@ void EditorAssetManager::RuntimeSave(const std::string& path) {
 	fs::create_directories(fs::path(path) / "Asset");
 	fs::create_directories(fs::path(path) / "Asset" / "Mesh");
 	fs::create_directories(fs::path(path) / "Asset" / "Texture");
-	fs::create_directories(fs::path(path) / "Asset" / "Sound");
+	fs::create_directories(fs::path(path) / "Asset" / "Audio");
+	fs::create_directories(fs::path(path) / "Asset" / "Script");
+	fs::create_directories(fs::path(path) / "Asset" / "Shader");
 
+	auto assetPath = fs::path(path) / "Asset";
 	BinaryWriter pack((fs::path(path) / ".volc.assetpk").string());
-	BinaryWriter meshFile((fs::path(path) / "Asset" / "Mesh" / "mesh.bin").string());
-	BinaryWriter textureFile((fs::path(path) / "Asset" / "Texture" / "image.bin").string());
-	BinaryWriter soundFile((fs::path(path) / "Asset" / "Sound" / "sound.bin").string());
+	BinaryWriter meshFile((assetPath / "Mesh" / "mesh.bin").string());
+	BinaryWriter textureFile((assetPath / "Texture" / "image.bin").string());
+	BinaryWriter soundFile((assetPath / "Audio" / "sound.bin").string());
 	
 	pack.Write(std::string("VOLC_PACK"));
 	pack.Write(m_AssetRegistry.size());
+
 	for(auto [asset, _] : m_AssetRegistry) {
 		pack.Write((uint64_t)asset.ID);
 		pack.Write((uint32_t)asset.Type);
@@ -306,8 +313,9 @@ void EditorAssetManager::RuntimeSave(const std::string& path) {
 				}
 			}
 			else {
-
 				// mesh = Get<Mesh>(asset);
+				// meshFile.Write(mesh->SubMeshes);
+				// meshFile.Write()
 			}
 		}
 		else if(asset.Type == AssetType::Texture) {
@@ -324,11 +332,11 @@ void EditorAssetManager::RuntimeSave(const std::string& path) {
 		else if(asset.Type == AssetType::Audio) {
 			pack.Write(soundFile.GetPosition());
 
-			auto sound = Get<Sound>(asset);
-			// soundFile.Write(sound->GetData());
+			Buffer<float> soundData = AssetImporter::GetAudioData(path);
+			soundFile.Write(soundData);
 		}
 		else if(asset.Type == AssetType::Script) {
-
+			// pack.Write()
 		}
 
 		auto& refs = m_References[asset.ID];
@@ -338,6 +346,29 @@ void EditorAssetManager::RuntimeSave(const std::string& path) {
 			pack.Write((uint32_t)ref.Type);
 		}
 	}
+
+	Application::PushDir();
+
+	for(auto name : { "Framebuffer", "Lighting", "Bloom" }) {
+		auto sourceRoot = fs::path("Magma") / "assets" / "shaders" / name;
+		auto source1 = sourceRoot.string() + ".glsl.vert";
+		auto source2 = sourceRoot.string() + ".glsl.frag";
+
+		auto targetRoot = fs::path(path) / "Asset" / "Shader" / name;
+		auto target1 = targetRoot.string() + ".glsl.vert";
+		auto target2 = targetRoot.string() + ".glsl.frag";
+
+		if(FileUtils::FileExists(target1))
+			fs::remove(target1);
+		if(FileUtils::FileExists(source1))
+			fs::copy_file(source1, target1);
+		if(FileUtils::FileExists(target2))
+			fs::remove(target2);
+		if(FileUtils::FileExists(source2))
+			fs::copy_file(source2, target2);
+	}
+
+	Application::PopDir();
 }
 
 }

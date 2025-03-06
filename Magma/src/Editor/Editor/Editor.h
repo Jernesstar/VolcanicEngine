@@ -19,9 +19,10 @@ namespace Magma {
 
 class Editor {
 public:
-	Editor(const CommandLineArgs& args);
+	Editor();
 	~Editor();
-
+	
+	void Load(const CommandLineArgs& args);
 	void Update(TimeStep ts);
 	void Render();
 
@@ -53,6 +54,7 @@ private:
 	void RunProject();
 	void SaveProject();
 	void ExportProject();
+	void ExportProject(const std::string& path);
 };
 
 }

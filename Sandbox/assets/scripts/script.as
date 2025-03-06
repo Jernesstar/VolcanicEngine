@@ -4,8 +4,6 @@ float test(float a, float b)
     return a + b;
 }
 
-namespace UI {
-
 class Button : IUIObject
 {
     // Screen @thisScreen;
@@ -34,6 +32,4 @@ class Button : IUIObject
     {
         print("Mouse down");
     }
-}
-
 }

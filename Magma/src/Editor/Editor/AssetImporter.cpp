@@ -211,10 +211,15 @@ List<SubMesh> AssetImporter::GetMeshData(const std::string& path) {
 	return meshes;
 }
 
+Buffer<float> AssetImporter::GetAudioData(const std::string& path) {
+	auto source = new SoLoud::Wav;
+	VOLCANICORE_ASSERT(source->load(path.c_str()) == 0);
+	Buffer<float> data;
+
+	return data;
+}
 Ref<Sound> AssetImporter::GetAudio(const std::string& path) {
-	// auto source = new SoLoud::Wav;
-	// VOLCANICORE_ASSERT(source->load(path.c_str()) == 0);
-	// return CreateRef<Sound>(source);
+	return CreateRef<Sound>(GetAudioData(path));
 }
 
 }

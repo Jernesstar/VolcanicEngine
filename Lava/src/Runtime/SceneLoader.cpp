@@ -16,10 +16,11 @@
 
 #include <Magma/Scene/Component.h>
 
-#include "Runtime.h"
+#include <Lava/App.h>
 
 using namespace Magma::ECS;
 using namespace Magma::Physics;
+using namespace Lava;
 
 namespace Magma {
 
@@ -110,10 +111,17 @@ static Entity s_CurrentEntity;
 template<>
 BinaryReader& BinaryReader::ReadObject(ScriptComponent& comp) {
 	std::string className;
+	uint64_t id;
+	Read(id);
+	Asset asset{ id, AssetType::Script };
 	Read(className);
-	auto _class =
-		Application::As<Lava::Runtime>()->GetApp()->GetScriptClass(className);
-	comp.Instance = _class->Instantiate(s_CurrentEntity);
+	comp.ModuleAsset = asset;
+	if(className != "") {
+		auto& assetManager = App::Get()->GetAssetManager();
+		auto mod = assetManager.Get<ScriptModule>(asset);
+		auto _class = mod->GetScriptClass(className);
+		comp.Instance = _class->Instantiate(s_CurrentEntity);
+	}
 
 	return *this;
 }
@@ -248,117 +256,5 @@ void SceneLoader::Save(const Scene& scene, const std::string& path) {
 			// writer.Write(entity);
 		});
 }
-
-}
-
-
-namespace YAML {
-
-template<typename T>
-struct convert<List<T>> {
-	static Node encode(const List<T>& list) {
-		Node node;
-		for(auto& val : list)
-			node.push_back(val);
-		node.SetStyle(EmitterStyle::Flow);
-		return node;
-	}
-
-	static bool decode(const Node& node, List<T>& v) {
-		if(!node.IsSequence())
-			return false;
-		for(uint64_t i = 0; i < node.size(); i++)
-			v.Add(node[i].as<T>());
-		return true;
-	}
-};
-
-template<>
-struct convert<glm::vec2> {
-	static Node encode(const glm::vec2& v) {
-		Node node;
-		node.push_back(v.x);
-		node.push_back(v.y);
-		node.SetStyle(EmitterStyle::Flow);
-		return node;
-	}
-
-	static bool decode(const Node& node, glm::vec2& v) {
-		if(!node.IsSequence() || node.size() != 2)
-			return false;
-
-		v.x = node[0].as<float>();
-		v.y = node[1].as<float>();
-		return true;
-	}
-};
-
-template<>
-struct convert<glm::vec3> {
-	static Node encode(const glm::vec3& v) {
-		Node node;
-		node.push_back(v.x);
-		node.push_back(v.y);
-		node.push_back(v.z);
-		node.SetStyle(EmitterStyle::Flow);
-		return node;
-	}
-
-	static bool decode(const Node& node, glm::vec3& v) {
-		if(!node.IsSequence() || node.size() != 3)
-			return false;
-
-		v.x = node[0].as<float>();
-		v.y = node[1].as<float>();
-		v.z = node[2].as<float>();
-		return true;
-	}
-};
-
-template<>
-struct convert<glm::vec4> {
-	static Node encode(const glm::vec4& v) {
-		Node node;
-		node.push_back(v.x);
-		node.push_back(v.y);
-		node.push_back(v.z);
-		node.push_back(v.w);
-		node.SetStyle(EmitterStyle::Flow);
-		return node;
-	}
-
-	static bool decode(const Node& node, glm::vec4& v) {
-		if(!node.IsSequence() || node.size() != 4)
-			return false;
-
-		v.x = node[0].as<float>();
-		v.y = node[1].as<float>();
-		v.z = node[2].as<float>();
-		v.w = node[3].as<float>();
-		return true;
-	}
-};
-
-template<>
-struct convert<VolcaniCore::Vertex> {
-	static Node encode(const VolcaniCore::Vertex& vertex) {
-		Node node;
-		node.push_back(vertex.Position);
-		node.push_back(vertex.Normal);
-		node.push_back(vertex.TexCoord);
-		node.SetStyle(EmitterStyle::Flow);
-		return node;
-	}
-
-	static bool decode(const Node& node, VolcaniCore::Vertex& vertex) {
-		if(!node.IsSequence() || node.size() != 3)
-			return false;
-
-		vertex.Position = node[0].as<glm::vec3>();
-		vertex.Normal	= node[1].as<glm::vec3>();
-		vertex.TexCoord = node[2].as<glm::vec2>();
-		return true;
-	}
-};
 
 }

@@ -1,7 +1,6 @@
 #include "Editor.h"
 
 #include <cstdlib>
-#include <filesystem>
 
 #include <imgui/imgui.h>
 #include <imgui/imgui_internal.h>
@@ -16,13 +15,6 @@
 
 #include <Magma/UI/UIRenderer.h>
 
-#include <Magma/Physics/Physics.h>
-
-#include <Magma/Script/ScriptEngine.h>
-#include <Magma/Script/ScriptModule.h>
-
-#include <Lava/ScriptGlue.h>
-
 #include "Project/ProjectTab.h"
 
 #include "SceneLoader.h"
@@ -30,7 +22,8 @@
 
 using namespace VolcaniCore;
 using namespace Magma::UI;
-using namespace Magma::Physics;
+
+namespace fs = std::filesystem;
 
 namespace Magma {
 struct {
@@ -50,15 +43,19 @@ struct {
 	} tab;
 } static menu;
 
-Editor::Editor(const CommandLineArgs& args) {
-	namespace fs = std::filesystem;
+Editor::Editor() {
 
-	Physics::Init();
-	ScriptEngine::Init();
-	Lava::ScriptGlue::Init();
+}
 
+void Editor::Load(const CommandLineArgs& args) {
 	if(args["--project"]) {
 		NewProject(args["--project"]);
+
+		if(args["--export"]) {
+			ExportProject(args["--export"]);
+			Application::Close();
+		}
+
 		NewTab(CreateRef<ProjectTab>(m_Project.Path));
 	}
 	for(auto& path : args["--scene"])
@@ -69,9 +66,6 @@ Editor::Editor(const CommandLineArgs& args) {
 
 Editor::~Editor() {
 	m_Tabs.Clear();
-
-	// Physics::Close();
-	ScriptEngine::Shutdown();
 }
 
 void Editor::Update(TimeStep ts) {
@@ -229,8 +223,6 @@ void Editor::NewTab() {
 }
 
 void Editor::OpenTab() {
-	namespace fs = std::filesystem;
-
 	IGFD::FileDialogConfig config;
 	config.path = m_Project.Path;
 	auto instance = ImGuiFileDialog::Instance();
@@ -277,12 +269,30 @@ void Editor::NewProject() {
 }
 
 void Editor::NewProject(const std::string& path) {
-	namespace fs = std::filesystem;
-
 	m_Project.Load(path);
-	m_App = CreateRef<Lava::App>(m_Project);
 	m_AssetManager.Load(path);
 	m_AssetManager.Reload();
+	
+	m_App = CreateRef<Lava::App>(m_Project);
+	m_App->SceneLoad =
+		[&](Scene& scene)
+		{
+			auto scenePath = fs::path(path) / "Visual" / "Scene" / scene.Name;
+			SceneLoader::EditorLoad(scene, scenePath.string() + ".magma.scene");
+		};		
+	m_App->UILoad =
+		[&](UIPage& page)
+		{
+			auto uiPath = fs::path(path) / "Visual" / "UI" / page.Name;
+			UILoader::EditorLoad(page, uiPath.string() + ".magma.ui.json", Theme());
+		};
+	m_App->ScreenLoad =
+		[&](Ref<ScriptModule> script)
+		{
+			auto scriptPath =
+				fs::path(path) / "Project" / "Screen" / script->Name;
+			script->Load(scriptPath.string() + ".as");
+		};
 
 	auto themePath =
 		fs::path(path) / "Visual" / "UI" / "theme.magma.ui.json";
@@ -328,8 +338,6 @@ void Editor::SaveProject() {
 }
 
 void Editor::ExportProject() {
-	namespace fs = std::filesystem;
-
 	IGFD::FileDialogConfig config;
 	config.path = ".";
 	auto instance = ImGuiFileDialog::Instance();
@@ -347,48 +355,49 @@ void Editor::ExportProject() {
 	if(exportPath == "")
 		return;
 
-	m_Project.ExportPath = exportPath;
+	ExportProject(exportPath);
+}
 
+void Editor::ExportProject(const std::string& exportPath) {
 	fs::create_directories(exportPath);
-
 	fs::create_directories(fs::path(exportPath) / "Class");
 	fs::create_directories(fs::path(exportPath) / "Scene");
 	fs::create_directories(fs::path(exportPath) / "UI");
 
+	m_Project.ExportPath = exportPath;
+	m_Project.Save((fs::path(exportPath) / ".volc.proj").string());
+
 	for(auto& screen : m_Project.Screens) {
 		auto mod = CreateRef<ScriptModule>(screen.Name);
-		mod->Reload(
+		mod->Load(
 			(fs::path(m_Project.Path) / "Project" / "Screen" / screen.Name
 			).string() + ".as");
 		mod->Save(
 			(fs::path(exportPath) / "Class" / screen.Name).string() + ".class");
 
 		if(screen.Scene != "") {
-			auto scenePath =
+			auto path =
 				fs::path(m_Project.Path) / "Visual" / "Scene" / screen.Scene;
 			Scene scene;
-			SceneLoader::EditorLoad(scene, scenePath.string() + ".magma.scene");
+			SceneLoader::EditorLoad(scene, path.string() + ".magma.scene");
 			SceneLoader::RuntimeSave(scene, m_Project.Path, exportPath);
 		}
-		if(screen.Page != "") {
-			auto uiPath =
-				fs::path(m_Project.Path) / "Visual" / "UI" / screen.Page;
-			UIPage ui;
-			UILoader::EditorLoad(ui, uiPath.string() + ".magma.ui.json",
+		if(screen.UI != "") {
+			auto path = fs::path(m_Project.Path) / "Visual" / "UI" / screen.UI;
+			UIPage uiPage;
+			UILoader::EditorLoad(uiPage, path.string() + ".magma.ui.json",
 								 UITab::GetTheme());
-			UILoader::RuntimeSave(ui, m_Project.Path, exportPath);
+			UILoader::RuntimeSave(uiPage, m_Project.Path, exportPath);
 		}
 	}
 
 	auto mod = CreateRef<ScriptModule>(m_Project.App);
-	mod->Reload(
+	mod->Load(
 		(fs::path(m_Project.Path) / "Project" / "App" / m_Project.App
 		).string() + ".as");
 	mod->Save((fs::path(exportPath) / ".volc.class").string());
 
 	m_AssetManager.RuntimeSave(exportPath);
-
-	m_Project.Save((fs::path(exportPath) / ".volc.proj").string());
 
 	auto runtimeEnv = getenv("VOLC_RUNTIME");
 	VOLCANICORE_ASSERT(runtimeEnv);

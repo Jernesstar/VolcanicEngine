@@ -29,6 +29,7 @@ public:
 	static Ref<Texture> GetTexture(const std::string& path);
 	static Ref<Cubemap> GetCubemap(const std::string& path);
 
+	static Buffer<float> GetAudioData(const std::string& path);
 	static Ref<Sound> GetAudio(const std::string& path);
 };
 

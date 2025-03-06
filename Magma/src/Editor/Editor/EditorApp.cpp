@@ -22,7 +22,7 @@ using namespace Magma::Physics;
 namespace Magma {
 
 EditorApp::EditorApp(const CommandLineArgs& args)
-	: Application(1920, 1080, "Magma Editor"), m_Editor(args)
+	: Application(1920, 1080, "Magma Editor")
 {
 	Events::RegisterListener<KeyPressedEvent>(
 		[](const KeyPressedEvent& event)
@@ -37,6 +37,10 @@ EditorApp::EditorApp(const CommandLineArgs& args)
 
 	ShaderLibrary::Add("Framebuffer",
 		ShaderPipeline::Create("Magma/assets/shaders/", "Framebuffer"));
+	ShaderLibrary::Add("Lighting",
+		ShaderPipeline::Create("Magma/assets/shaders/", "Lighting"));
+	ShaderLibrary::Add("Bloom",
+		ShaderPipeline::Create("Magma/assets/shaders/", "Bloom"));
 
 	float fontSize = 18.0f;
 
@@ -48,6 +52,8 @@ EditorApp::EditorApp(const CommandLineArgs& args)
 			"Magma/assets/fonts/JetBrainsMono-Regular.ttf", fontSize);
 
 	Application::PopDir();
+
+	m_Editor.Load(args);
 }
 
 EditorApp::~EditorApp() {

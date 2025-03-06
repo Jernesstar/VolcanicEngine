@@ -15,7 +15,6 @@
 
 #include "Project/AssetEditorPanel.h"
 
-
 namespace Magma {
 
 ContentBrowserPanel::ContentBrowserPanel(const std::string& path)
@@ -102,8 +101,8 @@ void ContentBrowserPanel::Draw() {
 			int32_t columnCount = (int32_t)(panelWidth / cellSize);
 			columnCount = columnCount ? columnCount : 1;
 
-			auto& editor = Application::As<EditorApp>()->GetEditor();
-			auto& assetManager = editor.GetAssetManager();
+			auto& assetManager =
+				Application::As<EditorApp>()->GetEditor().GetAssetManager();
 
 			if(ImGui::BeginTable("AssetsTable", columnCount))
 			{

@@ -12,11 +12,14 @@
 #include <Magma/Core/BinaryWriter.h>
 #include <Magma/Core/BinaryReader.h>
 
+#include <Lava/App.h>
+
 #include "Runtime.h"
 #include "AssetManager.h"
 
 using namespace Magma;
 using namespace Magma::UI;
+using namespace Lava;
 
 namespace Magma {
 
@@ -30,10 +33,11 @@ static void ReadUI(BinaryReader* reader, UIElement* element) {
 	reader->Read(element->y);
 	reader->Read((uint32_t&)element->xAlignment);
 	reader->Read((uint32_t&)element->yAlignment);
-	reader->Read(element->Color.r);
-	reader->Read(element->Color.g);
-	reader->Read(element->Color.b);
-	reader->Read(element->Color.a);
+	reader->ReadData(&element->Color.r, sizeof(glm::vec4));
+	uint64_t assetID;
+	reader->Read(assetID);
+	element->ModuleID = assetID;
+	reader->Read(element->Class);
 }
 
 template<>
@@ -41,10 +45,7 @@ BinaryReader& BinaryReader::ReadObject(UI::Window& window) {
 	ReadUI(this, &window);
 	Read(window.BorderWidth);
 	Read(window.BorderHeight);
-	Read(window.BorderColor.r);
-	Read(window.BorderColor.g);
-	Read(window.BorderColor.b);
-	Read(window.BorderColor.a);
+	ReadData(&window.BorderColor.r, sizeof(glm::vec4));
 
 	return *this;
 }
@@ -80,9 +81,8 @@ BinaryReader& BinaryReader::ReadObject(UI::Image& image) {
 	ReadUI(this, &image);
 	uint64_t id;
 	Read(id);
-	auto* assetManager =
-		Application::As<Lava::Runtime>()->GetApp()->GetAssetManager();
-	image.Content = assetManager->Get<Texture>(Asset{ id, AssetType::Texture });
+	auto& assetManager = App::Get()->GetAssetManager();
+	image.Content = assetManager.Get<Texture>(Asset{ id, AssetType::Texture });
 
 	return *this;
 }
@@ -118,33 +118,24 @@ BinaryReader& BinaryReader::ReadObject(UI::UINode& node) {
 
 namespace Lava {
 
-Ref<ScriptModule> UILoader::Load(UIPage& page, const std::string& path) {
+void UILoader::Load(UIPage& page, const std::string& path) {
 	namespace fs = std::filesystem;
 
-	// auto pagePath =
-	// 	(fs::path(projectPath) / "UI" / "Data" / page.Name).string() + ".bin";
-	// auto funcPath =
-	// 	(fs::path(projectPath) / "UI" / "Func" / page.Name).string() + ".class";
+	auto pagePath =
+		(fs::path(path) / "UI" / "Data" / page.Name).string() + ".bin";
 
-	// BinaryReader reader(pagePath);
+	BinaryReader reader(pagePath);
 
-	// reader.Read(page.Name);
+	reader.Read(page.Name);
+	reader
+		.Read(page.Windows, "", &page)
+		.Read(page.Buttons, "", &page)
+		.Read(page.Dropdowns, "", &page)
+		.Read(page.Texts, "", &page)
+		.Read(page.TextInputs, "", &page)
+		.Read(page.Images, "", &page);
 
-	// reader
-	// 	.Read(page.Windows, "", &page)
-	// 	.Read(page.Buttons, "", &page)
-	// 	.Read(page.Dropdowns, "", &page)
-	// 	.Read(page.Texts, "", &page)
-	// 	.Read(page.TextInputs, "", &page)
-	// 	.Read(page.Images, "", &page);
-
-	// reader.Read(page.FirstOrders);
-
-	// auto mod = CreateRef<ScriptModule>(page.Name);
-	// mod->Reload(funcPath);
-	// return mod;
-
-	return nullptr;
+	reader.Read(page.FirstOrders);
 }
 
 }

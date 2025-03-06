@@ -7,6 +7,8 @@
 #include <VolcaniCore/Core/List.h>
 #include <VolcaniCore/Core/UUID.h>
 
+#include <Magma/Script/ScriptObject.h>
+
 using namespace VolcaniCore;
 
 namespace Magma::UI {
@@ -46,6 +48,9 @@ public:
 	YAlignment yAlignment = YAlignment::Top;
 	glm::vec4 Color;
 	// TODO(Implement): Border
+	std::string Class;
+	UUID ModuleID;
+	Ref<Script::ScriptObject> ScriptInstance;
 
 public:
 	UIElement(UIElementType type)

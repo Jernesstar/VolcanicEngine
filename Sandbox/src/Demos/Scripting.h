@@ -1,5 +1,9 @@
 #pragma once
 
+#include <iostream>
+
+#include <angelscript/add_on/scriptstdstring/scriptstdstring.h>
+
 #include <VolcaniCore/Core/FileUtils.h>
 
 #include <Magma/Script/ScriptEngine.h>
@@ -26,17 +30,19 @@ private:
 	Ref<ScriptObject> obj;
 };
 
+static void print(const std::string& str) {
+	std::cout << str << "\n";
+}
+
 Script::Script() {
 	Events::RegisterListener<KeyPressedEvent>(
 		[&](const KeyPressedEvent& event)
 		{
 			if(event.Key == Key::Escape)
 				Application::Close();
-			if(event.Key == Key::R)
-				mod->Reload();
 		});
-	Events::RegisterListener<MouseButtonPressedEvent>(
-		[&](const MouseButtonPressedEvent& event)
+	Events::RegisterListener<KeyPressedEvent>(
+		[&](const KeyPressedEvent& event)
 		{
 			obj->Call("OnClick");
 		});
@@ -47,6 +53,11 @@ Script::Script() {
 
 	ScriptEngine::Init();
 
+	RegisterStdString(ScriptEngine::Get());
+
+	ScriptEngine::Get()->RegisterGlobalFunction(
+		"void print(const string &in)", asFUNCTION(print), asCALL_CDECL);
+
 	ScriptEngine::RegisterInterface("IUIObject")
 		.AddMethod("void OnClick()")
 		.AddMethod("void OnHover()")
@@ -54,11 +65,10 @@ Script::Script() {
 		.AddMethod("void OnMouseDown()");
 
 	mod = CreateRef<ScriptModule>("TestScript");
-	mod->Reload("Sandbox/assets/scripts/script.as");
+	mod->Load("Sandbox/assets/scripts/script.as");
 
-	scriptClass = mod->GetScriptClass("UI::Button");
+	scriptClass = mod->GetScriptClass("Button");
 
-	VOLCANICORE_LOG_INFO("Here");
 	obj = scriptClass->Instantiate();
 }
 

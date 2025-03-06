@@ -235,18 +235,39 @@ void SceneHierarchyPanel::DrawEntityNode(Entity& entity) {
 					if(!entity.Has<CameraComponent>()
 					&& ImGui::MenuItem("CameraComponent"))
 						entity.Add<CameraComponent>();
-					if(!entity.Has<MeshComponent>()
-					&& ImGui::MenuItem("MeshComponent"))
-						entity.Add<MeshComponent>();
-					if(!entity.Has<RigidBodyComponent>()
-					&& ImGui::MenuItem("RigidBodyComponent"))
-						entity.Add<RigidBodyComponent>();
+					if(!entity.Has<TagComponent>()
+					&& ImGui::MenuItem("TagComponent"))
+						entity.Add<TagComponent>();
 					if(!entity.Has<TransformComponent>()
 					&& ImGui::MenuItem("TransformComponent"))
 						entity.Add<TransformComponent>();
+					if(!entity.Has<AudioComponent>()
+					&& ImGui::MenuItem("AudioComponent"))
+						entity.Add<AudioComponent>();
+					if(!entity.Has<MeshComponent>()
+					&& ImGui::MenuItem("MeshComponent"))
+						entity.Add<MeshComponent>();
+					if(!entity.Has<SkyboxComponent>()
+					&& ImGui::MenuItem("SkyboxComponent"))
+						entity.Add<SkyboxComponent>();
 					if(!entity.Has<ScriptComponent>()
 					&& ImGui::MenuItem("ScriptComponent"))
 						entity.Add<ScriptComponent>();
+					if(!entity.Has<RigidBodyComponent>()
+					&& ImGui::MenuItem("RigidBodyComponent"))
+						entity.Add<RigidBodyComponent>();
+					if(!entity.Has<DirectionalLightComponent>()
+					&& ImGui::MenuItem("DirectionalLightComponent"))
+						entity.Add<DirectionalLightComponent>();
+					if(!entity.Has<PointLightComponent>()
+					&& ImGui::MenuItem("PointLightComponent"))
+						entity.Add<PointLightComponent>();
+					if(!entity.Has<SpotlightComponent>()
+					&& ImGui::MenuItem("SpotlightComponent"))
+						entity.Add<SpotlightComponent>();
+					if(!entity.Has<ParticleSystemComponent>()
+					&& ImGui::MenuItem("ParticleSystemComponent"))
+						entity.Add<ParticleSystemComponent>();
 
 					ImGui::EndMenu();
 				}
@@ -254,19 +275,40 @@ void SceneHierarchyPanel::DrawEntityNode(Entity& entity) {
 				if(ImGui::BeginMenu("Delete")) {
 					if(entity.Has<CameraComponent>()
 					&& ImGui::MenuItem("CameraComponent"))
-						entity.Remove<CameraComponent>();
-					if(entity.Has<MeshComponent>()
-					&& ImGui::MenuItem("MeshComponent"))
-						entity.Remove<MeshComponent>();
-					if(entity.Has<RigidBodyComponent>()
-					&& ImGui::MenuItem("RigidBodyComponent"))
-						entity.Remove<RigidBodyComponent>();
+						entity.Add<CameraComponent>();
+					if(entity.Has<TagComponent>()
+					&& ImGui::MenuItem("TagComponent"))
+						entity.Add<TagComponent>();
 					if(entity.Has<TransformComponent>()
 					&& ImGui::MenuItem("TransformComponent"))
-						entity.Remove<TransformComponent>();
+						entity.Add<TransformComponent>();
+					if(entity.Has<AudioComponent>()
+					&& ImGui::MenuItem("AudioComponent"))
+						entity.Add<AudioComponent>();
+					if(entity.Has<MeshComponent>()
+					&& ImGui::MenuItem("MeshComponent"))
+						entity.Add<MeshComponent>();
+					if(entity.Has<SkyboxComponent>()
+					&& ImGui::MenuItem("SkyboxComponent"))
+						entity.Add<SkyboxComponent>();
 					if(entity.Has<ScriptComponent>()
 					&& ImGui::MenuItem("ScriptComponent"))
-						entity.Remove<ScriptComponent>();
+						entity.Add<ScriptComponent>();
+					if(entity.Has<RigidBodyComponent>()
+					&& ImGui::MenuItem("RigidBodyComponent"))
+						entity.Add<RigidBodyComponent>();
+					if(entity.Has<DirectionalLightComponent>()
+					&& ImGui::MenuItem("DirectionalLightComponent"))
+						entity.Add<DirectionalLightComponent>();
+					if(entity.Has<PointLightComponent>()
+					&& ImGui::MenuItem("PointLightComponent"))
+						entity.Add<PointLightComponent>();
+					if(entity.Has<SpotlightComponent>()
+					&& ImGui::MenuItem("SpotlightComponent"))
+						entity.Add<SpotlightComponent>();
+					if(entity.Has<ParticleSystemComponent>()
+					&& ImGui::MenuItem("ParticleSystemComponent"))
+						entity.Add<ParticleSystemComponent>();
 
 					ImGui::EndMenu();
 				}
