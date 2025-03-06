@@ -10,11 +10,11 @@ class PlayerController : IEntity
 
     void OnUpdate(float ts)
     {
-        ref component = handle.GetTransformComponent();
+        // ref component = handle.GetTransformComponent();
 
-        if(Input.KeyPressed(Key::Left))
-            component.Translation.x -= 4.0 * ts;
-        if(Input.KeyPressed(Key::Right))
-            component.Translation.x += 4.0 * ts;
+        // if(Input.KeyPressed(Key::Left))
+        //     component.Translation.x -= 4.0 * ts;
+        // if(Input.KeyPressed(Key::Right))
+        //     component.Translation.x += 4.0 * ts;
     }
 }

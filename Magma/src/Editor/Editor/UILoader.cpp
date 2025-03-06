@@ -40,8 +40,6 @@ void UILoader::EditorLoad(UIPage& page, const std::string& path,
 	}
 
 	auto name = fs::path(path).stem().stem().stem().string();
-	auto funcFolder = (fs::path(path).parent_path() / "Func").string();
-	auto funcPath = funcFolder + ".magma.ui.func";
 	if(!FileUtils::FileExists(path)) {
 		VOLCANICORE_LOG_ERROR(
 			"Could not find .magma.ui.json file with name %s", name.c_str());
@@ -184,7 +182,9 @@ void Serialize(const UIElement* ui, JSONSerializer& serializer) {
 							return "None";
 					}
 				}())
-		.WriteKey("Color").Write(ui->Color);
+		.WriteKey("Color").Write(ui->Color)
+		.WriteKey("ModuleID").Write((uint64_t)ui->ModuleID)
+		.WriteKey("Class").Write(ui->Class);
 
 	switch(ui->GetType()) {
 		case UIElementType::Window:
@@ -312,6 +312,13 @@ Theme UILoader::LoadTheme(const std::string& path) {
 
 namespace Magma {
 
+template<>
+BinaryWriter& BinaryWriter::WriteObject(const UI::UINode& node) {
+	Write((uint32_t)node.first);
+	Write(node.second);
+	return *this;
+}
+
 static void WriteUI(BinaryWriter* writer, const UIElement* element) {
 	writer->Write(element->GetID());
 	writer->Write(element->Width);
@@ -321,6 +328,7 @@ static void WriteUI(BinaryWriter* writer, const UIElement* element) {
 	writer->Write((uint32_t)element->xAlignment);
 	writer->Write((uint32_t)element->yAlignment);
 	writer->WriteData(&element->Color.r, sizeof(glm::vec4));
+	writer->Write(element->Children);
 	writer->Write((uint64_t)element->ModuleID);
 	writer->Write(element->Class);
 }
@@ -373,19 +381,13 @@ template<>
 BinaryWriter& BinaryWriter::WriteObject(const UI::Button& button) {
 	WriteUI(this, &button);
 	auto display = button.Display;
-	Write(display->Is(UI::UIElementType::Text));
-	if(display->Is(UI::UIElementType::Text))
+	bool isText = display->Is(UI::UIElementType::Text);
+	Write(isText);
+	if(isText)
 		Write(*display->As<UI::Text>());
 	else
 		Write(*display->As<UI::Image>());
 
-	return *this;
-}
-
-template<>
-BinaryWriter& BinaryWriter::WriteObject(const UI::UINode& node) {
-	Write((uint32_t)node.first);
-	Write(node.second);
 	return *this;
 }
 
@@ -396,15 +398,10 @@ namespace Magma {
 void UILoader::RuntimeSave(const UIPage& page, const std::string& projectPath,
 						   const std::string& exportPath)
 {
-	auto pagePath =
-		(fs::path(projectPath) / "Visual" / "UI" / page.Name
-		).string() + ".magma.ui.json";
-
 	auto dataPath = (fs::path(exportPath) / "UI" / page.Name).string() + ".bin";
 	BinaryWriter writer(dataPath);
 
 	writer.Write(page.Name);
-
 	writer
 		.Write(page.Windows)
 		.Write(page.Buttons)
@@ -571,6 +568,11 @@ void LoadElement(UIPage& page, const rapidjson::Value& elementNode,
 				elementNode["Color"][2].Get<float>(),
 				elementNode["Color"][3].Get<float>()
 			};
+
+	if(elementNode.HasMember("ModuleID"))
+		element->ModuleID = elementNode["ModuleID"].Get<uint64_t>();
+	if(elementNode.HasMember("Class"))
+		element->Class = elementNode["Class"].Get<std::string>();
 }
 
 }

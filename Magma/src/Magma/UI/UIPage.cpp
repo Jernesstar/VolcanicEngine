@@ -133,6 +133,45 @@ void UIPage::Add(const UINode& node) {
 	FirstOrders.Add(node);
 }
 
+void UIPage::Delete(const UINode& node) {
+	switch(node.first) {
+		case UIElementType::Window:
+		{
+			Windows.Pop(node.second);
+			break;
+		}
+		case UIElementType::Button:
+		{
+			Buttons.Pop(node.second);
+			break;
+		}
+		case UIElementType::Dropdown:
+		{
+			Dropdowns.Pop(node.second);
+			break;
+		}
+		case UIElementType::Text:
+		{
+			Texts.Pop(node.second);
+			break;
+		}
+		case UIElementType::TextInput:
+		{
+			TextInputs.Pop(node.second);
+			break;
+		}
+		case UIElementType::Image:
+		{
+			Images.Pop(node.second);
+			break;
+		}
+	}
+}
+
+void UIPage::Delete(const std::string& id) {
+
+}
+
 void UIPage::Clear() {
 	FirstOrders.Clear();
 	Windows.Clear();

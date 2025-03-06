@@ -67,7 +67,7 @@ Script::Script() {
 	mod = CreateRef<ScriptModule>("TestScript");
 	mod->Load("Sandbox/assets/scripts/script.as");
 
-	scriptClass = mod->GetScriptClass("Button");
+	scriptClass = mod->GetClass("Button");
 
 	obj = scriptClass->Instantiate();
 }

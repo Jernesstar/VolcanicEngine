@@ -22,9 +22,10 @@ public:
 	void Load(const std::string& path);
 	void Save(const std::string& path);
 
-	Ref<ScriptClass> GetScriptClass(const std::string& name);
+	Ref<ScriptClass> GetClass(const std::string& name) const;
+	const auto& GetClasses() const { return m_Classes; }
 
-	asIScriptContext* GetContext() { return m_Ctx; }
+	asIScriptContext* GetContext() const { return m_Ctx; }
 
 private:
 	asIScriptModule* m_Handle;

@@ -21,7 +21,19 @@ using namespace Magma;
 using namespace Magma::UI;
 using namespace Lava;
 
+static UIPage* s_CurrentPage;
+
 namespace Magma {
+
+template<>
+BinaryReader& BinaryReader::ReadObject(UI::UINode& node) {
+	uint32_t type;
+	Read(type);
+	node.first = (UI::UIElementType)type;
+	Read(node.second);
+
+	return *this;
+}
 
 static void ReadUI(BinaryReader* reader, UIElement* element) {
 	std::string id;
@@ -31,9 +43,13 @@ static void ReadUI(BinaryReader* reader, UIElement* element) {
 	reader->Read(element->Height);
 	reader->Read(element->x);
 	reader->Read(element->y);
-	reader->Read((uint32_t&)element->xAlignment);
-	reader->Read((uint32_t&)element->yAlignment);
+	uint32_t xAlign, yAlign;
+	reader->Read(xAlign);
+	reader->Read(yAlign);
+	element->xAlignment = (XAlignment)xAlign;
+	element->yAlignment = (YAlignment)yAlign;
 	reader->ReadData(&element->Color.r, sizeof(glm::vec4));
+	reader->Read(element->Children);
 	uint64_t assetID;
 	reader->Read(assetID);
 	element->ModuleID = assetID;
@@ -93,23 +109,15 @@ BinaryReader& BinaryReader::ReadObject(UI::Button& button) {
 	bool isText;
 	Read(isText);
 	if(isText) {
-		auto display = CreateRef<UI::Text>();
+		auto display = CreateRef<UI::Text>("", s_CurrentPage);
 		Read(*display);
 		button.Display = display;
 	}
 	else {
-		auto display = CreateRef<UI::Image>();
+		auto display = CreateRef<UI::Image>("", s_CurrentPage);
 		Read(*display);
 		button.Display = display;
 	}
-
-	return *this;
-}
-
-template<>
-BinaryReader& BinaryReader::ReadObject(UI::UINode& node) {
-	Read((uint32_t&)node.first);
-	Read(node.second);
 
 	return *this;
 }
@@ -121,11 +129,9 @@ namespace Lava {
 void UILoader::Load(UIPage& page, const std::string& path) {
 	namespace fs = std::filesystem;
 
-	auto pagePath =
-		(fs::path(path) / "UI" / "Data" / page.Name).string() + ".bin";
+	BinaryReader reader(path);
 
-	BinaryReader reader(pagePath);
-
+	s_CurrentPage = &page;
 	reader.Read(page.Name);
 	reader
 		.Read(page.Windows, "", &page)
@@ -136,6 +142,7 @@ void UILoader::Load(UIPage& page, const std::string& path) {
 		.Read(page.Images, "", &page);
 
 	reader.Read(page.FirstOrders);
+	s_CurrentPage = nullptr;
 }
 
 }

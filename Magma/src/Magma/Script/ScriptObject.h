@@ -26,9 +26,7 @@ public:
 		func.CallVoid(std::forward<Args>(args)...);
 	}
 
-	ScriptClass* GetClass() {
-		return m_Class;
-	}
+	const ScriptClass* GetClass() const { return m_Class; }
 
 private:
 	uint32_t AddRef();
@@ -41,7 +39,7 @@ private:
 	asIScriptObject* m_Handle = nullptr;
 	int m_RefCount;
 
-	ScriptClass* m_Class;
+	const ScriptClass* m_Class;
 
 	friend class ScriptClass;
 };

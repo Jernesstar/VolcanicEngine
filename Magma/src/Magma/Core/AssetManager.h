@@ -60,6 +60,8 @@ public:
 	virtual ~AssetManager() = default;
 
 	bool IsLoaded(Asset asset) {
+		if(!m_AssetRegistry.count(asset))
+			return false;
 		return m_AssetRegistry[asset];
 	}
 	virtual void Load(Asset asset) = 0;

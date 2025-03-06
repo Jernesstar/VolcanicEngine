@@ -17,13 +17,8 @@
             "x": 20,
             "y": 20,
             "Color": [0.0, 0.0, 0.0, 1.0],
-
-            "OnUpdate": "Default",
-            "OnClick": "@script{ print(\"Coming from Button1\"); }",
-            "OnMouseUp": {
-                "Speed": 0.4,
-                "Translate": -2
-            }
+            "ModuleID": 9099402520052546251,
+            "Class": "Button1"
         }
     ]
 }

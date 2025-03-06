@@ -21,7 +21,7 @@ public:
 	void SetInstanceMethod(const List<std::string>& args);
 
 	template<typename... Args>
-	Ref<ScriptObject> Instantiate(Args&&... args) {
+	Ref<ScriptObject> Instantiate(Args&&... args) const {
 		ScriptFunc func = GetFunc();
 		asIScriptObject* obj =
 			func.CallReturn<asIScriptObject*>(std::forward<Args>(args)...);
@@ -32,12 +32,12 @@ public:
 		return newObj;
 	}
 
-	asIScriptFunction* GetFunction(const std::string& name);
+	asIScriptFunction* GetFunction(const std::string& name) const;
 
-	ScriptModule* GetModule() { return m_Module; }
+	ScriptModule* GetModule() const { return m_Module; }
 
 private:
-	ScriptFunc GetFunc();
+	ScriptFunc GetFunc() const;
 
 private:
 	asITypeInfo* m_Type;

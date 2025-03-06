@@ -60,6 +60,11 @@ void ScriptModule::Load(const std::string& path) {
 
 	auto* engine = ScriptEngine::Get();
 
+	if(!fs::exists(path)) {
+		VOLCANICORE_LOG_WARNING("File '%s' does not exist", path.c_str());
+		return;
+	}
+
 	if(fs::path(path).extension() == ".as") {
 		CScriptBuilder builder;
 		builder.StartNewModule(engine, Name.c_str());
@@ -87,10 +92,10 @@ void ScriptModule::Save(const std::string& path) {
 	m_Handle->SaveByteCode(&stream, true);
 }
 
-Ref<ScriptClass> ScriptModule::GetScriptClass(const std::string& name) {
+Ref<ScriptClass> ScriptModule::GetClass(const std::string& name) const {
 	if(!m_Classes.count(name))
 		return nullptr;
-	return m_Classes[name];
+	return m_Classes.at(name);
 }
 
 }

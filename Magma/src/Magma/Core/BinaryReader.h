@@ -52,6 +52,7 @@ public:
 	BinaryReader& Read(List<TData>& values, Args&&... args) {
 		uint64_t size;
 		ReadRaw<uint64_t>(size);
+		values.Allocate(size);
 		for(uint64_t i = 0; i < size; i++)
 			Read(values.Emplace(std::forward<Args>(args)...));
 
@@ -62,6 +63,7 @@ public:
 	BinaryReader& Read(Map<TKey, TValue>& map) {
 		uint64_t size;
 		ReadRaw<uint64_t>(size);
+		map.reserve(size);
 
 		for(uint64_t i = 0; i < size; i++) {
 			TKey key;

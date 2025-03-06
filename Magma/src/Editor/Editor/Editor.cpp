@@ -53,6 +53,7 @@ void Editor::Load(const CommandLineArgs& args) {
 
 		if(args["--export"]) {
 			ExportProject(args["--export"]);
+			VOLCANICORE_LOG_INFO("Exported project successfully");
 			Application::Close();
 		}
 
@@ -268,34 +269,33 @@ void Editor::NewProject() {
 	Application::GetWindow()->SetTitle("Magma Editor");
 }
 
-void Editor::NewProject(const std::string& path) {
-	m_Project.Load(path);
-	m_AssetManager.Load(path);
+void Editor::NewProject(const std::string& volcPath) {
+	m_Project.Load(volcPath);
+	m_AssetManager.Load(volcPath);
 	m_AssetManager.Reload();
-	
+	auto rootPath = fs::path(volcPath).parent_path();
+
 	m_App = CreateRef<Lava::App>(m_Project);
 	m_App->SceneLoad =
 		[&](Scene& scene)
 		{
-			auto scenePath = fs::path(path) / "Visual" / "Scene" / scene.Name;
+			auto scenePath = rootPath / "Visual" / "Scene" / scene.Name;
 			SceneLoader::EditorLoad(scene, scenePath.string() + ".magma.scene");
 		};		
 	m_App->UILoad =
 		[&](UIPage& page)
 		{
-			auto uiPath = fs::path(path) / "Visual" / "UI" / page.Name;
+			auto uiPath = rootPath / "Visual" / "UI" / page.Name;
 			UILoader::EditorLoad(page, uiPath.string() + ".magma.ui.json", Theme());
 		};
 	m_App->ScreenLoad =
 		[&](Ref<ScriptModule> script)
 		{
-			auto scriptPath =
-				fs::path(path) / "Project" / "Screen" / script->Name;
+			auto scriptPath = rootPath / "Project" / "Screen" / script->Name;
 			script->Load(scriptPath.string() + ".as");
 		};
 
-	auto themePath =
-		fs::path(path) / "Visual" / "UI" / "theme.magma.ui.json";
+	auto themePath = rootPath / "Visual" / "UI" / "theme.magma.ui.json";
 	if(fs::exists(themePath))
 		UITab::GetTheme() = UILoader::LoadTheme(themePath.string());
 }
@@ -324,10 +324,10 @@ void Editor::RunProject() {
 	std::string command;
 #ifdef VOLCANICENGINE_WINDOWS
 	command = ".\\build\\Lava\\bin\\Runtime --project ";
-	command += m_Project.Path + "\\.magma.proj";
+	command += m_Project.ExportPath + "\\.volc.proj";
 #elif VOLCANICENGINE_LINUX
 	command = "./build/Lava/bin/Runtime --project ";
-	command += m_Project.Path + "/.magma.proj";
+	command += m_Project.ExportPath + "/.volc.proj";
 #endif
 	system(command.c_str());
 }

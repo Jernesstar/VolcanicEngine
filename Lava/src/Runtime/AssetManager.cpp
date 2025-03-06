@@ -32,6 +32,10 @@ BinaryReader& BinaryReader::ReadObject(SubMesh& mesh) {
 namespace Lava {
 
 void RuntimeAssetManager::Load(Asset asset) {
+	if(IsLoaded(asset))
+		return;
+
+	m_AssetRegistry[asset] = true;
 	uint64_t offset = m_AssetOffsets[asset.ID];
 
 	if(asset.Type == AssetType::Mesh) {
@@ -63,8 +67,10 @@ void RuntimeAssetManager::Load(Asset asset) {
 		reader.Read(width);
 		reader.Read(height);
 		reader.Read(data);
+
 		Ref<Texture> texture = Texture::Create(width, height);
 		texture->SetData(data);
+
 		m_TextureAssets[asset.ID] = texture;
 	}
 	else if(asset.Type == AssetType::Cubemap) {
@@ -74,11 +80,25 @@ void RuntimeAssetManager::Load(Asset asset) {
 
 	}
 	else if(asset.Type == AssetType::Script) {
-		
+		BinaryReader reader("Asset/Script/script.bin");
+		std::string name;
+		reader.SetPosition(offset);
+		reader.Read(name);
+
+		auto path = "Asset/Script/" + name + ".class";
+		Ref<ScriptModule> mod = CreateRef<ScriptModule>(name);
+		mod->Load(path);
+
+		m_ScriptAssets[asset.ID] = mod;
 	}
 }
 
 void RuntimeAssetManager::Unload(Asset asset) {
+	if(!IsLoaded(asset))
+		return;
+
+	m_AssetRegistry[asset] = false;
+	uint64_t offset = m_AssetOffsets[asset.ID];
 
 }
 
@@ -91,7 +111,6 @@ void RuntimeAssetManager::Load() {
 
 	uint64_t count;
 	reader.Read(count);
-
 	for(uint64_t i = 0; i < count; i++) {
 		uint64_t id;
 		uint32_t typeInt;
@@ -105,6 +124,9 @@ void RuntimeAssetManager::Load() {
 
 		uint64_t refCount;
 		reader.Read(refCount);
+		if(!refCount)
+			continue;
+
 		m_References[asset.ID].Allocate(refCount);
 		for(uint64_t i = 0; i < refCount; i++) {
 			uint64_t refID;

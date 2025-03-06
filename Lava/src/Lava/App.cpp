@@ -40,13 +40,20 @@ static Ref<ScriptObject> s_AppObject;
 struct RuntimeScreen {
 	Scene World;
 	UIPage UI;
-	Ref<ScriptModule> ScreenModule;
-	Ref<ScriptObject> ScreenObject;
+	Ref<ScriptModule> Script;
+	Ref<ScriptObject> ScriptObj;
 
 	RuntimeScreen(const Screen& screen)
 		: World(screen.Scene), UI(screen.UI)
 	{
-		ScreenModule = CreateRef<ScriptModule>(screen.Name);
+		Script = CreateRef<ScriptModule>(screen.Name);
+	}
+
+	~RuntimeScreen() {
+		ScriptObj->Call("OnClose");
+
+		ScriptObj.reset();
+		Script.reset();
 	}
 };
 
@@ -55,11 +62,12 @@ static RuntimeScreen* s_Screen = nullptr;
 App::App(const Project& project)
 	: m_Project(project)
 {
+	s_Instance = this;
+
+	Physics::Init();
 	ScriptEngine::Init();
 	ScriptGlue::RegisterInterface();
-	Physics::Init();
 
-	s_Instance = this;
 	ScriptEngine::RegisterSingleton("AppClass", "App", this);
 
 	ScriptEngine::RegisterMethod<App>(
@@ -74,24 +82,25 @@ App::App(const Project& project)
 }
 
 App::~App() {
-	// Physics::Close();
 	// ScriptGlue::Close();
 	ScriptEngine::Shutdown();
+	// Physics::Close();
 }
 
 void App::OnLoad() {
+	Application::GetWindow()->SetTitle(m_Project.Name);
+
 	s_AppModule = CreateRef<ScriptModule>(m_Project.App);
 	s_AppModule->Load("./.volc.class");
 
-	s_AppObject = s_AppModule->GetScriptClass(m_Project.App)->Instantiate();
+	s_AppObject = s_AppModule->GetClass(m_Project.App)->Instantiate();
 	s_AppObject->Call("OnLoad");
 
-	Application::GetWindow()->SetTitle(m_Project.Name);
 	SetScreen(m_Project.StartScreen);
 }
 
 void App::OnClose() {
-	UIRenderer::Close();
+	delete s_Screen;
 
 	s_AppObject->Call("OnClose");
 
@@ -114,7 +123,7 @@ void App::OnUpdate(TimeStep ts) {
 		{
 			if(state == TraversalStage::Begin) {
 				element->Draw();
-				
+
 				auto object = element->ScriptInstance;
 				if(!object)
 					return;
@@ -145,6 +154,8 @@ void App::SetScreen(const std::string& name) {
 		Running = false;
 		return;
 	}
+	if(name == "")
+		return;
 
 	auto [found, idx] =
 		m_Project.Screens.Find(
@@ -163,33 +174,33 @@ void App::SetScreen(const std::string& name) {
 	delete s_Screen;
 	s_Screen = new RuntimeScreen(screen);
 
-	ScreenLoad(s_Screen->ScreenModule);
+	ScreenLoad(s_Screen->Script);
 	if(screen.Scene != "")
 		SceneLoad(s_Screen->World);
 	if(screen.UI != "")
 		UILoad(s_Screen->UI);
 
-	// auto scriptClass = s_Screen->ScreenModule->GetScriptClass(name);
-	// scriptClass->SetInstanceMethod({ "Scene @scene", "UIPage @page" });
-	// s_Screen->ScreenObject =
-	// 	scriptClass->Instantiate(s_Screen->World, s_Screen->UI);
-	// s_Screen->ScreenObject->Call("OnLoad");
+	auto scriptClass = s_Screen->Script->GetClass(name);
+	s_Screen->ScriptObj =
+		scriptClass->Instantiate(s_Screen->World, s_Screen->UI);
+	s_Screen->ScriptObj->Call("OnLoad");
 
 	s_Screen->UI.Traverse(
 		[&](UIElement* element)
 		{
-			// Asset asset = { element->ModuleID, AssetType::Script };
-			// auto mod = m_AssetManager->Get<ScriptModule>(asset);
-			// Ref<ScriptClass> _class = mod->GetScriptClass(element->Class);
-			// scriptClass->SetInstanceMethod({ "const string &id" });
+			if(!element->ModuleID || element->Class == "")
+				return;
 
-			// if(!_class)
-			// 	return;
+			Asset asset = { element->ModuleID, AssetType::Script };
+			m_AssetManager->Load(asset);
+			auto mod = m_AssetManager->Get<ScriptModule>(asset);
+			Ref<ScriptClass> _class = mod->GetClass(element->Class);
 
-			// element->ScriptInstance = _class->Instantiate();
+			if(!_class)
+				return;
+
+			element->ScriptInstance = _class->Instantiate(element->GetID());
 		});
-
-	VOLCANICORE_LOG_INFO("Here");
 }
 
 void App::PushScreen(const std::string& name) {

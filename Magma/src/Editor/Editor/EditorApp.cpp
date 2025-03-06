@@ -39,8 +39,8 @@ EditorApp::EditorApp(const CommandLineArgs& args)
 		ShaderPipeline::Create("Magma/assets/shaders/", "Framebuffer"));
 	ShaderLibrary::Add("Lighting",
 		ShaderPipeline::Create("Magma/assets/shaders/", "Lighting"));
-	ShaderLibrary::Add("Bloom",
-		ShaderPipeline::Create("Magma/assets/shaders/", "Bloom"));
+	// ShaderLibrary::Add("Bloom",
+	// 	ShaderPipeline::Create("Magma/assets/shaders/", "Bloom"));
 
 	float fontSize = 18.0f;
 

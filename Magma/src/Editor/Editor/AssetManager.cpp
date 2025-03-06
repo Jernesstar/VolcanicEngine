@@ -14,6 +14,8 @@
 
 #include "AssetImporter.h"
 
+namespace fs = std::filesystem;
+
 namespace Magma {
 
 EditorAssetManager::EditorAssetManager() {
@@ -25,8 +27,13 @@ EditorAssetManager::~EditorAssetManager() {
 }
 
 void EditorAssetManager::Load(Asset asset) {
+	if(IsLoaded(asset))
+		return;
+
 	std::string path = GetPath(asset.ID);
 	m_AssetRegistry[asset] = true;
+	if(path == "")
+		return;
 
 	if(asset.Type == AssetType::Mesh)
 		m_MeshAssets[asset.ID] = AssetImporter::GetMesh(path);
@@ -36,9 +43,18 @@ void EditorAssetManager::Load(Asset asset) {
 		m_CubemapAssets[asset.ID] = AssetImporter::GetCubemap(path);
 	else if(asset.Type == AssetType::Audio)
 		m_AudioAssets[asset.ID] = AssetImporter::GetAudio(path);
+	else if(asset.Type == AssetType::Script) {
+		auto name = fs::path(path).filename().stem().string();
+		Ref<ScriptModule> mod = CreateRef<ScriptModule>(name);
+		mod->Load(path);
+		m_ScriptAssets[asset.ID] = mod;
+	}
 }
 
 void EditorAssetManager::Unload(Asset asset) {
+	if(!IsLoaded(asset))
+		return;
+
 	std::string path = m_Paths[asset.ID];
 	m_AssetRegistry[asset] = false;
 
@@ -62,7 +78,7 @@ Asset EditorAssetManager::Add(const std::string& path, AssetType type) {
 
 UUID EditorAssetManager::GetFromPath(const std::string& path) {
 	for(auto [id, assetPath] : m_Paths)
-		if(path == assetPath)
+		if(fs::path(path) == fs::path(assetPath))
 			return id;
 
 	return 0;
@@ -105,7 +121,6 @@ void EditorAssetManager::Load(const std::string& path) {
 
 		if(node["Path"])
 			m_Paths[id] = (rootPath / node["Path"].as<std::string>()).string();
-
 		if(asset.Type == AssetType::Mesh) {
 			if(node["Path"]) {
 				auto materials = AssetImporter::GetMeshMaterials(m_Paths[id]);
@@ -162,7 +177,8 @@ void EditorAssetManager::Reload() {
 			(rootPath / "Cubemap"),
 			(rootPath / "Font"),
 			(rootPath / "Audio"),
-			(rootPath / "Script")
+			(rootPath / "Script"),
+			(rootPath / "Shader")
 		};
 
 	uint32_t i = 0;
@@ -271,22 +287,23 @@ BinaryWriter& BinaryWriter::WriteObject(const SubMesh& mesh) {
 
 namespace Magma {
 
-void EditorAssetManager::RuntimeSave(const std::string& path) {
+void EditorAssetManager::RuntimeSave(const std::string& exportPath) {
 	namespace fs = std::filesystem;
 
-	fs::create_directories(fs::path(path) / "Asset");
-	fs::create_directories(fs::path(path) / "Asset" / "Mesh");
-	fs::create_directories(fs::path(path) / "Asset" / "Texture");
-	fs::create_directories(fs::path(path) / "Asset" / "Audio");
-	fs::create_directories(fs::path(path) / "Asset" / "Script");
-	fs::create_directories(fs::path(path) / "Asset" / "Shader");
+	auto assetPath = fs::path(exportPath) / "Asset";
+	fs::create_directories(assetPath);
+	fs::create_directories(assetPath / "Mesh");
+	fs::create_directories(assetPath / "Texture");
+	fs::create_directories(assetPath / "Audio");
+	fs::create_directories(assetPath / "Script");
+	fs::create_directories(assetPath / "Shader");
 
-	auto assetPath = fs::path(path) / "Asset";
-	BinaryWriter pack((fs::path(path) / ".volc.assetpk").string());
+	BinaryWriter pack((fs::path(exportPath) / ".volc.assetpk").string());
 	BinaryWriter meshFile((assetPath / "Mesh" / "mesh.bin").string());
 	BinaryWriter textureFile((assetPath / "Texture" / "image.bin").string());
 	BinaryWriter soundFile((assetPath / "Audio" / "sound.bin").string());
-	
+	BinaryWriter scriptFile((assetPath / "Script" / "script.bin").string());
+
 	pack.Write(std::string("VOLC_PACK"));
 	pack.Write(m_AssetRegistry.size());
 
@@ -305,7 +322,7 @@ void EditorAssetManager::RuntimeSave(const std::string& path) {
 					AssetImporter::GetMeshMaterials(m_Paths[asset.ID]);
 				for(auto mat : materials) {
 					std::bitset<3> flags;
-					
+
 					flags |= (mat[0] != "") << 0; // Diffuse
 					flags |= (mat[1] != "") << 1; // Specular
 					flags |= (mat[2] != "") << 2; // Emissive
@@ -332,19 +349,32 @@ void EditorAssetManager::RuntimeSave(const std::string& path) {
 		else if(asset.Type == AssetType::Audio) {
 			pack.Write(soundFile.GetPosition());
 
-			Buffer<float> soundData = AssetImporter::GetAudioData(path);
-			soundFile.Write(soundData);
+			// Buffer<float> soundData = AssetImporter::GetAudioData(path);
+			// soundFile.Write(soundData);
 		}
 		else if(asset.Type == AssetType::Script) {
-			// pack.Write()
+			pack.Write(scriptFile.GetPosition());
+
+			Load(asset);
+			auto mod = Get<ScriptModule>(asset);
+			auto outputPath = assetPath / "Script" / mod->Name;
+			mod->Save(outputPath.string() + ".class");
+			scriptFile.Write(mod->Name);
+		}
+		else if(asset.Type == AssetType::Shader) {
+
 		}
 
-		auto& refs = m_References[asset.ID];
-		pack.Write(refs.Count());
-		for(auto& ref : refs) {
-			pack.Write((uint64_t)ref.ID);
-			pack.Write((uint32_t)ref.Type);
+		if(m_References.count(asset.ID)) {
+			auto& refs = m_References[asset.ID];
+			pack.Write(refs.Count());
+			for(auto& ref : refs) {
+				pack.Write((uint64_t)ref.ID);
+				pack.Write((uint32_t)ref.Type);
+			}
 		}
+		else
+			pack.Write((uint64_t)0);
 	}
 
 	Application::PushDir();
@@ -354,7 +384,7 @@ void EditorAssetManager::RuntimeSave(const std::string& path) {
 		auto source1 = sourceRoot.string() + ".glsl.vert";
 		auto source2 = sourceRoot.string() + ".glsl.frag";
 
-		auto targetRoot = fs::path(path) / "Asset" / "Shader" / name;
+		auto targetRoot = fs::path(exportPath) / "Asset" / "Shader" / name;
 		auto target1 = targetRoot.string() + ".glsl.vert";
 		auto target2 = targetRoot.string() + ".glsl.frag";
 

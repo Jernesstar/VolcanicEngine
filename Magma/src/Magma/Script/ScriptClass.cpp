@@ -7,10 +7,9 @@ namespace Magma::Script {
 ScriptClass::ScriptClass(const std::string& name, asITypeInfo* type)
 	: Name(name)
 {
-	std::string str = Name + " @" + Name + "()";
 	m_Type = type;
 	VOLCANICORE_ASSERT(m_Type);
-	m_Factory = m_Type->GetFactoryByDecl(str.c_str());
+	m_Factory = m_Type->GetFactoryByIndex(0);
 	// VOLCANICORE_ASSERT(m_Factory);
 
 	for(uint32_t i = 0; i < m_Type->GetMethodCount(); i++) {
@@ -28,14 +27,13 @@ void ScriptClass::SetInstanceMethod(const List<std::string>& args) {
 	m_Factory = m_Type->GetFactoryByDecl(method.c_str());
 }
 
-asIScriptFunction* ScriptClass::GetFunction(const std::string& name) {
+asIScriptFunction* ScriptClass::GetFunction(const std::string& name) const {
 	if(!m_Functions.count(name))
 		return nullptr;
-
-	return m_Functions[name];
+	return m_Functions.at(name);
 }
 
-ScriptFunc ScriptClass::GetFunc() {
+ScriptFunc ScriptClass::GetFunc() const {
 	return ScriptFunc{ m_Factory, m_Module->GetContext() };
 }
 

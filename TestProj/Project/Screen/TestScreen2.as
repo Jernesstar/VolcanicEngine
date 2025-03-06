@@ -1,5 +1,15 @@
+
 class TestScreen2 : IScreen
 {
+    Scene @SceneHandle;
+    UIPage @UIHandle;
+
+    TestScreen2(Scene @world, UIPage @ui)
+    {
+        @SceneHandle = world;
+        @UIHandle = ui;
+    }
+
     void OnLoad()
     {
 
@@ -15,6 +25,4 @@ class TestScreen2 : IScreen
 
     }
 
-    Scene @m_Scene;
-    UIPage @m_Page;
 }

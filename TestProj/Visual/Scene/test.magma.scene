@@ -27,7 +27,7 @@ Scene:
             Transform:
               Translation: [0, 0, 0]
               Rotation: [0, 0, 0]
-              Scale: [2.0999999, 6.69999981, 8.39999962]
+              Scale: [1.79999995, 11.8000002, 8.39999962]
           MeshComponent:
             AssetID: 10036008063945961451
     - Entity:
@@ -38,8 +38,14 @@ Scene:
             Tag: Empty Tag
           TransformComponent:
             Transform:
-              Translation: [9.60000038, -19.1000004, -114]
+              Translation: [0, 0, 0]
               Rotation: [0, 0, 0]
               Scale: [9.30000019, 28.1000004, 1.89999998]
           MeshComponent:
             AssetID: 10036008063945961451
+    - Entity:
+        Name: ""
+        ID: 550
+        Components:
+          AudioComponent:
+            AssetID: 16624656892553940704

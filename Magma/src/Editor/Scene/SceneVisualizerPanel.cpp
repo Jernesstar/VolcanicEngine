@@ -120,17 +120,12 @@ void SceneVisualizerPanel::Draw() {
 			if(auto payload = ImGui::AcceptDragDropPayload("ASSET")) {
 				options.add.asset = *(Asset*)payload->Data;
 
-				switch(options.add.asset.Type) {
-					case AssetType::Mesh:
-						ImGui::OpenPopup("Create Entity with MeshComponent");
-						break;
-					case AssetType::Audio:
-						ImGui::OpenPopup("Create Entity with AudioComponent");
-						break;
-					case AssetType::Script:
-						ImGui::OpenPopup("Create Entity with ScriptComponent");
-						break;
-				}
+				if(options.add.asset.Type == AssetType::Mesh)
+					ImGui::OpenPopup("Create Entity with MeshComponent");
+				else if(options.add.asset.Type == AssetType::Audio)
+					ImGui::OpenPopup("Create Entity with AudioComponent");
+				else if(options.add.asset.Type == AssetType::Script)
+					ImGui::OpenPopup("Create Entity with ScriptComponent");
 			}
 			ImGui::EndDragDropTarget();
 		}
@@ -151,14 +146,15 @@ void SceneVisualizerPanel::Draw() {
 		ImGui::EndChild();
 
 		bool open = false;
-		open = ImGui::BeginPopupModal("Create Entity with MeshComponent");
-		if(!open)
+		if(options.add.asset.Type == AssetType::Mesh)
+			open = ImGui::BeginPopupModal("Create Entity with MeshComponent");
+		else if(options.add.asset.Type == AssetType::Audio)
 			open = ImGui::BeginPopupModal("Create Entity with AudioComponent");
-		if(!open)
+		else if(options.add.asset.Type == AssetType::Script)
 			open = ImGui::BeginPopupModal("Create Entity with ScriptComponent");
 
 		if(open) {
-			auto asset = options.add.asset;
+			auto& asset = options.add.asset;
 			static std::string str;
 			static std::string hint = "Enter entity name";
 			ImGui::InputTextWithHint("##Input", hint.c_str(), &str);
@@ -191,19 +187,20 @@ void SceneVisualizerPanel::Draw() {
 						else if(asset.Type == AssetType::Audio)
 							newEntity.Add<AudioComponent>(asset);
 						else if(asset.Type == AssetType::Script) {
-							auto mod =
-								editor.GetAssetManager().Get<ScriptModule>(asset);
+							auto& assetManager = editor.GetAssetManager();
+							auto mod = assetManager.Get<ScriptModule>(asset);
 							std::string name = SelectScriptClass(mod);
-							auto _class = mod->GetScriptClass(name);
-							_class->SetInstanceMethod({ "Entity entity" });
+							auto _class = mod->GetClass(name);
 							auto obj = _class->Instantiate(newEntity);
 							newEntity.Add<ScriptComponent>(asset, obj);
 						}
 
+						asset.Type = AssetType::None;
 						ImGui::CloseCurrentPopup();
 					}
 				}
 			}
+
 			ImGui::EndPopup();
 		}
 
@@ -406,6 +403,7 @@ void EditorSceneRenderer::SubmitMesh(Entity entity) {
 		Application::As<EditorApp>()->GetEditor().GetAssetManager();
 	auto& tc = entity.Get<TransformComponent>();
 	auto& mc = entity.Get<MeshComponent>();
+	assetManager.Load(mc.MeshAsset);
 	auto mesh = assetManager.Get<Mesh>(mc.MeshAsset);
 
 	if(entity == Selected)

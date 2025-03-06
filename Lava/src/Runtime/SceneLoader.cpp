@@ -119,7 +119,7 @@ BinaryReader& BinaryReader::ReadObject(ScriptComponent& comp) {
 	if(className != "") {
 		auto& assetManager = App::Get()->GetAssetManager();
 		auto mod = assetManager.Get<ScriptModule>(asset);
-		auto _class = mod->GetScriptClass(className);
+		auto _class = mod->GetClass(className);
 		comp.Instance = _class->Instantiate(s_CurrentEntity);
 	}
 

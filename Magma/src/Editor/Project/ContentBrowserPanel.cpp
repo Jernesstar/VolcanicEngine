@@ -106,6 +106,8 @@ void ContentBrowserPanel::Draw() {
 
 			if(ImGui::BeginTable("AssetsTable", columnCount))
 			{
+				static Asset s_Asset;
+
 				for(auto& [asset, _] : assetManager.GetRegistry()) {
 					if(!asset.Primary)
 						continue;
@@ -123,6 +125,7 @@ void ContentBrowserPanel::Draw() {
 					button.x = -1;
 					button.y = -1;
 					if(UI::UIRenderer::DrawButton(button).Clicked) {
+						s_Asset = asset;
 						auto panel =
 							m_Tab->GetPanel("AssetEditor")
 							->As<AssetEditorPanel>();
@@ -132,7 +135,7 @@ void ContentBrowserPanel::Draw() {
 					if(ImGui::BeginDragDropSource())
 					{
 						ImGui::SetDragDropPayload("ASSET",
-							&asset, sizeof(Asset), ImGuiCond_Once);
+							&s_Asset, sizeof(Asset), ImGuiCond_Once);
 
 						UI::Image image;
 						image.Content = m_FileIcon->Content;
@@ -158,8 +161,8 @@ void ContentBrowserPanel::Draw() {
 }
 
 ImRect Traverse(fs::path path) {
-	List<fs::path> folders;
-	List<fs::path> files;
+	List<fs::path> folders(15);
+	List<fs::path> files(15);
 
 	ImRect nodeRect;
 	if(fs::is_directory(path)) {
@@ -178,6 +181,7 @@ ImRect Traverse(fs::path path) {
 			else
 				files.Add(path);
 		}
+
 	}
 	else {
 		static std::string selected = "";

@@ -48,9 +48,11 @@ public:
 	YAlignment yAlignment = YAlignment::Top;
 	glm::vec4 Color;
 	// TODO(Implement): Border
-	std::string Class;
-	UUID ModuleID;
-	Ref<Script::ScriptObject> ScriptInstance;
+	// BorderElement Border;
+	List<UINode> Children;
+	std::string Class = "";
+	UUID ModuleID = 0;
+	Ref<Script::ScriptObject> ScriptInstance = nullptr;
 
 public:
 	UIElement(UIElementType type)
@@ -95,7 +97,6 @@ protected:
 	UIPage* m_Root;
 	UINode m_Node;
 	UINode m_Parent;
-	List<UINode> m_Children;
 
 	UIState m_State;
 
