@@ -158,6 +158,13 @@ void SerializeEntity(YAMLSerializer& serializer, const Entity& entity) {
 			.EndMapping()
 		.EndMapping(); // TransformComponent
 	}
+	if(entity.Has<AudioComponent>()) {
+		auto asset = entity.Get<AudioComponent>().AudioAsset;
+		serializer.WriteKey("AudioComponent")
+		.BeginMapping()
+			.WriteKey("AssetID").Write((uint64_t)asset.ID)
+		.EndMapping();
+	}
 	if(entity.Has<MeshComponent>()) {
 		auto asset = entity.Get<MeshComponent>().MeshAsset;
 		serializer.WriteKey("MeshComponent")
@@ -172,13 +179,6 @@ void SerializeEntity(YAMLSerializer& serializer, const Entity& entity) {
 			.WriteKey("AssetID").Write((uint64_t)asset.ID)
 		.EndMapping();
 	}
-	if(entity.Has<AudioComponent>()) {
-		auto asset = entity.Get<AudioComponent>().AudioAsset;
-		serializer.WriteKey("AudioComponent")
-		.BeginMapping()
-			.WriteKey("AssetID").Write((uint64_t)asset.ID)
-		.EndMapping();
-	}
 	if(entity.Has<ScriptComponent>()) {
 		const auto& comp = entity.Get<ScriptComponent>();
 		auto asset = comp.ModuleAsset;
@@ -188,9 +188,9 @@ void SerializeEntity(YAMLSerializer& serializer, const Entity& entity) {
 		.BeginMapping()
 			.WriteKey("ModuleAsset").Write((uint64_t)asset.ID)
 			.WriteKey("Class").Write(obj ? obj->GetClass()->Name : "")
-			.WriteKey("Instance").BeginMapping()
-				// TODO(Implement): Reflection
-			.EndMapping()
+			// .WriteKey("Instance").BeginMapping()
+			// 	// TODO(Implement): Reflection
+			// .EndMapping()
 		.EndMapping();
 	}
 	if(entity.Has<RigidBodyComponent>()) {
@@ -332,8 +332,8 @@ void DeserializeEntity(YAML::Node entityNode, Scene& scene) {
 
 		auto camera = Camera::Create(type, fr);
 		camera->SetPositionDirection(pos, dir);
-		camera->Resize(w, h);
 		camera->SetProjection(near, far);
+		camera->Resize(w, h);
 
 		entity.Add<CameraComponent>(camera);
 	}
@@ -510,21 +510,15 @@ BinaryWriter& BinaryWriter::WriteObject(const TransformComponent& comp) {
 }
 
 template<>
-BinaryWriter& BinaryWriter::WriteObject(const MeshComponent& comp) {
-	Write((uint64_t)comp.MeshAsset.ID);
-	return *this;
-}
-
-template<>
-BinaryWriter& BinaryWriter::WriteObject(const SkyboxComponent& comp) {
-	Write((uint64_t)comp.CubemapAsset.ID);
-	return *this;
-}
-
-template<>
 BinaryWriter& BinaryWriter::WriteObject(const AudioComponent& comp) {
 	Write((uint64_t)comp.AudioAsset.ID);
 
+	return *this;
+}
+
+template<>
+BinaryWriter& BinaryWriter::WriteObject(const MeshComponent& comp) {
+	Write((uint64_t)comp.MeshAsset.ID);
 	return *this;
 }
 
@@ -602,11 +596,11 @@ BinaryWriter& BinaryWriter::WriteObject(const Entity& entity) {
 	componentBits |= ((uint16_t)entity.Has<CameraComponent>()			<< 0);
 	componentBits |= ((uint16_t)entity.Has<TagComponent>()				<< 1);
 	componentBits |= ((uint16_t)entity.Has<TransformComponent>()		<< 2);
-	componentBits |= ((uint16_t)entity.Has<MeshComponent>()				<< 3);
-	componentBits |= ((uint16_t)entity.Has<SkyboxComponent>()			<< 4);
-	componentBits |= ((uint16_t)entity.Has<RigidBodyComponent>()		<< 5);
+	componentBits |= ((uint16_t)entity.Has<AudioComponent>()			<< 3);
+	componentBits |= ((uint16_t)entity.Has<MeshComponent>()				<< 4);
+	componentBits |= ((uint16_t)entity.Has<SkyboxComponent>()			<< 5);
 	componentBits |= ((uint16_t)entity.Has<ScriptComponent>()			<< 6);
-	componentBits |= ((uint16_t)entity.Has<AudioComponent>()			<< 7);
+	componentBits |= ((uint16_t)entity.Has<RigidBodyComponent>()		<< 7);
 	componentBits |= ((uint16_t)entity.Has<DirectionalLightComponent>() << 8);
 	componentBits |= ((uint16_t)entity.Has<PointLightComponent>()		<< 9);
 	componentBits |= ((uint16_t)entity.Has<SpotlightComponent>()		<< 10);
@@ -614,30 +608,30 @@ BinaryWriter& BinaryWriter::WriteObject(const Entity& entity) {
 
 	Write(componentBits.to_ulong());
 
-	// if(entity.Has<CameraComponent>())
-	// 	Write(entity.Get<CameraComponent>());
-	// if(entity.Has<TagComponent>())
-	// 	Write(entity.Get<TagComponent>());
-	// if(entity.Has<TransformComponent>())
-	// 	Write(entity.Get<TransformComponent>());
-	// if(entity.Has<MeshComponent>())
-	// 	Write(entity.Get<MeshComponent>());
-	// if(entity.Has<SkyboxComponent>())
-	// 	Write(entity.Get<SkyboxComponent>());
-	// if(entity.Has<RigidBodyComponent>())
-	// 	Write(entity.Get<RigidBodyComponent>());
-	// if(entity.Has<ScriptComponent>())
-	// 	Write(entity.Get<ScriptComponent>());
-	// if(entity.Has<AudioComponent>())
-	// 	Write(entity.Get<AudioComponent>());
-	// if(entity.Has<DirectionalLightComponent>())
-	// 	Write(entity.Get<DirectionalLightComponent>());
-	// if(entity.Has<PointLightComponent>())
-	// 	Write(entity.Get<PointLightComponent>());
-	// if(entity.Has<SpotlightComponent>())
-	// 	Write(entity.Get<SpotlightComponent>());
-	// if(entity.Has<ParticleSystemComponent>())
-	// 	Write(entity.Get<ParticleSystemComponent>());
+	if(entity.Has<CameraComponent>())
+		Write(entity.Get<CameraComponent>());
+	if(entity.Has<TagComponent>())
+		Write(entity.Get<TagComponent>());
+	if(entity.Has<TransformComponent>())
+		Write(entity.Get<TransformComponent>());
+	if(entity.Has<AudioComponent>())
+		Write(entity.Get<AudioComponent>());
+	if(entity.Has<MeshComponent>())
+		Write(entity.Get<MeshComponent>());
+	if(entity.Has<SkyboxComponent>())
+		Write(entity.Get<SkyboxComponent>());
+	if(entity.Has<ScriptComponent>())
+		Write(entity.Get<ScriptComponent>());
+	if(entity.Has<RigidBodyComponent>())
+		Write(entity.Get<RigidBodyComponent>());
+	if(entity.Has<DirectionalLightComponent>())
+		Write(entity.Get<DirectionalLightComponent>());
+	if(entity.Has<PointLightComponent>())
+		Write(entity.Get<PointLightComponent>());
+	if(entity.Has<SpotlightComponent>())
+		Write(entity.Get<SpotlightComponent>());
+	if(entity.Has<ParticleSystemComponent>())
+		Write(entity.Get<ParticleSystemComponent>());
 
 	return *this;
 }

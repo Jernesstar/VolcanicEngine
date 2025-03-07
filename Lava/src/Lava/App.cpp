@@ -77,14 +77,14 @@ App::App(const Project& project)
 	ScriptEngine::RegisterMethod<App>(
 		"AppClass", "void PopScreen()", &App::PopScreen);
 
-	// ScriptEngine::RegisterMethod<App>(
-	// 	"InputClass", "bool KeyPressed(Key key)", &App::PopScreen);
+	ScriptEngine::RegisterMethod<App>(
+		"AppClass", "const AssetManager get_Assets() const property",
+		&App::GetAssetManager);
 }
 
 App::~App() {
-	// ScriptGlue::Close();
 	ScriptEngine::Shutdown();
-	// Physics::Close();
+	Physics::Close();
 }
 
 void App::OnLoad() {
@@ -113,6 +113,8 @@ void App::OnUpdate(TimeStep ts) {
 
 	if(!s_Screen)
 		return;
+
+	s_Screen->ScriptObj->Call("OnUpdate", (float)ts);
 
 	s_Screen->World.OnRender(m_SceneRenderer);
 

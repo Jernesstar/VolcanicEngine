@@ -73,6 +73,15 @@ BinaryReader& BinaryReader::ReadObject(TransformComponent& comp) {
 }
 
 template<>
+BinaryReader& BinaryReader::ReadObject(AudioComponent& comp) {
+	uint64_t id;
+	Read(id);
+	comp.AudioAsset = { id, AssetType::Audio };
+
+	return *this;
+}
+
+template<>
 BinaryReader& BinaryReader::ReadObject(MeshComponent& comp) {
 	uint64_t id;
 	Read(id);
@@ -86,21 +95,6 @@ BinaryReader& BinaryReader::ReadObject(SkyboxComponent& comp) {
 	uint64_t id;
 	Read(id);
 	comp.CubemapAsset = { id, AssetType::Cubemap };
-
-	return *this;
-}
-
-template<>
-BinaryReader& BinaryReader::ReadObject(RigidBodyComponent& comp) {
-	uint32_t typeInt;
-	Read(typeInt);
-	RigidBody::Type type = (RigidBody::Type)typeInt;
-	uint32_t shapeTypeInt;
-	Read(shapeTypeInt);
-	Shape::Type shapeType = (Shape::Type)shapeTypeInt;
-
-	Ref<Shape> shape = Shape::Create(shapeType);
-	comp.Body = RigidBody::Create(type, shape);
 
 	return *this;
 }
@@ -126,10 +120,16 @@ BinaryReader& BinaryReader::ReadObject(ScriptComponent& comp) {
 }
 
 template<>
-BinaryReader& BinaryReader::ReadObject(AudioComponent& comp) {
-	uint64_t id;
-	Read(id);
-	comp.AudioAsset = { id, AssetType::Audio };
+BinaryReader& BinaryReader::ReadObject(RigidBodyComponent& comp) {
+	uint32_t typeInt;
+	Read(typeInt);
+	RigidBody::Type type = (RigidBody::Type)typeInt;
+	uint32_t shapeTypeInt;
+	Read(shapeTypeInt);
+	Shape::Type shapeType = (Shape::Type)shapeTypeInt;
+
+	Ref<Shape> shape = Shape::Create(shapeType);
+	comp.Body = RigidBody::Create(type, shape);
 
 	return *this;
 }
@@ -195,30 +195,30 @@ BinaryReader& BinaryReader::ReadObject(Entity& entity) {
 	VOLCANICORE_LOG_INFO(name.c_str());
 	VOLCANICORE_LOG_INFO(componentBits.to_string().c_str());
 
-	// if(componentBits[0])
-	// 	Read(entity.Set<CameraComponent>());
-	// if(componentBits[1])
-	// 	Read(entity.Set<TagComponent>());
-	// if(componentBits[2])
-	// 	Read(entity.Set<TransformComponent>());
-	// if(componentBits[3])
-	// 	Read(entity.Set<MeshComponent>());
-	// if(componentBits[4])
-	// 	Read(entity.Set<SkyboxComponent>());
-	// if(componentBits[5])
-	// 	Read(entity.Set<RigidBodyComponent>());
-	// if(componentBits[6])
-	// 	Read(entity.Set<ScriptComponent>());
-	// if(componentBits[7])
-	// 	Read(entity.Set<AudioComponent>());
-	// if(componentBits[8])
-	// 	Read(entity.Set<DirectionalLightComponent>());
-	// if(componentBits[9])
-	// 	Read(entity.Set<PointLightComponent>());
-	// if(componentBits[10])
-	// 	Read(entity.Set<SpotlightComponent>());
-	// if(componentBits[11])
-	// 	Read(entity.Set<ParticleSystemComponent>());
+	if(componentBits.test(0))
+		Read(entity.Set<CameraComponent>());
+	if(componentBits.test(1))
+		Read(entity.Set<TagComponent>());
+	if(componentBits.test(2))
+		Read(entity.Set<TransformComponent>());
+	if(componentBits.test(3))
+		Read(entity.Set<AudioComponent>());
+	if(componentBits.test(4))
+		Read(entity.Set<MeshComponent>());
+	if(componentBits.test(5))
+		Read(entity.Set<SkyboxComponent>());
+	if(componentBits.test(6))
+		Read(entity.Set<ScriptComponent>());
+	if(componentBits.test(7))
+		Read(entity.Set<RigidBodyComponent>());
+	if(componentBits.test(8))
+		Read(entity.Set<DirectionalLightComponent>());
+	if(componentBits.test(9))
+		Read(entity.Set<PointLightComponent>());
+	if(componentBits.test(10))
+		Read(entity.Set<SpotlightComponent>());
+	if(componentBits.test(11))
+		Read(entity.Set<ParticleSystemComponent>());
 
 	return *this;
 }

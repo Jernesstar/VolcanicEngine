@@ -16,8 +16,8 @@ public:
 	Buffer(uint64_t maxCount)
 		: m_MaxCount(maxCount), m_Count(0)
 	{
-		if(maxCount != 0)
-			m_Data = (T*)malloc(GetMaxSize());
+		VOLCANICORE_ASSERT(maxCount);
+		m_Data = (T*)malloc(GetMaxSize());
 	}
 	Buffer(Buffer&& other)
 		: m_MaxCount(other.GetMaxCount()), m_Count(other.GetCount())
@@ -30,7 +30,7 @@ public:
 		m_Data = (T*)malloc(GetMaxSize());
 		Set(other.Get(), other.GetCount());
 	}
-	Buffer(std::initializer_list<T> list)
+	Buffer(const std::initializer_list<T>& list)
 		: m_MaxCount(list.size())
 	{
 		m_Data = (T*)malloc(GetMaxSize());
@@ -48,8 +48,6 @@ public:
 		Delete();
 	}
 
-	operator bool() const { return m_Data && m_Count; }
-
 	Buffer& operator =(const Buffer& other) = delete;
 
 	Buffer& operator =(Buffer&& other) {
@@ -58,6 +56,8 @@ public:
 		m_Count = other.m_Count;
 		return *this;
 	}
+
+	operator bool() const { return m_Data && m_Count; }
 
 	T* Get(uint64_t i = 0) const { return m_Data + i; }
 
@@ -78,21 +78,15 @@ public:
 	Buffer<T> Copy() const { return Buffer<T>(*this); }
 
 	void Add(const T& element) {
-		if(m_MaxCount != 0 && m_Count >= m_MaxCount)
+		if(m_Count >= m_MaxCount)
 			return;
 
 		m_Data[m_Count++] = element;
 	}
 	void Add(const Buffer& buffer) {
-		if(m_MaxCount != 0 && m_Count + buffer.GetCount() >= m_MaxCount)
-			return;
-
 		Set(buffer.Get(), buffer.GetCount(), m_Count);
 	}
 	void Add(const std::vector<T>& list) {
-		if(m_MaxCount != 0 && m_Count + list.size() >= m_MaxCount)
-			return;
-
 		Set(list.data(), list.size(), m_Count);
 	}
 	void Add(const void* data, uint64_t count) {
@@ -225,7 +219,7 @@ public:
 	}
 
 	void Add(const Buffer& buffer) {
-		if(m_MaxCount != 0 && m_Count + buffer.GetCount() >= m_MaxCount)
+		if(m_Count + buffer.GetCount() >= m_MaxCount)
 			return;
 
 		Set(buffer.Get(), buffer.GetCount(), m_Count);

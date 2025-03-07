@@ -43,3 +43,6 @@ Scene:
               Scale: [9.30000019, 28.1000004, 1.89999998]
           MeshComponent:
             AssetID: 10036008063945961451
+          ScriptComponent:
+            ModuleAsset: 10737729776046424356
+            Class: PlayerController

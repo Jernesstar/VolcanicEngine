@@ -20,7 +20,7 @@ public:
 		: m_Buffer(size) { }
 	// List(const Buffer<T>& buffer)
 	// 	: m_Buffer(buffer), m_Back(buffer.GetCount()) { }
-	List(std::initializer_list<T> list)
+	List(const std::initializer_list<T>& list)
 		: m_Buffer(list.size())
 	{
 		for(auto& element : list)
@@ -223,7 +223,7 @@ private:
 
 	void ShiftLeft(uint64_t beg, uint64_t end, uint64_t dx) {
 		for(int64_t i = (int64_t)beg; i <= (int64_t)end; i++) {
-			new (m_Buffer.Get(i) - dx) T(*m_Buffer.Get(i));
+			new (m_Buffer.Get(i - dx)) T(*m_Buffer.Get(i));
 			m_Buffer.Get(i)->~T();
 		}
 	}
@@ -236,18 +236,15 @@ private:
 	}
 
 	void Free(int64_t idx) {
-		if(Count() >= m_Buffer.GetMaxCount()) {
-			auto newMax = m_Buffer.GetMaxCount() + 6;
+		if(Count() == m_Buffer.GetMaxCount()) {
+			auto newMax = 2 * m_Buffer.GetMaxCount();
 			T* newData = (T*)malloc(newMax * sizeof(T));
+			m_Front = 0;
+			m_Back++;
 
-			uint64_t pos;
-			if(idx < 0)
-				pos = (uint64_t)(((int64_t)m_Back + 1 + idx) - (int64_t)m_Front);
-			else
-				pos = (uint64_t)idx;
-
+			uint64_t pos = Absolute(idx);
 			uint64_t delta = 0;
-			for(uint64_t i = 0; i < Count() + 1; i++) {
+			for(uint64_t i = 0; i < Count(); i++) {
 				if(i == pos)
 					delta = 1;
 				else
@@ -256,8 +253,6 @@ private:
 				Remove(i - delta);
 			}
 
-			m_Front = 0;
-			m_Back = Count() + 1;
 			m_Buffer = Buffer<T>(newData, m_Back, newMax);
 			return;
 		}
@@ -270,13 +265,13 @@ private:
 		}
 
 		auto abs = Absolute(idx);
-		if(idx == 0) {
+		if(abs == 0) {
 			if(m_Front != 0)
 				m_Front--;
 			else
 				ShiftRight(0, (m_Back++) - 1, 1);
 		}
-		else if(idx == -1) {
+		else if(abs == m_Back - 1) {
 			if(m_Back != m_Buffer.GetMaxCount())
 				m_Back++;
 			else
