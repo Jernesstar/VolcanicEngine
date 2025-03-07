@@ -14,10 +14,10 @@ public:
 	Buffer() = default;
 
 	Buffer(uint64_t maxCount)
-		: m_MaxCount(maxCount), m_Count(0)
+		: m_MaxCount(maxCount)
 	{
-		VOLCANICORE_ASSERT(maxCount);
-		m_Data = (T*)malloc(GetMaxSize());
+		if(maxCount)
+			m_Data = (T*)malloc(GetMaxSize());
 	}
 	Buffer(Buffer&& other)
 		: m_MaxCount(other.GetMaxCount()), m_Count(other.GetCount())
@@ -36,12 +36,11 @@ public:
 		m_Data = (T*)malloc(GetMaxSize());
 		Set(list.begin(), list.size());
 	}
-	Buffer(T* buffer, uint64_t count, uint64_t maxCount = 0)
-		: m_MaxCount(maxCount), m_Count(count)
+	Buffer(T* data, uint64_t count, uint64_t maxCount = 0)
+		: m_Data(data), m_MaxCount(maxCount), m_Count(count)
 	{
 		if(!m_MaxCount)
-			m_MaxCount = m_Count;
-		m_Data = buffer;
+			m_MaxCount = count;
 	}
 
 	~Buffer() {
@@ -155,9 +154,11 @@ public:
 	Buffer() = default;
 
 	Buffer(uint64_t size, uint64_t maxCount)
-		: m_SizeT(size), m_MaxCount(maxCount), m_Count(0)
+		: m_SizeT(size), m_MaxCount(maxCount)
 	{
-		m_Data = malloc(GetMaxSize());
+		VOLCANICORE_ASSERT(size != 0);
+		if(maxCount)
+			m_Data = malloc(GetMaxSize());
 	}
 	Buffer(Buffer&& other)
 		: m_SizeT(other.m_SizeT),
@@ -180,15 +181,14 @@ public:
 		Set(list.data(), list.size());
 	}
 
-	Buffer(void* buffer, uint64_t size, uint64_t count = 0)
+	Buffer(void* data, uint64_t size, uint64_t count = 0)
 		: m_SizeT(size), m_MaxCount(count), m_Count(count)
 	{
-		m_Data = (void*)buffer;
+		m_Data = data;
 	}
 
 	~Buffer() {
-		if(m_MaxCount != 0) // We do in fact own this pointer
-			Delete();
+		Delete();
 	}
 
 	operator bool() const { return m_Data && m_Count; }

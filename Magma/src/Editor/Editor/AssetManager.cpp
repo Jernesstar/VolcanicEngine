@@ -77,7 +77,7 @@ Asset EditorAssetManager::Add(const std::string& path, AssetType type) {
 }
 
 UUID EditorAssetManager::GetFromPath(const std::string& path) {
-	for(auto [id, assetPath] : m_Paths)
+	for(auto& [id, assetPath] : m_Paths)
 		if(fs::path(path) == fs::path(assetPath))
 			return id;
 
@@ -92,11 +92,8 @@ std::string EditorAssetManager::GetPath(UUID id) {
 }
 
 void EditorAssetManager::Load(const std::string& path) {
-	namespace fs = std::filesystem;
-
 	auto packPath =
 		(fs::path(path).parent_path() / "Visual" / ".magma.assetpk").string();
-	auto rootPath = fs::path(path).parent_path() / "Visual" / "Asset";
 	m_Path = packPath;
 
 	YAML::Node file;
@@ -112,6 +109,7 @@ void EditorAssetManager::Load(const std::string& path) {
 	if(!assetPackNode)
 		return;
 
+	auto rootPath = fs::path(path).parent_path() / "Visual" / "Asset";
 	for(auto assetNode : assetPackNode["Assets"]) {
 		auto node = assetNode["Asset"];
 		UUID id = node["ID"].as<uint64_t>();
@@ -171,18 +169,18 @@ void EditorAssetManager::Reload() {
 
 	auto rootPath = fs::path(m_Path).parent_path() / "Asset";
 	List<fs::path> paths
-		{
-			(rootPath / "Mesh"),
-			(rootPath / "Image"),
-			(rootPath / "Cubemap"),
-			(rootPath / "Font"),
-			(rootPath / "Audio"),
-			(rootPath / "Script"),
-			(rootPath / "Shader")
-		};
+	{
+		(rootPath / "Mesh"),
+		(rootPath / "Image"),
+		(rootPath / "Cubemap"),
+		(rootPath / "Font"),
+		(rootPath / "Audio"),
+		(rootPath / "Script"),
+		(rootPath / "Shader")
+	};
 
 	uint32_t i = 0;
-	for(auto folder : paths) {
+	for(auto& folder : paths) {
 		for(auto p : FileUtils::GetFiles(folder.string())) {
 			std::string path = p;
 			if(i == 0)
@@ -192,6 +190,8 @@ void EditorAssetManager::Reload() {
 		}
 		i++;
 	}
+
+	VOLCANICORE_LOG_INFO("Reload end");
 }
 
 void EditorAssetManager::Save() {

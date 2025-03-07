@@ -5,7 +5,13 @@
 #include <VolcaniCore/Graphics/Renderer.h>
 #include <VolcaniCore/Graphics/ShaderLibrary.h>
 
+#include <Magma/Script/ScriptEngine.h>
+
+#include <Magma/Physics/Physics.h>
+
 #include <Magma/UI/UIRenderer.h>
+
+#include <Lava/ScriptGlue.h>
 
 #include "SceneLoader.h"
 #include "UILoader.h"
@@ -43,13 +49,17 @@ Runtime::Runtime(const CommandLineArgs& args)
 	// ShaderLibrary::Add(
 	// 	"Bloom", ShaderPipeline::Create("Asset/Shader", "Bloom"));
 
+	Physics::Init();
+	ScriptEngine::Init();
+	ScriptGlue::RegisterInterface();
+
+	UIRenderer::Init();
+
 	Project project;
 	project.Load("./.volc.proj");
+	m_AssetManager.Load();
 
 	m_App = CreateRef<App>(project);
-	m_AssetManager.Load();
-	m_App->SetAssetManager(m_AssetManager);
-
 	m_App->ScreenLoad =
 		[&](Ref<ScriptModule> script)
 		{
@@ -57,11 +67,11 @@ Runtime::Runtime(const CommandLineArgs& args)
 			script->Load(scriptPath.string() + ".class");
 		};
 	m_App->SceneLoad =
-	[&](Scene& scene)
-	{
-		auto scenePath = fs::path("Scene") / scene.Name;
-		SceneLoader::Load(scene, scenePath.string() + ".bin");
-	};
+		[&](Scene& scene)
+		{
+			auto scenePath = fs::path("Scene") / scene.Name;
+			SceneLoader::Load(scene, scenePath.string() + ".bin");
+		};
 	m_App->UILoad =
 		[&](UIPage& page)
 		{
@@ -69,10 +79,9 @@ Runtime::Runtime(const CommandLineArgs& args)
 			UILoader::Load(page, uiPath.string() + ".bin");
 		};
 
-	UIRenderer::Init();
-
 	m_App->ChangeScreen = true;
 	m_App->Running = true;
+	m_App->SetAssetManager(m_AssetManager);
 	m_App->OnLoad();
 }
 
@@ -81,6 +90,9 @@ Runtime::~Runtime() {
 	m_App.reset();
 
 	UIRenderer::Close();
+
+	ScriptEngine::Shutdown();
+	Physics::Close();
 }
 
 void Runtime::OnUpdate(TimeStep ts) {

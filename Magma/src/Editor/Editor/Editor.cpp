@@ -13,7 +13,13 @@
 #include <VolcaniCore/Core/Input.h>
 #include <VolcaniCore/Graphics/RendererAPI.h>
 
+#include <Magma/Script/ScriptEngine.h>
+
+#include <Magma/Physics/Physics.h>
+
 #include <Magma/UI/UIRenderer.h>
+
+#include <Lava/ScriptGlue.h>
 
 #include "Project/ProjectTab.h"
 
@@ -44,7 +50,9 @@ struct {
 } static menu;
 
 Editor::Editor() {
-
+	Physics::Init();
+	ScriptEngine::Init();
+	Lava::ScriptGlue::RegisterInterface();
 }
 
 void Editor::Load(const CommandLineArgs& args) {
@@ -67,6 +75,9 @@ void Editor::Load(const CommandLineArgs& args) {
 
 Editor::~Editor() {
 	m_Tabs.Clear();
+
+	ScriptEngine::Shutdown();
+	Physics::Close();
 }
 
 void Editor::Update(TimeStep ts) {
@@ -175,7 +186,8 @@ void Editor::Render() {
 		ImGuiID dockspaceID = ImGui::GetID("DockSpace");
 		ImGui::DockSpace(dockspaceID, ImVec2(0.0f, 0.0f), dockspaceFlags);
 
-		m_Tabs[0]->As<ProjectTab>()->RenderEssentialPanels();
+		if(m_Tabs)
+			m_Tabs[0]->As<ProjectTab>()->RenderEssentialPanels();
 		if(m_CurrentTab)
 			m_CurrentTab->Render();
 	}
@@ -271,28 +283,31 @@ void Editor::NewProject() {
 
 void Editor::NewProject(const std::string& volcPath) {
 	m_Project.Load(volcPath);
+
 	m_AssetManager.Load(volcPath);
 	m_AssetManager.Reload();
-	auto rootPath = fs::path(volcPath).parent_path();
 
+	auto rootPath = fs::path(volcPath).parent_path();
 	m_App = CreateRef<Lava::App>(m_Project);
-	m_App->SceneLoad =
-		[&](Scene& scene)
-		{
-			auto scenePath = rootPath / "Visual" / "Scene" / scene.Name;
-			SceneLoader::EditorLoad(scene, scenePath.string() + ".magma.scene");
-		};		
-	m_App->UILoad =
-		[&](UIPage& page)
-		{
-			auto uiPath = rootPath / "Visual" / "UI" / page.Name;
-			UILoader::EditorLoad(page, uiPath.string() + ".magma.ui.json", Theme());
-		};
+
 	m_App->ScreenLoad =
 		[&](Ref<ScriptModule> script)
 		{
 			auto scriptPath = rootPath / "Project" / "Screen" / script->Name;
 			script->Load(scriptPath.string() + ".as");
+		};
+	m_App->SceneLoad =
+		[&](Scene& scene)
+		{
+			auto scenePath = rootPath / "Visual" / "Scene" / scene.Name;
+			SceneLoader::EditorLoad(scene, scenePath.string() + ".magma.scene");
+		};
+	m_App->UILoad =
+		[&](UIPage& page)
+		{
+			auto uiPath = rootPath / "Visual" / "UI" / page.Name;
+			UILoader::EditorLoad(page, uiPath.string() + ".magma.ui.json",
+				UITab::GetTheme());
 		};
 
 	auto themePath = rootPath / "Visual" / "UI" / "theme.magma.ui.json";

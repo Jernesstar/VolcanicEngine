@@ -7,6 +7,7 @@
 #include <angelscript/add_on/scripthandle/scripthandle.h>
 #include <angelscript/add_on/scriptstdstring/scriptstdstring.h>
 #include <angelscript/add_on/scripthelper/scripthelper.h>
+#include <angelscript/add_on/scriptmath/scriptmath.h>
 
 #include <Magma/ECS/Entity.h>
 
@@ -45,7 +46,8 @@ void ScriptGlue::RegisterInterface() {
 	RegisterScriptMath(engine);
 
 	RegisterStaticFunctions();
-	RegisterECS();
+	// RegisterTypes();
+	// RegisterECS();
 
 	ScriptEngine::RegisterInterface("IApp")
 		.AddMethod("void OnLoad()")
@@ -68,18 +70,18 @@ void ScriptGlue::RegisterInterface() {
 		.AddMethod("void OnMouseUp()")
 		.AddMethod("void OnMouseDown()");
 
-	engine->RegisterObjectType("Scene", 0, asOBJ_REF | asOBJ_NOCOUNT);
-	engine->RegisterObjectMethod("Scene", "Entity GetEntity(const uint64 &in)",
-		asMETHODPR(ECS::World, GetEntity, (UUID), Entity), asCALL_THISCALL, 0,
-		asOFFSET(Scene, EntityWorld));
+	// engine->RegisterObjectType("Scene", 0, asOBJ_REF | asOBJ_NOCOUNT);
+	// engine->RegisterObjectMethod("Scene", "Entity GetEntity(const uint64 &in)",
+	// 	asMETHODPR(ECS::World, GetEntity, (UUID), Entity), asCALL_THISCALL, 0,
+	// 	asOFFSET(Scene, EntityWorld));
 
-	engine->RegisterObjectType("UIElement", 0, asOBJ_REF | asOBJ_NOCOUNT);
-	// engine->RegisterObjectProperty("UIElement", "")
+	// engine->RegisterObjectType("UIElement", 0, asOBJ_REF | asOBJ_NOCOUNT);
+	// // engine->RegisterObjectProperty("UIElement", "")
 
-	engine->RegisterObjectType("UIPage", 0, asOBJ_REF | asOBJ_NOCOUNT);
-	engine->RegisterObjectMethod("UIPage", "UIElement@ Get(const string &in)",
-		asMETHODPR(UIPage, Get, (const std::string&) const, UIElement*),
-		asCALL_THISCALL);
+	// engine->RegisterObjectType("UIPage", 0, asOBJ_REF | asOBJ_NOCOUNT);
+	// engine->RegisterObjectMethod("UIPage", "UIElement@ Get(const string &in)",
+	// 	asMETHODPR(UIPage, Get, (const std::string&) const, UIElement*),
+	// 	asCALL_THISCALL);
 }
 
 void RegisterStaticFunctions() {
@@ -89,9 +91,57 @@ void RegisterStaticFunctions() {
 		"void print(const string &in)", asFUNCTION(print), asCALL_CDECL);
 }
 
+static void Vec3DefaultConstructor(Vec3* self) {
+	new(self) Vec3();
+}
+static void Vec4DefaultConstructor(Vec4* self) {
+	new(self) Vec4();
+}
+
+static void Vec3CopyConstructor(const Vec3& other, Vec3* self) {
+	new(self) Vec3(other);
+}
+static void Vec4CopyConstructor(const Vec4& other, Vec4* self) {
+	new(self) Vec4(other);
+}
+
+static void Vec3ConvConstructor(float v, Vec3* self) {
+	new(self) Vec3(v);
+}
+static void Vec4ConvConstructor(float v, Vec4* self) {
+	new(self) Vec4(v);
+}
+
+static void Vec3InitConstructor(float r, float g, float b, Vec3* self) {
+	new(self) Vec3(r, g, b);
+}
+static void Vec4InitConstructor(float r, float g, float b, float a, Vec4* self) {
+	new(self) Vec4(r, g, b, a);
+}
+
+static void Vec3ListConstructor(float* list, Vec3* self) {
+	new(self) Vec3(list[0], list[1], list[2]);
+}
+static void Vec4ListConstructor(float* list, Vec4* self) {
+	new(self) Vec4(list[0], list[1], list[2], list[3]);
+}
+
 void RegisterTypes() {
-	// Vec
-	// 
+	auto* engine = ScriptEngine::Get();
+	engine->RegisterObjectBehaviour("Vec3", asBEHAVE_CONSTRUCT,
+		"void f()", asFUNCTION(Vec3DefaultConstructor), asCALL_CDECL_OBJLAST);
+	engine->RegisterObjectBehaviour("Vec3", asBEHAVE_CONSTRUCT,
+		"void f(const Vec3 &in)",
+		asFUNCTION(Vec3CopyConstructor), asCALL_CDECL_OBJLAST);
+	engine->RegisterObjectBehaviour("Vec3", asBEHAVE_CONSTRUCT,
+		"void f(float)",
+		asFUNCTION(Vec3ConvConstructor), asCALL_CDECL_OBJLAST);
+	engine->RegisterObjectBehaviour("Vec3", asBEHAVE_CONSTRUCT,
+		"void f(float, float)",
+		asFUNCTION(Vec3InitConstructor), asCALL_CDECL_OBJLAST);
+	engine->RegisterObjectBehaviour("Vec3", asBEHAVE_LIST_CONSTRUCT,
+		"void f(const int &in) {float, float, float}",
+		asFUNCTION(Vec3ListConstructor), asCALL_CDECL_OBJLAST);
 }
 
 void RegisterECS() {

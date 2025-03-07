@@ -64,10 +64,6 @@ App::App(const Project& project)
 {
 	s_Instance = this;
 
-	Physics::Init();
-	ScriptEngine::Init();
-	ScriptGlue::RegisterInterface();
-
 	ScriptEngine::RegisterSingleton("AppClass", "App", this);
 
 	ScriptEngine::RegisterMethod<App>(
@@ -77,14 +73,13 @@ App::App(const Project& project)
 	ScriptEngine::RegisterMethod<App>(
 		"AppClass", "void PopScreen()", &App::PopScreen);
 
-	ScriptEngine::RegisterMethod<App>(
-		"AppClass", "const AssetManager get_Assets() const property",
-		&App::GetAssetManager);
+	// ScriptEngine::RegisterMethod<App>(
+	// 	"AppClass", "const AssetManager get_Assets() const property",
+	// 	&App::GetAssetManager);
 }
 
 App::~App() {
-	ScriptEngine::Shutdown();
-	Physics::Close();
+
 }
 
 void App::OnLoad() {

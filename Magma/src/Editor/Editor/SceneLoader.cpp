@@ -523,6 +523,12 @@ BinaryWriter& BinaryWriter::WriteObject(const MeshComponent& comp) {
 }
 
 template<>
+BinaryWriter& BinaryWriter::WriteObject(const SkyboxComponent& comp) {
+	Write((uint64_t)comp.CubemapAsset.ID);
+	return *this;
+}
+
+template<>
 BinaryWriter& BinaryWriter::WriteObject(const ScriptComponent& comp) {
 	Write((uint64_t)comp.ModuleAsset.ID);
 	Write(comp.Instance ? comp.Instance->GetClass()->Name : std::string(""));
