@@ -41,7 +41,6 @@ public:
 
 	~List() {
 		Clear();
-		m_Buffer.Delete();
 	}
 
 	List& operator =(const std::initializer_list<T>& list) {

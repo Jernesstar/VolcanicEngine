@@ -1,8 +1,8 @@
 Project:
-  ExportPath: .\TestGame\
+  ExportPath: TestGame/
   Name: TestProj
   App: TestGame
-  StartScreen: TestHome
+  StartScreen: TestScreen2
   Screens:
     - Screen:
         Name: TestHome

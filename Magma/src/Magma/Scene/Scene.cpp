@@ -52,9 +52,9 @@ void Scene::OnRender(SceneRenderer& renderer) {
 		});
 
 	world.query_builder()
+	.with<DirectionalLightComponent>().or_()
 	.with<PointLightComponent>().or_()
-	.with<SpotlightComponent>().or_()
-	.with<DirectionalLightComponent>()
+	.with<SpotlightComponent>()
 	.build()
 	.each(
 		[&](flecs::entity id)
@@ -72,8 +72,7 @@ void Scene::OnRender(SceneRenderer& renderer) {
 		});
 
 	world.query_builder()
-	.with<MeshComponent>().and_()
-	.with<TransformComponent>()
+	.with<MeshComponent>().and_().with<TransformComponent>()
 	.build()
 	.each(
 		[&](flecs::entity id)
@@ -85,11 +84,11 @@ void Scene::OnRender(SceneRenderer& renderer) {
 }
 
 void Scene::RegisterSystems() {
-	// TODO(Change): Move to each system's constructor
 	EntityWorld.Add<ParticleSystem>();
 	EntityWorld.Add<PhysicsSystem>();
 	EntityWorld.Add<ScriptSystem>();
-
+	
+	// TODO(Change): Move to each system's constructor
 	for(auto phase : { flecs::OnUpdate }) {
 		Phase ourPhase;
 		if(phase == flecs::PreUpdate)

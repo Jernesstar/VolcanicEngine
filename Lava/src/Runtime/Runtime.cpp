@@ -40,8 +40,8 @@ Runtime::Runtime(const CommandLineArgs& args)
 		"Framebuffer", ShaderPipeline::Create("Asset/Shader", "Framebuffer"));
 	ShaderLibrary::Add(
 		"Lighting", ShaderPipeline::Create("Asset/Shader", "Lighting"));
-	ShaderLibrary::Add(
-		"Bloom", ShaderPipeline::Create("Asset/Shader", "Bloom"));
+	// ShaderLibrary::Add(
+	// 	"Bloom", ShaderPipeline::Create("Asset/Shader", "Bloom"));
 
 	Project project;
 	project.Load("./.volc.proj");
@@ -71,8 +71,7 @@ Runtime::Runtime(const CommandLineArgs& args)
 
 	UIRenderer::Init();
 
-	m_App->ChangeScreen = true;/
-	
+	m_App->ChangeScreen = true;
 	m_App->Running = true;
 	m_App->OnLoad();
 }

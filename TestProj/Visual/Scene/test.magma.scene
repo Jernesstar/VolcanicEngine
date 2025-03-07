@@ -43,9 +43,3 @@ Scene:
               Scale: [9.30000019, 28.1000004, 1.89999998]
           MeshComponent:
             AssetID: 10036008063945961451
-    - Entity:
-        Name: ""
-        ID: 550
-        Components:
-          AudioComponent:
-            AssetID: 16624656892553940704

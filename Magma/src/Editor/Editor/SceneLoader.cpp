@@ -599,45 +599,45 @@ BinaryWriter& BinaryWriter::WriteObject(const Entity& entity) {
 	Write(entity.GetName());
 
 	std::bitset<12> componentBits;
-	componentBits |= (entity.Has<CameraComponent>()			<< 0);
-	componentBits |= (entity.Has<TagComponent>()			<< 1);
-	componentBits |= (entity.Has<TransformComponent>()		<< 2);
-	componentBits |= (entity.Has<MeshComponent>()			<< 3);
-	componentBits |= (entity.Has<SkyboxComponent>()			<< 4);
-	componentBits |= (entity.Has<RigidBodyComponent>()		<< 5);
-	componentBits |= (entity.Has<ScriptComponent>()			<< 6);
-	componentBits |= (entity.Has<AudioComponent>()			<< 7);
-	componentBits |= (entity.Has<DirectionalLightComponent>() << 8);
-	componentBits |= (entity.Has<PointLightComponent>()		<< 9);
-	componentBits |= (entity.Has<SpotlightComponent>()		<< 10);
-	componentBits |= (entity.Has<ParticleSystemComponent>()	<< 11);
+	componentBits |= ((uint16_t)entity.Has<CameraComponent>()			<< 0);
+	componentBits |= ((uint16_t)entity.Has<TagComponent>()				<< 1);
+	componentBits |= ((uint16_t)entity.Has<TransformComponent>()		<< 2);
+	componentBits |= ((uint16_t)entity.Has<MeshComponent>()				<< 3);
+	componentBits |= ((uint16_t)entity.Has<SkyboxComponent>()			<< 4);
+	componentBits |= ((uint16_t)entity.Has<RigidBodyComponent>()		<< 5);
+	componentBits |= ((uint16_t)entity.Has<ScriptComponent>()			<< 6);
+	componentBits |= ((uint16_t)entity.Has<AudioComponent>()			<< 7);
+	componentBits |= ((uint16_t)entity.Has<DirectionalLightComponent>() << 8);
+	componentBits |= ((uint16_t)entity.Has<PointLightComponent>()		<< 9);
+	componentBits |= ((uint16_t)entity.Has<SpotlightComponent>()		<< 10);
+	componentBits |= ((uint16_t)entity.Has<ParticleSystemComponent>()	<< 11);
 
 	Write(componentBits.to_ulong());
 
-	if(entity.Has<CameraComponent>())
-		Write(entity.Get<CameraComponent>());
-	if(entity.Has<TagComponent>())
-		Write(entity.Get<TagComponent>());
-	if(entity.Has<TransformComponent>())
-		Write(entity.Get<TransformComponent>());
-	if(entity.Has<MeshComponent>())
-		Write(entity.Get<MeshComponent>());
-	if(entity.Has<SkyboxComponent>())
-		Write(entity.Get<SkyboxComponent>());
-	if(entity.Has<RigidBodyComponent>())
-		Write(entity.Get<RigidBodyComponent>());
-	if(entity.Has<ScriptComponent>())
-		Write(entity.Get<ScriptComponent>());
-	if(entity.Has<AudioComponent>())
-		Write(entity.Get<AudioComponent>());
-	if(entity.Has<DirectionalLightComponent>())
-		Write(entity.Get<DirectionalLightComponent>());
-	if(entity.Has<PointLightComponent>())
-		Write(entity.Get<PointLightComponent>());
-	if(entity.Has<SpotlightComponent>())
-		Write(entity.Get<SpotlightComponent>());
-	if(entity.Has<ParticleSystemComponent>())
-		Write(entity.Get<ParticleSystemComponent>());
+	// if(entity.Has<CameraComponent>())
+	// 	Write(entity.Get<CameraComponent>());
+	// if(entity.Has<TagComponent>())
+	// 	Write(entity.Get<TagComponent>());
+	// if(entity.Has<TransformComponent>())
+	// 	Write(entity.Get<TransformComponent>());
+	// if(entity.Has<MeshComponent>())
+	// 	Write(entity.Get<MeshComponent>());
+	// if(entity.Has<SkyboxComponent>())
+	// 	Write(entity.Get<SkyboxComponent>());
+	// if(entity.Has<RigidBodyComponent>())
+	// 	Write(entity.Get<RigidBodyComponent>());
+	// if(entity.Has<ScriptComponent>())
+	// 	Write(entity.Get<ScriptComponent>());
+	// if(entity.Has<AudioComponent>())
+	// 	Write(entity.Get<AudioComponent>());
+	// if(entity.Has<DirectionalLightComponent>())
+	// 	Write(entity.Get<DirectionalLightComponent>());
+	// if(entity.Has<PointLightComponent>())
+	// 	Write(entity.Get<PointLightComponent>());
+	// if(entity.Has<SpotlightComponent>())
+	// 	Write(entity.Get<SpotlightComponent>());
+	// if(entity.Has<ParticleSystemComponent>())
+	// 	Write(entity.Get<ParticleSystemComponent>());
 
 	return *this;
 }
@@ -670,8 +670,8 @@ void SceneLoader::RuntimeSave(const Scene& scene,
 	.ForEach(
 		[&](const Entity& entity)
 		{
-			entityCount++;
 			writer.Write(entity);
+			entityCount++;
 		});
 
 	writer.SetPosition(idx);

@@ -25,6 +25,5 @@ void main()
     else
         color = u_Material.DiffuseColor.rgb;
 
-    // FragColor = vec4(color, 1.0);
-    FragColor = vec4(1.0);
+    FragColor = vec4(color, 1.0);
 }
