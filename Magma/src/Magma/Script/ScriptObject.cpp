@@ -27,8 +27,7 @@ uint32_t ScriptObject::AddRef() {
 
 uint32_t ScriptObject::Release() {
 	if(--m_RefCount == 0) {
-		// delete this;
-		// delete m_Handle;
+		m_Handle->Release();
 		return 0;
 	}
 
