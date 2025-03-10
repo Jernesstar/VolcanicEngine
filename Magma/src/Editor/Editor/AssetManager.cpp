@@ -190,8 +190,6 @@ void EditorAssetManager::Reload() {
 		}
 		i++;
 	}
-
-	VOLCANICORE_LOG_INFO("Reload end");
 }
 
 void EditorAssetManager::Save() {

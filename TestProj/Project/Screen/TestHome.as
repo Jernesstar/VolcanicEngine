@@ -1,13 +1,8 @@
 
 class TestHome : IScreen
 {
-    // Scene @SceneHandle;
-    // UIPage @UIHandle;
-
     TestHome(Scene &world, UIPage &ui)
     {
-        // @SceneHandle = world;
-        // @UIHandle = ui;
     }
 
     void OnLoad()

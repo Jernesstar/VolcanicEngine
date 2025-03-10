@@ -305,7 +305,9 @@ TabState UIRenderer::DrawTab(const std::string& name, bool closeButton) {
 	ImGui::SetNextItemWidth(size.x + (2.0f*radius + padding));
 
 	ImGui::PushID(s_Stack.Count());
-	bool tabItem = ImGui::BeginTabItem(name.c_str());
+	bool tabItem =
+		ImGui::BeginTabItem(name.c_str(), nullptr,
+			closeButton ? 0 : ImGuiTabItemFlags_NoReorder);
 	ImGui::PopID();
 
 	ImVec2 pos;

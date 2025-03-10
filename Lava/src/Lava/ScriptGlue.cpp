@@ -68,18 +68,18 @@ void ScriptGlue::RegisterInterface() {
 		.AddMethod("void OnMouseUp()")
 		.AddMethod("void OnMouseDown()");
 
-	engine->RegisterObjectType("Scene", 0, asOBJ_VALUE | asOBJ_NOCOUNT);
-	engine->RegisterObjectMethod("Scene", "Entity GetEntity(const uint64 &in)",
+	engine->RegisterObjectType("SceneClass", 0, asOBJ_REF | asOBJ_NOHANDLE);
+	engine->RegisterObjectMethod("SceneClass", "Entity GetEntity(uint64)",
 		asMETHODPR(ECS::World, GetEntity, (UUID), Entity), asCALL_THISCALL, 0,
 		asOFFSET(Scene, EntityWorld));
 
-	engine->RegisterObjectType("UIElement", 0, asOBJ_VALUE | asOBJ_NOCOUNT);
+	// engine->RegisterObjectType("UIElement", 0, asOBJ_VALUE | asOBJ_NOCOUNT);
 	// engine->RegisterObjectProperty("UIElement", "")
 
-	engine->RegisterObjectType("UIPage", 0, asOBJ_VALUE | asOBJ_NOCOUNT);
-	engine->RegisterObjectMethod("UIPage", "UIElement@ Get(const string &in)",
-		asMETHODPR(UIPage, Get, (const std::string&) const, UIElement*),
-		asCALL_THISCALL);
+	engine->RegisterObjectType("UIPageClass", 0, asOBJ_REF | asOBJ_NOHANDLE);
+	// engine->RegisterObjectMethod("UIPageClass", "UIElement Get(const string &in)",
+	// 	asMETHODPR(UIPage, Get, (const std::string&) const, UIElement*),
+	// 	asCALL_THISCALL);
 }
 
 static void print(const std::string& str) {
@@ -155,29 +155,39 @@ static uint64_t GetAssetID(Asset* asset) {
 }
 
 void RegisterAssetManager() {
+	auto* engine = ScriptEngine::Get();
+
 	engine->RegisterObjectType("Asset", sizeof(Asset),
 		asOBJ_VALUE | asOBJ_POD | asGetTypeTraits<Asset>());
 	engine->RegisterObjectMethod("Asset", "uint64 get_ID() const property",
 		asFUNCTION(GetAssetID), asCALL_CDECL_OBJLAST);
 
-	engine->RegisterEnum("Magma::AssetType");
-	engine->RegisterEnumValue("Magma::AssetType", "Mesh",	 0);
-	engine->RegisterEnumValue("Magma::AssetType", "Texture", 1);
-	engine->RegisterEnumValue("Magma::AssetType", "Cubemap", 2);
-	engine->RegisterEnumValue("Magma::AssetType", "Font",	 3);
-	engine->RegisterEnumValue("Magma::AssetType", "Audio",	 4);
-	engine->RegisterEnumValue("Magma::AssetType", "Script",	 5);
-	engine->RegisterEnumValue("Magma::AssetType", "Shader",	 6);
-	engine->RegisterEnumValue("Magma::AssetType", "None",	 7);
+	engine->RegisterEnum("AssetType");
+	engine->RegisterEnumValue("AssetType", "Mesh",	  0);
+	engine->RegisterEnumValue("AssetType", "Texture", 1);
+	engine->RegisterEnumValue("AssetType", "Cubemap", 2);
+	engine->RegisterEnumValue("AssetType", "Font",	  3);
+	engine->RegisterEnumValue("AssetType", "Audio",	  4);
+	engine->RegisterEnumValue("AssetType", "Script",  5);
+	engine->RegisterEnumValue("AssetType", "Shader",  6);
+	engine->RegisterEnumValue("AssetType", "None",	  7);
 
 	engine->RegisterObjectProperty("Asset", "AssetType Type",
 		asOFFSET(Asset, Type));
 	engine->RegisterObjectProperty("Asset", "bool Primary",
 		asOFFSET(Asset, Primary));
 
-	engine->RegisterObjectType("AssetManager", sizeof(Asset),
-		asOBJ_VALUE | asOBJ_POD | asOBJ_NOCOUNT | asGetTypeTraits<Asset>());
-	engine->RegisterObjectMethod("AssetManager", "Asset")
+	engine->RegisterObjectType("AssetManager", 0, asOBJ_REF | asOBJ_NOHANDLE);
+	engine->RegisterObjectMethod("AssetManager", "bool IsLoaded(Asset) const",
+		asMETHOD(AssetManager, IsLoaded), asCALL_THISCALL);
+	engine->RegisterObjectMethod("AssetManager", "bool Load(Asset)",
+		asMETHOD(AssetManager, Load), asCALL_THISCALL);
+	engine->RegisterObjectMethod("AssetManager", "bool Unload(Asset)",
+		asMETHOD(AssetManager, Unload), asCALL_THISCALL);
+
+	// engine->RegisterObjectMethod("AssetManager", "ref Sound GetSound(Asset)",
+	// 	asMETHODPR(AssetManager, Get<Sound>, (Asset), Ref<Sound>),
+	// 	asCALL_THISCALL);
 }
 
 void RegisterECS() {
@@ -203,10 +213,8 @@ void RegisterECS() {
 		asOFFSET(TransformComponent, Rotation));
 	engine->RegisterObjectProperty("TransformComponent", "Vec3 Scale",
 		asOFFSET(TransformComponent, Scale));
-	engine->RegisterObjectProperty("TransformComponent", "Vec3 Scale",
-		asOFFSET(TransformComponent, Scale));
 
-	engine->RegisterObjectType("AudioComponent",sizeof(AudioComponent),
+	engine->RegisterObjectType("AudioComponent", sizeof(AudioComponent),
 		asOBJ_VALUE | asOBJ_APP_CLASS_MORE_CONSTRUCTORS | asOBJ_POD
 		| asGetTypeTraits<AudioComponent>());
 	engine->RegisterObjectProperty("AudioComponent", "Asset AudioAsset",
@@ -242,7 +250,7 @@ void RegisterECS() {
 
 	engine->RegisterObjectType("Entity", sizeof(Entity),
 		asOBJ_VALUE | asOBJ_APP_CLASS_MORE_CONSTRUCTORS | asOBJ_POD
-		| asOBJ_APP_CLASS_ALLINTS | asGetTypeTraits<Entity>());
+		| asGetTypeTraits<Entity>());
 	engine->RegisterObjectMethod("Entity", "string get_Name() const property",
 		asMETHOD(Entity, GetName), asCALL_THISCALL);
 	engine->RegisterObjectMethod("Entity", "bool Alive() const",

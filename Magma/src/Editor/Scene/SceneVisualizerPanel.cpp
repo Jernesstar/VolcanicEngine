@@ -403,7 +403,7 @@ void EditorSceneRenderer::SubmitMesh(Entity entity) {
 		Application::As<EditorApp>()->GetEditor().GetAssetManager();
 	auto& tc = entity.Get<TransformComponent>();
 	auto& mc = entity.Get<MeshComponent>();
-	// assetManager.Load(mc.MeshAsset);
+	assetManager.Load(mc.MeshAsset);
 	auto mesh = assetManager.Get<Mesh>(mc.MeshAsset);
 
 	if(entity == Selected)

@@ -161,8 +161,8 @@ void ContentBrowserPanel::Draw() {
 }
 
 ImRect Traverse(fs::path path) {
-	List<fs::path> folders(15);
-	List<fs::path> files(15);
+	List<fs::path> folders;
+	List<fs::path> files;
 
 	ImRect nodeRect;
 	if(fs::is_directory(path)) {

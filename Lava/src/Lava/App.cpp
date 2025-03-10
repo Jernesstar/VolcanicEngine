@@ -37,6 +37,9 @@ namespace Lava {
 static Ref<ScriptModule> s_AppModule;
 static Ref<ScriptObject> s_AppObject;
 
+static Scene* m_ScenePtr;
+static UIPage* m_UIPtr;
+
 struct RuntimeScreen {
 	Scene World;
 	UIPage UI;
@@ -73,9 +76,7 @@ App::App(const Project& project)
 	ScriptEngine::RegisterMethod<App>(
 		"AppClass", "void PopScreen()", &App::PopScreen);
 
-	// ScriptEngine::RegisterMethod<App>(
-	// 	"AppClass", "const AssetManager get_Assets() const property",
-	// 	&App::GetAssetManager);
+	// ScriptEngine::Get()->RegisterGlobalProperty("AssetManager Assets", m_AssetManager);
 }
 
 App::~App() {
@@ -178,8 +179,7 @@ void App::SetScreen(const std::string& name) {
 		UILoad(s_Screen->UI);
 
 	auto scriptClass = s_Screen->Script->GetClass(name);
-	s_Screen->ScriptObj =
-		scriptClass->Instantiate(s_Screen->World, s_Screen->UI);
+	s_Screen->ScriptObj = scriptClass->Instantiate();
 	s_Screen->ScriptObj->Call("OnLoad");
 
 	s_Screen->UI.Traverse(

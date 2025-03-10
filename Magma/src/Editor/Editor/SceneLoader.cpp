@@ -186,7 +186,7 @@ void SerializeEntity(YAMLSerializer& serializer, const Entity& entity) {
 
 		serializer.WriteKey("ScriptComponent")
 		.BeginMapping()
-			.WriteKey("ModuleAsset").Write((uint64_t)asset.ID)
+			.WriteKey("ModuleID").Write((uint64_t)asset.ID)
 			.WriteKey("Class").Write(obj ? obj->GetClass()->Name : "")
 			// .WriteKey("Instance").BeginMapping()
 			// 	// TODO(Implement): Reflection
@@ -376,7 +376,7 @@ void DeserializeEntity(YAML::Node entityNode, Scene& scene) {
 
 	auto scriptComponentNode = components["ScriptComponent"];
 	if(scriptComponentNode) {
-		auto id = scriptComponentNode["ModuleAsset"].as<uint64_t>();
+		auto id = scriptComponentNode["ModuleID"].as<uint64_t>();
 		Asset asset = { id, AssetType::Script };
 		auto classNode = scriptComponentNode["Class"];
 		std::string className = classNode.as<std::string>();

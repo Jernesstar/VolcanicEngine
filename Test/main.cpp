@@ -1,40 +1,28 @@
 #include <iostream>
+#include <filesystem>
 
 #include <VolcaniCore/Core/List.h>
+#include <VolcaniCore/Graphics/RendererAPI.h>
 
 using namespace VolcaniCore;
 
-struct Type {
-	int Val;
-
-	Type() = default;
-	Type(int i)
-		: Val(i) { }
-	Type(Type&&) = default;
-	Type(const Type&) = default;
-	~Type() = default;
-};
-
-static List<Type> theList;
-
 void func() {
-	// static_assert(std::is_aggregate<Type>());
-}
+	DrawPass pass;
+	List<DrawCommand> theList(3);
 
-void func2() {
-	theList.Emplace();
-	theList.Emplace();
-	theList.Emplace();
-	theList.Emplace();
+	theList.Emplace(&pass);
+	theList.Emplace(&pass);
+	theList.Emplace(&pass);
+	theList.EmplaceAt(0, &pass);
 
+	std::cout << "Count: " << theList.Count() << "\n";
 	for(auto& val : theList)
-		std::cout << val.Val << "\n";
+		std::cout << val.Pass << "\n";
 }
 
 int main() {
 	std::cout << "Begin\n";
 	func();
-	func2();
 	std::cout << "End\n";
 
 	return 0;

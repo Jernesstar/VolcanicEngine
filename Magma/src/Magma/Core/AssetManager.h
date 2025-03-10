@@ -59,10 +59,10 @@ public:
 	AssetManager() = default;
 	virtual ~AssetManager() = default;
 
-	bool IsLoaded(Asset asset) {
+	bool IsLoaded(Asset asset) const {
 		if(!m_AssetRegistry.count(asset))
 			return false;
-		return m_AssetRegistry[asset];
+		return m_AssetRegistry.at(asset);
 	}
 	virtual void Load(Asset asset) = 0;
 	virtual void Unload(Asset asset) = 0;

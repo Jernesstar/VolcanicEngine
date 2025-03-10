@@ -17,28 +17,27 @@ public:
 	List()
 		: m_Buffer(5) { }
 	List(uint64_t size)
-		: m_Buffer(size ? size : 5) { }
+		: m_Buffer(size) { }
 	List(std::initializer_list<T> list)
-		: m_Buffer(list.size() ? list.size() : 5)
+		: m_Buffer(list.size())
 	{
-		for(auto element : list)
+		for(auto& element : list)
 			Add(element);
 	}
 	List(List&& other)
-		: m_Buffer(other.m_Buffer.GetMaxCount() ? other.m_Buffer.GetMaxCount() : 5)
+		: m_Buffer(other.m_Buffer.GetMaxCount())
 	{
 		for(auto& val : other)
 			Add(val);
 	}
 	List(const List& other)
-		: m_Buffer(other.m_Buffer.GetMaxCount() ? other.m_Buffer.GetMaxCount() : 5)
+		: m_Buffer(other.m_Buffer.GetMaxCount())
 	{
 		for(auto& val : other)
 			Add(val);
 	}
 
 	~List() {
-		VOLCANICORE_LOG_INFO("List Destructor");
 		Clear();
 		m_Buffer.Delete();
 	}
@@ -47,9 +46,9 @@ public:
 		Clear();
 		m_Buffer.Delete();
 		uint64_t max = list.size();
-		m_Buffer = Buffer<T>(max ? max : 5);
+		m_Buffer = Buffer<T>(max);
 
-		for(auto val : list)
+		for(auto& val : list)
 			Add(val);
 
 		return *this;
@@ -59,7 +58,7 @@ public:
 		Clear();
 		m_Buffer.Delete();
 		uint64_t max = other.m_Buffer.GetMaxCount();
-		m_Buffer = Buffer<T>(max ? max : 5);
+		m_Buffer = Buffer<T>(max);
 
 		for(auto& val : other)
 			Add(val);
@@ -71,7 +70,7 @@ public:
 		Clear();
 		m_Buffer.Delete();
 		uint64_t max = other.m_Buffer.GetMaxCount();
-		m_Buffer = Buffer<T>(max ? max : 5);
+		m_Buffer = Buffer<T>(max);
 
 		for(auto& val : other)
 			Add(val);
@@ -189,11 +188,11 @@ public:
 
 		m_Front = 0;
 		m_Back = Count();
+		m_Buffer.Delete();
 		m_Buffer = Buffer<T>(newData, m_Back, maxCount);
 	}
 
 	void Clear() {
-		VOLCANICORE_LOG_INFO("List Clear");
 		for(uint64_t i = 0; i < Count(); i++)
 			Remove(i);
 
@@ -236,35 +235,47 @@ private:
 	}
 
 	void ShiftRight(uint64_t beg, uint64_t end, uint64_t dx) {
-		for(int64_t i = (int64_t)end; i >= (int64_t)beg; --i) {
+		for(int64_t i = (int64_t)end; i >= (int64_t)beg; i--) {
 			new (m_Buffer.Get(i + dx)) T(*m_Buffer.Get(i));
 			m_Buffer.Get(i)->~T();
 		}
 	}
 
 	void Free(int64_t idx) {
-		if(Count() >= m_Buffer.GetMaxCount()) {
+		if(!m_Buffer.GetMaxCount()) {
+			m_Buffer = Buffer<T>(5);
+			m_Back = 1;
+			m_Front = 0;
+			return;
+		}
+
+		if(Count() == m_Buffer.GetMaxCount()) {
 			auto newMax = m_Buffer.GetMaxCount() + 11;
 			T* newData = (T*)malloc(newMax * sizeof(T));
 
-			uint64_t pos;
-			if(idx < 0)
-				pos = (uint64_t)(((int64_t)m_Back + 1 + idx) - (int64_t)m_Front);
+			uint64_t beg = 0;
+			uint64_t end = 0;
+			uint64_t skip = 0;
+			if(idx == 0)
+				beg = 0;
+			if(idx == -1)
+				end = Count() - 1;
 			else
-				pos = (uint64_t)idx;
+				if(idx < 0)
+					skip = (uint64_t)((int64_t)m_Back + 1 + idx);
+				else
+					skip = (uint64_t)idx;
 
-			uint64_t delta = 0;
-			for(uint64_t i = 0; i < Count() + 1; i++) {
+			for(uint64_t i = beg; i <= end; i++) {
 				if(i == pos)
 					delta = 1;
-				else
+				else {
 					new (newData + i) T(*At(i - delta));
-
-				Remove(i - delta);
+					Remove(i - delta);
+				}
 			}
 
-			m_Front = 0;
-			m_Back = Count() + 1;
+			m_Buffer.Delete();
 			m_Buffer = Buffer<T>(newData, m_Back, newMax);
 		}
 

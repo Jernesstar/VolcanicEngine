@@ -25,7 +25,7 @@ public:
 		std::swap(m_Data, other.m_Data);
 	}
 	Buffer(const Buffer& other)
-		: m_MaxCount(other.GetMaxCount())
+		: m_MaxCount(other.GetMaxCount()), m_Count(other.GetCount())
 	{
 		m_Data = (T*)malloc(GetMaxSize());
 		Set(other.Get(), other.GetCount());
@@ -61,7 +61,7 @@ public:
 	T* Get(uint64_t i = 0) const { return m_Data + i; }
 
 	template<typename ...Args>
-	void New(uint64_t i, Args... args) {
+	void New(uint64_t i, Args&&... args) {
 		new (Get(i)) T(std::forward<Args>(args)...);
 	}
 
@@ -84,9 +84,6 @@ public:
 	}
 	void Add(const Buffer& buffer) {
 		Set(buffer.Get(), buffer.GetCount(), m_Count);
-	}
-	void Add(const std::vector<T>& list) {
-		Set(list.data(), list.size(), m_Count);
 	}
 	void Add(const void* data, uint64_t count) {
 		Set(data, count, m_Count);
