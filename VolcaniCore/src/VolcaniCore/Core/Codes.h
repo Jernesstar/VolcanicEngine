@@ -1,4 +1,5 @@
 #pragma once
+
 namespace VolcaniCore {
 
 using KeyCode = unsigned short; // uint16_t
@@ -110,7 +111,7 @@ enum Key : KeyCode {
 	RightCtrl  = 228,
 	RightShift = 229,
 	RightAlt   = 230,
-	
+
 	Mute       = 127,
 	VolumeUp   = 128,
 	VolumeDown = 129,

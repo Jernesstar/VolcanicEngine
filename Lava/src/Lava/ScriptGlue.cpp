@@ -30,8 +30,9 @@ using namespace Magma::Script;
 
 namespace Lava {
 
-static void RegisterStaticFunctions();
+static void RegisterGlobalFunctions();
 static void RegisterTypes();
+static void RegisterInput();
 static void RegisterAssetManager();
 static void RegisterECS();
 
@@ -42,8 +43,9 @@ void ScriptGlue::RegisterInterface() {
 	RegisterScriptHandle(engine);
 	RegisterScriptMath(engine);
 
-	RegisterStaticFunctions();
+	RegisterGlobalFunctions();
 	RegisterTypes();
+	RegisterInput();
 	RegisterAssetManager();
 	RegisterECS();
 
@@ -73,8 +75,8 @@ void ScriptGlue::RegisterInterface() {
 		asMETHODPR(ECS::World, GetEntity, (UUID), Entity), asCALL_THISCALL, 0,
 		asOFFSET(Scene, EntityWorld));
 
-	// engine->RegisterObjectType("UIElement", 0, asOBJ_VALUE | asOBJ_NOCOUNT);
-	// engine->RegisterObjectProperty("UIElement", "")
+	engine->RegisterObjectType("UIElement", 0, asOBJ_REF);
+	engine->RegisterObjectProperty("UIElement", "")
 
 	engine->RegisterObjectType("UIPageClass", 0, asOBJ_REF | asOBJ_NOHANDLE);
 	// engine->RegisterObjectMethod("UIPageClass", "UIElement Get(const string &in)",
@@ -86,7 +88,7 @@ static void print(const std::string& str) {
 	std::cout << str << "\n";
 }
 
-void RegisterStaticFunctions() {
+void RegisterGlobalFunctions() {
 	auto* engine = ScriptEngine::Get();
 
 	engine->RegisterGlobalFunction(
@@ -150,6 +152,46 @@ void RegisterTypes() {
 		asFUNCTION(Vec3ListConstructor), asCALL_CDECL_OBJLAST);
 }
 
+void RegisterInput() {
+	auto* engine = ScriptEngine::Get();
+
+	engine->RegisterEnum("Key");
+	engine->RegisterEnumValue("Key", "A", 65);
+	engine->RegisterEnumValue("Key", "B", 66);
+	engine->RegisterEnumValue("Key", "C", 67);
+	engine->RegisterEnumValue("Key", "D", 68);
+	engine->RegisterEnumValue("Key", "E", 69);
+	engine->RegisterEnumValue("Key", "F", 70);
+	engine->RegisterEnumValue("Key", "G", 71);
+	engine->RegisterEnumValue("Key", "H", 72);
+	engine->RegisterEnumValue("Key", "I", 73);
+	engine->RegisterEnumValue("Key", "J", 74);
+	engine->RegisterEnumValue("Key", "K", 75);
+	engine->RegisterEnumValue("Key", "L", 76);
+	engine->RegisterEnumValue("Key", "M", 77);
+	engine->RegisterEnumValue("Key", "N", 78);
+	engine->RegisterEnumValue("Key", "O", 79);
+	engine->RegisterEnumValue("Key", "P", 80);
+	engine->RegisterEnumValue("Key", "Q", 81);
+	engine->RegisterEnumValue("Key", "R", 82);
+	engine->RegisterEnumValue("Key", "S", 83);
+	engine->RegisterEnumValue("Key", "T", 84);
+	engine->RegisterEnumValue("Key", "U", 85);
+	engine->RegisterEnumValue("Key", "V", 86);
+	engine->RegisterEnumValue("Key", "W", 87);
+	engine->RegisterEnumValue("Key", "X", 88);
+	engine->RegisterEnumValue("Key", "Y", 89);
+	engine->RegisterEnumValue("Key", "Z", 90);
+	
+	engine->RegisterEnumValue("Key", "Ctrl", 224 + 230);
+	engine->RegisterEnumValue("Key", "Shift", 225 + 229);
+
+	engine->RegisterEnumValue("Key", "Right", 262);
+	engine->RegisterEnumValue("Key", "Left",  263);
+	engine->RegisterEnumValue("Key", "Down",  264);
+	engine->RegisterEnumValue("Key", "Up",    265);
+}
+
 static uint64_t GetAssetID(Asset* asset) {
 	return (uint64_t)asset->ID;
 }
@@ -177,17 +219,20 @@ void RegisterAssetManager() {
 	engine->RegisterObjectProperty("Asset", "bool Primary",
 		asOFFSET(Asset, Primary));
 
-	engine->RegisterObjectType("AssetManager", 0, asOBJ_REF | asOBJ_NOHANDLE);
-	engine->RegisterObjectMethod("AssetManager", "bool IsLoaded(Asset) const",
+	engine->RegisterObjectType("AssetManagerClass", 0, asOBJ_REF | asOBJ_NOHANDLE);
+	engine->RegisterObjectMethod("AssetManagerClass", "bool IsLoaded(Asset) const",
 		asMETHOD(AssetManager, IsLoaded), asCALL_THISCALL);
-	engine->RegisterObjectMethod("AssetManager", "bool Load(Asset)",
+	engine->RegisterObjectMethod("AssetManagerClass", "bool Load(Asset)",
 		asMETHOD(AssetManager, Load), asCALL_THISCALL);
-	engine->RegisterObjectMethod("AssetManager", "bool Unload(Asset)",
+	engine->RegisterObjectMethod("AssetManagerClass", "bool Unload(Asset)",
 		asMETHOD(AssetManager, Unload), asCALL_THISCALL);
 
-	// engine->RegisterObjectMethod("AssetManager", "ref Sound GetSound(Asset)",
-	// 	asMETHODPR(AssetManager, Get<Sound>, (Asset), Ref<Sound>),
-	// 	asCALL_THISCALL);
+	engine->RegisterObjectType("Sound", 0, asOBJ_REF)
+
+	engine->RegisterObjectMethod("AssetManagerClass",
+		"ref Sound @+ GetSound(Asset)",
+		asMETHODPR(AssetManager, Get<Sound>, (Asset), Ref<Sound>),
+		asCALL_THISCALL);
 }
 
 void RegisterECS() {

@@ -62,6 +62,14 @@ struct RuntimeScreen {
 
 static RuntimeScreen* s_Screen = nullptr;
 
+static Scene* GetScene() {
+	return &s_Screen->World;
+}
+
+static UIPage* GetUI() {
+	return &s_Screen->UI;
+}
+
 App::App(const Project& project)
 	: m_Project(project)
 {
@@ -76,7 +84,10 @@ App::App(const Project& project)
 	ScriptEngine::RegisterMethod<App>(
 		"AppClass", "void PopScreen()", &App::PopScreen);
 
-	// ScriptEngine::Get()->RegisterGlobalProperty("AssetManager Assets", m_AssetManager);
+	ScriptEngine::Get()->RegisterGlobalFunction(
+		"SceneClass get_Scene() property", asFUNCTION(GetScene));
+	ScriptEngine::Get()->RegisterGlobalFunction(
+		"UIPageClass get_UI() property", asFUNCTION(GetUI));
 }
 
 App::~App() {
@@ -84,6 +95,9 @@ App::~App() {
 }
 
 void App::OnLoad() {
+	ScriptEngine::Get()->RegisterGlobalProperty(
+		"AssetManagerClass AssetManager", m_AssetManager);
+
 	Application::GetWindow()->SetTitle(m_Project.Name);
 
 	s_AppModule = CreateRef<ScriptModule>(m_Project.App);
@@ -112,6 +126,7 @@ void App::OnUpdate(TimeStep ts) {
 
 	s_Screen->ScriptObj->Call("OnUpdate", (float)ts);
 
+	s_Screen->World.OnUpdate(ts);
 	s_Screen->World.OnRender(m_SceneRenderer);
 
 	UIRenderer::BeginFrame();

@@ -253,30 +253,36 @@ private:
 			auto newMax = m_Buffer.GetMaxCount() + 11;
 			T* newData = (T*)malloc(newMax * sizeof(T));
 
-			uint64_t beg = 0;
-			uint64_t end = 0;
-			uint64_t skip = 0;
-			if(idx == 0)
-				beg = 0;
-			if(idx == -1)
-				end = Count() - 1;
-			else
-				if(idx < 0)
-					skip = (uint64_t)((int64_t)m_Back + 1 + idx);
-				else
-					skip = (uint64_t)idx;
-
-			for(uint64_t i = beg; i <= end; i++) {
-				if(i == pos)
-					delta = 1;
-				else {
-					new (newData + i) T(*At(i - delta));
-					Remove(i - delta);
+			if(idx == 0) {
+				for(uint64_t i = 1; i < Count() + 1; i++) {
+					if(i == pos)
+						delta = 1;
+					else {
+						new (newData + i) T(*At(i - delta));
+						Remove(i - delta);
+					}
+				}
+			}
+			if(idx == -1) {
+				for(uint64_t i = 0; i < Count(); i++) {
+					new (newData + i) T(*At(i));
+					Remove(i);
+				}
+			}
+			else {
+				for(uint64_t i = 1; i < Count() + 1; i++) {
+					if(i == pos)
+						delta = 1;
+					else {
+						new (newData + i) T(*At(i - delta));
+						Remove(i - delta);
+					}
 				}
 			}
 
 			m_Buffer.Delete();
 			m_Buffer = Buffer<T>(newData, m_Back, newMax);
+			return;
 		}
 
 		m_Buffer.Add();
