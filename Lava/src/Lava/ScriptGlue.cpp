@@ -240,6 +240,14 @@ void RegisterAssetManager() {
 	// 	asCALL_THISCALL);
 }
 
+static ScriptObject* GetScriptInstance(ScriptComponent* sc) {
+	return sc->Instance.get();
+}
+
+static Physics::RigidBody* GetRigidBody(RigidBodyComponent* rc) {
+	return rc->Body.get();
+}
+
 void RegisterECS() {
 	auto* engine = ScriptEngine::Get();
 
@@ -279,12 +287,30 @@ void RegisterECS() {
 	engine->RegisterObjectType("SkyboxComponent", sizeof(SkyboxComponent),
 		asOBJ_VALUE | asOBJ_APP_CLASS_MORE_CONSTRUCTORS | asOBJ_POD
 		| asGetTypeTraits<SkyboxComponent>());
+	engine->RegisterObjectProperty("SkyboxComponent", "Asset CubemapAsset",
+		asOFFSET(SkyboxComponent, CubemapAsset));
+
 	engine->RegisterObjectType("ScriptComponent", sizeof(ScriptComponent),
 		asOBJ_VALUE | asOBJ_APP_CLASS_MORE_CONSTRUCTORS | asOBJ_POD
 		| asGetTypeTraits<ScriptComponent>());
+	// engine->RegisterObjectProperty("ScriptComponent", "Asset ModuleAsset",
+	// 	asOFFSET(ScriptComponent, ModuleAsset));
+	// engine->RegisterObjectMethod("ScriptComponent", "ScriptInstance@ get_Instance()",
+	// 	asFUNCTION(GetScriptInstance), asCALL_CDECL_OBJLAST);
+
 	engine->RegisterObjectType("RigidBodyComponent", sizeof(RigidBodyComponent),
 		asOBJ_VALUE | asOBJ_APP_CLASS_MORE_CONSTRUCTORS | asOBJ_POD
 		| asGetTypeTraits<RigidBodyComponent>());
+
+	// engine->RegisterObjectType("RigidBody", 0,
+	// 	asOBJ_REF | asGetTypeTraits<Physics::RigidBody>());
+	// engine->RegisterObjectProperty("RigidBody", )
+	// engine->RegisterObjectMethod("RigidBody", "void ApplyForce(Vec3 force)",
+	// 	asMETHOD(Physics::DynamicBody::ApplyForce));
+
+	// engine->RegisterObjectMethod("RigidBodyComponent", "RigidBody@ get_Body()",
+	// 	asFUNCTION(GetRigidBody), asCALL_CDECL_OBJLAST);
+
 	engine->RegisterObjectType("DirectionalLightComponent", sizeof(DirectionalLightComponent),
 		asOBJ_VALUE | asOBJ_APP_CLASS_MORE_CONSTRUCTORS | asOBJ_POD
 		| asGetTypeTraits<DirectionalLightComponent>());

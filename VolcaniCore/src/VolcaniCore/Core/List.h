@@ -43,6 +43,7 @@ public:
 
 	List& operator =(std::initializer_list<T> list) {
 		Clear();
+		m_Buffer.Delete();
 		m_Buffer = Buffer<T>(list.size());
 
 		for(auto& val : list)
@@ -53,6 +54,7 @@ public:
 
 	List& operator =(List&& other) {
 		Clear();
+		m_Buffer.Delete();
 		m_Buffer = Buffer<T>(other.m_Buffer.GetMaxCount());
 
 		for(auto& val : other)
@@ -63,6 +65,7 @@ public:
 
 	List& operator =(const List& other) {
 		Clear();
+		m_Buffer.Delete();
 		m_Buffer = Buffer<T>(other.m_Buffer.GetMaxCount());
 
 		for(auto& val : other)
@@ -150,15 +153,15 @@ public:
 			func(val);
 	}
 
-	template<typename TOut, class TPredicate>
-	List<TOut> Apply(TPredicate&& func) {
+	template<typename TOut>
+	List<TOut> Apply(const Func<TOut, T&>& func) {
 		List<TOut> out;
 		for(auto& val : *this)
 			out.Add(func(val));
 		return out;
 	}
 
-	SearchResult Find(Func<bool, const T&> func) const {
+	SearchResult Find(const Func<bool, const T&>& func) const {
 		for(uint64_t i = 0; i < Count(); i++)
 			if(func(*At(i)))
 				return { true, i };
@@ -175,12 +178,13 @@ public:
 
 		T* newData = (T*)malloc(maxCount * sizeof(T));
 		for(uint64_t i = 0; i < Count(); i++) {
-			new (newData + i) T(*At(i));
+			new ((newData + i)) T(*At(i));
 			Remove(i);
 		}
 
 		m_Back -= m_Front;
 		m_Front = 0;
+		m_Buffer.Delete();
 		m_Buffer = Buffer<T>(newData, m_Back, maxCount);
 	}
 
@@ -196,10 +200,10 @@ public:
 
 	using iterator = T*;
 	using const_iterator = const T*;
-	iterator begin() { return m_Buffer.Get(m_Front); }
-	iterator end() { return m_Buffer.Get(m_Back); }
-	const_iterator cbegin() const { return m_Buffer.Get(m_Front); }
-	const_iterator cend()	const { return m_Buffer.Get(m_Back); }
+	iterator begin() { return m_Buffer.Get() + m_Front; }
+	iterator end() { return m_Buffer.Get() + m_Back; }
+	const_iterator cbegin() const { return m_Buffer.Get() + m_Front; }
+	const_iterator cend()	const { return m_Buffer.Get() + m_Back; }
 	const_iterator begin()	const { return cbegin(); }
 	const_iterator end()	const { return cend(); }
 
@@ -256,11 +260,12 @@ private:
 				if(i == pos)
 					delta = 1;
 				else {
-					new (newData + i) T(*At(i - delta));
+					new ((newData + i)) T(*At(i - delta));
 					Remove(i - delta);
 				}
 			}
 
+			m_Buffer.Delete();
 			m_Buffer = Buffer<T>(newData, ++m_Back, newMax);
 			return;
 		}

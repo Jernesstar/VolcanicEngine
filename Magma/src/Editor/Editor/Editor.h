@@ -55,6 +55,9 @@ private:
 	void SaveProject();
 	void ExportProject();
 	void ExportProject(const std::string& path);
+
+	void RenderEmptyTab();
+	void RenderBackground();
 };
 
 }

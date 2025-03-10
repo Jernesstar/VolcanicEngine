@@ -162,7 +162,7 @@ void Editor::Render() {
 						 | ImGuiTabBarFlags_TabListPopupButton;
 		ImGui::BeginTabBar("Tabs", tabBarFlags);
 		{
-			auto leadingFlags = ImGuiTabItemFlags_Leading
+			auto leadingFlags = ImGuiTabItemFlags_Trailing
 							  | ImGuiTabItemFlags_NoReorder;
 			if(ImGui::TabItemButton("+", leadingFlags))
 				menu.tab.newTab = true;
@@ -188,8 +188,12 @@ void Editor::Render() {
 
 		if(m_Tabs)
 			m_Tabs[0]->As<ProjectTab>()->RenderEssentialPanels();
-		if(m_CurrentTab)
-			m_CurrentTab->Render();
+		if(m_CurrentTab) {
+			if(m_CurrentTab->Type != TabType::None)
+				m_CurrentTab->Render();
+			else
+				RenderEmptyTab();
+		}
 	}
 	ImGui::End();
 
@@ -212,6 +216,14 @@ void Editor::Render() {
 		ReopenTab();
 	if(menu.tab.closeTab)
 		CloseTab(m_CurrentTab);
+}
+
+void Editor::RenderEmptyTab() {
+
+}
+
+void Editor::RenderBackground() {
+
 }
 
 void Editor::SetTab(Ref<Tab> tab) {

@@ -64,11 +64,14 @@ public:
 
 	operator bool() const { return m_Data && m_Count; }
 
-	T* Get(uint64_t i = 0) const { return m_Data + i; }
+	T* Get(uint64_t i = 0) const {
+		VOLCANICORE_ASSERT(i < m_MaxCount);
+		return m_Data + i;
+	}
 
 	template<typename ...Args>
 	void New(uint64_t i, Args&&... args) {
-		new (Get(i)) T(std::forward<Args>(args)...);
+		new ((void*)Get(i)) T(std::forward<Args>(args)...);
 	}
 
 	std::vector<T> GetList() const {

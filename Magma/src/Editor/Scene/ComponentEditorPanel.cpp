@@ -26,21 +26,33 @@ void ComponentEditorPanel::Update(TimeStep ts) {
 struct {
 	struct {
 		bool Camera	   = false;
-		bool Mesh	   = false;
-		bool RigidBody = false;
 		bool Tag	   = false;
 		bool Transform = false;
+		bool Audio	   = false;
+		bool Mesh	   = false;
+		bool Skybox	   = false;
 		bool Script	   = false;
+		bool RigidBody = false;
+		bool DirectionalLight = false;
+		bool PointLight = false;
+		bool Spotlight = false;
+		bool ParticleSystem = false;
 	} component;
 } focus;
 
 void ComponentEditorPanel::ClearFocus() {
 	focus.component.Camera = false;
-	focus.component.Mesh = false;
-	focus.component.RigidBody = false;
 	focus.component.Tag = false;
 	focus.component.Transform = false;
+	focus.component.Audio = false;
+	focus.component.Mesh = false;
+	focus.component.Skybox = false;
 	focus.component.Script = false;
+	focus.component.RigidBody = false;
+	focus.component.DirectionalLight = false;
+	focus.component.PointLight = false;
+	focus.component.Spotlight = false;
+	focus.component.ParticleSystem = false;
 }
 
 template<>
@@ -51,26 +63,6 @@ void ComponentEditorPanel::SetFocus<CameraComponent>() {
 template<>
 bool ComponentEditorPanel::IsFocused<CameraComponent>(Entity& entity) {
 	return m_Context == entity && focus.component.Camera;
-}
-
-template<>
-void ComponentEditorPanel::SetFocus<MeshComponent>() {
-	ClearFocus();
-	focus.component.Mesh = true;
-}
-template<>
-bool ComponentEditorPanel::IsFocused<MeshComponent>(Entity& entity) {
-	return m_Context == entity && focus.component.Mesh;
-}
-
-template<>
-void ComponentEditorPanel::SetFocus<RigidBodyComponent>() {
-	ClearFocus();
-	focus.component.RigidBody = true;
-}
-template<>
-bool ComponentEditorPanel::IsFocused<RigidBodyComponent>(Entity& entity) {
-	return m_Context == entity && focus.component.RigidBody;
 }
 
 template<>
@@ -94,6 +86,36 @@ bool ComponentEditorPanel::IsFocused<TransformComponent>(Entity& entity) {
 }
 
 template<>
+void ComponentEditorPanel::SetFocus<AudioComponent>() {
+	ClearFocus();
+	focus.component.Audio = true;
+}
+template<>
+bool ComponentEditorPanel::IsFocused<AudioComponent>(Entity& entity) {
+	return m_Context == entity && focus.component.Audio;
+}
+
+template<>
+void ComponentEditorPanel::SetFocus<MeshComponent>() {
+	ClearFocus();
+	focus.component.Mesh = true;
+}
+template<>
+bool ComponentEditorPanel::IsFocused<MeshComponent>(Entity& entity) {
+	return m_Context == entity && focus.component.Mesh;
+}
+
+template<>
+void ComponentEditorPanel::SetFocus<SkyboxComponent>() {
+	ClearFocus();
+	focus.component.Skybox = true;
+}
+template<>
+bool ComponentEditorPanel::IsFocused<SkyboxComponent>(Entity& entity) {
+	return m_Context == entity && focus.component.Skybox;
+}
+
+template<>
 void ComponentEditorPanel::SetFocus<ScriptComponent>() {
 	ClearFocus();
 	focus.component.Script = true;
@@ -101,6 +123,16 @@ void ComponentEditorPanel::SetFocus<ScriptComponent>() {
 template<>
 bool ComponentEditorPanel::IsFocused<ScriptComponent>(Entity& entity) {
 	return m_Context == entity && focus.component.Script;
+}
+
+template<>
+void ComponentEditorPanel::SetFocus<RigidBodyComponent>() {
+	ClearFocus();
+	focus.component.RigidBody = true;
+}
+template<>
+bool ComponentEditorPanel::IsFocused<RigidBodyComponent>(Entity& entity) {
+	return m_Context == entity && focus.component.RigidBody;
 }
 
 template<typename TComponent>
@@ -131,18 +163,13 @@ void DrawComponent<CameraComponent>(Entity& entity) {
 }
 
 template<>
-void DrawComponent<MeshComponent>(Entity& entity) {
-	
-}
-
-template<>
-void DrawComponent<RigidBodyComponent>(Entity& entity) {
-
-}
-
-template<>
 void DrawComponent<TagComponent>(Entity& entity) {
+	if(!entity.Has<TagComponent>())
+		return;
 
+	auto& component = entity.Set<TagComponent>();
+	ImGui::SeparatorText("TagComponent");
+	ImGui::InputText("##Tag", &component.Tag);
 }
 
 template<>
@@ -168,7 +195,27 @@ void DrawComponent<TransformComponent>(Entity& entity) {
 }
 
 template<>
+void DrawComponent<AudioComponent>(Entity& entity) {
+	
+}
+
+template<>
+void DrawComponent<MeshComponent>(Entity& entity) {
+	
+}
+
+template<>
+void DrawComponent<SkyboxComponent>(Entity& entity) {
+
+}
+
+template<>
 void DrawComponent<ScriptComponent>(Entity& entity) {
+
+}
+
+template<>
+void DrawComponent<RigidBodyComponent>(Entity& entity) {
 
 }
 
@@ -178,16 +225,20 @@ void ComponentEditorPanel::Draw() {
 		if(m_Context) {
 			if(IsFocused<CameraComponent>(m_Context))
 				DrawComponent<CameraComponent>(m_Context);
-			if(IsFocused<MeshComponent>(m_Context))
-				DrawComponent<MeshComponent>(m_Context);
-			if(IsFocused<RigidBodyComponent>(m_Context))
-				DrawComponent<RigidBodyComponent>(m_Context);
-			if(IsFocused<TagComponent>(m_Context))
+			else if(IsFocused<TagComponent>(m_Context))
 				DrawComponent<TagComponent>(m_Context);
-			if(IsFocused<TransformComponent>(m_Context))
+			else if(IsFocused<TransformComponent>(m_Context))
 				DrawComponent<TransformComponent>(m_Context);
-			if(IsFocused<ScriptComponent>(m_Context))
+			else if(IsFocused<AudioComponent>(m_Context))
+				DrawComponent<AudioComponent>(m_Context);
+			else if(IsFocused<MeshComponent>(m_Context))
+				DrawComponent<MeshComponent>(m_Context);
+			else if(IsFocused<SkyboxComponent>(m_Context))
+				DrawComponent<SkyboxComponent>(m_Context);
+			else if(IsFocused<ScriptComponent>(m_Context))
 				DrawComponent<ScriptComponent>(m_Context);
+			else if(IsFocused<RigidBodyComponent>(m_Context))
+				DrawComponent<RigidBodyComponent>(m_Context);
 		}
 	}
 	ImGui::End();
