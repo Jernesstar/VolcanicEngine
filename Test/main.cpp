@@ -1,8 +1,16 @@
 #include <iostream>
-#include <filesystem>
 
 #include <VolcaniCore/Core/List.h>
-#include <VolcaniCore/Graphics/RendererAPI.h>
+
+struct DrawPass {
+
+};
+
+struct DrawCommand {
+	DrawPass* Pass;
+
+	uint32_t Width, Height;
+};
 
 using namespace VolcaniCore;
 

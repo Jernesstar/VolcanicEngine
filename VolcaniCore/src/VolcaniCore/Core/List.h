@@ -255,23 +255,20 @@ private:
 
 			if(idx == 0) {
 				for(uint64_t i = 1; i < Count() + 1; i++) {
-					if(i == pos)
-						delta = 1;
-					else {
-						new (newData + i) T(*At(i - delta));
-						Remove(i - delta);
-					}
+					new (newData + i) T(*At(i));
+					Remove(i);
 				}
 			}
-			if(idx == -1) {
+			else if(idx == -1) {
 				for(uint64_t i = 0; i < Count(); i++) {
 					new (newData + i) T(*At(i));
 					Remove(i);
 				}
 			}
 			else {
-				for(uint64_t i = 1; i < Count() + 1; i++) {
-					if(i == pos)
+				uint64_t delta = 0;
+				for(uint64_t i = 0; i < Count() + 1; i++) {
+					if(i == (uint64_t)idx)
 						delta = 1;
 					else {
 						new (newData + i) T(*At(i - delta));

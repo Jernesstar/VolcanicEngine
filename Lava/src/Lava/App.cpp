@@ -85,9 +85,9 @@ App::App(const Project& project)
 		"AppClass", "void PopScreen()", &App::PopScreen);
 
 	ScriptEngine::Get()->RegisterGlobalFunction(
-		"SceneClass get_Scene() property", asFUNCTION(GetScene));
+		"SceneClass get_Scene() property", asFUNCTION(GetScene), asCALL_CDECL);
 	ScriptEngine::Get()->RegisterGlobalFunction(
-		"UIPageClass get_UI() property", asFUNCTION(GetUI));
+		"UIPageClass get_UI() property", asFUNCTION(GetUI), asCALL_CDECL);
 }
 
 App::~App() {

@@ -76,7 +76,7 @@ void ScriptGlue::RegisterInterface() {
 		asOFFSET(Scene, EntityWorld));
 
 	engine->RegisterObjectType("UIElement", 0, asOBJ_REF);
-	engine->RegisterObjectProperty("UIElement", "")
+	// engine->RegisterObjectProperty("UIElement", "");
 
 	engine->RegisterObjectType("UIPageClass", 0, asOBJ_REF | asOBJ_NOHANDLE);
 	// engine->RegisterObjectMethod("UIPageClass", "UIElement Get(const string &in)",
@@ -155,6 +155,11 @@ void RegisterTypes() {
 void RegisterInput() {
 	auto* engine = ScriptEngine::Get();
 
+	engine->RegisterEnum("Mouse");
+	engine->RegisterEnumValue("Mouse", "Left", 0);
+	engine->RegisterEnumValue("Mouse", "Right", 1);
+	engine->RegisterEnumValue("Mouse", "Middle", 2);
+
 	engine->RegisterEnum("Key");
 	engine->RegisterEnumValue("Key", "A", 65);
 	engine->RegisterEnumValue("Key", "B", 66);
@@ -182,7 +187,7 @@ void RegisterInput() {
 	engine->RegisterEnumValue("Key", "X", 88);
 	engine->RegisterEnumValue("Key", "Y", 89);
 	engine->RegisterEnumValue("Key", "Z", 90);
-	
+
 	engine->RegisterEnumValue("Key", "Ctrl", 224 + 230);
 	engine->RegisterEnumValue("Key", "Shift", 225 + 229);
 
@@ -227,12 +232,12 @@ void RegisterAssetManager() {
 	engine->RegisterObjectMethod("AssetManagerClass", "bool Unload(Asset)",
 		asMETHOD(AssetManager, Unload), asCALL_THISCALL);
 
-	engine->RegisterObjectType("Sound", 0, asOBJ_REF)
+	// engine->RegisterObjectType("Sound", 0, asOBJ_REF);
 
-	engine->RegisterObjectMethod("AssetManagerClass",
-		"ref Sound @+ GetSound(Asset)",
-		asMETHODPR(AssetManager, Get<Sound>, (Asset), Ref<Sound>),
-		asCALL_THISCALL);
+	// engine->RegisterObjectMethod("AssetManagerClass",
+	// 	"ref Sound @+ GetSound(Asset)",
+	// 	asMETHODPR(AssetManager, Get<Sound>, (Asset), Ref<Sound>),
+	// 	asCALL_THISCALL);
 }
 
 void RegisterECS() {
@@ -242,7 +247,7 @@ void RegisterECS() {
 		asOBJ_VALUE | asOBJ_APP_CLASS_MORE_CONSTRUCTORS | asOBJ_POD
 		| asGetTypeTraits<CameraComponent>());
 	// engine->RegisterObjectProperty("CameraComponent")
-	
+
 	engine->RegisterObjectType("TagComponent", sizeof(TagComponent),
 		asOBJ_VALUE | asOBJ_APP_CLASS_MORE_CONSTRUCTORS | asOBJ_POD
 		| asGetTypeTraits<TagComponent>());
