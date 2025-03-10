@@ -27,12 +27,18 @@ public:
 	Buffer(const Buffer& other)
 		: m_MaxCount(other.GetMaxCount()), m_Count(other.GetCount())
 	{
+		if(!m_MaxCount)
+			return;
+
 		m_Data = (T*)malloc(GetMaxSize());
 		Set(other.Get(), other.GetCount());
 	}
 	Buffer(const std::initializer_list<T>& list)
 		: m_MaxCount(list.size())
 	{
+		if(!m_MaxCount)
+			return;
+
 		m_Data = (T*)malloc(GetMaxSize());
 		Set(list.begin(), list.size());
 	}
@@ -118,6 +124,9 @@ public:
 	}
 
 	void Delete() {
+		if(!m_Data)
+			return;
+
 		free(m_Data);
 		m_Data = nullptr;
 		m_Count = 0;

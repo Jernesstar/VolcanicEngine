@@ -1,31 +1,35 @@
 #include <iostream>
+#include <memory>
 
 #include <VolcaniCore/Core/List.h>
 
-struct DrawPass {
-
-};
-
-struct DrawCommand {
-	DrawPass* Pass;
-
-	uint32_t Width, Height;
-};
-
 using namespace VolcaniCore;
 
-void func() {
-	DrawPass pass;
-	List<DrawCommand> theList(3);
+struct Tab {
+	std::string Name;
+	uint32_t Type;
 
-	theList.Emplace(&pass);
-	theList.Emplace(&pass);
-	theList.Emplace(&pass);
-	theList.EmplaceAt(0, &pass);
+	Tab(const std::string& name, uint32_t type)
+		: Name(name), Type(type) { }
+};
+
+List<std::shared_ptr<Tab>> theList;
+
+void func2(Ref<Tab> tab) {
+	theList.Add(tab);
+}
+
+void func() {
+	theList.Allocate(5);
+
+	auto tab = std::make_shared<Tab>(std::string("First Tab"), 2);
+	func2(tab);
+	theList.Add(std::make_shared<Tab>(std::string("Second Tab"), 4));
+	theList.Add(std::make_shared<Tab>(std::string("Third Tab"), 1));
 
 	std::cout << "Count: " << theList.Count() << "\n";
 	for(auto& val : theList)
-		std::cout << val.Pass << "\n";
+		std::cout << val->Name << ", Type: " << val->Type << "\n";
 }
 
 int main() {
