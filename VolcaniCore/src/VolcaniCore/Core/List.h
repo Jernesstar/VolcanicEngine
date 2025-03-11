@@ -14,8 +14,7 @@ struct SearchResult {
 template<typename T>
 class List {
 public:
-	List()
-		: m_Buffer(5) { }
+	List() = default;
 	List(uint64_t size)
 		: m_Buffer(size) { }
 	List(std::initializer_list<T> list)

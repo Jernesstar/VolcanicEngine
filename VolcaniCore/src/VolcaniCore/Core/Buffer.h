@@ -12,30 +12,36 @@ template<typename T>
 class Buffer {
 public:
 	Buffer() = default;
-
 	Buffer(uint64_t maxCount)
 		: m_MaxCount(maxCount)
 	{
+		VOLCANICORE_LOG_INFO("Buffer - Count Ctor: %i", maxCount);
 		if(maxCount)
 			m_Data = (T*)malloc(GetMaxSize());
 	}
 	Buffer(Buffer&& other)
 		: m_MaxCount(other.GetMaxCount()), m_Count(other.GetCount())
 	{
+		VOLCANICORE_LOG_INFO("Buffer - Move Ctor");
+		VOLCANICORE_LOG_INFO("{ %i, %i, %i } vs. { %i, %i, %i }",
+			other.GetCount(), other.GetMaxCount(), other.Get(),
+			GetCount(), GetMaxCount(), Get());
 		std::swap(m_Data, other.m_Data);
 	}
 	Buffer(const Buffer& other)
-		: m_MaxCount(other.GetMaxCount()), m_Count(other.GetCount())
+		: m_MaxCount(other.GetMaxCount())
 	{
+		VOLCANICORE_LOG_INFO("Buffer - Copy Ctor: %i", m_MaxCount);
 		if(!m_MaxCount)
 			return;
 
 		m_Data = (T*)malloc(GetMaxSize());
 		Set(other.Get(), other.GetCount());
 	}
-	Buffer(const std::initializer_list<T>& list)
+	Buffer(std::initializer_list<T> list)
 		: m_MaxCount(list.size())
 	{
+		VOLCANICORE_LOG_INFO("Buffer - Init Ctor: %i", m_MaxCount);
 		if(!m_MaxCount)
 			return;
 
@@ -45,6 +51,7 @@ public:
 	Buffer(T* data, uint64_t count, uint64_t maxCount = 0)
 		: m_Data(data), m_MaxCount(maxCount), m_Count(count)
 	{
+		VOLCANICORE_LOG_INFO("Buffer - Own Ctor: { %i, %i }", count, maxCount);
 		if(!m_MaxCount)
 			m_MaxCount = count;
 	}
@@ -72,10 +79,6 @@ public:
 	template<typename ...Args>
 	void New(uint64_t i, Args&&... args) {
 		new ((void*)Get(i)) T(std::forward<Args>(args)...);
-	}
-
-	std::vector<T> GetList() const {
-		return std::vector<T>(m_Data, m_Data + m_Count);
 	}
 
 	uint64_t GetCount()	   const { return m_Count; }
