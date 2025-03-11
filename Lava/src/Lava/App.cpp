@@ -70,6 +70,10 @@ static UIPage* GetUI() {
 	return &s_Screen->UI;
 }
 
+static asIScriptObject* GetScriptApp() {
+	return s_AppObject->GetHandle();
+}
+
 App::App(const Project& project)
 	: m_Project(project)
 {
@@ -88,6 +92,9 @@ App::App(const Project& project)
 		"SceneClass get_Scene() property", asFUNCTION(GetScene), asCALL_CDECL);
 	ScriptEngine::Get()->RegisterGlobalFunction(
 		"UIPageClass get_UI() property", asFUNCTION(GetUI), asCALL_CDECL);
+
+	ScriptEngine::Get()->RegisterGlobalProperty("IApp@ get_ScriptApp() property",
+		asFUNCTION(GetScriptApp), asCALL_CDECL);
 }
 
 App::~App() {

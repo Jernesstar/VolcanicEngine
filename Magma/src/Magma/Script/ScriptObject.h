@@ -26,6 +26,7 @@ public:
 		func.CallVoid(std::forward<Args>(args)...);
 	}
 
+	asIScriptObject* GetHandle() const { return m_Handle; }
 	const ScriptClass* GetClass() const { return m_Class; }
 
 private:

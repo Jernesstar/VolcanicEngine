@@ -78,7 +78,7 @@ public:
 
 	template<typename ...Args>
 	void New(uint64_t i, Args&&... args) {
-		new ((void*)Get(i)) T(std::forward<Args>(args)...);
+		new (Get(i)) T(std::forward<Args>(args)...);
 	}
 
 	uint64_t GetCount()	   const { return m_Count; }

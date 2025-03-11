@@ -150,6 +150,10 @@ void RegisterTypes() {
 	engine->RegisterObjectBehaviour("Vec3", asBEHAVE_LIST_CONSTRUCT,
 		"void f(const int &in) {float, float, float}",
 		asFUNCTION(Vec3ListConstructor), asCALL_CDECL_OBJLAST);
+
+	engine->RegisterGlobalFunction(
+		"Vec3 normalize(const Vec3 &in)", asFUNCTION(glm::normalize),
+		asCALL_CDECL);
 }
 
 void RegisterInput() {
@@ -224,24 +228,28 @@ void RegisterAssetManager() {
 	engine->RegisterObjectProperty("Asset", "bool Primary",
 		asOFFSET(Asset, Primary));
 
-	engine->RegisterObjectType("AssetManagerClass", 0, asOBJ_REF | asOBJ_NOHANDLE);
-	engine->RegisterObjectMethod("AssetManagerClass", "bool IsLoaded(Asset) const",
+	engine->RegisterObjectType("AssetManagerClass", 0,
+		asOBJ_REF | asOBJ_NOHANDLE);
+	engine->RegisterObjectMethod("AssetManagerClass",
+		"bool IsLoaded(Asset) const",
 		asMETHOD(AssetManager, IsLoaded), asCALL_THISCALL);
 	engine->RegisterObjectMethod("AssetManagerClass", "bool Load(Asset)",
 		asMETHOD(AssetManager, Load), asCALL_THISCALL);
 	engine->RegisterObjectMethod("AssetManagerClass", "bool Unload(Asset)",
 		asMETHOD(AssetManager, Unload), asCALL_THISCALL);
 
-	// engine->RegisterObjectType("Sound", 0, asOBJ_REF);
+	engine->RegisterObjectType("Sound", 0, asOBJ_REF);
 
-	// engine->RegisterObjectMethod("AssetManagerClass",
-	// 	"ref Sound @+ GetSound(Asset)",
-	// 	asMETHODPR(AssetManager, Get<Sound>, (Asset), Ref<Sound>),
-	// 	asCALL_THISCALL);
+	engine->RegisterObjectMethod("AssetManagerClass",
+		"Sound @+ GetSound(Asset)",
+		asMETHODPR(AssetManager, Get<Sound>, (Asset), Ref<Sound>),
+		asCALL_THISCALL);
+	engine->RegisterObjectMethod("Sound", "void Play()", asMETHOD(Sound, Play),
+		asCALL_THISCALL);
 }
 
-static ScriptObject* GetScriptInstance(ScriptComponent* sc) {
-	return sc->Instance.get();
+static asIScriptObject* GetScriptInstance(ScriptComponent* sc) {
+	return sc->Instance->GetHandle();
 }
 
 static Physics::RigidBody* GetRigidBody(RigidBodyComponent* rc) {
@@ -293,20 +301,31 @@ void RegisterECS() {
 	engine->RegisterObjectType("ScriptComponent", sizeof(ScriptComponent),
 		asOBJ_VALUE | asOBJ_APP_CLASS_MORE_CONSTRUCTORS | asOBJ_POD
 		| asGetTypeTraits<ScriptComponent>());
-	// engine->RegisterObjectProperty("ScriptComponent", "Asset ModuleAsset",
-	// 	asOFFSET(ScriptComponent, ModuleAsset));
-	// engine->RegisterObjectMethod("ScriptComponent", "ScriptInstance@ get_Instance()",
-	// 	asFUNCTION(GetScriptInstance), asCALL_CDECL_OBJLAST);
+	engine->RegisterObjectProperty("ScriptComponent", "Asset ModuleAsset",
+		asOFFSET(ScriptComponent, ModuleAsset));
+	engine->RegisterObjectMethod("ScriptComponent", "IEntity@ get_Instance()",
+		asFUNCTION(GetScriptInstance), asCALL_CDECL_OBJLAST);
 
 	engine->RegisterObjectType("RigidBodyComponent", sizeof(RigidBodyComponent),
 		asOBJ_VALUE | asOBJ_APP_CLASS_MORE_CONSTRUCTORS | asOBJ_POD
 		| asGetTypeTraits<RigidBodyComponent>());
 
-	// engine->RegisterObjectType("RigidBody", 0,
-	// 	asOBJ_REF | asGetTypeTraits<Physics::RigidBody>());
-	// engine->RegisterObjectProperty("RigidBody", )
-	// engine->RegisterObjectMethod("RigidBody", "void ApplyForce(Vec3 force)",
-	// 	asMETHOD(Physics::DynamicBody::ApplyForce));
+	engine->RegisterObjectType("RigidBody", 0,
+		asOBJ_REF | asGetTypeTraits<Physics::RigidBody>());
+		engine->RegisterObjectType("TransformComponent", sizeof(TransformComponent),
+		asOBJ_VALUE | asOBJ_APP_CLASS_MORE_CONSTRUCTORS | asOBJ_POD
+		| asGetTypeTraits<TransformComponent>());
+
+	engine->RegisterObjectProperty("Transform", "Vec3 Translation",
+		asOFFSET(Transform, Translation));
+	engine->RegisterObjectProperty("Transform", "Vec3 Rotation",
+		asOFFSET(Transform, Rotation));
+	engine->RegisterObjectProperty("Transform", "Vec3 Scale",
+		asOFFSET(Transform, Scale));
+
+	engine->RegisterObjectProperty("RigidBody", "")
+	engine->RegisterObjectMethod("RigidBody", "void ApplyForce(Vec3 force)",
+		asMETHOD(Physics::DynamicBody::ApplyForce));
 
 	// engine->RegisterObjectMethod("RigidBodyComponent", "RigidBody@ get_Body()",
 	// 	asFUNCTION(GetRigidBody), asCALL_CDECL_OBJLAST);
