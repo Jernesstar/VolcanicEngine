@@ -15,17 +15,15 @@ struct Tab {
 
 List<std::shared_ptr<Tab>> theList;
 
-void func2(Ref<Tab> tab) {
-	theList.Add(tab);
-}
-
 void func() {
-	theList.Allocate(5);
+	theList.Allocate(3);
 
-	auto tab = std::make_shared<Tab>(std::string("First Tab"), 2);
-	func2(tab);
+	theList.Add(std::make_shared<Tab>(std::string("First Tab"), 2));
 	theList.Add(std::make_shared<Tab>(std::string("Second Tab"), 4));
 	theList.Add(std::make_shared<Tab>(std::string("Third Tab"), 1));
+	theList.Add(std::make_shared<Tab>(std::string("Fourth Tab"), 1));
+	theList.Add(std::make_shared<Tab>(std::string("Fifth Tab"), 0));
+	theList.Add(std::make_shared<Tab>(std::string("Sixth Tab"), 1));
 
 	std::cout << "Count: " << theList.Count() << "\n";
 	for(auto& val : theList)

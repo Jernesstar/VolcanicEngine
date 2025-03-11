@@ -3,6 +3,11 @@
 #include <iostream>
 #include <fstream>
 
+#define GLM_ENABLE_EXPERIMENTAL
+
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/quaternion.hpp>
+
 #include <angelscript.h>
 #include <angelscript/add_on/scripthandle/scripthandle.h>
 #include <angelscript/add_on/scriptstdstring/scriptstdstring.h>
@@ -130,6 +135,13 @@ static void Vec4ListConstructor(float* list, Vec4* ptr) {
 	new(ptr) Vec4(list[0], list[1], list[2], list[3]);
 }
 
+static Vec3 NormalizeVec3(const Vec3& vec) {
+	return glm::normalize(vec);
+}
+static Vec4 NormalizeVec4(const Vec4& vec) {
+	return glm::normalize(vec);
+}
+
 void RegisterTypes() {
 	auto* engine = ScriptEngine::Get();
 
@@ -151,9 +163,8 @@ void RegisterTypes() {
 		"void f(const int &in) {float, float, float}",
 		asFUNCTION(Vec3ListConstructor), asCALL_CDECL_OBJLAST);
 
-	engine->RegisterGlobalFunction(
-		"Vec3 normalize(const Vec3 &in)", asFUNCTION(glm::normalize),
-		asCALL_CDECL);
+	engine->RegisterGlobalFunction("Vec3 normalize(const Vec3 &in)",
+		asFUNCTION(NormalizeVec3), asCALL_CDECL);
 }
 
 void RegisterInput() {
@@ -259,20 +270,17 @@ static Physics::RigidBody* GetRigidBody(RigidBodyComponent* rc) {
 void RegisterECS() {
 	auto* engine = ScriptEngine::Get();
 
-	engine->RegisterObjectType("CameraComponent", sizeof(CameraComponent),
-		asOBJ_VALUE | asOBJ_APP_CLASS_MORE_CONSTRUCTORS | asOBJ_POD
-		| asGetTypeTraits<CameraComponent>());
+	engine->RegisterObjectType("CameraComponent", 0,
+		asOBJ_REF | asOBJ_NOCOUNT | asGetTypeTraits<CameraComponent>());
 	// engine->RegisterObjectProperty("CameraComponent")
 
-	engine->RegisterObjectType("TagComponent", sizeof(TagComponent),
-		asOBJ_VALUE | asOBJ_APP_CLASS_MORE_CONSTRUCTORS | asOBJ_POD
-		| asGetTypeTraits<TagComponent>());
+	engine->RegisterObjectType("TagComponent", 0,
+		asOBJ_REF | asOBJ_NOCOUNT | asGetTypeTraits<TagComponent>());
 	engine->RegisterObjectProperty("TagComponent", "string Tag",
 		asOFFSET(TagComponent, Tag));
 
-	engine->RegisterObjectType("TransformComponent", sizeof(TransformComponent),
-		asOBJ_VALUE | asOBJ_APP_CLASS_MORE_CONSTRUCTORS | asOBJ_POD
-		| asGetTypeTraits<TransformComponent>());
+	engine->RegisterObjectType("TransformComponent", 0,
+		asOBJ_REF | asOBJ_NOCOUNT | asGetTypeTraits<TransformComponent>());
 	engine->RegisterObjectProperty("TransformComponent", "Vec3 Translation",
 		asOFFSET(TransformComponent, Translation));
 	engine->RegisterObjectProperty("TransformComponent", "Vec3 Rotation",
@@ -280,41 +288,33 @@ void RegisterECS() {
 	engine->RegisterObjectProperty("TransformComponent", "Vec3 Scale",
 		asOFFSET(TransformComponent, Scale));
 
-	engine->RegisterObjectType("AudioComponent", sizeof(AudioComponent),
-		asOBJ_VALUE | asOBJ_APP_CLASS_MORE_CONSTRUCTORS | asOBJ_POD
-		| asGetTypeTraits<AudioComponent>());
+	engine->RegisterObjectType("AudioComponent", 0,
+		asOBJ_REF | asOBJ_NOCOUNT | asGetTypeTraits<AudioComponent>());
 	engine->RegisterObjectProperty("AudioComponent", "Asset AudioAsset",
 		asOFFSET(AudioComponent, AudioAsset));
 
-	engine->RegisterObjectType("MeshComponent", sizeof(MeshComponent),
-		asOBJ_VALUE | asOBJ_APP_CLASS_MORE_CONSTRUCTORS | asOBJ_POD
-		| asGetTypeTraits<MeshComponent>());
+	engine->RegisterObjectType("MeshComponent", 0,
+		asOBJ_REF | asOBJ_NOCOUNT | asGetTypeTraits<MeshComponent>());
 	engine->RegisterObjectProperty("MeshComponent", "Asset MeshAsset",
 		asOFFSET(MeshComponent, MeshAsset));
 
-	engine->RegisterObjectType("SkyboxComponent", sizeof(SkyboxComponent),
-		asOBJ_VALUE | asOBJ_APP_CLASS_MORE_CONSTRUCTORS | asOBJ_POD
-		| asGetTypeTraits<SkyboxComponent>());
+	engine->RegisterObjectType("SkyboxComponent", 0,
+		asOBJ_REF | asOBJ_NOCOUNT | asGetTypeTraits<SkyboxComponent>());
 	engine->RegisterObjectProperty("SkyboxComponent", "Asset CubemapAsset",
 		asOFFSET(SkyboxComponent, CubemapAsset));
 
-	engine->RegisterObjectType("ScriptComponent", sizeof(ScriptComponent),
-		asOBJ_VALUE | asOBJ_APP_CLASS_MORE_CONSTRUCTORS | asOBJ_POD
-		| asGetTypeTraits<ScriptComponent>());
+	engine->RegisterObjectType("ScriptComponent", 0,
+		asOBJ_REF | asOBJ_NOCOUNT | asGetTypeTraits<ScriptComponent>());
 	engine->RegisterObjectProperty("ScriptComponent", "Asset ModuleAsset",
 		asOFFSET(ScriptComponent, ModuleAsset));
 	engine->RegisterObjectMethod("ScriptComponent", "IEntity@ get_Instance()",
 		asFUNCTION(GetScriptInstance), asCALL_CDECL_OBJLAST);
 
-	engine->RegisterObjectType("RigidBodyComponent", sizeof(RigidBodyComponent),
-		asOBJ_VALUE | asOBJ_APP_CLASS_MORE_CONSTRUCTORS | asOBJ_POD
-		| asGetTypeTraits<RigidBodyComponent>());
+	engine->RegisterObjectType("RigidBodyComponent", 0,
+		asOBJ_REF | asOBJ_NOCOUNT | asGetTypeTraits<RigidBodyComponent>());
 
 	engine->RegisterObjectType("RigidBody", 0,
 		asOBJ_REF | asGetTypeTraits<Physics::RigidBody>());
-		engine->RegisterObjectType("TransformComponent", sizeof(TransformComponent),
-		asOBJ_VALUE | asOBJ_APP_CLASS_MORE_CONSTRUCTORS | asOBJ_POD
-		| asGetTypeTraits<TransformComponent>());
 
 	engine->RegisterObjectProperty("Transform", "Vec3 Translation",
 		asOFFSET(Transform, Translation));
@@ -323,25 +323,21 @@ void RegisterECS() {
 	engine->RegisterObjectProperty("Transform", "Vec3 Scale",
 		asOFFSET(Transform, Scale));
 
-	engine->RegisterObjectProperty("RigidBody", "")
-	engine->RegisterObjectMethod("RigidBody", "void ApplyForce(Vec3 force)",
-		asMETHOD(Physics::DynamicBody::ApplyForce));
+	// engine->RegisterObjectProperty("RigidBody", "Transform PhysicsTransform");
+	// engine->RegisterObjectMethod("RigidBody", "void ApplyForce(Vec3 force)",
+	// 	asMETHOD(Physics::DynamicBody::ApplyForce));
 
-	// engine->RegisterObjectMethod("RigidBodyComponent", "RigidBody@ get_Body()",
-	// 	asFUNCTION(GetRigidBody), asCALL_CDECL_OBJLAST);
+	engine->RegisterObjectMethod("RigidBodyComponent", "RigidBody@ get_Body()",
+		asFUNCTION(GetRigidBody), asCALL_CDECL_OBJLAST);
 
-	engine->RegisterObjectType("DirectionalLightComponent", sizeof(DirectionalLightComponent),
-		asOBJ_VALUE | asOBJ_APP_CLASS_MORE_CONSTRUCTORS | asOBJ_POD
-		| asGetTypeTraits<DirectionalLightComponent>());
-	engine->RegisterObjectType("PointLightComponent", sizeof(PointLightComponent),
-		asOBJ_VALUE | asOBJ_APP_CLASS_MORE_CONSTRUCTORS | asOBJ_POD
-		| asGetTypeTraits<PointLightComponent>());
-	engine->RegisterObjectType("SpotlightComponent", sizeof(SpotlightComponent),
-		asOBJ_VALUE | asOBJ_APP_CLASS_MORE_CONSTRUCTORS | asOBJ_POD
-		| asGetTypeTraits<SpotlightComponent>());
-	engine->RegisterObjectType("ParticleSystemComponent", sizeof(ParticleSystemComponent),
-		asOBJ_VALUE | asOBJ_APP_CLASS_MORE_CONSTRUCTORS | asOBJ_POD
-		| asGetTypeTraits<ParticleSystemComponent>());
+	engine->RegisterObjectType("DirectionalLightComponent", 0,
+		asOBJ_REF | asOBJ_NOCOUNT | asGetTypeTraits<DirectionalLightComponent>());
+	engine->RegisterObjectType("PointLightComponent", 0,
+		asOBJ_REF | asOBJ_NOCOUNT | asGetTypeTraits<PointLightComponent>());
+	engine->RegisterObjectType("SpotlightComponent", 0,
+		asOBJ_REF | asOBJ_NOCOUNT | asGetTypeTraits<SpotlightComponent>());
+	engine->RegisterObjectType("ParticleSystemComponent", 0,
+		asOBJ_REF | asOBJ_NOCOUNT | asGetTypeTraits<ParticleSystemComponent>());
 
 	engine->RegisterObjectType("Entity", sizeof(Entity),
 		asOBJ_VALUE | asOBJ_APP_CLASS_MORE_CONSTRUCTORS | asOBJ_POD

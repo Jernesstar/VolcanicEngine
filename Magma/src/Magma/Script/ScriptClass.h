@@ -33,6 +33,7 @@ public:
 	}
 
 	asIScriptFunction* GetFunction(const std::string& name) const;
+	const auto& GetFunctions() const { return m_Functions; }
 
 	ScriptModule* GetModule() const { return m_Module; }
 
@@ -43,6 +44,7 @@ private:
 	asITypeInfo* m_Type;
 	asIScriptFunction* m_Factory;
 	Map<std::string, asIScriptFunction*> m_Functions;
+	List<std::string> m_Fields;
 
 	ScriptModule* m_Module;
 

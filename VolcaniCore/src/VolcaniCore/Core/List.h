@@ -17,7 +17,7 @@ public:
 	List() = default;
 	List(uint64_t size)
 		: m_Buffer(size) { }
-	List(std::initializer_list<T> list)
+	List(const std::initializer_list<T>& list)
 		: m_Buffer(list.size())
 	{
 		for(auto& element : list)
@@ -38,9 +38,10 @@ public:
 
 	~List() {
 		Clear();
+		m_Buffer.Delete();
 	}
 
-	List& operator =(std::initializer_list<T> list) {
+	List& operator =(const std::initializer_list<T>& list) {
 		Clear();
 		m_Buffer.Delete();
 		m_Buffer = Buffer<T>(list.size());
@@ -237,12 +238,12 @@ private:
 	}
 
 	void Free(int64_t idx) {
-		if(!m_Buffer.GetMaxCount()) {
-			m_Buffer = Buffer<T>(5);
-			m_Back = 1;
-			m_Front = 0;
-			return;
-		}
+		// if(!m_Buffer.GetMaxCount()) {
+		// 	m_Buffer = Buffer<T>(5);
+		// 	m_Back = 1;
+		// 	m_Front = 0;
+		// 	return;
+		// }
 
 		if(Count() == m_Buffer.GetMaxCount()) {
 			auto newMax = m_Buffer.GetMaxCount() + 11;
@@ -255,13 +256,12 @@ private:
 				pos = (uint64_t)idx;
 
 			uint64_t delta = 0;
-			for(uint64_t i = 0; i < Count() + 1; i++) {
+			for(uint64_t i = 0; i < Count(); i++) {
 				if(i == pos)
 					delta = 1;
-				else {
-					new ((newData + i)) T(*At(i - delta));
-					Remove(i - delta);
-				}
+
+				new (newData + i + delta) T(*At(i));
+				Remove(i);
 			}
 
 			m_Buffer.Delete();

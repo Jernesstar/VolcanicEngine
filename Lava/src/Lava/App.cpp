@@ -92,9 +92,6 @@ App::App(const Project& project)
 		"SceneClass get_Scene() property", asFUNCTION(GetScene), asCALL_CDECL);
 	ScriptEngine::Get()->RegisterGlobalFunction(
 		"UIPageClass get_UI() property", asFUNCTION(GetUI), asCALL_CDECL);
-
-	ScriptEngine::Get()->RegisterGlobalProperty("IApp@ get_ScriptApp() property",
-		asFUNCTION(GetScriptApp), asCALL_CDECL);
 }
 
 App::~App() {
@@ -112,6 +109,9 @@ void App::OnLoad() {
 
 	s_AppObject = s_AppModule->GetClass(m_Project.App)->Instantiate();
 	s_AppObject->Call("OnLoad");
+
+	ScriptEngine::Get()->RegisterGlobalProperty(
+		"IApp@ ScriptApp", s_AppObject->GetHandle());
 
 	SetScreen(m_Project.StartScreen);
 }

@@ -15,33 +15,26 @@ public:
 	Buffer(uint64_t maxCount)
 		: m_MaxCount(maxCount)
 	{
-		VOLCANICORE_LOG_INFO("Buffer - Count Ctor: %i", maxCount);
 		if(maxCount)
 			m_Data = (T*)malloc(GetMaxSize());
 	}
 	Buffer(Buffer&& other)
 		: m_MaxCount(other.GetMaxCount()), m_Count(other.GetCount())
 	{
-		VOLCANICORE_LOG_INFO("Buffer - Move Ctor");
-		VOLCANICORE_LOG_INFO("{ %i, %i, %i } vs. { %i, %i, %i }",
-			other.GetCount(), other.GetMaxCount(), other.Get(),
-			GetCount(), GetMaxCount(), Get());
 		std::swap(m_Data, other.m_Data);
 	}
 	Buffer(const Buffer& other)
 		: m_MaxCount(other.GetMaxCount())
 	{
-		VOLCANICORE_LOG_INFO("Buffer - Copy Ctor: %i", m_MaxCount);
 		if(!m_MaxCount)
 			return;
 
 		m_Data = (T*)malloc(GetMaxSize());
 		Set(other.Get(), other.GetCount());
 	}
-	Buffer(std::initializer_list<T> list)
+	Buffer(const std::initializer_list<T>& list)
 		: m_MaxCount(list.size())
 	{
-		VOLCANICORE_LOG_INFO("Buffer - Init Ctor: %i", m_MaxCount);
 		if(!m_MaxCount)
 			return;
 
@@ -51,7 +44,6 @@ public:
 	Buffer(T* data, uint64_t count, uint64_t maxCount = 0)
 		: m_Data(data), m_MaxCount(maxCount), m_Count(count)
 	{
-		VOLCANICORE_LOG_INFO("Buffer - Own Ctor: { %i, %i }", count, maxCount);
 		if(!m_MaxCount)
 			m_MaxCount = count;
 	}
@@ -72,7 +64,7 @@ public:
 	operator bool() const { return m_Data && m_Count; }
 
 	T* Get(uint64_t i = 0) const {
-		VOLCANICORE_ASSERT(i < m_MaxCount);
+		VOLCANICORE_ASSERT((i == 0 && !m_Data) || (i < m_MaxCount));
 		return m_Data + i;
 	}
 
@@ -130,9 +122,6 @@ public:
 	}
 
 	void Delete() {
-		if(!m_Data)
-			return;
-
 		free(m_Data);
 		m_Data = nullptr;
 		m_Count = 0;
@@ -185,15 +174,7 @@ public:
 		Set(other.Get(), other.GetCount());
 	}
 
-	template<typename T>
-	Buffer(const std::vector<T>& list)
-		: m_SizeT(sizeof(T)), m_MaxCount(list.size())
-	{
-		m_Data = malloc(GetMaxSize());
-		Set(list.data(), list.size());
-	}
-
-	Buffer(void* data, uint64_t size, uint64_t count = 0)
+	Buffer(void* data, uint64_t size, uint64_t count)
 		: m_SizeT(size), m_MaxCount(count), m_Count(count)
 	{
 		m_Data = data;
@@ -216,9 +197,6 @@ public:
 	}
 
 	void* Get() const { return m_Data; }
-
-	template<typename T>
-	T* Get() const { return (T*)m_Data; }
 
 	uint64_t GetCount()	   const { return m_Count; }
 	uint64_t GetMaxCount() const { return m_MaxCount; }
