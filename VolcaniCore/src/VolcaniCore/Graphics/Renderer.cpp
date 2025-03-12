@@ -113,6 +113,7 @@ void Renderer::PopOptions(uint32_t count) {
 }
 
 void Renderer::Flush() {
+	s_Stack.Clear();
 	RendererAPI::Get()->EndFrame();
 }
 

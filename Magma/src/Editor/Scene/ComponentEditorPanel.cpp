@@ -290,7 +290,7 @@ void DrawComponent<ParticleSystemComponent>(Entity& entity) {
 		&component.MaxParticleCount, &min, &max);
 	ImGui::DragFloat("Particle Life Time", &component.ParticleLifetime,
 		1.0f, 1.0f, 10000.0f);
-	ImGui::Text("Asset: %i", (uint64_t)component.ImageAsset.ID);
+	ImGui::Text("Asset: %li", (uint64_t)component.ImageAsset.ID);
 	ImGui::Button("Change Asset");
 }
 

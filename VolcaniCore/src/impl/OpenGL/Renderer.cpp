@@ -63,7 +63,7 @@ void Renderer::Init() {
 	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS); // Smooth cubemap edges
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
-	s_Data.Commands.Allocate(50);
+	s_Data.Commands.Allocate(100);
 	s_Data.Passes.Allocate(10);
 }
 
@@ -79,20 +79,20 @@ void Renderer::StartFrame() {
 }
 
 void Renderer::EndFrame() {
-	// if(!s_Data.Commands)
-	// 	return;
+	if(!s_Data.Commands)
+		return;
 
-	// for(auto& [buffer, backend] : s_Data.Arrays) {
-	// 	if(backend.Indices.GetCount() && buffer->Specs.MaxIndexCount)
-	// 		backend.Array->GetIndexBuffer()->SetData(backend.Indices);
-	// 	if(backend.Vertices.GetCount() && buffer->Specs.MaxVertexCount)
-	// 		backend.Array->GetVertexBuffer(0)->SetData(backend.Vertices);
-	// 	if(backend.Instances.GetCount() && buffer->Specs.MaxInstanceCount)
-	// 		backend.Array->GetVertexBuffer(1)->SetData(backend.Instances);
-	// }
+	for(auto& [buffer, backend] : s_Data.Arrays) {
+		if(backend.Indices.GetCount() && buffer->Specs.MaxIndexCount)
+			backend.Array->GetIndexBuffer()->SetData(backend.Indices);
+		if(backend.Vertices.GetCount() && buffer->Specs.MaxVertexCount)
+			backend.Array->GetVertexBuffer(0)->SetData(backend.Vertices);
+		if(backend.Instances.GetCount() && buffer->Specs.MaxInstanceCount)
+			backend.Array->GetVertexBuffer(1)->SetData(backend.Instances);
+	}
 
-	// for(auto& command : s_Data.Commands)
-	// 	FlushCommand(command);
+	for(auto& command : s_Data.Commands)
+		FlushCommand(command);
 
 	s_Data.Commands.Clear();
 	s_Data.Passes.Clear();
@@ -151,26 +151,26 @@ DrawBuffer* Renderer::GetDrawBuffer(DrawBufferSpecification& specs) {
 void Renderer::SetBufferData(DrawBuffer* buffer, uint8_t bufferIndex,
 							 const void* data, uint64_t count, uint64_t offset)
 {
-	// auto& backendBuffer = s_Data.Arrays[buffer];
-	// if(bufferIndex == 0)
-	// 	if(count == 0)
-	// 		backendBuffer.Indices.Clear();
-	// 	else
-	// 		backendBuffer.Indices.Set(data, count, offset);
-	// else if(bufferIndex == 1)
-	// 	if(count == 0)
-	// 		backendBuffer.Vertices.Clear();
-	// 	else
-	// 		backendBuffer.Vertices.Set(data, count, offset);
-	// else if(bufferIndex == 2)
-	// 	if(count == 0)
-	// 		backendBuffer.Instances.Clear();
-	// 	else
-	// 		backendBuffer.Instances.Set(data, count, offset);
+	auto& backendBuffer = s_Data.Arrays[buffer];
+	if(bufferIndex == 0)
+		if(count == 0)
+			backendBuffer.Indices.Clear();
+		else
+			backendBuffer.Indices.Set(data, count, offset);
+	else if(bufferIndex == 1)
+		if(count == 0)
+			backendBuffer.Vertices.Clear();
+		else
+			backendBuffer.Vertices.Set(data, count, offset);
+	else if(bufferIndex == 2)
+		if(count == 0)
+			backendBuffer.Instances.Clear();
+		else
+			backendBuffer.Instances.Set(data, count, offset);
 
-	// buffer->IndicesCount = backendBuffer.Indices.GetCount();
-	// buffer->VerticesCount = backendBuffer.Vertices.GetCount();
-	// buffer->InstancesCount = backendBuffer.Instances.GetCount();
+	buffer->IndicesCount = backendBuffer.Indices.GetCount();
+	buffer->VerticesCount = backendBuffer.Vertices.GetCount();
+	buffer->InstancesCount = backendBuffer.Instances.GetCount();
 }
 
 void Renderer::ReleaseBuffer(DrawBuffer* buffer) {

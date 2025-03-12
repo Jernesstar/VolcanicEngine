@@ -82,7 +82,7 @@ public:
 	const T& operator[](int64_t idx) const { return *At(idx); }
 
 	T* At(int64_t idx) const {
-		VOLCANICORE_ASSERT(idx >= -(int64_t)m_Back || idx < Count());
+		VOLCANICORE_ASSERT(idx >= -(int64_t)m_Back || idx < (int64_t)Count());
 		auto abs = Absolute(idx);
 		return m_Buffer.Get(abs);
 	}
@@ -178,7 +178,7 @@ public:
 
 		T* newData = (T*)malloc(maxCount * sizeof(T));
 		for(uint64_t i = 0; i < Count(); i++) {
-			new ((newData + i)) T(*At(i));
+			new (newData + i) T(*At(i));
 			Remove(i);
 		}
 
@@ -238,12 +238,14 @@ private:
 	}
 
 	void Free(int64_t idx) {
-		// if(!m_Buffer.GetMaxCount()) {
-		// 	m_Buffer = Buffer<T>(5);
-		// 	m_Back = 1;
-		// 	m_Front = 0;
-		// 	return;
-		// }
+		VOLCANICORE_LOG_INFO("Idx: %i", idx);
+
+		if(!m_Buffer.GetMaxCount()) {
+			m_Buffer = Buffer<T>(5);
+			m_Back = 1;
+			m_Front = 0;
+			return;
+		}
 
 		if(Count() == m_Buffer.GetMaxCount()) {
 			auto newMax = m_Buffer.GetMaxCount() + 11;
@@ -277,17 +279,18 @@ private:
 		}
 
 		auto abs = Absolute(idx);
-		if(abs == 0) {
-			if(m_Front != 0)
-				m_Front--;
-			else
-				ShiftRight(0, (m_Back++) - 1, 1);
-		}
-		else if(abs == m_Back - 1) {
+		VOLCANICORE_LOG_INFO("Absolute: %li", abs);
+		if(abs == m_Back - 1) {
 			if(m_Back != m_Buffer.GetMaxCount())
 				m_Back++;
 			else
 				ShiftLeft((m_Front--), m_Back - 1, 1);
+		}
+		else if(abs == 0) {
+			if(m_Front != 0)
+				m_Front--;
+			else
+				ShiftRight(0, (m_Back++) - 1, 1);
 		}
 		else
 			ShiftRight(abs, (m_Back++) - 1, 1);

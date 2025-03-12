@@ -107,13 +107,16 @@ public:
 
 	void Add() {
 		m_Count++;
+		VOLCANICORE_ASSERT(m_Count <= m_MaxCount);
 	}
 
 	void AddRange(uint64_t count) {
 		m_Count += count;
+		VOLCANICORE_ASSERT(m_Count <= m_MaxCount);
 	}
 
 	void Remove() {
+		VOLCANICORE_ASSERT(m_Count);
 		m_Count--;
 	}
 
@@ -138,8 +141,11 @@ public:
 
 		m_MaxCount = count;
 		T* newData = (T*)malloc(GetMaxSize());
-		memcpy(newData, m_Data, GetSize());
-		free(m_Data);
+		if(m_Data) {
+			memcpy(newData, m_Data, GetSize());
+			free(m_Data);
+		}
+
 		m_Data = newData;
 	}
 

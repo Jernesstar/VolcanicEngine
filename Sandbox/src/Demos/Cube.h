@@ -119,6 +119,8 @@ Cube::Cube()
 	controller.TranslationSpeed = 20.0f;
 
 	UIRenderer::Init();
+
+	auto* command = RendererAPI::Get()->NewDrawCommand(nullptr);
 }
 
 Cube::~Cube() {

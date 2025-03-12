@@ -387,100 +387,100 @@ void RegisterECS() {
 		asCALL_THISCALL);
 
 	engine->RegisterObjectMethod("Entity",
-		"CameraComponent& GetCameraComponent()",
+		"CameraComponent@ GetCameraComponent()",
 		asMETHODPR(Entity, Get<CameraComponent>, () const,
 			const CameraComponent&), asCALL_THISCALL);
 	engine->RegisterObjectMethod("Entity",
-		"TagComponent& GetTagComponent()",
+		"TagComponent@ GetTagComponent()",
 		asMETHODPR(Entity, Get<TagComponent>, () const,
 			const TagComponent&), asCALL_THISCALL);
 	engine->RegisterObjectMethod("Entity",
-		"TransformComponent& GetTransformComponent()",
+		"TransformComponent@ GetTransformComponent()",
 		asMETHODPR(Entity, Get<TransformComponent>, () const,
 			const TransformComponent&), asCALL_THISCALL);
 	engine->RegisterObjectMethod("Entity",
-		"AudioComponent& GetAudioComponent()",
+		"AudioComponent@ GetAudioComponent()",
 		asMETHODPR(Entity, Get<AudioComponent>, () const,
 			const AudioComponent&), asCALL_THISCALL);
 	engine->RegisterObjectMethod("Entity",
-		"MeshComponent& GetMeshComponent()",
+		"MeshComponent@ GetMeshComponent()",
 		asMETHODPR(Entity, Get<MeshComponent>, () const,
 			const MeshComponent&), asCALL_THISCALL);
 	engine->RegisterObjectMethod("Entity",
-		"SkyboxComponent& GetSkyboxComponent()",
+		"SkyboxComponent@ GetSkyboxComponent()",
 		asMETHODPR(Entity, Get<SkyboxComponent>, () const,
 			const SkyboxComponent&), asCALL_THISCALL);
 	engine->RegisterObjectMethod("Entity",
-		"ScriptComponent& GetScriptComponent()",
+		"ScriptComponent@ GetScriptComponent()",
 		asMETHODPR(Entity, Get<ScriptComponent>, () const,
 			const ScriptComponent&), asCALL_THISCALL);
 	engine->RegisterObjectMethod("Entity",
-		"RigidBodyComponent& GetRigidBodyComponent()",
+		"RigidBodyComponent@ GetRigidBodyComponent()",
 		asMETHODPR(Entity, Get<RigidBodyComponent>, () const,
 			const RigidBodyComponent&), asCALL_THISCALL);
 	engine->RegisterObjectMethod("Entity",
-		"DirectionalLightComponent& GetDirectionalLightComponent()",
+		"DirectionalLightComponent@ GetDirectionalLightComponent()",
 		asMETHODPR(Entity, Get<DirectionalLightComponent>, () const,
 			const DirectionalLightComponent&), asCALL_THISCALL);
 	engine->RegisterObjectMethod("Entity",
-		"PointLightComponent& GetPointLightComponent()",
+		"PointLightComponent@ GetPointLightComponent()",
 		asMETHODPR(Entity, Get<PointLightComponent>, () const,
 			const PointLightComponent&), asCALL_THISCALL);
 	engine->RegisterObjectMethod("Entity",
-		"SpotlightComponent& GetSpotlightComponent()",
+		"SpotlightComponent@ GetSpotlightComponent()",
 		asMETHODPR(Entity, Get<SpotlightComponent>, () const,
 			const SpotlightComponent&), asCALL_THISCALL);
 	engine->RegisterObjectMethod("Entity",
-		"ParticleSystemComponent& GetParticleSystemComponent()",
+		"ParticleSystemComponent@ GetParticleSystemComponent()",
 		asMETHODPR(Entity, Get<ParticleSystemComponent>, () const,
 			const ParticleSystemComponent&), asCALL_THISCALL);
 
 	engine->RegisterObjectMethod("Entity",
-		"CameraComponent& SetCameraComponent()",
+		"CameraComponent@ SetCameraComponent()",
 		asMETHODPR(Entity, Set<CameraComponent>, (),
 			CameraComponent&), asCALL_THISCALL);
 	engine->RegisterObjectMethod("Entity",
-		"TagComponent& SetTagComponent()",
+		"TagComponent@ SetTagComponent()",
 		asMETHODPR(Entity, Set<TagComponent>, (),
 			TagComponent&), asCALL_THISCALL);
 	engine->RegisterObjectMethod("Entity",
-		"TransformComponent& SetTransformComponent()",
+		"TransformComponent@ SetTransformComponent()",
 		asMETHODPR(Entity, Set<TransformComponent>, (),
 			TransformComponent&), asCALL_THISCALL);
 	engine->RegisterObjectMethod("Entity",
-		"AudioComponent& SetAudioComponent()",
+		"AudioComponent@ SetAudioComponent()",
 		asMETHODPR(Entity, Set<AudioComponent>, (),
 			AudioComponent&), asCALL_THISCALL);
 	engine->RegisterObjectMethod("Entity",
-		"MeshComponent& SetMeshComponent()",
+		"MeshComponent@ SetMeshComponent()",
 		asMETHODPR(Entity, Set<MeshComponent>, (),
 			MeshComponent&), asCALL_THISCALL);
 	engine->RegisterObjectMethod("Entity",
-		"SkyboxComponent& SetSkyboxComponent()",
+		"SkyboxComponent@ SetSkyboxComponent()",
 		asMETHODPR(Entity, Set<SkyboxComponent>, (),
 			SkyboxComponent&), asCALL_THISCALL);
 	engine->RegisterObjectMethod("Entity",
-		"ScriptComponent& SetScriptComponent()",
+		"ScriptComponent@ SetScriptComponent()",
 		asMETHODPR(Entity, Set<ScriptComponent>, (),
 			ScriptComponent&), asCALL_THISCALL);
 	engine->RegisterObjectMethod("Entity",
-		"RigidBodyComponent& SetRigidBodyComponent()",
+		"RigidBodyComponent@ SetRigidBodyComponent()",
 		asMETHODPR(Entity, Set<RigidBodyComponent>, (),
 			RigidBodyComponent&), asCALL_THISCALL);
 	engine->RegisterObjectMethod("Entity",
-		"DirectionalLightComponent& SetDirectionalLightComponent()",
+		"DirectionalLightComponent@ SetDirectionalLightComponent()",
 		asMETHODPR(Entity, Set<DirectionalLightComponent>, (),
 			DirectionalLightComponent&), asCALL_THISCALL);
 	engine->RegisterObjectMethod("Entity",
-		"PointLightComponent& SetPointLightComponent()",
+		"PointLightComponent@ SetPointLightComponent()",
 		asMETHODPR(Entity, Set<PointLightComponent>, (),
 			PointLightComponent&), asCALL_THISCALL);
 	engine->RegisterObjectMethod("Entity",
-		"SpotlightComponent& SetSpotlightComponent()",
+		"SpotlightComponent@ SetSpotlightComponent()",
 		asMETHODPR(Entity, Set<SpotlightComponent>, (),
 			SpotlightComponent&), asCALL_THISCALL);
 	engine->RegisterObjectMethod("Entity",
-		"ParticleSystemComponent& SetParticleSystemComponent()",
+		"ParticleSystemComponent@ SetParticleSystemComponent()",
 		asMETHODPR(Entity, Set<ParticleSystemComponent>, (),
 			ParticleSystemComponent&), asCALL_THISCALL);
 }

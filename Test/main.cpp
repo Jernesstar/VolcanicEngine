@@ -2,37 +2,41 @@
 #include <memory>
 
 #include <VolcaniCore/Core/List.h>
+#include <VolcaniCore/Graphics/RendererAPI.h>
+#include <VolcaniCore/Graphics/Renderer.h>
 
 using namespace VolcaniCore;
 
-struct Tab {
-	std::string Name;
-	uint32_t Type;
-
-	Tab(const std::string& name, uint32_t type)
-		: Name(name), Type(type) { }
+struct BackendBuffer {
+	// Ref<VertexArray> Array;
+	Buffer<uint32_t> Indices;
+	Buffer<void> Vertices;
+	Buffer<void> Instances;
 };
 
-List<std::shared_ptr<Tab>> theList;
+struct RendererData {
+	Map<DrawBuffer*, BackendBuffer> Arrays;
+	List<DrawCommand> Commands;
+	List<DrawPass> Passes;
+	DrawPass* LastPass = nullptr;
+};
+
+static RendererData s_Data;
 
 void func() {
-	theList.Allocate(3);
+	s_Data.Commands.Allocate(50);
+}
 
-	theList.Add(std::make_shared<Tab>(std::string("First Tab"), 2));
-	theList.Add(std::make_shared<Tab>(std::string("Second Tab"), 4));
-	theList.Add(std::make_shared<Tab>(std::string("Third Tab"), 1));
-	theList.Add(std::make_shared<Tab>(std::string("Fourth Tab"), 1));
-	theList.Add(std::make_shared<Tab>(std::string("Fifth Tab"), 0));
-	theList.Add(std::make_shared<Tab>(std::string("Sixth Tab"), 1));
+void func2() {
+	DrawPass pass;
 
-	std::cout << "Count: " << theList.Count() << "\n";
-	for(auto& val : theList)
-		std::cout << val->Name << ", Type: " << val->Type << "\n";
 }
 
 int main() {
 	std::cout << "Begin\n";
 	func();
+	func2();
+	func2();
 	std::cout << "End\n";
 
 	return 0;
