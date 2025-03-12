@@ -154,10 +154,11 @@ void SceneVisualizerPanel::Draw() {
 			open = ImGui::BeginPopupModal("Create Entity with ScriptComponent");
 
 		if(open) {
-			auto& asset = options.add.asset;
 			static std::string str;
 			static std::string hint = "Enter entity name";
 			ImGui::InputTextWithHint("##Input", hint.c_str(), &str);
+			static bool exit = false;
+			static Entity newEntity;
 
 			if(ImGui::Button("Cancel"))
 				ImGui::CloseCurrentPopup();
@@ -166,9 +167,9 @@ void SceneVisualizerPanel::Draw() {
 				if(ImGui::Button("Create")
 				|| ImGui::IsKeyPressed(ImGuiKey_Enter, false))
 				{
+					exit = true;
 					auto& world = m_Context->EntityWorld;
-					Entity newEntity;
-					bool exit = true;
+
 					if(str == "")
 						newEntity = world.AddEntity();
 					else {
@@ -180,25 +181,32 @@ void SceneVisualizerPanel::Draw() {
 						else
 							newEntity = world.AddEntity(str);
 					}
+				}
+			}
 
-					if(exit) {
-						if(asset.Type == AssetType::Mesh)
-							newEntity.Add<MeshComponent>(asset);
-						else if(asset.Type == AssetType::Audio)
-							newEntity.Add<AudioComponent>(asset);
-						else if(asset.Type == AssetType::Script) {
-							auto& assetManager = editor.GetAssetManager();
-							auto mod = assetManager.Get<ScriptModule>(asset);
-							std::string name = SelectScriptClass(mod);
-							auto _class = mod->GetClass(name);
-							auto obj = _class->Instantiate(newEntity);
-							newEntity.Add<ScriptComponent>(asset, obj);
-						}
-
-						asset.Type = AssetType::None;
-						ImGui::CloseCurrentPopup();
+			auto& asset = options.add.asset;
+			if(exit) {
+				if(asset.Type == AssetType::Mesh)
+					newEntity.Add<MeshComponent>(asset);
+				else if(asset.Type == AssetType::Audio)
+					newEntity.Add<AudioComponent>(asset);
+				else if(asset.Type == AssetType::Script) {
+					exit = false;
+					auto& assetManager = editor.GetAssetManager();
+					assetManager.Load(asset);
+					auto mod = assetManager.Get<ScriptModule>(asset);
+					std::string name = SelectScriptClass(mod);
+					if(name != "") {
+						exit = true;
+						auto _class = mod->GetClass(name);
+						auto obj = _class->Instantiate(newEntity);
+						newEntity.Add<ScriptComponent>(asset, obj);
 					}
 				}
+			}
+			if(exit) {
+				asset.Type = AssetType::None;
+				ImGui::CloseCurrentPopup();
 			}
 
 			ImGui::EndPopup();
@@ -266,8 +274,22 @@ void SceneVisualizerPanel::Draw() {
 }
 
 std::string SelectScriptClass(Ref<ScriptModule> mod) {
+	static std::string select = "";
+	ImGui::OpenPopup("Select Script Class");
 
-	return "";
+	ImGui::BeginPopup("Select Script Class");
+	{
+		for(const auto& [name, _] : mod->GetClasses()) {
+			bool pressed = ImGui::Button(name.c_str());
+			// if(pressed) {
+			// 	select = name;
+			// 	ImGui::CloseCurrentPopup();
+			// }
+		}
+	}
+	ImGui::EndPopup();
+
+	return select;
 }
 
 EditorSceneRenderer::EditorSceneRenderer() {
@@ -368,18 +390,18 @@ void EditorSceneRenderer::Begin() {
 	.SetInput("u_CameraPosition", camera->GetPosition());
 }
 
-void EditorSceneRenderer::SubmitCamera(Entity entity) {
+void EditorSceneRenderer::SubmitCamera(const Entity& entity) {
 
 }
 
-void EditorSceneRenderer::SubmitSkybox(Entity entity) {
+void EditorSceneRenderer::SubmitSkybox(const Entity& entity) {
 	// auto& sc = entity.Get<SkyboxComponent>();
 
 	// FirstCommand->UniformData
 	// .SetInput("u_Skybox", CubemapSlot{ sc.Asset.Get<Cubemap>() });
 }
 
-void EditorSceneRenderer::SubmitLight(Entity entity) {
+void EditorSceneRenderer::SubmitLight(const Entity& entity) {
 	// if(entity.Has<DirectionalLightComponent>()) {
 	// 	auto& dc = entity.Get<DirectionalLightComponent>();
 	// 	DirectionalLightBuffer->SetData(&dc);
@@ -395,11 +417,11 @@ void EditorSceneRenderer::SubmitLight(Entity entity) {
 	// }
 }
 
-void EditorSceneRenderer::SubmitParticles(Entity entity) {
+void EditorSceneRenderer::SubmitParticles(const Entity& entity) {
 
 }
 
-void EditorSceneRenderer::SubmitMesh(Entity entity) {
+void EditorSceneRenderer::SubmitMesh(const Entity& entity) {
 	auto& assetManager =
 		Application::As<EditorApp>()->GetEditor().GetAssetManager();
 	auto& tc = entity.Get<TransformComponent>();

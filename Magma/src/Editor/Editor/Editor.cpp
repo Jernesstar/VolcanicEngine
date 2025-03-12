@@ -182,12 +182,15 @@ void Editor::Render() {
 				CloseTab(tabToDelete);
 		}
 		ImGui::EndTabBar();
+		// ImGui::SameLine();
+		// if(m_Tabs)
+		// 	GetProjectTab()->RenderButtons();
 
 		ImGuiID dockspaceID = ImGui::GetID("DockSpace");
 		ImGui::DockSpace(dockspaceID, ImVec2(0.0f, 0.0f), dockspaceFlags);
 
 		if(m_Tabs)
-			m_Tabs[0]->As<ProjectTab>()->RenderEssentialPanels();
+			GetProjectTab()->RenderEssentialPanels();
 		if(m_CurrentTab) {
 			if(m_CurrentTab->Type != TabType::None)
 				m_CurrentTab->Render();

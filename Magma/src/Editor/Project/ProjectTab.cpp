@@ -104,7 +104,7 @@ void ProjectTab::Render() {
 	}
 	ImGui::EndMainMenuBar();
 
-	ButtonUI();
+	RenderButtons();
 }
 
 void ProjectTab::RenderEssentialPanels() {
@@ -112,7 +112,7 @@ void ProjectTab::RenderEssentialPanels() {
 	GetPanel("AssetEditor")->Draw();
 }
 
-void ProjectTab::ButtonUI() {
+void ProjectTab::RenderButtons() {
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(0, 0));
 

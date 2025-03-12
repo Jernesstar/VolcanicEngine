@@ -313,7 +313,7 @@ void RuntimeSceneRenderer::Begin() {
 
 }
 
-void RuntimeSceneRenderer::SubmitCamera(Entity entity) {
+void RuntimeSceneRenderer::SubmitCamera(const Entity& entity) {
 	auto camera = entity.Get<CameraComponent>().Cam;
 
 	FirstCommand->UniformData
@@ -322,14 +322,14 @@ void RuntimeSceneRenderer::SubmitCamera(Entity entity) {
 	.SetInput("u_CameraPosition", camera->GetPosition());
 }
 
-void RuntimeSceneRenderer::SubmitSkybox(Entity entity) {
+void RuntimeSceneRenderer::SubmitSkybox(const Entity& entity) {
 	// auto& sc = entity.Get<SkyboxComponent>();
 
 	// FirstCommand->UniformData
 	// .SetInput("u_Skybox", CubemapSlot{ sc.Asset.Get<Cubemap>() });
 }
 
-void RuntimeSceneRenderer::SubmitLight(Entity entity) {
+void RuntimeSceneRenderer::SubmitLight(const Entity& entity) {
 	if(entity.Has<DirectionalLightComponent>()) {
 		auto& dc = entity.Get<DirectionalLightComponent>();
 		DirectionalLightBuffer->SetData(&dc);
@@ -345,11 +345,11 @@ void RuntimeSceneRenderer::SubmitLight(Entity entity) {
 	}
 }
 
-void RuntimeSceneRenderer::SubmitParticles(Entity entity) {
+void RuntimeSceneRenderer::SubmitParticles(const Entity& entity) {
 
 }
 
-void RuntimeSceneRenderer::SubmitMesh(Entity entity) {
+void RuntimeSceneRenderer::SubmitMesh(const Entity& entity) {
 	auto& tc = entity.Get<TransformComponent>();
 	auto& mc = entity.Get<MeshComponent>();
 	auto mesh = App::Get()->GetAssetManager().Get<Mesh>(mc.MeshAsset);

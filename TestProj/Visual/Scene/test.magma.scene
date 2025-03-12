@@ -32,6 +32,61 @@ Scene:
             AssetID: 10036008063945961451
     - Entity:
         Name: ""
+        ID: 550
+        Components:
+          {}
+    - Entity:
+        Name: ""
+        ID: 551
+        Components:
+          {}
+    - Entity:
+        Name: ""
+        ID: 552
+        Components:
+          {}
+    - Entity:
+        Name: ""
+        ID: 553
+        Components:
+          {}
+    - Entity:
+        Name: ""
+        ID: 554
+        Components:
+          {}
+    - Entity:
+        Name: ""
+        ID: 555
+        Components:
+          {}
+    - Entity:
+        Name: ""
+        ID: 556
+        Components:
+          {}
+    - Entity:
+        Name: ""
+        ID: 557
+        Components:
+          {}
+    - Entity:
+        Name: ""
+        ID: 558
+        Components:
+          {}
+    - Entity:
+        Name: ""
+        ID: 559
+        Components:
+          {}
+    - Entity:
+        Name: ""
+        ID: 560
+        Components:
+          {}
+    - Entity:
+        Name: ""
         ID: 549
         Components:
           TagComponent:

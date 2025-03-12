@@ -27,11 +27,11 @@ class RuntimeSceneRenderer : public SceneRenderer {
 		void Update(TimeStep ts) override;
 	
 		void Begin() override;
-		void SubmitCamera(Entity entity) override;
-		void SubmitSkybox(Entity entity) override;
-		void SubmitLight(Entity entity) override;
-		void SubmitParticles(Entity entity) override;
-		void SubmitMesh(Entity entity) override;
+		void SubmitCamera(const Entity& entity) override;
+		void SubmitSkybox(const Entity& entity) override;
+		void SubmitLight(const Entity& entity) override;
+		void SubmitParticles(const Entity& entity) override;
+		void SubmitMesh(const Entity& entity) override;
 		void Render() override;
 	
 	private:	

@@ -25,11 +25,11 @@ public:
 	virtual void Update(TimeStep ts) = 0;
 
 	virtual void Begin() = 0;
-	virtual void SubmitCamera(Entity entity) = 0;
-	virtual void SubmitSkybox(Entity entity) = 0;
-	virtual void SubmitLight(Entity entity) = 0;
-	virtual void SubmitParticles(Entity entity) = 0;
-	virtual void SubmitMesh(Entity entity) = 0;
+	virtual void SubmitCamera(const Entity& entity) = 0;
+	virtual void SubmitSkybox(const Entity& entity) = 0;
+	virtual void SubmitLight(const Entity& entity) = 0;
+	virtual void SubmitParticles(const Entity& entity) = 0;
+	virtual void SubmitMesh(const Entity& entity) = 0;
 	virtual void Render() = 0;
 
 	Ref<Framebuffer> GetOutput() const { return m_Output; }

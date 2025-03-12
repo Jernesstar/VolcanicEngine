@@ -83,7 +83,7 @@ void ScriptGlue::RegisterInterface() {
 		asMETHODPR(ECS::World, GetEntity, (UUID), Entity), asCALL_THISCALL, 0,
 		asOFFSET(Scene, EntityWorld));
 
-	engine->RegisterObjectType("UIElement", 0, asOBJ_REF);
+	engine->RegisterObjectType("UIElement", 0, asOBJ_REF | asOBJ_NOCOUNT);
 	// engine->RegisterObjectProperty("UIElement", "");
 
 	engine->RegisterObjectType("UIPageClass", 0, asOBJ_REF | asOBJ_NOHANDLE);
@@ -219,6 +219,11 @@ static uint64_t GetAssetID(Asset* asset) {
 	return (uint64_t)asset->ID;
 }
 
+static Sound* GetSound(AssetManager* manager, Asset* asset) {
+	manager->Load(*asset);
+	return manager->Get<Sound>(*asset).get();
+}
+
 void RegisterAssetManager() {
 	auto* engine = ScriptEngine::Get();
 
@@ -244,22 +249,19 @@ void RegisterAssetManager() {
 
 	engine->RegisterObjectType("AssetManagerClass", 0,
 		asOBJ_REF | asOBJ_NOHANDLE);
-	engine->RegisterObjectMethod("AssetManagerClass",
-		"bool IsLoaded(Asset) const",
+	engine->RegisterObjectMethod("AssetManagerClass", "bool IsLoaded(Asset) const",
 		asMETHOD(AssetManager, IsLoaded), asCALL_THISCALL);
 	engine->RegisterObjectMethod("AssetManagerClass", "bool Load(Asset)",
 		asMETHOD(AssetManager, Load), asCALL_THISCALL);
 	engine->RegisterObjectMethod("AssetManagerClass", "bool Unload(Asset)",
 		asMETHOD(AssetManager, Unload), asCALL_THISCALL);
 
-	engine->RegisterObjectType("Sound", 0, asOBJ_REF);
+	engine->RegisterObjectType("Sound", 0, asOBJ_REF | asOBJ_NOCOUNT);
 	engine->RegisterObjectMethod("Sound", "void Play()", asMETHOD(Sound, Play),
 		asCALL_THISCALL);
 
 	engine->RegisterObjectMethod("AssetManagerClass",
-		"Sound @+ GetSound(Asset)",
-		asMETHODPR(AssetManager, Get<Sound>, (Asset), Ref<Sound>),
-		asCALL_THISCALL);
+		"Sound@ GetSound(Asset)", asFUNCTION(GetSound), asCALL_CDECL_OBJLAST);
 }
 
 static asIScriptObject* GetScriptInstance(ScriptComponent* sc) {
@@ -308,10 +310,10 @@ void RegisterECS() {
 
 	engine->RegisterObjectType("RigidBodyComponent", 0, asOBJ_REF | asOBJ_NOCOUNT);
 
-	engine->RegisterObjectType("RigidBody", 0, asOBJ_REF);
+	engine->RegisterObjectType("RigidBody", 0, asOBJ_REF | asOBJ_NOCOUNT);
 
 	engine->RegisterObjectType("Transform", sizeof(Transform),
-		asOBJ_VALUE | asGetTypeTraits<Transform>());
+		asOBJ_VALUE | asOBJ_POD |  asGetTypeTraits<Transform>());
 	engine->RegisterObjectProperty("Transform", "Vec3 Translation",
 		asOFFSET(Transform, Translation));
 	engine->RegisterObjectProperty("Transform", "Vec3 Rotation",

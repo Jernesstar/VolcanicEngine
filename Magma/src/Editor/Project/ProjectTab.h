@@ -20,6 +20,7 @@ public:
 
 	void Update(TimeStep ts) override;
 	void Render() override;
+	void RenderButtons();
 	void RenderEssentialPanels();
 
 	ScreenState GetState() const { return m_ScreenState; }
@@ -31,7 +32,6 @@ private:
 private:
 	void Setup();
 
-	void ButtonUI();
 	void OnPlay();
 	void OnPause();
 	void OnStop();

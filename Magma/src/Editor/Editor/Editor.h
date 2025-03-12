@@ -27,7 +27,7 @@ public:
 	void Render();
 
 	void NewTab(Ref<Tab> tab);
-	Ref<Tab> GetProjectTab() { return m_Tabs[0]; }
+	ProjectTab* GetProjectTab() { return m_Tabs[0]->As<ProjectTab>(); }
 
 	Project& GetProject() { return m_Project; }
 	EditorAssetManager& GetAssetManager() { return m_AssetManager; }
