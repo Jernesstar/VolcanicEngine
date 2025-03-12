@@ -22,12 +22,12 @@ Scene:
         ID: 548
         Components:
           TagComponent:
-            Tag: Empty Tag
+            Tag: TestEntity
           TransformComponent:
             Transform:
               Translation: [0, 0, 0]
               Rotation: [0, 0, 0]
-              Scale: [1.79999995, 11.8000002, 8.39999962]
+              Scale: [1, 1, 1]
           MeshComponent:
             AssetID: 10036008063945961451
     - Entity:
@@ -35,7 +35,7 @@ Scene:
         ID: 549
         Components:
           TagComponent:
-            Tag: Empty Tag
+            Tag: TestEntity
           TransformComponent:
             Transform:
               Translation: [0, 0, 0]

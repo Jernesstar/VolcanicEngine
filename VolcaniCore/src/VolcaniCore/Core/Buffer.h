@@ -116,7 +116,7 @@ public:
 	}
 
 	void Remove() {
-		VOLCANICORE_ASSERT(m_Count);
+		// VOLCANICORE_ASSERT(m_Count);
 		m_Count--;
 	}
 

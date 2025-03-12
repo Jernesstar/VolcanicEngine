@@ -361,6 +361,7 @@ void EditorSceneRenderer::Begin() {
 	call.Blending = BlendingMode::Greatest;
 
 	FirstCommand = RendererAPI::Get()->NewDrawCommand(LightingPass->Get());
+	FirstCommand->Clear = false;
 	FirstCommand->UniformData
 	.SetInput("u_ViewProj", camera->GetViewProjection());
 	FirstCommand->UniformData
@@ -403,7 +404,7 @@ void EditorSceneRenderer::SubmitMesh(Entity entity) {
 		Application::As<EditorApp>()->GetEditor().GetAssetManager();
 	auto& tc = entity.Get<TransformComponent>();
 	auto& mc = entity.Get<MeshComponent>();
-	assetManager.Load(mc.MeshAsset);
+	// assetManager.Load(mc.MeshAsset);
 	auto mesh = assetManager.Get<Mesh>(mc.MeshAsset);
 
 	if(entity == Selected)
@@ -466,8 +467,8 @@ void EditorSceneRenderer::Render() {
 		Renderer3D::DrawMesh(mesh, tc, command);
 	}
 
-	Renderer3D::End();
 	Objects.clear();
+	Renderer3D::End();
 
 	Renderer::Flush();
 

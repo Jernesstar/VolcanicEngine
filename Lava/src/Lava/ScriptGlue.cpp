@@ -48,12 +48,6 @@ void ScriptGlue::RegisterInterface() {
 	RegisterScriptHandle(engine);
 	RegisterScriptMath(engine);
 
-	RegisterGlobalFunctions();
-	RegisterTypes();
-	RegisterInput();
-	RegisterAssetManager();
-	RegisterECS();
-
 	ScriptEngine::RegisterInterface("IApp")
 		.AddMethod("void OnLoad()")
 		.AddMethod("void OnClose()")
@@ -75,7 +69,16 @@ void ScriptGlue::RegisterInterface() {
 		.AddMethod("void OnMouseUp()")
 		.AddMethod("void OnMouseDown()");
 
+	RegisterGlobalFunctions();
+	RegisterTypes();
+	RegisterInput();
+	RegisterAssetManager();
+	RegisterECS();
+
 	engine->RegisterObjectType("SceneClass", 0, asOBJ_REF | asOBJ_NOHANDLE);
+	engine->RegisterObjectMethod("SceneClass", "Entity FindEntity(const string &in)",
+		asMETHODPR(ECS::World, GetEntity, (const std::string&), Entity),
+		asCALL_THISCALL, 0, asOFFSET(Scene, EntityWorld));
 	engine->RegisterObjectMethod("SceneClass", "Entity GetEntity(uint64)",
 		asMETHODPR(ECS::World, GetEntity, (UUID), Entity), asCALL_THISCALL, 0,
 		asOFFSET(Scene, EntityWorld));
@@ -250,12 +253,12 @@ void RegisterAssetManager() {
 		asMETHOD(AssetManager, Unload), asCALL_THISCALL);
 
 	engine->RegisterObjectType("Sound", 0, asOBJ_REF);
+	engine->RegisterObjectMethod("Sound", "void Play()", asMETHOD(Sound, Play),
+		asCALL_THISCALL);
 
 	engine->RegisterObjectMethod("AssetManagerClass",
 		"Sound @+ GetSound(Asset)",
 		asMETHODPR(AssetManager, Get<Sound>, (Asset), Ref<Sound>),
-		asCALL_THISCALL);
-	engine->RegisterObjectMethod("Sound", "void Play()", asMETHOD(Sound, Play),
 		asCALL_THISCALL);
 }
 
@@ -270,17 +273,14 @@ static Physics::RigidBody* GetRigidBody(RigidBodyComponent* rc) {
 void RegisterECS() {
 	auto* engine = ScriptEngine::Get();
 
-	engine->RegisterObjectType("CameraComponent", 0,
-		asOBJ_REF | asOBJ_NOCOUNT | asGetTypeTraits<CameraComponent>());
+	engine->RegisterObjectType("CameraComponent", 0, asOBJ_REF | asOBJ_NOCOUNT);
 	// engine->RegisterObjectProperty("CameraComponent")
 
-	engine->RegisterObjectType("TagComponent", 0,
-		asOBJ_REF | asOBJ_NOCOUNT | asGetTypeTraits<TagComponent>());
+	engine->RegisterObjectType("TagComponent", 0, asOBJ_REF | asOBJ_NOCOUNT);
 	engine->RegisterObjectProperty("TagComponent", "string Tag",
 		asOFFSET(TagComponent, Tag));
 
-	engine->RegisterObjectType("TransformComponent", 0,
-		asOBJ_REF | asOBJ_NOCOUNT | asGetTypeTraits<TransformComponent>());
+	engine->RegisterObjectType("TransformComponent", 0, asOBJ_REF | asOBJ_NOCOUNT);
 	engine->RegisterObjectProperty("TransformComponent", "Vec3 Translation",
 		asOFFSET(TransformComponent, Translation));
 	engine->RegisterObjectProperty("TransformComponent", "Vec3 Rotation",
@@ -288,34 +288,30 @@ void RegisterECS() {
 	engine->RegisterObjectProperty("TransformComponent", "Vec3 Scale",
 		asOFFSET(TransformComponent, Scale));
 
-	engine->RegisterObjectType("AudioComponent", 0,
-		asOBJ_REF | asOBJ_NOCOUNT | asGetTypeTraits<AudioComponent>());
+	engine->RegisterObjectType("AudioComponent", 0, asOBJ_REF | asOBJ_NOCOUNT);
 	engine->RegisterObjectProperty("AudioComponent", "Asset AudioAsset",
 		asOFFSET(AudioComponent, AudioAsset));
 
-	engine->RegisterObjectType("MeshComponent", 0,
-		asOBJ_REF | asOBJ_NOCOUNT | asGetTypeTraits<MeshComponent>());
+	engine->RegisterObjectType("MeshComponent", 0, asOBJ_REF | asOBJ_NOCOUNT);
 	engine->RegisterObjectProperty("MeshComponent", "Asset MeshAsset",
 		asOFFSET(MeshComponent, MeshAsset));
 
-	engine->RegisterObjectType("SkyboxComponent", 0,
-		asOBJ_REF | asOBJ_NOCOUNT | asGetTypeTraits<SkyboxComponent>());
+	engine->RegisterObjectType("SkyboxComponent", 0, asOBJ_REF | asOBJ_NOCOUNT);
 	engine->RegisterObjectProperty("SkyboxComponent", "Asset CubemapAsset",
 		asOFFSET(SkyboxComponent, CubemapAsset));
 
-	engine->RegisterObjectType("ScriptComponent", 0,
-		asOBJ_REF | asOBJ_NOCOUNT | asGetTypeTraits<ScriptComponent>());
+	engine->RegisterObjectType("ScriptComponent", 0, asOBJ_REF | asOBJ_NOCOUNT);
 	engine->RegisterObjectProperty("ScriptComponent", "Asset ModuleAsset",
 		asOFFSET(ScriptComponent, ModuleAsset));
 	engine->RegisterObjectMethod("ScriptComponent", "IEntity@ get_Instance()",
 		asFUNCTION(GetScriptInstance), asCALL_CDECL_OBJLAST);
 
-	engine->RegisterObjectType("RigidBodyComponent", 0,
-		asOBJ_REF | asOBJ_NOCOUNT | asGetTypeTraits<RigidBodyComponent>());
+	engine->RegisterObjectType("RigidBodyComponent", 0, asOBJ_REF | asOBJ_NOCOUNT);
 
-	engine->RegisterObjectType("RigidBody", 0,
-		asOBJ_REF | asGetTypeTraits<Physics::RigidBody>());
+	engine->RegisterObjectType("RigidBody", 0, asOBJ_REF);
 
+	engine->RegisterObjectType("Transform", sizeof(Transform),
+		asOBJ_VALUE | asGetTypeTraits<Transform>());
 	engine->RegisterObjectProperty("Transform", "Vec3 Translation",
 		asOFFSET(Transform, Translation));
 	engine->RegisterObjectProperty("Transform", "Vec3 Rotation",
@@ -323,28 +319,26 @@ void RegisterECS() {
 	engine->RegisterObjectProperty("Transform", "Vec3 Scale",
 		asOFFSET(Transform, Scale));
 
-	// engine->RegisterObjectProperty("RigidBody", "Transform PhysicsTransform");
+	engine->RegisterObjectMethod("RigidBody",
+		"Transform get_PhysicsTransform() const property",
+		asMETHOD(Physics::RigidBody, GetTransform), asCALL_THISCALL);
 	// engine->RegisterObjectMethod("RigidBody", "void ApplyForce(Vec3 force)",
 	// 	asMETHOD(Physics::DynamicBody::ApplyForce));
 
 	engine->RegisterObjectMethod("RigidBodyComponent", "RigidBody@ get_Body()",
 		asFUNCTION(GetRigidBody), asCALL_CDECL_OBJLAST);
 
-	engine->RegisterObjectType("DirectionalLightComponent", 0,
-		asOBJ_REF | asOBJ_NOCOUNT | asGetTypeTraits<DirectionalLightComponent>());
-	engine->RegisterObjectType("PointLightComponent", 0,
-		asOBJ_REF | asOBJ_NOCOUNT | asGetTypeTraits<PointLightComponent>());
-	engine->RegisterObjectType("SpotlightComponent", 0,
-		asOBJ_REF | asOBJ_NOCOUNT | asGetTypeTraits<SpotlightComponent>());
-	engine->RegisterObjectType("ParticleSystemComponent", 0,
-		asOBJ_REF | asOBJ_NOCOUNT | asGetTypeTraits<ParticleSystemComponent>());
+	engine->RegisterObjectType("DirectionalLightComponent", 0, asOBJ_REF | asOBJ_NOCOUNT);
+	engine->RegisterObjectType("PointLightComponent", 0, asOBJ_REF | asOBJ_NOCOUNT);
+	engine->RegisterObjectType("SpotlightComponent", 0, asOBJ_REF | asOBJ_NOCOUNT);
+	engine->RegisterObjectType("ParticleSystemComponent", 0, asOBJ_REF | asOBJ_NOCOUNT);
 
 	engine->RegisterObjectType("Entity", sizeof(Entity),
 		asOBJ_VALUE | asOBJ_APP_CLASS_MORE_CONSTRUCTORS | asOBJ_POD
 		| asGetTypeTraits<Entity>());
 	engine->RegisterObjectMethod("Entity", "string get_Name() const property",
 		asMETHOD(Entity, GetName), asCALL_THISCALL);
-	engine->RegisterObjectMethod("Entity", "bool Alive() const",
+	engine->RegisterObjectMethod("Entity", "bool get_Alive() const property",
 		asMETHOD(Entity, IsAlive), asCALL_THISCALL);
 	engine->RegisterObjectMethod("Entity", "void Kill()",
 		asMETHOD(Entity, Kill), asCALL_THISCALL);
@@ -387,51 +381,51 @@ void RegisterECS() {
 		asCALL_THISCALL);
 
 	engine->RegisterObjectMethod("Entity",
-		"CameraComponent@ GetCameraComponent()",
+		"const CameraComponent@ GetCameraComponent()",
 		asMETHODPR(Entity, Get<CameraComponent>, () const,
 			const CameraComponent&), asCALL_THISCALL);
 	engine->RegisterObjectMethod("Entity",
-		"TagComponent@ GetTagComponent()",
+		"const TagComponent@ GetTagComponent()",
 		asMETHODPR(Entity, Get<TagComponent>, () const,
 			const TagComponent&), asCALL_THISCALL);
 	engine->RegisterObjectMethod("Entity",
-		"TransformComponent@ GetTransformComponent()",
+		"const TransformComponent@ GetTransformComponent()",
 		asMETHODPR(Entity, Get<TransformComponent>, () const,
 			const TransformComponent&), asCALL_THISCALL);
 	engine->RegisterObjectMethod("Entity",
-		"AudioComponent@ GetAudioComponent()",
+		"const AudioComponent@ GetAudioComponent()",
 		asMETHODPR(Entity, Get<AudioComponent>, () const,
 			const AudioComponent&), asCALL_THISCALL);
 	engine->RegisterObjectMethod("Entity",
-		"MeshComponent@ GetMeshComponent()",
+		"const MeshComponent@ GetMeshComponent()",
 		asMETHODPR(Entity, Get<MeshComponent>, () const,
 			const MeshComponent&), asCALL_THISCALL);
 	engine->RegisterObjectMethod("Entity",
-		"SkyboxComponent@ GetSkyboxComponent()",
+		"const SkyboxComponent@ GetSkyboxComponent()",
 		asMETHODPR(Entity, Get<SkyboxComponent>, () const,
 			const SkyboxComponent&), asCALL_THISCALL);
 	engine->RegisterObjectMethod("Entity",
-		"ScriptComponent@ GetScriptComponent()",
+		"const ScriptComponent@ GetScriptComponent()",
 		asMETHODPR(Entity, Get<ScriptComponent>, () const,
 			const ScriptComponent&), asCALL_THISCALL);
 	engine->RegisterObjectMethod("Entity",
-		"RigidBodyComponent@ GetRigidBodyComponent()",
+		"const RigidBodyComponent@ GetRigidBodyComponent()",
 		asMETHODPR(Entity, Get<RigidBodyComponent>, () const,
 			const RigidBodyComponent&), asCALL_THISCALL);
 	engine->RegisterObjectMethod("Entity",
-		"DirectionalLightComponent@ GetDirectionalLightComponent()",
+		"const DirectionalLightComponent@ GetDirectionalLightComponent()",
 		asMETHODPR(Entity, Get<DirectionalLightComponent>, () const,
 			const DirectionalLightComponent&), asCALL_THISCALL);
 	engine->RegisterObjectMethod("Entity",
-		"PointLightComponent@ GetPointLightComponent()",
+		"const PointLightComponent@ GetPointLightComponent()",
 		asMETHODPR(Entity, Get<PointLightComponent>, () const,
 			const PointLightComponent&), asCALL_THISCALL);
 	engine->RegisterObjectMethod("Entity",
-		"SpotlightComponent@ GetSpotlightComponent()",
+		"const SpotlightComponent@ GetSpotlightComponent()",
 		asMETHODPR(Entity, Get<SpotlightComponent>, () const,
 			const SpotlightComponent&), asCALL_THISCALL);
 	engine->RegisterObjectMethod("Entity",
-		"ParticleSystemComponent@ GetParticleSystemComponent()",
+		"const ParticleSystemComponent@ GetParticleSystemComponent()",
 		asMETHODPR(Entity, Get<ParticleSystemComponent>, () const,
 			const ParticleSystemComponent&), asCALL_THISCALL);
 

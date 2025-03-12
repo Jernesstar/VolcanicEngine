@@ -238,8 +238,6 @@ private:
 	}
 
 	void Free(int64_t idx) {
-		VOLCANICORE_LOG_INFO("Idx: %i", idx);
-
 		if(!m_Buffer.GetMaxCount()) {
 			m_Buffer = Buffer<T>(5);
 			m_Back = 1;
@@ -279,7 +277,6 @@ private:
 		}
 
 		auto abs = Absolute(idx);
-		VOLCANICORE_LOG_INFO("Absolute: %li", abs);
 		if(abs == m_Back - 1) {
 			if(m_Back != m_Buffer.GetMaxCount())
 				m_Back++;
