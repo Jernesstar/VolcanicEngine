@@ -7,7 +7,9 @@
 
 namespace VolcaniCore {
 
-Window::Window(uint32_t width, uint32_t height) {
+Window::Window(uint32_t width, uint32_t height)
+	: m_Width(width), m_Height(height)
+{
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);

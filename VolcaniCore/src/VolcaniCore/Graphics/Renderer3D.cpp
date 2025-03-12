@@ -109,8 +109,8 @@ void Renderer3D::Init() {
 }
 
 void Renderer3D::Close() {
-	RendererAPI::Get()->ReleaseBuffer(s_CubemapBuffer);
 	RendererAPI::Get()->ReleaseBuffer(s_MeshBuffer);
+	RendererAPI::Get()->ReleaseBuffer(s_CubemapBuffer);
 }
 
 DrawBuffer* Renderer3D::GetMeshBuffer() {

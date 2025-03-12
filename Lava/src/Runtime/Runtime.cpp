@@ -93,6 +93,8 @@ Runtime::~Runtime() {
 
 	ScriptEngine::Shutdown();
 	Physics::Close();
+
+	ShaderLibrary::Clear();
 }
 
 void Runtime::OnUpdate(TimeStep ts) {

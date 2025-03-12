@@ -23,8 +23,8 @@ void Init() {
 void Close() {
 #ifdef MAGMA_PHYSICS
 	PX_RELEASE(s_Dispatcher);
-	PX_RELEASE(s_Physics);
-	PX_RELEASE(s_Foundation);
+	// PX_RELEASE(s_Physics);
+	// PX_RELEASE(s_Foundation);
 #endif
 }
 

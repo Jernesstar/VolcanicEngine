@@ -17,4 +17,8 @@ Ref<ShaderPipeline> ShaderLibrary::Get(const std::string& name) {
 	return s_Shaders[name];
 }
 
+void ShaderLibrary::Clear() {
+	s_Shaders.clear();
+}
+
 }

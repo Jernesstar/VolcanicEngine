@@ -57,6 +57,8 @@ EditorApp::EditorApp(const CommandLineArgs& args)
 }
 
 EditorApp::~EditorApp() {
+	ShaderLibrary::Clear();
+
 	UIRenderer::Close();
 }
 

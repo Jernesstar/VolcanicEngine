@@ -37,7 +37,8 @@ void Application::Close() {
 	Renderer::Close();
 	RendererAPI::Shutdown();
 
-	// glfwTerminate();
+	s_Window.reset();
+	glfwTerminate();
 	exit(0);
 }
 

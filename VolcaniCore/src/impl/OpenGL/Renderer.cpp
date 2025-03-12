@@ -69,6 +69,8 @@ void Renderer::Init() {
 
 void Renderer::Close() {
 	s_Data.Arrays.clear();
+	s_Data.Commands.Clear();
+	s_Data.Passes.Clear();
 }
 
 void Renderer::StartFrame() {
