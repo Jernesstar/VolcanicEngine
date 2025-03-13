@@ -148,6 +148,11 @@ void DrawComponent<AudioComponent>(Entity& entity) {
 	auto& component = entity.Set<AudioComponent>();
 	ImGui::SeparatorText("AudioComponent");
 
+	ImGui::Text("Module ID: %li", (uint64_t)component.ModuleAsset.ID);
+	std::string text = component.ModuleAsset.ID ? "Change Module" : "Set Module";
+	if(ImGui::Button(text.c_str())) {
+
+	}
 }
 
 template<>
@@ -158,6 +163,11 @@ void DrawComponent<MeshComponent>(Entity& entity) {
 	auto& component = entity.Set<MeshComponent>();
 	ImGui::SeparatorText("MeshComponent");
 
+	ImGui::Text("Module ID: %li", (uint64_t)component.ModuleAsset.ID);
+	std::string text = component.ModuleAsset.ID ? "Change Module" : "Set Module";
+	if(ImGui::Button(text.c_str())) {
+
+	}
 }
 
 template<>
@@ -168,6 +178,11 @@ void DrawComponent<SkyboxComponent>(Entity& entity) {
 	auto& component = entity.Set<SkyboxComponent>();
 	ImGui::SeparatorText("SkyboxComponent");
 
+	ImGui::Text("Module ID: %li", (uint64_t)component.ModuleAsset.ID);
+	std::string text = component.ModuleAsset.ID ? "Change Module" : "Set Module";
+	if(ImGui::Button(text.c_str())) {
+
+	}
 }
 
 template<>
@@ -302,7 +317,12 @@ void DrawComponent<ParticleSystemComponent>(Entity& entity) {
 	ImGui::DragFloat("Particle Life Time", &component.ParticleLifetime,
 		1.0f, 1.0f, 10000.0f);
 	ImGui::Text("Asset: %li", (uint64_t)component.ImageAsset.ID);
-	ImGui::Button("Change Asset");
+
+	ImGui::Text("Module ID: %li", (uint64_t)component.ModuleAsset.ID);
+	std::string text = component.ModuleAsset.ID ? "Change Module" : "Set Module";
+	if(ImGui::Button(text.c_str())) {
+
+	}
 }
 
 void ComponentEditorPanel::Draw() {

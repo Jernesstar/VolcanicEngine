@@ -19,6 +19,14 @@ void ParticleSystem::Run(Phase phase) {
 			[this](Entity& entity)
 			{
 				auto [pc] = GetRequired(entity);
+
+				for(auto& p : pc.Particles) {
+					p.Life -= dt;
+					if(p.Life > 0.0f) {
+						p.Position -= p.Velocity * dt;
+						p.Color.a -= dt * 2.5f;
+					}
+				}
 			});
 	}
 }

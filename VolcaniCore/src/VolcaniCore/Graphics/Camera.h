@@ -33,15 +33,15 @@ public:
 
 	const glm::vec3& GetPosition()  const { return Position; }
 	const glm::vec3& GetDirection() const { return Direction; }
-
-	const glm::mat4& GetView()           const { return View; }
-	const glm::mat4& GetProjection()     const { return Projection; }
-	const glm::mat4& GetViewProjection() const { return ViewProjection; }
-
+	
 	uint32_t GetViewportWidth() const { return ViewportWidth; }
 	uint32_t GetViewportHeight() const { return ViewportHeight; }
 	float GetNear() const { return Near; }
 	float GetFar()	const { return Far; }
+
+	const glm::mat4& GetView()           const { return View; }
+	const glm::mat4& GetProjection()     const { return Projection; }
+	const glm::mat4& GetViewProjection() const { return ViewProjection; }
 
 protected:
 	glm::vec3 Position	= { 0.0f, 0.0f, 0.0f };

@@ -160,6 +160,10 @@ void SceneVisualizerPanel::Draw() {
 			static bool exit = false;
 			static Entity newEntity;
 
+			auto& asset = options.add.asset;
+			auto& world = m_Context->EntityWorld;
+			auto& assetManager = editor.GetAssetManager();
+
 			if(ImGui::Button("Cancel"))
 				ImGui::CloseCurrentPopup();
 			else {
@@ -168,23 +172,25 @@ void SceneVisualizerPanel::Draw() {
 				|| ImGui::IsKeyPressed(ImGuiKey_Enter, false))
 				{
 					exit = true;
-					auto& world = m_Context->EntityWorld;
-
-					if(str == "")
-						newEntity = world.AddEntity();
-					else {
-						if(world.GetEntity(str).IsValid()) {
-							exit = false;
-							str = "";
-							hint = "Entity name must be unique";
+					
+					if(asset.Type != AssetType::Script) {
+						if(str == "")
+							newEntity = world.AddEntity();
+						else {
+							if(world.GetEntity(str).IsValid()) {
+								exit = false;
+								str = "";
+								hint = "Entity name must be unique";
+							}
+							else
+								newEntity = world.AddEntity(str);
 						}
-						else
-							newEntity = world.AddEntity(str);
+''
+						assetManager.Load(asset);
 					}
 				}
 			}
 
-			auto& asset = options.add.asset;
 			if(exit) {
 				if(asset.Type == AssetType::Mesh)
 					newEntity.Add<MeshComponent>(asset);
@@ -192,8 +198,7 @@ void SceneVisualizerPanel::Draw() {
 					newEntity.Add<AudioComponent>(asset);
 				else if(asset.Type == AssetType::Script) {
 					exit = false;
-					auto& assetManager = editor.GetAssetManager();
-					assetManager.Load(asset);
+
 					auto mod = assetManager.Get<ScriptModule>(asset);
 					std::string name = SelectScriptClass(mod);
 					if(name != "") {
@@ -281,15 +286,15 @@ std::string SelectScriptClass(Ref<ScriptModule> mod) {
 	{
 		for(const auto& [name, _] : mod->GetClasses()) {
 			bool pressed = ImGui::Button(name.c_str());
-			// if(pressed) {
-			// 	select = name;
-			// 	ImGui::CloseCurrentPopup();
-			// }
+			if(pressed) {
+				select = name;
+				ImGui::CloseCurrentPopup();
+			}
 		}
 	}
 	ImGui::EndPopup();
 
-	return select;
+	return "";
 }
 
 EditorSceneRenderer::EditorSceneRenderer() {
@@ -428,7 +433,6 @@ void EditorSceneRenderer::SubmitMesh(const Entity& entity) {
 		Application::As<EditorApp>()->GetEditor().GetAssetManager();
 	auto& tc = entity.Get<TransformComponent>();
 	auto& mc = entity.Get<MeshComponent>();
-	assetManager.Load(mc.MeshAsset);
 	auto mesh = assetManager.Get<Mesh>(mc.MeshAsset);
 
 	if(entity == Selected)

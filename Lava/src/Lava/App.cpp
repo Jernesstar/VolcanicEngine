@@ -323,12 +323,12 @@ void RuntimeSceneRenderer::SubmitCamera(const Entity& entity) {
 }
 
 void RuntimeSceneRenderer::SubmitSkybox(const Entity& entity) {
-	// auto& sc = entity.Get<SkyboxComponent>();
-	// auto& assetManager = App::Get()->GetAssetManager();
-	// auto cubemap = assetManager.Get<Cubemap>(sc.CubemapAsset);
+	auto& sc = entity.Get<SkyboxComponent>();
+	auto& assetManager = App::Get()->GetAssetManager();
+	auto cubemap = assetManager.Get<Cubemap>(sc.CubemapAsset);
 
-	// FirstCommand->UniformData
-	// .SetInput("u_Skybox", CubemapSlot{ cubemap, 0 });
+	FirstCommand->UniformData
+	.SetInput("u_Skybox", CubemapSlot{ cubemap, 0 });
 }
 
 void RuntimeSceneRenderer::SubmitLight(const Entity& entity) {

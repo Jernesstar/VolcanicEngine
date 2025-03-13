@@ -197,6 +197,8 @@ void Editor::Render() {
 			else
 				RenderEmptyTab();
 		}
+		else
+			RenderWelcomeScreen();
 	}
 	ImGui::End();
 
@@ -225,8 +227,12 @@ void Editor::RenderEmptyTab() {
 
 }
 
-void Editor::RenderBackground() {
+void Editor::RenderWelcomeScreen() {
+	UI::Image image =
+		AssetImporter::GetTexture("Magma/assets/image/VolcanicDisplay.png");
 
+	image.x = 50;
+	image.y = 50;
 }
 
 void Editor::SetTab(Ref<Tab> tab) {

@@ -219,9 +219,9 @@ static uint64_t GetAssetID(Asset* asset) {
 	return (uint64_t)asset->ID;
 }
 
-static Sound* GetSound(AssetManager* manager, Asset* asset) {
-	manager->Load(*asset);
-	return manager->Get<Sound>(*asset).get();
+static Sound* GetSound(AssetManager* manager, const Asset& asset) {
+	manager->Load(asset);
+	return manager->Get<Sound>(asset).get();
 }
 
 void RegisterAssetManager() {
@@ -264,6 +264,38 @@ void RegisterAssetManager() {
 		"Sound@ GetSound(Asset)", asFUNCTION(GetSound), asCALL_CDECL_OBJLAST);
 }
 
+static Vec3 GetCameraPosition(CameraComponent* cc) {
+	return cc.Cam->GetPosition();
+}
+
+static void SetCameraPosition(CameraComponent* cc, const Vec3& vec) {
+	cc.Cam->SetPosition(vec);
+}
+
+static Vec3 GetCameraDirection(CameraComponent* cc) {
+	return cc.Cam->GetDirection();
+}
+
+static void SetCameraDirection(CameraComponent* cc, const Vec3& vec) {
+	cc.Cam->SetDirection(vec)
+}
+
+static uint32_t GetCameraWidth(CameraComponent* cc) {
+	return cc.Cam->GetViewportWidth();
+}
+
+static void SetCameraWidth(CameraComponent* cc, uint32_t width) {
+	cc.Cam->Resize(width, 0);
+}
+
+static uint32_t GetCameraHeight(CameraComponent* cc) {
+	return cc.Cam->GetViewportHeight();
+}
+
+static void SetCameraHeight(CameraComponent* cc, uint32_t height) {
+	cc.Cam->Resize(0, height);
+}
+
 static asIScriptObject* GetScriptInstance(ScriptComponent* sc) {
 	return sc->Instance->GetHandle();
 }
@@ -276,7 +308,30 @@ void RegisterECS() {
 	auto* engine = ScriptEngine::Get();
 
 	engine->RegisterObjectType("CameraComponent", 0, asOBJ_REF | asOBJ_NOCOUNT);
-	// engine->RegisterObjectProperty("CameraComponent")
+	engine->RegisterObjectMethod("CameraComponent",
+		"Vec3 get_Position() const property", asFUNCTION(GetCameraPosition),
+		asCALL_CDECL_OBJLAST);
+	engine->RegisterObjectMethod("CameraComponent",
+		"uint32 set_Position(const Vec3&) const property",
+		asFUNCTION(SetCameraPosition), asCALL_CDECL_OBJLAST);
+	engine->RegisterObjectMethod("CameraComponent",
+		"Vec3 get_Direction() const property", asFUNCTION(GetCameraDirection),
+		asCALL_CDECL_OBJLAST);
+	engine->RegisterObjectMethod("CameraComponent",
+		"uint32 set_Direction(const Vec3&) const property",
+		asFUNCTION(SetCameraDirection), asCALL_CDECL_OBJLAST);
+	engine->RegisterObjectMethod("CameraComponent",
+		"uint32 get_Width() const property", asFUNCTION(GetCameraWidth),
+		asCALL_CDECL_OBJLAST);
+	engine->RegisterObjectMethod("CameraComponent",
+		"void set_Width(uint32) property", asFUNCTION(SetCameraWidth)
+		asCALL_CDECL_OBJLAST);	
+	engine->RegisterObjectMethod("CameraComponent",
+		"uint32 get_Height() const property", asFUNCTION(GetCameraHeight),
+		asCALL_CDECL_OBJLAST);
+	engine->RegisterObjectMethod("CameraComponent",
+		"void set_Height(uint32) property", asFUNCTION(SetCameraHeight),
+		asCALL_CDECL_OBJLAST);
 
 	engine->RegisterObjectType("TagComponent", 0, asOBJ_REF | asOBJ_NOCOUNT);
 	engine->RegisterObjectProperty("TagComponent", "string Tag",
@@ -313,7 +368,7 @@ void RegisterECS() {
 	engine->RegisterObjectType("RigidBody", 0, asOBJ_REF | asOBJ_NOCOUNT);
 
 	engine->RegisterObjectType("Transform", sizeof(Transform),
-		asOBJ_VALUE | asOBJ_POD |  asGetTypeTraits<Transform>());
+		asOBJ_VALUE | asOBJ_POD | asGetTypeTraits<Transform>());
 	engine->RegisterObjectProperty("Transform", "Vec3 Translation",
 		asOFFSET(Transform, Translation));
 	engine->RegisterObjectProperty("Transform", "Vec3 Rotation",

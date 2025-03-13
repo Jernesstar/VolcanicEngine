@@ -7,6 +7,7 @@
 
 #include "Graphics/Renderer.h"
 #include "Graphics/RendererAPI.h"
+#include "Graphics/ShaderLibrary.h"
 
 namespace fs = std::filesystem;
 
@@ -33,6 +34,8 @@ void Application::Init() {
 
 void Application::Close() {
 	delete s_Instance;
+
+	ShaderLibrary::Clear();
 
 	Renderer::Close();
 	RendererAPI::Shutdown();
