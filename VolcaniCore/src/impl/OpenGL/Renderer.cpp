@@ -63,7 +63,7 @@ void Renderer::Init() {
 	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS); // Smooth cubemap edges
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
-	s_Data.Commands.Allocate(30);
+	s_Data.Commands.Allocate(1000);
 	s_Data.Passes.Allocate(5);
 }
 
@@ -96,8 +96,8 @@ void Renderer::EndFrame() {
 	for(auto& command : s_Data.Commands)
 		FlushCommand(command);
 
-	s_Data.Commands.Clear();
 	s_Data.Passes.Clear();
+	s_Data.Commands.Clear();
 }
 
 DebugInfo Renderer::GetDebugInfo() {
@@ -108,7 +108,7 @@ DrawBuffer* Renderer::NewDrawBuffer(DrawBufferSpecification& specs, void* data)
 {
 	auto* buffer = new DrawBuffer{ specs };
 	auto array = CreateRef<VertexArray>();
-	s_Data.Arrays[buffer] = BackendBuffer{ array };
+	s_Data.Arrays.emplace(std::make_pair(buffer, array));
 
 	if(data) {
 		array->AddVertexBuffer(

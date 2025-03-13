@@ -26,8 +26,12 @@ public:
 	List(List&& other)
 		: m_Buffer(other.m_Buffer.GetMaxCount())
 	{
-		for(auto& val : other)
-			Add(val);
+		for(auto& val : other) {
+			if constexpr(std::is_copy_constructible<T>())
+				Add(val);
+			else
+				AddMove(std::forward<T&&>(val));
+		}
 	}
 	List(const List& other)
 		: m_Buffer(other.m_Buffer.GetMaxCount())
@@ -103,6 +107,10 @@ public:
 		return *At(idx);
 	}
 
+	void AddMove(T&& element) {
+		Inplace(-1, std::forward<T&&>(element));
+	}
+
 	void Add(const T& element) {
 		Insert(-1, element);
 	}
@@ -142,6 +150,11 @@ public:
 		return val;
 	}
 
+	void Inplace(int64_t idx, T&& element) {
+		Free(idx);
+		new (At(idx)) T(std::move(element));
+	}
+
 	void Insert(int64_t idx, const T& element) {
 		Free(idx);
 		new (At(idx)) T(element);
@@ -178,7 +191,7 @@ public:
 
 		T* newData = (T*)malloc(maxCount * sizeof(T));
 		for(uint64_t i = 0; i < Count(); i++) {
-			new (newData + i) T(*At(i));
+			Place(At(i), newData + i);
 			Remove(i);
 		}
 
@@ -223,16 +236,23 @@ private:
 		At(idx)->~T();
 	}
 
+	void Place(T* src, T* dst) {
+		if constexpr(std::is_copy_constructible<T>())
+			new (dst) T(*src);
+		else
+			new (dst) T(std::move(*src));
+	}
+
 	void ShiftLeft(uint64_t beg, uint64_t end, uint64_t dx) {
 		for(int64_t i = (int64_t)beg; i <= (int64_t)end; i++) {
-			new (m_Buffer.Get((uint64_t)i - dx)) T(*m_Buffer.Get((uint64_t)i));
+			Place(m_Buffer.Get((uint64_t)i), m_Buffer.Get((uint64_t)i - dx));
 			m_Buffer.Get((uint64_t)i)->~T();
 		}
 	}
 
 	void ShiftRight(uint64_t beg, uint64_t end, uint64_t dx) {
 		for(int64_t i = (int64_t)end; i >= (int64_t)beg; i--) {
-			new (m_Buffer.Get((uint64_t)i + dx)) T(*m_Buffer.Get((uint64_t)i));
+			Place(m_Buffer.Get((uint64_t)i), m_Buffer.Get((uint64_t)i + dx));
 			m_Buffer.Get((uint64_t)i)->~T();
 		}
 	}
@@ -240,6 +260,7 @@ private:
 	void Free(int64_t idx) {
 		if(!m_Buffer.GetMaxCount()) {
 			m_Buffer = Buffer<T>(5);
+			m_Buffer.Add();
 			m_Back = 1;
 			m_Front = 0;
 			return;
@@ -260,7 +281,7 @@ private:
 				if(i == pos)
 					delta = 1;
 
-				new (newData + i + delta) T(*At(i));
+				Place(At(i), newData + i + delta);
 				Remove(i);
 			}
 

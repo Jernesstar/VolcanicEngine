@@ -3,12 +3,12 @@
 namespace VolcaniCore {
 
 Ref<Mesh> Mesh::Create(MeshType type,
-						const Buffer<Vertex>& vertices,
-						const Buffer<uint32_t>& indices,
+						Buffer<Vertex>&& vertices,
+						Buffer<uint32_t>&& indices,
 						const Material& material)
 {
 	auto mesh = CreateRef<Mesh>(type);
-	mesh->SubMeshes.Emplace(vertices, indices, 0U);
+	mesh->SubMeshes.Emplace(std::move(vertices), std::move(indices), 0U);
 	mesh->Materials.Add(material);
 	return mesh;
 }
@@ -94,7 +94,7 @@ Ref<Mesh> Mesh::Create(MeshType type, const Material& material) {
 		}
 	}
 
-	return Create(type, vertices, indices, material);
+	return Create(type, std::move(vertices), std::move(indices), material);
 }
 
 Ref<Mesh> Mesh::Create(MeshType type, const glm::vec4& color) {

@@ -92,10 +92,10 @@ void DrawComponent<CameraComponent>(Entity& entity) {
 	ImGui::SeparatorText("CameraComponent");
 
 	auto pos = camera->GetPosition();
-	if(ImGui::SliderFloat3("Position", &pos.x, -FLT_MAX, +FLT_MAX))
+	if(ImGui::DragFloat3("Position", &pos.x, 1.0f, -FLT_MAX/2.0f, +FLT_MAX/2.0f))
 		camera->SetPosition(pos);
 	auto dir = camera->GetDirection();
-	if(ImGui::SliderFloat3("Direction", &dir.x, -FLT_MAX, +FLT_MAX));
+	if(ImGui::DragFloat3("Direction", &dir.x, 1.0f, -FLT_MAX/2.0f, +FLT_MAX/2.0f));
 		camera->SetDirection(dir);
 
 	uint32_t max = 3000;
@@ -104,6 +104,8 @@ void DrawComponent<CameraComponent>(Entity& entity) {
 	bool w = ImGui::SliderScalar("Viewport Width", ImGuiDataType_U32, &vW, &min, &max);
 	auto vH = camera->GetViewportHeight();
 	bool h = ImGui::SliderScalar("Viewport Height", ImGuiDataType_U32, &vH, &min, &max);
+	if(w || h)
+		camera->Resize(vW, vH);
 }
 
 template<>
@@ -175,6 +177,15 @@ void DrawComponent<ScriptComponent>(Entity& entity) {
 
 	auto& component = entity.Set<ScriptComponent>();
 	ImGui::SeparatorText("ScriptComponent");
+
+	ImGui::Text("Module ID: %li", (uint64_t)component.ModuleAsset.ID);
+	std::string text = component.ModuleAsset.ID ? "Change Module" : "Set Module";
+	if(ImGui::Button(text.c_str())) {
+
+	}
+
+	if(!component.Instance)
+		return;
 
 	auto* handle = component.Instance->GetHandle();
 	for(uint32_t i = 0; i < handle->GetPropertyCount(); i++) {

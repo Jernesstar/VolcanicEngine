@@ -23,15 +23,6 @@ public:
 	{
 		std::swap(m_Data, other.m_Data);
 	}
-	Buffer(const Buffer& other)
-		: m_MaxCount(other.GetMaxCount())
-	{
-		if(!m_MaxCount)
-			return;
-
-		m_Data = (T*)malloc(GetMaxSize());
-		Set(other.Get(), other.GetCount());
-	}
 	Buffer(const std::initializer_list<T>& list)
 		: m_MaxCount(list.size())
 	{
@@ -61,6 +52,18 @@ public:
 		return *this;
 	}
 
+	Buffer& operator =(const std::initializer_list<T>& list) {
+		if(m_MaxCount < list.size()) {
+			free(m_Data);
+			m_MaxCount = list.size();
+			m_Data = (T*)malloc(GetMaxSize());
+		}
+
+		m_Count = list.size();
+		memcpy(m_Data, list.begin(), GetSize());
+		return *this;
+	}
+
 	operator bool() const { return m_Data && m_Count; }
 
 	T* Get(uint64_t i = 0) const {
@@ -68,17 +71,16 @@ public:
 		return m_Data + i;
 	}
 
-	template<typename ...Args>
-	void New(uint64_t i, Args&&... args) {
-		new (Get(i)) T(std::forward<Args>(args)...);
-	}
-
 	uint64_t GetCount()	   const { return m_Count; }
 	uint64_t GetMaxCount() const { return m_MaxCount; }
 	uint64_t GetSize()	   const { return m_Count	 * sizeof(T); }
 	uint64_t GetMaxSize()  const { return m_MaxCount * sizeof(T); }
 
-	Buffer<T> Copy() const { return Buffer<T>(*this); }
+	Buffer<T> Copy() const {
+		T* newData = (T*)malloc(GetSize());
+		memcpy(newData, m_Data, GetSize());
+		return Buffer<T>(newData, GetCount());
+	}
 
 	void Add(const T& element) {
 		if(m_Count >= m_MaxCount)
@@ -116,7 +118,7 @@ public:
 	}
 
 	void Remove() {
-		// VOLCANICORE_ASSERT(m_Count);
+		VOLCANICORE_ASSERT(m_Count > 0);
 		m_Count--;
 	}
 

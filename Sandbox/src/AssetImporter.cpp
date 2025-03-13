@@ -91,7 +91,7 @@ static SubMesh LoadMesh(const aiMesh* mesh) {
 		indices.Add(face.mIndices[2]);
 	}
 
-	return { vertices, indices, mesh->mMaterialIndex };
+	return { std::move(vertices), std::move(indices), mesh->mMaterialIndex };
 }
 
 static Ref<Texture> LoadTexture(const std::string& dir,
@@ -148,7 +148,7 @@ Ref<Mesh> AssetImporter::GetMesh(const std::string& path) {
 	mesh->Materials.Allocate(scene->mNumMaterials);
 
 	for(uint32_t i = 0; i < scene->mNumMeshes; i++)
-		mesh->SubMeshes.Add(LoadMesh(scene->mMeshes[i]));
+		mesh->SubMeshes.AddMove(LoadMesh(scene->mMeshes[i]));
 
 	auto dir = (fs::path(path).parent_path() / "textures").string();
 	for(uint32_t i = 0; i < scene->mNumMaterials; i++)

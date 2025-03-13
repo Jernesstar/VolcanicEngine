@@ -1,7 +1,8 @@
 
 class TestHome : IScreen
 {
-    TestHome(Scene &world, UIPage &ui)
+
+    TestHome()
     {
     }
 

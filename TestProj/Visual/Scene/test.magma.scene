@@ -6,12 +6,12 @@ Scene:
         ID: 547
         Components:
           TagComponent:
-            Tag: Empty Tag
+            Tag: SceneCamera
           CameraComponent:
             Camera:
               Type: Stereographic
               VerticalFOV: 45
-              Position: [0, 0, 10]
+              Position: [0, 0, 0]
               Direction: [0, 0, -1]
               ViewportWidth: 800
               ViewportHeight: 600
@@ -25,76 +25,39 @@ Scene:
             Tag: TestEntity
           TransformComponent:
             Transform:
-              Translation: [0, 0, 0]
-              Rotation: [0, 0, 0]
-              Scale: [1, 1, 1]
+              Translation: [0, 11.8000002, -2]
+              Rotation: [0.994837642, 0.680678427, 0]
+              Scale: [50.5, 38.5, 44.4000015]
           MeshComponent:
             AssetID: 10036008063945961451
     - Entity:
-        Name: ""
+        Name: Player
         ID: 550
         Components:
-          {}
+          ScriptComponent:
+            ModuleID: 0
+            Class: ""
     - Entity:
-        Name: ""
-        ID: 551
+        Name: ScriptableEntity
+        ID: 4294967847
         Components:
           {}
     - Entity:
-        Name: ""
-        ID: 552
-        Components:
-          {}
-    - Entity:
-        Name: ""
+        Name: AnotherScriptableObject
         ID: 553
         Components:
           {}
     - Entity:
-        Name: ""
+        Name: Ball
+        ID: 552
+        Components:
+          MeshComponent:
+            AssetID: 4186775327602265389
+    - Entity:
+        Name: Ball2
         ID: 554
         Components:
-          {}
-    - Entity:
-        Name: ""
-        ID: 555
-        Components:
-          {}
-    - Entity:
-        Name: ""
-        ID: 556
-        Components:
-          {}
-    - Entity:
-        Name: ""
-        ID: 557
-        Components:
-          {}
-    - Entity:
-        Name: ""
-        ID: 558
-        Components:
-          {}
-    - Entity:
-        Name: ""
-        ID: 559
-        Components:
-          {}
-    - Entity:
-        Name: ""
-        ID: 560
-        Components:
-          {}
-    - Entity:
-        Name: ""
-        ID: 549
-        Components:
           TagComponent:
-            Tag: TestEntity
-          TransformComponent:
-            Transform:
-              Translation: [0, 0, 0]
-              Rotation: [0, 0, 0]
-              Scale: [9.30000019, 28.1000004, 1.89999998]
+            Tag: Obstacle
           MeshComponent:
-            AssetID: 10036008063945961451
+            AssetID: 4186775327602265389

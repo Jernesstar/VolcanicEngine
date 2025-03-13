@@ -221,7 +221,7 @@ void EditorAssetManager::Save() {
 		else {
 			auto& refs = m_References[asset.ID];
 			auto mesh = m_MeshAssets[asset.ID];
-			auto subMesh = mesh->SubMeshes[0];
+			auto& subMesh = mesh->SubMeshes[0];
 			serializer.WriteKey("MeshType").Write((uint32_t)mesh->Type);
 
 			serializer.WriteKey("Material")

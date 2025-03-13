@@ -16,6 +16,11 @@ void Project::Load(const std::string& path) {
 		file = YAML::LoadFile(path);
 	}
 	catch(YAML::ParserException e) {
+		VOLCANICORE_LOG_INFO("File '%s' is not well formatted", path.c_str());
+		return;
+	}
+	catch(YAML::BadFile e) {
+		VOLCANICORE_LOG_INFO("File '%s' is bad", path.c_str());
 		return;
 	}
 

@@ -301,26 +301,25 @@ EditorSceneRenderer::EditorSceneRenderer() {
 	auto window = Application::GetWindow();
 	m_Output = Framebuffer::Create(window->GetWidth(), window->GetHeight());
 
-	Ref<ShaderPipeline> shader;
-	Ref<Framebuffer> buffer;
-
-	shader = ShaderPipeline::Create("Magma/assets/shaders", "Grid");
-	GridPass = RenderPass::Create("Grid", shader, m_Output);
+	GridPass =
+		RenderPass::Create("Grid",
+			ShaderPipeline::Create("Magma/assets/shaders", "Grid"), m_Output);
 	GridPass->SetData(Renderer3D::GetMeshBuffer());
 
-	shader = ShaderPipeline::Create("Magma/assets/shaders", "Mesh");
 	// buffer = Framebuffer::Create(window->GetWidth(), window->GetHeight());
-	LightingPass = RenderPass::Create("Lighting", shader, m_Output);
+	LightingPass =
+		RenderPass::Create("Lighting",
+			ShaderPipeline::Create("Magma/assets/shaders", "Mesh"), m_Output);
 	LightingPass->SetData(Renderer3D::GetMeshBuffer());
 
-	shader = ShaderPipeline::Create("Magma/assets/shaders", "Mask");
-	buffer = Framebuffer::Create(window->GetWidth(), window->GetHeight());
-	MaskPass = RenderPass::Create("Mask", shader, buffer);
-	MaskPass->SetData(Renderer3D::GetMeshBuffer());
+	// shader = ShaderPipeline::Create("Magma/assets/shaders", "Mask");
+	// buffer = Framebuffer::Create(window->GetWidth(), window->GetHeight());
+	// MaskPass = RenderPass::Create("Mask", shader, buffer);
+	// MaskPass->SetData(Renderer3D::GetMeshBuffer());
 
-	shader = ShaderPipeline::Create("Magma/assets/shaders", "Outline");
-	OutlinePass = RenderPass::Create("Outline", shader, m_Output);
-	OutlinePass->SetData(Renderer2D::GetScreenBuffer());
+	// shader = ShaderPipeline::Create("Magma/assets/shaders", "Outline");
+	// OutlinePass = RenderPass::Create("Outline", shader, m_Output);
+	// OutlinePass->SetData(Renderer2D::GetScreenBuffer());
 
 	// DirectionalLightBuffer =
 	// 	UniformBuffer::Create(
@@ -395,10 +394,13 @@ void EditorSceneRenderer::SubmitCamera(const Entity& entity) {
 }
 
 void EditorSceneRenderer::SubmitSkybox(const Entity& entity) {
-	// auto& sc = entity.Get<SkyboxComponent>();
+	auto& sc = entity.Get<SkyboxComponent>();
+	auto& assetManager =
+		Application::As<EditorApp>()->GetEditor().GetAssetManager();
+	auto cubemap = assetManager.Get<Cubemap>(sc.CubemapAsset);
 
-	// FirstCommand->UniformData
-	// .SetInput("u_Skybox", CubemapSlot{ sc.Asset.Get<Cubemap>() });
+	FirstCommand->UniformData
+	.SetInput("u_Skybox", CubemapSlot{ cubemap });
 }
 
 void EditorSceneRenderer::SubmitLight(const Entity& entity) {
@@ -426,7 +428,7 @@ void EditorSceneRenderer::SubmitMesh(const Entity& entity) {
 		Application::As<EditorApp>()->GetEditor().GetAssetManager();
 	auto& tc = entity.Get<TransformComponent>();
 	auto& mc = entity.Get<MeshComponent>();
-	// assetManager.Load(mc.MeshAsset);
+	assetManager.Load(mc.MeshAsset);
 	auto mesh = assetManager.Get<Mesh>(mc.MeshAsset);
 
 	if(entity == Selected)
@@ -438,16 +440,16 @@ void EditorSceneRenderer::SubmitMesh(const Entity& entity) {
 
 	auto* command = Objects[mesh];
 
-	Renderer3D::DrawMesh(mesh, tc, command);
+	Renderer3D::DrawMesh(mesh, Transform{ }, command);
 }
 
 void EditorSceneRenderer::Render() {
-	FirstCommand->UniformData
-	.SetInput("u_DirectionalLightCount", (int32_t)HasDirectionalLight);
-	FirstCommand->UniformData
-	.SetInput("u_PointLightCount", (int32_t)PointLightCount);
-	FirstCommand->UniformData
-	.SetInput("u_SpotlightCount", (int32_t)SpotlightCount);
+	// FirstCommand->UniformData
+	// .SetInput("u_DirectionalLightCount", (int32_t)HasDirectionalLight);
+	// FirstCommand->UniformData
+	// .SetInput("u_PointLightCount", (int32_t)PointLightCount);
+	// FirstCommand->UniformData
+	// .SetInput("u_SpotlightCount", (int32_t)SpotlightCount);
 
 	// if(Selected) {
 	if(false) {

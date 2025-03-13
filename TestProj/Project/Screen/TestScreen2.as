@@ -1,28 +1,23 @@
 
 class TestScreen2 : IScreen
 {
-    Scene @SceneHandle;
-    UIPage @UIHandle;
 
-    TestScreen2(Scene @world, UIPage @ui)
+    TestScreen2()
     {
-        @SceneHandle = world;
-        @UIHandle = ui;
     }
 
     void OnLoad()
     {
-
+        print("TestScreen2 Load");
     }
 
     void OnClose()
     {
-
+        print("TestScreen2 Close");
     }
 
     void OnUpdate(float ts)
     {
 
     }
-
 }

@@ -340,11 +340,11 @@ void Editor::OpenProject() {
 		if(instance->IsOk()) {
 			std::string path = instance->GetFilePathName();
 			NewProject(path);
+			NewTab(CreateRef<ProjectTab>(m_Project.Path));
 		}
 
 		instance->Close();
 		menu.project.openProject = false;
-		SetTab(nullptr);
 	}
 }
 

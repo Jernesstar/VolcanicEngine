@@ -160,12 +160,12 @@ static void DrawSubMesh(Ref<Mesh> root, SubMesh& mesh, const glm::mat4& tr,
 						DrawCommand* cmd)
 {
 	DrawCommand* command;
-	if(cmd)
-		command = cmd;
-	else if(s_Meshes.count(&mesh))
+	if(s_Meshes.count(&mesh))
 		command = s_Meshes[&mesh];
+	else if(cmd)
+		command = cmd;
 	else
-		s_Meshes[&mesh] = command = Renderer::NewCommand();
+		command = s_Meshes[&mesh] = Renderer::NewCommand();
 
 	if(!command->VerticesCount) {
 		if(cmd) {
@@ -179,13 +179,13 @@ static void DrawSubMesh(Ref<Mesh> root, SubMesh& mesh, const glm::mat4& tr,
 				command->UniformData
 				.SetInput("u_Material.Diffuse", TextureSlot{ mat.Diffuse, 0 });
 				command->UniformData
-				.SetInput("u_Material.IsTextured", true);
+				.SetInput("u_Material.IsTextured", 1);
 			}
 			else {
 				command->UniformData
 				.SetInput("u_Material.DiffuseColor", mat.DiffuseColor);
 				command->UniformData
-				.SetInput("u_Material.IsTextured", false);
+				.SetInput("u_Material.IsTextured", 0);
 			}
 
 			command->UniformData

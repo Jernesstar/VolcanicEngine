@@ -17,6 +17,21 @@
 
 using namespace Magma::ECS;
 
+#define FOCUS_COMPONENT(Name, Display) \
+if(entity.Has<Name>()) { \
+	bool focus = editor->IsFocused<Name>(entity); \
+	auto addFlags = focus ? ImGuiTreeNodeFlags_Selected : 0; \
+	if(ImGui::TreeNodeEx(Display, flags | addFlags)) { \
+		if(ImGui::IsMouseClicked(0) && ImGui::IsItemHovered()) { \
+			if(focus) \
+				editor->ClearFocus(); \
+			else \
+				editor->SetFocus<Name>(); \
+		} \
+		ImGui::TreePop(); \
+	} \
+} \
+
 namespace Magma {
 
 SceneHierarchyPanel::SceneHierarchyPanel(Scene* context)
@@ -47,8 +62,15 @@ struct {
 void SceneHierarchyPanel::Draw() {
 	ImGui::Begin("Scene Hierarchy", &Open);
 	{
-		if(ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
+		if(ImGui::IsMouseDown(0) && ImGui::IsWindowHovered()) {
+			// auto editor =
+			// 	m_Tab->GetPanel("ComponentEditor")->As<ComponentEditorPanel>();
+			// auto visual =
+			// 	m_Tab->GetPanel("SceneVisualizer")->As<SceneVisualizerPanel>();
 			m_Selected = { };
+			// editor->SetContext(m_Selected);
+			// visual->Select(m_Selected);
+		}
 		if(ImGui::IsMouseDown(1) && ImGui::IsWindowHovered())
 			ImGui::OpenPopup("Options");
 
@@ -148,84 +170,18 @@ void SceneHierarchyPanel::DrawEntityNode(Entity& entity) {
 			ImGui::OpenPopup("Properties");
 
 		flags = ImGuiTreeNodeFlags_Bullet | ImGuiTreeNodeFlags_DefaultOpen;
-		if(entity.Has<CameraComponent>()) {
-			bool focus = editor->IsFocused<CameraComponent>(entity);
-			auto addFlags = focus ? ImGuiTreeNodeFlags_Selected : 0;
-			if(ImGui::TreeNodeEx("CameraComponent", flags | addFlags)) {
-				if(ImGui::IsMouseClicked(0) && ImGui::IsItemHovered()) {
-					if(focus)
-						editor->ClearFocus();
-					else
-						editor->SetFocus<CameraComponent>();
-				}
-				ImGui::TreePop();
-			}
-		}
-		if(entity.Has<MeshComponent>()) {
-			bool focus = editor->IsFocused<MeshComponent>(entity);
-			auto addFlags = focus ? ImGuiTreeNodeFlags_Selected : 0;
-			if(ImGui::TreeNodeEx("MeshComponent", flags | addFlags)) {
-				if(ImGui::IsMouseClicked(0) && ImGui::IsItemHovered()) {
-					if(focus)
-						editor->ClearFocus();
-					else
-						editor->SetFocus<MeshComponent>();
-				}
-				ImGui::TreePop();
-			}
-		}
-		if(entity.Has<RigidBodyComponent>()) {
-			bool focus = editor->IsFocused<RigidBodyComponent>(entity);
-			auto addFlags = focus ? ImGuiTreeNodeFlags_Selected : 0;
-			if(ImGui::TreeNodeEx("RigidBodyComponent", flags | addFlags)) {
-				if(ImGui::IsMouseClicked(0) && ImGui::IsItemHovered()) {
-					if(focus)
-						editor->ClearFocus();
-					else
-						editor->SetFocus<RigidBodyComponent>();
-				}
-				ImGui::TreePop();
-			}
-		}
-		if(entity.Has<TagComponent>()) {
-			bool focus = editor->IsFocused<TagComponent>(entity);
-			auto addFlags = focus ? ImGuiTreeNodeFlags_Selected : 0;
-			if(ImGui::TreeNodeEx("TagComponent", flags | addFlags)) {
-				if(ImGui::IsMouseClicked(0) && ImGui::IsItemHovered()) {
-					if(focus)
-						editor->ClearFocus();
-					else
-						editor->SetFocus<TagComponent>();
-				}
-				ImGui::TreePop();
-			}
-		}
-		if(entity.Has<TransformComponent>()) {
-			bool focus = editor->IsFocused<TransformComponent>(entity);
-			auto addFlags = focus ? ImGuiTreeNodeFlags_Selected : 0;
-			if(ImGui::TreeNodeEx("TransformComponent", flags | addFlags)) {
-				if(ImGui::IsMouseClicked(0) && ImGui::IsItemHovered()) {
-					if(focus)
-						editor->ClearFocus();
-					else
-						editor->SetFocus<TransformComponent>();
-				}
-				ImGui::TreePop();
-			}
-		}
-		if(entity.Has<ScriptComponent>()) {
-			bool focus = editor->IsFocused<ScriptComponent>(entity);
-			auto addFlags = focus ? ImGuiTreeNodeFlags_Selected : 0;
-			if(ImGui::TreeNodeEx("ScriptComponent", flags | addFlags)) {
-				if(ImGui::IsMouseClicked(0) && ImGui::IsItemHovered()) {
-					if(focus)
-						editor->ClearFocus();
-					else
-						editor->SetFocus<ScriptComponent>();
-				}
-				ImGui::TreePop();
-			}
-		}
+		FOCUS_COMPONENT(CameraComponent, "CameraComponent")
+		FOCUS_COMPONENT(TagComponent, "TagComponent")
+		FOCUS_COMPONENT(TransformComponent, "TransformComponent")
+		FOCUS_COMPONENT(AudioComponent, "AudioComponent")
+		FOCUS_COMPONENT(MeshComponent, "MeshComponent")
+		FOCUS_COMPONENT(SkyboxComponent, "SkyboxComponent")
+		FOCUS_COMPONENT(ScriptComponent, "ScriptComponent")
+		FOCUS_COMPONENT(RigidBodyComponent, "RigidBodyComponent")
+		FOCUS_COMPONENT(DirectionalLightComponent, "DirectionalLightComponent")
+		FOCUS_COMPONENT(PointLightComponent, "PointLightComponent")
+		FOCUS_COMPONENT(SpotlightComponent, "SpotlightComponent")
+		FOCUS_COMPONENT(ParticleSystemComponent, "ParticleSystemComponent")
 
 		if(ImGui::BeginPopup("Properties"))
 		{
@@ -275,40 +231,40 @@ void SceneHierarchyPanel::DrawEntityNode(Entity& entity) {
 				if(ImGui::BeginMenu("Delete")) {
 					if(entity.Has<CameraComponent>()
 					&& ImGui::MenuItem("CameraComponent"))
-						entity.Add<CameraComponent>();
+						entity.Remove<CameraComponent>();
 					if(entity.Has<TagComponent>()
 					&& ImGui::MenuItem("TagComponent"))
-						entity.Add<TagComponent>();
+						entity.Remove<TagComponent>();
 					if(entity.Has<TransformComponent>()
 					&& ImGui::MenuItem("TransformComponent"))
-						entity.Add<TransformComponent>();
+						entity.Remove<TransformComponent>();
 					if(entity.Has<AudioComponent>()
 					&& ImGui::MenuItem("AudioComponent"))
-						entity.Add<AudioComponent>();
+						entity.Remove<AudioComponent>();
 					if(entity.Has<MeshComponent>()
 					&& ImGui::MenuItem("MeshComponent"))
-						entity.Add<MeshComponent>();
+						entity.Remove<MeshComponent>();
 					if(entity.Has<SkyboxComponent>()
 					&& ImGui::MenuItem("SkyboxComponent"))
-						entity.Add<SkyboxComponent>();
+						entity.Remove<SkyboxComponent>();
 					if(entity.Has<ScriptComponent>()
 					&& ImGui::MenuItem("ScriptComponent"))
-						entity.Add<ScriptComponent>();
+						entity.Remove<ScriptComponent>();
 					if(entity.Has<RigidBodyComponent>()
 					&& ImGui::MenuItem("RigidBodyComponent"))
-						entity.Add<RigidBodyComponent>();
+						entity.Remove<RigidBodyComponent>();
 					if(entity.Has<DirectionalLightComponent>()
 					&& ImGui::MenuItem("DirectionalLightComponent"))
-						entity.Add<DirectionalLightComponent>();
+						entity.Remove<DirectionalLightComponent>();
 					if(entity.Has<PointLightComponent>()
 					&& ImGui::MenuItem("PointLightComponent"))
-						entity.Add<PointLightComponent>();
+						entity.Remove<PointLightComponent>();
 					if(entity.Has<SpotlightComponent>()
 					&& ImGui::MenuItem("SpotlightComponent"))
-						entity.Add<SpotlightComponent>();
+						entity.Remove<SpotlightComponent>();
 					if(entity.Has<ParticleSystemComponent>()
 					&& ImGui::MenuItem("ParticleSystemComponent"))
-						entity.Add<ParticleSystemComponent>();
+						entity.Remove<ParticleSystemComponent>();
 
 					ImGui::EndMenu();
 				}

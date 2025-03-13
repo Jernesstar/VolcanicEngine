@@ -38,8 +38,8 @@ enum class MeshType { Quad, Cube, Model };
 class Mesh {
 public:
 	static Ref<Mesh> Create(MeshType type,
-							const Buffer<Vertex>& vertices,
-							const Buffer<uint32_t>& indices,
+							Buffer<Vertex>&& vertices,
+							Buffer<uint32_t>&& indices,
 							const Material& material = { });
 	static Ref<Mesh> Create(MeshType type,
 							const Material& material = { });
