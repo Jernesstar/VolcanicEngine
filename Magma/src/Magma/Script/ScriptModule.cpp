@@ -1,7 +1,6 @@
 #include "ScriptModule.h"
 
 #include <angelscript.h>
-#include <angelscript/add_on/scriptstdstring/scriptstdstring.h>
 #include <angelscript/add_on/scriptbuilder/scriptbuilder.h>
 
 #include <VolcaniCore/Core/FileUtils.h>

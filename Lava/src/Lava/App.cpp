@@ -310,7 +310,7 @@ void RuntimeSceneRenderer::Update(TimeStep ts) {
 
 void RuntimeSceneRenderer::Begin() {
 	FirstCommand = RendererAPI::Get()->NewDrawCommand(LightingPass->Get());
-
+	FirstCommand->Clear = true;
 }
 
 void RuntimeSceneRenderer::SubmitCamera(const Entity& entity) {
@@ -323,10 +323,12 @@ void RuntimeSceneRenderer::SubmitCamera(const Entity& entity) {
 }
 
 void RuntimeSceneRenderer::SubmitSkybox(const Entity& entity) {
-	// auto& sc = entity.Get<SkyboxComponent>();
+	auto& sc = entity.Get<SkyboxComponent>();
+	auto& assetManager = App::Get()->GetAssetManager();
+	auto cubemap = assetManager.Get<Cubemap>(sc.CubemapAsset);
 
-	// FirstCommand->UniformData
-	// .SetInput("u_Skybox", CubemapSlot{ sc.Asset.Get<Cubemap>() });
+	FirstCommand->UniformData
+	.SetInput("u_Skybox", CubemapSlot{ cubemap });
 }
 
 void RuntimeSceneRenderer::SubmitLight(const Entity& entity) {
@@ -352,7 +354,8 @@ void RuntimeSceneRenderer::SubmitParticles(const Entity& entity) {
 void RuntimeSceneRenderer::SubmitMesh(const Entity& entity) {
 	auto& tc = entity.Get<TransformComponent>();
 	auto& mc = entity.Get<MeshComponent>();
-	auto mesh = App::Get()->GetAssetManager().Get<Mesh>(mc.MeshAsset);
+	auto& assetManager = App::Get()->GetAssetManager();
+	auto mesh = assetManager.Get<Mesh>(mc.MeshAsset);
 
 	if(!Objects.count(mesh))
 		Objects[mesh] =
