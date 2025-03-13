@@ -43,19 +43,34 @@ void RuntimeAssetManager::Load(Asset asset) {
 		BinaryReader reader("Asset/Mesh/mesh.bin");
 		reader.SetPosition(offset);
 		reader.Read(mesh->SubMeshes);
-		List<uint64_t> materialFlags;
+
+		List<uint8_t> materialFlags;
 		reader.Read(materialFlags);
 
 		auto& refs = m_References[asset.ID];
-		uint64_t i = 0;
-		for(auto mat : materialFlags) {
+		uint64_t refIdx = 0;
+		for(uint64_t i = 0; i < materialFlags.Count(); i++) {
 			std::bitset<3> flags(mat);
-			if(flags.test(0)) // Diffuse
-				Load(refs[i++]);
-			if(flags.test(1)) // Specular
-				Load(refs[i++]);
-			if(flags.test(2)) // Emissive
-				Load(refs[i++]);
+			mesh->Materials.Emplace();
+
+			if(flags.test(0))  {
+				Load(refs[refIdx]);
+				mesh->Material[i].Diffuse = Get<Texture>(refs[refIdx++]);
+			}
+			if(flags.test(1)) {
+				Load(refs[refIdx]);
+				mesh->Material[i].Specular = Get<Texture>(refs[refIdx++]);
+			}
+			if(flags.test(2)) {
+				Load(refs[refIdx]);
+				mesh->Material[i].Emissive = Get<Texture>(refs[refIdx++]);
+			}
+		}
+		if(refIndex == 0) {
+			// mesh->Materials.Emplace();
+			// reader.ReadData(&mesh->Materials[0].DiffuseColor.x, sizeof(Vec4));
+			// reader.ReadData(&mesh->Materials[0].SpecularColor.x, sizeof(Vec4));
+			// reader.ReadData(&mesh->Materials[0].EmissiveColor.x, sizeof(Vec4));
 		}
 
 		m_MeshAssets[asset.ID] = mesh;

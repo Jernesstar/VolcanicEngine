@@ -219,9 +219,9 @@ void EditorAssetManager::Save() {
 			serializer.WriteKey("Path")
 				.Write(fs::relative(path, rootPath).generic_string());
 		else {
-			auto& refs = m_References[asset.ID];
-			auto mesh = m_MeshAssets[asset.ID];
-			auto& subMesh = mesh->SubMeshes[0];
+			List<Asset>& refs = m_References[asset.ID];
+			Ref<Mesh> mesh = m_MeshAssets[asset.ID];
+			const SubMesh& subMesh = mesh->SubMeshes[0];
 			serializer.WriteKey("MeshType").Write((uint32_t)mesh->Type);
 
 			serializer.WriteKey("Material")
@@ -314,23 +314,22 @@ void EditorAssetManager::RuntimeSave(const std::string& exportPath) {
 			pack.Write(meshFile.GetPosition());
 
 			if(path != "") {
-				auto meshes = AssetImporter::GetMeshData(path);
+				List<MaterialPaths> materials;
+				List<SubMesh> meshes;
+				AssetImporter::GetMeshData(path, meshes, materials);
 				meshFile.Write(meshes);
-				auto materials =
-					AssetImporter::GetMeshMaterials(m_Paths[asset.ID]);
-				for(auto mat : materials) {
+				meshFile.Write(materials.Count());
+				for(auto& mat : materials) {
 					std::bitset<3> flags;
-
 					flags |= (mat[0] != "") << 0; // Diffuse
 					flags |= (mat[1] != "") << 1; // Specular
 					flags |= (mat[2] != "") << 2; // Emissive
-					meshFile.Write(flags.to_ullong());
+					meshFile.Write((uint8_t)flags.to_ulong());
 				}
 			}
 			else {
 				// mesh = Get<Mesh>(asset);
 				// meshFile.Write(mesh->SubMeshes);
-				// meshFile.Write()
 			}
 		}
 		else if(asset.Type == AssetType::Texture) {
@@ -347,8 +346,8 @@ void EditorAssetManager::RuntimeSave(const std::string& exportPath) {
 		else if(asset.Type == AssetType::Audio) {
 			pack.Write(soundFile.GetPosition());
 
-			// Buffer<float> soundData = AssetImporter::GetAudioData(path);
-			// soundFile.Write(soundData);
+			Buffer<float> soundData = AssetImporter::GetAudioData(path);
+			soundFile.Write(soundData);
 		}
 		else if(asset.Type == AssetType::Script) {
 			pack.Write(scriptFile.GetPosition());

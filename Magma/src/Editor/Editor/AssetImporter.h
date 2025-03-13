@@ -15,7 +15,7 @@ struct MaterialPaths {
 	std::string Speccular;
 	std::string Emissive;
 
-	std::string operator[](uint32_t i) { return *(&this->Diffuse + i); }
+	std::string operator[](uint32_t i) { return *(&Diffuse + i); }
 };
 
 class AssetImporter {
@@ -23,8 +23,8 @@ public:
 	static ImageData GetImageData(const std::string& path, bool flip = false);
 
 	static Ref<Mesh> GetMesh(const std::string& path);
-	static List<MaterialPaths> GetMeshMaterials(const std::string& path);
-	static List<SubMesh> GetMeshData(const std::string& path);
+	static void GetMeshData(const std::string& path,
+		List<SubMesh>& mesh, List<MaterialPaths>& materialPaths);
 
 	static Ref<Texture> GetTexture(const std::string& path);
 	static Ref<Cubemap> GetCubemap(const std::string& path);
