@@ -50,23 +50,23 @@ void RuntimeAssetManager::Load(Asset asset) {
 		auto& refs = m_References[asset.ID];
 		uint64_t refIdx = 0;
 		for(uint64_t i = 0; i < materialFlags.Count(); i++) {
-			std::bitset<3> flags(mat);
+			std::bitset<3> flags(materialFlags[i]);
 			mesh->Materials.Emplace();
 
 			if(flags.test(0))  {
 				Load(refs[refIdx]);
-				mesh->Material[i].Diffuse = Get<Texture>(refs[refIdx++]);
+				mesh->Materials[i].Diffuse = Get<Texture>(refs[refIdx++]);
 			}
 			if(flags.test(1)) {
 				Load(refs[refIdx]);
-				mesh->Material[i].Specular = Get<Texture>(refs[refIdx++]);
+				mesh->Materials[i].Specular = Get<Texture>(refs[refIdx++]);
 			}
 			if(flags.test(2)) {
 				Load(refs[refIdx]);
-				mesh->Material[i].Emissive = Get<Texture>(refs[refIdx++]);
+				mesh->Materials[i].Emissive = Get<Texture>(refs[refIdx++]);
 			}
 		}
-		if(refIndex == 0) {
+		if(refIdx == 0) {
 			// mesh->Materials.Emplace();
 			// reader.ReadData(&mesh->Materials[0].DiffuseColor.x, sizeof(Vec4));
 			// reader.ReadData(&mesh->Materials[0].SpecularColor.x, sizeof(Vec4));

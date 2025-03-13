@@ -121,7 +121,9 @@ void EditorAssetManager::Load(const std::string& path) {
 			m_Paths[id] = (rootPath / node["Path"].as<std::string>()).string();
 		if(asset.Type == AssetType::Mesh) {
 			if(node["Path"]) {
-				auto materials = AssetImporter::GetMeshMaterials(m_Paths[id]);
+				List<SubMesh> meshes;
+				List<MaterialPaths> materials;
+				AssetImporter::GetMeshData(m_Paths[id], meshes, materials);
 				for(auto matPaths : materials) {
 					for(uint32_t i = 0; i < 3; i++) {
 						auto path = matPaths[i];

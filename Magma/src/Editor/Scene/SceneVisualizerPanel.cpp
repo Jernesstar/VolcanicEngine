@@ -440,7 +440,7 @@ void EditorSceneRenderer::SubmitMesh(const Entity& entity) {
 
 	auto* command = Objects[mesh];
 
-	Renderer3D::DrawMesh(mesh, Transform{ }, command);
+	Renderer3D::DrawMesh(mesh, tc, command);
 }
 
 void EditorSceneRenderer::Render() {

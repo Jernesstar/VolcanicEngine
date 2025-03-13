@@ -167,7 +167,7 @@ Ref<Mesh> AssetImporter::GetMesh(const std::string& path) {
 }
 
 void AssetImporter::GetMeshData(const std::string& path,
-	List<SubMesh>& meshes, List<MaterialPath>& materialPaths)
+	List<SubMesh>& meshes, List<MaterialPaths>& materialPaths)
 {
 	Assimp::Importer importer;
 	uint32_t loadFlags = aiProcess_Triangulate
