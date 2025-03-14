@@ -71,6 +71,10 @@ public:
 		return m_AssetRegistry.count(asset);
 	}
 
+	bool HasRefs(Asset asset) const {
+		return m_References.count(asset.ID);
+	}
+
 	void Clear() {
 		m_AssetRegistry.clear();
 		m_References.clear();

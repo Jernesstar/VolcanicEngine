@@ -6,6 +6,7 @@
 
 #include <VolcaniCore/Core/Application.h>
 #include <VolcaniCore/Core/FileUtils.h>
+#include <VolcaniCore/Core/Math.h>
 
 #include <Magma/Core/YAMLSerializer.h>
 
@@ -23,7 +24,7 @@ EditorAssetManager::EditorAssetManager() {
 }
 
 EditorAssetManager::~EditorAssetManager() {
-	Save();
+
 }
 
 void EditorAssetManager::Load(Asset asset) {
@@ -283,6 +284,13 @@ BinaryWriter& BinaryWriter::WriteObject(const SubMesh& mesh) {
 	return *this;
 }
 
+template<>
+BinaryWriter& BinaryWriter::WriteObject(const Vec4& vec) {
+	WriteData(&vec.x, sizeof(Vec4));
+
+	return *this;
+}
+
 }
 
 namespace Magma {
@@ -310,8 +318,8 @@ void EditorAssetManager::RuntimeSave(const std::string& exportPath) {
 	for(auto [asset, _] : m_AssetRegistry) {
 		pack.Write((uint64_t)asset.ID);
 		pack.Write((uint32_t)asset.Type);
-
 		auto path = m_Paths[asset.ID];
+
 		if(asset.Type == AssetType::Mesh) {
 			pack.Write(meshFile.GetPosition());
 
@@ -332,7 +340,9 @@ void EditorAssetManager::RuntimeSave(const std::string& exportPath) {
 			else {
 				auto mesh = Get<Mesh>(asset);
 				meshFile.Write(mesh->SubMeshes);
-				meshFile.Write((uint64_t)0);
+				meshFile.Write(mesh->Materials[0].DiffuseColor);
+				meshFile.Write(mesh->Materials[0].SpecularColor);
+				meshFile.Write(mesh->Materials[0].EmissiveColor);
 			}
 		}
 		else if(asset.Type == AssetType::Texture) {
@@ -366,7 +376,9 @@ void EditorAssetManager::RuntimeSave(const std::string& exportPath) {
 
 		}
 
-		if(m_References.count(asset.ID)) {
+		if(!HasRefs(asset))
+			pack.Write((uint64_t)0);
+		else {
 			auto& refs = m_References[asset.ID];
 			pack.Write(refs.Count());
 			for(auto& ref : refs) {
@@ -374,8 +386,6 @@ void EditorAssetManager::RuntimeSave(const std::string& exportPath) {
 				pack.Write((uint32_t)ref.Type);
 			}
 		}
-		else
-			pack.Write((uint64_t)0);
 	}
 
 	Application::PushDir();

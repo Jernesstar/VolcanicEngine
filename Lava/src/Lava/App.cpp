@@ -63,19 +63,19 @@ struct RuntimeScreen {
 
 static RuntimeScreen* s_Screen = nullptr;
 
-static Scene& GetScene() {
-	return *s_Screen->World;
+static Scene* GetScene() {
+	return s_Screen->World.get();
 }
 
-static UIPage& GetUI() {
-	return s_Screen->UI;
+static UIPage* GetUI() {
+	return &s_Screen->UI;
 }
 
 static asIScriptObject* GetScriptApp() {
 	return s_AppObject->GetHandle();
 }
 
-static AssetManager& GetAssetManagerInstance() {
+static AssetManager* GetAssetManagerInstance() {
 	return App::Get()->GetAssetManager();
 }
 
@@ -120,6 +120,10 @@ void App::OnLoad() {
 	s_AppObject = s_AppModule->GetClass(m_Project.App)->Instantiate();
 	s_AppObject->Call("OnLoad");
 
+	Asset asset = { UUID(10036008063945961451ULL), AssetType::Mesh };
+	m_AssetManager->Load(asset);
+	m_AssetManager->Get<Mesh>(asset);
+
 	SetScreen(m_Project.StartScreen);
 }
 
@@ -133,6 +137,8 @@ void App::OnClose() {
 }
 
 void App::OnUpdate(TimeStep ts) {
+	Renderer::Clear();
+
 	s_AppObject->Call("OnUpdate", (float)ts);
 
 	if(!s_Screen)
@@ -141,7 +147,7 @@ void App::OnUpdate(TimeStep ts) {
 	s_Screen->ScriptObj->Call("OnUpdate", (float)ts);
 
 	s_Screen->World->OnUpdate(ts);
-	s_Screen->World->OnRender(m_SceneRenderer);
+	// s_Screen->World->OnRender(m_SceneRenderer);
 
 	UIRenderer::BeginFrame();
 
@@ -195,12 +201,11 @@ void App::SetScreen(const std::string& name) {
 		return;
 	}
 	else
-		VOLCANICORE_LOG_INFO("Found screen '%s", name.c_str());
+		VOLCANICORE_LOG_INFO("Found screen '%s'", name.c_str());
 
 	auto& screen = m_Project.Screens[idx];
 	delete s_Screen;
 	s_Screen = new RuntimeScreen(screen);
-	Renderer::Clear();
 
 	ScreenLoad(s_Screen->Script);
 	if(screen.Scene != "")
@@ -327,9 +332,9 @@ void RuntimeSceneRenderer::SubmitCamera(const Entity& entity) {
 
 void RuntimeSceneRenderer::SubmitSkybox(const Entity& entity) {
 	auto& sc = entity.Get<SkyboxComponent>();
-	auto& assetManager = App::Get()->GetAssetManager();
-	assetManager.Load(sc.CubemapAsset);
-	auto cubemap = assetManager.Get<Cubemap>(sc.CubemapAsset);
+	auto* assetManager = App::Get()->GetAssetManager();
+	assetManager->Load(sc.CubemapAsset);
+	auto cubemap = assetManager->Get<Cubemap>(sc.CubemapAsset);
 
 	FirstCommand->UniformData
 	.SetInput("u_Skybox", CubemapSlot{ cubemap, 0 });
@@ -358,9 +363,9 @@ void RuntimeSceneRenderer::SubmitParticles(const Entity& entity) {
 void RuntimeSceneRenderer::SubmitMesh(const Entity& entity) {
 	auto& tc = entity.Get<TransformComponent>();
 	auto& mc = entity.Get<MeshComponent>();
-	auto& assetManager = App::Get()->GetAssetManager();
-	assetManager.Load(mc.MeshAsset);
-	auto mesh = assetManager.Get<Mesh>(mc.MeshAsset);
+	auto* assetManager = App::Get()->GetAssetManager();
+	assetManager->Load(mc.MeshAsset);
+	auto mesh = assetManager->Get<Mesh>(mc.MeshAsset);
 
 	if(!Objects.count(mesh))
 		Objects[mesh] =

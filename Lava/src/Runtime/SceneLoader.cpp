@@ -105,16 +105,16 @@ template<>
 BinaryReader& BinaryReader::ReadObject(ScriptComponent& comp) {
 	uint64_t id;
 	Read(id);
-	Asset asset{ id, AssetType::Script };
+	Asset asset = { id, AssetType::Script };
 	comp.ModuleAsset = asset;
 
 	std::string className;
 	Read(className);
 
 	if(className != "") {
-		auto& assetManager = App::Get()->GetAssetManager();
-		assetManager.Load(asset);
-		auto mod = assetManager.Get<ScriptModule>(asset);
+		auto* assetManager = App::Get()->GetAssetManager();
+		assetManager->Load(asset);
+		auto mod = assetManager->Get<ScriptModule>(asset);
 		auto _class = mod->GetClass(className);
 		comp.Instance = _class->Instantiate(s_CurrentEntity);
 	}

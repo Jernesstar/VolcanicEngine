@@ -80,15 +80,12 @@ public:
 	void PushScreen(const std::string& name);
 	void PopScreen();
 
-	void OnKeyPressed();
-
-	void SetAssetManager(AssetManager& manager) { m_AssetManager = &manager; }
-	AssetManager& GetAssetManager() { return *m_AssetManager; }
+	void SetAssetManager(AssetManager* manager) { m_AssetManager = manager; }
+	AssetManager* GetAssetManager() { return m_AssetManager; }
 	RuntimeSceneRenderer& GetRenderer() { return m_SceneRenderer; }
 
 private:
 	Project m_Project;
-
 	AssetManager* m_AssetManager;
 	RuntimeSceneRenderer m_SceneRenderer;
 

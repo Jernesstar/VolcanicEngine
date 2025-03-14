@@ -82,7 +82,7 @@ Runtime::Runtime(const CommandLineArgs& args)
 
 	m_App->ChangeScreen = true;
 	m_App->Running = true;
-	m_App->SetAssetManager(m_AssetManager);
+	m_App->SetAssetManager(&m_AssetManager);
 	m_App->OnLoad();
 }
 

@@ -175,8 +175,8 @@ UIState UIRenderer::DrawButton(UI::Button& button) {
 	return {
 		ImGui::IsItemClicked(),
 		ImGui::IsItemHovered(),
-		ImGui::IsMouseReleased(0),
-		ImGui::IsMouseDown(0),
+		ImGui::IsMouseReleased(0) && ImGui::IsItemHovered(),
+		ImGui::IsMouseDown(0) && ImGui::IsItemHovered(),
 	};
 }
 
@@ -335,7 +335,7 @@ void UIRenderer::ShowPopupLabel(const std::string& str) {
 	ImGui::SetItemTooltip(str.c_str());
 }
 
-void UIRenderer::Pop(uint32_t count) {
+void UIRenderer::Pop(uint64_t count) {
 	count = count ? count : s_Stack.Count();
 	while(count--) {
 		auto type = s_Stack.Pop();

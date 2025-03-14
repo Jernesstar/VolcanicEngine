@@ -4,6 +4,8 @@
 
 #include <Magma/Core/BinaryReader.h>
 
+#include <VolcaniCore/Core/Math.h>
+
 namespace Lava {
 
 RuntimeAssetManager::RuntimeAssetManager() {
@@ -42,17 +44,27 @@ void RuntimeAssetManager::Load(Asset asset) {
 		Ref<Mesh> mesh = CreateRef<Mesh>(MeshType::Model);
 		BinaryReader reader("Asset/Mesh/mesh.bin");
 		reader.SetPosition(offset);
+		VOLCANICORE_LOG_INFO("Here");
 		reader.Read(mesh->SubMeshes);
 
-		List<uint8_t> materialFlags;
-		reader.Read(materialFlags);
-		if(!materialFlags) {
-			//
+		if(!HasRefs(asset)) {
+			VOLCANICORE_LOG_INFO("Here2");
+			// Engine-generated model and material
+			mesh->Materials.Emplace();
+			reader.Read(mesh->Materials[0].DiffuseColor.x);
+			reader.Read(mesh->Materials[0].SpecularColor.x);
+			reader.Read(mesh->Materials[0].EmissiveColor.x);
+
+			m_MeshAssets[asset.ID] = mesh;
+
 			return;
 		}
 
-		auto& refs = m_References[asset.ID];
+		List<Asset>& refs = m_References[asset.ID];
 		uint64_t refIdx = 0;
+		List<uint8_t> materialFlags;
+		reader.Read(materialFlags);
+
 		for(uint64_t i = 0; i < materialFlags.Count(); i++) {
 			std::bitset<3> flags(materialFlags[i]);
 			mesh->Materials.Emplace();
@@ -69,12 +81,6 @@ void RuntimeAssetManager::Load(Asset asset) {
 				Load(refs[refIdx]);
 				mesh->Materials[i].Emissive = Get<Texture>(refs[refIdx++]);
 			}
-		}
-		if(refIdx == 0) {
-			// mesh->Materials.Emplace();
-			// reader.ReadData(&mesh->Materials[0].DiffuseColor.x, sizeof(Vec4));
-			// reader.ReadData(&mesh->Materials[0].SpecularColor.x, sizeof(Vec4));
-			// reader.ReadData(&mesh->Materials[0].EmissiveColor.x, sizeof(Vec4));
 		}
 
 		m_MeshAssets[asset.ID] = mesh;

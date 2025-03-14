@@ -76,6 +76,7 @@ void Editor::Load(const CommandLineArgs& args) {
 Editor::~Editor() {
 	m_Tabs.Clear();
 
+	m_AssetManager.Save();
 	m_AssetManager.Clear();
 
 	ScriptEngine::Shutdown();
@@ -310,6 +311,7 @@ void Editor::NewProject(const std::string& volcPath) {
 	auto rootPath = fs::path(volcPath).parent_path();
 	m_App = CreateRef<Lava::App>(m_Project);
 
+	m_App->SetAssetManager(&m_AssetManager);
 	m_App->ScreenLoad =
 		[&](Ref<ScriptModule> script)
 		{

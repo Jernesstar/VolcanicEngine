@@ -97,8 +97,9 @@ BinaryReader& BinaryReader::ReadObject(UI::Image& image) {
 	ReadUI(this, &image);
 	uint64_t id;
 	Read(id);
-	auto& assetManager = App::Get()->GetAssetManager();
-	image.Content = assetManager.Get<Texture>(Asset{ id, AssetType::Texture });
+	Asset asset = { id, AssetType::Texture };
+	auto* assetManager = App::Get()->GetAssetManager();
+	image.Content = assetManager->Get<Texture>(asset);
 
 	return *this;
 }
