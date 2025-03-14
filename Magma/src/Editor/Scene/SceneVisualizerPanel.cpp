@@ -185,7 +185,7 @@ void SceneVisualizerPanel::Draw() {
 							else
 								newEntity = world.AddEntity(str);
 						}
-''
+
 						assetManager.Load(asset);
 					}
 				}
@@ -399,13 +399,13 @@ void EditorSceneRenderer::SubmitCamera(const Entity& entity) {
 }
 
 void EditorSceneRenderer::SubmitSkybox(const Entity& entity) {
-	auto& sc = entity.Get<SkyboxComponent>();
-	auto& assetManager =
-		Application::As<EditorApp>()->GetEditor().GetAssetManager();
-	auto cubemap = assetManager.Get<Cubemap>(sc.CubemapAsset);
+	// auto& sc = entity.Get<SkyboxComponent>();
+	// auto& assetManager =
+	// 	Application::As<EditorApp>()->GetEditor().GetAssetManager();
+	// auto cubemap = assetManager.Get<Cubemap>(sc.CubemapAsset);
 
-	FirstCommand->UniformData
-	.SetInput("u_Skybox", CubemapSlot{ cubemap });
+	// FirstCommand->UniformData
+	// .SetInput("u_Skybox", CubemapSlot{ cubemap });
 }
 
 void EditorSceneRenderer::SubmitLight(const Entity& entity) {
@@ -433,6 +433,7 @@ void EditorSceneRenderer::SubmitMesh(const Entity& entity) {
 		Application::As<EditorApp>()->GetEditor().GetAssetManager();
 	auto& tc = entity.Get<TransformComponent>();
 	auto& mc = entity.Get<MeshComponent>();
+	assetManager.Load(mc.MeshAsset);
 	auto mesh = assetManager.Get<Mesh>(mc.MeshAsset);
 
 	if(entity == Selected)

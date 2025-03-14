@@ -39,6 +39,8 @@ EditorApp::EditorApp(const CommandLineArgs& args)
 		ShaderPipeline::Create("Magma/assets/shaders/", "Framebuffer"));
 	ShaderLibrary::Add("Lighting",
 		ShaderPipeline::Create("Magma/assets/shaders/", "Lighting"));
+	ShaderLibrary::Add("Mesh",
+		ShaderPipeline::Create("Magma/assets/shaders/", "Mesh"));
 	// ShaderLibrary::Add("Bloom",
 	// 	ShaderPipeline::Create("Magma/assets/shaders/", "Bloom"));
 

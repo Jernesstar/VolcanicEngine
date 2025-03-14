@@ -37,22 +37,23 @@ namespace Lava {
 static Ref<ScriptModule> s_AppModule;
 static Ref<ScriptObject> s_AppObject;
 
-static Scene* m_ScenePtr;
-static UIPage* m_UIPtr;
-
 struct RuntimeScreen {
-	Scene World;
+	Ref<Scene> World;
 	UIPage UI;
 	Ref<ScriptModule> Script;
 	Ref<ScriptObject> ScriptObj;
 
 	RuntimeScreen(const Screen& screen)
-		: World(screen.Scene), UI(screen.UI)
+		: UI(screen.UI)
 	{
+		World = CreateRef<Scene>(screen.Scene);
 		Script = CreateRef<ScriptModule>(screen.Name);
 	}
 
 	~RuntimeScreen() {
+		UI.Clear();
+		World.reset();
+
 		ScriptObj->Call("OnClose");
 
 		ScriptObj.reset();
@@ -63,7 +64,7 @@ struct RuntimeScreen {
 static RuntimeScreen* s_Screen = nullptr;
 
 static Scene& GetScene() {
-	return s_Screen->World;
+	return *s_Screen->World;
 }
 
 static UIPage& GetUI() {
@@ -111,6 +112,7 @@ App::~App() {
 
 void App::OnLoad() {
 	Application::GetWindow()->SetTitle(m_Project.Name);
+	// Application::GetWindow()->SetIcon();
 
 	s_AppModule = CreateRef<ScriptModule>(m_Project.App);
 	s_AppModule->Load("./.volc.class");
@@ -138,8 +140,8 @@ void App::OnUpdate(TimeStep ts) {
 
 	s_Screen->ScriptObj->Call("OnUpdate", (float)ts);
 
-	s_Screen->World.OnUpdate(ts);
-	s_Screen->World.OnRender(m_SceneRenderer);
+	s_Screen->World->OnUpdate(ts);
+	s_Screen->World->OnRender(m_SceneRenderer);
 
 	UIRenderer::BeginFrame();
 
@@ -198,10 +200,11 @@ void App::SetScreen(const std::string& name) {
 	auto& screen = m_Project.Screens[idx];
 	delete s_Screen;
 	s_Screen = new RuntimeScreen(screen);
+	Renderer::Clear();
 
 	ScreenLoad(s_Screen->Script);
 	if(screen.Scene != "")
-		SceneLoad(s_Screen->World);
+		SceneLoad(*s_Screen->World);
 	if(screen.UI != "")
 		UILoad(s_Screen->UI);
 
@@ -266,42 +269,42 @@ RuntimeSceneRenderer::RuntimeSceneRenderer() {
 	// LightingPass = RenderPass::Create("Bloom", shader, buffer);
 	// LightingPass->SetData(Renderer3D::GetMeshBuffer());
 
-	DirectionalLightBuffer =
-		UniformBuffer::Create(
-			BufferLayout
-			{
-				{ "Ambient",   BufferDataType::Vec3 },
-				{ "Diffuse",   BufferDataType::Vec3 },
-				{ "Specular",  BufferDataType::Vec3 },
-				{ "Direction", BufferDataType::Vec3 },
-			});
+	// DirectionalLightBuffer =
+	// 	UniformBuffer::Create(
+	// 		BufferLayout
+	// 		{
+	// 			{ "Ambient",   BufferDataType::Vec3 },
+	// 			{ "Diffuse",   BufferDataType::Vec3 },
+	// 			{ "Specular",  BufferDataType::Vec3 },
+	// 			{ "Direction", BufferDataType::Vec3 },
+	// 		});
 
-	PointLightBuffer =
-		UniformBuffer::Create(
-			BufferLayout
-			{
-				{ "Ambient",   BufferDataType::Vec3 },
-				{ "Diffuse",   BufferDataType::Vec3 },
-				{ "Specular",  BufferDataType::Vec3 },
-				{ "Position",  BufferDataType::Vec3 },
-				{ "Direction", BufferDataType::Vec3 },
-				{ "Constant",  BufferDataType::Float },
-				{ "Linear",	   BufferDataType::Float },
-				{ "Quadratic", BufferDataType::Float },
-			}, 100);
+	// PointLightBuffer =
+	// 	UniformBuffer::Create(
+	// 		BufferLayout
+	// 		{
+	// 			{ "Ambient",   BufferDataType::Vec3 },
+	// 			{ "Diffuse",   BufferDataType::Vec3 },
+	// 			{ "Specular",  BufferDataType::Vec3 },
+	// 			{ "Position",  BufferDataType::Vec3 },
+	// 			{ "Direction", BufferDataType::Vec3 },
+	// 			{ "Constant",  BufferDataType::Float },
+	// 			{ "Linear",	   BufferDataType::Float },
+	// 			{ "Quadratic", BufferDataType::Float },
+	// 		}, 100);
 
-	SpotlightBuffer =
-		UniformBuffer::Create(
-			BufferLayout
-			{
-				{ "Ambient",   BufferDataType::Vec3 },
-				{ "Diffuse",   BufferDataType::Vec3 },
-				{ "Specular",  BufferDataType::Vec3 },
-				{ "Position",  BufferDataType::Vec3 },
-				{ "Direction", BufferDataType::Vec3 },
-				{ "CutoffAngle",	  BufferDataType::Float },
-				{ "OuterCutoffAngle", BufferDataType::Float },
-			}, 100);
+	// SpotlightBuffer =
+	// 	UniformBuffer::Create(
+	// 		BufferLayout
+	// 		{
+	// 			{ "Ambient",   BufferDataType::Vec3 },
+	// 			{ "Diffuse",   BufferDataType::Vec3 },
+	// 			{ "Specular",  BufferDataType::Vec3 },
+	// 			{ "Position",  BufferDataType::Vec3 },
+	// 			{ "Direction", BufferDataType::Vec3 },
+	// 			{ "CutoffAngle",	  BufferDataType::Float },
+	// 			{ "OuterCutoffAngle", BufferDataType::Float },
+	// 		}, 100);
 }
 
 void RuntimeSceneRenderer::Update(TimeStep ts) {
@@ -325,6 +328,7 @@ void RuntimeSceneRenderer::SubmitCamera(const Entity& entity) {
 void RuntimeSceneRenderer::SubmitSkybox(const Entity& entity) {
 	auto& sc = entity.Get<SkyboxComponent>();
 	auto& assetManager = App::Get()->GetAssetManager();
+	assetManager.Load(sc.CubemapAsset);
 	auto cubemap = assetManager.Get<Cubemap>(sc.CubemapAsset);
 
 	FirstCommand->UniformData
@@ -355,6 +359,7 @@ void RuntimeSceneRenderer::SubmitMesh(const Entity& entity) {
 	auto& tc = entity.Get<TransformComponent>();
 	auto& mc = entity.Get<MeshComponent>();
 	auto& assetManager = App::Get()->GetAssetManager();
+	assetManager.Load(mc.MeshAsset);
 	auto mesh = assetManager.Get<Mesh>(mc.MeshAsset);
 
 	if(!Objects.count(mesh))

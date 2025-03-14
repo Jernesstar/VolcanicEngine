@@ -46,6 +46,10 @@ void RuntimeAssetManager::Load(Asset asset) {
 
 		List<uint8_t> materialFlags;
 		reader.Read(materialFlags);
+		if(!materialFlags) {
+			//
+			return;
+		}
 
 		auto& refs = m_References[asset.ID];
 		uint64_t refIdx = 0;
@@ -53,7 +57,7 @@ void RuntimeAssetManager::Load(Asset asset) {
 			std::bitset<3> flags(materialFlags[i]);
 			mesh->Materials.Emplace();
 
-			if(flags.test(0))  {
+			if(flags.test(0)) {
 				Load(refs[refIdx]);
 				mesh->Materials[i].Diffuse = Get<Texture>(refs[refIdx++]);
 			}
@@ -76,7 +80,9 @@ void RuntimeAssetManager::Load(Asset asset) {
 		m_MeshAssets[asset.ID] = mesh;
 	}
 	else if(asset.Type == AssetType::Texture) {
-		BinaryReader reader("Asset/Image/image.bin");
+		BinaryReader reader("Asset/Texture/image.bin");
+		reader.SetPosition(offset);
+
 		uint32_t width, height;
 		Buffer<uint8_t> data;
 		reader.Read(width);
@@ -148,8 +154,7 @@ void RuntimeAssetManager::Load() {
 			uint32_t refType;
 			reader.Read(refID);
 			reader.Read(refType);
-			Asset asset{ refID, (AssetType)refType };
-			m_References[asset.ID].Add(asset);
+			m_References[asset.ID].Emplace(refID, (AssetType)refType, false);
 		}
 	}
 }

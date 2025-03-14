@@ -187,7 +187,7 @@ void SerializeEntity(YAMLSerializer& serializer, const Entity& entity) {
 		serializer.WriteKey("ScriptComponent")
 		.BeginMapping()
 			.WriteKey("ModuleID").Write((uint64_t)asset.ID)
-			.WriteKey("Class").Write(obj ? obj->GetClass()->Name : "")
+			.WriteKey("Class").Write(obj ? obj->GetClass()->Name : std::string(""))
 			// .WriteKey("Instance").BeginMapping()
 			// 	// TODO(Implement): Reflection
 			// .EndMapping()
@@ -299,13 +299,14 @@ void SerializeEntity(YAMLSerializer& serializer, const Entity& entity) {
 }
 
 void DeserializeEntity(YAML::Node entityNode, Scene& scene) {
-	Entity entity =
-		scene.EntityWorld.AddEntity(entityNode["ID"].as<uint64_t>());
+	uint64_t entityID = entityNode["ID"].as<uint64_t>();
+	Entity entity = scene.EntityWorld.AddEntity(entityID);
 	auto name = entityNode["Name"].as<std::string>();
 	if(name != "")
 		entity.SetName(name);
 
-	auto& assetManager = App::Get()->GetAssetManager();
+	auto& assetManager =
+		Application::As<EditorApp>()->GetEditor().GetAssetManager();
 	auto components = entityNode["Components"];
 
 	auto cameraComponentNode = components["CameraComponent"];
@@ -377,16 +378,31 @@ void DeserializeEntity(YAML::Node entityNode, Scene& scene) {
 	auto scriptComponentNode = components["ScriptComponent"];
 	if(scriptComponentNode) {
 		auto id = scriptComponentNode["ModuleID"].as<uint64_t>();
+		auto className = scriptComponentNode["Class"].as<std::string>();
+		// VOLCANICORE_LOG_INFO("ID: %llu, Class: %s", id, className.c_str());
 		Asset asset = { id, AssetType::Script };
-		auto classNode = scriptComponentNode["Class"];
-		std::string className = classNode.as<std::string>();
-		if(className != "") {
-			auto mod = assetManager.Get<ScriptModule>(asset);
-			auto _class = mod->GetClass(className);
-			entity.Add<ScriptComponent>(asset, _class->Instantiate(entity));
-		}
-		else
+
+		if(className == "" || !id || !assetManager.IsValid(asset))
 			entity.Add<ScriptComponent>();
+		else {
+			assetManager.Load(asset);
+			auto mod = assetManager.Get<ScriptModule>(asset);
+			if(!mod) {
+				VOLCANICORE_LOG_INFO("Could not find class module %li, \
+					requestered for by Entity %li", (uint64_t)id, (uint64_t)entityID);
+			}
+			else {
+				auto _class = mod->GetClass(className);
+				if(!_class) {
+					VOLCANICORE_LOG_INFO("Could not find class '%s' in module %li, \
+						requestered for by Entity %li", className.c_str(), (uint64_t)id, (uint64_t)entityID);
+				}
+				else {
+					auto instance = _class->Instantiate(entity);
+					entity.Add<ScriptComponent>(asset, instance);
+				}
+			}
+		}
 	}
 
 	auto rigidBodyComponentNode = components["RigidBodyComponent"];
@@ -612,7 +628,7 @@ BinaryWriter& BinaryWriter::WriteObject(const Entity& entity) {
 	componentBits |= ((uint16_t)entity.Has<SpotlightComponent>()		<< 10);
 	componentBits |= ((uint16_t)entity.Has<ParticleSystemComponent>()	<< 11);
 
-	Write(componentBits.to_ulong());
+	Write((uint16_t)componentBits.to_ulong());
 
 	if(entity.Has<CameraComponent>())
 		Write(entity.Get<CameraComponent>());

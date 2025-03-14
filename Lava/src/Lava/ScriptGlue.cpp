@@ -165,6 +165,9 @@ void RegisterTypes() {
 	engine->RegisterObjectBehaviour("Vec3", asBEHAVE_LIST_CONSTRUCT,
 		"void f(const int &in) {float, float, float}",
 		asFUNCTION(Vec3ListConstructor), asCALL_CDECL_OBJLAST);
+	engine->RegisterObjectProperty("Vec3", "float x", asOFFSET(Vec3, x));
+	engine->RegisterObjectProperty("Vec3", "float y", asOFFSET(Vec3, y));
+	engine->RegisterObjectProperty("Vec3", "float z", asOFFSET(Vec3, z));
 
 	engine->RegisterGlobalFunction("Vec3 normalize(const Vec3 &in)",
 		asFUNCTION(NormalizeVec3), asCALL_CDECL);
@@ -265,35 +268,35 @@ void RegisterAssetManager() {
 }
 
 static Vec3 GetCameraPosition(CameraComponent* cc) {
-	return cc.Cam->GetPosition();
+	return cc->Cam->GetPosition();
 }
 
 static void SetCameraPosition(CameraComponent* cc, const Vec3& vec) {
-	cc.Cam->SetPosition(vec);
+	cc->Cam->SetPosition(vec);
 }
 
 static Vec3 GetCameraDirection(CameraComponent* cc) {
-	return cc.Cam->GetDirection();
+	return cc->Cam->GetDirection();
 }
 
 static void SetCameraDirection(CameraComponent* cc, const Vec3& vec) {
-	cc.Cam->SetDirection(vec)
+	cc->Cam->SetDirection(vec);
 }
 
 static uint32_t GetCameraWidth(CameraComponent* cc) {
-	return cc.Cam->GetViewportWidth();
+	return cc->Cam->GetViewportWidth();
 }
 
 static void SetCameraWidth(CameraComponent* cc, uint32_t width) {
-	cc.Cam->Resize(width, 0);
+	cc->Cam->Resize(width, 0);
 }
 
 static uint32_t GetCameraHeight(CameraComponent* cc) {
-	return cc.Cam->GetViewportHeight();
+	return cc->Cam->GetViewportHeight();
 }
 
 static void SetCameraHeight(CameraComponent* cc, uint32_t height) {
-	cc.Cam->Resize(0, height);
+	cc->Cam->Resize(0, height);
 }
 
 static asIScriptObject* GetScriptInstance(ScriptComponent* sc) {
@@ -312,19 +315,19 @@ void RegisterECS() {
 		"Vec3 get_Position() const property", asFUNCTION(GetCameraPosition),
 		asCALL_CDECL_OBJLAST);
 	engine->RegisterObjectMethod("CameraComponent",
-		"uint32 set_Position(const Vec3&) const property",
+		"void set_Position(const Vec3 &in) property",
 		asFUNCTION(SetCameraPosition), asCALL_CDECL_OBJLAST);
 	engine->RegisterObjectMethod("CameraComponent",
 		"Vec3 get_Direction() const property", asFUNCTION(GetCameraDirection),
 		asCALL_CDECL_OBJLAST);
 	engine->RegisterObjectMethod("CameraComponent",
-		"uint32 set_Direction(const Vec3&) const property",
+		"void set_Direction(const Vec3 &in) property",
 		asFUNCTION(SetCameraDirection), asCALL_CDECL_OBJLAST);
 	engine->RegisterObjectMethod("CameraComponent",
 		"uint32 get_Width() const property", asFUNCTION(GetCameraWidth),
 		asCALL_CDECL_OBJLAST);
 	engine->RegisterObjectMethod("CameraComponent",
-		"void set_Width(uint32) property", asFUNCTION(SetCameraWidth)
+		"void set_Width(uint32) property", asFUNCTION(SetCameraWidth),
 		asCALL_CDECL_OBJLAST);	
 	engine->RegisterObjectMethod("CameraComponent",
 		"uint32 get_Height() const property", asFUNCTION(GetCameraHeight),

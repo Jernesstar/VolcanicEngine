@@ -2,7 +2,6 @@
 
 #include <VolcaniCore/Event/Events.h>
 
-#include <VolcaniCore/Graphics/Renderer.h>
 #include <VolcaniCore/Graphics/ShaderLibrary.h>
 
 #include <Magma/Script/ScriptEngine.h>
@@ -46,6 +45,8 @@ Runtime::Runtime(const CommandLineArgs& args)
 		"Framebuffer", ShaderPipeline::Create("Asset/Shader", "Framebuffer"));
 	ShaderLibrary::Add(
 		"Lighting", ShaderPipeline::Create("Asset/Shader", "Lighting"));
+	ShaderLibrary::Add(
+		"Mesh", ShaderPipeline::Create("Asset/Shader", "Mesh"));
 	// ShaderLibrary::Add(
 	// 	"Bloom", ShaderPipeline::Create("Asset/Shader", "Bloom"));
 
@@ -88,6 +89,8 @@ Runtime::Runtime(const CommandLineArgs& args)
 Runtime::~Runtime() {
 	m_App->OnClose();
 	m_App.reset();
+
+	m_AssetManager.Clear();
 
 	UIRenderer::Close();
 

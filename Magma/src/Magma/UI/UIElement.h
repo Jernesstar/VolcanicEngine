@@ -46,7 +46,7 @@ public:
 	int32_t y = 0;
 	XAlignment xAlignment = XAlignment::Left;
 	YAlignment yAlignment = YAlignment::Top;
-	glm::vec4 Color;
+	glm::vec4 Color = glm::vec4(0.0f);
 	// TODO(Implement): Border
 	// BorderElement Border;
 	List<UINode> Children;

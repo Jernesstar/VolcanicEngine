@@ -2,7 +2,7 @@ Project:
   Name: TestProj
   App: TestGame
   ExportPath: ""
-  StartScreen: TestScreen2
+  StartScreen: TestHome
   Screens:
     - Screen:
         Name: TestHome

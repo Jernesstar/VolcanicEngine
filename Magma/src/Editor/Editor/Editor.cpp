@@ -76,6 +76,8 @@ void Editor::Load(const CommandLineArgs& args) {
 Editor::~Editor() {
 	m_Tabs.Clear();
 
+	m_AssetManager.Clear();
+
 	ScriptEngine::Shutdown();
 	Physics::Close();
 }
@@ -228,11 +230,8 @@ void Editor::RenderEmptyTab() {
 }
 
 void Editor::RenderWelcomeScreen() {
-	UI::Image image =
-		AssetImporter::GetTexture("Magma/assets/image/VolcanicDisplay.png");
-
-	image.x = 50;
-	image.y = 50;
+	// UI::Image image =
+	// 	AssetImporter::GetTexture("Magma/assets/image/VolcanicDisplay.png");
 }
 
 void Editor::SetTab(Ref<Tab> tab) {

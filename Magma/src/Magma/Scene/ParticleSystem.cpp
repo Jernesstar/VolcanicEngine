@@ -21,11 +21,9 @@ void ParticleSystem::Run(Phase phase) {
 				auto [pc] = GetRequired(entity);
 
 				for(auto& p : pc.Particles) {
-					p.Life -= dt;
-					if(p.Life > 0.0f) {
-						p.Position -= p.Velocity * dt;
-						p.Color.a -= dt * 2.5f;
-					}
+					p.Life -= (float)m_TimeStep;
+					if(p.Life > 0.0f)
+						p.Position -= p.Velocity * (float)m_TimeStep;
 				}
 			});
 	}

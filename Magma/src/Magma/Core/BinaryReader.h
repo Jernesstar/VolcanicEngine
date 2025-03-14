@@ -1,8 +1,8 @@
 #pragma once
 
-
 #include <VolcaniCore/Core/Defines.h>
 #include <VolcaniCore/Core/List.h>
+#include <VolcaniCore/Core/FileUtils.h>
 
 #include "FileStream.h"
 
@@ -13,6 +13,7 @@ namespace Magma {
 class BinaryReader : public FileStream {
 public:
 	BinaryReader(const std::string& path) {
+		VOLCANICORE_ASSERT(FileUtils::FileExists(path));
 		m_Stream.open(path, std::ios::in | std::ios::binary);
 	}
 
@@ -43,7 +44,7 @@ public:
 	BinaryReader& Read(Buffer<T>& buffer) {
 		uint64_t count;
 		Read(count);
-		buffer.Clear();
+		buffer.Allocate(count);
 		buffer.AddRange(count);
 		return ReadData(buffer.Get(), count * sizeof(T));
 	}

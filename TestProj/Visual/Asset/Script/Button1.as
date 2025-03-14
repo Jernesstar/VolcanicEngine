@@ -26,7 +26,7 @@ class Button1 : IUIObject
     void OnMouseUp()
     {
         print("Mouse up");
-        // App.SetScreen("TestScreen2");
+        App.SetScreen("TestScreen2");
     }
 
     void OnMouseDown()

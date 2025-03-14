@@ -12,7 +12,7 @@ using namespace Magma::Audio;
 namespace Magma {
 struct MaterialPaths {
 	std::string Diffuse;
-	std::string Speccular;
+	std::string Specular;
 	std::string Emissive;
 
 	std::string operator[](uint32_t i) { return *(&Diffuse + i); }

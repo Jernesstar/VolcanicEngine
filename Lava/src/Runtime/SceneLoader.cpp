@@ -103,14 +103,17 @@ static Entity s_CurrentEntity;
 
 template<>
 BinaryReader& BinaryReader::ReadObject(ScriptComponent& comp) {
-	std::string className;
 	uint64_t id;
 	Read(id);
 	Asset asset{ id, AssetType::Script };
-	Read(className);
 	comp.ModuleAsset = asset;
+
+	std::string className;
+	Read(className);
+
 	if(className != "") {
 		auto& assetManager = App::Get()->GetAssetManager();
+		assetManager.Load(asset);
 		auto mod = assetManager.Get<ScriptModule>(asset);
 		auto _class = mod->GetClass(className);
 		comp.Instance = _class->Instantiate(s_CurrentEntity);
@@ -173,6 +176,10 @@ BinaryReader& BinaryReader::ReadObject(SpotlightComponent& comp) {
 
 template<>
 BinaryReader& BinaryReader::ReadObject(ParticleSystemComponent& comp) {
+	Read(comp.Position);
+	Read(comp.MaxParticleCount);
+	Read(comp.ParticleLifetime);
+
 	uint64_t id;
 	Read(id);
 	comp.ImageAsset = { id, AssetType::Texture };
@@ -188,12 +195,9 @@ BinaryReader& BinaryReader::ReadObject(Entity& entity) {
 
 	s_CurrentEntity = entity;
 
-	uint32_t bits;
+	uint16_t bits;
 	Read(bits);
 	std::bitset<12> componentBits(bits);
-
-	VOLCANICORE_LOG_INFO(name.c_str());
-	VOLCANICORE_LOG_INFO(componentBits.to_string().c_str());
 
 	if(componentBits.test(0))
 		Read(entity.Set<CameraComponent>());

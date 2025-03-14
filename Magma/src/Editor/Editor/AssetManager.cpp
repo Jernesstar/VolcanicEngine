@@ -298,12 +298,12 @@ void EditorAssetManager::RuntimeSave(const std::string& exportPath) {
 	fs::create_directories(assetPath / "Script");
 	fs::create_directories(assetPath / "Shader");
 
-	BinaryWriter pack((fs::path(exportPath) / ".volc.assetpk").string());
 	BinaryWriter meshFile((assetPath / "Mesh" / "mesh.bin").string());
 	BinaryWriter textureFile((assetPath / "Texture" / "image.bin").string());
 	BinaryWriter soundFile((assetPath / "Audio" / "sound.bin").string());
 	BinaryWriter scriptFile((assetPath / "Script" / "script.bin").string());
 
+	BinaryWriter pack((fs::path(exportPath) / ".volc.assetpk").string());
 	pack.Write(std::string("VOLC_PACK"));
 	pack.Write(m_AssetRegistry.size());
 
@@ -323,15 +323,16 @@ void EditorAssetManager::RuntimeSave(const std::string& exportPath) {
 				meshFile.Write(materials.Count());
 				for(auto& mat : materials) {
 					std::bitset<3> flags;
-					flags |= (mat[0] != "") << 0; // Diffuse
-					flags |= (mat[1] != "") << 1; // Specular
-					flags |= (mat[2] != "") << 2; // Emissive
+					flags |= (mat.Diffuse != "") << 0;
+					flags |= (mat.Specular != "") << 1;
+					flags |= (mat.Emissive != "") << 2;
 					meshFile.Write((uint8_t)flags.to_ulong());
 				}
 			}
 			else {
-				// mesh = Get<Mesh>(asset);
-				// meshFile.Write(mesh->SubMeshes);
+				auto mesh = Get<Mesh>(asset);
+				meshFile.Write(mesh->SubMeshes);
+				meshFile.Write((uint64_t)0);
 			}
 		}
 		else if(asset.Type == AssetType::Texture) {
@@ -344,12 +345,13 @@ void EditorAssetManager::RuntimeSave(const std::string& exportPath) {
 		}
 		else if(asset.Type == AssetType::Cubemap) {
 			// pack.Write(textureFile.GetPosition());
+
 		}
 		else if(asset.Type == AssetType::Audio) {
 			pack.Write(soundFile.GetPosition());
 
-			Buffer<float> soundData = AssetImporter::GetAudioData(path);
-			soundFile.Write(soundData);
+			// Buffer<float> soundData = AssetImporter::GetAudioData(path);
+			// soundFile.Write(soundData);
 		}
 		else if(asset.Type == AssetType::Script) {
 			pack.Write(scriptFile.GetPosition());
@@ -378,7 +380,7 @@ void EditorAssetManager::RuntimeSave(const std::string& exportPath) {
 
 	Application::PushDir();
 
-	for(auto name : { "Framebuffer", "Lighting", "Bloom" }) {
+	for(auto name : { "Framebuffer", "Lighting", "Bloom", "Mesh" }) {
 		auto sourceRoot = fs::path("Magma") / "assets" / "shaders" / name;
 		auto source1 = sourceRoot.string() + ".glsl.vert";
 		auto source2 = sourceRoot.string() + ".glsl.frag";

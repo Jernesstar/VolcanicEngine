@@ -110,7 +110,7 @@ void Scene::RegisterSystems() {
 
 				if(ourPhase == Phase::OnUpdate)
 					sys->Update(it.delta_time());
-				// sys->Run(ourPhase);
+				sys->Run(ourPhase);
 			});
 	}
 
@@ -154,7 +154,7 @@ void Scene::RegisterSystems() {
 		.run(
 			[&](flecs::iter& it)
 			{
-				auto sys = EntityWorld.Get<PhysicsSystem>();
+				auto sys = EntityWorld.Get<ScriptSystem>();
 				if(!sys)
 					return;
 
@@ -163,27 +163,6 @@ void Scene::RegisterSystems() {
 				sys->Run(ourPhase);
 			});
 	}
-
-	EntityWorld.GetNative()
-	.observer()
-	.with<RigidBodyComponent>()
-	.event(flecs::Monitor)
-	.each(
-		[&](flecs::iter& it, size_t i)
-		{
-			auto sys = EntityWorld.Get<PhysicsSystem>();
-			if(!sys)
-				return;
-
-			Entity entity{ it.entity(i) };
-
-			if(it.event() == flecs::OnAdd)
-				sys->OnComponentAdd(entity);
-			else if(it.event() == flecs::OnSet)
-				sys->OnComponentSet(entity);
-			else if(it.event() == flecs::OnRemove)
-				sys->OnComponentRemove(entity);
-		});
 
 	EntityWorld.GetNative()
 	.observer()

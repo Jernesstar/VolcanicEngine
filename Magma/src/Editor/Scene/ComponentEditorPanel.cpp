@@ -148,8 +148,8 @@ void DrawComponent<AudioComponent>(Entity& entity) {
 	auto& component = entity.Set<AudioComponent>();
 	ImGui::SeparatorText("AudioComponent");
 
-	ImGui::Text("Module ID: %li", (uint64_t)component.ModuleAsset.ID);
-	std::string text = component.ModuleAsset.ID ? "Change Module" : "Set Module";
+	ImGui::Text("Asset ID: %li", (uint64_t)component.AudioAsset.ID);
+	std::string text = component.AudioAsset.ID ? "Change Asset" : "Set Asset";
 	if(ImGui::Button(text.c_str())) {
 
 	}
@@ -163,8 +163,8 @@ void DrawComponent<MeshComponent>(Entity& entity) {
 	auto& component = entity.Set<MeshComponent>();
 	ImGui::SeparatorText("MeshComponent");
 
-	ImGui::Text("Module ID: %li", (uint64_t)component.ModuleAsset.ID);
-	std::string text = component.ModuleAsset.ID ? "Change Module" : "Set Module";
+	ImGui::Text("Asset ID: %li", (uint64_t)component.MeshAsset.ID);
+	std::string text = component.MeshAsset.ID ? "Change Asset" : "Set Asset";
 	if(ImGui::Button(text.c_str())) {
 
 	}
@@ -178,8 +178,8 @@ void DrawComponent<SkyboxComponent>(Entity& entity) {
 	auto& component = entity.Set<SkyboxComponent>();
 	ImGui::SeparatorText("SkyboxComponent");
 
-	ImGui::Text("Module ID: %li", (uint64_t)component.ModuleAsset.ID);
-	std::string text = component.ModuleAsset.ID ? "Change Module" : "Set Module";
+	ImGui::Text("Asset ID: %li", (uint64_t)component.CubemapAsset.ID);
+	std::string text = component.CubemapAsset.ID ? "Change Asset" : "Set Asset";
 	if(ImGui::Button(text.c_str())) {
 
 	}
@@ -193,7 +193,7 @@ void DrawComponent<ScriptComponent>(Entity& entity) {
 	auto& component = entity.Set<ScriptComponent>();
 	ImGui::SeparatorText("ScriptComponent");
 
-	ImGui::Text("Module ID: %li", (uint64_t)component.ModuleAsset.ID);
+	ImGui::Text("Asset ID: %li", (uint64_t)component.ModuleAsset.ID);
 	std::string text = component.ModuleAsset.ID ? "Change Module" : "Set Module";
 	if(ImGui::Button(text.c_str())) {
 
@@ -318,8 +318,8 @@ void DrawComponent<ParticleSystemComponent>(Entity& entity) {
 		1.0f, 1.0f, 10000.0f);
 	ImGui::Text("Asset: %li", (uint64_t)component.ImageAsset.ID);
 
-	ImGui::Text("Module ID: %li", (uint64_t)component.ModuleAsset.ID);
-	std::string text = component.ModuleAsset.ID ? "Change Module" : "Set Module";
+	ImGui::Text("Module ID: %li", (uint64_t)component.ImageAsset.ID);
+	std::string text = component.ImageAsset.ID ? "Change Asset" : "Set Asset";
 	if(ImGui::Button(text.c_str())) {
 
 	}

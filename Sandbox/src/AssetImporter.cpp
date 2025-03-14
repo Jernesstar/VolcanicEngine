@@ -1,4 +1,4 @@
-f#include "AssetImporter.h"
+#include "AssetImporter.h"
 
 #include <stb_image/stb_image.h>
 

@@ -59,13 +59,28 @@ public:
 	AssetManager() = default;
 	virtual ~AssetManager() = default;
 
-	bool IsLoaded(Asset asset) const {
-		if(!m_AssetRegistry.count(asset))
-			return false;
-		return m_AssetRegistry.at(asset);
-	}
 	virtual void Load(Asset asset) = 0;
 	virtual void Unload(Asset asset) = 0;
+
+	bool IsLoaded(Asset asset) const {
+		if(!IsValid(asset)) return false;
+		return m_AssetRegistry.at(asset);
+	}
+
+	bool IsValid(Asset asset) const {
+		return m_AssetRegistry.count(asset);
+	}
+
+	void Clear() {
+		m_AssetRegistry.clear();
+		m_References.clear();
+
+		m_MeshAssets.clear();
+		m_TextureAssets.clear();
+		m_CubemapAssets.clear();
+		m_AudioAssets.clear();
+		m_ScriptAssets.clear();
+	}
 
 	template<typename T>
 	Ref<T> Get(Asset asset);

@@ -1,8 +1,8 @@
 Project:
-  ExportPath: C:\Users\Jercy Mukala\Code\VolcanicEngine\TestGame
+  ExportPath: .\TestGame\
   Name: TestProj
   App: TestGame
-  StartScreen: TestScreen2
+  StartScreen: TestHome
   Screens:
     - Screen:
         Name: TestHome

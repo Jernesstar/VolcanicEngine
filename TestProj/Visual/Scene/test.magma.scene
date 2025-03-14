@@ -11,48 +11,12 @@ Scene:
             Camera:
               Type: Stereographic
               VerticalFOV: 45
-              Position: [0, 0, 0]
+              Position: [0, 0, 10]
               Direction: [0, 0, -1]
               ViewportWidth: 800
               ViewportHeight: 600
               Near: 0.00100000005
               Far: 1000
-    - Entity:
-        Name: ""
-        ID: 548
-        Components:
-          TagComponent:
-            Tag: TestEntity
-          TransformComponent:
-            Transform:
-              Translation: [-21.1000004, 0, -2]
-              Rotation: [0.994837642, 0.680678427, 0]
-              Scale: [50.5, 38.5, 44.4000015]
-          MeshComponent:
-            AssetID: 10036008063945961451
-    - Entity:
-        Name: Player
-        ID: 550
-        Components:
-          ScriptComponent:
-            ModuleID: 0
-            Class: ""
-    - Entity:
-        Name: ScriptableEntity
-        ID: 4294967847
-        Components:
-          {}
-    - Entity:
-        Name: AnotherScriptableObject
-        ID: 553
-        Components:
-          {}
-    - Entity:
-        Name: Ball
-        ID: 552
-        Components:
-          MeshComponent:
-            AssetID: 4186775327602265389
     - Entity:
         Name: Ball2
         ID: 554
@@ -61,8 +25,31 @@ Scene:
             Tag: Obstacle
           TransformComponent:
             Transform:
-              Translation: [-2.9000001, 3.0999999, 4.19999981]
+              Translation: [-3, -6, 6]
               Rotation: [0, 0, 0]
               Scale: [1, 1, 1]
           MeshComponent:
             AssetID: 4186775327602265389
+    - Entity:
+        Name: Ball
+        ID: 552
+        Components:
+          TransformComponent:
+            Transform:
+              Translation: [0, 0, 0]
+              Rotation: [0, 0, 0]
+              Scale: [1, 1, 1]
+          MeshComponent:
+            AssetID: 4186775327602265389
+    - Entity:
+        Name: Player
+        ID: 550
+        Components:
+          TransformComponent:
+            Transform:
+              Translation: [0, 0, 0]
+              Rotation: [0, 0, 0]
+              Scale: [1, 1, 1]
+          ScriptComponent:
+            ModuleID: 10737729776046424356
+            Class: "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"

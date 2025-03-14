@@ -53,12 +53,14 @@ public:
 		flecs::query<TComponents...> q = 
 			m_World.query_builder<TComponents...>().build();
 
+		m_World.defer_begin();
 		q.each(
 			[func](flecs::entity handle, TComponents&...)
 			{
 				Entity entity{ handle };
 				func(entity);
 			});
+		m_World.defer_end();
 	}
 
 	// template<typename TEvent>
@@ -98,6 +100,9 @@ public:
 	template<class TSystem>
 	void Remove() {
  		uint64_t id = TypeIDGenerator<System<>>::GetID<TSystem>();
+		if(!m_Systems.count(id))
+			return;
+
 		delete (TSystem*)m_Systems[id];
 		m_Systems.erase(id);
 	}

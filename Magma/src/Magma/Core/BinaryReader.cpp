@@ -6,8 +6,12 @@ template<>
 BinaryReader& BinaryReader::ReadObject(std::string& str) {
 	uint64_t size;
 	ReadRaw<uint64_t>(size);
-	str.resize(size);
-	ReadData((void*)str.data(), size);
+	if(size) {
+		str.resize(size);
+		ReadData((void*)str.data(), size);
+	}
+	else
+		str = "";
 
 	return *this;
 }
