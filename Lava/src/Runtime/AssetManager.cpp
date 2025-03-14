@@ -56,7 +56,6 @@ void RuntimeAssetManager::Load(Asset asset) {
 			reader.Read(mesh->Materials[0].EmissiveColor.x);
 
 			m_MeshAssets[asset.ID] = mesh;
-
 			return;
 		}
 
