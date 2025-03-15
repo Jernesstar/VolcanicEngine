@@ -110,8 +110,10 @@ void SceneTab::Render() {
 	if(menu.file.saveScene) {
 		if(m_ScenePath == "")
 			SaveScene();
-		else
+		else {
+			VOLCANICORE_LOG_INFO("Here");
 			SceneLoader::EditorSave(m_Scene, m_ScenePath);
+		}
 		menu.file.saveScene = false;
 	}
 	if(menu.file.saveAsScene)

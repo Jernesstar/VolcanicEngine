@@ -16,4 +16,9 @@ class TestGame : IApp
 	{
 		// print("OnUpdate: " + ts);
 	}
+
+	void NewMethod()
+	{
+		print("New Method");
+	}
 }

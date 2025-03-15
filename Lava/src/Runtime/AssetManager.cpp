@@ -45,13 +45,10 @@ void RuntimeAssetManager::Load(Asset asset) {
 		BinaryReader reader("Asset/Mesh/mesh.bin");
 		m_MeshAssets[asset.ID] = mesh;
 		
-		VOLCANICORE_LOG_INFO("Here");
 		reader.SetPosition(offset);
 		reader.Read(mesh->SubMeshes);
 
 		if(!HasRefs(asset)) {
-			VOLCANICORE_LOG_INFO("Here2");
-			// Engine-generated model and material
 			mesh->Materials.Emplace();
 			reader.Read(mesh->Materials[0].DiffuseColor);
 			reader.Read(mesh->Materials[0].SpecularColor);

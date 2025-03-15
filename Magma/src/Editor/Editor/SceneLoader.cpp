@@ -183,11 +183,12 @@ void SerializeEntity(YAMLSerializer& serializer, const Entity& entity) {
 		const auto& comp = entity.Get<ScriptComponent>();
 		auto asset = comp.ModuleAsset;
 		auto obj = comp.Instance;
+		std::string name = obj ? obj->GetClass()->Name : std::string("");
 
 		serializer.WriteKey("ScriptComponent")
 		.BeginMapping()
 			.WriteKey("ModuleID").Write((uint64_t)asset.ID)
-			.WriteKey("Class").Write(obj ? obj->GetClass()->Name : std::string(""))
+			.WriteKey("Class").Write(name)
 			// .WriteKey("Instance").BeginMapping()
 			// 	// TODO(Implement): Reflection
 			// .EndMapping()
@@ -388,14 +389,16 @@ void DeserializeEntity(YAML::Node entityNode, Scene& scene) {
 			assetManager.Load(asset);
 			auto mod = assetManager.Get<ScriptModule>(asset);
 			if(!mod) {
-				VOLCANICORE_LOG_INFO("Could not find class module %li, \
-					requestered for by Entity %li", (uint64_t)id, (uint64_t)entityID);
+				VOLCANICORE_LOG_INFO(
+					"Could not find class module %llu, needed for Entity %llu",
+					(uint64_t)id, (uint64_t)entityID);
 			}
 			else {
 				auto _class = mod->GetClass(className);
 				if(!_class) {
-					VOLCANICORE_LOG_INFO("Could not find class '%s' in module %li, \
-						requestered for by Entity %li", className.c_str(), (uint64_t)id, (uint64_t)entityID);
+					VOLCANICORE_LOG_INFO(
+						"Could not find class '%s' in module %llu, needed for Entity %llu",
+						className.c_str(), (uint64_t)id, (uint64_t)entityID);
 				}
 				else {
 					auto instance = _class->Instantiate(entity);

@@ -1,7 +1,5 @@
 #include "Editor.h"
 
-#include <cstdlib>
-
 #include <imgui/imgui.h>
 #include <imgui/imgui_internal.h>
 #include <imgui/misc/cpp/imgui_stdlib.h>
@@ -52,7 +50,20 @@ struct {
 Editor::Editor() {
 	Physics::Init();
 	ScriptEngine::Init();
+
 	Lava::ScriptGlue::RegisterInterface();
+}
+
+Editor::~Editor() {
+	m_Tabs.Clear();
+	m_ClosedTabs.Clear();
+	m_CurrentTab.reset();
+
+	m_AssetManager.Save();
+	m_AssetManager.Clear();
+
+	ScriptEngine::Shutdown();
+	Physics::Close();
 }
 
 void Editor::Load(const CommandLineArgs& args) {
@@ -71,16 +82,6 @@ void Editor::Load(const CommandLineArgs& args) {
 		NewTab(CreateRef<SceneTab>(path));
 	for(auto& path : args["--ui"])
 		NewTab(CreateRef<UITab>(path));
-}
-
-Editor::~Editor() {
-	m_Tabs.Clear();
-
-	m_AssetManager.Save();
-	m_AssetManager.Clear();
-
-	ScriptEngine::Shutdown();
-	Physics::Close();
 }
 
 void Editor::Update(TimeStep ts) {
@@ -266,10 +267,10 @@ void Editor::OpenTab() {
 	if(instance->Display("ChooseFile")) {
 		if(instance->IsOk()) {
 			fs::path path = instance->GetFilePathName();
-			if(path.extension() == ".json")
-				NewTab(CreateRef<UITab>(path.string()));
-			else
+			if(path.extension() == ".scene")
 				NewTab(CreateRef<SceneTab>(path.string()));
+			else
+				NewTab(CreateRef<UITab>(path.string()));
 		}
 
 		instance->Close();

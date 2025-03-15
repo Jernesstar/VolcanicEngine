@@ -120,10 +120,6 @@ void App::OnLoad() {
 	s_AppObject = s_AppModule->GetClass(m_Project.App)->Instantiate();
 	s_AppObject->Call("OnLoad");
 
-	Asset asset = { UUID(10036008063945961451ULL), AssetType::Mesh };
-	m_AssetManager->Load(asset);
-	m_AssetManager->Get<Mesh>(asset);
-
 	SetScreen(m_Project.StartScreen);
 }
 
@@ -146,8 +142,8 @@ void App::OnUpdate(TimeStep ts) {
 
 	s_Screen->ScriptObj->Call("OnUpdate", (float)ts);
 
-	s_Screen->World->OnUpdate(ts);
-	// s_Screen->World->OnRender(m_SceneRenderer);
+	// s_Screen->World->OnUpdate(ts);
+	s_Screen->World->OnRender(m_SceneRenderer);
 
 	UIRenderer::BeginFrame();
 
@@ -264,9 +260,9 @@ RuntimeSceneRenderer::RuntimeSceneRenderer() {
 	Ref<ShaderPipeline> shader;
 	Ref<Framebuffer> buffer;
 
-	shader = ShaderLibrary::Get("Lighting");
-	buffer = Framebuffer::Create(window->GetWidth(), window->GetHeight());
-	LightingPass = RenderPass::Create("Lighting", shader, buffer);
+	shader = ShaderLibrary::Get("Mesh");
+	// buffer = Framebuffer::Create(window->GetWidth(), window->GetHeight());
+	LightingPass = RenderPass::Create("Lighting", shader, m_Output);
 	LightingPass->SetData(Renderer3D::GetMeshBuffer());
 
 	// shader = ShaderLibrary::Get("Bloom");
@@ -386,6 +382,8 @@ void RuntimeSceneRenderer::Render() {
 
 	Renderer3D::End();
 	Objects.clear();
+
+	Renderer2D::DrawFullscreenQuad(m_Output, AttachmentTarget::Color);
 
 	Renderer::Flush();
 

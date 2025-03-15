@@ -80,6 +80,7 @@ public:
 	void PushScreen(const std::string& name);
 	void PopScreen();
 
+	auto& GetProject() { return m_Project; }
 	void SetAssetManager(AssetManager* manager) { m_AssetManager = manager; }
 	AssetManager* GetAssetManager() { return m_AssetManager; }
 	RuntimeSceneRenderer& GetRenderer() { return m_SceneRenderer; }

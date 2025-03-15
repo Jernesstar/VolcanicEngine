@@ -13,6 +13,8 @@
 #include <Magma/Core/BinaryWriter.h>
 #include <Magma/Core/BinaryReader.h>
 
+#include <Lava/App.h>
+
 #include "AssetImporter.h"
 
 namespace fs = std::filesystem;
@@ -31,8 +33,8 @@ void EditorAssetManager::Load(Asset asset) {
 	if(IsLoaded(asset))
 		return;
 
-	std::string path = GetPath(asset.ID);
 	m_AssetRegistry[asset] = true;
+	std::string path = GetPath(asset.ID);
 	if(path == "")
 		return;
 
@@ -56,7 +58,6 @@ void EditorAssetManager::Unload(Asset asset) {
 	if(!IsLoaded(asset))
 		return;
 
-	std::string path = m_Paths[asset.ID];
 	m_AssetRegistry[asset] = false;
 
 	if(asset.Type == AssetType::Mesh)
@@ -67,6 +68,8 @@ void EditorAssetManager::Unload(Asset asset) {
 		m_CubemapAssets.erase(asset.ID);
 	else if(asset.Type == AssetType::Audio)
 		m_AudioAssets.erase(asset.ID);
+	else if(asset.Type == AssetType::Script)
+		m_ScriptAssets.erase(asset.ID);
 }
 
 Asset EditorAssetManager::Add(const std::string& path, AssetType type) {
@@ -222,8 +225,8 @@ void EditorAssetManager::Save() {
 			serializer.WriteKey("Path")
 				.Write(fs::relative(path, rootPath).generic_string());
 		else {
-			List<Asset>& refs = m_References[asset.ID];
 			Ref<Mesh> mesh = m_MeshAssets[asset.ID];
+			List<Asset>& refs = m_References[asset.ID];
 			const SubMesh& subMesh = mesh->SubMeshes[0];
 			serializer.WriteKey("MeshType").Write((uint32_t)mesh->Type);
 
