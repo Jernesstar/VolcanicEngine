@@ -43,19 +43,19 @@ void RuntimeAssetManager::Load(Asset asset) {
 	if(asset.Type == AssetType::Mesh) {
 		Ref<Mesh> mesh = CreateRef<Mesh>(MeshType::Model);
 		BinaryReader reader("Asset/Mesh/mesh.bin");
-		reader.SetPosition(offset);
+		m_MeshAssets[asset.ID] = mesh;
+		
 		VOLCANICORE_LOG_INFO("Here");
+		reader.SetPosition(offset);
 		reader.Read(mesh->SubMeshes);
 
 		if(!HasRefs(asset)) {
 			VOLCANICORE_LOG_INFO("Here2");
 			// Engine-generated model and material
 			mesh->Materials.Emplace();
-			reader.Read(mesh->Materials[0].DiffuseColor.x);
-			reader.Read(mesh->Materials[0].SpecularColor.x);
-			reader.Read(mesh->Materials[0].EmissiveColor.x);
-
-			m_MeshAssets[asset.ID] = mesh;
+			reader.Read(mesh->Materials[0].DiffuseColor);
+			reader.Read(mesh->Materials[0].SpecularColor);
+			reader.Read(mesh->Materials[0].EmissiveColor);
 			return;
 		}
 
@@ -81,8 +81,6 @@ void RuntimeAssetManager::Load(Asset asset) {
 				mesh->Materials[i].Emissive = Get<Texture>(refs[refIdx++]);
 			}
 		}
-
-		m_MeshAssets[asset.ID] = mesh;
 	}
 	else if(asset.Type == AssetType::Texture) {
 		BinaryReader reader("Asset/Texture/image.bin");
