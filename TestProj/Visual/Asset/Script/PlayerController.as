@@ -29,8 +29,8 @@ class PlayerController : IEntity
     void OnUpdate(float ts)
     {
         if(KeyPressed(Key::Space)) {
-            // Sound@ sound = AssetManager.GetSound(asset);
-            // sound.Play();
+            Sound@ sound = AssetManager.GetSound(asset);
+            sound.Play();
             print("Space");
         }
 

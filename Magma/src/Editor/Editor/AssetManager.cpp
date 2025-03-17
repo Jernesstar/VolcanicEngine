@@ -364,8 +364,8 @@ void EditorAssetManager::RuntimeSave(const std::string& exportPath) {
 		else if(asset.Type == AssetType::Audio) {
 			pack.Write(soundFile.GetPosition());
 
-			// Buffer<float> soundData = AssetImporter::GetAudioData(path);
-			// soundFile.Write(soundData);
+			Buffer<float> soundData = AssetImporter::GetAudioData(path);
+			soundFile.Write(soundData);
 		}
 		else if(asset.Type == AssetType::Script) {
 			pack.Write(scriptFile.GetPosition());

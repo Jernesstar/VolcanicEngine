@@ -98,7 +98,18 @@ void RuntimeAssetManager::Load(Asset asset) {
 
 	}
 	else if(asset.Type == AssetType::Audio) {
+		BinaryReader reader("Asset/Audio/sound.bin");
+		reader.SetPosition(offset);
+		Buffer<float> data;
+		reader.Read(data);
 
+		Ref<Sound> sound = CreateRef<Sound>();
+		bool success = 
+			sound->GetInternal()
+			.loadRawWave(data.Get(), data.GetCount(), 44100.0f, 1, true, false);
+		VOLCANICORE_ASSERT(success);
+
+		m_AudioAssets[asset.ID] = sound;
 	}
 	else if(asset.Type == AssetType::Script) {
 		BinaryReader reader("Asset/Script/script.bin");

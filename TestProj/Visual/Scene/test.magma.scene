@@ -104,6 +104,12 @@ Scene:
           MeshComponent:
             AssetID: 4186775327602265389
     - Entity:
+        Name: ewrw
+        ID: 562
+        Components:
+          MeshComponent:
+            AssetID: 10036008063945961451
+    - Entity:
         Name: Ball2
         ID: 554
         Components:
