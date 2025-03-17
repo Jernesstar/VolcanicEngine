@@ -50,6 +50,7 @@ void ScriptGlue::RegisterInterface() {
 	RegisterScriptHandle(engine);
 	RegisterScriptMath(engine);
 
+	RegisterInput();
 	ScriptEngine::RegisterInterface("IApp")
 		.AddMethod("void OnLoad()")
 		.AddMethod("void OnClose()")
@@ -62,7 +63,14 @@ void ScriptGlue::RegisterInterface() {
 
 	ScriptEngine::RegisterInterface("IEntity")
 		.AddMethod("void OnUpdate(float ts)")
-		// .AddMethod("void OnEvent()")
+		// KeyPressed, KeyReleased
+		.AddMethod("void OnKeyEvent(KeyEvent@)")
+		// MousePressed, MouseReleased
+		.AddMethod("void OnMouseEvent(MouseEvent@)")
+		// WindowResized, WindowClosed, ScreenChanged
+		.AddMethod("void OnAppEvent(AppEvent@)")
+		// PlayerDied, LevelComplete, Collided
+		.AddMethod("void OnGameEvent(GameEvent@)")
 		;
 
 	ScriptEngine::RegisterInterface("IUIObject")
@@ -73,7 +81,6 @@ void ScriptGlue::RegisterInterface() {
 
 	RegisterGlobalFunctions();
 	RegisterTypes();
-	RegisterInput();
 	RegisterAssetManager();
 	RegisterECS();
 
@@ -224,6 +231,11 @@ void RegisterInput() {
 		asFUNCTION(Input::KeyPressed), asCALL_CDECL);
 	engine->RegisterGlobalFunction("bool MousePressed(Mouse button)",
 		asFUNCTION(Input::MouseButtonPressed), asCALL_CDECL);
+
+	engine->RegisterObjectType("KeyEvent", 0, asOBJ_REF | asOBJ_NOCOUNT);
+	engine->RegisterObjectType("MouseEvent", 0, asOBJ_REF | asOBJ_NOCOUNT);
+	engine->RegisterObjectType("AppEvent", 0, asOBJ_REF | asOBJ_NOCOUNT);
+	engine->RegisterObjectType("GameEvent", 0, asOBJ_REF | asOBJ_NOCOUNT);
 }
 
 static uint64_t GetAssetID(Asset* asset) {

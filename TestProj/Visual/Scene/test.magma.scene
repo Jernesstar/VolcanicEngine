@@ -28,9 +28,6 @@ Scene:
               Translation: [4.19999981, 16.8999996, 0]
               Rotation: [1.22173047, 1.51843643, 0]
               Scale: [1, 1, 11.8999996]
-          ScriptComponent:
-            ModuleID: 2691709289590626850
-            Class: PlayerController
     - Entity:
         Name: Ball
         ID: 552
@@ -122,6 +119,3 @@ Scene:
               Scale: [1, 1, 1]
           MeshComponent:
             AssetID: 4186775327602265389
-          ScriptComponent:
-            ModuleID: 2691709289590626850
-            Class: PlayerController

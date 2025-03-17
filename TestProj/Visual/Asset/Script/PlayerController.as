@@ -28,12 +28,6 @@ class PlayerController : IEntity
 
     void OnUpdate(float ts)
     {
-        if(KeyPressed(Key::Space)) {
-            Sound@ sound = AssetManager.GetSound(asset);
-            sound.Play();
-            print("Space");
-        }
-
         TransformComponent@ tc = handle.SetTransformComponent();
 
         if(KeyPressed(Key::Left))
@@ -44,5 +38,32 @@ class PlayerController : IEntity
             tc.Translation.z -= 0.05f * ts;
         if(KeyPressed(Key::Down))
             tc.Translation.z += 0.05f * ts;
+    }
+
+    void OnKeyEvent(KeyEvent@ event)
+    {
+        // if(event.Key == Key::Space and !event.IsRepeat) {
+        //     Sound@ sound = AssetManager.GetSound(asset);
+        //     sound.Play();
+        // }
+    }
+
+    void OnMouseEvent(MouseEvent@ event)
+    {
+        print("Press");
+        // PhysicsSystem@ world = Scene.GetPhysicsSystem();
+        // HitInfo info = world.RayTest(event.x, event.y);
+        // if(info.HasHit and info.Body.EntityHandle == handle)
+        //     print("Hit");
+    }
+
+    void OnAppEvent(AppEvent@ event)
+    {
+
+    }
+
+    void OnGameEvent(GameEvent@ event)
+    {
+
     }
 }

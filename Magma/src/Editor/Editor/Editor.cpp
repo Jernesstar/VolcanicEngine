@@ -197,9 +197,8 @@ void Editor::Render() {
 				CloseTab(tabToDelete);
 		}
 		ImGui::EndTabBar();
-		// ImGui::SameLine();
-		// if(m_Tabs)
-		// 	GetProjectTab()->RenderButtons();
+		if(m_Tabs)
+			GetProjectTab()->RenderButtons();
 
 		ImGuiID dockspaceID = ImGui::GetID("DockSpace");
 		ImGui::DockSpace(dockspaceID, ImVec2(0.0f, 0.0f), dockspaceFlags);

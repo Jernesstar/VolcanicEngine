@@ -113,35 +113,38 @@ void ProjectTab::RenderEssentialPanels() {
 }
 
 void ProjectTab::RenderButtons() {
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-	ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(0, 0));
+	// ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+	// ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(0, 0));
 
 	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.f, 0.f, 0.f, 0.f));
 	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.f, 0.f, 0.f, 0.f));
 	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.f, 0.f, 0.f, 0.f));
 
-	auto flags = ImGuiWindowFlags_NoDecoration
-			   | ImGuiWindowFlags_NoScrollWithMouse
-			   | ImGuiWindowFlags_NoScrollbar
-			   | ImGuiWindowFlags_NoResize
-			   | ImGuiWindowFlags_NoMove
-			   | ImGuiWindowFlags_NoTitleBar;
-	ImGui::Begin("##toolbar", nullptr, flags);
-	{
-		float size = ImGui::GetWindowHeight() - 2.0f;
-		auto x = 0.5f * (ImGui::GetWindowContentRegionMax().x - size);
+	// auto flags = ImGuiWindowFlags_NoDecoration
+	// 		   | ImGuiWindowFlags_NoScrollWithMouse
+	// 		   | ImGuiWindowFlags_NoScrollbar
+	// 		   | ImGuiWindowFlags_NoResize
+	// 		   | ImGuiWindowFlags_NoMove
+	// 		   | ImGuiWindowFlags_NoTitleBar;
+	// ImGui::Begin("##toolbar", nullptr, flags);
+	// {
+		// float size = ImGui::GetWindowHeight() - 2.0f;
+		// auto x = 0.5f * (ImGui::GetWindowContentRegionMax().x - size);
+		float x = Application::GetWindow()->GetWidth() - 100.0f;
+		float y = 27.0f;
+		float size = 18.0f;
 		UI::Button* button = &m_PlayButton;
 		if(m_ScreenState == ScreenState::Play)
 			button = &m_PauseButton;
 
 		button->x = x;
-		button->y = ImGui::GetCursorPosY();
+		button->y = y;
 		button->SetSize(size, size);
 		button->Render();
 
 		ImGui::SameLine();
-		m_StopButton.x = ImGui::GetCursorPosX() + 5.0f;
-		m_StopButton.y = ImGui::GetCursorPosY();
+		m_StopButton.x = x + size + 7.0f;
+		m_StopButton.y = y;
 		m_StopButton.SetSize(size, size);
 		m_StopButton.Render();
 
@@ -152,11 +155,11 @@ void ProjectTab::RenderButtons() {
 				OnPause();
 		if(m_StopButton.GetState().Clicked)
 			OnStop();
-	}
-	ImGui::End();
+	// }
+	// ImGui::End();
 
 	ImGui::PopStyleColor(3);
-	ImGui::PopStyleVar(2);
+	// ImGui::PopStyleVar(2);
 }
 
 void ProjectTab::OnPlay() {
