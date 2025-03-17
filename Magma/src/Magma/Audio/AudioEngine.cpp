@@ -2,18 +2,20 @@
 
 namespace Magma::Audio {
 
-static SoLoud::Soloud s_Engine;
+static SoLoud::Soloud* s_Engine;
 
 void AudioEngine::Init() {
-	s_Engine.init();
+	s_Engine = new SoLoud::Soloud;
+	s_Engine->init();
 }
 
-void AudioEngine::Close() {
-	s_Engine.deinit();
+void AudioEngine::Shutdown() {
+	s_Engine->deinit();
+	delete s_Engine;
 }
 
 SoLoud::Soloud* AudioEngine::Get() {
-	return &s_Engine;
+	return s_Engine;
 }
 
 }

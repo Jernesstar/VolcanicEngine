@@ -122,7 +122,8 @@ void EditorAssetManager::Load(const std::string& path) {
 		m_AssetRegistry[asset] = false;
 
 		if(node["Path"])
-			m_Paths[id] = (rootPath / node["Path"].as<std::string>()).string();
+			m_Paths[id] =
+				(rootPath / node["Path"].as<std::string>()).generic_string();
 		if(asset.Type == AssetType::Mesh) {
 			if(node["Path"]) {
 				List<SubMesh> meshes;

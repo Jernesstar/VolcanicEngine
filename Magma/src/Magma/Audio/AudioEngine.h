@@ -7,7 +7,7 @@ namespace Magma::Audio {
 class AudioEngine {
 public:
 	static void Init();
-	static void Close();
+	static void Shutdown();
 	static SoLoud::Soloud* Get();
 };
 

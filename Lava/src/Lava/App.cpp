@@ -63,20 +63,22 @@ struct RuntimeScreen {
 
 static RuntimeScreen* s_Screen = nullptr;
 
-static Scene* GetScene() {
-	return s_Screen->World.get();
+static Scene& GetScene() {
+	return *s_Screen->World;
 }
 
-static UIPage* GetUI() {
-	return &s_Screen->UI;
+static UIPage& GetUI() {
+	return s_Screen->UI;
 }
 
 static asIScriptObject* GetScriptApp() {
-	return s_AppObject->GetHandle();
+	auto* handle = s_AppObject->GetHandle();
+	handle->AddRef();
+	return handle;
 }
 
-static AssetManager* GetAssetManagerInstance() {
-	return App::Get()->GetAssetManager();
+static AssetManager& GetAssetManagerInstance() {
+	return *App::Get()->GetAssetManager();
 }
 
 App::App(const Project& project)
@@ -111,11 +113,8 @@ App::~App() {
 }
 
 void App::OnLoad() {
-	Application::GetWindow()->SetTitle(m_Project.Name);
-	// Application::GetWindow()->SetIcon();
-
 	s_AppModule = CreateRef<ScriptModule>(m_Project.App);
-	s_AppModule->Load("./.volc.class");
+	AppLoad(s_AppModule);
 
 	s_AppObject = s_AppModule->GetClass(m_Project.App)->Instantiate();
 	s_AppObject->Call("OnLoad");

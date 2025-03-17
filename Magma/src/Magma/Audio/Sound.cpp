@@ -6,12 +6,12 @@
 
 namespace Magma::Audio {
 
-Sound::Sound(Buffer<float> data) {
+Sound::Sound() {
 
 }
 
 Sound::~Sound() {
-	// delete m_Source;
+
 }
 
 void Sound::Play() {

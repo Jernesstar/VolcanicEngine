@@ -3,21 +3,33 @@
 class PlayerController : IEntity
 {
     Entity handle;
+    Asset asset = Asset(16624656892553940704, AssetType::Audio);
 
     PlayerController(Entity entity)
     {
         handle = entity;
         print("Name: " + entity.Name);
         print("Alive: " + entity.Alive);
-        const TagComponent @tc = handle.GetTagComponent();
+        const TagComponent@ tc = handle.GetTagComponent();
         print(tc.Tag);
 
-        // TestGame @game = cast<TestGame>(ScriptApp);
-        // ScriptApp;
+        TestGame@ game = cast<TestGame>(ScriptApp);
+        game.NewMethod();
+        print("Coins: " + game.State.Coins);
+
+        AssetManager.Load(asset);
+        bool loaded = AssetManager.IsLoaded(asset);
+        print("Loaded: " + loaded);
     }
 
     void OnUpdate(float ts)
     {
+        if(KeyPressed(Key::Space)) {
+            // Sound@ sound = AssetManager.GetSound(asset);
+            // sound.Play();
+            print("Space");
+        }
+
         // TransformComponent @tc = handle.SetTransformComponent();
         // print("Component: { " + tc.Translation.x + "," + tc.Translation.y + "," + tc.Translation.z + " }");
 

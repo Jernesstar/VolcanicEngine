@@ -199,14 +199,18 @@ void AssetImporter::GetMeshData(const std::string& path,
 }
 
 Buffer<float> AssetImporter::GetAudioData(const std::string& path) {
-	auto source = new SoLoud::Wav;
-	VOLCANICORE_ASSERT(source->load(path.c_str()) == 0);
+	SoLoud::Wav sound;
+	VOLCANICORE_ASSERT(sound.load(path.c_str()) == 0);
 	Buffer<float> data;
 
 	return data;
 }
+
 Ref<Sound> AssetImporter::GetAudio(const std::string& path) {
-	return CreateRef<Sound>(GetAudioData(path));
+	auto output = CreateRef<Sound>();
+	VOLCANICORE_LOG_INFO("Loading sound '%s'", path.c_str());
+	VOLCANICORE_ASSERT(output->GetInternal().load(path.c_str()) == 0);
+	return output;
 }
 
 }

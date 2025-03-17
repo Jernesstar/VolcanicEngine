@@ -119,8 +119,17 @@ void RuntimeAssetManager::Unload(Asset asset) {
 		return;
 
 	m_AssetRegistry[asset] = false;
-	uint64_t offset = m_AssetOffsets[asset.ID];
 
+	if(asset.Type == AssetType::Mesh)
+		m_MeshAssets.erase(asset.ID);
+	else if(asset.Type == AssetType::Texture)
+		m_TextureAssets.erase(asset.ID);
+	else if(asset.Type == AssetType::Cubemap)
+		m_CubemapAssets.erase(asset.ID);
+	else if(asset.Type == AssetType::Audio)
+		m_AudioAssets.erase(asset.ID);
+	else if(asset.Type == AssetType::Script)
+		m_ScriptAssets.erase(asset.ID);
 }
 
 void RuntimeAssetManager::Load() {

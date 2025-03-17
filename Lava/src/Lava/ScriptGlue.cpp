@@ -14,6 +14,8 @@
 #include <angelscript/add_on/scripthelper/scripthelper.h>
 #include <angelscript/add_on/scriptmath/scriptmath.h>
 
+#include <VolcaniCore/Core/Input.h>
+
 #include <Magma/Core/AssetManager.h>
 
 #include <Magma/Scene/Scene.h>
@@ -163,7 +165,7 @@ void RegisterTypes() {
 		"void f(float, float, float)",
 		asFUNCTION(Vec3InitConstructor), asCALL_CDECL_OBJLAST);
 	engine->RegisterObjectBehaviour("Vec3", asBEHAVE_LIST_CONSTRUCT,
-		"void f(const int &in) {float, float, float}",
+		"void f(const int &in) { float, float, float }",
 		asFUNCTION(Vec3ListConstructor), asCALL_CDECL_OBJLAST);
 	engine->RegisterObjectProperty("Vec3", "float x", asOFFSET(Vec3, x));
 	engine->RegisterObjectProperty("Vec3", "float y", asOFFSET(Vec3, y));
@@ -209,6 +211,7 @@ void RegisterInput() {
 	engine->RegisterEnumValue("Key", "Y", 89);
 	engine->RegisterEnumValue("Key", "Z", 90);
 
+	engine->RegisterEnumValue("Key", "Space", 32);
 	engine->RegisterEnumValue("Key", "Ctrl", 224 + 230);
 	engine->RegisterEnumValue("Key", "Shift", 225 + 229);
 
@@ -216,13 +219,26 @@ void RegisterInput() {
 	engine->RegisterEnumValue("Key", "Left",  263);
 	engine->RegisterEnumValue("Key", "Down",  264);
 	engine->RegisterEnumValue("Key", "Up",    265);
+
+	engine->RegisterGlobalFunction("bool KeyPressed(Key key)",
+		asFUNCTION(Input::KeyPressed), asCALL_CDECL);
+	engine->RegisterGlobalFunction("bool MousePressed(Mouse button)",
+		asFUNCTION(Input::MouseButtonPressed), asCALL_CDECL);
 }
 
 static uint64_t GetAssetID(Asset* asset) {
 	return (uint64_t)asset->ID;
 }
 
-static Sound* GetSound(AssetManager* manager, const Asset& asset) {
+static AssetType GetAssetType(Asset* asset) {
+	return asset->Type;
+}
+
+static void AssetInitCtor(uint64_t id, AssetType type, Asset* ptr) {
+	new (ptr) Asset{ id, type };
+}
+
+static Sound* GetSound(Asset asset, AssetManager* manager) {
 	manager->Load(asset);
 	return manager->Get<Sound>(asset).get();
 }
@@ -245,10 +261,13 @@ void RegisterAssetManager() {
 	engine->RegisterEnumValue("AssetType", "Shader",  6);
 	engine->RegisterEnumValue("AssetType", "None",	  7);
 
-	engine->RegisterObjectProperty("Asset", "AssetType Type",
-		asOFFSET(Asset, Type));
-	engine->RegisterObjectProperty("Asset", "bool Primary",
-		asOFFSET(Asset, Primary));
+	engine->RegisterObjectMethod("Asset", "AssetType get_Type() const property",
+		asFUNCTION(GetAssetType), asCALL_CDECL_OBJLAST);
+	// engine->RegisterObjectMethod("Asset", "bool get_Primary() const property",
+	// 	asFUNCTION(GetAssetPrimaryFlag), asCALL_CDECL_OBJLAST);
+	engine->RegisterObjectBehaviour("Asset", asBEHAVE_CONSTRUCT,
+		"void f(uint64, AssetType)",
+		asFUNCTION(AssetInitCtor), asCALL_CDECL_OBJLAST);
 
 	engine->RegisterObjectType("AssetManagerClass", 0,
 		asOBJ_REF | asOBJ_NOHANDLE);
@@ -258,6 +277,8 @@ void RegisterAssetManager() {
 		asMETHOD(AssetManager, Load), asCALL_THISCALL);
 	engine->RegisterObjectMethod("AssetManagerClass", "bool Unload(Asset)",
 		asMETHOD(AssetManager, Unload), asCALL_THISCALL);
+	// engine->RegisterObjectMethod("AssetManagerClass", "Asset GetNamedAsset(Asset)",
+	// 	asMETHOD(AssetManager, Unload), asCALL_THISCALL);
 
 	engine->RegisterObjectType("Sound", 0, asOBJ_REF | asOBJ_NOCOUNT);
 	engine->RegisterObjectMethod("Sound", "void Play()", asMETHOD(Sound, Play),

@@ -13,6 +13,8 @@
 
 #include <Magma/Script/ScriptEngine.h>
 
+#include <Magma/Audio/AudioEngine.h>
+
 #include <Magma/Physics/Physics.h>
 
 #include <Magma/UI/UIRenderer.h>
@@ -49,6 +51,7 @@ struct {
 
 Editor::Editor() {
 	Physics::Init();
+	AudioEngine::Init();
 	ScriptEngine::Init();
 
 	Lava::ScriptGlue::RegisterInterface();
@@ -59,10 +62,16 @@ Editor::~Editor() {
 	m_ClosedTabs.Clear();
 	m_CurrentTab.reset();
 
+	if(m_App) {
+		m_App->OnClose();
+		m_App.reset();
+	}
+
 	m_AssetManager.Save();
 	m_AssetManager.Clear();
 
 	ScriptEngine::Shutdown();
+	AudioEngine::Shutdown();
 	Physics::Close();
 }
 
@@ -311,8 +320,12 @@ void Editor::NewProject(const std::string& volcPath) {
 
 	auto rootPath = fs::path(volcPath).parent_path();
 	m_App = CreateRef<Lava::App>(m_Project);
-
-	m_App->SetAssetManager(&m_AssetManager);
+	m_App->AppLoad =
+		[&](Ref<ScriptModule> script)
+		{
+			auto scriptPath = rootPath / "Project" / "App" / script->Name;
+			script->Load(scriptPath.string() + ".as");
+		};
 	m_App->ScreenLoad =
 		[&](Ref<ScriptModule> script)
 		{
@@ -332,6 +345,11 @@ void Editor::NewProject(const std::string& volcPath) {
 			UILoader::EditorLoad(page, uiPath.string() + ".magma.ui.json",
 				UITab::GetTheme());
 		};
+
+	m_App->Running = false;
+	m_App->ChangeScreen = false;
+	m_App->SetAssetManager(&m_AssetManager);
+	m_App->OnLoad();
 
 	auto themePath = rootPath / "Visual" / "UI" / "theme.magma.ui.json";
 	if(fs::exists(themePath))

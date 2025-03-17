@@ -14,9 +14,8 @@ public:
 
 	Asset Add(const std::string& path, AssetType type);
 
-	UUID GetFromPath(const std::string& path);
-
 	std::string GetPath(UUID id);
+	UUID GetFromPath(const std::string& path);
 
 	const Map<Asset, bool>& GetRegistry() const { return m_AssetRegistry; }
 

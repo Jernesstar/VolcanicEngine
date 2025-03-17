@@ -63,10 +63,10 @@ public:
 	bool ChangeScreen;
 	bool Running;
 
-	Func<void, Scene&> SceneLoad;
-	Func<void, const Scene&> SceneSave;
-	Func<void, UIPage&> UILoad;
+	Func<void, Ref<ScriptModule>> AppLoad;
 	Func<void, Ref<ScriptModule>> ScreenLoad;
+	Func<void, Scene&> SceneLoad;
+	Func<void, UIPage&> UILoad;
 
 public:
 	App(const Project& project);

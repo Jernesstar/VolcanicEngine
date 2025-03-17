@@ -6,6 +6,8 @@
 
 #include <Magma/Script/ScriptEngine.h>
 
+#include <Magma/Audio/AudioEngine.h>
+
 #include <Magma/Physics/Physics.h>
 
 #include <Magma/UI/UIRenderer.h>
@@ -51,6 +53,7 @@ Runtime::Runtime(const CommandLineArgs& args)
 	// 	"Bloom", ShaderPipeline::Create("Asset/Shader", "Bloom"));
 
 	Physics::Init();
+	AudioEngine::Init();
 	ScriptEngine::Init();
 	ScriptGlue::RegisterInterface();
 
@@ -58,9 +61,18 @@ Runtime::Runtime(const CommandLineArgs& args)
 
 	Project project;
 	project.Load("./.volc.proj");
+
+	Application::GetWindow()->SetTitle(project.Name);
 	m_AssetManager.Load();
+	// Application::GetWindow()->SetIcon();
 
 	m_App = CreateRef<App>(project);
+
+	m_App->AppLoad =
+		[&](Ref<ScriptModule> script)
+		{
+			script->Load("./.volc.class");
+		};
 	m_App->ScreenLoad =
 		[&](Ref<ScriptModule> script)
 		{
@@ -95,6 +107,7 @@ Runtime::~Runtime() {
 	UIRenderer::Close();
 
 	ScriptEngine::Shutdown();
+	AudioEngine::Shutdown();
 	Physics::Close();
 }
 

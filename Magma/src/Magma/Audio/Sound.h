@@ -15,10 +15,12 @@ public:
 	float Volume = -1.0f;
 
 public:
-	Sound(Buffer<float> data);
+	Sound();
 	~Sound();
 
 	void Play();
+
+	SoLoud::Wav& GetInternal() { return m_Sound; }
 
 private:
 	SoLoud::Wav m_Sound;
