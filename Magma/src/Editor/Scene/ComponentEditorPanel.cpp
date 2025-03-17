@@ -202,34 +202,76 @@ void DrawComponent<ScriptComponent>(Entity& entity) {
 	if(!component.Instance)
 		return;
 
+	ImGui::SeparatorText("Fields");
+
 	auto* handle = component.Instance->GetHandle();
 	for(uint32_t i = 0; i < handle->GetPropertyCount(); i++) {
-		ImGui::Text(handle->GetPropertyName(i)); ImGui::SameLine(120.0f);
-		void* address = handle->GetAddressOfProperty(i);
-		int f = handle->GetPropertyTypeId(i);
+		auto typeID = handle->GetPropertyTypeId(i);
+		auto* typeInfo = ScriptEngine::Get()->GetTypeInfoById(typeID);
+		if(typeInfo) {
+			ImGui::Text(typeInfo->GetName());
+			ImGui::SameLine(100.0f);
+			ImGui::Text(handle->GetPropertyName(i));
+			continue;
+		}
 
-		if(f == asTYPEID_BOOL)
-			ImGui::RadioButton("##Bool", (int*)address, 0);
-		else if(f == asTYPEID_INT8)
+		void* address = handle->GetAddressOfProperty(i);
+
+		if(typeID == asTYPEID_BOOL) {
+			ImGui::Text("bool"); ImGui::SameLine(100.0f);
+			ImGui::Text(handle->GetPropertyName(i)); ImGui::SameLine(200.0f);
+			ImGui::Checkbox("##Bool", (bool*)address);
+		}
+		else if(typeID == asTYPEID_INT8) {
+			ImGui::Text("int8"); ImGui::SameLine(100.0f);
+			ImGui::Text(handle->GetPropertyName(i)); ImGui::SameLine(200.0f);
 			ImGui::InputScalar("##Signed 8bit", ImGuiDataType_S8, address);
-		else if(f == asTYPEID_INT16)
+		}
+		else if(typeID == asTYPEID_INT16) {
+			ImGui::Text("int16"); ImGui::SameLine(100.0f);
+			ImGui::Text(handle->GetPropertyName(i)); ImGui::SameLine(200.0f);
 			ImGui::InputScalar("##Signed 16bit", ImGuiDataType_S16, address);
-		else if(f == asTYPEID_INT32)
+		}
+		else if(typeID == asTYPEID_INT32) {
+			ImGui::Text("int32"); ImGui::SameLine(100.0f);
+			ImGui::Text(handle->GetPropertyName(i)); ImGui::SameLine(200.0f);
 			ImGui::InputScalar("##Signed 32bit", ImGuiDataType_S32, address);
-		else if(f == asTYPEID_INT64)
+		}
+		else if(typeID == asTYPEID_INT64) {
+			ImGui::Text("int64"); ImGui::SameLine(100.0f);
+			ImGui::Text(handle->GetPropertyName(i)); ImGui::SameLine(200.0f);
 			ImGui::InputScalar("##Signed 64bit", ImGuiDataType_S64, address);
-		else if(f == asTYPEID_UINT8)
+		}
+		else if(typeID == asTYPEID_UINT8) {
+			ImGui::Text("uint8"); ImGui::SameLine(100.0f);
+			ImGui::Text(handle->GetPropertyName(i)); ImGui::SameLine(200.0f);
 			ImGui::InputScalar("##Unsigned 8bit", ImGuiDataType_U8, address);
-		else if(f == asTYPEID_UINT16)
+		}
+		else if(typeID == asTYPEID_UINT16) {
+			ImGui::Text("uint16"); ImGui::SameLine(100.0f);
+			ImGui::Text(handle->GetPropertyName(i)); ImGui::SameLine(200.0f);
 			ImGui::InputScalar("##Unsigned 16bit", ImGuiDataType_U16, address);
-		else if(f == asTYPEID_UINT32)
+		}
+		else if(typeID == asTYPEID_UINT32) {
+			ImGui::Text("uint32"); ImGui::SameLine(100.0f);
+			ImGui::Text(handle->GetPropertyName(i)); ImGui::SameLine(200.0f);
 			ImGui::InputScalar("##Unsigned 32bit", ImGuiDataType_U32, address);
-		else if(f == asTYPEID_UINT64)
+		}
+		else if(typeID == asTYPEID_UINT64) {
+			ImGui::Text("uint64"); ImGui::SameLine(100.0f);
+			ImGui::Text(handle->GetPropertyName(i)); ImGui::SameLine(200.0f);
 			ImGui::InputScalar("##Unsigned 64bit", ImGuiDataType_U64, address);
-		else if(f == asTYPEID_FLOAT)
-			ImGui::InputFloat("##Float", (float*)address);
-		else if(f == asTYPEID_DOUBLE)
+		}
+		else if(typeID == asTYPEID_FLOAT) {
+			ImGui::Text("float"); ImGui::SameLine(100.0f);
+			ImGui::Text(handle->GetPropertyName(i)); ImGui::SameLine(200.0f);
+			ImGui::InputFloat("##Float", (float*)address, 0.0f, 0.0f, "%.10f");
+		}
+		else if(typeID == asTYPEID_DOUBLE) {
+			ImGui::Text("double"); ImGui::SameLine(100.0f);
+			ImGui::Text(handle->GetPropertyName(i)); ImGui::SameLine(200.0f);
 			ImGui::InputDouble("##Double", (double*)address);
+		}
 	}
 }
 

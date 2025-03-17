@@ -4,6 +4,10 @@ class PlayerController : IEntity
 {
     Entity handle;
     Asset asset = Asset(16624656892553940704, AssetType::Audio);
+    bool SomeBool;
+    int8 Signed8;
+    uint32 Unsigned32;
+    float Float;
 
     PlayerController(Entity entity)
     {
