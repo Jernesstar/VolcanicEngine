@@ -2,7 +2,7 @@
 
 class PlayerController : IEntity
 {
-    Entity handle;
+    Entity Handle;
     Asset asset = Asset(16624656892553940704, AssetType::Audio);
     bool SomeBool;
     int8 Signed8;
@@ -11,10 +11,10 @@ class PlayerController : IEntity
 
     PlayerController(Entity entity)
     {
-        handle = entity;
+        Handle = entity;
         print("Name: " + entity.Name);
         print("Alive: " + entity.Alive);
-        const TagComponent@ tc = handle.GetTagComponent();
+        const TagComponent@ tc = Handle.GetTagComponent();
         print(tc.Tag);
 
         TestGame@ game = cast<TestGame>(ScriptApp);
@@ -28,7 +28,7 @@ class PlayerController : IEntity
 
     void OnUpdate(float ts)
     {
-        TransformComponent@ tc = handle.SetTransformComponent();
+        TransformComponent@ tc = Handle.SetTransformComponent();
 
         if(KeyPressed(Key::Left))
             tc.Translation.x -= 0.05f * ts;
@@ -42,7 +42,11 @@ class PlayerController : IEntity
 
     void OnKeyEvent(KeyEvent@ event)
     {
-        // if(event.Key == Key::Space and !event.IsRepeat) {
+        // KeyPressedEvent@ e = cast<KeyPressedEvent>(event);
+        // if(e == null)
+        //     return;
+
+        // if(e.Key == Key::Space and !e.IsRepeat) {
         //     Sound@ sound = AssetManager.GetSound(asset);
         //     sound.Play();
         // }
@@ -51,9 +55,12 @@ class PlayerController : IEntity
     void OnMouseEvent(MouseEvent@ event)
     {
         print("Press");
+        if(!Handle.HasRigidBodyComponent())
+            return;
+
         // PhysicsSystem@ world = Scene.GetPhysicsSystem();
         // HitInfo info = world.RayTest(event.x, event.y);
-        // if(info.HasHit and info.Body.EntityHandle == handle)
+        // if(info.HasHit and info.Body.EntityHandle == Handle)
         //     print("Hit");
     }
 
@@ -64,6 +71,8 @@ class PlayerController : IEntity
 
     void OnGameEvent(GameEvent@ event)
     {
-
+        // if(event.ID == "Collision") {
+        //     CollisionEvent@ e = 
+        // }
     }
 }

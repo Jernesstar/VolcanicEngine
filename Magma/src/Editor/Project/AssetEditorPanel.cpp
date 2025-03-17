@@ -43,16 +43,16 @@ static void EditAsset(Asset asset) {
 		case AssetType::Cubemap:
 			type = "Cubemap";
 			break;
-		// case AssetType::Font:
-		// 	type = "Font";
-		// 	break;
+		case AssetType::Script:
+			type = "Script";
+			break;
 		case AssetType::Audio:
 			type = "Audio";
 			break;
 	}
 
 	ImGui::Text("Type: %s", type.c_str());
-	ImGui::Text("ID: %lu", asset.ID / (uint64_t)1e15);
+	ImGui::Text("ID: %llu", asset.ID);
 }
 
 void AssetEditorPanel::Draw() {

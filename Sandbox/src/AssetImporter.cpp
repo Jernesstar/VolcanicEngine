@@ -158,10 +158,9 @@ Ref<Mesh> AssetImporter::GetMesh(const std::string& path) {
 }
 
 Ref<Sound> AssetImporter::GetAudio(const std::string& path) {
-	// auto source = new SoLoud::Wav;
-	// VOLCANICORE_ASSERT(source->load(path.c_str()) == 0);
-	// return CreateRef<Sound>(source);
-	return nullptr;
+	auto sound = CreateRef<Sound>();
+	VOLCANICORE_ASSERT(sound->GetInternal().load(path.c_str()) == 0);
+	return sound;
 }
 
 }

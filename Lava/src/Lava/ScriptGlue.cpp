@@ -246,6 +246,10 @@ static AssetType GetAssetType(Asset* asset) {
 	return asset->Type;
 }
 
+static void AssetDefaultCtor(Asset* ptr) {
+	new (ptr) Asset{ };
+}
+
 static void AssetInitCtor(uint64_t id, AssetType type, Asset* ptr) {
 	new (ptr) Asset{ id, type };
 }

@@ -33,6 +33,7 @@
 using namespace Magma::ECS;
 using namespace Magma::Script;
 using namespace Magma::Physics;
+
 namespace Magma {
 
 SceneVisualizerPanel::SceneVisualizerPanel(Scene* context)
