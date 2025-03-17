@@ -123,22 +123,22 @@ void Serialize(const UIElement* ui, JSONSerializer& serializer) {
 
 	switch(ui->GetType()) {
 		case UIElementType::Window:
-			serializer.Write("Window");
+			serializer.Write(std::string("Window"));
 			break;
 		case UIElementType::Button:
-			serializer.Write("Button");
+			serializer.Write(std::string("Button"));
 			break;
 		case UIElementType::Dropdown:
-			serializer.Write("Dropdown");
+			serializer.Write(std::string("Dropdown"));
 			break;
 		case UIElementType::Text:
-			serializer.Write("Text");
+			serializer.Write(std::string("Text"));
 			break;
 		case UIElementType::TextInput:
-			serializer.Write("TextInput");
+			serializer.Write(std::string("TextInput"));
 			break;
 		case UIElementType::Image:
-			serializer.Write("Image");
+			serializer.Write(std::string("Image"));
 			break;
 	}
 

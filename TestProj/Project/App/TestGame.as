@@ -17,7 +17,7 @@ shared class TestGame : IApp
 	void OnLoad()
 	{
 		print("OnLoad");
-		App.SetScreen("This is a test");
+		App.SwitchScreen("This is a test");
 	}
 
 	void OnClose()

@@ -37,6 +37,11 @@ namespace Lava {
 static Ref<ScriptModule> s_AppModule;
 static Ref<ScriptObject> s_AppObject;
 
+static bool s_ShouldSwitchScreen;
+static bool s_ShouldPushScreen;
+static bool s_ShouldPopScreen;
+static std::string s_NewScreenName;
+
 struct RuntimeScreen {
 	Ref<Scene> World;
 	UIPage UI;
@@ -89,7 +94,7 @@ App::App(const Project& project)
 	ScriptEngine::RegisterSingleton("AppClass", "App", this);
 
 	ScriptEngine::RegisterMethod<App>(
-		"AppClass", "void SetScreen(const string &in)", &App::SetScreen);
+		"AppClass", "void SwitchScreen(const string &in)", &App::SwitchScreen);
 	ScriptEngine::RegisterMethod<App>(
 		"AppClass", "void PushScreen(const string &in)", &App::PushScreen);
 	ScriptEngine::RegisterMethod<App>(
@@ -119,7 +124,7 @@ void App::OnLoad() {
 	s_AppObject = s_AppModule->GetClass(m_Project.App)->Instantiate();
 	s_AppObject->Call("OnLoad");
 
-	SetScreen(m_Project.StartScreen);
+	ScreenSet(m_Project.StartScreen);
 }
 
 void App::OnClose() {
@@ -141,7 +146,7 @@ void App::OnUpdate(TimeStep ts) {
 
 	s_Screen->ScriptObj->Call("OnUpdate", (float)ts);
 
-	// s_Screen->World->OnUpdate(ts);
+	s_Screen->World->OnUpdate(ts);
 	s_Screen->World->OnRender(m_SceneRenderer);
 
 	UIRenderer::BeginFrame();
@@ -175,15 +180,39 @@ void App::OnUpdate(TimeStep ts) {
 		});
 
 	UIRenderer::EndFrame();
+
+	if(s_ShouldSwitchScreen)
+		ScreenSet(s_NewScreenName);
+	else if(s_ShouldPushScreen)
+		ScreenPush(s_NewScreenName);
+	else if(s_ShouldPopScreen)
+		ScreenPop();
 }
 
-void App::SetScreen(const std::string& name) {
+void App::SwitchScreen(const std::string& name) {
+	s_ShouldSwitchScreen = true;
+	s_NewScreenName = name;
+}
+
+void App::PushScreen(const std::string& name) {
+	s_ShouldPushScreen = true;
+	s_NewScreenName = name;
+}
+
+void App::PopScreen(const std::string& name) {
+	s_ShouldPopScreen = true;
+	s_NewScreenName = name;
+}
+
+void App::ScreenSet(const std::string& name) {
 	if(!ChangeScreen) {
 		Running = false;
 		return;
 	}
 	if(name == "")
 		return;
+
+	s_ShouldSwitchScreen = false;
 
 	auto [found, idx] =
 		m_Project.Screens.Find(
@@ -230,7 +259,7 @@ void App::SetScreen(const std::string& name) {
 		});
 }
 
-void App::PushScreen(const std::string& name) {
+void App::ScreenPush(const std::string& name) {
 	if(!ChangeScreen) {
 		Running = false;
 		return;
@@ -239,7 +268,7 @@ void App::PushScreen(const std::string& name) {
 
 }
 
-void App::PopScreen() {
+void App::ScreenPop() {
 	if(!ChangeScreen) {
 		Running = false;
 		return;

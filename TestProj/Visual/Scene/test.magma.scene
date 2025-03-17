@@ -32,19 +32,6 @@ Scene:
             ModuleID: 2691709289590626850
             Class: PlayerController
     - Entity:
-        Name: Ball2
-        ID: 554
-        Components:
-          TagComponent:
-            Tag: Obstacle
-          TransformComponent:
-            Transform:
-              Translation: [-9, -6, 6]
-              Rotation: [0, 0, 0]
-              Scale: [1, 1, 1]
-          MeshComponent:
-            AssetID: 4186775327602265389
-    - Entity:
         Name: Ball
         ID: 552
         Components:
@@ -116,3 +103,19 @@ Scene:
         Components:
           MeshComponent:
             AssetID: 4186775327602265389
+    - Entity:
+        Name: Ball2
+        ID: 554
+        Components:
+          TagComponent:
+            Tag: Obstacle
+          TransformComponent:
+            Transform:
+              Translation: [-9, -6, 6]
+              Rotation: [0, 0, 0]
+              Scale: [1, 1, 1]
+          MeshComponent:
+            AssetID: 4186775327602265389
+          ScriptComponent:
+            ModuleID: 2691709289590626850
+            Class: PlayerController

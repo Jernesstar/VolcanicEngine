@@ -76,9 +76,13 @@ public:
 	void OnClose();
 	void OnUpdate(TimeStep ts);
 
-	void SetScreen(const std::string& name);
+	void SwitchScreen(const std::string& name);
 	void PushScreen(const std::string& name);
-	void PopScreen();
+	void PopScreen(const std::string& name);
+
+	void ScreenSet(const std::string& name);
+	void ScreenPush(const std::string& name);
+	void ScreenPop();
 
 	auto& GetProject() { return m_Project; }
 	void SetAssetManager(AssetManager* manager) { m_AssetManager = manager; }

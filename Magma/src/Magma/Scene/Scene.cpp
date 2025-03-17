@@ -104,13 +104,15 @@ void Scene::RegisterSystems() {
 		.run(
 			[&](flecs::iter& it)
 			{
-				auto sys = EntityWorld.Get<ParticleSystem>();
-				if(!sys)
-					return;
+				while(it.next()) {
+					auto sys = EntityWorld.Get<ParticleSystem>();
+					if(!sys)
+						return;
 
-				if(ourPhase == Phase::OnUpdate)
-					sys->Update(it.delta_time());
-				sys->Run(ourPhase);
+					if(ourPhase == Phase::OnUpdate)
+						sys->Update(it.delta_time());
+					sys->Run(ourPhase);
+				}
 			});
 	}
 
@@ -129,13 +131,15 @@ void Scene::RegisterSystems() {
 		.run(
 			[&](flecs::iter& it)
 			{
-				auto sys = EntityWorld.Get<PhysicsSystem>();
-				if(!sys)
-					return;
+				while(it.next()) {
+					auto sys = EntityWorld.Get<PhysicsSystem>();
+					if(!sys)
+						return;
 
-				if(ourPhase == Phase::OnUpdate)
-					sys->Update(it.delta_time());
-				sys->Run(ourPhase);
+					if(ourPhase == Phase::OnUpdate)
+						sys->Update(it.delta_time());
+					sys->Run(ourPhase);
+				}
 			});
 	}
 
@@ -154,13 +158,15 @@ void Scene::RegisterSystems() {
 		.run(
 			[&](flecs::iter& it)
 			{
-				auto sys = EntityWorld.Get<ScriptSystem>();
-				if(!sys)
-					return;
+				while(it.next()) {
+					auto sys = EntityWorld.Get<ScriptSystem>();
+					if(!sys)
+						return;
 
-				if(ourPhase == Phase::OnUpdate)
+					// if(ourPhase == Phase::OnUpdate)
 					sys->Update(it.delta_time());
-				sys->Run(ourPhase);
+					sys->Run(ourPhase);
+				}
 			});
 	}
 

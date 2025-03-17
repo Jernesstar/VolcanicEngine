@@ -43,7 +43,7 @@ SceneTab::SceneTab(const std::string& path)
 SceneTab::~SceneTab() {
 	if(m_ScenePath == "")
 		m_ScenePath = "Magma/assets/scenes/" + m_Scene.Name + ".magma.scene";
-	// SceneLoader::EditorSave(m_Scene, m_ScenePath);
+	SceneLoader::EditorSave(m_Scene, m_ScenePath);
 }
 
 void SceneTab::Setup() {

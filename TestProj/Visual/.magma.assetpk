@@ -17,10 +17,10 @@ AssetPack:
         Type: 5
         Path: Script/Button1.as
     - Asset:
-        ID: 16624656892553940704
-        Type: 4
-        Path: Audio/Woosh2.wav
-    - Asset:
         ID: 2691709289590626850
         Type: 5
         Path: Script/PlayerController.as
+    - Asset:
+        ID: 16624656892553940704
+        Type: 4
+        Path: Audio/Woosh2.wav

@@ -51,9 +51,9 @@ UITab::UITab(const UI::UIPage& page)
 }
 
 UITab::~UITab() {
-	// if(m_UIPath == "")
-	// 	m_UIPath = "Magma/assets/ui/" + m_Root.Name + ".magma.ui.json";
-	// UILoader::EditorSave(m_Root, m_UIPath);
+	if(m_UIPath == "")
+		m_UIPath = "Magma/assets/ui/" + m_Root.Name + ".magma.ui.json";
+	UILoader::EditorSave(m_Root, m_UIPath);
 }
 
 void UITab::Update(TimeStep ts) {

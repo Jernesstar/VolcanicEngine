@@ -277,8 +277,9 @@ void RegisterAssetManager() {
 		asMETHOD(AssetManager, Load), asCALL_THISCALL);
 	engine->RegisterObjectMethod("AssetManagerClass", "bool Unload(Asset)",
 		asMETHOD(AssetManager, Unload), asCALL_THISCALL);
-	// engine->RegisterObjectMethod("AssetManagerClass", "Asset GetNamedAsset(Asset)",
-	// 	asMETHOD(AssetManager, Unload), asCALL_THISCALL);
+	// engine->RegisterObjectMethod("AssetManagerClass",
+	// 	"Asset GetNamedAsset(const string &in)",
+	// 	asMETHOD(AssetManager, GetNamedAsset), asCALL_THISCALL);
 
 	engine->RegisterObjectType("Sound", 0, asOBJ_REF | asOBJ_NOCOUNT);
 	engine->RegisterObjectMethod("Sound", "void Play()", asMETHOD(Sound, Play),

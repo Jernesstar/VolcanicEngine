@@ -70,6 +70,8 @@ Editor::~Editor() {
 	m_AssetManager.Save();
 	m_AssetManager.Clear();
 
+	m_Project.Save((fs::path(m_Project.Path) / ".magma.proj").string());
+
 	ScriptEngine::Shutdown();
 	AudioEngine::Shutdown();
 	Physics::Close();
@@ -391,6 +393,8 @@ void Editor::RunProject() {
 void Editor::SaveProject() {
 	menu.project.saveProject = false;
 
+	if(m_Project.ExportPath != "")
+		ExportProject(m_Project.ExportPath);
 }
 
 void Editor::ExportProject() {

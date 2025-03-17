@@ -34,12 +34,15 @@ class PlayerController : IEntity
             print("Space");
         }
 
-        // TransformComponent @tc = handle.SetTransformComponent();
-        // print("Component: { " + tc.Translation.x + "," + tc.Translation.y + "," + tc.Translation.z + " }");
+        TransformComponent@ tc = handle.SetTransformComponent();
 
-        // if(Input.KeyPressed(Key::Left))
-            // tc.Translation.x -= 4.0 * ts;
-        // if(Input.KeyPressed(Key::Right))
-        //     component.Translation.x += 4.0 * ts;
+        if(KeyPressed(Key::Left))
+            tc.Translation.x -= 0.05f * ts;
+        if(KeyPressed(Key::Right))
+            tc.Translation.x += 0.05f * ts;
+        if(KeyPressed(Key::Up))
+            tc.Translation.z -= 0.05f * ts;
+        if(KeyPressed(Key::Down))
+            tc.Translation.z += 0.05f * ts;
     }
 }
