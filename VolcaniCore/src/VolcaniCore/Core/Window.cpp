@@ -30,9 +30,7 @@ Window::Window(uint32_t width, uint32_t height)
 }
 
 Window::~Window() {
-	if(m_NativeWindow)
-		glfwDestroyWindow(m_NativeWindow);
-	m_NativeWindow = nullptr;
+	glfwDestroyWindow(m_NativeWindow);
 }
 
 void Window::Resize(uint32_t width, uint32_t height) {
@@ -44,14 +42,16 @@ void Window::Resize(uint32_t width, uint32_t height) {
 	glfwSetWindowSize(m_NativeWindow, width, height);
 }
 
-void Window::SetIcon(const Buffer<uint8_t>& imageData) {
-	if(!imageData) {
+void Window::SetIcon(const ImageData& imageData) {
+	if(!imageData.Data) {
 		glfwSetWindowIcon(m_NativeWindow, 0, nullptr);
 		return;
 	}
 
 	GLFWimage icon;
-	icon.pixels = imageData.Get();
+	icon.width = imageData.Width;
+	icon.height = imageData.Height;
+	icon.pixels = imageData.Data.Get();
 	glfwSetWindowIcon(m_NativeWindow, 1, &icon);
 }
 

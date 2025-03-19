@@ -1,293 +1,193 @@
-==33828== Memcheck, a memory error detector
-==33828== Copyright (C) 2002-2022, and GNU GPL'd, by Julian Seward et al.
-==33828== Using Valgrind-3.22.0-bd4db67b1d-20231031 and LibVEX; rerun with -h for copyright info
-==33828== Command: build/Magma/bin/Editor --project TestProj/.magma.proj
-==33828== Parent PID: 689
-==33828== 
---33828-- 
---33828-- Valgrind options:
---33828--    --leak-check=full
---33828--    --show-leak-kinds=definite
---33828--    --track-origins=yes
---33828--    --verbose
---33828--    --log-file=valgrind-out.txt
---33828-- Contents of /proc/version:
---33828--   Linux version 6.8.0-1021-azure (buildd@lcy02-amd64-045) (x86_64-linux-gnu-gcc-11 (Ubuntu 11.4.0-1ubuntu1~22.04) 11.4.0, GNU ld (GNU Binutils for Ubuntu) 2.38) #25~22.04.1-Ubuntu SMP Thu Jan 16 21:37:09 UTC 2025
---33828-- 
---33828-- Arch and hwcaps: AMD64, LittleEndian, amd64-cx16-lzcnt-rdtscp-sse3-ssse3-avx-avx2-bmi-f16c-rdrand-rdseed
---33828-- Page sizes: currently 4096, max supported 4096
---33828-- Valgrind library directory: /usr/libexec/valgrind
---33828-- Reading syms from /workspaces/VolcanicEngine/build/Magma/bin/Editor
---33828-- Reading syms from /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
---33828--   Considering /usr/lib/debug/.build-id/1c/8db5f83bba514f8fd5f1fb6d7be975be1bb855.debug ..
---33828--   .. build-id is valid
---33828-- Reading syms from /usr/libexec/valgrind/memcheck-amd64-linux
---33828--    object doesn't have a dynamic symbol table
---33828-- Scheduler: using generic scheduler lock implementation.
---33828-- Reading suppressions file: /usr/libexec/valgrind/default.supp
-==33828== embedded gdbserver: reading from /tmp/vgdb-pipe-from-vgdb-to-33828-by-root-on-codespaces-53617f
-==33828== embedded gdbserver: writing to   /tmp/vgdb-pipe-to-vgdb-from-33828-by-root-on-codespaces-53617f
-==33828== embedded gdbserver: shared mem   /tmp/vgdb-pipe-shared-mem-vgdb-33828-by-root-on-codespaces-53617f
-==33828== 
-==33828== TO CONTROL THIS PROCESS USING vgdb (which you probably
-==33828== don't want to do, unless you know exactly what you're doing,
-==33828== or are doing some strange experiment):
-==33828==   /usr/bin/vgdb --pid=33828 ...command...
-==33828== 
-==33828== TO DEBUG THIS PROCESS USING GDB: start GDB like this
-==33828==   /path/to/gdb build/Magma/bin/Editor
-==33828== and then give GDB the following command
-==33828==   target remote | /usr/bin/vgdb --pid=33828
-==33828== --pid is optional if only one valgrind process is running
-==33828== 
---33828-- REDIR: 0x4028b00 (ld-linux-x86-64.so.2:strlen) redirected to 0x580c2e1a (???)
---33828-- REDIR: 0x40272b0 (ld-linux-x86-64.so.2:index) redirected to 0x580c2e34 (???)
---33828-- Reading syms from /usr/libexec/valgrind/vgpreload_core-amd64-linux.so
---33828-- Reading syms from /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so
-==33828== WARNING: new redirection conflicts with existing -- ignoring it
---33828--     old: 0x04028b00 (strlen              ) R-> (0000.0) 0x580c2e1a ???
---33828--     new: 0x04028b00 (strlen              ) R-> (2007.0) 0x0484f340 strlen
---33828-- REDIR: 0x40274e0 (ld-linux-x86-64.so.2:strcmp) redirected to 0x4850460 (strcmp)
---33828-- REDIR: 0x4026910 (ld-linux-x86-64.so.2:mempcpy) redirected to 0x4853cd0 (mempcpy)
---33828-- Reading syms from /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.33
---33828-- Reading syms from /usr/lib/x86_64-linux-gnu/libm.so.6
---33828-- Reading syms from /usr/lib/x86_64-linux-gnu/libgcc_s.so.1
---33828-- Reading syms from /usr/lib/x86_64-linux-gnu/libc.so.6
---33828--   Considering /usr/lib/debug/.build-id/42/c84c92e6f98126b3e2230ebfdead22c235b667.debug ..
---33828--   .. build-id is valid
---33828-- REDIR: 0x4028ca0 (ld-linux-x86-64.so.2:strncmp) redirected to 0x484fc90 (strncmp)
---33828-- REDIR: 0x4cad050 (libc.so.6:strnlen) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
---33828-- REDIR: 0x4cad0e0 (libc.so.6:strpbrk) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
---33828-- REDIR: 0x4cab1a0 (libc.so.6:strcmp) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
---33828-- REDIR: 0x4cc43b0 (libc.so.6:wcsnlen) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
---33828-- REDIR: 0x4caa290 (libc.so.6:memset) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
---33828-- REDIR: 0x4cc3b20 (libc.so.6:wcslen) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
---33828-- REDIR: 0x4d2f3c0 (libc.so.6:__memcpy_chk) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
---33828-- REDIR: 0x4caa200 (libc.so.6:memrchr) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
---33828-- REDIR: 0x4cc4350 (libc.so.6:wcsncpy) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
---33828-- REDIR: 0x4ca9720 (libc.so.6:memcpy@@GLIBC_2.14) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
---33828-- REDIR: 0x4cc28e0 (libc.so.6:wcschr) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
---33828-- REDIR: 0x4cab090 (libc.so.6:index) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
---33828-- REDIR: 0x4cad110 (libc.so.6:rindex) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
---33828-- REDIR: 0x4cc2990 (libc.so.6:wcscmp) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
---33828-- REDIR: 0x4caa4b0 (libc.so.6:stpncpy) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
---33828-- REDIR: 0x4cd0eb0 (libc.so.6:wmemchr) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
---33828-- REDIR: 0x4cacef0 (libc.so.6:strncmp) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
---33828-- REDIR: 0x4caa510 (libc.so.6:strcasecmp) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
---33828-- REDIR: 0x4cac310 (libc.so.6:strcspn) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
---33828-- REDIR: 0x4cc38f0 (libc.so.6:wcscpy) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
---33828-- REDIR: 0x4cab020 (libc.so.6:strcat) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
---33828-- REDIR: 0x4cacdf0 (libc.so.6:strncasecmp_l) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
---33828-- REDIR: 0x4cab110 (libc.so.6:strchrnul) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
---33828-- REDIR: 0x4ca9630 (libc.so.6:bcmp) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
---33828-- REDIR: 0x4cac2a0 (libc.so.6:strcpy) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
---33828-- REDIR: 0x4caa5b0 (libc.so.6:strcasecmp_l) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
---33828-- REDIR: 0x4caccc0 (libc.so.6:strlen) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
---33828-- REDIR: 0x4cacf90 (libc.so.6:strncpy) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
---33828-- REDIR: 0x4cd0f30 (libc.so.6:wmemcmp) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
---33828-- REDIR: 0x4d2f4e0 (libc.so.6:__memmove_chk) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
-==33828== WARNING: new redirection conflicts with existing -- ignoring it
---33828--     old: 0x04d809d0 (__memcpy_chk_avx_una) R-> (2030.0) 0x04853dd0 __memcpy_chk
---33828--     new: 0x04d809d0 (__memcpy_chk_avx_una) R-> (2024.0) 0x04853740 __memmove_chk
---33828-- REDIR: 0x4caa440 (libc.so.6:stpcpy) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
---33828-- REDIR: 0x4ca9fc0 (libc.so.6:memmove) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
-==33828== Preferring higher priority redirection:
---33828--     old: 0x04d80a00 (__memcpy_avx_unalign) R-> (2018.0) 0x04851580 __memcpy_avx_unaligned_erms
---33828--     new: 0x04d80a00 (__memcpy_avx_unalign) R-> (2018.1) 0x04852d60 memmove
---33828-- REDIR: 0x4ca95b0 (libc.so.6:memchr) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
---33828-- REDIR: 0x4cad2e0 (libc.so.6:strspn) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
---33828-- REDIR: 0x4caa0e0 (libc.so.6:mempcpy) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
---33828-- REDIR: 0x4cacd50 (libc.so.6:strncasecmp) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
---33828-- REDIR: 0x4cadba0 (libc.so.6:strstr) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
-==33828== WARNING: new redirection conflicts with existing -- ignoring it
---33828--     old: 0x04d809d0 (__memcpy_chk_avx_una) R-> (2030.0) 0x04853dd0 __memcpy_chk
---33828--     new: 0x04d809d0 (__memcpy_chk_avx_una) R-> (2024.0) 0x04853740 __memmove_chk
---33828-- REDIR: 0x4d855f0 (libc.so.6:__strrchr_avx2) redirected to 0x484ed20 (rindex)
---33828-- REDIR: 0x4d83740 (libc.so.6:__strlen_avx2) redirected to 0x484f220 (strlen)
---33828-- REDIR: 0x4d802a0 (libc.so.6:__memcmp_avx2_movbe) redirected to 0x4852480 (bcmp)
---33828-- REDIR: 0x4d84820 (libc.so.6:__strncmp_avx2) redirected to 0x484fab0 (strncmp)
---33828-- REDIR: 0x4ca5650 (libc.so.6:malloc) redirected to 0x48467b0 (malloc)
---33828-- REDIR: 0x4ca67a0 (libc.so.6:calloc) redirected to 0x484d8a0 (calloc)
---33828-- REDIR: 0x4d80a00 (libc.so.6:__memcpy_avx_unaligned_erms) redirected to 0x4852d60 (memmove)
---33828-- REDIR: 0x491e8e0 (libstdc++.so.6:operator new(unsigned long)) redirected to 0x4846f30 (operator new(unsigned long))
---33828-- REDIR: 0x4ca60a0 (libc.so.6:realloc) redirected to 0x484db00 (realloc)
---33828-- REDIR: 0x4d80000 (libc.so.6:__memchr_avx2) redirected to 0x48504e0 (memchr)
---33828-- REDIR: 0x4ca5d30 (libc.so.6:free) redirected to 0x4849820 (free)
---33828-- REDIR: 0x491c8b0 (libstdc++.so.6:operator delete(void*, unsigned long)) redirected to 0x484a530 (operator delete(void*, unsigned long))
---33828-- REDIR: 0x4d81400 (libc.so.6:__memset_avx2_unaligned_erms) redirected to 0x4852c50 (memset)
---33828-- REDIR: 0x4d82f90 (libc.so.6:__strcmp_avx2) redirected to 0x4850360 (strcmp)
---33828-- REDIR: 0x4d82b60 (libc.so.6:__strchr_avx2) redirected to 0x484ef00 (index)
---33828-- REDIR: 0x4d82da0 (libc.so.6:__strchrnul_avx2) redirected to 0x48537b0 (strchrnul)
---33828-- REDIR: 0x4d809c0 (libc.so.6:__mempcpy_avx_unaligned_erms) redirected to 0x48538d0 (mempcpy)
---33828-- REDIR: 0x4d809d0 (libc.so.6:__memcpy_chk_avx_unaligned_erms) redirected to 0x4853dd0 (__memcpy_chk)
---33828-- REDIR: 0x4d816b0 (libc.so.6:__stpcpy_avx2) redirected to 0x48525a0 (stpcpy)
---33828-- Reading syms from /usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
---33828-- Reading syms from /usr/lib/x86_64-linux-gnu/libxcb.so.1.1.0
---33828-- Reading syms from /usr/lib/x86_64-linux-gnu/libXau.so.6.0.0
---33828-- Reading syms from /usr/lib/x86_64-linux-gnu/libXdmcp.so.6.0.0
---33828-- Reading syms from /usr/lib/x86_64-linux-gnu/libbsd.so.0.12.1
---33828-- Reading syms from /usr/lib/x86_64-linux-gnu/libmd.so.0.1.0
---33828-- REDIR: 0x4d2ff90 (libc.so.6:__strcpy_chk) redirected to 0x4853830 (__strcpy_chk)
---33828-- REDIR: 0x4d84e80 (libc.so.6:__strncpy_avx2) redirected to 0x484f4f0 (strncpy)
---33828-- REDIR: 0x4cbfe10 (libc.so.6:__strstr_sse2_unaligned) redirected to 0x4853e40 (strstr)
---33828-- Reading syms from /usr/lib/x86_64-linux-gnu/libXxf86vm.so.1.0.0
---33828-- Reading syms from /usr/lib/x86_64-linux-gnu/libXext.so.6.4.0
---33828-- Reading syms from /usr/lib/x86_64-linux-gnu/libXi.so.6.1.0
---33828-- Reading syms from /usr/lib/x86_64-linux-gnu/libXrandr.so.2.2.0
---33828-- Reading syms from /usr/lib/x86_64-linux-gnu/libXrender.so.1.3.0
---33828-- Reading syms from /usr/lib/x86_64-linux-gnu/libXcursor.so.1.0.2
---33828-- Reading syms from /usr/lib/x86_64-linux-gnu/libXfixes.so.3.1.0
---33828-- Reading syms from /usr/lib/x86_64-linux-gnu/libXinerama.so.1.0.0
---33828-- Reading syms from /usr/lib/x86_64-linux-gnu/libX11-xcb.so.1.0.0
---33828-- REDIR: 0x4d834f0 (libc.so.6:__strcpy_avx2) redirected to 0x484f370 (strcpy)
---33828-- REDIR: 0x4d9ff70 (libc.so.6:__strcspn_sse42) redirected to 0x4854010 (strcspn)
---33828-- REDIR: 0x4da2c10 (libc.so.6:__strspn_sse42) redirected to 0x4854110 (strspn)
---33828-- Reading syms from /usr/lib/x86_64-linux-gnu/libGLX.so.0.0.0
---33828-- Reading syms from /usr/lib/x86_64-linux-gnu/libGLdispatch.so.0.0.0
---33828-- Reading syms from /usr/lib/x86_64-linux-gnu/libGLX_mesa.so.0.0.0
---33828-- Reading syms from /usr/lib/x86_64-linux-gnu/libglapi.so.0.0.0
---33828-- Reading syms from /usr/lib/x86_64-linux-gnu/libgallium-24.2.8-1ubuntu1~24.04.1.so
---33828-- Reading syms from /usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
---33828-- Reading syms from /usr/lib/x86_64-linux-gnu/libxcb-glx.so.0.0.0
---33828-- Reading syms from /usr/lib/x86_64-linux-gnu/libxcb-dri2.so.0.0.0
---33828-- Reading syms from /usr/lib/x86_64-linux-gnu/libxcb-shm.so.0.0.0
---33828-- Reading syms from /usr/lib/x86_64-linux-gnu/libexpat.so.1.9.1
---33828-- Reading syms from /usr/lib/x86_64-linux-gnu/libxshmfence.so.1.0.0
---33828-- Reading syms from /usr/lib/x86_64-linux-gnu/libxcb-randr.so.0.1.0
---33828-- Reading syms from /usr/lib/x86_64-linux-gnu/libxcb-dri3.so.0.1.0
---33828-- Reading syms from /usr/lib/x86_64-linux-gnu/libxcb-present.so.0.0.0
---33828-- Reading syms from /usr/lib/x86_64-linux-gnu/libxcb-sync.so.1.0.0
---33828-- Reading syms from /usr/lib/x86_64-linux-gnu/libxcb-xfixes.so.0.0.0
---33828-- Reading syms from /usr/lib/x86_64-linux-gnu/libLLVM.so.19.1
---33828-- Reading syms from /usr/lib/x86_64-linux-gnu/libz.so.1.3
---33828-- Reading syms from /usr/lib/x86_64-linux-gnu/libzstd.so.1.5.5
---33828-- Reading syms from /usr/lib/x86_64-linux-gnu/libsensors.so.5.0.0
---33828-- Reading syms from /usr/lib/x86_64-linux-gnu/libdrm_radeon.so.1.0.1
---33828-- Reading syms from /usr/lib/x86_64-linux-gnu/libelf-0.190.so
---33828-- Reading syms from /usr/lib/x86_64-linux-gnu/libdrm_amdgpu.so.1.0.0
---33828-- Reading syms from /usr/lib/x86_64-linux-gnu/libdrm_intel.so.1.0.0
---33828-- REDIR: 0x4026bf0 (ld-linux-x86-64.so.2:stpcpy) redirected to 0x4852960 (stpcpy)
---33828-- Reading syms from /usr/lib/x86_64-linux-gnu/libffi.so.8.1.4
---33828-- Reading syms from /usr/lib/x86_64-linux-gnu/libedit.so.2.0.72
---33828-- Reading syms from /usr/lib/x86_64-linux-gnu/libxml2.so.2.9.14
---33828-- Reading syms from /usr/lib/x86_64-linux-gnu/libpciaccess.so.0.11.1
---33828-- Reading syms from /usr/lib/x86_64-linux-gnu/libtinfo.so.6.4
---33828-- Reading syms from /usr/lib/x86_64-linux-gnu/libicuuc.so.74.2
---33828-- Reading syms from /usr/lib/x86_64-linux-gnu/liblzma.so.5.4.5
---33828-- Reading syms from /usr/lib/x86_64-linux-gnu/libicudata.so.74.2
-==33828== WARNING: new redirection conflicts with existing -- ignoring it
---33828--     old: 0x04d809d0 (__memcpy_chk_avx_una) R-> (2030.0) 0x04853dd0 __memcpy_chk
---33828--     new: 0x04d809d0 (__memcpy_chk_avx_una) R-> (2024.0) 0x04853740 __memmove_chk
---33828-- REDIR: 0x4cace90 (libc.so.6:strncat) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
-==33828== WARNING: new redirection conflicts with existing -- ignoring it
---33828--     old: 0x04d809d0 (__memcpy_chk_avx_una) R-> (2030.0) 0x04853dd0 __memcpy_chk
---33828--     new: 0x04d809d0 (__memcpy_chk_avx_una) R-> (2024.0) 0x04853740 __memmove_chk
---33828-- REDIR: 0x491e980 (libstdc++.so.6:operator new(unsigned long, std::align_val_t)) redirected to 0x4847500 (operator new(unsigned long, std::align_val_t))
---33828-- REDIR: 0x491eaa0 (libstdc++.so.6:operator delete(void*, unsigned long, std::align_val_t)) redirected to 0x484aeb0 (operator delete(void*, unsigned long, std::align_val_t))
---33828-- Reading syms from /usr/lib/x86_64-linux-gnu/libvulkan.so.1.3.275
---33828-- REDIR: 0x4d84400 (libc.so.6:__strncat_avx2) redirected to 0x484f0d0 (strncat)
---33828-- Reading syms from /usr/lib/x86_64-linux-gnu/libvulkan_intel_hasvk.so
---33828-- Reading syms from /usr/lib/x86_64-linux-gnu/libwayland-client.so.0.22.0
---33828-- Reading syms from /usr/lib/x86_64-linux-gnu/libvulkan_radeon.so
---33828-- Reading syms from /usr/lib/x86_64-linux-gnu/libvulkan_lvp.so
---33828-- Reading syms from /usr/lib/x86_64-linux-gnu/libvulkan_nouveau.so
---33828-- Reading syms from /usr/lib/x86_64-linux-gnu/libvulkan_intel.so
---33828-- Reading syms from /usr/lib/x86_64-linux-gnu/libvulkan_virtio.so
---33828-- Reading syms from /usr/lib/x86_64-linux-gnu/libVkLayer_MESA_device_select.so
---33828-- memcheck GC: 1000 nodes, 208 survivors (20.8%)
---33828-- memcheck GC: 1014 new table size (driftup)
---33828-- memcheck GC: 1014 nodes, 238 survivors (23.5%)
---33828-- memcheck GC: 1029 new table size (driftup)
---33828-- Discarding syms at 0x17107880-0x1710f982 in /usr/lib/x86_64-linux-gnu/libVkLayer_MESA_device_select.so (have_dinfo 1)
---33828-- Discarding syms at 0x1238dfc0-0x128fef52 in /usr/lib/x86_64-linux-gnu/libvulkan_intel_hasvk.so (have_dinfo 1)
---33828-- Discarding syms at 0x1319d180-0x136571d2 in /usr/lib/x86_64-linux-gnu/libvulkan_radeon.so (have_dinfo 1)
---33828-- Discarding syms at 0x13d4c640-0x140f9192 in /usr/lib/x86_64-linux-gnu/libvulkan_lvp.so (have_dinfo 1)
---33828-- Discarding syms at 0x146d47c0-0x14d67db2 in /usr/lib/x86_64-linux-gnu/libvulkan_nouveau.so (have_dinfo 1)
---33828-- Discarding syms at 0x155c3140-0x15cd9c52 in /usr/lib/x86_64-linux-gnu/libvulkan_intel.so (have_dinfo 1)
---33828-- Discarding syms at 0x16be8900-0x16cacc12 in /usr/lib/x86_64-linux-gnu/libvulkan_virtio.so (have_dinfo 1)
---33828-- Discarding syms at 0x13151580-0x13156b84 in /usr/lib/x86_64-linux-gnu/libwayland-client.so.0.22.0 (have_dinfo 1)
---33828-- Discarding syms at 0x122eb740-0x12336b3c in /usr/lib/x86_64-linux-gnu/libvulkan.so.1.3.275 (have_dinfo 1)
---33828-- memcheck GC: 1029 nodes, 202 survivors (19.6%)
---33828-- memcheck GC: 1044 new table size (driftup)
---33828-- REDIR: 0x4ca7430 (libc.so.6:posix_memalign) redirected to 0x484e260 (posix_memalign)
---33828-- REDIR: 0x4d85320 (libc.so.6:__strnlen_avx2) redirected to 0x484f1c0 (strnlen)
---33828-- REDIR: 0x491c8a0 (libstdc++.so.6:operator delete(void*)) redirected to 0x484a080 (operator delete(void*))
---33828-- Reading syms from /usr/lib/x86_64-linux-gnu/libGL.so.1.7.0
---33828-- Discarding syms at 0x16c761e0-0x16c79081 in /usr/lib/x86_64-linux-gnu/libGL.so.1.7.0 (have_dinfo 1)
---33828-- REDIR: 0x4ca6650 (libc.so.6:memalign) redirected to 0x484ddc0 (memalign)
---33828-- memcheck GC: 1044 nodes, 314 survivors (30.1%)
---33828-- memcheck GC: 1059 new table size (driftup)
---33828-- Reading syms from /usr/lib/x86_64-linux-gnu/libGL.so.1.7.0
---33828-- REDIR: 0x491e950 (libstdc++.so.6:operator new[](unsigned long)) redirected to 0x4848550 (operator new[](unsigned long))
---33828-- REDIR: 0x491c8d0 (libstdc++.so.6:operator delete[](void*)) redirected to 0x484bec0 (operator delete[](void*))
---33828-- REDIR: 0x4d838c0 (libc.so.6:__strncasecmp_avx2) redirected to 0x484fdd0 (strncasecmp)
---33828-- memcheck GC: 1059 nodes, 526 survivors (49.7%)
---33828-- memcheck GC: 1074 new table size (driftup)
---33828-- memcheck GC: 1074 nodes, 752 survivors (70.0%)
---33828-- memcheck GC: 1518 new table size (stepup)
---33828-- memcheck GC: 1518 nodes, 876 survivors (57.7%)
---33828-- memcheck GC: 2146 new table size (stepup)
---33828-- memcheck GC: 2146 nodes, 1329 survivors (61.9%)
---33828-- memcheck GC: 3034 new table size (stepup)
---33828-- REDIR: 0x491c8e0 (libstdc++.so.6:operator delete[](void*, unsigned long)) redirected to 0x484c370 (operator delete[](void*, unsigned long))
---33828-- REDIR: 0x491e930 (libstdc++.so.6:operator new(unsigned long, std::nothrow_t const&)) redirected to 0x4847970 (operator new(unsigned long, std::nothrow_t const&))
---33828-- Discarding syms at 0x56c33a0-0x56c9ee9 in /usr/lib/x86_64-linux-gnu/libXrandr.so.2.2.0 (have_dinfo 1)
---33828-- Discarding syms at 0x56ef1a0-0x56efb0e in /usr/lib/x86_64-linux-gnu/libXinerama.so.1.0.0 (have_dinfo 1)
---33828-- Discarding syms at 0x56b14a0-0x56bcb99 in /usr/lib/x86_64-linux-gnu/libXi.so.6.1.0 (have_dinfo 1)
---33828-- Discarding syms at 0x16c761e0-0x16c79081 in /usr/lib/x86_64-linux-gnu/libGL.so.1.7.0 (have_dinfo 1)
---33828-- Discarding syms at 0x5afb700-0x5b15371 in /usr/lib/x86_64-linux-gnu/libGLX.so.0.0.0 (have_dinfo 1)
---33828-- Discarding syms at 0x5b6c2c0-0x5b6e42f in /usr/lib/x86_64-linux-gnu/libGLdispatch.so.0.0.0 (have_dinfo 1)
---33828-- Discarding syms at 0x5bfdec0-0x5c3b9d2 in /usr/lib/x86_64-linux-gnu/libGLX_mesa.so.0.0.0 (have_dinfo 1)
---33828-- Discarding syms at 0x5694240-0x5696a98 in /usr/lib/x86_64-linux-gnu/libXxf86vm.so.1.0.0 (have_dinfo 1)
---33828-- Discarding syms at 0x5d2a380-0x73509a2 in /usr/lib/x86_64-linux-gnu/libgallium-24.2.8-1ubuntu1~24.04.1.so (have_dinfo 1)
---33828-- Discarding syms at 0x56f4040-0x56f411f in /usr/lib/x86_64-linux-gnu/libX11-xcb.so.1.0.0 (have_dinfo 1)
---33828-- Discarding syms at 0x5c61100-0x5c6e759 in /usr/lib/x86_64-linux-gnu/libglapi.so.0.0.0 (have_dinfo 1)
---33828-- Discarding syms at 0x83800a0-0x83882a9 in /usr/lib/x86_64-linux-gnu/libxcb-glx.so.0.0.0 (have_dinfo 1)
---33828-- Discarding syms at 0x83930a0-0x83941f9 in /usr/lib/x86_64-linux-gnu/libxcb-dri2.so.0.0.0 (have_dinfo 1)
---33828-- Discarding syms at 0x83990e0-0x8399b07 in /usr/lib/x86_64-linux-gnu/libxcb-shm.so.0.0.0 (have_dinfo 1)
---33828-- Discarding syms at 0x83a1210-0x83bccf3 in /usr/lib/x86_64-linux-gnu/libexpat.so.1.9.1 (have_dinfo 1)
---33828-- Discarding syms at 0x83c9180-0x83c9450 in /usr/lib/x86_64-linux-gnu/libxshmfence.so.1.0.0 (have_dinfo 1)
---33828-- Discarding syms at 0x83d40c0-0x83d8c57 in /usr/lib/x86_64-linux-gnu/libxcb-randr.so.0.1.0 (have_dinfo 1)
---33828-- Discarding syms at 0x83e00e0-0x83e114c in /usr/lib/x86_64-linux-gnu/libxcb-dri3.so.0.1.0 (have_dinfo 1)
---33828-- Discarding syms at 0x83e60a0-0x83e68ba in /usr/lib/x86_64-linux-gnu/libxcb-present.so.0.0.0 (have_dinfo 1)
---33828-- Discarding syms at 0x83ed100-0x83ef2c6 in /usr/lib/x86_64-linux-gnu/libxcb-sync.so.1.0.0 (have_dinfo 1)
---33828-- Discarding syms at 0x83f60a0-0x83f8789 in /usr/lib/x86_64-linux-gnu/libxcb-xfixes.so.0.0.0 (have_dinfo 1)
---33828-- Discarding syms at 0x1006c5a0-0x10072f38 in /usr/lib/x86_64-linux-gnu/libsensors.so.5.0.0 (have_dinfo 1)
---33828-- Discarding syms at 0x1007b2a0-0x10080b86 in /usr/lib/x86_64-linux-gnu/libdrm_radeon.so.1.0.1 (have_dinfo 1)
---33828-- Discarding syms at 0x1008a700-0x1009ef4f in /usr/lib/x86_64-linux-gnu/libelf-0.190.so (have_dinfo 1)
---33828-- Discarding syms at 0x100a87a0-0x100ad3f1 in /usr/lib/x86_64-linux-gnu/libdrm_amdgpu.so.1.0.0 (have_dinfo 1)
---33828-- Discarding syms at 0x100b5660-0x100caa38 in /usr/lib/x86_64-linux-gnu/libdrm_intel.so.1.0.0 (have_dinfo 1)
---33828-- Discarding syms at 0x8363760-0x836e771 in /usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0 (have_dinfo 1)
---33828-- Discarding syms at 0x103005c0-0x10304980 in /usr/lib/x86_64-linux-gnu/libpciaccess.so.0.11.1 (have_dinfo 1)
-==33828== 
-==33828== HEAP SUMMARY:
-==33828==     in use at exit: 263,414 bytes in 3,413 blocks
-==33828==   total heap usage: 157,972 allocs, 154,559 frees, 1,160,191,115 bytes allocated
-==33828== 
-==33828== Searching for pointers to 3,413 not-freed blocks
-==33828== Checked 12,369,264 bytes
-==33828== 
-==33828== 112 (56 direct, 56 indirect) bytes in 1 blocks are definitely lost in loss record 2,535 of 2,609
-==33828==    at 0x484D953: calloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
-==33828==    by 0x69AEF7D: ???
-==33828==    by 0x644CC23: ???
-==33828==    by 0x6435560: ???
-==33828==    by 0x6435747: ???
-==33828==    by 0x63E279E: ???
-==33828==    by 0x63E5551: ???
-==33828==    by 0x63E0054: ???
-==33828==    by 0x638702F: ???
-==33828==    by 0x63C9C4B: ???
-==33828==    by 0x63C56D7: ???
-==33828==    by 0x63565F2: ???
-==33828== 
-==33828== LEAK SUMMARY:
-==33828==    definitely lost: 56 bytes in 1 blocks
-==33828==    indirectly lost: 56 bytes in 1 blocks
-==33828==      possibly lost: 0 bytes in 0 blocks
-==33828==    still reachable: 263,302 bytes in 3,411 blocks
-==33828==         suppressed: 0 bytes in 0 blocks
-==33828== Reachable blocks (those to which a pointer was found) are not shown.
-==33828== To see them, rerun with: --leak-check=full --show-leak-kinds=all
-==33828== 
-==33828== ERROR SUMMARY: 1 errors from 1 contexts (suppressed: 0 from 0)
+==62978== Memcheck, a memory error detector
+==62978== Copyright (C) 2002-2022, and GNU GPL'd, by Julian Seward et al.
+==62978== Using Valgrind-3.22.0-bd4db67b1d-20231031 and LibVEX; rerun with -h for copyright info
+==62978== Command: build/Sandbox/bin/Sandbox --project Cube
+==62978== Parent PID: 866
+==62978== 
+--62978-- 
+--62978-- Valgrind options:
+--62978--    --leak-check=full
+--62978--    --show-leak-kinds=definite
+--62978--    --track-origins=yes
+--62978--    --verbose
+--62978--    --log-file=valgrind-out.txt
+--62978-- Contents of /proc/version:
+--62978--   Linux version 6.8.0-1021-azure (buildd@lcy02-amd64-045) (x86_64-linux-gnu-gcc-11 (Ubuntu 11.4.0-1ubuntu1~22.04) 11.4.0, GNU ld (GNU Binutils for Ubuntu) 2.38) #25~22.04.1-Ubuntu SMP Thu Jan 16 21:37:09 UTC 2025
+--62978-- 
+--62978-- Arch and hwcaps: AMD64, LittleEndian, amd64-cx16-lzcnt-rdtscp-sse3-ssse3-avx-avx2-bmi-f16c-rdrand-rdseed
+--62978-- Page sizes: currently 4096, max supported 4096
+--62978-- Valgrind library directory: /usr/libexec/valgrind
+--62978-- Reading syms from /workspaces/VolcanicEngine/build/Sandbox/bin/Sandbox
+--62978-- Reading syms from /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+--62978--   Considering /usr/lib/debug/.build-id/1c/8db5f83bba514f8fd5f1fb6d7be975be1bb855.debug ..
+--62978--   .. build-id is valid
+--62978-- Reading syms from /usr/libexec/valgrind/memcheck-amd64-linux
+--62978--    object doesn't have a dynamic symbol table
+--62978-- Scheduler: using generic scheduler lock implementation.
+--62978-- Reading suppressions file: /usr/libexec/valgrind/default.supp
+==62978== embedded gdbserver: reading from /tmp/vgdb-pipe-from-vgdb-to-62978-by-root-on-codespaces-53617f
+==62978== embedded gdbserver: writing to   /tmp/vgdb-pipe-to-vgdb-from-62978-by-root-on-codespaces-53617f
+==62978== embedded gdbserver: shared mem   /tmp/vgdb-pipe-shared-mem-vgdb-62978-by-root-on-codespaces-53617f
+==62978== 
+==62978== TO CONTROL THIS PROCESS USING vgdb (which you probably
+==62978== don't want to do, unless you know exactly what you're doing,
+==62978== or are doing some strange experiment):
+==62978==   /usr/bin/vgdb --pid=62978 ...command...
+==62978== 
+==62978== TO DEBUG THIS PROCESS USING GDB: start GDB like this
+==62978==   /path/to/gdb build/Sandbox/bin/Sandbox
+==62978== and then give GDB the following command
+==62978==   target remote | /usr/bin/vgdb --pid=62978
+==62978== --pid is optional if only one valgrind process is running
+==62978== 
+--62978-- REDIR: 0x4028b00 (ld-linux-x86-64.so.2:strlen) redirected to 0x580c2e1a (???)
+--62978-- REDIR: 0x40272b0 (ld-linux-x86-64.so.2:index) redirected to 0x580c2e34 (???)
+--62978-- Reading syms from /usr/libexec/valgrind/vgpreload_core-amd64-linux.so
+--62978-- Reading syms from /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so
+==62978== WARNING: new redirection conflicts with existing -- ignoring it
+--62978--     old: 0x04028b00 (strlen              ) R-> (0000.0) 0x580c2e1a ???
+--62978--     new: 0x04028b00 (strlen              ) R-> (2007.0) 0x0484f340 strlen
+--62978-- REDIR: 0x40274e0 (ld-linux-x86-64.so.2:strcmp) redirected to 0x4850460 (strcmp)
+--62978-- REDIR: 0x4026910 (ld-linux-x86-64.so.2:mempcpy) redirected to 0x4853cd0 (mempcpy)
+--62978-- Reading syms from /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.33
+--62978-- Reading syms from /usr/lib/x86_64-linux-gnu/libm.so.6
+--62978-- Reading syms from /usr/lib/x86_64-linux-gnu/libgcc_s.so.1
+--62978-- Reading syms from /usr/lib/x86_64-linux-gnu/libc.so.6
+--62978--   Considering /usr/lib/debug/.build-id/42/c84c92e6f98126b3e2230ebfdead22c235b667.debug ..
+--62978--   .. build-id is valid
+--62978-- REDIR: 0x4028ca0 (ld-linux-x86-64.so.2:strncmp) redirected to 0x484fc90 (strncmp)
+--62978-- REDIR: 0x4cad050 (libc.so.6:strnlen) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
+--62978-- REDIR: 0x4cad0e0 (libc.so.6:strpbrk) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
+--62978-- REDIR: 0x4cab1a0 (libc.so.6:strcmp) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
+--62978-- REDIR: 0x4cc43b0 (libc.so.6:wcsnlen) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
+--62978-- REDIR: 0x4caa290 (libc.so.6:memset) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
+--62978-- REDIR: 0x4cc3b20 (libc.so.6:wcslen) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
+--62978-- REDIR: 0x4d2f3c0 (libc.so.6:__memcpy_chk) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
+--62978-- REDIR: 0x4caa200 (libc.so.6:memrchr) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
+--62978-- REDIR: 0x4cc4350 (libc.so.6:wcsncpy) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
+--62978-- REDIR: 0x4ca9720 (libc.so.6:memcpy@@GLIBC_2.14) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
+--62978-- REDIR: 0x4cc28e0 (libc.so.6:wcschr) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
+--62978-- REDIR: 0x4cab090 (libc.so.6:index) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
+--62978-- REDIR: 0x4cad110 (libc.so.6:rindex) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
+--62978-- REDIR: 0x4cc2990 (libc.so.6:wcscmp) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
+--62978-- REDIR: 0x4caa4b0 (libc.so.6:stpncpy) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
+--62978-- REDIR: 0x4cd0eb0 (libc.so.6:wmemchr) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
+--62978-- REDIR: 0x4cacef0 (libc.so.6:strncmp) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
+--62978-- REDIR: 0x4caa510 (libc.so.6:strcasecmp) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
+--62978-- REDIR: 0x4cac310 (libc.so.6:strcspn) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
+--62978-- REDIR: 0x4cc38f0 (libc.so.6:wcscpy) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
+--62978-- REDIR: 0x4cab020 (libc.so.6:strcat) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
+--62978-- REDIR: 0x4cacdf0 (libc.so.6:strncasecmp_l) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
+--62978-- REDIR: 0x4cab110 (libc.so.6:strchrnul) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
+--62978-- REDIR: 0x4ca9630 (libc.so.6:bcmp) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
+--62978-- REDIR: 0x4cac2a0 (libc.so.6:strcpy) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
+--62978-- REDIR: 0x4caa5b0 (libc.so.6:strcasecmp_l) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
+--62978-- REDIR: 0x4caccc0 (libc.so.6:strlen) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
+--62978-- REDIR: 0x4cacf90 (libc.so.6:strncpy) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
+--62978-- REDIR: 0x4cd0f30 (libc.so.6:wmemcmp) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
+--62978-- REDIR: 0x4d2f4e0 (libc.so.6:__memmove_chk) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
+==62978== WARNING: new redirection conflicts with existing -- ignoring it
+--62978--     old: 0x04d809d0 (__memcpy_chk_avx_una) R-> (2030.0) 0x04853dd0 __memcpy_chk
+--62978--     new: 0x04d809d0 (__memcpy_chk_avx_una) R-> (2024.0) 0x04853740 __memmove_chk
+--62978-- REDIR: 0x4caa440 (libc.so.6:stpcpy) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
+--62978-- REDIR: 0x4ca9fc0 (libc.so.6:memmove) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
+==62978== Preferring higher priority redirection:
+--62978--     old: 0x04d80a00 (__memcpy_avx_unalign) R-> (2018.0) 0x04851580 __memcpy_avx_unaligned_erms
+--62978--     new: 0x04d80a00 (__memcpy_avx_unalign) R-> (2018.1) 0x04852d60 memmove
+--62978-- REDIR: 0x4ca95b0 (libc.so.6:memchr) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
+--62978-- REDIR: 0x4cad2e0 (libc.so.6:strspn) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
+--62978-- REDIR: 0x4caa0e0 (libc.so.6:mempcpy) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
+--62978-- REDIR: 0x4cacd50 (libc.so.6:strncasecmp) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
+--62978-- REDIR: 0x4cadba0 (libc.so.6:strstr) redirected to 0x483d1c0 (_vgnU_ifunc_wrapper)
+==62978== WARNING: new redirection conflicts with existing -- ignoring it
+--62978--     old: 0x04d809d0 (__memcpy_chk_avx_una) R-> (2030.0) 0x04853dd0 __memcpy_chk
+--62978--     new: 0x04d809d0 (__memcpy_chk_avx_una) R-> (2024.0) 0x04853740 __memmove_chk
+--62978-- REDIR: 0x4d855f0 (libc.so.6:__strrchr_avx2) redirected to 0x484ed20 (rindex)
+--62978-- REDIR: 0x4d83740 (libc.so.6:__strlen_avx2) redirected to 0x484f220 (strlen)
+--62978-- REDIR: 0x4d802a0 (libc.so.6:__memcmp_avx2_movbe) redirected to 0x4852480 (bcmp)
+--62978-- REDIR: 0x4d84820 (libc.so.6:__strncmp_avx2) redirected to 0x484fab0 (strncmp)
+--62978-- REDIR: 0x4ca5650 (libc.so.6:malloc) redirected to 0x48467b0 (malloc)
+--62978-- REDIR: 0x4d80a00 (libc.so.6:__memcpy_avx_unaligned_erms) redirected to 0x4852d60 (memmove)
+--62978-- REDIR: 0x4ca67a0 (libc.so.6:calloc) redirected to 0x484d8a0 (calloc)
+--62978-- REDIR: 0x491e8e0 (libstdc++.so.6:operator new(unsigned long)) redirected to 0x4846f30 (operator new(unsigned long))
+--62978-- REDIR: 0x4ca60a0 (libc.so.6:realloc) redirected to 0x484db00 (realloc)
+--62978-- REDIR: 0x4d80000 (libc.so.6:__memchr_avx2) redirected to 0x48504e0 (memchr)
+--62978-- REDIR: 0x4ca5d30 (libc.so.6:free) redirected to 0x4849820 (free)
+--62978-- REDIR: 0x491c8b0 (libstdc++.so.6:operator delete(void*, unsigned long)) redirected to 0x484a530 (operator delete(void*, unsigned long))
+--62978-- REDIR: 0x4d81400 (libc.so.6:__memset_avx2_unaligned_erms) redirected to 0x4852c50 (memset)
+--62978-- REDIR: 0x4d82f90 (libc.so.6:__strcmp_avx2) redirected to 0x4850360 (strcmp)
+--62978-- REDIR: 0x4d82b60 (libc.so.6:__strchr_avx2) redirected to 0x484ef00 (index)
+--62978-- REDIR: 0x4d82da0 (libc.so.6:__strchrnul_avx2) redirected to 0x48537b0 (strchrnul)
+--62978-- REDIR: 0x4d809c0 (libc.so.6:__mempcpy_avx_unaligned_erms) redirected to 0x48538d0 (mempcpy)
+--62978-- REDIR: 0x4d809d0 (libc.so.6:__memcpy_chk_avx_unaligned_erms) redirected to 0x4853dd0 (__memcpy_chk)
+--62978-- REDIR: 0x4d816b0 (libc.so.6:__stpcpy_avx2) redirected to 0x48525a0 (stpcpy)
+--62978-- Reading syms from /usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+--62978-- Reading syms from /usr/lib/x86_64-linux-gnu/libxcb.so.1.1.0
+--62978-- Reading syms from /usr/lib/x86_64-linux-gnu/libXau.so.6.0.0
+--62978-- Reading syms from /usr/lib/x86_64-linux-gnu/libXdmcp.so.6.0.0
+--62978-- Reading syms from /usr/lib/x86_64-linux-gnu/libbsd.so.0.12.1
+--62978-- Reading syms from /usr/lib/x86_64-linux-gnu/libmd.so.0.1.0
+--62978-- REDIR: 0x4d2ff90 (libc.so.6:__strcpy_chk) redirected to 0x4853830 (__strcpy_chk)
+--62978-- REDIR: 0x4d84e80 (libc.so.6:__strncpy_avx2) redirected to 0x484f4f0 (strncpy)
+--62978-- REDIR: 0x4cbfe10 (libc.so.6:__strstr_sse2_unaligned) redirected to 0x4853e40 (strstr)
+--62978-- Reading syms from /usr/lib/x86_64-linux-gnu/libXxf86vm.so.1.0.0
+--62978-- Reading syms from /usr/lib/x86_64-linux-gnu/libXext.so.6.4.0
+--62978-- Reading syms from /usr/lib/x86_64-linux-gnu/libXi.so.6.1.0
+--62978-- Reading syms from /usr/lib/x86_64-linux-gnu/libXrandr.so.2.2.0
+--62978-- Reading syms from /usr/lib/x86_64-linux-gnu/libXrender.so.1.3.0
+--62978-- Reading syms from /usr/lib/x86_64-linux-gnu/libXcursor.so.1.0.2
+--62978-- Reading syms from /usr/lib/x86_64-linux-gnu/libXfixes.so.3.1.0
+--62978-- Reading syms from /usr/lib/x86_64-linux-gnu/libXinerama.so.1.0.0
+--62978-- Reading syms from /usr/lib/x86_64-linux-gnu/libX11-xcb.so.1.0.0
+--62978-- REDIR: 0x4d834f0 (libc.so.6:__strcpy_avx2) redirected to 0x484f370 (strcpy)
+--62978-- REDIR: 0x4d9ff70 (libc.so.6:__strcspn_sse42) redirected to 0x4854010 (strcspn)
+--62978-- REDIR: 0x4da2c10 (libc.so.6:__strspn_sse42) redirected to 0x4854110 (strspn)
+--62978-- Reading syms from /usr/lib/x86_64-linux-gnu/libGLX.so.0.0.0
+--62978-- Reading syms from /usr/lib/x86_64-linux-gnu/libGLdispatch.so.0.0.0
+--62978-- Reading syms from /usr/lib/x86_64-linux-gnu/libGLX_mesa.so.0.0.0
+--62978-- Reading syms from /usr/lib/x86_64-linux-gnu/libglapi.so.0.0.0
+--62978-- Reading syms from /usr/lib/x86_64-linux-gnu/libgallium-24.2.8-1ubuntu1~24.04.1.so
+--62978-- Reading syms from /usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+--62978-- Reading syms from /usr/lib/x86_64-linux-gnu/libxcb-glx.so.0.0.0
+--62978-- Reading syms from /usr/lib/x86_64-linux-gnu/libxcb-dri2.so.0.0.0
+--62978-- Reading syms from /usr/lib/x86_64-linux-gnu/libxcb-shm.so.0.0.0
+--62978-- Reading syms from /usr/lib/x86_64-linux-gnu/libexpat.so.1.9.1
+--62978-- Reading syms from /usr/lib/x86_64-linux-gnu/libxshmfence.so.1.0.0
+--62978-- Reading syms from /usr/lib/x86_64-linux-gnu/libxcb-randr.so.0.1.0
+--62978-- Reading syms from /usr/lib/x86_64-linux-gnu/libxcb-dri3.so.0.1.0
+--62978-- Reading syms from /usr/lib/x86_64-linux-gnu/libxcb-present.so.0.0.0
+--62978-- Reading syms from /usr/lib/x86_64-linux-gnu/libxcb-sync.so.1.0.0
+--62978-- Reading syms from /usr/lib/x86_64-linux-gnu/libxcb-xfixes.so.0.0.0
+--62978-- Reading syms from /usr/lib/x86_64-linux-gnu/libLLVM.so.19.1
+==62978== 
+==62978== Process terminating with default action of signal 2 (SIGINT)
+==62978==    at 0x4025B6F: __open_nocancel (open64_nocancel.c:39)
+==62978==    by 0x4005CBB: open_verify.constprop.0 (dl-load.c:1623)
+==62978==    by 0x4006299: open_path (dl-load.c:1863)
+==62978==    by 0x40095F2: _dl_map_object (dl-load.c:2100)
+==62978==    by 0x4002A2C: openaux (dl-deps.c:64)
+==62978==    by 0x400151B: _dl_catch_exception (dl-catch.c:237)
+==62978==    by 0x4002E66: _dl_map_object_deps (dl-deps.c:232)
+==62978==    by 0x400D944: dl_open_worker_begin (dl-open.c:638)
+==62978==    by 0x400151B: _dl_catch_exception (dl-catch.c:237)
+==62978==    by 0x400CD1F: dl_open_worker (dl-open.c:803)
+==62978==    by 0x400151B: _dl_catch_exception (dl-catch.c:237)
+==62978==    by 0x400D163: _dl_open (dl-open.c:905)
+==62978== 
+==62978== HEAP SUMMARY:
+==62978==     in use at exit: 760,324 bytes in 1,167 blocks
+==62978==   total heap usage: 22,355 allocs, 21,188 frees, 4,155,674 bytes allocated
+==62978== 
+==62978== Searching for pointers to 1,167 not-freed blocks
+==62978== Checked 10,923,248 bytes
+==62978== 
+==62978== LEAK SUMMARY:
+==62978==    definitely lost: 0 bytes in 0 blocks
+==62978==    indirectly lost: 0 bytes in 0 blocks
+==62978==      possibly lost: 4,688 bytes in 3 blocks
+==62978==    still reachable: 755,636 bytes in 1,164 blocks
+==62978==         suppressed: 0 bytes in 0 blocks
+==62978== Reachable blocks (those to which a pointer was found) are not shown.
+==62978== To see them, rerun with: --leak-check=full --show-leak-kinds=all
+==62978== 
+==62978== ERROR SUMMARY: 2 errors from 2 contexts (suppressed: 0 from 0)

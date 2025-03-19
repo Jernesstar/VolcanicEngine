@@ -14,12 +14,12 @@ namespace fs = std::filesystem;
 namespace VolcaniCore {
 
 Application::Application(uint32_t width, uint32_t height,
-						 const std::string& title, const Buffer<uint8_t>& icon)
+						 const std::string& title, const ImageData& icon)
 {
+	s_Instance = this;
 	s_Window->Resize(width, height);
 	s_Window->SetIcon(icon);
 	s_Window->SetTitle(title);
-	s_Instance = this;
 }
 
 void Application::Init() {
@@ -93,7 +93,7 @@ void Application::PopDir() {
 }
 
 void Application::SetCurrentDir() {
-	auto env = getenv("VOLC_PATH");
+	char* env = getenv("VOLC_PATH");
 	VOLCANICORE_ASSERT(env);
 
 	s_LibraryPath = env;

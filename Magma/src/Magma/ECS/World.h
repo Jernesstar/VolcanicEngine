@@ -94,6 +94,9 @@ public:
 	template<typename TSystem>
 	TSystem* Get() {
 		auto id = TypeIDGenerator<System<>>::GetID<TSystem>();
+		if(!m_Systems.count(id))
+			return nullptr;
+
 		return (TSystem*)m_Systems[id];
 	}
 

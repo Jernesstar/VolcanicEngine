@@ -193,7 +193,7 @@ void DrawComponent<ScriptComponent>(Entity& entity) {
 	auto& component = entity.Set<ScriptComponent>();
 	ImGui::SeparatorText("ScriptComponent");
 
-	ImGui::Text("Asset ID: %llu", (uint64_t)component.ModuleAsset.ID);
+	ImGui::Text("Asset ID: %lu", (uint64_t)component.ModuleAsset.ID);
 	std::string text = component.ModuleAsset.ID ? "Change Module" : "Set Module";
 	if(ImGui::Button(text.c_str())) {
 
