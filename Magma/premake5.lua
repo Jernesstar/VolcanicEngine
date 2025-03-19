@@ -29,11 +29,11 @@ project "Magma"
         "%{Includes.yaml_cpp}",
         "%{Includes.rapidjson}",
 
+        "%{Includes.imgui}",
         "%{Includes.imgui}/imgui",
         "%{Includes.flecs}",
         "%{Includes.PhysX}",
 
-        "%{Includes.imgui}",
         "%{Includes.angelscript}",
         "%{VendorPaths.angelscript}",
         "%{Includes.soloud}",
@@ -70,7 +70,6 @@ include "Magma/.builddeps/flecs"
 include "Magma/.builddeps/angelscript"
 include "Magma/.builddeps/PhysX"
 include "Magma/.builddeps/soloud"
-include "Magma/.builddeps/rapidjson"
 include "Magma/.builddeps/yaml-cpp"
 
 project "Editor"
@@ -112,6 +111,8 @@ project "Editor"
         "%{Includes.imgui}/imgui",
         "%{Includes.yaml_cpp}",
         "%{Includes.rapidjson}",
+
+        "%{Includes.filewatch}",
 
         "%{Includes.flecs}",
         "%{Includes.rapidjson}",

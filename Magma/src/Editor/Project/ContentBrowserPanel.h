@@ -8,16 +8,14 @@
 
 namespace fs = std::filesystem;
 
-using namespace VolcaniCore;
-
 namespace Magma {
 
 class ContentBrowserPanel : public Panel  {
 public:
 	ContentBrowserPanel(const std::string& path);
-	~ContentBrowserPanel() = default;
+	~ContentBrowserPanel();
 
-	void Update(TimeStep ts) override;
+	void Update(VolcaniCore::TimeStep ts) override;
 	void Draw() override;
 
 private:

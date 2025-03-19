@@ -11,6 +11,8 @@
 
 namespace fs = std::filesystem;
 
+using namespace VolcaniCore;
+
 namespace Magma {
 
 AssetEditorPanel::AssetEditorPanel()

@@ -23,7 +23,7 @@ public:
 	template<typename TComponent>
 	bool IsFocused(Entity& entity);
 
-	void Update(TimeStep ts) override;
+	void Update(VolcaniCore::TimeStep ts) override;
 	void Draw() override;
 
 private:

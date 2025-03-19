@@ -34,13 +34,13 @@ namespace fs = std::filesystem;
 
 namespace Lava {
 
-static Ref<ScriptModule> s_AppModule;
-static Ref<ScriptObject> s_AppObject;
+static Ref<ScriptModule> s_AppModule = nullptr;
+static Ref<ScriptObject> s_AppObject = nullptr;
 
-static bool s_ShouldSwitchScreen;
-static bool s_ShouldPushScreen;
-static bool s_ShouldPopScreen;
-static std::string s_NewScreenName;
+static bool s_ShouldSwitchScreen = false;
+static bool s_ShouldPushScreen = false;
+static bool s_ShouldPopScreen = false;
+static std::string s_NewScreenName = "";
 
 struct RuntimeScreen {
 	Ref<Scene> World;

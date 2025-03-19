@@ -45,3 +45,6 @@
 [submodule "Magma/vendor/ImGuizmo"]
 	path = Magma/vendor/ImGuizmo
 	url = https://github.com/CedricGuillemet/ImGuizmo.git
+[submodule "Magma/vendor/filewatch"]
+	path = Magma/vendor/filewatch
+	url = https://github.com/ThomasMonkman/filewatch.git

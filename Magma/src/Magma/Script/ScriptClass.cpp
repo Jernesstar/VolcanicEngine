@@ -2,6 +2,8 @@
 
 #include "ScriptModule.h"
 
+using namespace VolcaniCore;
+
 namespace Magma::Script {
 
 ScriptClass::ScriptClass(const std::string& name, asITypeInfo* type)
@@ -16,12 +18,6 @@ ScriptClass::ScriptClass(const std::string& name, asITypeInfo* type)
 		auto method = m_Type->GetMethodByIndex(i);
 		m_Functions[method->GetName()] = method;
 	}
-
-	// for(uint32_t i = 0; i < m_Type->GetPropertyCount(); i++) {
-	// 	char name[20];
-	// 	// m_Type->GetProperty(i, (const char**)&name);
-	// 	m_Fields.Add(name);
-	// }
 }
 
 void ScriptClass::SetInstanceMethod(const List<std::string>& args) {

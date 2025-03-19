@@ -14,8 +14,8 @@ public:
 
 	Asset Add(const std::string& path, AssetType type);
 
-	std::string GetPath(UUID id);
-	UUID GetFromPath(const std::string& path);
+	std::string GetPath(VolcaniCore::UUID id);
+	VolcaniCore::UUID GetFromPath(const std::string& path);
 
 	const Map<Asset, bool>& GetRegistry() const { return m_AssetRegistry; }
 
@@ -27,7 +27,7 @@ public:
 
 public:
 	std::string m_Path;
-	Map<UUID, std::string> m_Paths;
+	Map<VolcaniCore::UUID, std::string> m_Paths;
 };
 
 }

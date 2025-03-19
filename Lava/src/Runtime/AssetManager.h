@@ -2,6 +2,7 @@
 
 #include <Magma/Core/AssetManager.h>
 
+using namespace VolcaniCore;
 using namespace Magma;
 
 namespace Lava {

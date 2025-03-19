@@ -12,7 +12,7 @@ public:
 	AssetEditorPanel();
 	~AssetEditorPanel() = default;
 
-	void Update(TimeStep ts) override;
+	void Update(VolcaniCore::TimeStep ts) override;
 	void Draw() override;
 
 	void Select(Asset asset) {

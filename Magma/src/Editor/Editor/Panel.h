@@ -4,13 +4,11 @@
 #include <VolcaniCore/Core/Template.h>
 #include <VolcaniCore/Core/Time.h>
 
-using namespace VolcaniCore;
-
 namespace Magma {
 
 class Tab;
 
-class Panel : public Derivable<Panel> {
+class Panel : public VolcaniCore::Derivable<Panel> {
 public:
 	const std::string Name;
 	bool Open = false;
@@ -20,7 +18,7 @@ public:
 		: Name(name) { }
 	~Panel() = default;
 
-	virtual void Update(TimeStep ts) { }
+	virtual void Update(VolcaniCore::TimeStep ts) { }
 	virtual void Draw() { }
 
 	void SetTab(Tab* tab) { m_Tab = tab; }

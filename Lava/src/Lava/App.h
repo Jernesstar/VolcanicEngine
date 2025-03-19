@@ -61,6 +61,7 @@ public:
 
 public:
 	bool ChangeScreen;
+	bool RenderUI;
 	bool Running;
 
 	Func<void, Ref<ScriptModule>> AppLoad;

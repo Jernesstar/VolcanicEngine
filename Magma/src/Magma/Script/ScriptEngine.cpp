@@ -7,6 +7,8 @@
 
 #include <VolcaniCore/Core/List.h>
 
+using namespace VolcaniCore;
+
 namespace Magma::Script {
 
 static asIScriptEngine* s_Engine;

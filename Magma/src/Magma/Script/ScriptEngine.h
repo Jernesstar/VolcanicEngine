@@ -4,8 +4,6 @@
 
 #include <VolcaniCore/Core/Defines.h>
 
-using namespace VolcaniCore;
-
 namespace Magma::Script {
 
 struct InterfaceBuilder {

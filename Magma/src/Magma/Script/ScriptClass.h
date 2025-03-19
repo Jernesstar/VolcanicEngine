@@ -4,8 +4,6 @@
 
 #include "ScriptObject.h"
 
-using namespace VolcaniCore;
-
 namespace Magma::Script {
 
 class ScriptModule;
@@ -18,7 +16,7 @@ public:
 	ScriptClass(const std::string& name, asITypeInfo* type);
 	~ScriptClass() = default;
 
-	void SetInstanceMethod(const List<std::string>& args);
+	void SetInstanceMethod(const VolcaniCore::List<std::string>& args);
 
 	template<typename... Args>
 	Ref<ScriptObject> Instantiate(Args&&... args) const {
@@ -53,7 +51,6 @@ private:
 	asITypeInfo* m_Type;
 	asIScriptFunction* m_Factory;
 	Map<std::string, asIScriptFunction*> m_Functions;
-	List<std::string> m_Fields;
 
 	ScriptModule* m_Module;
 

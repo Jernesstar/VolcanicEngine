@@ -7,8 +7,6 @@
 #include "ScriptObject.h"
 #include "ScriptClass.h"
 
-using namespace VolcaniCore;
-
 namespace Magma::Script {
 
 class ScriptModule {

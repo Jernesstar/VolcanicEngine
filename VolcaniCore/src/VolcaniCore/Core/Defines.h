@@ -23,8 +23,6 @@
 	#define MAGMA_PHYSICS
 #endif
 
-namespace VolcaniCore {
-
 template<typename T>
 using Ptr = std::unique_ptr<T>;
 
@@ -49,5 +47,3 @@ using Pair = std::pair<TValue1, TValue2>;
 
 template<typename TReturn, typename ...Args>
 using Func = std::function<TReturn(Args...)>;
-
-}

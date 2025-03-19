@@ -9,8 +9,6 @@
 
 #include <Magma/Script/ScriptObject.h>
 
-using namespace VolcaniCore;
-
 namespace Magma::UI {
 
 class UIPage;
@@ -38,7 +36,7 @@ enum class UIElementType {
 
 using UINode = std::pair<UIElementType, uint32_t>;
 
-class UIElement : public Derivable<UIElement> {
+class UIElement : public VolcaniCore::Derivable<UIElement> {
 public:
 	uint32_t Width = 0;
 	uint32_t Height = 0;
@@ -49,9 +47,9 @@ public:
 	glm::vec4 Color = glm::vec4(0.0f);
 	// TODO(Implement): Border
 	// BorderElement Border;
-	List<UINode> Children;
+	VolcaniCore::List<UINode> Children;
 	std::string Class = "";
-	UUID ModuleID = 0;
+	VolcaniCore::UUID ModuleID = 0;
 	Ref<Script::ScriptObject> ScriptInstance = nullptr;
 
 public:
@@ -88,7 +86,7 @@ public:
 	UIElement* GetParent() const;
 	UIElement* GetChild(const UINode& node) const;
 	UIElement* GetChild(const std::string& id) const;
-	List<UIElement*> GetChildren() const;
+	VolcaniCore::List<UIElement*> GetChildren() const;
 
 protected:
 	const UIElementType m_Type;

@@ -6,7 +6,6 @@
 
 #include <Magma/Audio/Sound.h>
 
-using namespace VolcaniCore;
 using namespace Magma::Audio;
 
 namespace Magma {
@@ -20,16 +19,18 @@ struct MaterialPaths {
 
 class AssetImporter {
 public:
-	static ImageData GetImageData(const std::string& path, bool flip = false);
+	static VolcaniCore::ImageData GetImageData(const std::string& path,
+		bool flip = false);
 
-	static Ref<Mesh> GetMesh(const std::string& path);
+	static Ref<VolcaniCore::Mesh> GetMesh(const std::string& path);
 	static void GetMeshData(const std::string& path,
-		List<SubMesh>& mesh, List<MaterialPaths>& materialPaths);
+		VolcaniCore::List<VolcaniCore::SubMesh>& mesh,
+		VolcaniCore::List<MaterialPaths>& materialPaths);
 
-	static Ref<Texture> GetTexture(const std::string& path);
-	static Ref<Cubemap> GetCubemap(const std::string& path);
+	static Ref<VolcaniCore::Texture> GetTexture(const std::string& path);
+	static Ref<VolcaniCore::Cubemap> GetCubemap(const std::string& path);
 
-	static Buffer<float> GetAudioData(const std::string& path);
+	static VolcaniCore::Buffer<float> GetAudioData(const std::string& path);
 	static Ref<Sound> GetAudio(const std::string& path);
 };
 

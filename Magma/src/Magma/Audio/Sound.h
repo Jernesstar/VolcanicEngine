@@ -6,8 +6,6 @@
 #include <VolcaniCore/Core/Defines.h>
 #include <VolcaniCore/Core/Buffer.h>
 
-using namespace VolcaniCore;
-
 namespace Magma::Audio {
 
 class Sound {

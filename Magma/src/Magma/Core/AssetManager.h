@@ -12,7 +12,6 @@
 #include <Magma/Script/ScriptModule.h>
 #include <Magma/Script/ScriptClass.h>
 
-using namespace VolcaniCore;
 using namespace Magma::Audio;
 using namespace Magma::Script;
 
@@ -30,7 +29,7 @@ enum class AssetType {
 };
 
 struct Asset {
-	UUID ID = 0;
+	VolcaniCore::UUID ID = 0;
 	AssetType Type = AssetType::None;
 	bool Primary = true;
 
@@ -91,26 +90,26 @@ public:
 
 protected:
 	Map<Asset, bool> m_AssetRegistry;
-	Map<UUID, List<Asset>> m_References;
+	Map<VolcaniCore::UUID, VolcaniCore::List<Asset>> m_References;
 
-	Map<UUID, Ref<Mesh>> m_MeshAssets;
-	Map<UUID, Ref<Texture>> m_TextureAssets;
-	Map<UUID, Ref<Cubemap>> m_CubemapAssets;
-	Map<UUID, Ref<Sound>> m_AudioAssets;
-	Map<UUID, Ref<ScriptModule>> m_ScriptAssets;
+	Map<VolcaniCore::UUID, Ref<VolcaniCore::Mesh>> m_MeshAssets;
+	Map<VolcaniCore::UUID, Ref<VolcaniCore::Texture>> m_TextureAssets;
+	Map<VolcaniCore::UUID, Ref<VolcaniCore::Cubemap>> m_CubemapAssets;
+	Map<VolcaniCore::UUID, Ref<Sound>> m_AudioAssets;
+	Map<VolcaniCore::UUID, Ref<ScriptModule>> m_ScriptAssets;
 
 private:
-	Ref<Mesh> GetMesh(Asset asset) {
+	Ref<VolcaniCore::Mesh> GetMesh(Asset asset) {
 		if(!m_MeshAssets.count(asset.ID))
 			return nullptr;
 		return m_MeshAssets[asset.ID];
 	}
-	Ref<Texture> GetTexture(Asset asset) {
+	Ref<VolcaniCore::Texture> GetTexture(Asset asset) {
 		if(!m_TextureAssets.count(asset.ID))
 			return nullptr;
 		return m_TextureAssets[asset.ID];
 	}
-	Ref<Cubemap> GetCubemap(Asset asset) {
+	Ref<VolcaniCore::Cubemap> GetCubemap(Asset asset) {
 		if(!m_CubemapAssets.count(asset.ID))
 			return nullptr;
 		return m_CubemapAssets[asset.ID];
@@ -128,19 +127,19 @@ private:
 };
 
 template<> inline
-Ref<Mesh> AssetManager::Get(Asset asset) {
+Ref<VolcaniCore::Mesh> AssetManager::Get(Asset asset) {
 	VOLCANICORE_ASSERT(asset.Type == AssetType::Mesh);
 	return GetMesh(asset);
 }
 
 template<> inline
-Ref<Texture> AssetManager::Get(Asset asset) {
+Ref<VolcaniCore::Texture> AssetManager::Get(Asset asset) {
 	VOLCANICORE_ASSERT(asset.Type == AssetType::Texture);
 	return GetTexture(asset);
 }
 
 template<> inline
-Ref<Cubemap> AssetManager::Get(Asset asset) {
+Ref<VolcaniCore::Cubemap> AssetManager::Get(Asset asset) {
 	VOLCANICORE_ASSERT(asset.Type == AssetType::Cubemap);
 	return GetCubemap(asset);
 }

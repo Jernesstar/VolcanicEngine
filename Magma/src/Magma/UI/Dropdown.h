@@ -9,7 +9,7 @@ namespace Magma::UI {
 class Dropdown : public UIElement {
 public:
 	uint64_t CurrentItem = 0;
-	List<std::string> Options;
+	VolcaniCore::List<std::string> Options;
 
 public:
 	Dropdown(const std::string& id, UIPage* root)
