@@ -322,25 +322,25 @@ void Editor::NewProject(const std::string& volcPath) {
 	auto rootPath = fs::path(volcPath).parent_path();
 	m_App = CreateRef<Lava::App>(m_Project);
 	m_App->AppLoad =
-		[&](Ref<ScriptModule> script)
+		[rootPath](Ref<ScriptModule> script)
 		{
 			auto scriptPath = rootPath / "Project" / "App" / script->Name;
 			script->Load(scriptPath.string() + ".as");
 		};
 	m_App->ScreenLoad =
-		[&](Ref<ScriptModule> script)
+		[rootPath](Ref<ScriptModule> script)
 		{
 			auto scriptPath = rootPath / "Project" / "Screen" / script->Name;
 			script->Load(scriptPath.string() + ".as");
 		};
 	m_App->SceneLoad =
-		[&](Scene& scene)
+		[rootPath](Scene& scene)
 		{
 			auto scenePath = rootPath / "Visual" / "Scene" / scene.Name;
 			SceneLoader::EditorLoad(scene, scenePath.string() + ".magma.scene");
 		};
 	m_App->UILoad =
-		[&](UIPage& page)
+		[rootPath](UIPage& page)
 		{
 			auto uiPath = rootPath / "Visual" / "UI" / page.Name;
 			UILoader::EditorLoad(page, uiPath.string() + ".magma.ui.json",

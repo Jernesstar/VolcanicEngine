@@ -29,6 +29,17 @@ Scene:
           MeshComponent:
             AssetID: 4186775327602265389
     - Entity:
+        Name: Player
+        ID: 4294967846
+        Components:
+          TransformComponent:
+            Transform:
+              Translation: [7.19999981, -9.19999981, 0]
+              Rotation: [0, 0, 0]
+              Scale: [10, 10, 10]
+          MeshComponent:
+            AssetID: 15277418182178081176
+    - Entity:
         Name: Ball2
         ID: 554
         Components:
@@ -41,17 +52,3 @@ Scene:
               Scale: [1, 1, 1]
           MeshComponent:
             AssetID: 4186775327602265389
-    - Entity:
-        Name: Player
-        ID: 4294967846
-        Components:
-          TransformComponent:
-            Transform:
-              Translation: [7.19999981, -9.19999981, 0]
-              Rotation: [0, 0, 0]
-              Scale: [10, 10, 10]
-          MeshComponent:
-            AssetID: 15277418182178081176
-          ScriptComponent:
-            ModuleID: 0
-            Class: ""

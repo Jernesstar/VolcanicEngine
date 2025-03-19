@@ -263,7 +263,8 @@ void RegisterAssetManager() {
 	auto* engine = ScriptEngine::Get();
 
 	engine->RegisterObjectType("Asset", sizeof(Asset),
-		asOBJ_VALUE | asOBJ_POD | asGetTypeTraits<Asset>());
+		asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_ALLINTS
+		| asGetTypeTraits<Asset>());
 	engine->RegisterObjectMethod("Asset", "uint64 get_ID() const property",
 		asFUNCTION(GetAssetID), asCALL_CDECL_OBJLAST);
 
@@ -432,8 +433,8 @@ void RegisterECS() {
 	engine->RegisterObjectType("ParticleSystemComponent", 0, asOBJ_REF | asOBJ_NOCOUNT);
 
 	engine->RegisterObjectType("Entity", sizeof(Entity),
-		asOBJ_VALUE | asOBJ_APP_CLASS_MORE_CONSTRUCTORS | asOBJ_POD
-		| asGetTypeTraits<Entity>());
+		asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_ALLINTS |
+		asGetTypeTraits<Entity>());
 	engine->RegisterObjectMethod("Entity", "string get_Name() const property",
 		asMETHOD(Entity, GetName), asCALL_THISCALL);
 	engine->RegisterObjectMethod("Entity", "bool get_Alive() const property",

@@ -4,7 +4,7 @@
 #include <imgui/imgui_internal.h>
 #include <imgui/misc/cpp/imgui_stdlib.h>
 
-#include <filewatch/FileWatch.hpp>
+// #include <filewatch/FileWatch.hpp>
 
 #include <VolcaniCore/Core/Application.h>
 #include <VolcaniCore/Core/Log.h>
@@ -19,7 +19,7 @@
 
 namespace Magma {
 
-static List<filewatch::FileWatch<std::string>> s_Watchers;
+// static List<filewatch::FileWatch<std::string>> s_Watchers;
 
 ContentBrowserPanel::ContentBrowserPanel(const std::string& path)
 	: Panel("ContentBrowser"), m_Path(path)
