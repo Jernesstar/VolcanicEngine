@@ -347,10 +347,9 @@ void Editor::NewProject(const std::string& volcPath) {
 				UITab::GetTheme());
 		};
 
-	m_App->Running = false;
 	m_App->ChangeScreen = false;
+	m_App->Running = false;
 	m_App->SetAssetManager(&m_AssetManager);
-	m_App->OnLoad();
 
 	auto themePath = rootPath / "Visual" / "UI" / "theme.magma.ui.json";
 	if(fs::exists(themePath))
@@ -426,6 +425,8 @@ void Editor::ExportProject(const std::string& exportPath) {
 	m_Project.ExportPath = exportPath;
 	m_Project.Save((fs::path(exportPath) / ".volc.proj").string());
 
+	m_App->OnLoad();
+
 	for(auto& screen : m_Project.Screens) {
 		auto mod = CreateRef<ScriptModule>(screen.Name);
 		mod->Load(
@@ -455,6 +456,8 @@ void Editor::ExportProject(const std::string& exportPath) {
 		(fs::path(m_Project.Path) / "Project" / "App" / m_Project.App
 		).string() + ".as");
 	mod->Save((fs::path(exportPath) / ".volc.class").string());
+
+	m_App->OnClose();
 
 	m_AssetManager.RuntimeSave(exportPath);
 

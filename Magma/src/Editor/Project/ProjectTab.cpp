@@ -66,8 +66,7 @@ void ProjectTab::Setup() {
 }
 
 void ProjectTab::Update(TimeStep ts) {
-	if(m_ScreenState != ScreenState::Edit)
-		App::Get()->OnUpdate(ts);
+	// App::Get()->OnUpdate(ts);
 
 	for(auto panel : m_Panels)
 		panel->Update(ts);
@@ -150,6 +149,7 @@ void ProjectTab::RenderButtons() {
 
 void ProjectTab::OnPlay() {
 	m_ScreenState = ScreenState::Play;
+	App::Get()->Running = true;
 	App::Get()->OnLoad();
 }
 
@@ -160,6 +160,7 @@ void ProjectTab::OnPause() {
 
 void ProjectTab::OnStop() {
 	m_ScreenState = ScreenState::Edit;
+	App::Get()->Running = false;
 	App::Get()->OnClose();
 }
 

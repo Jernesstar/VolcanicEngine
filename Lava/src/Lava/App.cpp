@@ -123,14 +123,14 @@ void App::OnLoad() {
 
 	s_AppObject = s_AppModule->GetClass(m_Project.App)->Instantiate();
 	s_AppObject->Call("OnLoad");
-
-	ScreenSet(m_Project.StartScreen);
 }
 
 void App::OnClose() {
 	delete s_Screen;
+	s_Screen = nullptr;
 
-	s_AppObject->Call("OnClose");
+	if(s_AppObject)
+		s_AppObject->Call("OnClose");
 
 	s_AppObject.reset();
 	s_AppModule.reset();
@@ -222,7 +222,7 @@ void App::ScreenSet(const std::string& name) {
 			[name](const Screen& screen) -> bool
 			{
 				return screen.Name == name;
-			});
+			}); 
 	if(!found) {
 		VOLCANICORE_LOG_INFO("Screen '%s' was not found", name.c_str());
 		return;

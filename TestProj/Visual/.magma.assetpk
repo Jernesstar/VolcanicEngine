@@ -1,13 +1,13 @@
 AssetPack:
   Assets:
     - Asset:
-        ID: 15277418182178081176
-        Type: 0
-        Path: Mesh/player/Knight_Golden_Male.obj
-    - Asset:
         ID: 2691709289590626850
         Type: 5
         Path: Script/PlayerController.as
+    - Asset:
+        ID: 15277418182178081176
+        Type: 0
+        Path: Mesh/player/Knight_Golden_Male.obj
     - Asset:
         ID: 16624656892553940704
         Type: 4
