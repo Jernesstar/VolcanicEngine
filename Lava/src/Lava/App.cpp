@@ -78,7 +78,7 @@ static UIPage& GetUI() {
 
 static asIScriptObject* GetScriptApp() {
 	auto* handle = s_AppObject->GetHandle();
-	handle->AddRef();
+	// handle->AddRef();
 	return handle;
 }
 
@@ -137,6 +137,9 @@ void App::OnClose() {
 }
 
 void App::OnUpdate(TimeStep ts) {
+	if(!Running)
+		return;
+
 	Renderer::Clear();
 
 	s_AppObject->Call("OnUpdate", (float)ts);

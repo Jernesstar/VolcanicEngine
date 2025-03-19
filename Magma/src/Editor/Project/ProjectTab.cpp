@@ -5,6 +5,8 @@
 #include <imgui/misc/cpp/imgui_stdlib.h>
 #include <ImGuiFileDialog/ImGuiFileDialog.h>
 
+#include <Lava/App.h>
+
 #include "Editor/EditorApp.h"
 #include "Editor/Tab.h"
 #include "Editor/AssetImporter.h"
@@ -12,6 +14,8 @@
 
 #include "ContentBrowserPanel.h"
 #include "AssetEditorPanel.h"
+
+using namespace Lava;
 
 namespace Magma {
 
@@ -62,15 +66,15 @@ void ProjectTab::Setup() {
 }
 
 void ProjectTab::Update(TimeStep ts) {
-	// if(m_ScreenState == ScreenState::Play)
-	// 	m_Scene.OnUpdate(ts);
+	if(m_ScreenState != ScreenState::Edit)
+		App::Get()->OnUpdate(ts);
 
 	for(auto panel : m_Panels)
 		panel->Update(ts);
 }
 
 void ProjectTab::Render() {
-	RenderButtons();
+	// RenderButtons();
 
 	ImGui::BeginMainMenuBar();
 	{
@@ -87,8 +91,6 @@ void ProjectTab::Render() {
 			ImGui::EndMenu();
 		}
 		if(ImGui::BeginMenu("Edit")) {
-			// if(ImGui::MenuItem("Add Entity", "Ctrl+N"))
-			// 	menu.edit.addEntity = true;
 
 			ImGui::EndMenu();
 		}
@@ -113,68 +115,52 @@ void ProjectTab::RenderEssentialPanels() {
 }
 
 void ProjectTab::RenderButtons() {
-	// ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-	// ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(0, 0));
-
 	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.f, 0.f, 0.f, 0.f));
 	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.f, 0.f, 0.f, 0.f));
 	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.f, 0.f, 0.f, 0.f));
 
-	// auto flags = ImGuiWindowFlags_NoDecoration
-	// 		   | ImGuiWindowFlags_NoScrollWithMouse
-	// 		   | ImGuiWindowFlags_NoScrollbar
-	// 		   | ImGuiWindowFlags_NoResize
-	// 		   | ImGuiWindowFlags_NoMove
-	// 		   | ImGuiWindowFlags_NoTitleBar;
-	// ImGui::Begin("##toolbar", nullptr, flags);
-	// {
-		// float size = ImGui::GetWindowHeight() - 2.0f;
-		// auto x = 0.5f * (ImGui::GetWindowContentRegionMax().x - size);
-		float x = Application::GetWindow()->GetWidth() - 100.0f;
-		float y = 27.0f;
-		float size = 18.0f;
-		UI::Button* button = &m_PlayButton;
-		if(m_ScreenState == ScreenState::Play)
-			button = &m_PauseButton;
+	float x = Application::GetWindow()->GetWidth() - 100.0f;
+	float y = 27.0f;
+	float size = 18.0f;
+	UI::Button* button = &m_PlayButton;
+	if(m_ScreenState == ScreenState::Play)
+		button = &m_PauseButton;
 
-		button->x = x;
-		button->y = y;
-		button->SetSize(size, size);
-		button->Render();
+	button->x = x;
+	button->y = y;
+	button->SetSize(size, size);
+	button->Render();
 
-		ImGui::SameLine();
-		m_StopButton.x = x + size + 7.0f;
-		m_StopButton.y = y;
-		m_StopButton.SetSize(size, size);
-		m_StopButton.Render();
+	ImGui::SameLine();
+	m_StopButton.x = x + size + 7.0f;
+	m_StopButton.y = y;
+	m_StopButton.SetSize(size, size);
+	m_StopButton.Render();
 
-		if(button->GetState().Clicked)
-			if(button == &m_PlayButton)
-				OnPlay();
-			else
-				OnPause();
-		if(m_StopButton.GetState().Clicked)
-			OnStop();
-	// }
-	// ImGui::End();
+	if(button->GetState().Clicked)
+		if(button == &m_PlayButton)
+			OnPlay();
+		else
+			OnPause();
+	if(m_StopButton.GetState().Clicked)
+		OnStop();
 
 	ImGui::PopStyleColor(3);
-	// ImGui::PopStyleVar(2);
 }
 
 void ProjectTab::OnPlay() {
 	m_ScreenState = ScreenState::Play;
-
+	App::Get()->OnLoad();
 }
 
 void ProjectTab::OnPause() {
 	m_ScreenState = ScreenState::Pause;
-
+	App::Get()->Running = false;
 }
 
 void ProjectTab::OnStop() {
 	m_ScreenState = ScreenState::Edit;
-
+	App::Get()->OnClose();
 }
 
 }

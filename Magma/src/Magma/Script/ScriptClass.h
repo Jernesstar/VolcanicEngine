@@ -32,6 +32,13 @@ public:
 		return newObj;
 	}
 
+	Ref<ScriptObject> Construct() {
+		asIScriptObject* obj =
+			(asIScriptObject*)ScriptEngine::Get()
+								->CreateUninitializedScriptObject();
+		
+	}
+
 	asIScriptFunction* GetFunction(const std::string& name) const;
 	const auto& GetFunctions() const { return m_Functions; }
 
