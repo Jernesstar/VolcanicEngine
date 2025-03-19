@@ -1,5 +1,5 @@
 Project:
-  ExportPath: .\TestGame\
+  ExportPath: TestGame/
   Name: TestProj
   App: TestGame
   StartScreen: TestHome

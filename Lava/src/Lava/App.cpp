@@ -49,9 +49,8 @@ struct RuntimeScreen {
 	Ref<ScriptObject> ScriptObj;
 
 	RuntimeScreen(const Screen& screen)
-		: UI(screen.UI)
+		: World(CreateRef<Scene>(screen.Scene)), UI(screen.UI)
 	{
-		World = CreateRef<Scene>(screen.Scene);
 		Script = CreateRef<ScriptModule>(screen.Name);
 	}
 
@@ -78,7 +77,7 @@ static UIPage& GetUI() {
 
 static asIScriptObject* GetScriptApp() {
 	auto* handle = s_AppObject->GetHandle();
-	// handle->AddRef();
+	handle->AddRef();
 	return handle;
 }
 
@@ -143,9 +142,6 @@ void App::OnUpdate(TimeStep ts) {
 	Renderer::Clear();
 
 	s_AppObject->Call("OnUpdate", (float)ts);
-
-	if(!s_Screen)
-		return;
 
 	s_Screen->ScriptObj->Call("OnUpdate", (float)ts);
 

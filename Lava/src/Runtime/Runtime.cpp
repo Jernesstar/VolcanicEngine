@@ -67,26 +67,25 @@ Runtime::Runtime(const CommandLineArgs& args)
 	// Application::GetWindow()->SetIcon();
 
 	m_App = CreateRef<App>(project);
-
 	m_App->AppLoad =
-		[&](Ref<ScriptModule> script)
+		[](Ref<ScriptModule> script)
 		{
 			script->Load("./.volc.class");
 		};
 	m_App->ScreenLoad =
-		[&](Ref<ScriptModule> script)
+		[](Ref<ScriptModule> script)
 		{
 			auto scriptPath = fs::path("Class") / script->Name;
 			script->Load(scriptPath.string() + ".class");
 		};
 	m_App->SceneLoad =
-		[&](Scene& scene)
+		[](Scene& scene)
 		{
 			auto scenePath = fs::path("Scene") / scene.Name;
 			SceneLoader::Load(scene, scenePath.string() + ".bin");
 		};
 	m_App->UILoad =
-		[&](UIPage& page)
+		[](UIPage& page)
 		{
 			auto uiPath = fs::path("UI") / page.Name;
 			UILoader::Load(page, uiPath.string() + ".bin");
