@@ -208,6 +208,7 @@ void DrawComponent<ScriptComponent>(Entity& entity) {
 	for(uint32_t i = 0; i < handle->GetPropertyCount(); i++) {
 		auto typeID = handle->GetPropertyTypeId(i);
 		auto* typeInfo = ScriptEngine::Get()->GetTypeInfoById(typeID);
+
 		if(typeInfo) {
 			ImGui::Text(typeInfo->GetName());
 			ImGui::SameLine(100.0f);
@@ -216,7 +217,6 @@ void DrawComponent<ScriptComponent>(Entity& entity) {
 		}
 
 		void* address = handle->GetAddressOfProperty(i);
-
 		if(typeID == asTYPEID_BOOL) {
 			ImGui::Text("bool"); ImGui::SameLine(100.0f);
 			ImGui::Text(handle->GetPropertyName(i)); ImGui::SameLine(200.0f);

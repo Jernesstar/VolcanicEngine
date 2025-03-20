@@ -124,6 +124,8 @@ void ProjectTab::RenderButtons() {
 	UI::Button* button = &m_PlayButton;
 	if(m_ScreenState == ScreenState::Play)
 		button = &m_PauseButton;
+	// if(m_ScreenState == ScreenState::Pause)
+	// 	button = &m_ResumeButton;
 
 	button->x = x;
 	button->y = y;

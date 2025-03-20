@@ -11,15 +11,15 @@ class PlayerController : IEntity
 
     PlayerController(Entity entity)
     {
+        TestGame@ game = cast<TestGame>(ScriptApp);
+        game.NewMethod();
+        print("Coins: " + game.State.Coins);
+
         Handle = entity;
         print("Name: " + entity.Name);
         print("Alive: " + entity.Alive);
         const TagComponent@ tc = Handle.GetTagComponent();
         print(tc.Tag);
-
-        TestGame@ game = cast<TestGame>(ScriptApp);
-        game.NewMethod();
-        print("Coins: " + game.State.Coins);
 
         AssetManager.Load(asset);
         bool loaded = AssetManager.IsLoaded(asset);
@@ -40,44 +40,56 @@ class PlayerController : IEntity
             tc.Translation.z += 0.05f * ts;
     }
 
-    void OnKeyEvent(KeyEvent@ event)
-    {
-        // KeyPressedEvent@ e = cast<KeyPressedEvent>(event);
-        // if(e == null)
-        //     return;
-
-        // if(e.Key == Key::Space and !e.IsRepeat) {
-        //     Sound@ sound = AssetManager.GetSound(asset);
-        //     sound.Play();
-        // }
-    }
-
-    void OnMouseEvent(MouseEvent@ event)
-    {
-        print("Press");
-        if(!Handle.HasRigidBodyComponent())
-            return;
-
-        // PhysicsSystem@ world = Scene.GetPhysicsSystem();
-        // HitInfo info = world.RayTest(event.x, event.y);
-        // if(info.HasHit and info.Body.EntityHandle == Handle)
-        //     print("Hit");
-    }
-
     void OnAppEvent(AppEvent@ event)
     {
 
     }
 
-    // void OnPhysicsEvent(PhysicsEvent@ event)
-    // {
+    void OnKeyEvent(KeyEvent@ event)
+    {
+        if(event.Type == KeyEventType::Character) {
+            KeyCharEvent@ e = cast<KeyCharEvent>(event);
+            print(e.Character);
+        }
 
-    // }
+        if(event.Type != KeyEventType::Pressed)
+            return;
+
+        KeyPressedEvent@ e = cast<KeyPressedEvent>(event);
+        if(e.Key == Key::Space and !e.IsRepeat)
+        {
+            Sound@ sound = AssetManager.GetSound(asset);
+            sound.Play();
+        }
+    }
+
+    void OnMouseEvent(MouseEvent@ event)
+    {
+        print("Mouse");
+        if(event.Type != MouseEventType::Pressed)
+            return;
+        print("Press");
+
+        MousePressedEvent@ e = cast<MousePressedEvent>(event);
+
+    }
+
+    void OnPhysicsEvent(PhysicsEvent@ event)
+    {
+        if(event.Type == PhysicsEventType::MousePress) {
+            print("Pressed");
+            return;
+        }
+
+        if(event.EntityHandle.GetTagComponent().Tag == "Lava")
+            BroadcastEvent("PlayerDied");
+    }
 
     void OnGameEvent(GameEvent@ event)
     {
-        // if(event.ID == "Collision") {
-        //     CollisionEvent@ e = 
-        // }
+        if(event.ID == "PlayerDied")
+        {
+            
+        }
     }
 }

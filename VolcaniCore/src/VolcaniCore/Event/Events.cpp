@@ -53,11 +53,11 @@ void Events::KeyCallback(GLFWwindow* window, int key, int scancode,
 		KeyPressedEvent event((KeyCode)key);
 		Dispatch(event);
 	}
-	if(action == GLFW_RELEASE) {
+	else if(action == GLFW_RELEASE) {
 		KeyReleasedEvent event((KeyCode)key);
 		Dispatch(event);
 	}
-	if(action == GLFW_REPEAT) {
+	else if(action == GLFW_REPEAT) {
 		KeyPressedEvent event((KeyCode)key, true);
 		Dispatch(event);
 	}

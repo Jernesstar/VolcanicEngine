@@ -7,7 +7,7 @@ enum class EventCategory { Key, Mouse, Window, Application };
 enum class EventType {
 	KeyPressed,
 	KeyReleased,
-	KeyCharEvent,
+	KeyChar,
 	MouseMoved,
 	MouseScrolled,
 	MouseButtonPressed,

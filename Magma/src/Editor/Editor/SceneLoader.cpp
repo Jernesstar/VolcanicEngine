@@ -181,17 +181,97 @@ void SerializeEntity(YAMLSerializer& serializer, const Entity& entity) {
 	}
 	if(entity.Has<ScriptComponent>()) {
 		const auto& comp = entity.Get<ScriptComponent>();
-		auto asset = comp.ModuleAsset;
 		auto obj = comp.Instance;
 		std::string name = obj ? obj->GetClass()->Name : std::string("");
 
 		serializer.WriteKey("ScriptComponent")
 		.BeginMapping()
-			.WriteKey("ModuleID").Write((uint64_t)asset.ID)
-			.WriteKey("Class").Write(name)
-			// .WriteKey("Instance").BeginMapping()
-			// 	// TODO(Implement): Reflection
-			// .EndMapping()
+			.WriteKey("ModuleID").Write((uint64_t)comp.ModuleAsset.ID)
+			.WriteKey("Class").Write(name);
+
+		if(obj) {
+			serializer.WriteKey("Fields").BeginSequence();
+
+			auto* handle = obj->GetHandle();
+			for(uint32_t i = 0; i < handle->GetPropertyCount(); i++) {
+				void* address = handle->GetAddressOfProperty(i);
+				auto typeID = handle->GetPropertyTypeId(i);
+				auto* typeInfo = ScriptEngine::Get()->GetTypeInfoById(typeID);
+	
+				serializer.BeginMapping()
+					.WriteKey("Field").BeginMapping();
+	
+				// Complex Type
+				if(typeInfo) {
+	
+						serializer.EndMapping()
+					.EndMapping();
+					continue;
+				}
+	
+				if(typeID == asTYPEID_BOOL) {
+					serializer
+						.WriteKey("Type").Write("bool")
+						.WriteKey("Value").Write(*(bool*)address);
+				}
+				else if(typeID == asTYPEID_INT8) {
+					serializer
+						.WriteKey("Type").Write("int8")
+						.WriteKey("Value").Write(*(int8_t*)address);
+				}
+				else if(typeID == asTYPEID_INT16) {
+					serializer
+						.WriteKey("Type").Write("int16")
+						.WriteKey("Value").Write(*(int16_t*)address);
+				}
+				else if(typeID == asTYPEID_INT32) {
+					serializer
+						.WriteKey("Type").Write("int32")
+						.WriteKey("Value").Write(*(int32_t*)address);
+				}
+				else if(typeID == asTYPEID_INT64) {
+					serializer
+						.WriteKey("Type").Write("int64")
+						.WriteKey("Value").Write(*(int64_t*)address);
+				}
+				else if(typeID == asTYPEID_UINT8) {
+					serializer
+						.WriteKey("Type").Write("uint8")
+						.WriteKey("Value").Write(*(uint8_t*)address);
+				}
+				else if(typeID == asTYPEID_UINT16) {
+					serializer
+						.WriteKey("Type").Write("uint16")
+						.WriteKey("Value").Write(*(uint16_t*)address);
+				}
+				else if(typeID == asTYPEID_UINT32) {
+					serializer
+						.WriteKey("Type").Write("uint32")
+						.WriteKey("Value").Write(*(uint32_t*)address);
+				}
+				else if(typeID == asTYPEID_UINT64) {
+					serializer
+						.WriteKey("Type").Write("uint64")
+						.WriteKey("Value").Write(*(uint64_t*)address);
+				}
+				else if(typeID == asTYPEID_FLOAT) {
+					serializer
+					.WriteKey("Type").Write("float")
+					.WriteKey("Value").Write(*(float*)address);
+				}
+				else if(typeID == asTYPEID_DOUBLE) {
+					serializer
+					.WriteKey("Type").Write("double")
+					.WriteKey("Value").Write(*(double*)address);
+				}
+	
+					serializer.EndMapping()
+				.EndMapping();
+			}
+		}
+		
+		serializer
+			.EndSequence()
 		.EndMapping();
 	}
 	if(entity.Has<RigidBodyComponent>()) {
@@ -380,7 +460,6 @@ void DeserializeEntity(YAML::Node entityNode, Scene& scene) {
 	if(scriptComponentNode) {
 		auto id = scriptComponentNode["ModuleID"].as<uint64_t>();
 		auto className = scriptComponentNode["Class"].as<std::string>();
-		// VOLCANICORE_LOG_INFO("ID: %llu, Class: %s", id, className.c_str());
 		Asset asset = { id, AssetType::Script };
 
 		if(className == "" || !id || !assetManager.IsValid(asset))

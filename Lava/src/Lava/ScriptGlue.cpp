@@ -34,14 +34,17 @@ using namespace Magma;
 using namespace Magma::UI;
 using namespace Magma::ECS;
 using namespace Magma::Script;
+using namespace Magma::Physics;
 
 namespace Lava {
 
 static void RegisterGlobalFunctions();
 static void RegisterTypes();
-static void RegisterInput();
+static void RegisterEvents();
 static void RegisterAssetManager();
 static void RegisterECS();
+static void RegisterScene();
+static void RegisterUI();
 
 void ScriptGlue::RegisterInterface() {
 	auto* engine = ScriptEngine::Get();
@@ -50,7 +53,7 @@ void ScriptGlue::RegisterInterface() {
 	RegisterScriptHandle(engine);
 	RegisterScriptMath(engine);
 
-	RegisterInput();
+	RegisterEvents();
 	ScriptEngine::RegisterInterface("IApp")
 		.AddMethod("void OnLoad()")
 		.AddMethod("void OnClose()")
@@ -69,6 +72,8 @@ void ScriptGlue::RegisterInterface() {
 		.AddMethod("void OnMouseEvent(MouseEvent@)")
 		// WindowResized, WindowClosed, ScreenChanged
 		.AddMethod("void OnAppEvent(AppEvent@)")
+		// MouseClicked, Collided
+		.AddMethod("void OnPhysicsEvent(PhysicsEvent@)")
 		// PlayerDied, LevelComplete, Collided
 		.AddMethod("void OnGameEvent(GameEvent@)")
 		;
@@ -84,21 +89,8 @@ void ScriptGlue::RegisterInterface() {
 	RegisterAssetManager();
 	RegisterECS();
 
-	engine->RegisterObjectType("SceneClass", 0, asOBJ_REF | asOBJ_NOHANDLE);
-	engine->RegisterObjectMethod("SceneClass", "Entity FindEntity(const string &in)",
-		asMETHODPR(ECS::World, GetEntity, (const std::string&), Entity),
-		asCALL_THISCALL, 0, asOFFSET(Scene, EntityWorld));
-	engine->RegisterObjectMethod("SceneClass", "Entity GetEntity(uint64)",
-		asMETHODPR(ECS::World, GetEntity, (UUID), Entity), asCALL_THISCALL, 0,
-		asOFFSET(Scene, EntityWorld));
-
-	engine->RegisterObjectType("UIElement", 0, asOBJ_REF | asOBJ_NOCOUNT);
-	// engine->RegisterObjectProperty("UIElement", "");
-
-	engine->RegisterObjectType("UIPageClass", 0, asOBJ_REF | asOBJ_NOHANDLE);
-	// engine->RegisterObjectMethod("UIPageClass", "UIElement Get(const string &in)",
-	// 	asMETHODPR(UIPage, Get, (const std::string&) const, UIElement*),
-	// 	asCALL_THISCALL);
+	RegisterScene();
+	RegisterUI();
 }
 
 static void print(const std::string& str) {
@@ -182,7 +174,25 @@ void RegisterTypes() {
 		asFUNCTION(NormalizeVec3), asCALL_CDECL);
 }
 
-void RegisterInput() {
+static KeyPressedEvent* KeyPressedEventCast(KeyEvent* event) {
+	if(event->Type != EventType::KeyPressed)
+		return nullptr;
+	return dynamic_cast<KeyPressedEvent*>(event);
+}
+
+static KeyReleasedEvent* KeyReleasedEventCast(KeyEvent* event) {
+	if(event->Type != EventType::KeyReleased)
+		return nullptr;
+	return dynamic_cast<KeyReleasedEvent*>(event);
+}
+
+static MousePressedEventCast* MousePressedEventCast(MouseEvent* event) {
+	if(event->Type != MouseButtonPressed)
+		return nullptr;
+	return dynamic_cast<MousePressedEvent*>(event);
+}
+
+void RegisterEvents() {
 	auto* engine = ScriptEngine::Get();
 
 	engine->RegisterEnum("Mouse");
@@ -232,8 +242,36 @@ void RegisterInput() {
 	engine->RegisterGlobalFunction("bool MousePressed(Mouse button)",
 		asFUNCTION(Input::MouseButtonPressed), asCALL_CDECL);
 
+	engine->RegisterEnum("EventType");
+	engine->RegisterEnumValue("EventType", "KeyPressed",	0);
+	engine->RegisterEnumValue("EventType", "KeyReleased",	1);
+	engine->RegisterEnumValue("EventType", "KeyChar",		2);
+	engine->RegisterEnumValue("EventType", "MouseMoved",	3);
+	engine->RegisterEnumValue("EventType", "MouseScrolled", 4);
+	engine->RegisterEnumValue("EventType", "MousePressed",	5);
+	engine->RegisterEnumValue("EventType", "MouseReleased", 6);
+
+	engine->RegisterObjectType("Event", 0, asOBJ_REF | asOBJ_NOCOUNT);
+	engine->RegisterObjectProperty("Event", "EventType Type",
+		asOFFSET(Event, Type));
+
 	engine->RegisterObjectType("KeyEvent", 0, asOBJ_REF | asOBJ_NOCOUNT);
+	engine->RegisterObjectProperty("KeyEvent", "const Key Code",
+		asOFFSET(KeyEvent, Key));
+
+	engine->RegisterObjectType("KeyPressedEvent", 0, asOBJ_REF | asOBJ_NOCOUNT);
+	engine->RegisterObjectProperty("KeyPressedEvent", "const bool IsRepeat",
+		asOFFSET(KeyPressedEvent, IsRepeat));
+	engine->RegisterObjectMethod("KeyEvent", "KeyPressedEvent@ opCast()",
+		asFUNCTION(KeyPressedEventCast));
+			
+	engine->RegisterObjectType("KeyReleasedEvent", 0, asOBJ_REF | asOBJ_NOCOUNT);
+	engine->RegisterObjectMethod("KeyEvent", "KeyReleasedEvent@ opCast()",
+		asFUNCTION(KeyReleasedEventCast));
+
 	engine->RegisterObjectType("MouseEvent", 0, asOBJ_REF | asOBJ_NOCOUNT);
+
+
 	engine->RegisterObjectType("AppEvent", 0, asOBJ_REF | asOBJ_NOCOUNT);
 	engine->RegisterObjectType("GameEvent", 0, asOBJ_REF | asOBJ_NOCOUNT);
 }
@@ -310,7 +348,7 @@ static Vec3 GetCameraPosition(CameraComponent* cc) {
 	return cc->Cam->GetPosition();
 }
 
-static void SetCameraPosition(CameraComponent* cc, const Vec3& vec) {
+static void SetCameraPosition(const Vec3& vec, CameraComponent* cc) {
 	cc->Cam->SetPosition(vec);
 }
 
@@ -318,7 +356,7 @@ static Vec3 GetCameraDirection(CameraComponent* cc) {
 	return cc->Cam->GetDirection();
 }
 
-static void SetCameraDirection(CameraComponent* cc, const Vec3& vec) {
+static void SetCameraDirection(const Vec3& vec, CameraComponent* cc) {
 	cc->Cam->SetDirection(vec);
 }
 
@@ -326,7 +364,7 @@ static uint32_t GetCameraWidth(CameraComponent* cc) {
 	return cc->Cam->GetViewportWidth();
 }
 
-static void SetCameraWidth(CameraComponent* cc, uint32_t width) {
+static void SetCameraWidth(uint32_t width, CameraComponent* cc) {
 	cc->Cam->Resize(width, 0);
 }
 
@@ -334,7 +372,7 @@ static uint32_t GetCameraHeight(CameraComponent* cc) {
 	return cc->Cam->GetViewportHeight();
 }
 
-static void SetCameraHeight(CameraComponent* cc, uint32_t height) {
+static void SetCameraHeight(uint32_t height, CameraComponent* cc) {
 	cc->Cam->Resize(0, height);
 }
 
@@ -421,16 +459,23 @@ void RegisterECS() {
 	engine->RegisterObjectMethod("RigidBody",
 		"Transform get_PhysicsTransform() const property",
 		asMETHOD(Physics::RigidBody, GetTransform), asCALL_THISCALL);
+	engine->RegisterObjectMethod("RigidBody",
+		"Transform get_PhysicsTransform() const property",
+		asMETHOD(Physics::RigidBody, GetTransform), asCALL_THISCALL);
 	// engine->RegisterObjectMethod("RigidBody", "void ApplyForce(Vec3 force)",
 	// 	asMETHOD(Physics::DynamicBody::ApplyForce));
 
 	engine->RegisterObjectMethod("RigidBodyComponent", "RigidBody@ get_Body()",
 		asFUNCTION(GetRigidBody), asCALL_CDECL_OBJLAST);
 
-	engine->RegisterObjectType("DirectionalLightComponent", 0, asOBJ_REF | asOBJ_NOCOUNT);
-	engine->RegisterObjectType("PointLightComponent", 0, asOBJ_REF | asOBJ_NOCOUNT);
-	engine->RegisterObjectType("SpotlightComponent", 0, asOBJ_REF | asOBJ_NOCOUNT);
-	engine->RegisterObjectType("ParticleSystemComponent", 0, asOBJ_REF | asOBJ_NOCOUNT);
+	engine->RegisterObjectType("DirectionalLightComponent", 0,
+		asOBJ_REF | asOBJ_NOCOUNT);
+	engine->RegisterObjectType("PointLightComponent", 0,
+		asOBJ_REF | asOBJ_NOCOUNT);
+	engine->RegisterObjectType("SpotlightComponent", 0,
+		asOBJ_REF | asOBJ_NOCOUNT);
+	engine->RegisterObjectType("ParticleSystemComponent", 0,
+		asOBJ_REF | asOBJ_NOCOUNT);
 
 	engine->RegisterObjectType("Entity", sizeof(Entity),
 		asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_ALLINTS |
@@ -576,6 +621,56 @@ void RegisterECS() {
 		"ParticleSystemComponent@ SetParticleSystemComponent()",
 		asMETHODPR(Entity, Set<ParticleSystemComponent>, (),
 			ParticleSystemComponent&), asCALL_THISCALL);
+}
+
+static HitInfo PhysicsRaycastScreen(uint32_t x, uint32_t y, PhysicsSystem* sys) {
+
+	return HitInfo();
+}
+
+static HitInfo PhysicsRaycast(const Vec3& start, const Vec3& dir, PhysicsSystem* sys) {
+
+	return HitInfo();
+}
+
+void RegisterScene() {
+	auto* engine = ScriptEngine::Get();
+
+	engine->RegisterObjectType("HitInfo", sizeof(Physics::HitInfo),
+		asOBJ_VALUE | asGetTypeTraits<Physics::HitInfo>());
+	engine->RegisterObjectProperty("HitInfo", "const bool HasHit",
+		asOFFSET(Physics::HitInfo, HasHit));
+	engine->RegisterObjectProperty("HitInfo", "RigidBody@ Actor",
+		asOFFSET(Physics::HitInfo, Actor));
+
+	engine->RegisterObjectType("PhysicsSystem", 0, asOBJ_REF | asOBJ_NOCOUNT);
+	engine->RegisterObjectMethod("PhysicsSystem"
+		"HitInfo Raycast(const Vec3 &in, const Vec3 &in)",
+		asFUNCTION(PhysicsRaycast), asCALL_CDECL_OBJLAST);
+
+	engine->RegisterObjectType("SceneClass", 0, asOBJ_REF | asOBJ_NOHANDLE);
+	engine->RegisterObjectMethod("SceneClass", "Entity FindEntity(const string &in)",
+		asMETHODPR(ECS::World, GetEntity, (const std::string&), Entity),
+		asCALL_THISCALL, 0, asOFFSET(Scene, EntityWorld));
+	engine->RegisterObjectMethod("SceneClass", "Entity GetEntity(uint64)",
+		asMETHODPR(ECS::World, GetEntity, (UUID), Entity), asCALL_THISCALL, 0,
+		asOFFSET(Scene, EntityWorld));
+
+	engine->RegisterObjectMethod("SceneClass", "PhysicsSystem@ GetPhysicsSystem()",
+		asMETHODPR(ECS::World, Get<PhysicsSystem>, (), PhysicsSystem*),
+		asCALL_THISCALL, 0, asOFFSET(Scene, EntityWorld));
+}
+
+void RegisterUI() {
+	auto* engine = ScriptEngine::Get();
+
+	engine->RegisterObjectType("UIElement", 0, asOBJ_REF | asOBJ_NOCOUNT);
+	// engine->RegisterObjectProperty("UIElement", "");
+
+	engine->RegisterObjectType("UIPageClass", 0, asOBJ_REF | asOBJ_NOHANDLE);
+	// engine->RegisterObjectMethod("UIPageClass", "UIElement Get(const string &in)",
+	// 	asMETHODPR(UIPage, Get, (const std::string&) const, UIElement*),
+	// 	asCALL_THISCALL);
 }
 
 }
