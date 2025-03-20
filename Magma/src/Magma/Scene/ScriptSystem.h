@@ -16,6 +16,9 @@ public:
 	void Update(TimeStep ts) override;
 	void Run(Phase phase) override;
 
+	void Listen(Entity& entity, const std::string& id);
+	void Broadcast(const std::string& id);
+
 	void OnComponentAdd(Entity& entity) override;
 	void OnComponentSet(Entity& entity) override;
 	void OnComponentRemove(Entity& entity) override;

@@ -35,6 +35,7 @@ struct Event {
 protected:
 	Event(EventCategory category, EventType type)
 		: Category(category), Type(type) { }
+	virtual ~Event() = default;
 };
 
 }

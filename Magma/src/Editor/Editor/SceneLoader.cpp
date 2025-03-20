@@ -211,58 +211,58 @@ void SerializeEntity(YAMLSerializer& serializer, const Entity& entity) {
 	
 				if(typeID == asTYPEID_BOOL) {
 					serializer
-						.WriteKey("Type").Write("bool")
+						.WriteKey("Type").Write(std::string("bool"))
 						.WriteKey("Value").Write(*(bool*)address);
 				}
 				else if(typeID == asTYPEID_INT8) {
 					serializer
-						.WriteKey("Type").Write("int8")
-						.WriteKey("Value").Write(*(int8_t*)address);
+						.WriteKey("Type").Write(std::string("int8"))
+						.WriteKey("Value").Write(*(int32_t*)address);
 				}
 				else if(typeID == asTYPEID_INT16) {
 					serializer
-						.WriteKey("Type").Write("int16")
-						.WriteKey("Value").Write(*(int16_t*)address);
+						.WriteKey("Type").Write(std::string("int16"))
+						.WriteKey("Value").Write(*(int32_t*)address);
 				}
 				else if(typeID == asTYPEID_INT32) {
 					serializer
-						.WriteKey("Type").Write("int32")
+						.WriteKey("Type").Write(std::string("int32"))
 						.WriteKey("Value").Write(*(int32_t*)address);
 				}
 				else if(typeID == asTYPEID_INT64) {
 					serializer
-						.WriteKey("Type").Write("int64")
+						.WriteKey("Type").Write(std::string("int64"))
 						.WriteKey("Value").Write(*(int64_t*)address);
 				}
 				else if(typeID == asTYPEID_UINT8) {
 					serializer
-						.WriteKey("Type").Write("uint8")
-						.WriteKey("Value").Write(*(uint8_t*)address);
+						.WriteKey("Type").Write(std::string("uint8"))
+						.WriteKey("Value").Write(*(uint32_t*)address);
 				}
 				else if(typeID == asTYPEID_UINT16) {
 					serializer
-						.WriteKey("Type").Write("uint16")
-						.WriteKey("Value").Write(*(uint16_t*)address);
+						.WriteKey("Type").Write(std::string("uint16"))
+						.WriteKey("Value").Write(*(uint32_t*)address);
 				}
 				else if(typeID == asTYPEID_UINT32) {
 					serializer
-						.WriteKey("Type").Write("uint32")
+						.WriteKey("Type").Write(std::string("uint32"))
 						.WriteKey("Value").Write(*(uint32_t*)address);
 				}
 				else if(typeID == asTYPEID_UINT64) {
 					serializer
-						.WriteKey("Type").Write("uint64")
+						.WriteKey("Type").Write(std::string("uint64"))
 						.WriteKey("Value").Write(*(uint64_t*)address);
 				}
 				else if(typeID == asTYPEID_FLOAT) {
 					serializer
-					.WriteKey("Type").Write("float")
+					.WriteKey("Type").Write(std::string("float"))
 					.WriteKey("Value").Write(*(float*)address);
 				}
 				else if(typeID == asTYPEID_DOUBLE) {
 					serializer
-					.WriteKey("Type").Write("double")
-					.WriteKey("Value").Write(*(double*)address);
+					.WriteKey("Type").Write(std::string("double"))
+					.WriteKey("Value").Write(*(float*)(double*)address);
 				}
 	
 					serializer.EndMapping()

@@ -17,6 +17,14 @@ void ScriptSystem::Run(Phase phase) {
 		});
 }
 
+void ScriptSystem::Listen(Entity& entity, const std::string& id) {
+
+}
+
+void ScriptSystem::Broadcast(const std::string& id) {
+
+}
+
 void ScriptSystem::OnComponentAdd(Entity& entity) {
 
 }

@@ -20,6 +20,8 @@
 
 #include <Magma/Scene/Scene.h>
 #include <Magma/Scene/Component.h>
+#include <Magma/Scene/PhysicsSystem.h>
+#include <Magma/Scene/ScriptSystem.h>
 
 #include <Magma/UI/UIPage.h>
 
@@ -70,8 +72,6 @@ void ScriptGlue::RegisterInterface() {
 		.AddMethod("void OnKeyEvent(KeyEvent@)")
 		// MousePressed, MouseReleased
 		.AddMethod("void OnMouseEvent(MouseEvent@)")
-		// WindowResized, WindowClosed, ScreenChanged
-		.AddMethod("void OnAppEvent(AppEvent@)")
 		// MouseClicked, Collided
 		.AddMethod("void OnPhysicsEvent(PhysicsEvent@)")
 		// PlayerDied, LevelComplete, Collided
@@ -186,10 +186,16 @@ static KeyReleasedEvent* KeyReleasedEventCast(KeyEvent* event) {
 	return dynamic_cast<KeyReleasedEvent*>(event);
 }
 
-static MousePressedEventCast* MousePressedEventCast(MouseEvent* event) {
-	if(event->Type != MouseButtonPressed)
+static KeyCharEvent* KeyCharacterEventCast(KeyEvent* event) {
+	if(event->Type != EventType::KeyChar)
 		return nullptr;
-	return dynamic_cast<MousePressedEvent*>(event);
+	return dynamic_cast<KeyCharEvent*>(event);
+}
+
+static MouseButtonPressedEvent* MousePressedEventCast(MouseEvent* event) {
+	if(event->Type != EventType::MouseButtonPressed)
+		return nullptr;
+	return dynamic_cast<MouseButtonPressedEvent*>(event);
 }
 
 void RegisterEvents() {
@@ -245,35 +251,54 @@ void RegisterEvents() {
 	engine->RegisterEnum("EventType");
 	engine->RegisterEnumValue("EventType", "KeyPressed",	0);
 	engine->RegisterEnumValue("EventType", "KeyReleased",	1);
-	engine->RegisterEnumValue("EventType", "KeyChar",		2);
+	engine->RegisterEnumValue("EventType", "KeyCharacter",	2);
 	engine->RegisterEnumValue("EventType", "MouseMoved",	3);
 	engine->RegisterEnumValue("EventType", "MouseScrolled", 4);
 	engine->RegisterEnumValue("EventType", "MousePressed",	5);
 	engine->RegisterEnumValue("EventType", "MouseReleased", 6);
 
-	engine->RegisterObjectType("Event", 0, asOBJ_REF | asOBJ_NOCOUNT);
-	engine->RegisterObjectProperty("Event", "EventType Type",
-		asOFFSET(Event, Type));
-
-	engine->RegisterObjectType("KeyEvent", 0, asOBJ_REF | asOBJ_NOCOUNT);
-	engine->RegisterObjectProperty("KeyEvent", "const Key Code",
-		asOFFSET(KeyEvent, Key));
-
 	engine->RegisterObjectType("KeyPressedEvent", 0, asOBJ_REF | asOBJ_NOCOUNT);
+	engine->RegisterObjectProperty("KeyPressedEvent", "EventType Type",
+		asOFFSET(KeyPressedEvent, Type));
+	engine->RegisterObjectProperty("KeyPressedEvent", "const Key Key",
+		asOFFSET(KeyPressedEvent, Key));
 	engine->RegisterObjectProperty("KeyPressedEvent", "const bool IsRepeat",
 		asOFFSET(KeyPressedEvent, IsRepeat));
-	engine->RegisterObjectMethod("KeyEvent", "KeyPressedEvent@ opCast()",
-		asFUNCTION(KeyPressedEventCast));
-			
+
 	engine->RegisterObjectType("KeyReleasedEvent", 0, asOBJ_REF | asOBJ_NOCOUNT);
+	engine->RegisterObjectProperty("KeyReleasedEvent", "EventType Type",
+		asOFFSET(KeyReleasedEvent, Type));
+	engine->RegisterObjectProperty("KeyReleasedEvent", "const Key Key",
+		asOFFSET(KeyReleasedEvent, Key));
+
+	engine->RegisterObjectType("KeyCharacterEvent", 0, asOBJ_REF | asOBJ_NOCOUNT);
+	engine->RegisterObjectProperty("KeyCharacterEvent", "EventType Type",
+		asOFFSET(KeyCharEvent, Type));
+	engine->RegisterObjectProperty("KeyCharacterEvent", "const Key Key",
+		asOFFSET(KeyCharEvent, Key));
+	engine->RegisterObjectMethod("KeyCharacterEvent", "string get_Char() const property",
+		asMETHOD(KeyCharEvent, ToString), asCALL_THISCALL);
+
+	engine->RegisterObjectType("KeyEvent", 0, asOBJ_REF | asOBJ_NOCOUNT);
+	engine->RegisterObjectProperty("KeyEvent", "EventType Type",
+		asOFFSET(KeyEvent, Type));
+	engine->RegisterObjectProperty("KeyEvent", "const Key Key",
+		asOFFSET(KeyEvent, Key));
+	engine->RegisterObjectMethod("KeyEvent", "KeyPressedEvent@ opCast()",
+		asFUNCTION(KeyPressedEventCast), asCALL_CDECL_OBJLAST);
 	engine->RegisterObjectMethod("KeyEvent", "KeyReleasedEvent@ opCast()",
-		asFUNCTION(KeyReleasedEventCast));
+		asFUNCTION(KeyReleasedEventCast), asCALL_CDECL_OBJLAST);
+	engine->RegisterObjectMethod("KeyEvent", "KeyCharacterEvent@ opCast()",
+		asFUNCTION(KeyCharacterEventCast), asCALL_CDECL_OBJLAST);
 
 	engine->RegisterObjectType("MouseEvent", 0, asOBJ_REF | asOBJ_NOCOUNT);
 
+	engine->RegisterObjectType("PhysicsEvent", 0, asOBJ_REF | asOBJ_NOCOUNT);
+	// engine->RegisterObjectProperty("PhysicsEvent", "PhysicsEventType Type")
 
-	engine->RegisterObjectType("AppEvent", 0, asOBJ_REF | asOBJ_NOCOUNT);
 	engine->RegisterObjectType("GameEvent", 0, asOBJ_REF | asOBJ_NOCOUNT);
+	// engine->RegisterObjectProperty("GameEvent", "string ID",
+	// 	asOFFSET(GameEvent, ID));
 }
 
 static uint64_t GetAssetID(Asset* asset) {
@@ -459,9 +484,6 @@ void RegisterECS() {
 	engine->RegisterObjectMethod("RigidBody",
 		"Transform get_PhysicsTransform() const property",
 		asMETHOD(Physics::RigidBody, GetTransform), asCALL_THISCALL);
-	engine->RegisterObjectMethod("RigidBody",
-		"Transform get_PhysicsTransform() const property",
-		asMETHOD(Physics::RigidBody, GetTransform), asCALL_THISCALL);
 	// engine->RegisterObjectMethod("RigidBody", "void ApplyForce(Vec3 force)",
 	// 	asMETHOD(Physics::DynamicBody::ApplyForce));
 
@@ -636,17 +658,25 @@ static HitInfo PhysicsRaycast(const Vec3& start, const Vec3& dir, PhysicsSystem*
 void RegisterScene() {
 	auto* engine = ScriptEngine::Get();
 
-	engine->RegisterObjectType("HitInfo", sizeof(Physics::HitInfo),
-		asOBJ_VALUE | asGetTypeTraits<Physics::HitInfo>());
-	engine->RegisterObjectProperty("HitInfo", "const bool HasHit",
-		asOFFSET(Physics::HitInfo, HasHit));
-	engine->RegisterObjectProperty("HitInfo", "RigidBody@ Actor",
-		asOFFSET(Physics::HitInfo, Actor));
+	// engine->RegisterObjectType("HitInfo", sizeof(Physics::HitInfo),
+	// 	asOBJ_VALUE | asGetTypeTraits<Physics::HitInfo>());
+	// engine->RegisterObjectProperty("HitInfo", "const bool HasHit",
+	// 	asOFFSET(Physics::HitInfo, HasHit));
+	// engine->RegisterObjectProperty("HitInfo", "RigidBody@ Actor",
+	// 	asOFFSET(Physics::HitInfo, Actor));
 
 	engine->RegisterObjectType("PhysicsSystem", 0, asOBJ_REF | asOBJ_NOCOUNT);
-	engine->RegisterObjectMethod("PhysicsSystem"
-		"HitInfo Raycast(const Vec3 &in, const Vec3 &in)",
-		asFUNCTION(PhysicsRaycast), asCALL_CDECL_OBJLAST);
+	// engine->RegisterObjectMethod("PhysicsSystem",
+	// 	"HitInfo Raycast(const Vec3 &in, const Vec3 &in)",
+	// 	asFUNCTION(PhysicsRaycast), asCALL_CDECL_OBJLAST);
+
+	engine->RegisterObjectType("ScriptSystem", 0, asOBJ_REF | asOBJ_NOCOUNT);
+	engine->RegisterObjectMethod("ScriptSystem",
+		"void ListenForEvent(Entity, const string &in)",
+		asMETHOD(ScriptSystem, Listen), asCALL_THISCALL);
+	engine->RegisterObjectMethod("ScriptSystem",
+		"void BroadcastEvent(const string &in)",
+		asMETHOD(ScriptSystem, Broadcast), asCALL_THISCALL);
 
 	engine->RegisterObjectType("SceneClass", 0, asOBJ_REF | asOBJ_NOHANDLE);
 	engine->RegisterObjectMethod("SceneClass", "Entity FindEntity(const string &in)",
@@ -658,6 +688,9 @@ void RegisterScene() {
 
 	engine->RegisterObjectMethod("SceneClass", "PhysicsSystem@ GetPhysicsSystem()",
 		asMETHODPR(ECS::World, Get<PhysicsSystem>, (), PhysicsSystem*),
+		asCALL_THISCALL, 0, asOFFSET(Scene, EntityWorld));
+	engine->RegisterObjectMethod("SceneClass", "ScriptSystem@ GetScriptSystem()",
+		asMETHODPR(ECS::World, Get<ScriptSystem>, (), ScriptSystem*),
 		asCALL_THISCALL, 0, asOFFSET(Scene, EntityWorld));
 }
 

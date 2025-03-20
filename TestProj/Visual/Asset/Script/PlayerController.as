@@ -24,6 +24,9 @@ class PlayerController : IEntity
         AssetManager.Load(asset);
         bool loaded = AssetManager.IsLoaded(asset);
         print("Loaded: " + loaded);
+
+        ScriptSystem@ sys = Scene.GetScriptSystem();
+        sys.ListenForEvent(Handle, "PlayerDied");
     }
 
     void OnUpdate(float ts)
@@ -40,19 +43,14 @@ class PlayerController : IEntity
             tc.Translation.z += 0.05f * ts;
     }
 
-    void OnAppEvent(AppEvent@ event)
-    {
-
-    }
-
     void OnKeyEvent(KeyEvent@ event)
     {
-        if(event.Type == KeyEventType::Character) {
-            KeyCharEvent@ e = cast<KeyCharEvent>(event);
-            print(e.Character);
+        if(event.Type == EventType::KeyCharacter) {
+            KeyCharacterEvent@ e = cast<KeyCharacterEvent>(event);
+            print("Inputted character: " + e.Char);
         }
 
-        if(event.Type != KeyEventType::Pressed)
+        if(event.Type != EventType::KeyPressed)
             return;
 
         KeyPressedEvent@ e = cast<KeyPressedEvent>(event);
@@ -65,31 +63,32 @@ class PlayerController : IEntity
 
     void OnMouseEvent(MouseEvent@ event)
     {
-        print("Mouse");
-        if(event.Type != MouseEventType::Pressed)
-            return;
-        print("Press");
+        // print("Mouse");
+        // if(event.Type != MouseEventType::Pressed)
+        //     return;
+        // print("Press");
 
-        MousePressedEvent@ e = cast<MousePressedEvent>(event);
-
+        // MousePressedEvent@ e = cast<MousePressedEvent>(event);
     }
 
     void OnPhysicsEvent(PhysicsEvent@ event)
     {
-        if(event.Type == PhysicsEventType::MousePress) {
-            print("Pressed");
-            return;
-        }
+        // if(event.Type == PhysicsEventType::MousePress) {
+        //     print("Pressed");
+        //     return;
+        // }
 
-        if(event.EntityHandle.GetTagComponent().Tag == "Lava")
-            BroadcastEvent("PlayerDied");
+        // if(event.EntityHandle.GetTagComponent().Tag == "Lava") {
+        //     ScriptSystem@ sys = Scene.GetScriptSystem();
+        //     sys.BroadcastEvent("PlayerDied");
+        // }
     }
 
     void OnGameEvent(GameEvent@ event)
     {
-        if(event.ID == "PlayerDied")
-        {
-            
-        }
+        // if(event.ID == "PlayerDied")
+        // {
+        //     print("Game over");
+        // }
     }
 }
