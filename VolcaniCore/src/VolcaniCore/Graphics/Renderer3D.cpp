@@ -173,25 +173,23 @@ static void DrawSubMesh(Ref<Mesh> root, SubMesh& mesh, const glm::mat4& tr,
 			command->IndicesIndex = s_MeshBuffer->IndicesCount;
 		}
 
-		if(!command->UniformData) {
+		if(!command->UniformData && root->Materials) {
 			Material& mat = root->Materials[mesh.MaterialIndex];
-			if(mat.Diffuse) {
-				command->UniformData
-				.SetInput("u_Material.Diffuse", TextureSlot{ mat.Diffuse, 0 });
-				command->UniformData
-				.SetInput("u_Material.IsTextured", 1);
-			}
-			else {
-				command->UniformData
-				.SetInput("u_Material.DiffuseColor", mat.DiffuseColor);
-				command->UniformData
-				.SetInput("u_Material.IsTextured", 0);
-			}
-
+			command->UniformData
+			.SetInput("u_Material.IsTextured", (bool)mat.Diffuse);
+			command->UniformData
+			.SetInput("u_Material.Diffuse", TextureSlot{ mat.Diffuse, 0 });
 			command->UniformData
 			.SetInput("u_Material.Specular", TextureSlot{ mat.Specular, 1 });
 			command->UniformData
-			.SetInput("u_Material.SpecularColor", mat.DiffuseColor);
+			.SetInput("u_Material.Emissive", TextureSlot{ mat.Emissive, 2 });
+
+			command->UniformData
+			.SetInput("u_Material.DiffuseColor", mat.DiffuseColor);
+			command->UniformData
+			.SetInput("u_Material.SpecularColor", mat.SpecularColor);
+			command->UniformData
+			.SetInput("u_Material.EmissiveColor", mat.DiffuseColor);
 		}
 
 		command->AddIndices(mesh.Indices);

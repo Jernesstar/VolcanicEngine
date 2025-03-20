@@ -172,7 +172,7 @@ void ContentBrowserPanel::Draw() {
 					if(ImGui::BeginDragDropSource())
 					{
 						ImGui::SetDragDropPayload("ASSET",
-							&s_Asset, sizeof(Asset), ImGuiCond_Once);
+							&s_Asset, sizeof(Asset));
 
 						UI::Image image;
 						image.Content = m_FileIcon->Content;

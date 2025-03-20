@@ -29,16 +29,27 @@ Scene:
           MeshComponent:
             AssetID: 4186775327602265389
     - Entity:
-        Name: Player
-        ID: 4294967846
+        Name: Cube
+        ID: 555
         Components:
           TransformComponent:
             Transform:
-              Translation: [7.19999981, -9.19999981, 0]
+              Translation: [13.1000004, -5.4000001, -16.2999992]
               Rotation: [0, 0, 0]
-              Scale: [10, 10, 10]
+              Scale: [10.8000002, 8.19999981, 7.5999999]
           MeshComponent:
-            AssetID: 15277418182178081176
+            AssetID: 10036008063945961451
+    - Entity:
+        Name: Cube2
+        ID: 556
+        Components:
+          TransformComponent:
+            Transform:
+              Translation: [0, -6.19999981, 26.3999996]
+              Rotation: [0, 0, 0]
+              Scale: [2.5999999, 1, 1]
+          MeshComponent:
+            AssetID: 10036008063945961451
     - Entity:
         Name: Ball2
         ID: 554
@@ -52,3 +63,20 @@ Scene:
               Scale: [1, 1, 1]
           MeshComponent:
             AssetID: 4186775327602265389
+    - Entity:
+        Name: Player
+        ID: 4294967846
+        Components:
+          MeshComponent:
+            AssetID: 15277418182178081176
+    - Entity:
+        Name: ""
+        ID: 558
+        Components:
+          TransformComponent:
+            Transform:
+              Translation: [-4.80000019, -5.0999999, 1.39999998]
+              Rotation: [0, 0, 0]
+              Scale: [0.400000006, 4.80000019, 5.69999981]
+          MeshComponent:
+            AssetID: 10036008063945961451

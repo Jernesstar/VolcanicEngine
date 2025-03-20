@@ -407,6 +407,7 @@ void EditorAssetManager::RuntimeSave(const std::string& exportPath) {
 			fs::remove(target1);
 		if(FileUtils::FileExists(source1))
 			fs::copy_file(source1, target1);
+
 		if(FileUtils::FileExists(target2))
 			fs::remove(target2);
 		if(FileUtils::FileExists(source2))

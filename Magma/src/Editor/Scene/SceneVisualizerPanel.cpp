@@ -211,6 +211,7 @@ void SceneVisualizerPanel::Draw() {
 				}
 			}
 			if(exit) {
+				exit = false;
 				asset.Type = AssetType::None;
 				ImGui::CloseCurrentPopup();
 			}
