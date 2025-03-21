@@ -1,7 +1,13 @@
 #include "../../../Project/App/TestGame.as"
 
+class SomeScriptClass
+{
+    uint32 Int = 0;
+}
+
 class PlayerController : IEntity
 {
+    SomeScriptClass Class;
     Entity Handle;
     Asset asset = Asset(16624656892553940704, AssetType::Audio);
     bool SomeBool;

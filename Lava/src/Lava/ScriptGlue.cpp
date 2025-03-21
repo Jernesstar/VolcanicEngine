@@ -346,8 +346,9 @@ void RegisterAssetManager() {
 	// engine->RegisterObjectMethod("Asset", "bool get_Primary() const property",
 	// 	asFUNCTION(GetAssetPrimaryFlag), asCALL_CDECL_OBJLAST);
 	engine->RegisterObjectBehaviour("Asset", asBEHAVE_CONSTRUCT,
-		"void f(uint64, AssetType)",
-		asFUNCTION(AssetInitCtor), asCALL_CDECL_OBJLAST);
+		"void f()", asFUNCTION(AssetDefaultCtor), asCALL_CDECL_OBJLAST);
+	engine->RegisterObjectBehaviour("Asset", asBEHAVE_CONSTRUCT,
+		"void f(uint64, AssetType)", asFUNCTION(AssetInitCtor), asCALL_CDECL_OBJLAST);
 
 	engine->RegisterObjectType("AssetManagerClass", 0,
 		asOBJ_REF | asOBJ_NOHANDLE);

@@ -51,6 +51,17 @@ Scene:
           MeshComponent:
             AssetID: 10036008063945961451
     - Entity:
+        Name: Model
+        ID: 560
+        Components:
+          TransformComponent:
+            Transform:
+              Translation: [0, -5.4000001, 0]
+              Rotation: [0, 0, 0]
+              Scale: [1, 1, 1]
+          MeshComponent:
+            AssetID: 15277418182178081176
+    - Entity:
         Name: Ball2
         ID: 554
         Components:
@@ -69,6 +80,38 @@ Scene:
         Components:
           MeshComponent:
             AssetID: 15277418182178081176
+          ScriptComponent:
+            ModuleID: 2691709289590626850
+            Class: PlayerController
+            Fields:
+              - Field:
+                  Name: Class
+              - Field:
+                  Name: Handle
+                  Type: Entity
+                  Value: 4294967846
+              - Field:
+                  Name: asset
+                  Type: Asset
+                  Value:
+                    ID: 0
+                    Type: 0
+              - Field:
+                  Name: SomeBool
+                  Type: bool
+                  Value: false
+              - Field:
+                  Name: Signed8
+                  Type: int8
+                  Value: 0
+              - Field:
+                  Name: Unsigned32
+                  Type: uint32
+                  Value: 0
+              - Field:
+                  Name: Float
+                  Type: float
+                  Value: 0
     - Entity:
         Name: ""
         ID: 558
@@ -80,3 +123,14 @@ Scene:
               Scale: [0.400000006, 4.80000019, 5.69999981]
           MeshComponent:
             AssetID: 10036008063945961451
+    - Entity:
+        Name: ""
+        ID: 559
+        Components:
+          TransformComponent:
+            Transform:
+              Translation: [0, -16.1000004, 0]
+              Rotation: [0, 0, 0]
+              Scale: [1, 1, 1]
+          MeshComponent:
+            AssetID: 4186775327602265389

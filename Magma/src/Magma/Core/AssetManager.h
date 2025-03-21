@@ -1,5 +1,7 @@
 #pragma once
 
+#include <map>
+
 #include <VolcaniCore/Core/Defines.h>
 #include <VolcaniCore/Core/UUID.h>
 
@@ -89,7 +91,7 @@ public:
 	Ref<T> Get(Asset asset);
 
 protected:
-	Map<Asset, bool> m_AssetRegistry;
+	std::map<Asset, bool> m_AssetRegistry;
 	Map<VolcaniCore::UUID, VolcaniCore::List<Asset>> m_References;
 
 	Map<VolcaniCore::UUID, Ref<VolcaniCore::Mesh>> m_MeshAssets;

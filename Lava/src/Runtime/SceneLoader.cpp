@@ -191,7 +191,8 @@ template<>
 BinaryReader& BinaryReader::ReadObject(Entity& entity) {
 	std::string name;
 	Read(name);
-	entity.SetName(name);
+	if(name != "")
+		entity.SetName(name);
 
 	s_CurrentEntity = entity;
 

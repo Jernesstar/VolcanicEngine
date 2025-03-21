@@ -17,7 +17,7 @@ public:
 	std::string GetPath(VolcaniCore::UUID id);
 	VolcaniCore::UUID GetFromPath(const std::string& path);
 
-	const Map<Asset, bool>& GetRegistry() const { return m_AssetRegistry; }
+	const auto& GetRegistry() const { return m_AssetRegistry; }
 
 	void Load(const std::string& path);
 	void Reload();

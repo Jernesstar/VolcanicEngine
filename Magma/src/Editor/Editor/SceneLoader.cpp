@@ -195,20 +195,22 @@ void SerializeEntity(YAMLSerializer& serializer, const Entity& entity) {
 			auto* handle = obj->GetHandle();
 			for(uint32_t i = 0; i < handle->GetPropertyCount(); i++) {
 				void* address = handle->GetAddressOfProperty(i);
+				std::string name = handle->GetPropertyName(i);
 				auto typeID = handle->GetPropertyTypeId(i);
 				auto* typeInfo = ScriptEngine::Get()->GetTypeInfoById(typeID);
 	
 				serializer.BeginMapping()
 					.WriteKey("Field").BeginMapping();
+
+				serializer.WriteKey("Name").Write(name);
 	
-				// Complex Type
-				if(typeInfo) {
-	
+				// Script Type
+				if(typeInfo && typeID & asTYPEID_SCRIPTOBJECT) {
 						serializer.EndMapping()
 					.EndMapping();
 					continue;
 				}
-	
+
 				if(typeID == asTYPEID_BOOL) {
 					serializer
 						.WriteKey("Type").Write(std::string("bool"))
@@ -217,12 +219,12 @@ void SerializeEntity(YAMLSerializer& serializer, const Entity& entity) {
 				else if(typeID == asTYPEID_INT8) {
 					serializer
 						.WriteKey("Type").Write(std::string("int8"))
-						.WriteKey("Value").Write(*(int32_t*)address);
+						.WriteKey("Value").Write((int32_t)*(int8_t*)address);
 				}
 				else if(typeID == asTYPEID_INT16) {
 					serializer
 						.WriteKey("Type").Write(std::string("int16"))
-						.WriteKey("Value").Write(*(int32_t*)address);
+						.WriteKey("Value").Write((int32_t)*(int16_t*)address);
 				}
 				else if(typeID == asTYPEID_INT32) {
 					serializer
@@ -237,12 +239,12 @@ void SerializeEntity(YAMLSerializer& serializer, const Entity& entity) {
 				else if(typeID == asTYPEID_UINT8) {
 					serializer
 						.WriteKey("Type").Write(std::string("uint8"))
-						.WriteKey("Value").Write(*(uint32_t*)address);
+						.WriteKey("Value").Write((uint32_t)*(uint8_t*)address);
 				}
 				else if(typeID == asTYPEID_UINT16) {
 					serializer
 						.WriteKey("Type").Write(std::string("uint16"))
-						.WriteKey("Value").Write(*(uint32_t*)address);
+						.WriteKey("Value").Write((uint32_t)*(uint16_t*)address);
 				}
 				else if(typeID == asTYPEID_UINT32) {
 					serializer
@@ -256,23 +258,34 @@ void SerializeEntity(YAMLSerializer& serializer, const Entity& entity) {
 				}
 				else if(typeID == asTYPEID_FLOAT) {
 					serializer
-					.WriteKey("Type").Write(std::string("float"))
-					.WriteKey("Value").Write(*(float*)address);
+						.WriteKey("Type").Write(std::string("float"))
+						.WriteKey("Value").Write(*(float*)address);
 				}
 				else if(typeID == asTYPEID_DOUBLE) {
 					serializer
-					.WriteKey("Type").Write(std::string("double"))
-					.WriteKey("Value").Write(*(float*)(double*)address);
+						.WriteKey("Type").Write(std::string("double"))
+						.WriteKey("Value").Write(*(float*)(double*)address);
 				}
-	
+				else if(std::string(typeInfo->GetName()) == "Entity") {
+					serializer
+						.WriteKey("Type").Write(std::string("Entity"))
+						.WriteKey("Value")
+							.Write((uint64_t)((Entity*)address)->GetHandle());
+				}
+				else if(std::string(typeInfo->GetName()) == "Asset") {
+					serializer
+						.WriteKey("Type").Write(std::string("Asset"))
+						.WriteKey("Value").Write(*(Asset*)address);
+				}
 					serializer.EndMapping()
 				.EndMapping();
 			}
+
+			serializer
+				.EndSequence();
 		}
-		
-		serializer
-			.EndSequence()
-		.EndMapping();
+
+		serializer.EndMapping();
 	}
 	if(entity.Has<RigidBodyComponent>()) {
 		auto body = entity.Get<RigidBodyComponent>().Body;
@@ -481,6 +494,49 @@ void DeserializeEntity(YAML::Node entityNode, Scene& scene) {
 				}
 				else {
 					auto instance = _class->Construct();
+					auto obj = instance->GetHandle();
+					uint32_t i = 0;
+					for(auto fieldNode : scriptComponentNode["Fields"]) {
+						void* address = obj->GetAddressOfProperty(i++);
+						auto node = fieldNode["Field"];
+						if(!node["Type"])
+							continue;
+
+						std::string name = node["Name"].as<std::string>();
+						std::string type = node["Type"].as<std::string>();
+
+						if(type == "bool")
+							*(bool*)address = node["Value"].as<bool>();
+						else if(type == "int8")
+							*(int8_t*)address = (int8_t)node["Value"].as<int32_t>();
+						else if(type == "int16")
+							*(int16_t*)address = (int16_t)node["Value"].as<int32_t>();
+						else if(type == "int32")
+							*(int32_t*)address = node["Value"].as<int32_t>();
+						else if(type == "int64")
+							*(int64_t*)address = node["Value"].as<int64_t>();
+						else if(type == "uint8")
+							*(uint8_t*)address = (uint8_t)node["Value"].as<uint32_t>();
+						else if(type == "uint16")
+							*(uint16_t*)address = (uint16_t)node["Value"].as<uint32_t>();
+						else if(type == "uint32")
+							*(uint32_t*)address = node["Value"].as<uint32_t>();
+						else if(type == "uint64")
+							*(uint64_t*)address = node["Value"].as<uint64_t>();
+						else if(type == "float")
+							*(float*)address = node["Value"].as<float>();
+						else if(type == "double")
+							*(double*)address = node["Value"].as<float>();
+						else if(type == "Entity")
+							*(Entity*)address = entity;
+						else if(type == "Asset") {
+							((Asset*)address)->ID =
+								node["Value"]["ID"].as<uint64_t>();
+							((Asset*)address)->Type =
+								(AssetType)node["Value"]["Type"].as<uint32_t>();
+						}
+					}
+
 					entity.Add<ScriptComponent>(asset, instance);
 				}
 			}
