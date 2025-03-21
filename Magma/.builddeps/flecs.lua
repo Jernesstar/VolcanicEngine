@@ -19,6 +19,7 @@ project "flecs"
     }
 
     defines {
+        "flecs_EXPORTS",
         "FLECS_DEBUG",
         -- "FLECS_CPP_NO_AUTO_REGISTRATION",
         -- "FLECS_CUSTOM_BUILD",
@@ -35,9 +36,5 @@ project "flecs"
         cdialect "gnu99"
         links {
             "Ws2_32"
-        }
-
-        linkeroptions {
-
         }
 

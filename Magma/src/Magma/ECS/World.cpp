@@ -33,8 +33,6 @@ World::World() {
 	m_World.component<ParticleSystemComponent>();
 
 	m_AllEntitiesQuery = m_World.query_builder().with<Component>().build();
-
-	m_EventHandler = m_World.entity("WorldEventHandler");
 }
 
 void World::OnUpdate(TimeStep ts) {

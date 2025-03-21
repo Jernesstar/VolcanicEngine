@@ -20,9 +20,9 @@ ScriptSystem::ScriptSystem(ECS::World* world)
 			});
 	// m_KeyReleasedCallbackID =
 	// 	Events::RegisterListener<KeyReleasedEvent>(
-	// 		[this](const KeyReleasedEvent& event)
+	// 		[this](KeyReleasedEvent& event)
 	// 		{
-	// 			m_KeyPressedCallbackEntity.enqueue<const KeyEvent*>(&event);
+	// 			m_KeyPressedCallbackEntity.enqueue<KeyReleasedEvent>(event);
 	// 		});
 }
 
@@ -61,11 +61,15 @@ void ScriptSystem::Broadcast(Entity& entity, const std::string& id) {
 }
 
 void ScriptSystem::OnComponentAdd(Entity& entity) {
+	VOLCANICORE_LOG_INFO("Registered '%s'", entity.GetName().c_str());
 	entity.GetHandle().observe<KeyPressedEvent>(
 		[this, &handle=entity](KeyPressedEvent& event)
 		{
 			auto sc = handle.Get<ScriptComponent>();
-			sc.Instance->Call("OnKeyEvent", &event);
+			if(!sc.Instance)
+				return;
+
+			sc.Instance->Call("OnKeyEvent", dynamic_cast<KeyEvent*>(&event));
 		});
 }
 
