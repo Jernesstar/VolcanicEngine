@@ -139,6 +139,13 @@ void App::OnUpdate(TimeStep ts) {
 	if(!Running)
 		return;
 
+	if(s_ShouldSwitchScreen)
+		ScreenSet(s_NewScreenName);
+	else if(s_ShouldPushScreen)
+		ScreenPush(s_NewScreenName);
+	else if(s_ShouldPopScreen)
+		ScreenPop();
+
 	Renderer::Clear();
 
 	s_AppObject->Call("OnUpdate", (float)ts);
@@ -147,6 +154,9 @@ void App::OnUpdate(TimeStep ts) {
 
 	s_Screen->World->OnUpdate(ts);
 	s_Screen->World->OnRender(m_SceneRenderer);
+
+	if(!RenderUI)
+		return;
 
 	UIRenderer::BeginFrame();
 
@@ -179,13 +189,6 @@ void App::OnUpdate(TimeStep ts) {
 		});
 
 	UIRenderer::EndFrame();
-
-	if(s_ShouldSwitchScreen)
-		ScreenSet(s_NewScreenName);
-	else if(s_ShouldPushScreen)
-		ScreenPush(s_NewScreenName);
-	else if(s_ShouldPopScreen)
-		ScreenPop();
 }
 
 void App::SwitchScreen(const std::string& name) {
@@ -346,6 +349,9 @@ void RuntimeSceneRenderer::Begin() {
 
 void RuntimeSceneRenderer::SubmitCamera(const Entity& entity) {
 	auto camera = entity.Get<CameraComponent>().Cam;
+	auto width = Application::GetWindow()->GetWidth();
+	auto height = Application::GetWindow()->GetHeight();
+	camera->Resize(width, height);
 
 	FirstCommand->UniformData
 	.SetInput("u_ViewProj", camera->GetViewProjection());

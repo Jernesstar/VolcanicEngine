@@ -469,18 +469,18 @@ void DeserializeEntity(YAML::Node entityNode, Scene& scene) {
 			auto mod = assetManager.Get<ScriptModule>(asset);
 			if(!mod) {
 				VOLCANICORE_LOG_INFO(
-					"Could not find class module %llu, needed for Entity %llu",
+					"Could not find class module %lu, needed for Entity %lu",
 					(uint64_t)id, (uint64_t)entityID);
 			}
 			else {
 				auto _class = mod->GetClass(className);
 				if(!_class) {
 					VOLCANICORE_LOG_INFO(
-						"Could not find class '%s' in module %llu, needed for Entity %llu",
+						"Could not find class '%s' in module %lu, needed for Entity %lu",
 						className.c_str(), (uint64_t)id, (uint64_t)entityID);
 				}
 				else {
-					auto instance = _class->Instantiate(entity);
+					auto instance = _class->Construct();
 					entity.Add<ScriptComponent>(asset, instance);
 				}
 			}
