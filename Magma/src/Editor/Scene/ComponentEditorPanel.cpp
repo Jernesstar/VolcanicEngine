@@ -354,13 +354,14 @@ void DrawComponent<ParticleSystemComponent>(Entity& entity) {
 		-FLT_MAX, +FLT_MAX, "%.4f");
 
 	uint64_t min = 3, max = 1000;
-	ImGui::SliderScalar("Particle Max Count", ImGuiDataType_U64,
+	ImGui::Text("Particle Max Count"); ImGui::SameLine(200.0f);
+	ImGui::SliderScalar("##MaxCount", ImGuiDataType_U64,
 		&component.MaxParticleCount, &min, &max);
-	ImGui::DragFloat("Particle Life Time", &component.ParticleLifetime,
+	ImGui::Text("Particle Life Time"); ImGui::SameLine(200.0f);
+	ImGui::DragFloat("##LifeTime", &component.ParticleLifetime,
 		1.0f, 1.0f, 10000.0f);
-	ImGui::Text("Asset: %li", (uint64_t)component.ImageAsset.ID);
+	ImGui::Text("Image Asset: %li", (uint64_t)component.ImageAsset.ID);
 
-	ImGui::Text("Module ID: %li", (uint64_t)component.ImageAsset.ID);
 	std::string text = component.ImageAsset.ID ? "Change Asset" : "Set Asset";
 	if(ImGui::Button(text.c_str())) {
 

@@ -159,17 +159,12 @@ struct ParticleSystemComponent : public Component {
 	uint64_t MaxParticleCount;
 	float ParticleLifetime; // In milliseconds
 	Asset ImageAsset;
-	List<Particle> Particles;
 
 	ParticleSystemComponent() = default;
 	ParticleSystemComponent(const Vec3& pos, uint64_t max, float lifetime,
 							const Asset& asset)
 		: Position(pos), MaxParticleCount(max), ParticleLifetime(lifetime),
-			ImageAsset(asset), Particles(max)
-	{
-		for(uint32_t i = 0; i < max; i++)
-			Particles.Emplace();
-	}
+			ImageAsset(asset) { }
 	ParticleSystemComponent(const ParticleSystemComponent& other) = default;
 };
 

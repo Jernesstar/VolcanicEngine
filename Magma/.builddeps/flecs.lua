@@ -7,11 +7,15 @@ project "flecs"
     targetdir ("%{RootPath}/build/Magma/lib")
 
     files {
-        "%{VendorPaths.flecs}/flecs.c",
+        "%{VendorPaths.flecs}/distr/flecs.c",
+        -- "%{VendorPaths.flecs}/src/*.c",
+        -- "%{VendorPaths.flecs}/src/datastructures/*.c",
+        -- "%{VendorPaths.flecs}/src/query/*.c",
+        -- "%{VendorPaths.flecs}/src/storage/*.c",
     }
 
     includedirs {
-        "%{Includes.flecs}",
+        "%{VendorPaths.flecs}/distr",
     }
 
     defines {
@@ -20,7 +24,7 @@ project "flecs"
         -- "FLECS_CUSTOM_BUILD",
         -- "FLECS_CPP",
         -- "FLECS_SYSTEM",
-        -- "FLECS_PIPELINE"
+        -- "FLECS_PIPELINE",
         -- "FLECS_ALERTS",
         -- "FLECS_LOG",
         -- "FLECS_METRICS",
@@ -29,3 +33,11 @@ project "flecs"
 
     filter "toolset:gcc or toolset:clang"
         cdialect "gnu99"
+        links {
+            "Ws2_32"
+        }
+
+        linkeroptions {
+
+        }
+

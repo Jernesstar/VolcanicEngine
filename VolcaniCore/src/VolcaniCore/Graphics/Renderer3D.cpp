@@ -189,7 +189,7 @@ static void DrawSubMesh(Ref<Mesh> root, SubMesh& mesh, const glm::mat4& tr,
 			command->UniformData
 			.SetInput("u_Material.SpecularColor", mat.SpecularColor);
 			command->UniformData
-			.SetInput("u_Material.EmissiveColor", mat.DiffuseColor);
+			.SetInput("u_Material.EmissiveColor", mat.EmissiveColor);
 		}
 
 		command->AddIndices(mesh.Indices);

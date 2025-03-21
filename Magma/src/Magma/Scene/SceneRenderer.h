@@ -1,7 +1,5 @@
 #pragma once
 
-#include <flecs/flecs.h>
-
 #include <VolcaniCore/Core/Buffer.h>
 #include <VolcaniCore/Graphics/RenderPass.h>
 #include <VolcaniCore/Graphics/Camera.h>

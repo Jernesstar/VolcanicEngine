@@ -23,7 +23,7 @@ void main()
     if(u_Material.IsTextured == 1)
         color = texture(u_Material.Diffuse, v_TexCoords).rgb;
     else
-        color = u_Material.DiffuseColor.rgb + u_Material.SpecularColor.rgb;
+        color = u_Material.DiffuseColor.rgb;
 
     FragColor = vec4(color, 1.0);
 }

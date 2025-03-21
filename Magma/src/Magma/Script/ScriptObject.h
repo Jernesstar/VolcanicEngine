@@ -15,13 +15,13 @@ public:
 	virtual ~ScriptObject();
 
 	template<typename T, typename... Args>
-	T Call(const std::string& name, Args&&... args) {
+	T Call(const std::string& name, Args&&... args) const {
 		ScriptFunc func = GetFunc(name);
 		return func.CallReturn<T>(std::forward<Args>(args)...);
 	}
 
 	template<typename... Args>
-	void Call(const std::string& name, Args&&... args) {
+	void Call(const std::string& name, Args&&... args) const {
 		ScriptFunc func = GetFunc(name);
 		func.CallVoid(std::forward<Args>(args)...);
 	}
@@ -34,7 +34,7 @@ private:
 	uint32_t Release();
 	void DestroyAndRelease();
 
-	ScriptFunc GetFunc(const std::string& name);
+	ScriptFunc GetFunc(const std::string& name) const;
 
 private:
 	asIScriptObject* m_Handle = nullptr;

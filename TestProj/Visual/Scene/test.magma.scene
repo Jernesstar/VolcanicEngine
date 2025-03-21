@@ -51,17 +51,6 @@ Scene:
           MeshComponent:
             AssetID: 10036008063945961451
     - Entity:
-        Name: Model
-        ID: 560
-        Components:
-          TransformComponent:
-            Transform:
-              Translation: [0, -5.4000001, 0]
-              Rotation: [0, 0, 0]
-              Scale: [1, 1, 1]
-          MeshComponent:
-            AssetID: 15277418182178081176
-    - Entity:
         Name: Ball2
         ID: 554
         Components:
@@ -75,11 +64,40 @@ Scene:
           MeshComponent:
             AssetID: 4186775327602265389
     - Entity:
+        Name: ""
+        ID: 558
+        Components:
+          TransformComponent:
+            Transform:
+              Translation: [-4.80000019, -5.0999999, 1.39999998]
+              Rotation: [0, 0, 0]
+              Scale: [0.400000006, 4.80000019, 5.69999981]
+          MeshComponent:
+            AssetID: 10036008063945961451
+    - Entity:
+        Name: ""
+        ID: 559
+        Components:
+          TransformComponent:
+            Transform:
+              Translation: [0, -16.1000004, 0]
+              Rotation: [0, 0, 0]
+              Scale: [1, 1, 1]
+          MeshComponent:
+            AssetID: 4186775327602265389
+    - Entity:
         Name: Player
         ID: 4294967846
         Components:
+          TagComponent:
+            Tag: MainCharacter
+          TransformComponent:
+            Transform:
+              Translation: [0, 0, 0]
+              Rotation: [0, 0, 0]
+              Scale: [1, 1, 1]
           MeshComponent:
-            AssetID: 15277418182178081176
+            AssetID: 10036008063945961451
           ScriptComponent:
             ModuleID: 2691709289590626850
             Class: PlayerController
@@ -112,25 +130,3 @@ Scene:
                   Name: Float
                   Type: float
                   Value: 0
-    - Entity:
-        Name: ""
-        ID: 558
-        Components:
-          TransformComponent:
-            Transform:
-              Translation: [-4.80000019, -5.0999999, 1.39999998]
-              Rotation: [0, 0, 0]
-              Scale: [0.400000006, 4.80000019, 5.69999981]
-          MeshComponent:
-            AssetID: 10036008063945961451
-    - Entity:
-        Name: ""
-        ID: 559
-        Components:
-          TransformComponent:
-            Transform:
-              Translation: [0, -16.1000004, 0]
-              Rotation: [0, 0, 0]
-              Scale: [1, 1, 1]
-          MeshComponent:
-            AssetID: 4186775327602265389

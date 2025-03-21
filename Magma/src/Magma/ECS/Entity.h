@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include <flecs/flecs.h>
+#include <flecs.h>
 
 namespace Magma::ECS {
 

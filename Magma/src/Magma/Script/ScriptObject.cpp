@@ -43,7 +43,7 @@ void ScriptObject::DestroyAndRelease() {
 	Release();
 }
 
-ScriptFunc ScriptObject::GetFunc(const std::string& name) {
+ScriptFunc ScriptObject::GetFunc(const std::string& name) const {
 	auto* function = m_Class->GetFunction(name);
 	auto* ctx = m_Class->GetModule()->GetContext();
 	return ScriptFunc{ function, ctx, m_Handle };

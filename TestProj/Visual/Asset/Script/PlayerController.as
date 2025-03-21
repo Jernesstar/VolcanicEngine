@@ -62,6 +62,7 @@ class PlayerController : IEntity
         KeyPressedEvent@ e = cast<KeyPressedEvent>(event);
         if(e.Key == Key::Space and !e.IsRepeat)
         {
+            print("Playing sound");
             Sound@ sound = AssetManager.GetSound(asset);
             sound.Play();
         }
@@ -85,8 +86,8 @@ class PlayerController : IEntity
         // }
 
         // if(event.EntityHandle.GetTagComponent().Tag == "Lava") {
-        //     ScriptSystem@ sys = Scene.GetScriptSystem();
-        //     sys.BroadcastEvent("PlayerDied");
+            ScriptSystem@ sys = Scene.GetScriptSystem();
+            sys.BroadcastEvent(Handle, "PlayerDied");
         // }
     }
 

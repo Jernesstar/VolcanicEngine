@@ -239,10 +239,6 @@ void App::ScreenSet(const std::string& name) {
 	if(screen.UI != "")
 		UILoad(s_Screen->UI);
 
-	auto scriptClass = s_Screen->Script->GetClass(name);
-	s_Screen->ScriptObj = scriptClass->Instantiate();
-	s_Screen->ScriptObj->Call("OnLoad");
-
 	s_Screen->UI.Traverse(
 		[&](UIElement* element)
 		{
@@ -259,6 +255,10 @@ void App::ScreenSet(const std::string& name) {
 
 			element->ScriptInstance = _class->Instantiate(element->GetID());
 		});
+
+	auto scriptClass = s_Screen->Script->GetClass(name);
+	s_Screen->ScriptObj = scriptClass->Instantiate();
+	s_Screen->ScriptObj->Call("OnLoad");
 }
 
 void App::ScreenPush(const std::string& name) {
