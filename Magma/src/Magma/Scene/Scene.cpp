@@ -63,7 +63,7 @@ void Scene::OnRender(SceneRenderer& renderer) {
 		});
 
 	world.query_builder()
-	.with<ParticleSystemComponent>()
+	.with<ParticleEmitterComponent>()
 	.build()
 	.each(
 		[&](flecs::entity id)
@@ -99,7 +99,7 @@ void Scene::RegisterSystems() {
 			ourPhase = Phase::PostUpdate;
 
 		EntityWorld.GetNative()
-		.system<ParticleSystemComponent>()
+		.system<ParticleEmitterComponent>()
 		.kind(phase)
 		.run(
 			[&](flecs::iter& it)

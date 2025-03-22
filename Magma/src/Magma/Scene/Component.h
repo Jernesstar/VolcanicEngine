@@ -152,20 +152,18 @@ struct SpotlightComponent : public Component {
 	SpotlightComponent(const SpotlightComponent& other) = default;
 };
 
-struct ParticleSystemComponent : public Component {
-	struct Particle { Vec3 Position, Velocity; float Life; };
-
+struct ParticleEmitterComponent : public Component {
 	Vec3 Position;
 	uint64_t MaxParticleCount;
 	float ParticleLifetime; // In milliseconds
 	Asset ImageAsset;
 
-	ParticleSystemComponent() = default;
-	ParticleSystemComponent(const Vec3& pos, uint64_t max, float lifetime,
-							const Asset& asset)
+	ParticleEmitterComponent() = default;
+	ParticleEmitterComponent(const Vec3& pos, uint64_t max, float lifetime,
+							 const Asset& asset)
 		: Position(pos), MaxParticleCount(max), ParticleLifetime(lifetime),
 			ImageAsset(asset) { }
-	ParticleSystemComponent(const ParticleSystemComponent& other) = default;
+	ParticleEmitterComponent(const ParticleEmitterComponent& other) = default;
 };
 
 }

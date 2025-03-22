@@ -342,12 +342,12 @@ void DrawComponent<SpotlightComponent>(Entity& entity) {
 }
 
 template<>
-void DrawComponent<ParticleSystemComponent>(Entity& entity) {
-	if(!entity.Has<ParticleSystemComponent>())
+void DrawComponent<ParticleEmitterComponent>(Entity& entity) {
+	if(!entity.Has<ParticleEmitterComponent>())
 		return;
 
-	auto& component = entity.Set<ParticleSystemComponent>();
-	ImGui::SeparatorText("ParticleSystemComponent");
+	auto& component = entity.Set<ParticleEmitterComponent>();
+	ImGui::SeparatorText("ParticleEmitterComponent");
 
 	ImGui::Text("Position"); ImGui::SameLine(120.0f);
 	ImGui::DragFloat3("##Position", &component.Position.x, 0.1f,
@@ -394,8 +394,8 @@ void ComponentEditorPanel::Draw() {
 				DrawComponent<PointLightComponent>(m_Context);
 			else if(IsFocused<SpotlightComponent>(m_Context))
 				DrawComponent<SpotlightComponent>(m_Context);
-			else if(IsFocused<ParticleSystemComponent>(m_Context))
-				DrawComponent<ParticleSystemComponent>(m_Context);
+			else if(IsFocused<ParticleEmitterComponent>(m_Context))
+				DrawComponent<ParticleEmitterComponent>(m_Context);
 		}
 	}
 	ImGui::End();

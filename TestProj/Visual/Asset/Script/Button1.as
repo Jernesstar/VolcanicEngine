@@ -1,5 +1,5 @@
 
-class Button1 : IUIObject
+class Button1 : IUIController
 {
     string ID;
 

@@ -181,7 +181,7 @@ void SceneHierarchyPanel::DrawEntityNode(Entity& entity) {
 		FOCUS_COMPONENT(DirectionalLightComponent, "DirectionalLightComponent")
 		FOCUS_COMPONENT(PointLightComponent, "PointLightComponent")
 		FOCUS_COMPONENT(SpotlightComponent, "SpotlightComponent")
-		FOCUS_COMPONENT(ParticleSystemComponent, "ParticleSystemComponent")
+		FOCUS_COMPONENT(ParticleEmitterComponent, "ParticleEmitterComponent")
 
 		if(ImGui::BeginPopup("Properties"))
 		{
@@ -221,9 +221,9 @@ void SceneHierarchyPanel::DrawEntityNode(Entity& entity) {
 					if(!entity.Has<SpotlightComponent>()
 					&& ImGui::MenuItem("SpotlightComponent"))
 						entity.Add<SpotlightComponent>();
-					if(!entity.Has<ParticleSystemComponent>()
-					&& ImGui::MenuItem("ParticleSystemComponent"))
-						entity.Add<ParticleSystemComponent>();
+					if(!entity.Has<ParticleEmitterComponent>()
+					&& ImGui::MenuItem("ParticleEmitterComponent"))
+						entity.Add<ParticleEmitterComponent>();
 
 					ImGui::EndMenu();
 				}
@@ -262,9 +262,9 @@ void SceneHierarchyPanel::DrawEntityNode(Entity& entity) {
 					if(entity.Has<SpotlightComponent>()
 					&& ImGui::MenuItem("SpotlightComponent"))
 						entity.Remove<SpotlightComponent>();
-					if(entity.Has<ParticleSystemComponent>()
-					&& ImGui::MenuItem("ParticleSystemComponent"))
-						entity.Remove<ParticleSystemComponent>();
+					if(entity.Has<ParticleEmitterComponent>()
+					&& ImGui::MenuItem("ParticleEmitterComponent"))
+						entity.Remove<ParticleEmitterComponent>();
 
 					ImGui::EndMenu();
 				}

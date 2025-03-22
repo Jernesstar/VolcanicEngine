@@ -175,7 +175,7 @@ BinaryReader& BinaryReader::ReadObject(SpotlightComponent& comp) {
 }
 
 template<>
-BinaryReader& BinaryReader::ReadObject(ParticleSystemComponent& comp) {
+BinaryReader& BinaryReader::ReadObject(ParticleEmitterComponent& comp) {
 	Read(comp.Position);
 	Read(comp.MaxParticleCount);
 	Read(comp.ParticleLifetime);
@@ -223,7 +223,7 @@ BinaryReader& BinaryReader::ReadObject(Entity& entity) {
 	if(componentBits.test(10))
 		Read(entity.Set<SpotlightComponent>());
 	if(componentBits.test(11))
-		Read(entity.Set<ParticleSystemComponent>());
+		Read(entity.Set<ParticleEmitterComponent>());
 
 	return *this;
 }

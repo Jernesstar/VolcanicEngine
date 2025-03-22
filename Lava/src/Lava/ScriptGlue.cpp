@@ -66,9 +66,9 @@ void ScriptGlue::RegisterInterface() {
 		.AddMethod("void OnClose()")
 		.AddMethod("void OnUpdate(float ts)");
 
-	ScriptEngine::RegisterInterface("IEntity")
+	ScriptEngine::RegisterInterface("IEntityController")
 		.AddMethod("void OnUpdate(float ts)")
-		// KeyPressed, KeyReleased
+		// KeyPressed, KeyReleased, KeyCharacter
 		.AddMethod("void OnKeyEvent(KeyEvent@)")
 		// MousePressed, MouseReleased
 		.AddMethod("void OnMouseEvent(MouseEvent@)")
@@ -78,7 +78,7 @@ void ScriptGlue::RegisterInterface() {
 		.AddMethod("void OnGameEvent(GameEvent@)")
 		;
 
-	ScriptEngine::RegisterInterface("IUIObject")
+	ScriptEngine::RegisterInterface("IUIController")
 		.AddMethod("void OnClick()")
 		.AddMethod("void OnHover()")
 		.AddMethod("void OnMouseUp()")
@@ -466,7 +466,7 @@ void RegisterECS() {
 	engine->RegisterObjectType("ScriptComponent", 0, asOBJ_REF | asOBJ_NOCOUNT);
 	engine->RegisterObjectProperty("ScriptComponent", "Asset ModuleAsset",
 		asOFFSET(ScriptComponent, ModuleAsset));
-	engine->RegisterObjectMethod("ScriptComponent", "IEntity@ get_Instance()",
+	engine->RegisterObjectMethod("ScriptComponent", "IEntityController@ get_Instance()",
 		asFUNCTION(GetScriptInstance), asCALL_CDECL_OBJLAST);
 
 	engine->RegisterObjectType("RigidBodyComponent", 0, asOBJ_REF | asOBJ_NOCOUNT);
@@ -497,7 +497,7 @@ void RegisterECS() {
 		asOBJ_REF | asOBJ_NOCOUNT);
 	engine->RegisterObjectType("SpotlightComponent", 0,
 		asOBJ_REF | asOBJ_NOCOUNT);
-	engine->RegisterObjectType("ParticleSystemComponent", 0,
+	engine->RegisterObjectType("ParticleEmitterComponent", 0,
 		asOBJ_REF | asOBJ_NOCOUNT);
 
 	engine->RegisterObjectType("Entity", sizeof(Entity),
@@ -544,7 +544,7 @@ void RegisterECS() {
 		asMETHODPR(Entity, Has<SpotlightComponent>, () const, bool),
 		asCALL_THISCALL);
 	engine->RegisterObjectMethod("Entity", "bool HasParticleSystemComponent() const",
-		asMETHODPR(Entity, Has<ParticleSystemComponent>, () const, bool),
+		asMETHODPR(Entity, Has<ParticleEmitterComponent>, () const, bool),
 		asCALL_THISCALL);
 
 	engine->RegisterObjectMethod("Entity",
@@ -592,9 +592,9 @@ void RegisterECS() {
 		asMETHODPR(Entity, Get<SpotlightComponent>, () const,
 			const SpotlightComponent&), asCALL_THISCALL);
 	engine->RegisterObjectMethod("Entity",
-		"const ParticleSystemComponent@ GetParticleSystemComponent()",
-		asMETHODPR(Entity, Get<ParticleSystemComponent>, () const,
-			const ParticleSystemComponent&), asCALL_THISCALL);
+		"const ParticleEmitterComponent@ GetParticleSystemComponent()",
+		asMETHODPR(Entity, Get<ParticleEmitterComponent>, () const,
+			const ParticleEmitterComponent&), asCALL_THISCALL);
 
 	engine->RegisterObjectMethod("Entity",
 		"CameraComponent@ SetCameraComponent()",
@@ -641,9 +641,9 @@ void RegisterECS() {
 		asMETHODPR(Entity, Set<SpotlightComponent>, (),
 			SpotlightComponent&), asCALL_THISCALL);
 	engine->RegisterObjectMethod("Entity",
-		"ParticleSystemComponent@ SetParticleSystemComponent()",
-		asMETHODPR(Entity, Set<ParticleSystemComponent>, (),
-			ParticleSystemComponent&), asCALL_THISCALL);
+		"ParticleEmitterComponent@ SetParticleSystemComponent()",
+		asMETHODPR(Entity, Set<ParticleEmitterComponent>, (),
+			ParticleEmitterComponent&), asCALL_THISCALL);
 }
 
 static HitInfo PhysicsRaycastScreen(uint32_t x, uint32_t y, PhysicsSystem* sys) {

@@ -30,7 +30,7 @@ World::World() {
 	m_World.component<DirectionalLightComponent>();
 	m_World.component<PointLightComponent>();
 	m_World.component<SpotlightComponent>();
-	m_World.component<ParticleSystemComponent>();
+	m_World.component<ParticleEmitterComponent>();
 
 	m_AllEntitiesQuery = m_World.query_builder().with<Component>().build();
 }

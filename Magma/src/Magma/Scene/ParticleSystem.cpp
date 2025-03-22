@@ -15,7 +15,7 @@ void ParticleSystem::Update(TimeStep ts) {
 void ParticleSystem::Run(Phase phase) {
 	if(phase == Phase::OnUpdate) {
 		m_EntityWorld
-		->ForEach<ParticleSystemComponent>(
+		->ForEach<ParticleEmitterComponent>(
 			[this](Entity& entity)
 			{
 				auto [pc] = GetRequired(entity);

@@ -5,7 +5,7 @@ class SomeScriptClass
     uint32 Int = 0;
 }
 
-class PlayerController : IEntity
+class PlayerController : IEntityController
 {
     SomeScriptClass Class;
     Entity Handle;

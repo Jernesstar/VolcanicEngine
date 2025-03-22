@@ -8,7 +8,7 @@ using namespace Magma::ECS;
 
 namespace Magma {
 
-class ParticleSystem : public System<ParticleSystemComponent> {
+class ParticleSystem : public System<ParticleEmitterComponent> {
 public:
 	ParticleSystem(ECS::World* world)
 		: System(world) { }

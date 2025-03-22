@@ -372,10 +372,10 @@ void SerializeEntity(YAMLSerializer& serializer, const Entity& entity) {
 			.EndMapping()
 		.EndMapping(); // SpotlightComponent
 	}
-	if(entity.Has<ParticleSystemComponent>()) {
-		const auto& system = entity.Get<ParticleSystemComponent>();
+	if(entity.Has<ParticleEmitterComponent>()) {
+		const auto& system = entity.Get<ParticleEmitterComponent>();
 
-		serializer.WriteKey("ParticleSystemComponent")
+		serializer.WriteKey("ParticleEmitterComponent")
 		.BeginMapping()
 			.WriteKey("System")
 			.BeginMapping()
@@ -384,7 +384,7 @@ void SerializeEntity(YAMLSerializer& serializer, const Entity& entity) {
 				.WriteKey("ParticleLifetime").Write(system.ParticleLifetime)
 				.WriteKey("AssetID").Write((uint64_t)system.ImageAsset.ID)
 			.EndMapping()
-		.EndMapping(); // ParticleSystemComponent
+		.EndMapping(); // ParticleEmitterComponent
 	}
 
 	serializer.EndMapping(); // Components
@@ -606,10 +606,10 @@ void DeserializeEntity(YAML::Node entityNode, Scene& scene) {
 			lightNode["OuterCutoffAngle"].as<float>());
 	}
 
-	auto particleSystemComponentNode = components["ParticleSystemComponent"];
+	auto particleSystemComponentNode = components["ParticleEmitterComponent"];
 	if(particleSystemComponentNode) {
 		auto system = particleSystemComponentNode["System"];
-		entity.Add<ParticleSystemComponent>(
+		entity.Add<ParticleEmitterComponent>(
 			system["Position"].as<glm::vec3>(),
 			system["MaxParticleCount"].as<uint64_t>(),
 			system["ParticleLifetime"].as<float>(),
@@ -738,7 +738,7 @@ BinaryWriter& BinaryWriter::WriteObject(const SpotlightComponent& comp) {
 }
 
 template<>
-BinaryWriter& BinaryWriter::WriteObject(const ParticleSystemComponent& comp) {
+BinaryWriter& BinaryWriter::WriteObject(const ParticleEmitterComponent& comp) {
 	Write(comp.Position);
 	Write(comp.MaxParticleCount);
 	Write(comp.ParticleLifetime);
@@ -764,7 +764,7 @@ BinaryWriter& BinaryWriter::WriteObject(const Entity& entity) {
 	componentBits |= ((uint16_t)entity.Has<DirectionalLightComponent>() << 8);
 	componentBits |= ((uint16_t)entity.Has<PointLightComponent>()		<< 9);
 	componentBits |= ((uint16_t)entity.Has<SpotlightComponent>()		<< 10);
-	componentBits |= ((uint16_t)entity.Has<ParticleSystemComponent>()	<< 11);
+	componentBits |= ((uint16_t)entity.Has<ParticleEmitterComponent>()	<< 11);
 
 	Write((uint16_t)componentBits.to_ulong());
 
@@ -790,8 +790,8 @@ BinaryWriter& BinaryWriter::WriteObject(const Entity& entity) {
 		Write(entity.Get<PointLightComponent>());
 	if(entity.Has<SpotlightComponent>())
 		Write(entity.Get<SpotlightComponent>());
-	if(entity.Has<ParticleSystemComponent>())
-		Write(entity.Get<ParticleSystemComponent>());
+	if(entity.Has<ParticleEmitterComponent>())
+		Write(entity.Get<ParticleEmitterComponent>());
 
 	return *this;
 }
