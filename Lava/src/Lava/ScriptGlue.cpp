@@ -175,8 +175,10 @@ void RegisterTypes() {
 }
 
 static KeyPressedEvent* KeyPressedEventCast(KeyEvent* event) {
-	if(event->Type != EventType::KeyPressed)
+	if(event->Type != EventType::KeyPressed) {
+		VOLCANICORE_LOG_INFO("Type: %i", (int32_t)event->Type);
 		return nullptr;
+	}
 	return dynamic_cast<KeyPressedEvent*>(event);
 }
 

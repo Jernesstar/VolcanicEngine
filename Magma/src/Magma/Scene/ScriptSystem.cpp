@@ -6,18 +6,45 @@
 
 namespace Magma {
 
+struct GameEventListener { };
+
 ScriptSystem::ScriptSystem(ECS::World* world)
 	: System(world)
 {
-	m_KeyPressedCallbackEntity = m_EntityWorld->GetNative().entity("KeyPressed");
-	m_KeyPressedCallbackEntity.observe<KeyPressedEvent>([](auto){});
+	// m_EntityWorld->GetNative()
+	// .observer()
+	// .event<GameEvent>()
+	// .run(
+	// 	[this](GameEvent& event)
+	// 	{
+	// 		m_EntityWorld->GetNative()
+	// 		.query<ScriptComponent>()
+	// 		.each(
+	// 			[this, event](flecs::entity e, ScriptComponent& sc)
+	// 			{
+	// 				auto eventID =
+	// 					m_EntityWorld->GetNative().lookup(event.ID.c_str());
+	// 				if(!eventID)
+	// 					return;
+	// 				if(!e.has<GameEventListener>(eventID))
+	// 					return;
+
+	// 				sc.Instance->Call("OnGameEvent", (&event));
+	// 			});
+	// 	});
 
 	m_KeyPressedCallbackID =
-		Events::RegisterListener<KeyPressedEvent>(
-			[this](KeyPressedEvent& event)
-			{
-				m_KeyPressedCallbackEntity.enqueue<KeyPressedEvent>(event);
-			});
+	Events::RegisterListener<KeyPressedEvent>(
+		[this](KeyPressedEvent& event)
+		{
+			m_EntityWorld->GetNative()
+			.query<ScriptComponent>()
+			.each(
+				[&](ScriptComponent& sc)
+				{
+					sc.Instance->Call("OnKeyEvent", dynamic_cast<KeyEvent&>(event));
+				});
+		});
 	// m_KeyReleasedCallbackID =
 	// 	Events::RegisterListener<KeyReleasedEvent>(
 	// 		[this](KeyReleasedEvent& event)
@@ -46,14 +73,11 @@ void ScriptSystem::Run(Phase phase) {
 }
 
 void ScriptSystem::Listen(Entity& entity, const std::string& id) {
-	VOLCANICORE_LOG_INFO("Entity '%s' registered for %s GameEvent",
+	// If already exists, returns existing
+	flecs::entity eventID = m_EntityWorld->GetNative().entity(id.c_str());
+	entity.GetHandle().add<GameEventListener>(eventID);
+	VOLCANICORE_LOG_INFO("Registered entity '%s' for '%s' GameEvent",
 		entity.GetName().c_str(), id.c_str());
-	entity.GetHandle().observe<GameEvent>(
-		[this, &handle=entity](GameEvent& event)
-		{
-			auto& component = handle.Get<ScriptComponent>();
-			component.Instance->Call("OnGameEvent", &event);
-		});
 }
 
 void ScriptSystem::Broadcast(Entity& entity, const std::string& id) {
@@ -61,16 +85,7 @@ void ScriptSystem::Broadcast(Entity& entity, const std::string& id) {
 }
 
 void ScriptSystem::OnComponentAdd(Entity& entity) {
-	VOLCANICORE_LOG_INFO("Registered '%s'", entity.GetName().c_str());
-	entity.GetHandle().observe<KeyPressedEvent>(
-		[this, &handle=entity](KeyPressedEvent& event)
-		{
-			auto sc = handle.Get<ScriptComponent>();
-			if(!sc.Instance)
-				return;
 
-			sc.Instance->Call("OnKeyEvent", dynamic_cast<KeyEvent*>(&event));
-		});
 }
 
 void ScriptSystem::OnComponentSet(Entity& entity) {

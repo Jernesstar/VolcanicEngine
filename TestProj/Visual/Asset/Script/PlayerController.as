@@ -32,7 +32,7 @@ class PlayerController : IEntityController
         print("Loaded: " + loaded);
 
         ScriptSystem@ sys = Scene.GetScriptSystem();
-        sys.ListenForEvent(Handle, "PlayerDied");
+        // sys.ListenForEvent(Handle, "PlayerDied");
     }
 
     void OnUpdate(float ts)
@@ -56,10 +56,12 @@ class PlayerController : IEntityController
             print("Inputted character: " + e.Char);
         }
 
+        KeyPressedEvent@ e = cast<KeyPressedEvent>(event);
+        print("Null " + (e == null));
+        print("Type: " + e.Type);
         if(event.Type != EventType::KeyPressed)
             return;
 
-        KeyPressedEvent@ e = cast<KeyPressedEvent>(event);
         if(e.Key == Key::Space and !e.IsRepeat)
         {
             print("Playing sound");

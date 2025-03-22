@@ -47,7 +47,7 @@ struct {
 		bool DirectionalLight = false;
 		bool PointLight = false;
 		bool Spotlight = false;
-		bool ParticleSystem = false;
+		bool ParticleEmitter = false;
 	} component;
 } focus;
 
@@ -63,7 +63,7 @@ void ComponentEditorPanel::ClearFocus() {
 	focus.component.DirectionalLight = false;
 	focus.component.PointLight = false;
 	focus.component.Spotlight = false;
-	focus.component.ParticleSystem = false;
+	focus.component.ParticleEmitter = false;
 }
 
 FOCUS_COMPONENT(Camera)
@@ -77,7 +77,7 @@ FOCUS_COMPONENT(RigidBody)
 FOCUS_COMPONENT(DirectionalLight)
 FOCUS_COMPONENT(PointLight)
 FOCUS_COMPONENT(Spotlight)
-FOCUS_COMPONENT(ParticleSystem)
+FOCUS_COMPONENT(ParticleEmitter)
 
 template<typename TComponent>
 static void DrawComponent(Entity& entity);

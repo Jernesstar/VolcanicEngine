@@ -20,7 +20,6 @@ public:
 	void OnComponentAdd(Entity& entity) override;
 	void OnComponentSet(Entity& entity) override;
 	void OnComponentRemove(Entity& entity) override;
-	
 
 	void Collides(Entity& e1, Entity& e2);
 	bool Collided(Entity& e1, Entity& e2);

@@ -1,6 +1,5 @@
 #include "Scene.h"
 
-#include "ParticleSystem.h"
 #include "PhysicsSystem.h"
 #include "ScriptSystem.h"
 
@@ -18,7 +17,6 @@ Scene::Scene(const std::string& name)
 }
 
 Scene::~Scene() {
-	EntityWorld.Remove<ParticleSystem>();
 	EntityWorld.Remove<PhysicsSystem>();
 	EntityWorld.Remove<ScriptSystem>();
 }
@@ -84,37 +82,10 @@ void Scene::OnRender(SceneRenderer& renderer) {
 }
 
 void Scene::RegisterSystems() {
-	EntityWorld.Add<ParticleSystem>();
 	EntityWorld.Add<PhysicsSystem>();
 	EntityWorld.Add<ScriptSystem>();
 	
 	// TODO(Change): Move to each system's constructor
-	for(auto phase : { flecs::OnUpdate }) {
-		Phase ourPhase;
-		if(phase == flecs::PreUpdate)
-			ourPhase = Phase::PreUpdate;
-		if(phase == flecs::OnUpdate)
-			ourPhase = Phase::OnUpdate;
-		if(phase == flecs::PostUpdate)
-			ourPhase = Phase::PostUpdate;
-
-		EntityWorld.GetNative()
-		.system<ParticleEmitterComponent>()
-		.kind(phase)
-		.run(
-			[&](flecs::iter& it)
-			{
-				while(it.next()) {
-					auto sys = EntityWorld.Get<ParticleSystem>();
-					if(!sys)
-						return;
-
-					if(ourPhase == Phase::OnUpdate)
-						sys->Update(it.delta_time());
-					sys->Run(ourPhase);
-				}
-			});
-	}
 
 	for(auto phase : { flecs::PreUpdate, flecs::OnUpdate, flecs::PostUpdate }) {
 		Phase ourPhase;
