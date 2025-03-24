@@ -9,6 +9,7 @@ namespace VolcaniCore {
 
 struct KeyEvent : public Event {
 	const KeyCode Key;
+	virtual ~KeyEvent() = default;
 
 protected:
 	KeyEvent(EventType type, KeyCode key)

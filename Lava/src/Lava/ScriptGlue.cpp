@@ -175,29 +175,27 @@ void RegisterTypes() {
 }
 
 static KeyPressedEvent* KeyPressedEventCast(KeyEvent* event) {
-	if(event->Type != EventType::KeyPressed) {
-		VOLCANICORE_LOG_INFO("Type: %i", (int32_t)event->Type);
+	if(event->Type != EventType::KeyPressed)
 		return nullptr;
-	}
-	return dynamic_cast<KeyPressedEvent*>(event);
+	return static_cast<KeyPressedEvent*>(event);
 }
 
 static KeyReleasedEvent* KeyReleasedEventCast(KeyEvent* event) {
 	if(event->Type != EventType::KeyReleased)
 		return nullptr;
-	return dynamic_cast<KeyReleasedEvent*>(event);
+	return static_cast<KeyReleasedEvent*>(event);
 }
 
 static KeyCharEvent* KeyCharacterEventCast(KeyEvent* event) {
 	if(event->Type != EventType::KeyChar)
 		return nullptr;
-	return dynamic_cast<KeyCharEvent*>(event);
+	return static_cast<KeyCharEvent*>(event);
 }
 
 static MouseButtonPressedEvent* MousePressedEventCast(MouseEvent* event) {
 	if(event->Type != EventType::MouseButtonPressed)
 		return nullptr;
-	return dynamic_cast<MouseButtonPressedEvent*>(event);
+	return static_cast<MouseButtonPressedEvent*>(event);
 }
 
 void RegisterEvents() {
@@ -259,8 +257,14 @@ void RegisterEvents() {
 	engine->RegisterEnumValue("EventType", "MousePressed",	5);
 	engine->RegisterEnumValue("EventType", "MouseReleased", 6);
 
+	engine->RegisterObjectType("KeyEvent", 0, asOBJ_REF | asOBJ_NOCOUNT);
+	engine->RegisterObjectProperty("KeyEvent", "const EventType Type",
+		asOFFSET(KeyEvent, Type));
+	engine->RegisterObjectProperty("KeyEvent", "const Key Key",
+		asOFFSET(KeyEvent, Key));
+
 	engine->RegisterObjectType("KeyPressedEvent", 0, asOBJ_REF | asOBJ_NOCOUNT);
-	engine->RegisterObjectProperty("KeyPressedEvent", "EventType Type",
+	engine->RegisterObjectProperty("KeyPressedEvent", "const EventType Type",
 		asOFFSET(KeyPressedEvent, Type));
 	engine->RegisterObjectProperty("KeyPressedEvent", "const Key Key",
 		asOFFSET(KeyPressedEvent, Key));
@@ -268,24 +272,19 @@ void RegisterEvents() {
 		asOFFSET(KeyPressedEvent, IsRepeat));
 
 	engine->RegisterObjectType("KeyReleasedEvent", 0, asOBJ_REF | asOBJ_NOCOUNT);
-	engine->RegisterObjectProperty("KeyReleasedEvent", "EventType Type",
+	engine->RegisterObjectProperty("KeyReleasedEvent", "const EventType Type",
 		asOFFSET(KeyReleasedEvent, Type));
 	engine->RegisterObjectProperty("KeyReleasedEvent", "const Key Key",
 		asOFFSET(KeyReleasedEvent, Key));
 
 	engine->RegisterObjectType("KeyCharacterEvent", 0, asOBJ_REF | asOBJ_NOCOUNT);
-	engine->RegisterObjectProperty("KeyCharacterEvent", "EventType Type",
+	engine->RegisterObjectProperty("KeyCharacterEvent", "const EventType Type",
 		asOFFSET(KeyCharEvent, Type));
 	engine->RegisterObjectProperty("KeyCharacterEvent", "const Key Key",
 		asOFFSET(KeyCharEvent, Key));
 	engine->RegisterObjectMethod("KeyCharacterEvent", "string get_Char() const property",
 		asMETHOD(KeyCharEvent, ToString), asCALL_THISCALL);
 
-	engine->RegisterObjectType("KeyEvent", 0, asOBJ_REF | asOBJ_NOCOUNT);
-	engine->RegisterObjectProperty("KeyEvent", "EventType Type",
-		asOFFSET(KeyEvent, Type));
-	engine->RegisterObjectProperty("KeyEvent", "const Key Key",
-		asOFFSET(KeyEvent, Key));
 	engine->RegisterObjectMethod("KeyEvent", "KeyPressedEvent@ opCast()",
 		asFUNCTION(KeyPressedEventCast), asCALL_CDECL_OBJLAST);
 	engine->RegisterObjectMethod("KeyEvent", "KeyReleasedEvent@ opCast()",

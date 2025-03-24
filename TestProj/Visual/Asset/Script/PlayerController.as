@@ -53,13 +53,11 @@ class PlayerController : IEntityController
     {
         if(event.Type == EventType::KeyCharacter) {
             KeyCharacterEvent@ e = cast<KeyCharacterEvent>(event);
-            print("Inputted character: " + e.Char);
+            print("Inputted character: '" + e.Char + "'");
         }
 
         KeyPressedEvent@ e = cast<KeyPressedEvent>(event);
-        print("Null " + (@e == null));
-        print("Type: " + e.Type);
-        if(event.Type != EventType::KeyPressed)
+        if(@e == null)
             return;
 
         if(e.Key == Key::Space and !e.IsRepeat)

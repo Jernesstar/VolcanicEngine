@@ -1,8 +1,10 @@
 #include "PhysicsSystem.h"
 
+#include <VolcaniCore/Core/Log.h>
+
 #include "ECS/World.h"
 
-#include <VolcaniCore/Core/Log.h>
+#include "Component.h"
 
 using namespace Magma::Physics;
 
@@ -46,13 +48,13 @@ void PhysicsSystem::OnComponentAdd(Entity& entity) {
 	m_World.AddActor(rc.Body);
 
 	m_World.AddContactCallback(
-		[](Ref<RigidBody> body1, Ref<RigidBody> body2)
+		[this](Ref<RigidBody> body1, Ref<RigidBody> body2)
 		{
 			Entity entity1 = m_EntityWorld->GetEntity((uint64_t)body1->Data);
 			Entity entity2 = m_EntityWorld->GetEntity((uint64_t)body2->Data);
 			if(entity1.Has<ScriptComponent>()) {
-				auto obj = entity.Get<ScriptComponent>().Instance;
-				obj->Call("OnPhysicsEvent", CollisionEvent{ other.Data });
+				auto obj = entity1.Get<ScriptComponent>().Instance;
+				obj->Call("OnPhysicsEvent", CollisionEvent{ entity2 });
 			}
 		});
 	// // Creating RigidBodyComponent then MeshComponent ==> bounding volume
@@ -87,13 +89,6 @@ void PhysicsSystem::Collides(Entity& e1, Entity& e2) {
 	auto actor1 = e1.Get<RigidBodyComponent>().Body;
 	auto actor2 = e2.Get<RigidBodyComponent>().Body;
 
-}
-
-bool PhysicsSystem::Collided(Entity& e1, Entity& e2) {
-	auto handle1 = e1.GetHandle();
-	auto handle2 = e2.GetHandle();
-
-	return handle1.has<CollidedWith>(handle2);
 }
 
 }

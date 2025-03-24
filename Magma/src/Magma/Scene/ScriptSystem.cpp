@@ -29,7 +29,7 @@ ScriptSystem::ScriptSystem(ECS::World* world)
 	// 				if(!e.has<GameEventListener>(eventID))
 	// 					return;
 
-	// 				sc.Instance->Call("OnGameEvent", (&event));
+	// 				sc.Instance->Call("OnGameEvent", &event);
 	// 			});
 	// 	});
 
@@ -40,23 +40,41 @@ ScriptSystem::ScriptSystem(ECS::World* world)
 			m_EntityWorld->GetNative()
 			.query<ScriptComponent>()
 			.each(
-				[&](ScriptComponent& sc)
+				[event=event](ScriptComponent& sc)
 				{
-					sc.Instance->Call("OnKeyEvent", dynamic_cast<KeyEvent&>(event));
+					sc.Instance->Call("OnKeyEvent", event);
 				});
 		});
-	// m_KeyReleasedCallbackID =
-	// 	Events::RegisterListener<KeyReleasedEvent>(
-	// 		[this](KeyReleasedEvent& event)
-	// 		{
-	// 			m_KeyPressedCallbackEntity.enqueue<KeyReleasedEvent>(event);
-	// 		});
+	m_KeyReleasedCallbackID =
+		Events::RegisterListener<KeyReleasedEvent>(
+			[this](KeyReleasedEvent& event)
+			{
+				m_EntityWorld->GetNative()
+				.query<ScriptComponent>()
+				.each(
+					[event=event](ScriptComponent& sc)
+					{
+						sc.Instance->Call("OnKeyEvent", event);
+					});
+			});
+	m_KeyCharCallbackID =
+		Events::RegisterListener<KeyCharEvent>(
+			[this](KeyCharEvent& event)
+			{
+				m_EntityWorld->GetNative()
+				.query<ScriptComponent>()
+				.each(
+					[event=event](ScriptComponent& sc)
+					{
+						sc.Instance->Call("OnKeyEvent", event);
+					});
+			});
 }
 
 ScriptSystem::~ScriptSystem() {
 	Events::UnregisterListener<KeyPressedEvent>(m_KeyPressedCallbackID);
-	// Events::UnregisterListener<KeyReleasedEvent>(m_KeyReleasedCallbackID);
-	// Events::UnregisterListener<KeyCharEvent>(m_KeyCharCallbackID);
+	Events::UnregisterListener<KeyReleasedEvent>(m_KeyReleasedCallbackID);
+	Events::UnregisterListener<KeyCharEvent>(m_KeyCharCallbackID);
 }
 
 void ScriptSystem::Update(TimeStep ts) {
