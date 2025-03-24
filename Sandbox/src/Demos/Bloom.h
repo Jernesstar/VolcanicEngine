@@ -61,7 +61,7 @@ Bloom::Bloom()
 	shader = ShaderPipeline::Create(
 		{
 			{ "Magma/assets/shaders/Framebuffer.glsl.vert", ShaderType::Vertex },
-			{ "Sandbox/assets/shaders/Downsample.glsl.frag", ShaderType::Fragment }
+			{ "Magma/assets/shaders/Downsample.glsl.frag", ShaderType::Fragment }
 		});
 	downsamplePass = RenderPass::Create("Downsample", shader);
 	downsamplePass->SetOutput(mips);
@@ -70,7 +70,7 @@ Bloom::Bloom()
 	shader = ShaderPipeline::Create(
 		{
 			{ "Magma/assets/shaders/Framebuffer.glsl.vert", ShaderType::Vertex },
-			{ "Sandbox/assets/shaders/Upsample.glsl.frag", ShaderType::Fragment }
+			{ "Magma/assets/shaders/Upsample.glsl.frag", ShaderType::Fragment }
 		});
 	upsamplePass = RenderPass::Create("Upsample", shader);
 	upsamplePass->SetOutput(mips);
@@ -79,7 +79,7 @@ Bloom::Bloom()
 	shader = ShaderPipeline::Create(
 		{
 			{ "Magma/assets/shaders/Framebuffer.glsl.vert", ShaderType::Vertex },
-			{ "Sandbox/assets/shaders/Bloom.glsl.frag", ShaderType::Fragment }
+			{ "Magma/assets/shaders/Bloom.glsl.frag", ShaderType::Fragment }
 		});
 	bloomPass = RenderPass::Create("Bloom", shader);
 
@@ -134,30 +134,30 @@ void Bloom::OnUpdate(TimeStep ts) {
 	}
 	Renderer::EndPass();
 
-	// Renderer2D::DrawFullscreenQuad(src, AttachmentTarget::Color);
+	Renderer2D::DrawFullscreenQuad(src, AttachmentTarget::Color);
 
-	Renderer::StartPass(downsamplePass);
-	{
-		Renderer::GetPass()->GetUniforms()
-		.Set("u_SrcResolution",
-			[&]() -> glm::vec2
-			{
-				return {
-					Application::GetWindow()->GetWidth(),
-					Application::GetWindow()->GetHeight()
-				};
-			})
-		.Set("u_SrcTexture",
-			[&]() -> TextureSlot
-			{
-				return { src->Get(AttachmentTarget::Color), 0 };
-			});
+	// Renderer::StartPass(downsamplePass);
+	// {
+	// 	Renderer::GetPass()->GetUniforms()
+	// 	.Set("u_SrcResolution",
+	// 		[&]() -> glm::vec2
+	// 		{
+	// 			return {
+	// 				Application::GetWindow()->GetWidth(),
+	// 				Application::GetWindow()->GetHeight()
+	// 			};
+	// 		})
+	// 	.Set("u_SrcTexture",
+	// 		[&]() -> TextureSlot
+	// 		{
+	// 			return { src->Get(AttachmentTarget::Color), 0 };
+	// 		});
 
-		Downsample();
-	}
-	Renderer::EndPass();
+	// 	Downsample();
+	// }
+	// Renderer::EndPass();
 
-	Renderer2D::DrawFullscreenQuad(mips, AttachmentTarget::Color);
+	// Renderer2D::DrawFullscreenQuad(mips, AttachmentTarget::Color);
 
 	// Renderer::StartPass(upsamplePass);
 	// {

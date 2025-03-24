@@ -57,7 +57,7 @@ class PlayerController : IEntityController
         }
 
         KeyPressedEvent@ e = cast<KeyPressedEvent>(event);
-        print("Null " + (e == null));
+        print("Null " + (@e == null));
         print("Type: " + e.Type);
         if(event.Type != EventType::KeyPressed)
             return;

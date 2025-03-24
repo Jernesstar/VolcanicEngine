@@ -85,11 +85,11 @@ void DynamicBody::SetShape(Ref<Shape> shape) {
 #endif
 }
 
-// void DynamicBody::SetVelocity(float velocity) {
-// #ifdef MAGMA_PHYSICS
-// 	// m_Actor->setAngularDamping(0.5f);
-// 	m_Actor->setLinearVelocity(velocity);
-// #endif
-// }
+void DynamicBody::ApplyForce(const glm::vec3& f) {
+#ifdef MAGMA_PHYSICS
+	// m_Actor->setAngularDamping(0.5f);
+	// m_Actor->setLinearVelocity(velocity);
+#endif
+}
 
 }

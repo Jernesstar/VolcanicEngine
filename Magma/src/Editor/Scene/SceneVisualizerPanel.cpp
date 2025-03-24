@@ -97,7 +97,8 @@ void SceneVisualizerPanel::Draw() {
 	m_Context->OnRender(m_Renderer);
 
 	auto flags = ImGuiWindowFlags_NoScrollbar
-			   | ImGuiWindowFlags_NoScrollWithMouse;
+			   | ImGuiWindowFlags_NoScrollWithMouse
+			   | ImGuiWindowFlags_NoNavInputs;
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0, 0 });
 	ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4{ 0.0f, 0.0f, 0.0f, 1.0f });
 	ImGui::Begin("Scene Visualizer", &Open, flags);

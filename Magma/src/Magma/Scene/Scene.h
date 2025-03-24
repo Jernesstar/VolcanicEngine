@@ -22,9 +22,8 @@ public:
 
 	void OnUpdate(TimeStep ts);
 	void OnRender(SceneRenderer& renderer);
-
-private:
 	void RegisterSystems();
+	void UnregisterSystems();
 };
 
 }

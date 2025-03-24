@@ -70,11 +70,9 @@ public:
 	DynamicBody(Ref<Shape> shape, const Transform& t = { });
 	~DynamicBody() = default;
 
-	// void SetVelocity(const glm::vec3& velocity);
 	void SetShape(Ref<Shape> shape) override;
 
-private:
-	
+	void ApplyForce(const glm::vec3& f);
 };
 
 }
