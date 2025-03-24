@@ -8,8 +8,6 @@ using namespace Magma::Physics;
 
 namespace Magma {
 
-struct CollidedWith { }; // Tag, indicates that a collision has occured
-
 PhysicsSystem::PhysicsSystem(ECS::World* world)
 	: System(world)
 {
@@ -44,9 +42,19 @@ void PhysicsSystem::Run(Phase phase) {
 
 void PhysicsSystem::OnComponentAdd(Entity& entity) {
 	auto& rc = entity.Get<RigidBodyComponent>();
-	rc.Body->Data = (void*)(uint64_t)(uint32_t)entity.GetHandle();
+	rc.Body->Data = (void*)(uint64_t)entity.GetHandle();
 	m_World.AddActor(rc.Body);
 
+	m_World.AddContactCallback(
+		[](Ref<RigidBody> body1, Ref<RigidBody> body2)
+		{
+			Entity entity1 = m_EntityWorld->GetEntity((uint64_t)body1->Data);
+			Entity entity2 = m_EntityWorld->GetEntity((uint64_t)body2->Data);
+			if(entity1.Has<ScriptComponent>()) {
+				auto obj = entity.Get<ScriptComponent>().Instance;
+				obj->Call("OnPhysicsEvent", CollisionEvent{ other.Data });
+			}
+		});
 	// // Creating RigidBodyComponent then MeshComponent ==> bounding volume
 	// // Creating MeshComponent then RigidBodyComponent ==> tightly-fitting volume
 
@@ -78,16 +86,7 @@ void PhysicsSystem::Collides(Entity& e1, Entity& e2) {
 
 	auto actor1 = e1.Get<RigidBodyComponent>().Body;
 	auto actor2 = e2.Get<RigidBodyComponent>().Body;
-	auto handle1 = e1.GetHandle();
-	auto handle2 = e2.GetHandle();
 
-	m_World.AddContactCallback(
-		actor1, actor2,
-		[handle1, handle2](Ref<RigidBody>, Ref<RigidBody>)
-		{
-			handle1.add<CollidedWith>(handle2);
-			handle2.add<CollidedWith>(handle1);
-		});
 }
 
 bool PhysicsSystem::Collided(Entity& e1, Entity& e2) {

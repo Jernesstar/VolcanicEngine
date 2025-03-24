@@ -10,6 +10,18 @@ using namespace Magma::ECS;
 
 namespace Magma {
 
+struct PhysicsEvent {
+	virtual ~PhysicsEvent() = default;
+};
+
+struct CollisionEvent : public PhysicsEvent {
+	Entity Other;
+};
+
+struct ClickedEvent : public PhysicsEvent {
+
+};
+
 class PhysicsSystem : public System<RigidBodyComponent> {
 public:
 	PhysicsSystem(ECS::World* world);

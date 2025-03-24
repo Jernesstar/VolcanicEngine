@@ -234,27 +234,29 @@ void App::ScreenSet(const std::string& name) {
 	s_Screen = new RuntimeScreen(screen);
 
 	ScreenLoad(s_Screen->Script);
-	if(screen.Scene != "")
+	if(screen.Scene != "") {
 		SceneLoad(*s_Screen->World);
-	if(screen.UI != "")
+		s_Screen->World->RegisterSystems();
+	}
+	if(screen.UI != "") {
 		UILoad(s_Screen->UI);
-
-	s_Screen->UI.Traverse(
-		[&](UIElement* element)
-		{
-			if(!element->ModuleID || element->Class == "")
-				return;
-
-			Asset asset = { element->ModuleID, AssetType::Script };
-			m_AssetManager->Load(asset);
-			auto mod = m_AssetManager->Get<ScriptModule>(asset);
-			Ref<ScriptClass> _class = mod->GetClass(element->Class);
-
-			if(!_class)
-				return;
-
-			element->ScriptInstance = _class->Instantiate(element->GetID());
-		});
+		s_Screen->UI.Traverse(
+			[&](UIElement* element)
+			{
+				if(!element->ModuleID || element->Class == "")
+					return;
+	
+				Asset asset = { element->ModuleID, AssetType::Script };
+				m_AssetManager->Load(asset);
+				auto mod = m_AssetManager->Get<ScriptModule>(asset);
+				Ref<ScriptClass> _class = mod->GetClass(element->Class);
+	
+				if(!_class)
+					return;
+	
+				element->ScriptInstance = _class->Instantiate(element->GetID());
+			});
+	}
 
 	auto scriptClass = s_Screen->Script->GetClass(name);
 	s_Screen->ScriptObj = scriptClass->Instantiate();
