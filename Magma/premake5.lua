@@ -4,8 +4,8 @@ project "Magma"
     cppdialect "C++latest"
     staticruntime "Off"
 
-    objdir ("%{RootPath}/build/Magma/obj")
-    targetdir ("%{RootPath}/build/Magma/lib")
+    objdir ("%{RootPath}/build/%{_ACTION}/Magma/obj")
+    targetdir ("%{RootPath}/build/%{_ACTION}/Magma/lib")
 
     files {
         "src/Magma/**.h",
@@ -78,8 +78,8 @@ project "Editor"
     cppdialect "C++latest"
     staticruntime "Off"
 
-    objdir ("%{RootPath}/build/Magma/obj")
-    targetdir ("%{RootPath}/build/Magma/bin")
+    objdir ("%{RootPath}/build/%{_ACTION}/Magma/obj")
+    targetdir ("%{RootPath}/build/%{_ACTION}/Magma/bin")
 
     files {
         "src/Editor/**.h",

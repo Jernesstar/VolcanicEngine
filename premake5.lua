@@ -1,5 +1,5 @@
 workspace "VolcanicEngine"
-    location ("build")
+    location ("build/%{_ACTION}")
     architecture "x86_64"
     configurations { "Debug", "Release" }
 

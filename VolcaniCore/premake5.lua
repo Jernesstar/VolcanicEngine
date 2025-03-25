@@ -4,8 +4,8 @@ project "VolcaniCore"
     cppdialect "C++latest"
     staticruntime "Off"
 
-    objdir ("%{RootPath}/build/VolcaniCore/obj")
-    targetdir ("%{RootPath}/build/VolcaniCore/lib")
+    objdir ("%{RootPath}/build/%{_ACTION}/VolcaniCore/obj")
+    targetdir ("%{RootPath}/build/%{_ACTION}/VolcaniCore/lib")
 
     files {
         "src/VolcaniCore/**.h",

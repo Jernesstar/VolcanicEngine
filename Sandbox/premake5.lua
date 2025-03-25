@@ -6,8 +6,8 @@ project "Sandbox"
     rtti "Off"
     staticruntime "Off"
 
-    objdir ("%{RootPath}/build/Sandbox/obj")
-    targetdir ("%{RootPath}/build/Sandbox/bin")
+    objdir ("%{RootPath}/build/%{_ACTION}/Sandbox/obj")
+    targetdir ("%{RootPath}/build/%{_ACTION}/Sandbox/bin")
 
     files {
         "src/**.h",

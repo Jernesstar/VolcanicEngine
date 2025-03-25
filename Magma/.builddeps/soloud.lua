@@ -3,8 +3,8 @@ project "soloud"
     language "C++"
     staticruntime "Off"
 
-    objdir ("%{RootPath}/build/Magma/obj")
-    targetdir ("%{RootPath}/build/Magma/lib")
+    objdir ("%{RootPath}/build/%{_ACTION}/Magma/obj")
+    targetdir ("%{RootPath}/build/%{_ACTION}/Magma/lib")
 
     files {
         "%{VendorPaths.soloud}/src/core/*.cpp",
@@ -21,5 +21,5 @@ project "soloud"
     }
 
     buildoptions {
-        "-Wunused-result"
+        -- "-Wunused-result"
     }

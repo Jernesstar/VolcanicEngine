@@ -1,4 +1,4 @@
 @echo off
 
-cd "build/"
+cd "build/gmake2/"
 "mingw32-make.exe" "-f" "Makefile"

@@ -1,8 +1,7 @@
 #include "Framebuffer.h"
 
-#if defined(VOLCANICENGINE_WINDOWS) && defined(MSVC)
 #define NOMINMAX
-#endif
+
 #include <algorithm>
 
 #include <glad/glad.h>

@@ -1,4 +1,4 @@
 #!/bin/bash
 
-cd build/
+cd build/gmake2/
 make -f Makefile

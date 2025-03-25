@@ -4,8 +4,8 @@ project "yaml-cpp"
     cppdialect "C++latest"
     staticruntime "Off"
 
-    objdir ("%{RootPath}/build/Magma/obj")
-    targetdir ("%{RootPath}/build/Magma/lib")
+    objdir ("%{RootPath}/build/%{_ACTION}/Magma/obj")
+    targetdir ("%{RootPath}/build/%{_ACTION}/Magma/lib")
 
     files {
         "%{VendorPaths.yaml_cpp}/src/**.h",

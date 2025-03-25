@@ -4,8 +4,8 @@ project "Lava"
     cppdialect "C++latest"
     staticruntime "Off"
 
-    objdir ("%{RootPath}/build/Lava/obj")
-    targetdir ("%{RootPath}/build/Lava/lib")
+    objdir ("%{RootPath}/build/%{_ACTION}/Lava/obj")
+    targetdir ("%{RootPath}/build/%{_ACTION}/Lava/lib")
 
     files {
         "src/Lava/**.h",
@@ -68,8 +68,8 @@ project "Runtime"
     rtti "Off"
     staticruntime "Off"
 
-    objdir ("%{RootPath}/build/Lava/obj")
-    targetdir ("%{RootPath}/build/Lava/bin")
+    objdir ("%{RootPath}/build/%{_ACTION}/Lava/obj")
+    targetdir ("%{RootPath}/build/%{_ACTION}/Lava/bin")
 
     files {
         "src/Runtime/**.cpp"

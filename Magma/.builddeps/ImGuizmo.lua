@@ -2,8 +2,8 @@ project "ImGuizmo"
     kind "StaticLib"
     language "C++"
 
-    objdir ("%{RootPath}/build/Magma/obj")
-    targetdir ("%{RootPath}/build/Magma/lib")
+    objdir ("%{RootPath}/build/%{_ACTION}/Magma/obj")
+    targetdir ("%{RootPath}/build/%{_ACTION}/Magma/lib")
 
     files {
         "%{VendorPaths.ImGuizmo}/*.h",

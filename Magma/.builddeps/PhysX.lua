@@ -4,8 +4,8 @@ project "PhysX"
     cppdialect "C++11"
     staticruntime "Off"
 
-    objdir ("%{RootPath}/build/Magma/obj")
-    targetdir ("%{RootPath}/build/Magma/lib")
+    objdir ("%{RootPath}/build/%{_ACTION}/Magma/obj")
+    targetdir ("%{RootPath}/build/%{_ACTION}/Magma/lib")
 
     filter "action:vs* or system:linux"
         files {

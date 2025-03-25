@@ -1,7 +1,7 @@
 rule "ASM"
     display "ASM Compile for angelscript"
     fileextension ".asm"
-    location "%{RootPath}/build"
+    location "%{RootPath}/build/%{_ACTION}"
 
     buildmessage "Compiling %(Filename) ASM file for MSVC build"
     buildcommands 'ml64.exe /c /nologo /Fo"%(Outputs)as_callfunc_x64_msvc_asm.obj" /W3 /Zi /Ta "%(RootDir)%(Directory)%(Filename)%(Extension)"'
@@ -13,8 +13,8 @@ project "angelscript"
     cppdialect "C++latest"
     staticruntime "Off"
 
-    objdir ("%{RootPath}/build/Magma/obj")
-    targetdir ("%{RootPath}/build/Magma/lib")
+    objdir ("%{RootPath}/build/%{_ACTION}/Magma/obj")
+    targetdir ("%{RootPath}/build/%{_ACTION}/Magma/lib")
 
     rules { "ASM" }
 
