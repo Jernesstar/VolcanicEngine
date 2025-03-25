@@ -1,7 +1,9 @@
 #include "AssetManager.h"
 
+#include <iostream>
 #include <bitset>
 
+#include <efsw/efsw.hpp>
 #include <angelscript/add_on/scriptbuilder/scriptbuilder.h>
 
 #include <VolcaniCore/Core/Application.h>
@@ -21,12 +23,83 @@ namespace fs = std::filesystem;
 
 namespace Magma {
 
-EditorAssetManager::EditorAssetManager() {
+class FileWatcher : public efsw::FileWatchListener {
+public:
+	FileWatcher(EditorAssetManager* assetManager);
+	~FileWatcher() = default;
+
+	void handleFileAction(efsw::WatchID id, const std::string& dir,
+		const std::string& file, efsw::Action action, std::string old) override;
+
+	void Add(const std::string& dir, const std::string& name);
+	void ReloadMesh(const std::string& name);
+	void ReloadTexture(const std::string& name);
+	void ReloadAudio(const std::string& name);
+	void ReloadScript(const std::string& name);
+
+private:
+	EditorAssetManager* m_AssetManager;
+};
+
+FileWatcher::FileWatcher(EditorAssetManager* assetManager)
+	: m_AssetManager(assetManager) { }
+
+void FileWatcher::handleFileAction(
+	efsw::WatchID id, const std::string& dir,
+	const std::string& file, efsw::Action action, std::string oldFilename)
+{
+	switch(action) {
+		case efsw::Actions::Add:
+			std::cout << "DIR (" << dir << ") FILE (" << file << ") has event Added" << "\n";
+			break;
+		case efsw::Actions::Delete:
+			std::cout << "DIR (" << dir << ") FILE (" << file << ") has event Delete" << "\n";
+			break;
+		case efsw::Actions::Modified:
+			std::cout << "DIR (" << dir << ") FILE (" << file << ") has event Modified" << "\n";
+			break;
+		case efsw::Actions::Moved:
+			std::cout << "DIR (" << dir << ") FILE (" << file << ") has event Moved from (" << oldFilename << ")" << "\n";
+			break;
+		default:
+			std::cout << "Should never happen!" << "\n";
+	}
+}
+
+void FileWatcher::Add(const std::string& dir, const std::string& name) {
 
 }
 
-EditorAssetManager::~EditorAssetManager() {
+void FileWatcher::ReloadMesh(const std::string& name) {
+	auto mesh = AssetImporter::GetMesh(name);
+	auto id = m_AssetManager->GetFromPath(name);
+	m_AssetManager->m_MeshAssets[id] = mesh;
+}
 
+void FileWatcher::ReloadTexture(const std::string& name) {
+
+}
+
+void FileWatcher::ReloadAudio(const std::string& name) {
+
+}
+
+void FileWatcher::ReloadScript(const std::string& name) {
+
+}
+
+static efsw::FileWatcher* s_FileWatcher;
+static efsw::FileWatchListener* s_Listener;
+static List<efsw::WatchID> s_WatcherIDs;
+
+EditorAssetManager::EditorAssetManager() {
+	s_FileWatcher = new efsw::FileWatcher();
+	s_Listener = new FileWatcher(this);
+}
+
+EditorAssetManager::~EditorAssetManager() {
+	s_WatcherIDs.ForEach([](auto& id) { s_FileWatcher->removeWatch(id); });
+	s_WatcherIDs.Clear();
 }
 
 void EditorAssetManager::Load(Asset asset) {
@@ -97,8 +170,7 @@ std::string EditorAssetManager::GetPath(UUID id) {
 
 void EditorAssetManager::Load(const std::string& path) {
 	auto rootPath = fs::path(path) / "Asset";
-	auto packPath = (rootPath / ".magma.assetpk").string();
-	m_Path = packPath;
+	m_Path = (rootPath / ".magma.assetpk").string();
 
 	YAML::Node file;
 	try {
@@ -108,8 +180,17 @@ void EditorAssetManager::Load(const std::string& path) {
 		VOLCANICORE_ASSERT_ARGS(false, "Could not load file %s: %s",
 								m_Path.c_str(), e.what());
 	}
-	auto assetPackNode = file["AssetPack"];
+	auto meshPath = rootPath / "Mesh";
+	auto scriptPath = rootPath / "Script";
 
+	s_WatcherIDs.Add(
+		s_FileWatcher->addWatch(meshPath.string(), s_Listener));
+	s_WatcherIDs.Add(
+		s_FileWatcher->addWatch(scriptPath.string(), s_Listener));
+
+	s_FileWatcher->watch();
+
+	auto assetPackNode = file["AssetPack"];
 	if(!assetPackNode)
 		return;
 

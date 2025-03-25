@@ -146,9 +146,12 @@ void App::OnUpdate(TimeStep ts) {
 	else if(s_ShouldPopScreen)
 		ScreenPop();
 
-	Renderer::Clear();
-
 	s_AppObject->Call("OnUpdate", (float)ts);
+
+	if(!s_Screen)
+		return;
+
+	Renderer::Clear();
 
 	s_Screen->ScriptObj->Call("OnUpdate", (float)ts);
 

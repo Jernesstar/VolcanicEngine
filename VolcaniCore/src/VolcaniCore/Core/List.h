@@ -160,8 +160,8 @@ public:
 		new (At(idx)) T(element);
 	}
 
-	template<typename TOut, class TPredicate>
-	void For(TPredicate&& func) {
+	template<class TPredicate>
+	void ForEach(TPredicate&& func) {
 		for(auto& val : *this)
 			func(val);
 	}

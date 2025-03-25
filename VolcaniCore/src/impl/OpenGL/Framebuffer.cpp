@@ -1,6 +1,8 @@
 #include "Framebuffer.h"
 
+#ifdef MSC_VER
 #define NOMINMAX
+#endif
 
 #include <algorithm>
 

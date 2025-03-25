@@ -4,8 +4,6 @@
 #include <imgui/imgui_internal.h>
 #include <imgui/misc/cpp/imgui_stdlib.h>
 
-// #include <filewatch/FileWatch.hpp>
-
 #include <VolcaniCore/Core/Application.h>
 #include <VolcaniCore/Core/Log.h>
 #include <VolcaniCore/Core/List.h>
@@ -19,48 +17,21 @@
 
 namespace Magma {
 
-// static List<filewatch::FileWatch<std::string>> s_Watchers;
-
 ContentBrowserPanel::ContentBrowserPanel(const std::string& path)
 	: Panel("ContentBrowser"), m_Path(path)
 {
+	Application::PushDir();
 	m_FileIcon =
 		CreateRef<UI::Image>(
 			AssetImporter::GetTexture("Magma/assets/icons/FileIcon.png"));
 	m_FolderIcon =
 		CreateRef<UI::Image>(
 			AssetImporter::GetTexture("Magma/assets/icons/FolderIcon.png"));
-
-	// s_Watchers.Add(
-	// 	filewatch::FileWatch<std::string>(
-	// 		(fs::path(path) / "Visual" / "Asset").string(),
-	// 		[](const std::string& path, const filewatch::Event event)
-	// 		{
-	// 			std::cout << path << " : ";
-	// 			switch (event) {
-	// 				case filewatch::Event::added:
-	// 					std::cout << "The file was added to the directory." << '\n';
-	// 					break;
-	// 				case filewatch::Event::removed:
-	// 					std::cout << "The file was removed from the directory." << '\n';
-	// 					break;
-	// 				case filewatch::Event::modified:
-	// 					std::cout << "The file was modified. This can be a change in the time stamp or attributes." << '\n';
-	// 					break;
-	// 				case filewatch::Event::renamed_old:
-	// 					std::cout << "The file was renamed and this is the old name." << '\n';
-	// 					break;
-	// 				case filewatch::Event::renamed_new:
-	// 					std::cout << "The file was renamed and this is the new name." << '\n';
-	// 					break;
-	// 				};
-	// 			}
-	// 	)
-	// );
+	Application::PopDir();
 }
 
 ContentBrowserPanel::~ContentBrowserPanel() {
-	// s_Watchers.Clear();
+
 }
 
 void ContentBrowserPanel::Update(VolcaniCore::TimeStep ts) {
@@ -218,7 +189,6 @@ ImRect Traverse(fs::path path) {
 			else
 				files.Add(path);
 		}
-
 	}
 	else {
 		static std::string selected = "";

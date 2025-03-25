@@ -121,7 +121,7 @@ project "Editor"
         "%{Includes.yaml_cpp}",
         "%{Includes.rapidjson}",
 
-        "%{Includes.filewatch}",
+        "%{Includes.efsw}",
 
         "%{Includes.flecs}",
         "%{Includes.rapidjson}",
@@ -146,6 +146,7 @@ project "Editor"
         "assimp",
         "freetype",
         "stb_image",
+        "efsw",
 
         "imgui",
         "ImGuiFileDialog",
@@ -199,3 +200,4 @@ include "Magma/.builddeps/ImGuizmo"
 include "Magma/.builddeps/assimp"
 include "Magma/.builddeps/freetype"
 include "Magma/.builddeps/stb_image"
+include "Magma/.builddeps/efsw"

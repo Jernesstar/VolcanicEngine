@@ -54,15 +54,20 @@ ProjectTab::~ProjectTab() {
 }
 
 void ProjectTab::Setup() {
+	Application::PushDir();
 	m_PlayButton.Display =
 		CreateRef<UI::Image>(
 			AssetImporter::GetTexture("Magma/assets/icons/PlayButton.png"));
 	m_PauseButton.Display =
 		CreateRef<UI::Image>(
 			AssetImporter::GetTexture("Magma/assets/icons/PauseButton.png"));
+	m_ResumeButton.Display =
+		CreateRef<UI::Image>(
+			AssetImporter::GetTexture("Magma/assets/icons/ResumeButton.png"));
 	m_StopButton.Display =
 		CreateRef<UI::Image>(
 			AssetImporter::GetTexture("Magma/assets/icons/StopButton.png"));
+	Application::PopDir();
 }
 
 void ProjectTab::Update(TimeStep ts) {
@@ -73,7 +78,6 @@ void ProjectTab::Update(TimeStep ts) {
 }
 
 void ProjectTab::Render() {
-	// RenderButtons();
 
 	ImGui::BeginMainMenuBar();
 	{
@@ -146,6 +150,7 @@ void ProjectTab::RenderButtons() {
 			OnResume();
 		else
 			OnPause();
+
 	if(m_StopButton.GetState().Clicked)
 		OnStop();
 
