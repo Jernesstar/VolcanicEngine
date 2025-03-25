@@ -37,6 +37,6 @@ project "angelscript"
             "%{VendorPaths.angelscript}/angelscript/source/as_callfunc_x64_msvc_asm.asm"
         }
 
-        defines {
+        buildoptions {
             "/NODEFAULTLIB:library"
         }

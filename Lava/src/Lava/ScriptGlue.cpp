@@ -14,6 +14,8 @@
 #include <angelscript/add_on/scripthelper/scripthelper.h>
 #include <angelscript/add_on/scriptmath/scriptmath.h>
 
+#include "App.h"
+
 #include <VolcaniCore/Core/Input.h>
 
 #include <Magma/Core/AssetManager.h>
@@ -29,8 +31,6 @@
 #include <Magma/Script/ScriptModule.h>
 #include <Magma/Script/ScriptClass.h>
 #include <Magma/Script/ScriptObject.h>
-
-#include "App.h"
 
 using namespace Magma;
 using namespace Magma::UI;

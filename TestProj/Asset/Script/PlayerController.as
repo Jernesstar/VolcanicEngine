@@ -47,6 +47,10 @@ class PlayerController : IEntityController
             tc.Translation.z -= 0.05f * ts;
         if(KeyPressed(Key::Down))
             tc.Translation.z += 0.05f * ts;
+        if(KeyPressed(Key::Q))
+            tc.Translation.y += 0.05f * ts;
+        if(KeyPressed(Key::E))
+            tc.Translation.y -= 0.05f * ts;
     }
 
     void OnKeyEvent(KeyEvent@ event)

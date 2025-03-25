@@ -1,7 +1,5 @@
 #pragma once
 
-#include <flecs.h>
-
 #include <VolcaniCore/Core/Time.h>
 #include <VolcaniCore/Core/Defines.h>
 #include <VolcaniCore/Core/List.h>

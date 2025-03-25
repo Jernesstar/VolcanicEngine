@@ -39,11 +39,20 @@ project "Magma"
         "%{Includes.soloud}",
     }
 
+    defines {
+        "FLECS_CPP_NO_AUTO_REGISTRATION",
+
+        "FLECS_CUSTOM_BUILD",
+        "FLECS_CPP",
+        "FLECS_SYSTEM",
+        "FLECS_PIPELINE",
+        "FLECS_TIMER",
+    }
+
     links {
         "VolcaniCore",
 
-        "yaml_cpp",
-        -- "rapidjson",
+        "yaml-cpp",
 
         "imgui",
         "flecs",
@@ -143,10 +152,19 @@ project "Editor"
         "ImGuizmo",
 
         "yaml-cpp",
-        -- "rapidjson",
         "flecs",
         "angelscript",
         "soloud"
+    }
+
+    defines {
+        "FLECS_CPP_NO_AUTO_REGISTRATION",
+
+        "FLECS_CUSTOM_BUILD",
+        "FLECS_CPP",
+        "FLECS_SYSTEM",
+        "FLECS_PIPELINE",
+        "FLECS_TIMER",
     }
 
     filter "toolset:msc or system:linux"

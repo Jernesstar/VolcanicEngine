@@ -23,10 +23,11 @@ World::World() {
 	m_World.component<CameraComponent>();
 	m_World.component<TagComponent>();
 	m_World.component<TransformComponent>();
+	m_World.component<AudioComponent>();
 	m_World.component<MeshComponent>();
 	m_World.component<SkyboxComponent>();
-	m_World.component<RigidBodyComponent>();
 	m_World.component<ScriptComponent>();
+	m_World.component<RigidBodyComponent>();
 	m_World.component<DirectionalLightComponent>();
 	m_World.component<PointLightComponent>();
 	m_World.component<SpotlightComponent>();

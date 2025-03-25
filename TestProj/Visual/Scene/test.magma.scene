@@ -51,30 +51,6 @@ Scene:
           MeshComponent:
             AssetID: 10036008063945961451
     - Entity:
-        Name: Ball2
-        ID: 554
-        Components:
-          TagComponent:
-            Tag: Obstacle
-          TransformComponent:
-            Transform:
-              Translation: [-9, -6, 6]
-              Rotation: [0, 0, 0]
-              Scale: [1, 1, 1]
-          MeshComponent:
-            AssetID: 4186775327602265389
-    - Entity:
-        Name: Magma
-        ID: 559
-        Components:
-          TransformComponent:
-            Transform:
-              Translation: [0, -16.1000004, 0]
-              Rotation: [0, 0, 0]
-              Scale: [1, 1, 1]
-          MeshComponent:
-            AssetID: 4186775327602265389
-    - Entity:
         Name: Player
         ID: 560
         Components:
@@ -119,3 +95,14 @@ Scene:
                   Name: Float
                   Type: float
                   Value: 0
+    - Entity:
+        Name: ""
+        ID: 561
+        Components:
+          TransformComponent:
+            Transform:
+              Translation: [-4.30000019, 11.6999998, -8]
+              Rotation: [0, 0, 0]
+              Scale: [1, 1, 1]
+          MeshComponent:
+            AssetID: 15277418182178081176

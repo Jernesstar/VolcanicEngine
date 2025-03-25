@@ -17,7 +17,7 @@ AssetPack:
         Type: 0
         MeshType: 1
         Material:
-          DiffuseColor: [1, 0, 1, 1]
+          DiffuseColor: [0, 0, 1, 1]
           SpecularColor: [0, 0, 0, 0]
           EmissiveColor: [0, 0, 0, 0]
     - Asset:

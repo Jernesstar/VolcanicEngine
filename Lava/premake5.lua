@@ -46,6 +46,16 @@ project "Lava"
         -- "rapidjson",
     }
 
+    defines {
+        "FLECS_CPP_NO_AUTO_REGISTRATION",
+
+        "FLECS_CUSTOM_BUILD",
+        "FLECS_CPP",
+        "FLECS_SYSTEM",
+        "FLECS_PIPELINE",
+        "FLECS_TIMER",
+    }
+
     filter "action:vs* or system:linux"
         links { "PhysX" }
 
@@ -115,6 +125,16 @@ project "Runtime"
         "flecs",
         "angelscript",
         "soloud"
+    }
+
+    defines {
+        "FLECS_CPP_NO_AUTO_REGISTRATION",
+
+        "FLECS_CUSTOM_BUILD",
+        "FLECS_CPP",
+        "FLECS_SYSTEM",
+        "FLECS_PIPELINE",
+        "FLECS_TIMER",
     }
 
     filter "action:vs* or system:linux"

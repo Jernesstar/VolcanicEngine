@@ -49,14 +49,14 @@ UIElement& UIElement::SetPosition(int32_t x, int32_t y) {
 UIElement& UIElement::CenterX() {
 	UIElement* parent = m_Root->Get(m_Parent);
 	if(parent)
-		x = parent->x + float(parent->Width - Width)/ 2.0f;
+		x = parent->x + uint32_t(parent->Width - Width) / 2.0f;
 	return *this;
 }
 
 UIElement& UIElement::CenterY() {
 	UIElement* parent = m_Root->Get(m_Parent);
 	if(parent)
-		y = parent->y - float(parent->Height - Height) / 2.0f;
+		y = parent->y - uint32_t(parent->Height - Height) / 2.0f;
 	return *this;
 }
 

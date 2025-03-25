@@ -68,7 +68,7 @@ Shadows::Shadows()
 			});
 	torch = AssetImporter::GetMesh("Sandbox/assets/models/mc-torch/Torch.obj");
 
-	depthCamera = CreateRef<OrthographicCamera>(20.0f, 20.0f, 1.0f, 20.0f);
+	depthCamera = CreateRef<OrthographicCamera>(20, 20, 1.0f, 20.0f);
 	depthCamera->SetPosition({ -2.0f, 6.0f, -2.0f });
 	depthCamera->SetDirection({ 0.0f, -2.0f, 0.0f });
 	sceneCamera = CreateRef<StereographicCamera>(75.0f);

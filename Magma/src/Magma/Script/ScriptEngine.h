@@ -112,12 +112,12 @@ void ScriptFunc::AddArg(uint32_t idx, const uint16_t& arg) {
 
 template<> inline
 void ScriptFunc::AddArg(uint32_t idx, const uint32_t& arg) {
-	Context->SetArgWord(idx, arg);
+	Context->SetArgDWord(idx, arg);
 }
 
 template<> inline
 void ScriptFunc::AddArg(uint32_t idx, const uint64_t& arg) {
-	Context->SetArgWord(idx, arg);
+	Context->SetArgQWord(idx, arg);
 }
 
 template<> inline

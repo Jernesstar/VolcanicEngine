@@ -3,8 +3,6 @@
 #include <VolcaniCore/Core/Defines.h>
 #include <VolcaniCore/Core/UUID.h>
 
-#include <flecs.h>
-
 #include "Entity.h"
 
 namespace Magma::ECS {

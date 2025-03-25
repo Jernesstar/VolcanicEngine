@@ -1,5 +1,9 @@
 #pragma once
 
+#ifdef _MSC_VER
+#define NOMINMAX
+#endif
+
 #include <string>
 
 #include <flecs.h>

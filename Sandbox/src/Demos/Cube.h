@@ -80,8 +80,8 @@ Cube::Cube()
 				Application::Close();
 		});
 
-	auto depth = Texture::Create(480, 270, Texture::Format::Depth);
-	auto color = Texture::Create(480, 270, Texture::Format::Normal,
+	auto depth = Texture::Create(320, 180, Texture::Format::Depth);
+	auto color = Texture::Create(320, 180, Texture::Format::Normal,
 								 Texture::Sampling::Nearest);
 	auto framebuffer = Framebuffer::Create(
 		{
@@ -116,11 +116,9 @@ Cube::Cube()
 
 	controller.SetCamera(camera);
 	controller.RotationSpeed = 0.0f;
-	controller.TranslationSpeed = 20.0f;
+	controller.TranslationSpeed = 1.0f;
 
 	UIRenderer::Init();
-
-	auto* command = RendererAPI::Get()->NewDrawCommand(nullptr);
 }
 
 Cube::~Cube() {
@@ -135,7 +133,7 @@ void Cube::OnUpdate(TimeStep ts) {
 	ImGui::Begin("Lights");
 	{
 		float r = camera->As<IsometricCamera>()->R;
-		if(ImGui::SliderFloat("Light.R", &r, 10.0f, 100.0f))
+		if(ImGui::DragFloat("Light.R", &r, 10.0f, 200.0f))
 			camera->As<IsometricCamera>()->SetDistance(r);
 	}
 	ImGui::End();
