@@ -72,6 +72,7 @@ public:
 
 	void SetShape(Ref<Shape> shape) override;
 
+	void SetMass(float mass);
 	void ApplyForce(const glm::vec3& f);
 };
 

@@ -22,7 +22,6 @@ RigidBody::~RigidBody() {
 #endif
 }
 
-// TODO(Fix): Scaled transforms
 void RigidBody::UpdateTransform() {
 #ifdef MAGMA_PHYSICS
 	PxTransform pose = m_Actor->getGlobalPose();
@@ -85,10 +84,15 @@ void DynamicBody::SetShape(Ref<Shape> shape) {
 #endif
 }
 
+void DynamicBody::SetMass(float mass) {
+#ifdef MAGMA_PHYSICS
+	m_Actor->setMass(mass);
+#endif
+}
+
 void DynamicBody::ApplyForce(const glm::vec3& f) {
 #ifdef MAGMA_PHYSICS
-	// m_Actor->setAngularDamping(0.5f);
-	// m_Actor->setLinearVelocity(velocity);
+	m_Actor->addForce(PxVec3{ f.x, f.y, f.z }, PxForceMode::Enum::eForce, true);
 #endif
 }
 

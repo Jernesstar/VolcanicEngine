@@ -66,7 +66,7 @@ void ProjectTab::Setup() {
 }
 
 void ProjectTab::Update(TimeStep ts) {
-	// App::Get()->OnUpdate(ts);
+	App::Get()->OnUpdate(ts);
 
 	for(auto panel : m_Panels)
 		panel->Update(ts);
@@ -121,11 +121,12 @@ void ProjectTab::RenderButtons() {
 	float x = Application::GetWindow()->GetWidth() - 100.0f;
 	float y = 27.0f;
 	float size = 18.0f;
+
 	UI::Button* button = &m_PlayButton;
 	if(m_ScreenState == ScreenState::Play)
 		button = &m_PauseButton;
-	// if(m_ScreenState == ScreenState::Pause)
-	// 	button = &m_ResumeButton;
+	else if(m_ScreenState == ScreenState::Pause)
+		button = &m_ResumeButton;
 
 	button->x = x;
 	button->y = y;
@@ -141,6 +142,8 @@ void ProjectTab::RenderButtons() {
 	if(button->GetState().Clicked)
 		if(button == &m_PlayButton)
 			OnPlay();
+		else if(button == &m_ResumeButton)
+			OnResume();
 		else
 			OnPause();
 	if(m_StopButton.GetState().Clicked)
@@ -158,6 +161,11 @@ void ProjectTab::OnPlay() {
 void ProjectTab::OnPause() {
 	m_ScreenState = ScreenState::Pause;
 	App::Get()->Running = false;
+}
+
+void ProjectTab::OnResume() {
+	m_ScreenState = ScreenState::Play;
+	App::Get()->Running = true;
 }
 
 void ProjectTab::OnStop() {

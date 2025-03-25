@@ -26,7 +26,7 @@ public:
 	ScreenState GetState() const { return m_ScreenState; }
 
 private:
-	UI::Button m_PlayButton, m_PauseButton, m_StopButton;
+	UI::Button m_PlayButton, m_PauseButton, m_ResumeButton, m_StopButton;
 	ScreenState m_ScreenState = ScreenState::Edit;
 
 private:
@@ -34,6 +34,7 @@ private:
 
 	void OnPlay();
 	void OnPause();
+	void OnResume();
 	void OnStop();
 };
 
