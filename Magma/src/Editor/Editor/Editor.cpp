@@ -316,7 +316,7 @@ void Editor::NewProject() {
 void Editor::NewProject(const std::string& volcPath) {
 	m_Project.Load(volcPath);
 
-	m_AssetManager.Load(volcPath);
+	m_AssetManager.Load(m_Project.Path);
 	m_AssetManager.Reload();
 
 	auto rootPath = fs::path(volcPath).parent_path();

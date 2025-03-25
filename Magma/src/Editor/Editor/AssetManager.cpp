@@ -96,8 +96,8 @@ std::string EditorAssetManager::GetPath(UUID id) {
 }
 
 void EditorAssetManager::Load(const std::string& path) {
-	auto packPath =
-		(fs::path(path).parent_path() / "Visual" / ".magma.assetpk").string();
+	auto rootPath = fs::path(path) / "Asset";
+	auto packPath = (rootPath / ".magma.assetpk").string();
 	m_Path = packPath;
 
 	YAML::Node file;
@@ -113,7 +113,6 @@ void EditorAssetManager::Load(const std::string& path) {
 	if(!assetPackNode)
 		return;
 
-	auto rootPath = fs::path(path).parent_path() / "Visual" / "Asset";
 	for(auto assetNode : assetPackNode["Assets"]) {
 		auto node = assetNode["Asset"];
 		UUID id = node["ID"].as<uint64_t>();
@@ -204,7 +203,7 @@ void EditorAssetManager::Save() {
 
 	if(m_Path == "")
 		return;
-	auto rootPath = fs::path(m_Path).parent_path() / "Asset";
+	auto rootPath = fs::path(m_Path).parent_path();
 
 	YAMLSerializer serializer;
 	serializer.BeginMapping();

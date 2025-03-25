@@ -1,4 +1,4 @@
-#include "../../../Project/App/TestGame.as"
+#include "../../Project/App/TestGame.as"
 
 class SomeScriptClass
 {
