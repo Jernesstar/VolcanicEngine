@@ -98,7 +98,7 @@ void FileWatcher::handleFileAction(
 
 	if(action == efsw::Actions::Add)
 		Add(type, fullPath);
-	else if(action == efsw::Actions::Remove)
+	else if(action == efsw::Actions::Delete)
 		Remove(type, fullPath);
 	else if(action == efsw::Actions::Modified) {
 		switch(type) {
@@ -139,17 +139,20 @@ void FileWatcher::ReloadMesh(const std::string& path) {
 
 void FileWatcher::ReloadTexture(const std::string& path) {
 	auto id = m_AssetManager->GetFromPath(path);
-	m_AssetManager->m_TextureAssets[asset.ID] = AssetImporter::GetTexture(path);
+	m_AssetManager->m_TextureAssets[id] = AssetImporter::GetTexture(path);
 }
 
 void FileWatcher::ReloadAudio(const std::string& path) {
 	auto id = m_AssetManager->GetFromPath(path);
-
+	m_AssetManager->m_AudioAssets[id] = AssetImporter::GetAudio(path);
 }
 
 void FileWatcher::ReloadScript(const std::string& path) {
 	auto id = m_AssetManager->GetFromPath(path);
-
+	auto name = fs::path(path).filename().stem().string();
+	Ref<ScriptModule> mod = CreateRef<ScriptModule>(name);
+	mod->Load(path);
+	m_AssetManager->m_ScriptAssets[id] = mod;
 }
 
 static efsw::FileWatcher* s_FileWatcher;

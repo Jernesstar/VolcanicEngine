@@ -89,8 +89,10 @@ void Renderer::EndFrame() {
 			backend.Array->GetIndexBuffer()->SetData(backend.Indices);
 		if(backend.Vertices.GetCount() && buffer->Specs.MaxVertexCount)
 			backend.Array->GetVertexBuffer(0)->SetData(backend.Vertices);
-		if(backend.Instances.GetCount() && buffer->Specs.MaxInstanceCount)
-			backend.Array->GetVertexBuffer(1)->SetData(backend.Instances);
+		if(backend.Instances.GetCount() && buffer->Specs.MaxInstanceCount) {
+			uint32_t idx = buffer->Specs.MaxVertexCount != 0;
+			backend.Array->GetVertexBuffer(idx)->SetData(backend.Instances);
+		}
 	}
 
 	for(auto& command : s_Data.Commands)

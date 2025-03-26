@@ -219,7 +219,7 @@ void Editor::Render() {
 			if(m_CurrentTab->Type != TabType::None)
 				m_CurrentTab->Render();
 			else
-				RenderEmptyTab();
+				RenderEmptyTab(m_CurrentTab);
 		}
 		else
 			RenderWelcomeScreen();
@@ -269,8 +269,7 @@ void Editor::RenderEmptyTab(Ref<Tab>& tab) {
 }
 
 void Editor::RenderWelcomeScreen() {
-	UI::Image image;
-	image.Display =
+	UI::Image image =
 		AssetImporter::GetTexture("Magma/assets/image/VolcanicDisplay.png");
 }
 
@@ -296,18 +295,18 @@ void Editor::NewTab() {
 }
 
 void Editor::OpenTab(TabType type) {
-	std::string extensions;
+	std::string exts;
 	if(type == TabType::None)
-		extensions = ".magma.scene, .magma.ui.json";
-	else if(type == TabType:::Scene)
-		extensions = ".magma.scene";
+		exts = ".magma.scene, .magma.ui.json";
+	else if(type == TabType::Scene)
+		exts = ".magma.scene";
 	else if(type == TabType::UI)
-		extensions = ".magma.ui.json";
+		exts = ".magma.ui.json";
 
 	IGFD::FileDialogConfig config;
 	config.path = m_Project.Path;
 	auto instance = ImGuiFileDialog::Instance();
-	instance->OpenDialog("ChooseFile", "Choose File", extensions, config);
+	instance->OpenDialog("ChooseFile", "Choose File", exts.c_str(), config);
 
 	if(instance->Display("ChooseFile")) {
 		if(instance->IsOk()) {

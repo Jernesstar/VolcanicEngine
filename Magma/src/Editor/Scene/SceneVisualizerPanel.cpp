@@ -23,6 +23,8 @@
 #include <Magma/Scene/PhysicsSystem.h>
 #include <Magma/Scene/SceneRenderer.h>
 
+#include <Lava/App.h>
+
 #include "Editor/AssetManager.h"
 #include "Editor/EditorApp.h"
 #include "Editor/Tab.h"
@@ -33,6 +35,7 @@
 using namespace Magma::ECS;
 using namespace Magma::Script;
 using namespace Magma::Physics;
+using namespace Lava;
 
 namespace Magma {
 
@@ -88,13 +91,15 @@ void SceneVisualizerPanel::Draw() {
 	auto& editor = Application::As<EditorApp>()->GetEditor();
 	auto tab = editor.GetProjectTab()->As<ProjectTab>();
 
-	if(tab->GetState() == ScreenState::Play) {
-		// m_Image.Content = tab->GetOutput();
+	Ref<Framebuffer> display;
+	if(tab->GetState() == ScreenState::Play)
+		display = App::Get()->GetRenderer().GetOutput();
+	else {
+		m_Context->OnRender(m_Renderer);
+		display = m_Renderer.GetOutput();
 	}
-	else
-		m_Image.Content = m_Renderer.GetOutput()->Get(AttachmentTarget::Color);
 
-	m_Context->OnRender(m_Renderer);
+	m_Image.Content = display->Get(AttachmentTarget::Color);
 
 	auto flags = ImGuiWindowFlags_NoScrollbar
 			   | ImGuiWindowFlags_NoScrollWithMouse
@@ -302,7 +307,6 @@ std::string SelectScriptClass(Ref<ScriptModule> mod) {
 
 EditorSceneRenderer::EditorSceneRenderer() {
 	auto camera = CreateRef<StereographicCamera>(75.0f);
-	// camera->SetPosition({ -2.0f, -3.0f, -3.0f });
 	m_Controller.SetCamera(camera);
 	m_Controller.TranslationSpeed = 10.0f;
 
@@ -313,6 +317,30 @@ EditorSceneRenderer::EditorSceneRenderer() {
 		RenderPass::Create("Grid",
 			ShaderPipeline::Create("Magma/assets/shaders", "Grid"), m_Output);
 	GridPass->SetData(Renderer3D::GetMeshBuffer());
+
+	BufferLayout instanceLayout =
+		{
+			{
+				{ "Position", BufferDataType::Vec3 }
+			},
+			true, // Dynamic
+			true  // Structure of arrays, aka. Instanced
+		};
+	DrawBufferSpecification specs
+	{
+		.VertexLayout = { },
+		.InstanceLayout = instanceLayout,
+		.MaxIndexCount = 0,
+		.MaxVertexCount = 0,
+		.MaxInstanceCount = 100
+	};
+	BillboardBuffer = RendererAPI::Get()->NewDrawBuffer(specs);
+	
+	BillboardPass =
+		RenderPass::Create("Billboard",
+			ShaderPipeline::Create("Magma/assets/shaders", "Billboard"),
+			m_Output);
+	BillboardPass->SetData(BillboardBuffer);
 
 	// buffer = Framebuffer::Create(window->GetWidth(), window->GetHeight());
 	LightingPass =
@@ -367,6 +395,10 @@ EditorSceneRenderer::EditorSceneRenderer() {
 	// 		}, 100);
 }
 
+EditorSceneRenderer::~EditorSceneRenderer() {
+	RendererAPI::Get()->ReleaseBuffer(BillboardBuffer);
+}
+
 void EditorSceneRenderer::Update(TimeStep ts) {
 	if(Hovered)
 		m_Controller.OnUpdate(ts);
@@ -395,6 +427,8 @@ void EditorSceneRenderer::Begin() {
 	.SetInput("u_ViewProj", camera->GetViewProjection());
 	FirstCommand->UniformData
 	.SetInput("u_CameraPosition", camera->GetPosition());
+
+	BillboardBuffer->Clear(DrawBufferIndex::Instances);
 }
 
 void EditorSceneRenderer::SubmitCamera(const Entity& entity) {
@@ -412,19 +446,48 @@ void EditorSceneRenderer::SubmitSkybox(const Entity& entity) {
 }
 
 void EditorSceneRenderer::SubmitLight(const Entity& entity) {
-	// if(entity.Has<DirectionalLightComponent>()) {
-	// 	auto& dc = entity.Get<DirectionalLightComponent>();
-	// 	DirectionalLightBuffer->SetData(&dc);
-	// 	HasDirectionalLight = true;
-	// }
-	// else if(entity.Has<PointLightComponent>()) {
-	// 	auto& pc = entity.Get<PointLightComponent>();
-	// 	PointLightBuffer->SetData(&pc, 1, PointLightCount++);
-	// }
-	// else if(entity.Has<SpotlightComponent>()) {
-	// 	auto& sc = entity.Get<SpotlightComponent>();
-	// 	SpotlightBuffer->SetData(&sc, 1, SpotlightCount++);
-	// }
+	glm::vec3 position;
+	uint32_t type = 0;
+
+	if(entity.Has<DirectionalLightComponent>()) {
+		auto& dc = entity.Get<DirectionalLightComponent>();
+		// DirectionalLightBuffer->SetData(&dc);
+		// HasDirectionalLight = true;
+		position = dc.Position;
+		type = 1;
+	}
+	else if(entity.Has<PointLightComponent>()) {
+		auto& pc = entity.Get<PointLightComponent>();
+		// PointLightBuffer->SetData(&pc, 1, PointLightCount++);
+
+		position = pc.Position;
+		type = 2;
+	}
+	else if(entity.Has<SpotlightComponent>()) {
+		auto& sc = entity.Get<SpotlightComponent>();
+		// SpotlightBuffer->SetData(&sc, 1, SpotlightCount++);
+
+		position = sc.Position;
+		type = 3;
+	}
+
+	auto camera = m_Controller.GetCamera();
+	auto* command = RendererAPI::Get()->NewDrawCommand(BillboardPass->Get());
+	command->AddInstance(glm::value_ptr(position));
+	command->UniformData.SetInput("u_View", camera->GetView());
+	command->UniformData.SetInput("u_ViewProj", camera->GetViewProjection());
+	command->UniformData.SetInput("u_BillboardWidth", 10.0f);
+	command->UniformData.SetInput("u_BillboardHeight", 10.0f);
+
+	auto& call = command->NewDrawCall();
+	call.VertexCount = 6;
+	call.InstanceCount = 1;
+	call.InstanceStart = 0;
+	call.Primitive = PrimitiveType::Triangle;
+	call.Partition = PartitionType::Instanced;
+	call.DepthTest = DepthTestingMode::Off;
+	call.Culling = CullingMode::Off;
+	call.Blending = BlendingMode::Greatest;
 }
 
 void EditorSceneRenderer::SubmitParticles(const Entity& entity) {
@@ -432,12 +495,11 @@ void EditorSceneRenderer::SubmitParticles(const Entity& entity) {
 }
 
 void EditorSceneRenderer::SubmitMesh(const Entity& entity) {
-	auto& assetManager =
-		Application::As<EditorApp>()->GetEditor().GetAssetManager();
+	auto* assetManager = App::Get()->GetAssetManager();
 	auto& tc = entity.Get<TransformComponent>();
 	auto& mc = entity.Get<MeshComponent>();
-	assetManager.Load(mc.MeshAsset);
-	auto mesh = assetManager.Get<Mesh>(mc.MeshAsset);
+	assetManager->Load(mc.MeshAsset);
+	auto mesh = assetManager->Get<Mesh>(mc.MeshAsset);
 
 	if(entity == Selected)
 		return;

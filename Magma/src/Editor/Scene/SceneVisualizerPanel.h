@@ -16,7 +16,7 @@ namespace Magma {
 class EditorSceneRenderer : public SceneRenderer {
 public:
 	EditorSceneRenderer();
-	~EditorSceneRenderer() = default;
+	~EditorSceneRenderer();
 
 	void Update(TimeStep ts) override;
 
@@ -41,6 +41,14 @@ private:
 	// Grid
 	Ref<RenderPass> GridPass;
 
+	// Outlining
+	Ref<RenderPass> MaskPass;
+	Ref<RenderPass> OutlinePass;
+
+	// Billboards
+	Ref<RenderPass> BillboardPass;
+	DrawBuffer* BillboardBuffer;
+
 	// Lighting and shadows
 	Ref<RenderPass> DepthPass;
 	Ref<RenderPass> LightingPass;
@@ -50,10 +58,6 @@ private:
 	bool HasDirectionalLight = false;
 	uint32_t PointLightCount = 0;
 	uint32_t SpotlightCount = 0;
-
-	// Outlining
-	Ref<RenderPass> MaskPass;
-	Ref<RenderPass> OutlinePass;
 
 	// Bloom
 	Ref<Framebuffer> Mips;

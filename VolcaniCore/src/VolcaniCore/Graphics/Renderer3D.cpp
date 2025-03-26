@@ -169,8 +169,8 @@ static void DrawSubMesh(Ref<Mesh> root, SubMesh& mesh, const glm::mat4& tr,
 
 	if(!command->VerticesCount) {
 		if(cmd) {
-			command->VerticesIndex = s_MeshBuffer->VerticesCount;
 			command->IndicesIndex = s_MeshBuffer->IndicesCount;
+			command->VerticesIndex = s_MeshBuffer->VerticesCount;
 		}
 
 		if(!command->UniformData && root->Materials) {

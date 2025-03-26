@@ -129,6 +129,14 @@ UINode UIPage::Add(UIElementType type, const std::string& id) {
 	return { UIElementType::None, 0 };
 }
 
+void UIPage::PushLayer(const std::string& name) {
+
+}
+
+void UIPage::PopLayer() {
+
+}
+
 void UIPage::Add(const UINode& node) {
 	FirstOrders.Add(node);
 }

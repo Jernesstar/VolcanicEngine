@@ -703,9 +703,9 @@ void RegisterUI() {
 	// engine->RegisterObjectProperty("UIElement", "");
 
 	engine->RegisterObjectType("UIPageClass", 0, asOBJ_REF | asOBJ_NOHANDLE);
-	engine->RegisterObjectMethod("UIPageClass", "PushLayer(const string &id)",
+	engine->RegisterObjectMethod("UIPageClass", "void PushLayer(const string &in)",
 		asMETHOD(UIPage, PushLayer), asCALL_THISCALL);
-	engine->RegisterObjectMethod("UIPageClass", "PopLayer()",
+	engine->RegisterObjectMethod("UIPageClass", "void PopLayer()",
 		asMETHOD(UIPage, PopLayer), asCALL_THISCALL);
 	// engine->RegisterObjectMethod("UIPageClass", "UIElement Get(const string &in)",
 	// 	asMETHODPR(UIPage, Get, (const std::string&) const, UIElement*),
