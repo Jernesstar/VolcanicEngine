@@ -2,19 +2,19 @@ AssetPack:
   Assets:
     - Asset:
         ID: 2691709289590626850
-        Type: 5
+        Type: Script
         Path: Script/PlayerController.as
     - Asset:
         ID: 4186775327602265389
-        Type: 0
+        Type: Mesh
         Path: Mesh/sphere/wooden_sphere.obj
     - Asset:
         ID: 9099402520052546251
-        Type: 5
+        Type: Script
         Path: Script/Button1.as
     - Asset:
         ID: 10036008063945961451
-        Type: 0
+        Type: Mesh
         MeshType: 1
         Material:
           DiffuseColor: [0, 0, 1, 1]
@@ -22,9 +22,9 @@ AssetPack:
           EmissiveColor: [0, 0, 0, 0]
     - Asset:
         ID: 15277418182178081176
-        Type: 0
+        Type: Mesh
         Path: Mesh/player/Knight_Golden_Male.obj
     - Asset:
         ID: 16624656892553940704
-        Type: 4
+        Type: Audio
         Path: Audio/Woosh2.wav

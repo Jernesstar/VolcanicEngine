@@ -23,6 +23,48 @@ namespace fs = std::filesystem;
 
 namespace Magma {
 
+static std::string AssetTypeToString(AssetType type) {
+	switch(type) {
+		case AssetType::Mesh:
+			return "Mesh";
+		case AssetType::Texture:
+			return "Texture";
+		case AssetType::Cubemap:
+			return "Cubemap";
+		case AssetType::Font:
+			return "Font";
+		case AssetType::Audio:
+			return "Audio";
+		case AssetType::Script:
+			return "Script";
+		case AssetType::Shader:
+			return "Shader";
+	}
+
+	return "None";
+}
+
+static AssetType AssetTypeFromString(const std::string& str) {
+	if(str == "Mesh")
+		return AssetType::Mesh;
+	else if(str == "Texture")
+		return AssetType::Texture;
+	else if(str == "Texture")
+		return AssetType::Texture;
+	else if(str == "Cubemap")
+		return AssetType::Cubemap;
+	else if(str == "Font")
+		return AssetType::Font;
+	else if(str == "Audio")
+		return AssetType::Audio;
+	else if(str == "Script")
+		return AssetType::Script;
+	else if(str == "Shader")
+		return AssetType::Shader;
+
+	return AssetType::None;
+}
+
 class FileWatcher : public efsw::FileWatchListener {
 public:
 	FileWatcher(EditorAssetManager* assetManager);
@@ -31,11 +73,13 @@ public:
 	void handleFileAction(efsw::WatchID id, const std::string& dir,
 		const std::string& file, efsw::Action action, std::string old) override;
 
-	void Add(const std::string& dir, const std::string& name);
-	void ReloadMesh(const std::string& name);
-	void ReloadTexture(const std::string& name);
-	void ReloadAudio(const std::string& name);
-	void ReloadScript(const std::string& name);
+	void Add(AssetType type, const std::string& path);
+	void Remove(AssetType type, const std::string& path);
+
+	void ReloadMesh(const std::string& path);
+	void ReloadTexture(const std::string& path);
+	void ReloadAudio(const std::string& path);
+	void ReloadScript(const std::string& path);
 
 private:
 	EditorAssetManager* m_AssetManager;
@@ -48,43 +92,63 @@ void FileWatcher::handleFileAction(
 	efsw::WatchID id, const std::string& dir,
 	const std::string& file, efsw::Action action, std::string oldFilename)
 {
-	switch(action) {
-		case efsw::Actions::Add:
-			std::cout << "DIR (" << dir << ") FILE (" << file << ") has event Added" << "\n";
-			break;
-		case efsw::Actions::Delete:
-			std::cout << "DIR (" << dir << ") FILE (" << file << ") has event Delete" << "\n";
-			break;
-		case efsw::Actions::Modified:
-			std::cout << "DIR (" << dir << ") FILE (" << file << ") has event Modified" << "\n";
-			break;
-		case efsw::Actions::Moved:
-			std::cout << "DIR (" << dir << ") FILE (" << file << ") has event Moved from (" << oldFilename << ")" << "\n";
-			break;
-		default:
-			std::cout << "Should never happen!" << "\n";
+	auto fullPath = (fs::path(dir) / file).string();
+	auto assetDir = fs::path(dir).filename().string();
+	AssetType type = AssetTypeFromString(assetDir);
+
+	if(action == efsw::Actions::Add)
+		Add(type, fullPath);
+	else if(action == efsw::Actions::Remove)
+		Remove(type, fullPath);
+	else if(action == efsw::Actions::Modified) {
+		switch(type) {
+			case AssetType::Mesh:
+				ReloadMesh(fullPath);
+				break;
+			case AssetType::Texture:
+				ReloadTexture(fullPath);
+				break;
+			case AssetType::Audio:
+				ReloadAudio(fullPath);
+				break;
+			case AssetType::Script:
+				ReloadScript(fullPath);
+				break;
+		}
+	}
+	else if(action == efsw::Actions::Moved) {
+		std::cout << "DIR (" << dir << ") FILE (" << file << ") has event Moved from (" << oldFilename << ")" << "\n";
+	}
+	else {
+		std::cout << "Should never happen!" << "\n";
 	}
 }
 
-void FileWatcher::Add(const std::string& dir, const std::string& name) {
+void FileWatcher::Add(AssetType type, const std::string& path) {
+	m_AssetManager->Add(path, type);
+}
+
+void FileWatcher::Remove(AssetType type, const std::string& path) {
 
 }
 
-void FileWatcher::ReloadMesh(const std::string& name) {
-	auto mesh = AssetImporter::GetMesh(name);
-	auto id = m_AssetManager->GetFromPath(name);
-	m_AssetManager->m_MeshAssets[id] = mesh;
+void FileWatcher::ReloadMesh(const std::string& path) {
+	auto id = m_AssetManager->GetFromPath(path);
+	m_AssetManager->m_MeshAssets[id] = AssetImporter::GetMesh(path);
 }
 
-void FileWatcher::ReloadTexture(const std::string& name) {
+void FileWatcher::ReloadTexture(const std::string& path) {
+	auto id = m_AssetManager->GetFromPath(path);
+	m_AssetManager->m_TextureAssets[asset.ID] = AssetImporter::GetTexture(path);
+}
+
+void FileWatcher::ReloadAudio(const std::string& path) {
+	auto id = m_AssetManager->GetFromPath(path);
 
 }
 
-void FileWatcher::ReloadAudio(const std::string& name) {
-
-}
-
-void FileWatcher::ReloadScript(const std::string& name) {
+void FileWatcher::ReloadScript(const std::string& path) {
+	auto id = m_AssetManager->GetFromPath(path);
 
 }
 
@@ -100,6 +164,8 @@ EditorAssetManager::EditorAssetManager() {
 EditorAssetManager::~EditorAssetManager() {
 	s_WatcherIDs.ForEach([](auto& id) { s_FileWatcher->removeWatch(id); });
 	s_WatcherIDs.Clear();
+	delete s_Listener;
+	delete s_FileWatcher;
 }
 
 void EditorAssetManager::Load(Asset asset) {
@@ -197,7 +263,7 @@ void EditorAssetManager::Load(const std::string& path) {
 	for(auto assetNode : assetPackNode["Assets"]) {
 		auto node = assetNode["Asset"];
 		UUID id = node["ID"].as<uint64_t>();
-		AssetType type = (AssetType)node["Type"].as<uint32_t>();
+		AssetType type = AssetTypeFromString(node["Type"].as<std::string>());
 		Asset asset = { id, type };
 		m_AssetRegistry[asset] = false;
 
@@ -299,7 +365,7 @@ void EditorAssetManager::Save() {
 		serializer.BeginMapping();
 		serializer.WriteKey("Asset").BeginMapping();
 		serializer.WriteKey("ID").Write((uint64_t)asset.ID);
-		serializer.WriteKey("Type").Write((uint32_t)asset.Type);
+		serializer.WriteKey("Type").Write(AssetTypeToString(asset.Type));
 
 		std::string path = GetPath(asset.ID);
 		if(path != "")

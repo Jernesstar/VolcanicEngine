@@ -27,6 +27,7 @@ public:
 	void Render();
 
 	void NewTab(Ref<Tab> tab);
+	Tab* GetCurrentTab();
 	ProjectTab* GetProjectTab() { return m_Tabs[0]->As<ProjectTab>(); }
 
 	Project& GetProject() { return m_Project; }
@@ -44,7 +45,7 @@ private:
 
 	void SetTab(Ref<Tab> tab);
 	void NewTab();
-	void OpenTab();
+	void OpenTab(TabType type = TabType::None);
 	void ReopenTab();
 	void CloseTab(Ref<Tab> tab);
 

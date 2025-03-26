@@ -23,6 +23,7 @@
 
 #include "Project/ProjectTab.h"
 
+#include "AssetImporter.h"
 #include "SceneLoader.h"
 #include "UILoader.h"
 
@@ -39,13 +40,19 @@ struct {
 		bool runProject    = false;
 		bool saveProject   = false;
 		bool exportProject = false;
+
+		bool addScreen     = false;
 	} project;
 
 	struct {
-		bool newTab    = false;
-		bool openTab   = false;
-		bool reopenTab = false;
-		bool closeTab  = false;
+		bool newTab      = false;
+		bool newScene    = false;
+		bool newUI       = false;
+		bool openTab     = false;
+		bool openScene   = false;
+		bool openUI      = false;
+		bool reopenTab   = false;
+		bool closeTab    = false;
 	} tab;
 } static menu;
 
@@ -83,7 +90,6 @@ void Editor::Load(const CommandLineArgs& args) {
 
 		if(args["--export"]) {
 			ExportProject(args["--export"]);
-			VOLCANICORE_LOG_INFO("Exported project successfully");
 			Application::Close();
 		}
 
@@ -140,6 +146,10 @@ void Editor::Render() {
 					menu.project.runProject = true;
 
 				ImGui::Separator();
+				if(ImGui::MenuItem("Add Screen"))
+					menu.project.addScreen = true;
+
+				ImGui::Separator();
 				if(ImGui::MenuItem("Export"))
 					menu.project.exportProject = true;
 
@@ -152,10 +162,10 @@ void Editor::Render() {
 					menu.tab.newTab = true;
 				if(ImGui::MenuItem("New Scene Tab")
 				|| Input::KeysPressed(Key::Ctrl, Key::T))
-					menu.tab.newTab = true;
+					menu.tab.newScene = true;
 				if(ImGui::MenuItem("New UI Tab")
 				|| Input::KeysPressed(Key::Ctrl, Key::T))
-					menu.tab.newTab = true;
+					menu.tab.newUI = true;
 				ImGui::Separator();
 
 				if(ImGui::MenuItem("Open", "Ctrl+O")
@@ -203,7 +213,7 @@ void Editor::Render() {
 		ImGuiID dockspaceID = ImGui::GetID("DockSpace");
 		ImGui::DockSpace(dockspaceID, ImVec2(0.0f, 0.0f), dockspaceFlags);
 
-		if(m_Tabs)
+		if(m_CurrentTab && m_CurrentTab != m_Tabs[0])
 			GetProjectTab()->RenderEssentialPanels();
 		if(m_CurrentTab) {
 			if(m_CurrentTab->Type != TabType::None)
@@ -229,21 +239,39 @@ void Editor::Render() {
 
 	if(menu.tab.newTab)
 		NewTab();
+	if(menu.tab.newScene)
+		NewTab(CreateRef<SceneTab>());
+	if(menu.tab.newUI)
+		NewTab(CreateRef<UITab>());
+
 	if(menu.tab.openTab)
 		OpenTab();
+	if(menu.tab.openScene)
+		OpenTab(TabType::Scene);
+	if(menu.tab.openUI)
+		OpenTab(TabType::UI);
+
 	if(menu.tab.reopenTab)
 		ReopenTab();
 	if(menu.tab.closeTab)
 		CloseTab(m_CurrentTab);
 }
 
-void Editor::RenderEmptyTab() {
-
+void Editor::RenderEmptyTab(Ref<Tab>& tab) {
+	if(ImGui::Button("Open Scene")) {
+		tab.reset();
+		tab = CreateRef<SceneTab>();
+	}
+	if(ImGui::Button("Open UI")) {
+		tab.reset();
+		tab = CreateRef<UITab>();
+	}
 }
 
 void Editor::RenderWelcomeScreen() {
-	// UI::Image image =
-	// 	AssetImporter::GetTexture("Magma/assets/image/VolcanicDisplay.png");
+	UI::Image image;
+	image.Display =
+		AssetImporter::GetTexture("Magma/assets/image/VolcanicDisplay.png");
 }
 
 void Editor::SetTab(Ref<Tab> tab) {
@@ -267,20 +295,27 @@ void Editor::NewTab() {
 	NewTab(newTab);
 }
 
-void Editor::OpenTab() {
+void Editor::OpenTab(TabType type) {
+	std::string extensions;
+	if(type == TabType::None)
+		extensions = ".magma.scene, .magma.ui.json";
+	else if(type == TabType:::Scene)
+		extensions = ".magma.scene";
+	else if(type == TabType::UI)
+		extensions = ".magma.ui.json";
+
 	IGFD::FileDialogConfig config;
 	config.path = m_Project.Path;
 	auto instance = ImGuiFileDialog::Instance();
-	instance->OpenDialog("ChooseFile", "Choose File",
-						 ".magma.scene, .magma.ui.json", config);
+	instance->OpenDialog("ChooseFile", "Choose File", extensions, config);
 
 	if(instance->Display("ChooseFile")) {
 		if(instance->IsOk()) {
-			fs::path path = instance->GetFilePathName();
-			if(path.extension() == ".scene")
-				NewTab(CreateRef<SceneTab>(path.string()));
+			std::string path = instance->GetFilePathName();
+			if(type == TabType::Scene)
+				NewTab(CreateRef<SceneTab>(path));
 			else
-				NewTab(CreateRef<UITab>(path.string()));
+				NewTab(CreateRef<UITab>(path));
 		}
 
 		instance->Close();
@@ -466,6 +501,7 @@ void Editor::ExportProject(const std::string& exportPath) {
 		fs::remove(target);
 
 	fs::copy_file(runtimePath, target, fs::copy_options::overwrite_existing);
+	VOLCANICORE_LOG_INFO("Exported project successfully");
 }
 
 }

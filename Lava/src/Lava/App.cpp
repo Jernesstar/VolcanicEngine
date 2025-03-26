@@ -102,7 +102,7 @@ App::App(const Project& project)
 	ScriptEngine::Get()->RegisterGlobalFunction(
 		"SceneClass& get_Scene() property", asFUNCTION(GetScene), asCALL_CDECL);
 	ScriptEngine::Get()->RegisterGlobalFunction(
-		"UIPageClass& get_UI() property", asFUNCTION(GetUI), asCALL_CDECL);
+		"UIPageClass& get_UIPage() property", asFUNCTION(GetUI), asCALL_CDECL);
 
 	ScriptEngine::Get()->RegisterGlobalFunction(
 		"IApp@ get_ScriptApp() property",

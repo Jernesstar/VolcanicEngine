@@ -45,6 +45,8 @@ public:
 	UIPage& operator =(const UIPage& other);
 
 	void Render();
+	void PushLayer(const std::string& name);
+	void PopLayer();
 
 	void Traverse(const Func<void, UIElement*>& func, bool dfs = true);
 	void Traverse(const Func<void, UIElement*, TraversalStage>& func);

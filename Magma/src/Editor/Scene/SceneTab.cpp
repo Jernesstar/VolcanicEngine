@@ -108,13 +108,11 @@ void SceneTab::Render() {
 	if(menu.file.openScene)
 		OpenScene();
 	if(menu.file.saveScene) {
+		menu.file.saveScene = false;
 		if(m_ScenePath == "")
 			SaveScene();
-		else {
-			VOLCANICORE_LOG_INFO("Here");
+		else
 			SceneLoader::EditorSave(m_Scene, m_ScenePath);
-		}
-		menu.file.saveScene = false;
 	}
 	if(menu.file.saveAsScene)
 		SaveScene();
@@ -170,6 +168,7 @@ void SceneTab::SaveScene() {
 
 void SceneTab::AddEntity() {
 	menu.edit.addEntity = false;
+	m_Scene.EntityWorld.AddEntity();
 }
 
 }
