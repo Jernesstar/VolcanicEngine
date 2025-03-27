@@ -182,7 +182,8 @@ void Lighting::OnUpdate(TimeStep ts) {
 				Renderer3D::DrawMesh(torch, { .Translation = { x, 1.0f, y } }, torchCommand);
 			}
 
-		Renderer3D::DrawMesh(player);
+		auto* newCommand = Renderer::NewCommand();
+		Renderer3D::DrawMesh(player, Transform{ }, command);
 
 		Renderer3D::End();
 	}

@@ -51,9 +51,10 @@ void Renderer::EndFrame() {
 	Renderer2D::EndFrame();
 }
 
-void Renderer::StartPass(Ref<RenderPass> pass) {
+void Renderer::StartPass(Ref<RenderPass> pass, bool pushCommand) {
 	s_RenderPass = pass;
-	PushCommand();
+	if(pushCommand)
+		PushCommand();
 }
 
 void Renderer::EndPass() {

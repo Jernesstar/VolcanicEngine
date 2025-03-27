@@ -9,8 +9,8 @@ const vec2 Vertices[4] =
     vec2[4](
         vec2(-0.5f, -0.5f),
         vec2( 0.5f, -0.5f),
-        vec2(-0.5f,  0.5f),
-        vec2( 0.5f,  0.5f)
+        vec2( 0.5f,  0.5f),
+        vec2(-0.5f,  0.5f)
     );
 
 const int Indices[6] = int[6](0, 2, 1, 2, 0, 3);
@@ -18,6 +18,7 @@ const int Indices[6] = int[6](0, 2, 1, 2, 0, 3);
 layout(location = 0) in vec3 a_BillboardCenter;
 
 layout(location = 0) out vec3 v_Position;
+layout(location = 1) out vec2 v_TexCoords;
 
 void main()
 {
@@ -29,6 +30,7 @@ void main()
         a_BillboardCenter
         + cameraRight * vertex.x * u_BillboardWidth
         + cameraUp * vertex.y * u_BillboardHeight;
+    v_TexCoords = vertex + 0.5;
 
     gl_Position = u_ViewProj * vec4(v_Position, 1.0);
 }

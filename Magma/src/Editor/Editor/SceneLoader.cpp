@@ -377,13 +377,10 @@ void SerializeEntity(YAMLSerializer& serializer, const Entity& entity) {
 
 		serializer.WriteKey("ParticleEmitterComponent")
 		.BeginMapping()
-			.WriteKey("System")
-			.BeginMapping()
-				.WriteKey("Position").Write(system.Position)
-				.WriteKey("MaxParticleCount").Write(system.MaxParticleCount)
-				.WriteKey("ParticleLifetime").Write(system.ParticleLifetime)
-				.WriteKey("AssetID").Write((uint64_t)system.ImageAsset.ID)
-			.EndMapping()
+			.WriteKey("Position").Write(system.Position)
+			.WriteKey("MaxParticleCount").Write(system.MaxParticleCount)
+			.WriteKey("ParticleLifetime").Write(system.ParticleLifetime)
+			.WriteKey("AssetID").Write((uint64_t)system.ImageAsset.ID)
 		.EndMapping(); // ParticleEmitterComponent
 	}
 
@@ -582,7 +579,7 @@ void DeserializeEntity(YAML::Node entityNode, Scene& scene) {
 
 	auto pointLightComponentNode = components["PointLightComponent"];
 	if(pointLightComponentNode) {
-		auto lightNode = directionalLightComponentNode["Light"];
+		auto lightNode = pointLightComponentNode["Light"];
 		entity.Add<PointLightComponent>(
 			lightNode["Ambient"].as<glm::vec3>(),
 			lightNode["Diffuse"].as<glm::vec3>(),
@@ -606,14 +603,13 @@ void DeserializeEntity(YAML::Node entityNode, Scene& scene) {
 			lightNode["OuterCutoffAngle"].as<float>());
 	}
 
-	auto particleSystemComponentNode = components["ParticleEmitterComponent"];
-	if(particleSystemComponentNode) {
-		auto system = particleSystemComponentNode["System"];
+	auto particleEmitterComponentNode = components["ParticleEmitterComponent"];
+	if(particleEmitterComponentNode) {
 		entity.Add<ParticleEmitterComponent>(
-			system["Position"].as<glm::vec3>(),
-			system["MaxParticleCount"].as<uint64_t>(),
-			system["ParticleLifetime"].as<float>(),
-			Asset{ system["AssetID"].as<uint64_t>(), AssetType::Texture });
+			particleEmitterComponentNode["Position"].as<glm::vec3>(),
+			particleEmitterComponentNode["MaxParticleCount"].as<uint64_t>(),
+			particleEmitterComponentNode["ParticleLifetime"].as<float>(),
+			Asset{ particleEmitterComponentNode["AssetID"].as<uint64_t>(), AssetType::Texture });
 	}
 }
 

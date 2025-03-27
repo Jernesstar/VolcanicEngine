@@ -27,7 +27,7 @@ public:
 	static const uint64_t MaxInstances;
 
 public:
-	static void StartPass(Ref<RenderPass> pass);
+	static void StartPass(Ref<RenderPass> pass, bool pushCommand = true);
 	static void EndPass();
 	static Ref<RenderPass> GetPass();
 

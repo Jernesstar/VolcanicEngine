@@ -160,10 +160,10 @@ static void DrawSubMesh(Ref<Mesh> root, SubMesh& mesh, const glm::mat4& tr,
 						DrawCommand* cmd)
 {
 	DrawCommand* command;
+	if(cmd)
+		command = cmd;
 	if(s_Meshes.count(&mesh))
 		command = s_Meshes[&mesh];
-	else if(cmd)
-		command = cmd;
 	else
 		command = s_Meshes[&mesh] = Renderer::NewCommand();
 

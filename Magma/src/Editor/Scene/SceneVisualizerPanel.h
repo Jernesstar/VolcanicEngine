@@ -35,9 +35,6 @@ private:
 	Entity Selected;
 	bool Hovered = false;
 
-	DrawCommand* FirstCommand;
-	Map<Ref<Mesh>, DrawCommand*> Objects;
-
 	// Grid
 	Ref<RenderPass> GridPass;
 
@@ -48,6 +45,12 @@ private:
 	// Billboards
 	Ref<RenderPass> BillboardPass;
 	DrawBuffer* BillboardBuffer;
+	DrawCommand* DirectionalLightBillboardCommand;
+	DrawCommand* PointLightBillboardCommand;
+	DrawCommand* SpotlightBillboardCommand;
+	Ref<Texture> DirectionalLightIcon;
+	Ref<Texture> PointLightIcon;
+	Ref<Texture> SpotlightIcon;
 
 	// Lighting and shadows
 	Ref<RenderPass> DepthPass;
@@ -55,6 +58,8 @@ private:
 	Ref<UniformBuffer> DirectionalLightBuffer;
 	Ref<UniformBuffer> PointLightBuffer;
 	Ref<UniformBuffer> SpotlightBuffer;
+	DrawCommand* FirstCommand;
+
 	bool HasDirectionalLight = false;
 	uint32_t PointLightCount = 0;
 	uint32_t SpotlightCount = 0;

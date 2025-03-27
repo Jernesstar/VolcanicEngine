@@ -26,6 +26,7 @@
 #include <Lava/App.h>
 
 #include "Editor/AssetManager.h"
+#include "Editor/AssetImporter.h"
 #include "Editor/EditorApp.h"
 #include "Editor/Tab.h"
 
@@ -326,6 +327,7 @@ EditorSceneRenderer::EditorSceneRenderer() {
 			true, // Dynamic
 			true  // Structure of arrays, aka. Instanced
 		};
+
 	DrawBufferSpecification specs
 	{
 		.VertexLayout = { },
@@ -341,6 +343,13 @@ EditorSceneRenderer::EditorSceneRenderer() {
 			ShaderPipeline::Create("Magma/assets/shaders", "Billboard"),
 			m_Output);
 	BillboardPass->SetData(BillboardBuffer);
+
+	DirectionalLightIcon =
+		AssetImporter::GetTexture("Magma/assets/icons/DirectionalLightIcon.png");
+	PointLightIcon =
+		AssetImporter::GetTexture("Magma/assets/icons/PointLightIcon.png");
+	SpotlightIcon =
+		AssetImporter::GetTexture("Magma/assets/icons/SpotlightIcon.png");
 
 	// buffer = Framebuffer::Create(window->GetWidth(), window->GetHeight());
 	LightingPass =
@@ -406,20 +415,89 @@ void EditorSceneRenderer::Update(TimeStep ts) {
 
 void EditorSceneRenderer::Begin() {
 	auto camera = m_Controller.GetCamera();
-	auto* command = RendererAPI::Get()->NewDrawCommand(GridPass->Get());
-	command->Clear = true;
-	command->UniformData
+
+	auto* gridCommand = RendererAPI::Get()->NewDrawCommand(GridPass->Get());
+	gridCommand->Clear = true;
+	gridCommand->UniformData
 	.SetInput("u_ViewProj", camera->GetViewProjection());
-	command->UniformData
+	gridCommand->UniformData
 	.SetInput("u_CameraPosition", camera->GetPosition());
 
-	auto& call = command->NewDrawCall();
-	call.VertexCount = 6;
-	call.Primitive = PrimitiveType::Triangle;
-	call.Partition = PartitionType::Single;
-	call.DepthTest = DepthTestingMode::Off;
-	call.Culling = CullingMode::Off;
-	call.Blending = BlendingMode::Greatest;
+	auto& gridCall = gridCommand->NewDrawCall();
+	gridCall.VertexCount = 6;
+	gridCall.Primitive = PrimitiveType::Triangle;
+	gridCall.Partition = PartitionType::Single;
+	gridCall.DepthTest = DepthTestingMode::Off;
+	gridCall.Culling = CullingMode::Off;
+	gridCall.Blending = BlendingMode::Greatest;
+
+	BillboardBuffer->Clear(DrawBufferIndex::Instances);
+
+	DirectionalLightBillboardCommand =
+		RendererAPI::Get()->NewDrawCommand(BillboardPass->Get());
+	DirectionalLightBillboardCommand->UniformData
+	.SetInput("u_View", camera->GetView());
+	DirectionalLightBillboardCommand->UniformData
+	.SetInput("u_ViewProj", camera->GetViewProjection());
+	DirectionalLightBillboardCommand->UniformData
+	.SetInput("u_BillboardWidth", 10.0f);
+	DirectionalLightBillboardCommand->UniformData
+	.SetInput("u_BillboardHeight", 10.0f);
+	DirectionalLightBillboardCommand->UniformData
+	.SetInput("u_Texture", TextureSlot{ DirectionalLightIcon, 0 });
+
+	auto& directionalCall = DirectionalLightBillboardCommand->NewDrawCall();
+	directionalCall.VertexCount = 6;
+	directionalCall.InstanceStart = 0;
+	directionalCall.Primitive = PrimitiveType::Triangle;
+	directionalCall.Partition = PartitionType::Instanced;
+	directionalCall.DepthTest = DepthTestingMode::Off;
+	directionalCall.Culling = CullingMode::Off;
+	directionalCall.Blending = BlendingMode::Greatest;
+
+	PointLightBillboardCommand =
+		RendererAPI::Get()->NewDrawCommand(BillboardPass->Get());
+	PointLightBillboardCommand->UniformData
+	.SetInput("u_View", camera->GetView());
+	PointLightBillboardCommand->UniformData
+	.SetInput("u_ViewProj", camera->GetViewProjection());
+	PointLightBillboardCommand->UniformData
+	.SetInput("u_BillboardWidth", 10.0f);
+	PointLightBillboardCommand->UniformData
+	.SetInput("u_BillboardHeight", 10.0f);
+	PointLightBillboardCommand->UniformData
+	.SetInput("u_Texture", TextureSlot{ PointLightIcon, 0 });
+
+	auto& pointLightCall = PointLightBillboardCommand->NewDrawCall();
+	pointLightCall.VertexCount = 6;
+	pointLightCall.InstanceStart = 25;
+	pointLightCall.Primitive = PrimitiveType::Triangle;
+	pointLightCall.Partition = PartitionType::Instanced;
+	pointLightCall.DepthTest = DepthTestingMode::Off;
+	pointLightCall.Culling = CullingMode::Off;
+	pointLightCall.Blending = BlendingMode::Greatest;
+
+	SpotlightBillboardCommand =
+		RendererAPI::Get()->NewDrawCommand(BillboardPass->Get());
+	SpotlightBillboardCommand->UniformData
+	.SetInput("u_View", camera->GetView());
+	SpotlightBillboardCommand->UniformData
+	.SetInput("u_ViewProj", camera->GetViewProjection());
+	SpotlightBillboardCommand->UniformData
+	.SetInput("u_BillboardWidth", 10.0f);
+	SpotlightBillboardCommand->UniformData
+	.SetInput("u_BillboardHeight", 10.0f);
+	SpotlightBillboardCommand->UniformData
+	.SetInput("u_Texture", TextureSlot{ SpotlightIcon, 0 });
+
+	auto& spotlightCall = SpotlightBillboardCommand->NewDrawCall();
+	spotlightCall.VertexCount = 6;
+	spotlightCall.InstanceStart = 75;
+	spotlightCall.Primitive = PrimitiveType::Triangle;
+	spotlightCall.Partition = PartitionType::Instanced;
+	spotlightCall.DepthTest = DepthTestingMode::Off;
+	spotlightCall.Culling = CullingMode::Off;
+	spotlightCall.Blending = BlendingMode::Greatest;
 
 	FirstCommand = RendererAPI::Get()->NewDrawCommand(LightingPass->Get());
 	FirstCommand->Clear = false;
@@ -427,8 +505,6 @@ void EditorSceneRenderer::Begin() {
 	.SetInput("u_ViewProj", camera->GetViewProjection());
 	FirstCommand->UniformData
 	.SetInput("u_CameraPosition", camera->GetPosition());
-
-	BillboardBuffer->Clear(DrawBufferIndex::Instances);
 }
 
 void EditorSceneRenderer::SubmitCamera(const Entity& entity) {
@@ -448,6 +524,7 @@ void EditorSceneRenderer::SubmitSkybox(const Entity& entity) {
 void EditorSceneRenderer::SubmitLight(const Entity& entity) {
 	glm::vec3 position;
 	uint32_t type = 0;
+	DrawCommand* command;
 
 	if(entity.Has<DirectionalLightComponent>()) {
 		auto& dc = entity.Get<DirectionalLightComponent>();
@@ -455,6 +532,7 @@ void EditorSceneRenderer::SubmitLight(const Entity& entity) {
 		// HasDirectionalLight = true;
 		position = dc.Position;
 		type = 1;
+		command = DirectionalLightBillboardCommand;
 	}
 	else if(entity.Has<PointLightComponent>()) {
 		auto& pc = entity.Get<PointLightComponent>();
@@ -462,6 +540,7 @@ void EditorSceneRenderer::SubmitLight(const Entity& entity) {
 
 		position = pc.Position;
 		type = 2;
+		command = PointLightBillboardCommand;
 	}
 	else if(entity.Has<SpotlightComponent>()) {
 		auto& sc = entity.Get<SpotlightComponent>();
@@ -469,25 +548,14 @@ void EditorSceneRenderer::SubmitLight(const Entity& entity) {
 
 		position = sc.Position;
 		type = 3;
+		command = SpotlightBillboardCommand;
 	}
 
-	auto camera = m_Controller.GetCamera();
-	auto* command = RendererAPI::Get()->NewDrawCommand(BillboardPass->Get());
-	command->AddInstance(glm::value_ptr(position));
-	command->UniformData.SetInput("u_View", camera->GetView());
-	command->UniformData.SetInput("u_ViewProj", camera->GetViewProjection());
-	command->UniformData.SetInput("u_BillboardWidth", 10.0f);
-	command->UniformData.SetInput("u_BillboardHeight", 10.0f);
-
-	auto& call = command->NewDrawCall();
-	call.VertexCount = 6;
-	call.InstanceCount = 1;
-	call.InstanceStart = 0;
-	call.Primitive = PrimitiveType::Triangle;
-	call.Partition = PartitionType::Instanced;
-	call.DepthTest = DepthTestingMode::Off;
-	call.Culling = CullingMode::Off;
-	call.Blending = BlendingMode::Greatest;
+	auto* buffer = BillboardBuffer;
+	auto& call = command->Calls[-1];
+	RendererAPI::Get()
+	->SetBufferData(buffer, DrawBufferIndex::Instances, glm::value_ptr(position),
+					1, call.InstanceStart + call.InstanceCount++);
 }
 
 void EditorSceneRenderer::SubmitParticles(const Entity& entity) {
@@ -498,19 +566,19 @@ void EditorSceneRenderer::SubmitMesh(const Entity& entity) {
 	auto* assetManager = App::Get()->GetAssetManager();
 	auto& tc = entity.Get<TransformComponent>();
 	auto& mc = entity.Get<MeshComponent>();
+
+	if(!assetManager->IsValid(mc.MeshAsset))
+		return;
+
 	assetManager->Load(mc.MeshAsset);
 	auto mesh = assetManager->Get<Mesh>(mc.MeshAsset);
 
 	if(entity == Selected)
 		return;
 
-	if(!Objects.count(mesh))
-		Objects[mesh] =
-			RendererAPI::Get()->NewDrawCommand(LightingPass->Get());
-
-	auto* command = Objects[mesh];
-
-	Renderer3D::DrawMesh(mesh, tc, command);
+	Renderer::StartPass(LightingPass, false);
+	Renderer3D::DrawMesh(mesh, tc);
+	Renderer::EndPass();
 }
 
 void EditorSceneRenderer::Render() {
@@ -561,7 +629,6 @@ void EditorSceneRenderer::Render() {
 		Renderer3D::DrawMesh(mesh, tc, command);
 	}
 
-	Objects.clear();
 	Renderer3D::End();
 
 	Renderer::Flush();

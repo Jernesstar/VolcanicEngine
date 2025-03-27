@@ -29,17 +29,6 @@ Scene:
           MeshComponent:
             AssetID: 4186775327602265389
     - Entity:
-        Name: Cube
-        ID: 555
-        Components:
-          TransformComponent:
-            Transform:
-              Translation: [13.1000004, -5.4000001, -16.2999992]
-              Rotation: [0, 0, 0]
-              Scale: [10.8000002, 8.19999981, 7.5999999]
-          MeshComponent:
-            AssetID: 10036008063945961451
-    - Entity:
         Name: Cube2
         ID: 556
         Components:
@@ -51,6 +40,30 @@ Scene:
           MeshComponent:
             AssetID: 10036008063945961451
     - Entity:
+        Name: ""
+        ID: 562
+        Components:
+          DirectionalLightComponent:
+            Light:
+              Ambient: [0, 0, 0]
+              Diffuse: [0, 0, 0]
+              Specular: [0, 0, 0]
+              Position: [0, -3.4000001, 0]
+              Direction: [0, 0.699999988, 0]
+    - Entity:
+        Name: ""
+        ID: 564
+        Components:
+          PointLightComponent:
+            Light:
+              Ambient: [0, 0, 0]
+              Diffuse: [0, 0, 0]
+              Specular: [0, 0, 0]
+              Position: [-13.3999996, -43.7000008, -11]
+              Constant: 0
+              Linear: 0
+              Quadratic: 0
+    - Entity:
         Name: Player
         ID: 560
         Components:
@@ -58,11 +71,11 @@ Scene:
             Tag: MainCharacter
           TransformComponent:
             Transform:
-              Translation: [-0.600000024, 0, 0]
-              Rotation: [0, 0, 0]
+              Translation: [-11.8999996, -8.5, 36.5]
+              Rotation: [3.14159274, 3.14159274, 0]
               Scale: [1, 1, 1]
           MeshComponent:
-            AssetID: 10036008063945961451
+            AssetID: 15277418182178081176
           ScriptComponent:
             ModuleID: 2691709289590626850
             Class: PlayerController
@@ -97,23 +110,14 @@ Scene:
                   Value: 0
     - Entity:
         Name: ""
-        ID: 561
+        ID: 565
         Components:
-          TransformComponent:
-            Transform:
-              Translation: [-4.30000019, 11.6999998, -8]
-              Rotation: [0, 0, 0]
-              Scale: [1, 1, 1]
-          MeshComponent:
-            AssetID: 15277418182178081176
-    - Entity:
-        Name: ""
-        ID: 562
-        Components:
-          DirectionalLightComponent:
+          SpotlightComponent:
             Light:
               Ambient: [0, 0, 0]
               Diffuse: [0, 0, 0]
               Specular: [0, 0, 0]
-              Position: [11.1999998, -35.5999985, 2.9000001]
-              Direction: [0, 0.699999988, 0]
+              Position: [21.7000008, -25.8999996, 0]
+              Direction: [0, 0, 0]
+              CutoffAngle: 0
+              OuterCutoffAngle: 0

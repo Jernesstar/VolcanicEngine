@@ -84,8 +84,12 @@ void VertexArray::AddVertexBuffer(Ref<VertexBuffer> vertexBuffer) {
 			case BufferDataType::Vec4:
 			{
 				glEnableVertexAttribArray(m_BufferIndex);
-				glVertexAttribPointer(m_BufferIndex++, count, GL_FLOAT,
+				glVertexAttribPointer(m_BufferIndex, count, GL_FLOAT,
 									  normalized, stride, (void*)offset);
+				if(layout.StructureOfArrays) // Instanced
+					glVertexAttribDivisor(m_BufferIndex, 1);
+				m_BufferIndex++;
+
 				break;
 			}
 			case BufferDataType::Mat2:
