@@ -44,8 +44,8 @@ struct TagComponent : public Component {
 
 struct TransformComponent : public Component {
 	Vec3 Translation = { 0.0f, 0.0f, 0.0f };
-	Vec3 Rotation	  = { 0.0f, 0.0f, 0.0f };
-	Vec3 Scale		  = { 1.0f, 1.0f, 1.0f };
+	Vec3 Rotation	 = { 0.0f, 0.0f, 0.0f };
+	Vec3 Scale		 = { 1.0f, 1.0f, 1.0f };
 
 	TransformComponent() = default;
 	TransformComponent(const Vec3& t, const Vec3& r, const Vec3& s)
