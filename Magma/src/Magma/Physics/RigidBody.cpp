@@ -86,13 +86,14 @@ void DynamicBody::SetShape(Ref<Shape> shape) {
 
 void DynamicBody::SetMass(float mass) {
 #ifdef MAGMA_PHYSICS
-	m_Actor->setMass(mass);
+	m_Actor->is<PxRigidBody>()->setMass(mass);
 #endif
 }
 
 void DynamicBody::ApplyForce(const glm::vec3& f) {
 #ifdef MAGMA_PHYSICS
-	m_Actor->addForce(PxVec3{ f.x, f.y, f.z }, PxForceMode::Enum::eForce, true);
+	m_Actor->is<PxRigidBody>()->
+		addForce(PxVec3{ f.x, f.y, f.z }, PxForceMode::Enum::eFORCE, true);
 #endif
 }
 

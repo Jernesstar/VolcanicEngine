@@ -118,6 +118,6 @@ Scene:
               Diffuse: [0, 0, 0]
               Specular: [0, 0, 0]
               Position: [21.7000008, -25.8999996, 0]
-              Direction: [0, 0, 0]
+              Direction: [2.35098856e-38, 2.35098856e-38, 2.35098856e-38]
               CutoffAngle: 0
               OuterCutoffAngle: 0

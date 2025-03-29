@@ -58,8 +58,11 @@ void SceneVisualizerPanel::SetContext(Scene* context) {
 	.ForEach<TransformComponent, MeshComponent>(
 		[this](Entity& entity)
 		{
-			Add(entity);
+			// Add(entity);
 		});
+
+	m_Selected = m_Context->EntityWorld.GetEntity("Player");
+	m_Renderer.Select(m_Selected);
 }
 
 static bool IsLight(ECS::Entity entity) {
@@ -81,9 +84,9 @@ static glm::vec3 GetLightPosition(ECS::Entity entity) {
 
 void SceneVisualizerPanel::Add(ECS::Entity entity) {
 	if(IsLight(entity)) {
-		auto shape = Shape::Create(Shape::Type::Cube);
+		auto shape = Shape::Create(Shape::Type::Box);
 		auto body = RigidBody::Create(RigidBody::Type::Static, shape);
-		body->SetTransform({ .Translation = GetLightPosition() });
+		body->SetTransform({ .Translation = GetLightPosition(entity) });
 		body->Data = (void*)(uint64_t)entity.GetHandle();
 		m_World.AddActor(body);
 
@@ -93,14 +96,14 @@ void SceneVisualizerPanel::Add(ECS::Entity entity) {
 	const auto& tc = entity.Get<TransformComponent>();
 	const auto& mc = entity.Get<MeshComponent>();
 
-	auto shape = Shape::Create(mesh);
-	auto body = RigidBody::Create(RigidBody::Type::Static, shape);
-	body->SetTransform(tc);
-	body->Data = (void*)(uint64_t)entity.GetHandle();
+	// auto shape = Shape::Create(mesh);
+	// auto body = RigidBody::Create(RigidBody::Type::Static, shape);
+	// body->SetTransform(tc);
+	// body->Data = (void*)(uint64_t)entity.GetHandle();
 	// m_Selected = entity;
 }
 
-void SceneVisualizerPanel::Remove(ECS::Entitty entity) {
+void SceneVisualizerPanel::Remove(ECS::Entity entity) {
 
 }
 
@@ -391,13 +394,15 @@ EditorSceneRenderer::EditorSceneRenderer() {
 			ShaderPipeline::Create("Magma/assets/shaders", "Mesh"), m_Output);
 	LightingPass->SetData(Renderer3D::GetMeshBuffer());
 
-	shader = ShaderPipeline::Create("Magma/assets/shaders", "Mask");
-	buffer = Framebuffer::Create(window->GetWidth(), window->GetHeight());
-	MaskPass = RenderPass::Create("Mask", shader, buffer);
+	MaskPass =
+		RenderPass::Create("Mask",
+			ShaderPipeline::Create("Magma/assets/shaders", "Mask"),
+			Framebuffer::Create(window->GetWidth(), window->GetHeight()));
 	MaskPass->SetData(Renderer3D::GetMeshBuffer());
 
-	shader = ShaderPipeline::Create("Magma/assets/shaders", "Outline");
-	OutlinePass = RenderPass::Create("Outline", shader, m_Output);
+	OutlinePass =
+		RenderPass::Create("Outline",
+			ShaderPipeline::Create("Magma/assets/shaders", "Outline"), m_Output);
 	OutlinePass->SetData(Renderer2D::GetScreenBuffer());
 
 	DirectionalLightBuffer =
@@ -640,15 +645,15 @@ void EditorSceneRenderer::Render() {
 		auto* assetManager = App::Get()->GetAssetManager();
 		auto& tc = Selected.Get<TransformComponent>();
 		auto& mc = Selected.Get<MeshComponent>();
+		assetManager->Load(mc.MeshAsset);
 		auto mesh = assetManager->Get<Mesh>(mc.MeshAsset);
 
 		{
-			DrawCommand* command;
-			command = RendererAPI::Get()->NewDrawCommand(MaskPass->Get());
+			auto* command = RendererAPI::Get()->NewDrawCommand(MaskPass->Get());
 			command->Clear = true;
 			command->UniformData
 			.SetInput("u_ViewProj",
-					LightingCommand->UniformData.Mat4Uniforms["u_ViewProj"]);
+				LightingCommand->UniformData.Mat4Uniforms["u_ViewProj"]);
 			command->UniformData
 			.SetInput("u_Color", glm::vec4(1.0f));
 

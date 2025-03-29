@@ -148,7 +148,7 @@ void DrawComponent<AudioComponent>(Entity& entity) {
 	auto& component = entity.Set<AudioComponent>();
 	ImGui::SeparatorText("AudioComponent");
 
-	ImGui::Text("Asset ID: %llu", (uint64_t)component.AudioAsset.ID);
+	ImGui::Text("Asset ID: %lu", (uint64_t)component.AudioAsset.ID);
 	std::string text = component.AudioAsset.ID ? "Change Asset" : "Set Asset";
 	if(ImGui::Button(text.c_str())) {
 
@@ -163,7 +163,7 @@ void DrawComponent<MeshComponent>(Entity& entity) {
 	auto& component = entity.Set<MeshComponent>();
 	ImGui::SeparatorText("MeshComponent");
 
-	ImGui::Text("Asset ID: %llu", (uint64_t)component.MeshAsset.ID);
+	ImGui::Text("Asset ID: %lu", (uint64_t)component.MeshAsset.ID);
 	std::string text = component.MeshAsset.ID ? "Change Asset" : "Set Asset";
 	if(ImGui::Button(text.c_str())) {
 
@@ -178,7 +178,7 @@ void DrawComponent<SkyboxComponent>(Entity& entity) {
 	auto& component = entity.Set<SkyboxComponent>();
 	ImGui::SeparatorText("SkyboxComponent");
 
-	ImGui::Text("Asset ID: %llu", (uint64_t)component.CubemapAsset.ID);
+	ImGui::Text("Asset ID: %lu", (uint64_t)component.CubemapAsset.ID);
 	std::string text = component.CubemapAsset.ID ? "Change Asset" : "Set Asset";
 	if(ImGui::Button(text.c_str())) {
 
