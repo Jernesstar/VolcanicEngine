@@ -1,34 +1,41 @@
 #version 450 core
 
-#define MAX_POINT_LIGHTS 100
-#define MAX_SPOT_LIGHTS 100
+#define MAX_POINT_LIGHTS 50
+#define MAX_SPOT_LIGHTS 50
 
 struct DirectionalLight {
     vec3 Position;
     vec3 Ambient;
     vec3 Diffuse;
-    vec3 Specular;
+    vec3 Specular; // 12
+
     vec3 Direction;
+    float _dummy;
 };
 
 struct PointLight {
     vec3 Position;
     vec3 Ambient;
     vec3 Diffuse;
-    vec3 Specular;
+    vec3 Specular; // 12
+
     float Constant;
     float Linear;
     float Quadratic;
+    float _dummy;
 };
 
 struct Spotlight {
     vec3 Position;
     vec3 Ambient;
     vec3 Diffuse;
-    vec3 Specular;
+    vec3 Specular; // 12
+
     vec3 Direction;
     float CutoffAngle;
+
     float OuterCutoffAngle;
+    vec3 _dummy;
 };
 
 struct Material {
@@ -48,17 +55,17 @@ uniform int u_SpotlightCount;
 
 layout(std140, binding = 0) uniform DirectionalLights
 {
-    DirectionalLight Buffer[2];
+    DirectionalLight Buffer[1];
 } u_DirectionalLights;
 
 layout(std140, binding = 1) uniform PointLights
 {
-    PointLight Buffer[MAX_POINTLIGHTS];
+    PointLight Buffer[MAX_POINT_LIGHTS];
 } u_PointLights;
 
 layout(std140, binding = 2) uniform Spotlights
 {
-    Spotlight Buffer[MAX_SPOTLIGHTS];
+    Spotlight Buffer[MAX_SPOT_LIGHTS];
 } u_Spotlights;
 
 uniform Material u_Material;

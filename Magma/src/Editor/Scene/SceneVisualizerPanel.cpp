@@ -58,19 +58,50 @@ void SceneVisualizerPanel::SetContext(Scene* context) {
 	.ForEach<TransformComponent, MeshComponent>(
 		[this](Entity& entity)
 		{
-			// const auto& tc = entity.Get<TransformComponent>();
-			// const auto& mc = entity.Get<MeshComponent>();
-			// auto& assetManager =
-			// 	Application::As<EditorApp>()->GetEditor().GetAssetManager();
-			// auto mesh = assetManager.Get<Mesh>(mc.MeshAsset);
-
-			// auto shape = Shape::Create(mesh);
-			// auto body = RigidBody::Create(RigidBody::Type::Static, shape);
-			// body->SetTransform(tc);
-			// body->Data = (void*)(uint64_t)entity.GetHandle();
-			// m_World.AddActor(body);
-			// m_Selected = entity;
+			Add(entity);
 		});
+}
+
+static bool IsLight(ECS::Entity entity) {
+	return entity.Has<DirectionalLightComponent>()
+		|| entity.Has<PointLightComponent>()
+		|| entity.Has<SpotlightComponent>();
+}
+
+static glm::vec3 GetLightPosition(ECS::Entity entity) {
+	if(entity.Has<DirectionalLightComponent>())
+		return entity.Get<DirectionalLightComponent>().Position;
+	if(entity.Has<PointLightComponent>())
+		return entity.Get<PointLightComponent>().Position;
+	if(entity.Has<SpotlightComponent>())
+		return entity.Get<SpotlightComponent>().Position;
+
+	return glm::vec3(0.0f);
+}
+
+void SceneVisualizerPanel::Add(ECS::Entity entity) {
+	if(IsLight(entity)) {
+		auto shape = Shape::Create(Shape::Type::Cube);
+		auto body = RigidBody::Create(RigidBody::Type::Static, shape);
+		body->SetTransform({ .Translation = GetLightPosition() });
+		body->Data = (void*)(uint64_t)entity.GetHandle();
+		m_World.AddActor(body);
+
+		return;
+	}
+
+	const auto& tc = entity.Get<TransformComponent>();
+	const auto& mc = entity.Get<MeshComponent>();
+
+	auto shape = Shape::Create(mesh);
+	auto body = RigidBody::Create(RigidBody::Type::Static, shape);
+	body->SetTransform(tc);
+	body->Data = (void*)(uint64_t)entity.GetHandle();
+	// m_Selected = entity;
+}
+
+void SceneVisualizerPanel::Remove(ECS::Entitty entity) {
+
 }
 
 static bool s_Hovered = false;
@@ -289,6 +320,8 @@ void SceneVisualizerPanel::Draw() {
 
 std::string SelectScriptClass(Ref<ScriptModule> mod) {
 	static std::string select = "";
+
+	ImGui::PushID(mod.get());
 	ImGui::OpenPopup("Select Script Class");
 
 	ImGui::BeginPopup("Select Script Class");
@@ -302,6 +335,7 @@ std::string SelectScriptClass(Ref<ScriptModule> mod) {
 		}
 	}
 	ImGui::EndPopup();
+	ImGui::PopID();
 
 	return "";
 }
@@ -320,13 +354,13 @@ EditorSceneRenderer::EditorSceneRenderer() {
 	GridPass->SetData(Renderer3D::GetMeshBuffer());
 
 	BufferLayout instanceLayout =
+	{
 		{
-			{
-				{ "Position", BufferDataType::Vec3 }
-			},
-			true, // Dynamic
-			true  // Structure of arrays, aka. Instanced
-		};
+			{ "Position", BufferDataType::Vec3 }
+		},
+		true, // Dynamic
+		true  // Structure of arrays, aka. Instanced
+	};
 
 	DrawBufferSpecification specs
 	{
@@ -334,7 +368,7 @@ EditorSceneRenderer::EditorSceneRenderer() {
 		.InstanceLayout = instanceLayout,
 		.MaxIndexCount = 0,
 		.MaxVertexCount = 0,
-		.MaxInstanceCount = 100
+		.MaxInstanceCount = 101
 	};
 	BillboardBuffer = RendererAPI::Get()->NewDrawBuffer(specs);
 	
@@ -357,51 +391,51 @@ EditorSceneRenderer::EditorSceneRenderer() {
 			ShaderPipeline::Create("Magma/assets/shaders", "Mesh"), m_Output);
 	LightingPass->SetData(Renderer3D::GetMeshBuffer());
 
-	// shader = ShaderPipeline::Create("Magma/assets/shaders", "Mask");
-	// buffer = Framebuffer::Create(window->GetWidth(), window->GetHeight());
-	// MaskPass = RenderPass::Create("Mask", shader, buffer);
-	// MaskPass->SetData(Renderer3D::GetMeshBuffer());
+	shader = ShaderPipeline::Create("Magma/assets/shaders", "Mask");
+	buffer = Framebuffer::Create(window->GetWidth(), window->GetHeight());
+	MaskPass = RenderPass::Create("Mask", shader, buffer);
+	MaskPass->SetData(Renderer3D::GetMeshBuffer());
 
-	// shader = ShaderPipeline::Create("Magma/assets/shaders", "Outline");
-	// OutlinePass = RenderPass::Create("Outline", shader, m_Output);
-	// OutlinePass->SetData(Renderer2D::GetScreenBuffer());
+	shader = ShaderPipeline::Create("Magma/assets/shaders", "Outline");
+	OutlinePass = RenderPass::Create("Outline", shader, m_Output);
+	OutlinePass->SetData(Renderer2D::GetScreenBuffer());
 
-	// DirectionalLightBuffer =
-	// 	UniformBuffer::Create(
-	// 		BufferLayout
-	// 		{
-	// 			{ "Ambient",   BufferDataType::Vec3 },
-	// 			{ "Diffuse",   BufferDataType::Vec3 },
-	// 			{ "Specular",  BufferDataType::Vec3 },
-	// 			{ "Direction", BufferDataType::Vec3 },
-	// 		});
+	DirectionalLightBuffer =
+		UniformBuffer::Create(
+			BufferLayout
+			{
+				{ "Ambient",   BufferDataType::Vec3 },
+				{ "Diffuse",   BufferDataType::Vec3 },
+				{ "Specular",  BufferDataType::Vec3 },
+				{ "Direction", BufferDataType::Vec3 },
+			}, 1);
 
-	// PointLightBuffer =
-	// 	UniformBuffer::Create(
-	// 		BufferLayout
-	// 		{
-	// 			{ "Ambient",   BufferDataType::Vec3 },
-	// 			{ "Diffuse",   BufferDataType::Vec3 },
-	// 			{ "Specular",  BufferDataType::Vec3 },
-	// 			{ "Position",  BufferDataType::Vec3 },
-	// 			{ "Direction", BufferDataType::Vec3 },
-	// 			{ "Constant",  BufferDataType::Float },
-	// 			{ "Linear",	   BufferDataType::Float },
-	// 			{ "Quadratic", BufferDataType::Float },
-	// 		}, 100);
+	PointLightBuffer =
+		UniformBuffer::Create(
+			BufferLayout
+			{
+				{ "Ambient",   BufferDataType::Vec3 },
+				{ "Diffuse",   BufferDataType::Vec3 },
+				{ "Specular",  BufferDataType::Vec3 },
+				{ "Position",  BufferDataType::Vec3 },
+				{ "Direction", BufferDataType::Vec3 },
+				{ "Constant",  BufferDataType::Float },
+				{ "Linear",	   BufferDataType::Float },
+				{ "Quadratic", BufferDataType::Float },
+			}, 50);
 
-	// SpotlightBuffer =
-	// 	UniformBuffer::Create(
-	// 		BufferLayout
-	// 		{
-	// 			{ "Ambient",   BufferDataType::Vec3 },
-	// 			{ "Diffuse",   BufferDataType::Vec3 },
-	// 			{ "Specular",  BufferDataType::Vec3 },
-	// 			{ "Position",  BufferDataType::Vec3 },
-	// 			{ "Direction", BufferDataType::Vec3 },
-	// 			{ "CutoffAngle",	  BufferDataType::Float },
-	// 			{ "OuterCutoffAngle", BufferDataType::Float },
-	// 		}, 100);
+	SpotlightBuffer =
+		UniformBuffer::Create(
+			BufferLayout
+			{
+				{ "Ambient",   BufferDataType::Vec3 },
+				{ "Diffuse",   BufferDataType::Vec3 },
+				{ "Specular",  BufferDataType::Vec3 },
+				{ "Position",  BufferDataType::Vec3 },
+				{ "Direction", BufferDataType::Vec3 },
+				{ "CutoffAngle",	  BufferDataType::Float },
+				{ "OuterCutoffAngle", BufferDataType::Float },
+			}, 50);
 }
 
 EditorSceneRenderer::~EditorSceneRenderer() {
@@ -416,94 +450,102 @@ void EditorSceneRenderer::Update(TimeStep ts) {
 void EditorSceneRenderer::Begin() {
 	auto camera = m_Controller.GetCamera();
 
-	auto* gridCommand = RendererAPI::Get()->NewDrawCommand(GridPass->Get());
-	gridCommand->Clear = true;
-	gridCommand->UniformData
-	.SetInput("u_ViewProj", camera->GetViewProjection());
-	gridCommand->UniformData
-	.SetInput("u_CameraPosition", camera->GetPosition());
+	{
+		auto* command = RendererAPI::Get()->NewDrawCommand(GridPass->Get());
+		command->Clear = true;
+		command->UniformData
+		.SetInput("u_ViewProj", camera->GetViewProjection());
+		command->UniformData
+		.SetInput("u_CameraPosition", camera->GetPosition());
 
-	auto& gridCall = gridCommand->NewDrawCall();
-	gridCall.VertexCount = 6;
-	gridCall.Primitive = PrimitiveType::Triangle;
-	gridCall.Partition = PartitionType::Single;
-	gridCall.DepthTest = DepthTestingMode::Off;
-	gridCall.Culling = CullingMode::Off;
-	gridCall.Blending = BlendingMode::Greatest;
+		auto& call = command->NewDrawCall();
+		call.VertexCount = 6;
+		call.Primitive = PrimitiveType::Triangle;
+		call.Partition = PartitionType::Single;
+		call.DepthTest = DepthTestingMode::Off;
+		call.Culling = CullingMode::Off;
+		call.Blending = BlendingMode::Greatest;
+	}
 
 	BillboardBuffer->Clear(DrawBufferIndex::Instances);
 
-	DirectionalLightBillboardCommand =
-		RendererAPI::Get()->NewDrawCommand(BillboardPass->Get());
-	DirectionalLightBillboardCommand->UniformData
-	.SetInput("u_View", camera->GetView());
-	DirectionalLightBillboardCommand->UniformData
+	{
+		DirectionalLightBillboardCommand =
+			RendererAPI::Get()->NewDrawCommand(BillboardPass->Get());
+		DirectionalLightBillboardCommand->UniformData
+		.SetInput("u_View", camera->GetView());
+		DirectionalLightBillboardCommand->UniformData
+		.SetInput("u_ViewProj", camera->GetViewProjection());
+		DirectionalLightBillboardCommand->UniformData
+		.SetInput("u_BillboardWidth", 10.0f);
+		DirectionalLightBillboardCommand->UniformData
+		.SetInput("u_BillboardHeight", 10.0f);
+		DirectionalLightBillboardCommand->UniformData
+		.SetInput("u_Texture", TextureSlot{ DirectionalLightIcon, 0 });
+
+		auto& call = DirectionalLightBillboardCommand->NewDrawCall();
+		call.VertexCount = 6;
+		call.InstanceStart = 0;
+		call.Primitive = PrimitiveType::Triangle;
+		call.Partition = PartitionType::Instanced;
+		call.DepthTest = DepthTestingMode::Off;
+		call.Culling = CullingMode::Off;
+		call.Blending = BlendingMode::Greatest;
+	}
+
+	{
+		PointLightBillboardCommand =
+			RendererAPI::Get()->NewDrawCommand(BillboardPass->Get());
+		PointLightBillboardCommand->UniformData
+		.SetInput("u_View", camera->GetView());
+		PointLightBillboardCommand->UniformData
+		.SetInput("u_ViewProj", camera->GetViewProjection());
+		PointLightBillboardCommand->UniformData
+		.SetInput("u_BillboardWidth", 10.0f);
+		PointLightBillboardCommand->UniformData
+		.SetInput("u_BillboardHeight", 10.0f);
+		PointLightBillboardCommand->UniformData
+		.SetInput("u_Texture", TextureSlot{ PointLightIcon, 0 });
+
+		auto& call = PointLightBillboardCommand->NewDrawCall();
+		call.VertexCount = 6;
+		call.InstanceStart = 1;
+		call.Primitive = PrimitiveType::Triangle;
+		call.Partition = PartitionType::Instanced;
+		call.DepthTest = DepthTestingMode::Off;
+		call.Culling = CullingMode::Off;
+		call.Blending = BlendingMode::Greatest;
+	}
+
+	{
+		SpotlightBillboardCommand =
+			RendererAPI::Get()->NewDrawCommand(BillboardPass->Get());
+		SpotlightBillboardCommand->UniformData
+		.SetInput("u_View", camera->GetView());
+		SpotlightBillboardCommand->UniformData
+		.SetInput("u_ViewProj", camera->GetViewProjection());
+		SpotlightBillboardCommand->UniformData
+		.SetInput("u_BillboardWidth", 10.0f);
+		SpotlightBillboardCommand->UniformData
+		.SetInput("u_BillboardHeight", 10.0f);
+		SpotlightBillboardCommand->UniformData
+		.SetInput("u_Texture", TextureSlot{ SpotlightIcon, 0 });
+
+		auto& call = SpotlightBillboardCommand->NewDrawCall();
+		call.VertexCount = 6;
+		call.InstanceStart = 51;
+		call.Primitive = PrimitiveType::Triangle;
+		call.Partition = PartitionType::Instanced;
+		call.DepthTest = DepthTestingMode::Off;
+		call.Culling = CullingMode::Off;
+		call.Blending = BlendingMode::Greatest;
+	}
+
+	LightingCommand = RendererAPI::Get()->NewDrawCommand(LightingPass->Get());
+	LightingCommand->Clear = false;
+	LightingCommand->UniformData
 	.SetInput("u_ViewProj", camera->GetViewProjection());
-	DirectionalLightBillboardCommand->UniformData
-	.SetInput("u_BillboardWidth", 10.0f);
-	DirectionalLightBillboardCommand->UniformData
-	.SetInput("u_BillboardHeight", 10.0f);
-	DirectionalLightBillboardCommand->UniformData
-	.SetInput("u_Texture", TextureSlot{ DirectionalLightIcon, 0 });
-
-	auto& directionalCall = DirectionalLightBillboardCommand->NewDrawCall();
-	directionalCall.VertexCount = 6;
-	directionalCall.InstanceStart = 0;
-	directionalCall.Primitive = PrimitiveType::Triangle;
-	directionalCall.Partition = PartitionType::Instanced;
-	directionalCall.DepthTest = DepthTestingMode::Off;
-	directionalCall.Culling = CullingMode::Off;
-	directionalCall.Blending = BlendingMode::Greatest;
-
-	PointLightBillboardCommand =
-		RendererAPI::Get()->NewDrawCommand(BillboardPass->Get());
-	PointLightBillboardCommand->UniformData
-	.SetInput("u_View", camera->GetView());
-	PointLightBillboardCommand->UniformData
-	.SetInput("u_ViewProj", camera->GetViewProjection());
-	PointLightBillboardCommand->UniformData
-	.SetInput("u_BillboardWidth", 10.0f);
-	PointLightBillboardCommand->UniformData
-	.SetInput("u_BillboardHeight", 10.0f);
-	PointLightBillboardCommand->UniformData
-	.SetInput("u_Texture", TextureSlot{ PointLightIcon, 0 });
-
-	auto& pointLightCall = PointLightBillboardCommand->NewDrawCall();
-	pointLightCall.VertexCount = 6;
-	pointLightCall.InstanceStart = 25;
-	pointLightCall.Primitive = PrimitiveType::Triangle;
-	pointLightCall.Partition = PartitionType::Instanced;
-	pointLightCall.DepthTest = DepthTestingMode::Off;
-	pointLightCall.Culling = CullingMode::Off;
-	pointLightCall.Blending = BlendingMode::Greatest;
-
-	SpotlightBillboardCommand =
-		RendererAPI::Get()->NewDrawCommand(BillboardPass->Get());
-	SpotlightBillboardCommand->UniformData
-	.SetInput("u_View", camera->GetView());
-	SpotlightBillboardCommand->UniformData
-	.SetInput("u_ViewProj", camera->GetViewProjection());
-	SpotlightBillboardCommand->UniformData
-	.SetInput("u_BillboardWidth", 10.0f);
-	SpotlightBillboardCommand->UniformData
-	.SetInput("u_BillboardHeight", 10.0f);
-	SpotlightBillboardCommand->UniformData
-	.SetInput("u_Texture", TextureSlot{ SpotlightIcon, 0 });
-
-	auto& spotlightCall = SpotlightBillboardCommand->NewDrawCall();
-	spotlightCall.VertexCount = 6;
-	spotlightCall.InstanceStart = 75;
-	spotlightCall.Primitive = PrimitiveType::Triangle;
-	spotlightCall.Partition = PartitionType::Instanced;
-	spotlightCall.DepthTest = DepthTestingMode::Off;
-	spotlightCall.Culling = CullingMode::Off;
-	spotlightCall.Blending = BlendingMode::Greatest;
-
-	FirstCommand = RendererAPI::Get()->NewDrawCommand(LightingPass->Get());
-	FirstCommand->Clear = false;
-	FirstCommand->UniformData
-	.SetInput("u_ViewProj", camera->GetViewProjection());
-	FirstCommand->UniformData
+	LightingCommand->UniformData
 	.SetInput("u_CameraPosition", camera->GetPosition());
 }
 
@@ -512,13 +554,13 @@ void EditorSceneRenderer::SubmitCamera(const Entity& entity) {
 }
 
 void EditorSceneRenderer::SubmitSkybox(const Entity& entity) {
-	// auto& sc = entity.Get<SkyboxComponent>();
-	// auto& assetManager =
-	// 	Application::As<EditorApp>()->GetEditor().GetAssetManager();
-	// auto cubemap = assetManager.Get<Cubemap>(sc.CubemapAsset);
+	auto& sc = entity.Get<SkyboxComponent>();
+	auto* assetManager = App::Get()->GetAssetManager();
+	assetManager->Load(sc.CubemapAsset);
+	auto cubemap = assetManager->Get<Cubemap>(sc.CubemapAsset);
 
-	// FirstCommand->UniformData
-	// .SetInput("u_Skybox", CubemapSlot{ cubemap });
+	LightingCommand->UniformData
+	.SetInput("u_Skybox", CubemapSlot{ cubemap });
 }
 
 void EditorSceneRenderer::SubmitLight(const Entity& entity) {
@@ -529,7 +571,10 @@ void EditorSceneRenderer::SubmitLight(const Entity& entity) {
 	if(entity.Has<DirectionalLightComponent>()) {
 		auto& dc = entity.Get<DirectionalLightComponent>();
 		// DirectionalLightBuffer->SetData(&dc);
-		// HasDirectionalLight = true;
+		if(HasDirectionalLight)
+			return;
+
+		HasDirectionalLight = true;
 		position = dc.Position;
 		type = 1;
 		command = DirectionalLightBillboardCommand;
@@ -577,47 +622,48 @@ void EditorSceneRenderer::SubmitMesh(const Entity& entity) {
 		return;
 
 	Renderer::StartPass(LightingPass, false);
-	Renderer3D::DrawMesh(mesh, tc);
+	{
+		Renderer3D::DrawMesh(mesh, tc);
+	}
 	Renderer::EndPass();
 }
 
 void EditorSceneRenderer::Render() {
-	// FirstCommand->UniformData
+	// LightingCommand->UniformData
 	// .SetInput("u_DirectionalLightCount", (int32_t)HasDirectionalLight);
-	// FirstCommand->UniformData
+	// LightingCommand->UniformData
 	// .SetInput("u_PointLightCount", (int32_t)PointLightCount);
-	// FirstCommand->UniformData
+	// LightingCommand->UniformData
 	// .SetInput("u_SpotlightCount", (int32_t)SpotlightCount);
 
-	// if(Selected) {
-	if(false) {
-		auto& assetManager =
-			Application::As<EditorApp>()->GetEditor().GetAssetManager();
+	if(Selected) {
+		auto* assetManager = App::Get()->GetAssetManager();
 		auto& tc = Selected.Get<TransformComponent>();
 		auto& mc = Selected.Get<MeshComponent>();
-		auto mesh = assetManager.Get<Mesh>(mc.MeshAsset);
+		auto mesh = assetManager->Get<Mesh>(mc.MeshAsset);
 
-		DrawCommand* command;
+		{
+			DrawCommand* command;
+			command = RendererAPI::Get()->NewDrawCommand(MaskPass->Get());
+			command->Clear = true;
+			command->UniformData
+			.SetInput("u_ViewProj",
+					LightingCommand->UniformData.Mat4Uniforms["u_ViewProj"]);
+			command->UniformData
+			.SetInput("u_Color", glm::vec4(1.0f));
 
-		command = RendererAPI::Get()->NewDrawCommand(MaskPass->Get());
-		command->Clear = true;
-		command->UniformData
-		.SetInput("u_ViewProj",
-				  FirstCommand->UniformData.Mat4Uniforms["u_ViewProj"]);
-		command->UniformData
-		.SetInput("u_Color", glm::vec4(1.0f));
-
-		Renderer3D::DrawMesh(mesh, tc, command);
+			Renderer3D::DrawMesh(mesh, tc, command);
+		}
 
 		auto width = (float)Application::GetWindow()->GetWidth();
 		auto height = (float)Application::GetWindow()->GetHeight();
 
 		Renderer::StartPass(OutlinePass);
 		{
-			auto* outlineCommand = Renderer::GetCommand();
-			outlineCommand->UniformData
-			.SetInput("u_PixelSize", 1.0f/glm::vec2(800, 600));
-			outlineCommand->UniformData
+			auto* command = Renderer::GetCommand();
+			command->UniformData
+			.SetInput("u_PixelSize", 1.0f / glm::vec2(width, height));
+			command->UniformData
 			.SetInput("u_Color", glm::vec3(0.0f, 0.0f, 1.0f));
 
 			auto mask = MaskPass->GetOutput();
@@ -625,17 +671,20 @@ void EditorSceneRenderer::Render() {
 		}
 		Renderer::EndPass();
 
-		command = RendererAPI::Get()->NewDrawCommand(LightingPass->Get());
-		Renderer3D::DrawMesh(mesh, tc, command);
+		Renderer::StartPass(LightingPass, false);
+		{
+			Renderer3D::DrawMesh(mesh, tc);
+		}
+		Renderer::EndPass();
 	}
 
 	Renderer3D::End();
 
 	Renderer::Flush();
 
+	HasDirectionalLight = false;
 	PointLightCount = 0;
 	SpotlightCount = 0;
-	HasDirectionalLight = false;
 }
 
 }

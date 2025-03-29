@@ -58,7 +58,7 @@ private:
 	Ref<UniformBuffer> DirectionalLightBuffer;
 	Ref<UniformBuffer> PointLightBuffer;
 	Ref<UniformBuffer> SpotlightBuffer;
-	DrawCommand* FirstCommand;
+	DrawCommand* LightingCommand;
 
 	bool HasDirectionalLight = false;
 	uint32_t PointLightCount = 0;
@@ -81,6 +81,8 @@ public:
 	void Update(TimeStep ts) override;
 	void Draw() override;
 
+	void Add(ECS::Entity entity);
+	void Remove(ECS::Entity entity);
 	void Select(ECS::Entity entity) {
 		m_Selected = entity;
 	}
