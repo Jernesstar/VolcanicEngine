@@ -391,7 +391,8 @@ EditorSceneRenderer::EditorSceneRenderer() {
 	// buffer = Framebuffer::Create(window->GetWidth(), window->GetHeight());
 	LightingPass =
 		RenderPass::Create("Lighting",
-			ShaderPipeline::Create("Magma/assets/shaders", "Mesh"), m_Output);
+			ShaderPipeline::Create("Magma/assets/shaders", "Lighting"),
+			m_Output);
 	LightingPass->SetData(Renderer3D::GetMeshBuffer());
 
 	MaskPass =
@@ -402,28 +403,29 @@ EditorSceneRenderer::EditorSceneRenderer() {
 
 	OutlinePass =
 		RenderPass::Create("Outline",
-			ShaderPipeline::Create("Magma/assets/shaders", "Outline"), m_Output);
+			ShaderPipeline::Create("Magma/assets/shaders", "Outline"),
+			m_Output);
 	OutlinePass->SetData(Renderer2D::GetScreenBuffer());
 
 	DirectionalLightBuffer =
 		UniformBuffer::Create(
 			BufferLayout
 			{
-				{ "Ambient",   BufferDataType::Vec3 },
-				{ "Diffuse",   BufferDataType::Vec3 },
-				{ "Specular",  BufferDataType::Vec3 },
-				{ "Direction", BufferDataType::Vec3 },
+				{ "Position",  BufferDataType::Vec4 },
+				{ "Ambient",   BufferDataType::Vec4 },
+				{ "Diffuse",   BufferDataType::Vec4 },
+				{ "Specular",  BufferDataType::Vec4 },
+				{ "Direction", BufferDataType::Vec4 },
 			}, 1);
-
+	
 	PointLightBuffer =
 		UniformBuffer::Create(
 			BufferLayout
 			{
-				{ "Ambient",   BufferDataType::Vec3 },
-				{ "Diffuse",   BufferDataType::Vec3 },
-				{ "Specular",  BufferDataType::Vec3 },
-				{ "Position",  BufferDataType::Vec3 },
-				{ "Direction", BufferDataType::Vec3 },
+				{ "Position",  BufferDataType::Vec4 },
+				{ "Ambient",   BufferDataType::Vec4 },
+				{ "Diffuse",   BufferDataType::Vec4 },
+				{ "Specular",  BufferDataType::Vec4 },
 				{ "Constant",  BufferDataType::Float },
 				{ "Linear",	   BufferDataType::Float },
 				{ "Quadratic", BufferDataType::Float },
@@ -433,11 +435,11 @@ EditorSceneRenderer::EditorSceneRenderer() {
 		UniformBuffer::Create(
 			BufferLayout
 			{
-				{ "Ambient",   BufferDataType::Vec3 },
-				{ "Diffuse",   BufferDataType::Vec3 },
-				{ "Specular",  BufferDataType::Vec3 },
-				{ "Position",  BufferDataType::Vec3 },
-				{ "Direction", BufferDataType::Vec3 },
+				{ "Position",  BufferDataType::Vec4 },
+				{ "Ambient",   BufferDataType::Vec4 },
+				{ "Diffuse",   BufferDataType::Vec4 },
+				{ "Specular",  BufferDataType::Vec4 },
+				{ "Direction", BufferDataType::Vec4 },
 				{ "CutoffAngle",	  BufferDataType::Float },
 				{ "OuterCutoffAngle", BufferDataType::Float },
 			}, 50);
@@ -482,9 +484,9 @@ void EditorSceneRenderer::Begin() {
 		DirectionalLightBillboardCommand->UniformData
 		.SetInput("u_ViewProj", camera->GetViewProjection());
 		DirectionalLightBillboardCommand->UniformData
-		.SetInput("u_BillboardWidth", 10.0f);
+		.SetInput("u_BillboardWidth", 1.0f);
 		DirectionalLightBillboardCommand->UniformData
-		.SetInput("u_BillboardHeight", 10.0f);
+		.SetInput("u_BillboardHeight", 1.0f);
 		DirectionalLightBillboardCommand->UniformData
 		.SetInput("u_Texture", TextureSlot{ DirectionalLightIcon, 0 });
 
@@ -493,9 +495,9 @@ void EditorSceneRenderer::Begin() {
 		call.InstanceStart = 0;
 		call.Primitive = PrimitiveType::Triangle;
 		call.Partition = PartitionType::Instanced;
-		call.DepthTest = DepthTestingMode::Off;
+		call.DepthTest = DepthTestingMode::On;
 		call.Culling = CullingMode::Off;
-		call.Blending = BlendingMode::Greatest;
+		call.Blending = BlendingMode::Additive;
 	}
 
 	{
@@ -506,9 +508,9 @@ void EditorSceneRenderer::Begin() {
 		PointLightBillboardCommand->UniformData
 		.SetInput("u_ViewProj", camera->GetViewProjection());
 		PointLightBillboardCommand->UniformData
-		.SetInput("u_BillboardWidth", 10.0f);
+		.SetInput("u_BillboardWidth", 1.0f);
 		PointLightBillboardCommand->UniformData
-		.SetInput("u_BillboardHeight", 10.0f);
+		.SetInput("u_BillboardHeight", 1.0f);
 		PointLightBillboardCommand->UniformData
 		.SetInput("u_Texture", TextureSlot{ PointLightIcon, 0 });
 
@@ -517,9 +519,9 @@ void EditorSceneRenderer::Begin() {
 		call.InstanceStart = 1;
 		call.Primitive = PrimitiveType::Triangle;
 		call.Partition = PartitionType::Instanced;
-		call.DepthTest = DepthTestingMode::Off;
+		call.DepthTest = DepthTestingMode::On;
 		call.Culling = CullingMode::Off;
-		call.Blending = BlendingMode::Greatest;
+		call.Blending = BlendingMode::Additive;
 	}
 
 	{
@@ -530,9 +532,9 @@ void EditorSceneRenderer::Begin() {
 		SpotlightBillboardCommand->UniformData
 		.SetInput("u_ViewProj", camera->GetViewProjection());
 		SpotlightBillboardCommand->UniformData
-		.SetInput("u_BillboardWidth", 10.0f);
+		.SetInput("u_BillboardWidth", 1.0f);
 		SpotlightBillboardCommand->UniformData
-		.SetInput("u_BillboardHeight", 10.0f);
+		.SetInput("u_BillboardHeight", 1.0f);
 		SpotlightBillboardCommand->UniformData
 		.SetInput("u_Texture", TextureSlot{ SpotlightIcon, 0 });
 
@@ -541,9 +543,9 @@ void EditorSceneRenderer::Begin() {
 		call.InstanceStart = 51;
 		call.Primitive = PrimitiveType::Triangle;
 		call.Partition = PartitionType::Instanced;
-		call.DepthTest = DepthTestingMode::Off;
+		call.DepthTest = DepthTestingMode::On;
 		call.Culling = CullingMode::Off;
-		call.Blending = BlendingMode::Greatest;
+		call.Blending = BlendingMode::Additive;
 	}
 
 	LightingCommand = RendererAPI::Get()->NewDrawCommand(LightingPass->Get());
@@ -552,6 +554,8 @@ void EditorSceneRenderer::Begin() {
 	.SetInput("u_ViewProj", camera->GetViewProjection());
 	LightingCommand->UniformData
 	.SetInput("u_CameraPosition", camera->GetPosition());
+	LightingCommand->UniformData
+	.SetInput("u_SceneVisualizer", 1);
 }
 
 void EditorSceneRenderer::SubmitCamera(const Entity& entity) {
@@ -568,36 +572,78 @@ void EditorSceneRenderer::SubmitSkybox(const Entity& entity) {
 	.SetInput("u_Skybox", CubemapSlot{ cubemap });
 }
 
+struct DirectionalLight {
+	glm::vec4 Position;
+	glm::vec4 Ambient;
+	glm::vec4 Diffuse;
+	glm::vec4 Specular;
+	glm::vec4 Direction;
+
+	DirectionalLight(const DirectionalLightComponent& dc)
+		: Position(dc.Position, 0.0f), Ambient(dc.Ambient, 0.0f),
+		Diffuse(dc.Diffuse, 0.0f), Specular(dc.Specular, 0.0f),
+		Direction(dc.Direction, 0.0f) { }
+};
+
+struct PointLight {
+	glm::vec4 Position;
+	glm::vec4 Ambient;
+	glm::vec4 Diffuse;
+	glm::vec4 Specular;
+
+	float Constant;
+	float Linear;
+	float Quadratic;
+	float _padding;
+
+	PointLight(const PointLightComponent& pc)
+		: Position(pc.Position, 0.0f), Ambient(pc.Ambient, 0.0f),
+		Diffuse(pc.Diffuse, 0.0f), Specular(pc.Specular, 0.0f),
+		Constant(pc.Constant), Linear(pc.Linear), Quadratic(pc.Quadratic) { }
+};
+
+struct Spotlight {
+	glm::vec4 Position;
+	glm::vec4 Ambient;
+	glm::vec4 Diffuse;
+	glm::vec4 Specular;
+	glm::vec4 Direction;
+
+	float CutoffAngle;
+	float OuterCutoffAngle;
+	float _padding[2];
+
+	Spotlight(const SpotlightComponent& sc)
+		: Position(sc.Position, 0.0f), Ambient(sc.Ambient, 0.0f),
+		Diffuse(sc.Diffuse, 0.0f), Specular(sc.Specular, 0.0f),
+		Direction(sc.Direction, 0.0f),
+		CutoffAngle(sc.CutoffAngle), OuterCutoffAngle(sc.OuterCutoffAngle) { }
+};
+
 void EditorSceneRenderer::SubmitLight(const Entity& entity) {
 	glm::vec3 position;
-	uint32_t type = 0;
 	DrawCommand* command;
 
 	if(entity.Has<DirectionalLightComponent>()) {
-		auto& dc = entity.Get<DirectionalLightComponent>();
-		// DirectionalLightBuffer->SetData(&dc);
-		if(HasDirectionalLight)
-			return;
-
+		DirectionalLight light = entity.Get<DirectionalLightComponent>();
+		DirectionalLightBuffer->SetData(&light);
 		HasDirectionalLight = true;
-		position = dc.Position;
-		type = 1;
+
+		position = light.Position;
 		command = DirectionalLightBillboardCommand;
 	}
 	else if(entity.Has<PointLightComponent>()) {
-		auto& pc = entity.Get<PointLightComponent>();
-		// PointLightBuffer->SetData(&pc, 1, PointLightCount++);
+		PointLight light = entity.Get<PointLightComponent>();
+		PointLightBuffer->SetData(&light, 1, PointLightCount++);
 
-		position = pc.Position;
-		type = 2;
+		position = light.Position;
 		command = PointLightBillboardCommand;
 	}
 	else if(entity.Has<SpotlightComponent>()) {
-		auto& sc = entity.Get<SpotlightComponent>();
-		// SpotlightBuffer->SetData(&sc, 1, SpotlightCount++);
+		Spotlight light = entity.Get<SpotlightComponent>();
+		SpotlightBuffer->SetData(&light, 1, SpotlightCount++);
 
-		position = sc.Position;
-		type = 3;
+		position = light.Position;
 		command = SpotlightBillboardCommand;
 	}
 
@@ -623,9 +669,6 @@ void EditorSceneRenderer::SubmitMesh(const Entity& entity) {
 	assetManager->Load(mc.MeshAsset);
 	auto mesh = assetManager->Get<Mesh>(mc.MeshAsset);
 
-	if(entity == Selected)
-		return;
-
 	Renderer::StartPass(LightingPass, false);
 	{
 		Renderer3D::DrawMesh(mesh, tc);
@@ -634,12 +677,21 @@ void EditorSceneRenderer::SubmitMesh(const Entity& entity) {
 }
 
 void EditorSceneRenderer::Render() {
-	// LightingCommand->UniformData
-	// .SetInput("u_DirectionalLightCount", (int32_t)HasDirectionalLight);
-	// LightingCommand->UniformData
-	// .SetInput("u_PointLightCount", (int32_t)PointLightCount);
-	// LightingCommand->UniformData
-	// .SetInput("u_SpotlightCount", (int32_t)SpotlightCount);
+	LightingCommand->UniformData
+	.SetInput("u_DirectionalLightCount", (int32_t)HasDirectionalLight);
+	LightingCommand->UniformData
+	.SetInput("u_PointLightCount", (int32_t)PointLightCount);
+	LightingCommand->UniformData
+	.SetInput("u_SpotlightCount", (int32_t)SpotlightCount);
+
+	LightingCommand->UniformData
+	.SetInput(UniformSlot{ DirectionalLightBuffer, "", 0 });
+	LightingCommand->UniformData
+	.SetInput(UniformSlot{ PointLightBuffer, "", 1 });
+	LightingCommand->UniformData
+	.SetInput(UniformSlot{ SpotlightBuffer, "", 2 });
+
+	Renderer3D::End();
 
 	if(Selected) {
 		auto* assetManager = App::Get()->GetAssetManager();
@@ -673,12 +725,6 @@ void EditorSceneRenderer::Render() {
 
 			auto mask = MaskPass->GetOutput();
 			Renderer2D::DrawFullscreenQuad(mask, AttachmentTarget::Color);
-		}
-		Renderer::EndPass();
-
-		Renderer::StartPass(LightingPass, false);
-		{
-			Renderer3D::DrawMesh(mesh, tc);
 		}
 		Renderer::EndPass();
 	}

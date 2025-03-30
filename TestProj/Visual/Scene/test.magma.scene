@@ -56,11 +56,11 @@ Scene:
         Components:
           PointLightComponent:
             Light:
-              Ambient: [0, 0, 0]
-              Diffuse: [0, 0, 0]
-              Specular: [0, 0, 0]
-              Position: [-13.3999996, -43.7000008, -11]
-              Constant: 0
+              Ambient: [1, 0, 0]
+              Diffuse: [1, 0, 0]
+              Specular: [1, 1, 1]
+              Position: [0, 0.5, 8.60000038]
+              Constant: 0.899999976
               Linear: 0
               Quadratic: 0
     - Entity:
@@ -71,7 +71,7 @@ Scene:
             Tag: MainCharacter
           TransformComponent:
             Transform:
-              Translation: [-11.8999996, -8.5, 36.5]
+              Translation: [-11.8999996, -9.69999981, 26.2000008]
               Rotation: [3.14159274, 3.14159274, 0]
               Scale: [1, 1, 1]
           MeshComponent:
@@ -117,7 +117,7 @@ Scene:
               Ambient: [0, 0, 0]
               Diffuse: [0, 0, 0]
               Specular: [0, 0, 0]
-              Position: [21.7000008, -25.8999996, 0]
-              Direction: [2.35098856e-38, 2.35098856e-38, 2.35098856e-38]
+              Position: [-5.69999981, 8.39999962, 43.5]
+              Direction: [0, 0, 0]
               CutoffAngle: 0
               OuterCutoffAngle: 0
