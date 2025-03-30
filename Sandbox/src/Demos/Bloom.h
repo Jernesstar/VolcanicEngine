@@ -65,7 +65,7 @@ Bloom::Bloom()
 		});
 	downsamplePass = RenderPass::Create("Downsample", shader);
 	downsamplePass->SetOutput(mips);
-	downsamplePass->SetData(Renderer3D::GetMeshBuffer());
+	downsamplePass->SetData(Renderer2D::GetScreenBuffer());
 
 	shader = ShaderPipeline::Create(
 		{
@@ -74,7 +74,7 @@ Bloom::Bloom()
 		});
 	upsamplePass = RenderPass::Create("Upsample", shader);
 	upsamplePass->SetOutput(mips);
-	upsamplePass->SetData(Renderer3D::GetMeshBuffer());
+	upsamplePass->SetData(Renderer2D::GetScreenBuffer());
 
 	shader = ShaderPipeline::Create(
 		{
@@ -82,6 +82,7 @@ Bloom::Bloom()
 			{ "Magma/assets/shaders/Bloom.glsl.frag", ShaderType::Fragment }
 		});
 	bloomPass = RenderPass::Create("Bloom", shader);
+	bloomPass->SetData(Renderer2D::GetScreenBuffer());
 
 	shader = ShaderPipeline::Create("Magma/assets/shaders", "Mesh");
 	drawPass = RenderPass::Create("Draw", shader);
@@ -134,30 +135,15 @@ void Bloom::OnUpdate(TimeStep ts) {
 	}
 	Renderer::EndPass();
 
-	Renderer2D::DrawFullscreenQuad(src, AttachmentTarget::Color);
+	// Renderer2D::DrawFullscreenQuad(src, AttachmentTarget::Color);
 
-	// Renderer::StartPass(downsamplePass);
-	// {
-	// 	Renderer::GetPass()->GetUniforms()
-	// 	.Set("u_SrcResolution",
-	// 		[&]() -> glm::vec2
-	// 		{
-	// 			return {
-	// 				Application::GetWindow()->GetWidth(),
-	// 				Application::GetWindow()->GetHeight()
-	// 			};
-	// 		})
-	// 	.Set("u_SrcTexture",
-	// 		[&]() -> TextureSlot
-	// 		{
-	// 			return { src->Get(AttachmentTarget::Color), 0 };
-	// 		});
+	Renderer::StartPass(downsamplePass);
+	{
+		// Downsample();
+	}
+	Renderer::EndPass();
 
-	// 	Downsample();
-	// }
-	// Renderer::EndPass();
-
-	// Renderer2D::DrawFullscreenQuad(mips, AttachmentTarget::Color);
+	Renderer2D::DrawFullscreenQuad(mips, AttachmentTarget::Color);
 
 	// Renderer::StartPass(upsamplePass);
 	// {
@@ -237,6 +223,18 @@ void Bloom::InitMips() {
 }
 
 void Bloom::Downsample() {
+	auto* command = Renderer::GetCommand();
+	command->UniformData
+	.SetInput("u_SrcResolution",
+		glm::vec2
+		{
+			Application::GetWindow()->GetWidth(),
+			Application::GetWindow()->GetHeight()
+		});
+	command->UniformData
+	.SetInput("u_SrcTexture",
+		TextureSlot{ src->Get(AttachmentTarget::Color), 0 });
+
 	uint32_t i = 0;
 	for(const auto& mip : mipChain) {
 		auto* command = Renderer::GetCommand();

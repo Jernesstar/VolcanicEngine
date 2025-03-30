@@ -474,80 +474,6 @@ void EditorSceneRenderer::Begin() {
 		call.Blending = BlendingMode::Greatest;
 	}
 
-	BillboardBuffer->Clear(DrawBufferIndex::Instances);
-
-	{
-		DirectionalLightBillboardCommand =
-			RendererAPI::Get()->NewDrawCommand(BillboardPass->Get());
-		DirectionalLightBillboardCommand->UniformData
-		.SetInput("u_View", camera->GetView());
-		DirectionalLightBillboardCommand->UniformData
-		.SetInput("u_ViewProj", camera->GetViewProjection());
-		DirectionalLightBillboardCommand->UniformData
-		.SetInput("u_BillboardWidth", 1.0f);
-		DirectionalLightBillboardCommand->UniformData
-		.SetInput("u_BillboardHeight", 1.0f);
-		DirectionalLightBillboardCommand->UniformData
-		.SetInput("u_Texture", TextureSlot{ DirectionalLightIcon, 0 });
-
-		auto& call = DirectionalLightBillboardCommand->NewDrawCall();
-		call.VertexCount = 6;
-		call.InstanceStart = 0;
-		call.Primitive = PrimitiveType::Triangle;
-		call.Partition = PartitionType::Instanced;
-		call.DepthTest = DepthTestingMode::On;
-		call.Culling = CullingMode::Off;
-		call.Blending = BlendingMode::Additive;
-	}
-
-	{
-		PointLightBillboardCommand =
-			RendererAPI::Get()->NewDrawCommand(BillboardPass->Get());
-		PointLightBillboardCommand->UniformData
-		.SetInput("u_View", camera->GetView());
-		PointLightBillboardCommand->UniformData
-		.SetInput("u_ViewProj", camera->GetViewProjection());
-		PointLightBillboardCommand->UniformData
-		.SetInput("u_BillboardWidth", 1.0f);
-		PointLightBillboardCommand->UniformData
-		.SetInput("u_BillboardHeight", 1.0f);
-		PointLightBillboardCommand->UniformData
-		.SetInput("u_Texture", TextureSlot{ PointLightIcon, 0 });
-
-		auto& call = PointLightBillboardCommand->NewDrawCall();
-		call.VertexCount = 6;
-		call.InstanceStart = 1;
-		call.Primitive = PrimitiveType::Triangle;
-		call.Partition = PartitionType::Instanced;
-		call.DepthTest = DepthTestingMode::On;
-		call.Culling = CullingMode::Off;
-		call.Blending = BlendingMode::Additive;
-	}
-
-	{
-		SpotlightBillboardCommand =
-			RendererAPI::Get()->NewDrawCommand(BillboardPass->Get());
-		SpotlightBillboardCommand->UniformData
-		.SetInput("u_View", camera->GetView());
-		SpotlightBillboardCommand->UniformData
-		.SetInput("u_ViewProj", camera->GetViewProjection());
-		SpotlightBillboardCommand->UniformData
-		.SetInput("u_BillboardWidth", 1.0f);
-		SpotlightBillboardCommand->UniformData
-		.SetInput("u_BillboardHeight", 1.0f);
-		SpotlightBillboardCommand->UniformData
-		.SetInput("u_Texture", TextureSlot{ SpotlightIcon, 0 });
-
-		auto& call = SpotlightBillboardCommand->NewDrawCall();
-		call.VertexCount = 6;
-		call.InstanceStart = 51;
-		call.Primitive = PrimitiveType::Triangle;
-		call.Partition = PartitionType::Instanced;
-		call.DepthTest = DepthTestingMode::On;
-		call.Culling = CullingMode::Off;
-		call.Blending = BlendingMode::Additive;
-	}
-
 	LightingCommand = RendererAPI::Get()->NewDrawCommand(LightingPass->Get());
 	LightingCommand->Clear = false;
 	LightingCommand->UniformData
@@ -556,6 +482,8 @@ void EditorSceneRenderer::Begin() {
 	.SetInput("u_CameraPosition", camera->GetPosition());
 	LightingCommand->UniformData
 	.SetInput("u_SceneVisualizer", 1);
+
+	BillboardBuffer->Clear(DrawBufferIndex::Instances);
 }
 
 void EditorSceneRenderer::SubmitCamera(const Entity& entity) {
@@ -594,7 +522,6 @@ struct PointLight {
 	float Constant;
 	float Linear;
 	float Quadratic;
-	float _padding;
 
 	PointLight(const PointLightComponent& pc)
 		: Position(pc.Position, 0.0f), Ambient(pc.Ambient, 0.0f),
@@ -611,7 +538,6 @@ struct Spotlight {
 
 	float CutoffAngle;
 	float OuterCutoffAngle;
-	float _padding[2];
 
 	Spotlight(const SpotlightComponent& sc)
 		: Position(sc.Position, 0.0f), Ambient(sc.Ambient, 0.0f),
@@ -622,36 +548,38 @@ struct Spotlight {
 
 void EditorSceneRenderer::SubmitLight(const Entity& entity) {
 	glm::vec3 position;
-	DrawCommand* command;
+	uint32_t start;
+	uint32_t count;
 
 	if(entity.Has<DirectionalLightComponent>()) {
 		DirectionalLight light = entity.Get<DirectionalLightComponent>();
 		DirectionalLightBuffer->SetData(&light);
 		HasDirectionalLight = true;
 
-		position = light.Position;
-		command = DirectionalLightBillboardCommand;
+		position = entity.Get<DirectionalLightComponent>().Position;
+		start = 0;
+		count = 0;
 	}
 	else if(entity.Has<PointLightComponent>()) {
 		PointLight light = entity.Get<PointLightComponent>();
-		PointLightBuffer->SetData(&light, 1, PointLightCount++);
+		PointLightBuffer->SetData(&light, 1, PointLightCount);
 
-		position = light.Position;
-		command = PointLightBillboardCommand;
+		position = entity.Get<PointLightComponent>().Position;
+		start = 1;
+		count = PointLightCount++;
 	}
 	else if(entity.Has<SpotlightComponent>()) {
 		Spotlight light = entity.Get<SpotlightComponent>();
-		SpotlightBuffer->SetData(&light, 1, SpotlightCount++);
+		SpotlightBuffer->SetData(&light, 1, SpotlightCount);
 
-		position = light.Position;
-		command = SpotlightBillboardCommand;
+		position = entity.Get<SpotlightComponent>().Position;
+		start = 51;
+		count = SpotlightCount++;
 	}
 
-	auto* buffer = BillboardBuffer;
-	auto& call = command->Calls[-1];
 	RendererAPI::Get()
-	->SetBufferData(buffer, DrawBufferIndex::Instances, glm::value_ptr(position),
-					1, call.InstanceStart + call.InstanceCount++);
+	->SetBufferData(BillboardBuffer, DrawBufferIndex::Instances,
+					glm::value_ptr(position), 1, start + count);
 }
 
 void EditorSceneRenderer::SubmitParticles(const Entity& entity) {
@@ -671,7 +599,7 @@ void EditorSceneRenderer::SubmitMesh(const Entity& entity) {
 
 	Renderer::StartPass(LightingPass, false);
 	{
-		Renderer3D::DrawMesh(mesh, tc);
+		Renderer3D::DrawMesh(mesh, (Transform)tc);
 	}
 	Renderer::EndPass();
 }
@@ -709,7 +637,7 @@ void EditorSceneRenderer::Render() {
 			command->UniformData
 			.SetInput("u_Color", glm::vec4(1.0f));
 
-			Renderer3D::DrawMesh(mesh, tc, command);
+			Renderer3D::DrawMesh(mesh, (Transform)tc, command);
 		}
 
 		auto width = (float)Application::GetWindow()->GetWidth();
@@ -730,6 +658,82 @@ void EditorSceneRenderer::Render() {
 	}
 
 	Renderer3D::End();
+
+	auto camera = m_Controller.GetCamera();
+	{
+		DirectionalLightBillboardCommand =
+			RendererAPI::Get()->NewDrawCommand(BillboardPass->Get());
+		DirectionalLightBillboardCommand->UniformData
+		.SetInput("u_View", camera->GetView());
+		DirectionalLightBillboardCommand->UniformData
+		.SetInput("u_ViewProj", camera->GetViewProjection());
+		DirectionalLightBillboardCommand->UniformData
+		.SetInput("u_BillboardWidth", 1.0f);
+		DirectionalLightBillboardCommand->UniformData
+		.SetInput("u_BillboardHeight", 1.0f);
+		DirectionalLightBillboardCommand->UniformData
+		.SetInput("u_Texture", TextureSlot{ DirectionalLightIcon, 0 });
+
+		auto& call = DirectionalLightBillboardCommand->NewDrawCall();
+		call.VertexCount = 6;
+		call.InstanceStart = 0;
+		call.InstanceCount = (uint64_t)HasDirectionalLight;
+		call.Primitive = PrimitiveType::Triangle;
+		call.Partition = PartitionType::Instanced;
+		call.DepthTest = DepthTestingMode::On;
+		call.Culling = CullingMode::Off;
+		call.Blending = BlendingMode::Greatest;
+	}
+
+	{
+		PointLightBillboardCommand =
+			RendererAPI::Get()->NewDrawCommand(BillboardPass->Get());
+		PointLightBillboardCommand->UniformData
+		.SetInput("u_View", camera->GetView());
+		PointLightBillboardCommand->UniformData
+		.SetInput("u_ViewProj", camera->GetViewProjection());
+		PointLightBillboardCommand->UniformData
+		.SetInput("u_BillboardWidth", 1.0f);
+		PointLightBillboardCommand->UniformData
+		.SetInput("u_BillboardHeight", 1.0f);
+		PointLightBillboardCommand->UniformData
+		.SetInput("u_Texture", TextureSlot{ PointLightIcon, 0 });
+
+		auto& call = PointLightBillboardCommand->NewDrawCall();
+		call.VertexCount = 6;
+		call.InstanceStart = 1;
+		call.InstanceCount = PointLightCount;
+		call.Primitive = PrimitiveType::Triangle;
+		call.Partition = PartitionType::Instanced;
+		call.DepthTest = DepthTestingMode::On;
+		call.Culling = CullingMode::Off;
+		call.Blending = BlendingMode::Greatest;
+	}
+
+	{
+		SpotlightBillboardCommand =
+			RendererAPI::Get()->NewDrawCommand(BillboardPass->Get());
+		SpotlightBillboardCommand->UniformData
+		.SetInput("u_View", camera->GetView());
+		SpotlightBillboardCommand->UniformData
+		.SetInput("u_ViewProj", camera->GetViewProjection());
+		SpotlightBillboardCommand->UniformData
+		.SetInput("u_BillboardWidth", 1.0f);
+		SpotlightBillboardCommand->UniformData
+		.SetInput("u_BillboardHeight", 1.0f);
+		SpotlightBillboardCommand->UniformData
+		.SetInput("u_Texture", TextureSlot{ SpotlightIcon, 0 });
+
+		auto& call = SpotlightBillboardCommand->NewDrawCall();
+		call.VertexCount = 6;
+		call.InstanceStart = 51;
+		call.InstanceCount = SpotlightCount;
+		call.Primitive = PrimitiveType::Triangle;
+		call.Partition = PartitionType::Instanced;
+		call.DepthTest = DepthTestingMode::On;
+		call.Culling = CullingMode::Off;
+		call.Blending = BlendingMode::Greatest;
+	}
 
 	Renderer::Flush();
 

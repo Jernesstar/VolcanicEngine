@@ -65,5 +65,6 @@ void main()
     downsample += (b + d + f + h) * 0.0625;
     downsample += (j + k + l + m) * 0.125;
 
+    FragColor = vec4(1.0);
     FragColor = vec4(downsample, 1.0);
 }

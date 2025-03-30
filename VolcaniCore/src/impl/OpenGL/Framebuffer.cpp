@@ -157,7 +157,7 @@ void Framebuffer::Attach(AttachmentTarget target, uint32_t idx, uint32_t dst) {
 	uint32_t id = att.m_RendererID;
 
 	// glBindFramebuffer(GL_FRAMEBUFFER, m_BufferID);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, type + idx, GL_TEXTURE_2D, id, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, type + dst, GL_TEXTURE_2D, id, 0);
 	// glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 

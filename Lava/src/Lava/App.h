@@ -39,8 +39,6 @@ class RuntimeSceneRenderer : public SceneRenderer {
 		void Render() override;
 	
 	private:	
-		DrawCommand* FirstCommand;
-		Map<Ref<Mesh>, DrawCommand*> Objects;
 
 		// Lighting and shadows
 		Ref<RenderPass> DepthPass;
@@ -48,6 +46,7 @@ class RuntimeSceneRenderer : public SceneRenderer {
 		Ref<UniformBuffer> DirectionalLightBuffer;
 		Ref<UniformBuffer> PointLightBuffer;
 		Ref<UniformBuffer> SpotlightBuffer;
+		DrawCommand* LightingCommand;
 		bool HasDirectionalLight = false;
 		uint32_t PointLightCount = 0;
 		uint32_t SpotlightCount = 0;
@@ -57,6 +56,9 @@ class RuntimeSceneRenderer : public SceneRenderer {
 		Ref<RenderPass> DownsamplePass;
 		Ref<RenderPass> UpsamplePass;
 		Ref<RenderPass> BloomPass;
+
+		// Particles
+
 	};
 
 class App {

@@ -302,45 +302,45 @@ RuntimeSceneRenderer::RuntimeSceneRenderer() {
 
 	// shader = ShaderLibrary::Get("Bloom");
 	// buffer = Framebuffer::Create(window->GetWidth(), window->GetHeight());
-	// LightingPass = RenderPass::Create("Bloom", shader, buffer);
-	// LightingPass->SetData(Renderer3D::GetMeshBuffer());
+	// BloomPass = RenderPass::Create("Bloom", shader, buffer);
+	// BloomPass->SetData(Renderer3D::GetMeshBuffer());
 
-	// DirectionalLightBuffer =
-	// 	UniformBuffer::Create(
-	// 		BufferLayout
-	// 		{
-	// 			{ "Ambient",   BufferDataType::Vec3 },
-	// 			{ "Diffuse",   BufferDataType::Vec3 },
-	// 			{ "Specular",  BufferDataType::Vec3 },
-	// 			{ "Direction", BufferDataType::Vec3 },
-	// 		});
+	DirectionalLightBuffer =
+		UniformBuffer::Create(
+			BufferLayout
+			{
+				{ "Position",  BufferDataType::Vec4 },
+				{ "Ambient",   BufferDataType::Vec4 },
+				{ "Diffuse",   BufferDataType::Vec4 },
+				{ "Specular",  BufferDataType::Vec4 },
+				{ "Direction", BufferDataType::Vec4 },
+			}, 1);
+	
+	PointLightBuffer =
+		UniformBuffer::Create(
+			BufferLayout
+			{
+				{ "Position",  BufferDataType::Vec4 },
+				{ "Ambient",   BufferDataType::Vec4 },
+				{ "Diffuse",   BufferDataType::Vec4 },
+				{ "Specular",  BufferDataType::Vec4 },
+				{ "Constant",  BufferDataType::Float },
+				{ "Linear",	   BufferDataType::Float },
+				{ "Quadratic", BufferDataType::Float },
+			}, 50);
 
-	// PointLightBuffer =
-	// 	UniformBuffer::Create(
-	// 		BufferLayout
-	// 		{
-	// 			{ "Ambient",   BufferDataType::Vec3 },
-	// 			{ "Diffuse",   BufferDataType::Vec3 },
-	// 			{ "Specular",  BufferDataType::Vec3 },
-	// 			{ "Position",  BufferDataType::Vec3 },
-	// 			{ "Direction", BufferDataType::Vec3 },
-	// 			{ "Constant",  BufferDataType::Float },
-	// 			{ "Linear",	   BufferDataType::Float },
-	// 			{ "Quadratic", BufferDataType::Float },
-	// 		}, 100);
-
-	// SpotlightBuffer =
-	// 	UniformBuffer::Create(
-	// 		BufferLayout
-	// 		{
-	// 			{ "Ambient",   BufferDataType::Vec3 },
-	// 			{ "Diffuse",   BufferDataType::Vec3 },
-	// 			{ "Specular",  BufferDataType::Vec3 },
-	// 			{ "Position",  BufferDataType::Vec3 },
-	// 			{ "Direction", BufferDataType::Vec3 },
-	// 			{ "CutoffAngle",	  BufferDataType::Float },
-	// 			{ "OuterCutoffAngle", BufferDataType::Float },
-	// 		}, 100);
+	SpotlightBuffer =
+		UniformBuffer::Create(
+			BufferLayout
+			{
+				{ "Position",  BufferDataType::Vec4 },
+				{ "Ambient",   BufferDataType::Vec4 },
+				{ "Diffuse",   BufferDataType::Vec4 },
+				{ "Specular",  BufferDataType::Vec4 },
+				{ "Direction", BufferDataType::Vec4 },
+				{ "CutoffAngle",	  BufferDataType::Float },
+				{ "OuterCutoffAngle", BufferDataType::Float },
+			}, 50);
 }
 
 void RuntimeSceneRenderer::Update(TimeStep ts) {
@@ -348,8 +348,8 @@ void RuntimeSceneRenderer::Update(TimeStep ts) {
 }
 
 void RuntimeSceneRenderer::Begin() {
-	FirstCommand = RendererAPI::Get()->NewDrawCommand(LightingPass->Get());
-	FirstCommand->Clear = true;
+	LightingCommand = RendererAPI::Get()->NewDrawCommand(LightingPass->Get());
+	LightingCommand->Clear = true;
 }
 
 void RuntimeSceneRenderer::SubmitCamera(const Entity& entity) {
@@ -358,9 +358,9 @@ void RuntimeSceneRenderer::SubmitCamera(const Entity& entity) {
 	auto height = Application::GetWindow()->GetHeight();
 	camera->Resize(width, height);
 
-	FirstCommand->UniformData
+	LightingCommand->UniformData
 	.SetInput("u_ViewProj", camera->GetViewProjection());
-	FirstCommand->UniformData
+	LightingCommand->UniformData
 	.SetInput("u_CameraPosition", camera->GetPosition());
 }
 
@@ -370,23 +370,69 @@ void RuntimeSceneRenderer::SubmitSkybox(const Entity& entity) {
 	assetManager->Load(sc.CubemapAsset);
 	auto cubemap = assetManager->Get<Cubemap>(sc.CubemapAsset);
 
-	FirstCommand->UniformData
+	LightingCommand->UniformData
 	.SetInput("u_Skybox", CubemapSlot{ cubemap, 0 });
 }
 
+struct DirectionalLight {
+	glm::vec4 Position;
+	glm::vec4 Ambient;
+	glm::vec4 Diffuse;
+	glm::vec4 Specular;
+	glm::vec4 Direction;
+
+	DirectionalLight(const DirectionalLightComponent& dc)
+		: Position(dc.Position, 0.0f), Ambient(dc.Ambient, 0.0f),
+		Diffuse(dc.Diffuse, 0.0f), Specular(dc.Specular, 0.0f),
+		Direction(dc.Direction, 0.0f) { }
+};
+
+struct PointLight {
+	glm::vec4 Position;
+	glm::vec4 Ambient;
+	glm::vec4 Diffuse;
+	glm::vec4 Specular;
+
+	float Constant;
+	float Linear;
+	float Quadratic;
+
+	PointLight(const PointLightComponent& pc)
+		: Position(pc.Position, 0.0f), Ambient(pc.Ambient, 0.0f),
+		Diffuse(pc.Diffuse, 0.0f), Specular(pc.Specular, 0.0f),
+		Constant(pc.Constant), Linear(pc.Linear), Quadratic(pc.Quadratic) { }
+};
+
+struct Spotlight {
+	glm::vec4 Position;
+	glm::vec4 Ambient;
+	glm::vec4 Diffuse;
+	glm::vec4 Specular;
+	glm::vec4 Direction;
+
+	float CutoffAngle;
+	float OuterCutoffAngle;
+
+	Spotlight(const SpotlightComponent& sc)
+		: Position(sc.Position, 0.0f), Ambient(sc.Ambient, 0.0f),
+		Diffuse(sc.Diffuse, 0.0f), Specular(sc.Specular, 0.0f),
+		Direction(sc.Direction, 0.0f),
+		CutoffAngle(sc.CutoffAngle), OuterCutoffAngle(sc.OuterCutoffAngle) { }
+};
+
 void RuntimeSceneRenderer::SubmitLight(const Entity& entity) {
 	if(entity.Has<DirectionalLightComponent>()) {
-		auto& dc = entity.Get<DirectionalLightComponent>();
-		DirectionalLightBuffer->SetData(&dc);
+		DirectionalLight light = entity.Get<DirectionalLightComponent>();
+		DirectionalLightBuffer->SetData(&light);
 		HasDirectionalLight = true;
 	}
 	else if(entity.Has<PointLightComponent>()) {
-		auto& pc = entity.Get<PointLightComponent>();
-		PointLightBuffer->SetData(&pc, 1, PointLightCount++);
+		PointLight light = entity.Get<PointLightComponent>();
+		PointLightBuffer->SetData(&light, 1, PointLightCount);
 	}
 	else if(entity.Has<SpotlightComponent>()) {
-		auto& sc = entity.Get<SpotlightComponent>();
-		SpotlightBuffer->SetData(&sc, 1, SpotlightCount++);
+		Spotlight light = entity.Get<SpotlightComponent>();
+		SpotlightBuffer->SetData(&light, 1, SpotlightCount);
 	}
 }
 
@@ -401,33 +447,37 @@ void RuntimeSceneRenderer::SubmitMesh(const Entity& entity) {
 	assetManager->Load(mc.MeshAsset);
 	auto mesh = assetManager->Get<Mesh>(mc.MeshAsset);
 
-	if(!Objects.count(mesh))
-		Objects[mesh] =
-			RendererAPI::Get()->NewDrawCommand(LightingPass->Get());
-
-	auto* command = Objects[mesh];
-
-	Renderer3D::DrawMesh(mesh, tc, command);
+	Renderer::StartPass(LightingPass, false);
+	{
+		Renderer3D::DrawMesh(mesh, tc);
+	}
+	Renderer::EndPass();
 }
 
 void RuntimeSceneRenderer::Render() {
-	FirstCommand->UniformData
+	LightingCommand->UniformData
 	.SetInput("u_DirectionalLightCount", (int32_t)HasDirectionalLight);
-	FirstCommand->UniformData
+	LightingCommand->UniformData
 	.SetInput("u_PointLightCount", (int32_t)PointLightCount);
-	FirstCommand->UniformData
+	LightingCommand->UniformData
 	.SetInput("u_SpotlightCount", (int32_t)SpotlightCount);
 
+	LightingCommand->UniformData
+	.SetInput(UniformSlot{ DirectionalLightBuffer, "", 0 });
+	LightingCommand->UniformData
+	.SetInput(UniformSlot{ PointLightBuffer, "", 1 });
+	LightingCommand->UniformData
+	.SetInput(UniformSlot{ SpotlightBuffer, "", 2 });
+
 	Renderer3D::End();
-	Objects.clear();
 
 	Renderer2D::DrawFullscreenQuad(m_Output, AttachmentTarget::Color);
 
 	Renderer::Flush();
 
+	HasDirectionalLight = false;
 	PointLightCount = 0;
 	SpotlightCount = 0;
-	HasDirectionalLight = false;
 }
 
 }
