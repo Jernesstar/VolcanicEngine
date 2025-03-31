@@ -107,6 +107,8 @@ Bloom::~Bloom() {
 }
 
 void Bloom::OnUpdate(TimeStep ts) {
+	Renderer::Clear();
+
 	UIRenderer::BeginFrame();
 
 	controller.OnUpdate(ts);
@@ -139,7 +141,7 @@ void Bloom::OnUpdate(TimeStep ts) {
 
 	Renderer::StartPass(downsamplePass);
 	{
-		// Downsample();
+		Downsample();
 	}
 	Renderer::EndPass();
 
@@ -237,25 +239,20 @@ void Bloom::Downsample() {
 
 	uint32_t i = 0;
 	for(const auto& mip : mipChain) {
-		auto* command = Renderer::GetCommand();
+		command = Renderer::GetCommand();
+		command->ViewportWidth = (uint32_t)mip.Size.x;
+		command->ViewportHeight = (uint32_t)mip.Size.y;
 		command->Outputs = { { AttachmentTarget::Color, i++ } };
 
 		Renderer2D::DrawFullscreenQuad(mips, AttachmentTarget::Color);
+		command->Calls[-1].Blending = BlendingMode::Off;
 		Renderer::PopCommand();
 
-		Renderer::PushCommand();
-		auto& uniforms = Renderer::GetPass()->GetUniforms()
-		.Clear()
-		.Set("u_SrcResolution",
-			[mip]() -> glm::vec2
-			{
-				return mip.Size;
-			})
-		.Set("u_SrcTexture",
-			[mip]() -> TextureSlot
-			{
-				return { mip.Sampler, 0 };
-			});
+		command = Renderer::PushCommand();
+		command->UniformData
+		.SetInput("u_SrcResolution", mip.Size);
+		command->UniformData
+		.SetInput("u_SrcTexture", TextureSlot{ mip.Sampler, 0 });
 	}
 }
 
