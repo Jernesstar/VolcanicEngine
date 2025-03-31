@@ -10,7 +10,7 @@
 // Remember to use edge clamping for this texture!
 
 uniform vec2 u_SrcResolution;
-layout(binding = 0) uniform sampler2D u_SrcTexture;
+layout(binding = 1) uniform sampler2D u_SrcTexture;
 
 layout(location = 0) in vec2 v_TexCoords;
 
@@ -65,6 +65,6 @@ void main()
     downsample += (b + d + f + h) * 0.0625;
     downsample += (j + k + l + m) * 0.125;
 
-    FragColor = vec4(1.0);
     FragColor = vec4(downsample, 1.0);
+    FragColor = vec4(1.0);
 }

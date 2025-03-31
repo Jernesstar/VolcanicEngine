@@ -67,7 +67,6 @@ Editor::Editor() {
 Editor::~Editor() {
 	m_Tabs.Clear();
 	m_ClosedTabs.Clear();
-	m_CurrentTab.reset();
 
 	if(m_App) {
 		m_App->OnClose();
@@ -213,16 +212,17 @@ void Editor::Render() {
 		ImGuiID dockspaceID = ImGui::GetID("DockSpace");
 		ImGui::DockSpace(dockspaceID, ImVec2(0.0f, 0.0f), dockspaceFlags);
 
-		if(m_CurrentTab && m_CurrentTab != m_Tabs[0])
-			GetProjectTab()->RenderEssentialPanels();
-		if(m_CurrentTab) {
-			if(m_CurrentTab->Type != TabType::None)
-				m_CurrentTab->Render();
-			else
-				RenderEmptyTab(m_CurrentTab);
-		}
-		else
+		if(!m_Tabs)
 			RenderWelcomeScreen();
+		else {
+			if(m_CurrentTab != 0)
+				GetProjectTab()->RenderEssentialPanels();
+
+			if(GetCurrentTab()->Type != TabType::None)
+				GetCurrentTab()->Render();
+			else
+				RenderEmptyTab(m_Tabs[m_CurrentTab]);
+		}
 	}
 	ImGui::End();
 
@@ -254,35 +254,50 @@ void Editor::Render() {
 	if(menu.tab.reopenTab)
 		ReopenTab();
 	if(menu.tab.closeTab)
-		CloseTab(m_CurrentTab);
+		CloseTab(GetCurrentTab());
 }
 
 void Editor::RenderEmptyTab(Ref<Tab>& tab) {
-	if(ImGui::Button("Open Scene")) {
-		tab.reset();
-		tab = CreateRef<SceneTab>();
+	ImGui::Begin("##Empty");
+	{
+		if(ImGui::Button("Open Scene")) {
+			tab.reset();
+			tab = CreateRef<SceneTab>();
+		}
+		if(ImGui::Button("Open UI")) {
+			tab.reset();
+			tab = CreateRef<UITab>();
+		}
 	}
-	if(ImGui::Button("Open UI")) {
-		tab.reset();
-		tab = CreateRef<UITab>();
-	}
+	ImGui::End();
 }
 
 void Editor::RenderWelcomeScreen() {
 	UI::Image image =
 		AssetImporter::GetTexture("Magma/assets/image/VolcanicDisplay.png");
+
+	ImGui::Begin("##Welcome");
+	{
+		image.Render();
+	}
+	ImGui::End();
 }
 
 void Editor::SetTab(Ref<Tab> tab) {
-	m_CurrentTab = tab;
 	auto title = "Magma Editor: " + m_Project.Name;
-	if(tab)
+	if(tab) {
+		auto [_, idx] = m_Tabs.Find([&](auto& val) { return val == tab; });
+		m_CurrentTab = idx;
 		title += " - " + tab->GetName();
+	}
 
 	Application::GetWindow()->SetTitle(title);
 }
 
 void Editor::NewTab(Ref<Tab> tab) {
+	menu.tab.newScene = false;
+	menu.tab.newUI = false;
+
 	m_Tabs.Add(tab);
 	SetTab(tab);
 }
@@ -319,6 +334,8 @@ void Editor::OpenTab(TabType type) {
 
 		instance->Close();
 		menu.tab.openTab = false;
+		menu.tab.openScene = false;
+		menu.tab.openUI = false;
 	}
 }
 
@@ -337,7 +354,7 @@ void Editor::CloseTab(Ref<Tab> tabToDelete) {
 	auto [_, idx] = m_Tabs.Find([&](auto& val) { return val == tabToDelete; });
 	m_ClosedTabs.Add(m_Tabs.Pop(idx));
 
-	if(tabToDelete == m_CurrentTab)
+	if(idx == m_CurrentTab)
 		SetTab(idx > 0 ? m_Tabs[idx - 1] : nullptr);
 }
 

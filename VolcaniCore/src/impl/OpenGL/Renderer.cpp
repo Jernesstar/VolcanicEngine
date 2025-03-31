@@ -213,15 +213,16 @@ void FlushCommand(DrawCommand& command) {
 
 		// s_Data.LastPass = command.Pass;
 	// }
-	if(command.ViewportWidth && command.ViewportHeight)
-		Resize(command.ViewportWidth, command.ViewportHeight);
-	else if(command.Pass && command.Pass->Output)
-		Resize(command.Pass->Output->GetWidth(), command.Pass->Output->GetHeight());
 
 	if(command.Pass && command.Pass->Pipeline)
 		command.Pass->Pipeline->As<OpenGL::ShaderProgram>()->Bind();
 	if(command.Pass && command.Pass->Output)
 		command.Pass->Output->As<OpenGL::Framebuffer>()->Bind();
+
+	if(command.ViewportWidth && command.ViewportHeight)
+		Resize(command.ViewportWidth, command.ViewportHeight);
+	else if(command.Pass && command.Pass->Output)
+		Resize(command.Pass->Output->GetWidth(), command.Pass->Output->GetHeight());
 
 	if(command.Pass && command.Pass->Output) {
 		uint32_t i = 0;
@@ -235,19 +236,22 @@ void FlushCommand(DrawCommand& command) {
 	if(command.Pass)
 		SetUniforms(command);
 
-	if(command.Pass && command.Pass->BufferData && command.Calls) {
-		Ref<VertexArray> array = s_Data.Arrays[command.Pass->BufferData].Array;
-
+	Ref<VertexArray> array;
+	if(command.Pass && command.Pass->BufferData) {
+		array = s_Data.Arrays[command.Pass->BufferData].Array;
 		array->Bind();
-		for(auto& call : command.Calls) {
-			FlushCall(command, call);
-			s_Info.IndexCount += call.IndexCount;
-			s_Info.VertexCount += call.VertexCount;
-			s_Info.InstanceCount += call.InstanceCount;
-			s_Info.DrawCallCount++;
-		}
-		array->Unbind();
 	}
+
+	for(auto& call : command.Calls) {
+		FlushCall(command, call);
+		s_Info.IndexCount += call.IndexCount;
+		s_Info.VertexCount += call.VertexCount;
+		s_Info.InstanceCount += call.InstanceCount;
+		s_Info.DrawCallCount++;
+	}
+
+	if(command.Pass && command.Pass->BufferData)
+		array->Unbind();
 
 	if(command.Pass && command.Pass->Output)
 		command.Pass->Output->As<OpenGL::Framebuffer>()->Unbind();

@@ -202,7 +202,7 @@ struct DrawUniforms {
 };
 
 struct DrawCommand {
-	DrawPass* Pass;
+	DrawPass* Pass = nullptr;
 
 	DrawUniforms UniformData;
 	List<Pair<AttachmentTarget, uint32_t>> Outputs;

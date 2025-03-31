@@ -27,7 +27,7 @@ public:
 	void Render();
 
 	void NewTab(Ref<Tab> tab);
-	Tab* GetCurrentTab();
+	Ref<Tab> GetCurrentTab() { return m_Tabs[m_CurrentTab]; }
 	ProjectTab* GetProjectTab() { return m_Tabs[0]->As<ProjectTab>(); }
 
 	Project& GetProject() { return m_Project; }
@@ -39,7 +39,7 @@ private:
 	EditorAssetManager m_AssetManager;
 	Ref<Lava::App> m_App;
 
-	Ref<Tab> m_CurrentTab;
+	uint64_t m_CurrentTab;
 	List<Ref<Tab>> m_Tabs;
 	List<Ref<Tab>> m_ClosedTabs;
 

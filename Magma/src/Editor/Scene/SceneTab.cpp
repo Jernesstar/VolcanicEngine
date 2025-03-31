@@ -28,7 +28,7 @@ struct {
 } static menu;
 
 SceneTab::SceneTab()
-	: Tab(TabType::Scene), m_Scene("New Scene")
+	: Tab(TabType::Scene), m_Scene("New Scene"), m_ScenePath("")
 {
 	Setup();
 }

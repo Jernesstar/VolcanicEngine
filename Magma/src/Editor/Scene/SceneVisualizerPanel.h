@@ -45,9 +45,6 @@ private:
 	// Billboards
 	Ref<RenderPass> BillboardPass;
 	DrawBuffer* BillboardBuffer;
-	DrawCommand* DirectionalLightBillboardCommand;
-	DrawCommand* PointLightBillboardCommand;
-	DrawCommand* SpotlightBillboardCommand;
 	Ref<Texture> DirectionalLightIcon;
 	Ref<Texture> PointLightIcon;
 	Ref<Texture> SpotlightIcon;
