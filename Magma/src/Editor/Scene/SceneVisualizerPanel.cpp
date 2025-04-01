@@ -524,7 +524,7 @@ struct PointLight {
 	float Constant;
 	float Linear;
 	float Quadratic;
-	float _padding;
+	// float _padding;
 
 	PointLight(const PointLightComponent& pc)
 		: Position(pc.Position, 0.0f), Ambient(pc.Ambient, 0.0f),
@@ -541,7 +541,7 @@ struct Spotlight {
 
 	float CutoffAngle;
 	float OuterCutoffAngle;
-	float _padding[2];
+	// float _padding[2];
 
 	Spotlight(const SpotlightComponent& sc)
 		: Position(sc.Position, 0.0f), Ambient(sc.Ambient, 0.0f),
@@ -560,7 +560,7 @@ void EditorSceneRenderer::SubmitLight(const Entity& entity) {
 		DirectionalLightBuffer->SetData(&light);
 		HasDirectionalLight = true;
 
-		position = entity.Get<DirectionalLightComponent>().Position;
+		position = light.Position;
 		start = 0;
 		count = 0;
 	}
@@ -568,7 +568,7 @@ void EditorSceneRenderer::SubmitLight(const Entity& entity) {
 		PointLight light = entity.Get<PointLightComponent>();
 		PointLightBuffer->SetData(&light, 1, PointLightCount);
 
-		position = entity.Get<PointLightComponent>().Position;
+		position = light.Position;
 		start = 1;
 		count = PointLightCount++;
 	}
@@ -576,7 +576,7 @@ void EditorSceneRenderer::SubmitLight(const Entity& entity) {
 		Spotlight light = entity.Get<SpotlightComponent>();
 		SpotlightBuffer->SetData(&light, 1, SpotlightCount);
 
-		position = entity.Get<SpotlightComponent>().Position;
+		position = light.Position;
 		start = 51;
 		count = SpotlightCount++;
 	}

@@ -137,9 +137,9 @@ void Bloom::OnUpdate(TimeStep ts) {
 	}
 	Renderer::EndPass();
 
-	Renderer2D::DrawFullscreenQuad(src, AttachmentTarget::Color);
+	// Renderer2D::DrawFullscreenQuad(src, AttachmentTarget::Color);
 
-	Renderer::StartPass(downsamplePass);
+	Renderer::StartPass(downsamplePass, false);
 	{
 		Downsample();
 	}
@@ -216,37 +216,37 @@ void Bloom::InitMips() {
 }
 
 void Bloom::Downsample() {
-	auto* command = Renderer::GetCommand();
-	command->UniformData
-	.SetInput("u_SrcTexture",
-		TextureSlot{ src->Get(AttachmentTarget::Color), 1 });
-
+	auto* command = Renderer::NewCommand();
 	command->UniformData
 	.SetInput("u_SrcResolution",
 		glm::vec2
 		{
-			Application::GetWindow()->GetWidth(),
-			Application::GetWindow()->GetHeight()
+			(float)Application::GetWindow()->GetWidth(),
+			(float)Application::GetWindow()->GetHeight()
 		});
+	command->UniformData
+	.SetInput("u_SrcTexture",
+		TextureSlot{ src->Get(AttachmentTarget::Color), 0 });
 
-	command = Renderer::PushCommand();
 	uint32_t i = 0;
 	for(const auto& mip : mipChain) {
-		command = Renderer::GetCommand();
-
-		Renderer2D::DrawFullscreenQuad(mips, AttachmentTarget::Color);
-		// command->ViewportWidth = mip.IntSize.x;
-		// command->ViewportHeight = mip.IntSize.y;
+		command->ViewportWidth = mip.IntSize.x;
+		command->ViewportHeight = mip.IntSize.y;
 		command->Outputs = { { AttachmentTarget::Color, i++ } };
-		command->Calls[-1].Blending = BlendingMode::Off;
 
-		Renderer::PopCommand();
+		auto& call = command->NewDrawCall();
+		call.VertexCount = 6;
+		call.Primitive = PrimitiveType::Triangle;
+		call.Partition = PartitionType::Single;
+		call.DepthTest = DepthTestingMode::Off;
+		call.Culling = CullingMode::Off;
+		call.Blending = BlendingMode::Off;
 
-		command = Renderer::PushCommand();
+		command = Renderer::NewCommand();
 		command->UniformData
 		.SetInput("u_SrcResolution", mip.Size);
 		command->UniformData
-		.SetInput("u_SrcTexture", TextureSlot{ mip.Sampler, 1 });
+		.SetInput("u_SrcTexture", TextureSlot{ mip.Sampler, 0 });
 	}
 }
 

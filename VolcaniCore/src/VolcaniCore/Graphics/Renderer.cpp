@@ -58,7 +58,7 @@ void Renderer::StartPass(Ref<RenderPass> pass, bool pushCommand) {
 }
 
 void Renderer::EndPass() {
-	PopCommand();
+	s_Stack.Clear();
 	s_RenderPass = nullptr;
 }
 

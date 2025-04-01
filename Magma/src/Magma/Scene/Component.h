@@ -147,7 +147,7 @@ struct SpotlightComponent : public Component {
 	SpotlightComponent(const Vec3& a, const Vec3& d, const Vec3& s,
 						const Vec3& pos, const Vec3& dir,
 						float inner, float outer)
-		: Ambient(a), Diffuse(d), Specular(s), Position(pos),
+		: Ambient(a), Diffuse(d), Specular(s), Position(pos), Direction(dir),
 			CutoffAngle(inner), OuterCutoffAngle(outer) { }
 	SpotlightComponent(const SpotlightComponent& other) = default;
 };

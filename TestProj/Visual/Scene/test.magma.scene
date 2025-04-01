@@ -48,7 +48,7 @@ Scene:
               Ambient: [1, 0, 0]
               Diffuse: [1, 0, 0]
               Specular: [1, 1, 1]
-              Position: [0.100000001, 0.899999976, 21.3999996]
+              Position: [0.699999988, -1.39999998, 1.29999995]
               Constant: 0.899999976
               Linear: 0
               Quadratic: 0
@@ -103,13 +103,13 @@ Scene:
         Components:
           SpotlightComponent:
             Light:
-              Ambient: [0, 0, 0]
-              Diffuse: [0, 0, 0]
-              Specular: [0, 0, 0]
-              Position: [-13.1999998, -13.1999998, 40.0999985]
-              Direction: [0, 0, 0]
-              CutoffAngle: 0
-              OuterCutoffAngle: 0
+              Ambient: [1, 1, 1]
+              Diffuse: [1, 1, 1]
+              Specular: [1, 1, 1]
+              Position: [-8.5, 2.5, -3.4000001]
+              Direction: [7.0999999, 0.899999976, 3.4000001]
+              CutoffAngle: 0.200000003
+              OuterCutoffAngle: 0.300000012
     - Entity:
         Name: ""
         ID: 566

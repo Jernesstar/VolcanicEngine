@@ -329,9 +329,9 @@ void DrawComponent<SpotlightComponent>(Entity& entity) {
 	ImGui::SeparatorText("SpotlightComponent");
 
 	ImGui::DragFloat3("Position", &component.Position.x, 0.1f,
-		-FLT_MAX, +FLT_MAX, "%.4f");
+		-FLT_MAX / 2.0f, +FLT_MAX / 2.0f, "%.4f");
 	ImGui::DragFloat3("Direction", &component.Direction.x, 0.1f,
-		-FLT_MAX, +FLT_MAX, "%.4f");
+		-FLT_MAX / 2.0f, +FLT_MAX / 2.0f, "%.4f");
 	ImGui::ColorEdit3("Ambient", &component.Ambient.x);
 	ImGui::ColorEdit3("Diffuse", &component.Diffuse.x);
 	ImGui::ColorEdit3("Specular", &component.Specular.x);

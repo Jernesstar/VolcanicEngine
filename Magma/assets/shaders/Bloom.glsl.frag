@@ -26,7 +26,7 @@ void main()
     result = vec3(1.0) - exp(-result * u_Exposure);
 
     // also gamma correct while we're at it
-    const float gamma = 2.2;
+    float gamma = 2.2;
     result = pow(result, vec3(1.0 / gamma));
 
     FragColor = vec4(result, 1.0);

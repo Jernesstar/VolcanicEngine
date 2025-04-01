@@ -73,11 +73,11 @@ Framebuffer::Framebuffer(const Map<AttachmentTarget, List<Attachment>>& map)
 	glBindFramebuffer(GL_FRAMEBUFFER, m_BufferID);
 
 	// TODO(Change): Replace with RenderBuffer
-	// if(!Has(AttachmentTarget::Depth))
-	// 	m_AttachmentMap.insert(
-	// 	{
-	// 		AttachmentTarget::Depth, { { Attachment::Type::Texture } }
-	// 	});
+	if(!Has(AttachmentTarget::Depth))
+		m_AttachmentMap.insert(
+		{
+			AttachmentTarget::Depth, { { Attachment::Type::Texture } }
+		});
 
 	uint32_t index = 0;
 	for(auto& _ : m_AttachmentMap[AttachmentTarget::Color])
