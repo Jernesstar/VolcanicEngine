@@ -106,7 +106,7 @@ Scene:
               Ambient: [1, 1, 1]
               Diffuse: [1, 1, 1]
               Specular: [1, 1, 1]
-              Position: [-8.5, 2.5, -3.4000001]
+              Position: [-8.5, -2.0999999, -3.4000001]
               Direction: [7.0999999, 0.899999976, 3.4000001]
               CutoffAngle: 0.200000003
               OuterCutoffAngle: 0.300000012

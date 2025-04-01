@@ -161,8 +161,6 @@ void App::OnUpdate(TimeStep ts) {
 	if(!RenderUI)
 		return;
 
-	UIRenderer::BeginFrame();
-
 	s_Screen->UI.Traverse(
 		[&](UIElement* element, TraversalStage state)
 		{
@@ -190,8 +188,6 @@ void App::OnUpdate(TimeStep ts) {
 					UIRenderer::Pop(1);
 			}
 		});
-
-	UIRenderer::EndFrame();
 }
 
 void App::SwitchScreen(const std::string& name) {
@@ -295,7 +291,7 @@ RuntimeSceneRenderer::RuntimeSceneRenderer() {
 	Ref<ShaderPipeline> shader;
 	Ref<Framebuffer> buffer;
 
-	shader = ShaderLibrary::Get("Mesh");
+	shader = ShaderLibrary::Get("Lighting");
 	// buffer = Framebuffer::Create(window->GetWidth(), window->GetHeight());
 	LightingPass = RenderPass::Create("Lighting", shader, m_Output);
 	LightingPass->SetData(Renderer3D::GetMeshBuffer());
@@ -428,11 +424,11 @@ void RuntimeSceneRenderer::SubmitLight(const Entity& entity) {
 	}
 	else if(entity.Has<PointLightComponent>()) {
 		PointLight light = entity.Get<PointLightComponent>();
-		PointLightBuffer->SetData(&light, 1, PointLightCount);
+		PointLightBuffer->SetData(&light, 1, PointLightCount++);
 	}
 	else if(entity.Has<SpotlightComponent>()) {
 		Spotlight light = entity.Get<SpotlightComponent>();
-		SpotlightBuffer->SetData(&light, 1, SpotlightCount);
+		SpotlightBuffer->SetData(&light, 1, SpotlightCount++);
 	}
 }
 
@@ -461,6 +457,8 @@ void RuntimeSceneRenderer::Render() {
 	.SetInput("u_PointLightCount", (int32_t)PointLightCount);
 	LightingCommand->UniformData
 	.SetInput("u_SpotlightCount", (int32_t)SpotlightCount);
+	LightingCommand->UniformData
+	.SetInput("u_SceneVisualizer", 0);
 
 	LightingCommand->UniformData
 	.SetInput(UniformSlot{ DirectionalLightBuffer, "", 0 });

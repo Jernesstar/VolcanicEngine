@@ -459,6 +459,9 @@ void EditorSceneRenderer::Begin() {
 	{
 		auto* command = RendererAPI::Get()->NewDrawCommand(GridPass->Get());
 		command->Clear = true;
+		command->DepthTest = DepthTestingMode::Off;
+		command->Culling = CullingMode::Off;
+		command->Blending = BlendingMode::Greatest;
 		command->UniformData
 		.SetInput("u_ViewProj", camera->GetViewProjection());
 		command->UniformData
@@ -468,9 +471,6 @@ void EditorSceneRenderer::Begin() {
 		call.VertexCount = 6;
 		call.Primitive = PrimitiveType::Triangle;
 		call.Partition = PartitionType::Single;
-		call.DepthTest = DepthTestingMode::Off;
-		call.Culling = CullingMode::Off;
-		call.Blending = BlendingMode::Greatest;
 	}
 
 	{
@@ -667,6 +667,9 @@ void EditorSceneRenderer::Render() {
 	{
 		auto* command =
 			RendererAPI::Get()->NewDrawCommand(BillboardPass->Get());
+		command->DepthTest = DepthTestingMode::On;
+		command->Culling = CullingMode::Off;
+		command->Blending = BlendingMode::Greatest;	
 		command->UniformData
 		.SetInput("u_View", camera->GetView());
 		command->UniformData
@@ -684,14 +687,14 @@ void EditorSceneRenderer::Render() {
 		call.InstanceCount = (uint64_t)HasDirectionalLight;
 		call.Primitive = PrimitiveType::Triangle;
 		call.Partition = PartitionType::Instanced;
-		call.DepthTest = DepthTestingMode::On;
-		call.Culling = CullingMode::Off;
-		call.Blending = BlendingMode::Greatest;
 	}
 
 	{
 		auto* command =
 			RendererAPI::Get()->NewDrawCommand(BillboardPass->Get());
+		command->DepthTest = DepthTestingMode::On;
+		command->Culling = CullingMode::Off;
+		command->Blending = BlendingMode::Greatest;
 		command->UniformData
 		.SetInput("u_View", camera->GetView());
 		command->UniformData
@@ -709,14 +712,14 @@ void EditorSceneRenderer::Render() {
 		call.InstanceCount = PointLightCount;
 		call.Primitive = PrimitiveType::Triangle;
 		call.Partition = PartitionType::Instanced;
-		call.DepthTest = DepthTestingMode::On;
-		call.Culling = CullingMode::Off;
-		call.Blending = BlendingMode::Greatest;
 	}
 
 	{
 		auto* command =
 			RendererAPI::Get()->NewDrawCommand(BillboardPass->Get());
+		command->DepthTest = DepthTestingMode::On;
+		command->Culling = CullingMode::Off;
+		command->Blending = BlendingMode::Greatest;
 		command->UniformData
 		.SetInput("u_View", camera->GetView());
 		command->UniformData
@@ -734,9 +737,6 @@ void EditorSceneRenderer::Render() {
 		call.InstanceCount = SpotlightCount;
 		call.Primitive = PrimitiveType::Triangle;
 		call.Partition = PartitionType::Instanced;
-		call.DepthTest = DepthTestingMode::On;
-		call.Culling = CullingMode::Off;
-		call.Blending = BlendingMode::Greatest;
 	}
 
 	Renderer::Flush();

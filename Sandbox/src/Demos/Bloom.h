@@ -34,12 +34,10 @@ private:
 	Ref<Framebuffer> mips;
 	List<BloomMip> mipChain;
 
-	uint32_t mipChainLength = 6;
-	float filterRadius	= 0.015f;
+	uint32_t mipChainLength = 5;
+	float filterRadius	= 0.005f;
 	float exposure		= 1.0f;
 	float bloomStrength = 0.04f;
-
-	float rotation = 0.0f;
 };
 
 Bloom::Bloom()
@@ -63,8 +61,7 @@ Bloom::Bloom()
 			{ "Magma/assets/shaders/Framebuffer.glsl.vert", ShaderType::Vertex },
 			{ "Magma/assets/shaders/Downsample.glsl.frag", ShaderType::Fragment }
 		});
-	downsamplePass = RenderPass::Create("Downsample", shader);
-	downsamplePass->SetOutput(mips);
+	downsamplePass = RenderPass::Create("Downsample", shader, mips);
 	downsamplePass->SetData(Renderer2D::GetScreenBuffer());
 
 	shader = ShaderPipeline::Create(
@@ -72,8 +69,7 @@ Bloom::Bloom()
 			{ "Magma/assets/shaders/Framebuffer.glsl.vert", ShaderType::Vertex },
 			{ "Magma/assets/shaders/Upsample.glsl.frag", ShaderType::Fragment }
 		});
-	upsamplePass = RenderPass::Create("Upsample", shader);
-	upsamplePass->SetOutput(mips);
+	upsamplePass = RenderPass::Create("Upsample", shader, mips);
 	upsamplePass->SetData(Renderer2D::GetScreenBuffer());
 
 	shader = ShaderPipeline::Create(
@@ -85,8 +81,7 @@ Bloom::Bloom()
 	bloomPass->SetData(Renderer2D::GetScreenBuffer());
 
 	shader = ShaderPipeline::Create("Magma/assets/shaders", "Mesh");
-	drawPass = RenderPass::Create("Draw", shader);
-	drawPass->SetOutput(src);
+	drawPass = RenderPass::Create("Draw", shader, src);
 	drawPass->SetData(Renderer3D::GetMeshBuffer());
 
 	cube = Mesh::Create(MeshType::Cube, { 0.98f, 0.92f, 0.0f, 1.0f });
@@ -107,8 +102,6 @@ Bloom::~Bloom() {
 }
 
 void Bloom::OnUpdate(TimeStep ts) {
-	Renderer::Clear();
-
 	UIRenderer::BeginFrame();
 
 	controller.OnUpdate(ts);
@@ -124,7 +117,6 @@ void Bloom::OnUpdate(TimeStep ts) {
 	Renderer::StartPass(drawPass);
 	{
 		Renderer::Clear();
-		Renderer::Resize(1920, 1080);
 
 		Renderer3D::Begin(camera);
 
@@ -132,12 +124,17 @@ void Bloom::OnUpdate(TimeStep ts) {
 		Renderer3D::DrawMesh(cube, { .Translation = {  2.0f,  0.0f,  0.0f } });
 		Renderer3D::DrawMesh(cube, { .Translation = {  0.0f,  0.0f, -2.0f } });
 		Renderer3D::DrawMesh(cube, { .Translation = {  0.0f,  0.0f,  2.0f } });
+		for(int i = -20; i < 20; i++) {
+			Renderer3D::DrawMesh(cube, { .Translation = { i, i, 0.0f } });
+			Renderer3D::DrawMesh(cube, { .Translation = { 0.0f, i, i } });
+			Renderer3D::DrawMesh(cube, { .Translation = { i, 0.0f, i } });
+		}
 
 		Renderer3D::End();
 	}
 	Renderer::EndPass();
 
-	// Renderer2D::DrawFullscreenQuad(src, AttachmentTarget::Color);
+	Renderer2D::DrawFullscreenQuad(src, AttachmentTarget::Color);
 
 	Renderer::StartPass(downsamplePass, false);
 	{
@@ -145,11 +142,11 @@ void Bloom::OnUpdate(TimeStep ts) {
 	}
 	Renderer::EndPass();
 
-	// Renderer::StartPass(upsamplePass);
-	// {
-	// 	Upsample();
-	// }
-	// Renderer::EndPass();
+	Renderer::StartPass(upsamplePass, false);
+	{
+		Upsample();
+	}
+	Renderer::EndPass();
 
 	// // Renderer2D::DrawFullscreenQuad(mips, AttachmentTarget::Color);
 
@@ -217,13 +214,10 @@ void Bloom::InitMips() {
 
 void Bloom::Downsample() {
 	auto* command = Renderer::NewCommand();
+	// command->Clear = true;
 	command->UniformData
 	.SetInput("u_SrcResolution",
-		glm::vec2
-		{
-			(float)Application::GetWindow()->GetWidth(),
-			(float)Application::GetWindow()->GetHeight()
-		});
+		glm::vec2{ src->GetWidth(), src->GetHeight() });
 	command->UniformData
 	.SetInput("u_SrcTexture",
 		TextureSlot{ src->Get(AttachmentTarget::Color), 0 });
@@ -232,15 +226,15 @@ void Bloom::Downsample() {
 	for(const auto& mip : mipChain) {
 		command->ViewportWidth = mip.IntSize.x;
 		command->ViewportHeight = mip.IntSize.y;
+		command->DepthTest = DepthTestingMode::On;
+		command->Blending = BlendingMode::Off;
+		command->Culling = CullingMode::Off;
 		command->Outputs = { { AttachmentTarget::Color, i++ } };
 
 		auto& call = command->NewDrawCall();
 		call.VertexCount = 6;
 		call.Primitive = PrimitiveType::Triangle;
 		call.Partition = PartitionType::Single;
-		call.DepthTest = DepthTestingMode::Off;
-		call.Culling = CullingMode::Off;
-		call.Blending = BlendingMode::Off;
 
 		command = Renderer::NewCommand();
 		command->UniformData
@@ -251,7 +245,7 @@ void Bloom::Downsample() {
 }
 
 void Bloom::Upsample() {
-	auto* command = Renderer::GetCommand();
+	auto* command = Renderer::NewCommand();
 	command->UniformData
 	.SetInput("u_FilterRadius", filterRadius);
 
@@ -259,16 +253,21 @@ void Bloom::Upsample() {
 		const BloomMip& mip = mipChain[i];
 		const BloomMip& nextMip = mipChain[i - 1];
 
-		command = Renderer::GetCommand();
+		command->ViewportWidth = nextMip.IntSize.x;
+		command->ViewportHeight = nextMip.IntSize.y;
+		command->DepthTest = DepthTestingMode::Off;
+		command->Blending = BlendingMode::Additive;
+		command->Culling = CullingMode::Off;
 		command->Outputs = { { AttachmentTarget::Color, i - 1 } };
 		command->UniformData
-		.SetInput("u_SrcTexture", TextureSlot{ mip.Sampler, 1 });
+		.SetInput("u_SrcTexture", TextureSlot{ mip.Sampler, 0 });
 
-		Renderer2D::DrawFullscreenQuad(mips, AttachmentTarget::Color);
-		command->Calls[-1].Blending = BlendingMode::Additive;
-		Renderer::PopCommand();
+		auto& call = command->NewDrawCall();
+		call.VertexCount = 6;
+		call.Primitive = PrimitiveType::Triangle;
+		call.Partition = PartitionType::Single;
 
-		Renderer::PushCommand();
+		command = Renderer::NewCommand();
 	}
 }
 

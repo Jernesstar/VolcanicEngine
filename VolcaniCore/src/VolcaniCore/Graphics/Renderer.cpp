@@ -20,7 +20,6 @@ static FrameData s_Frame;
 static Ref<RenderPass> s_RenderPass;
 static List<DrawCommand*> s_Stack;
 
-static DrawCall s_Options;
 static bool s_OptionsValid = false;
 
 void Renderer::Init() {
@@ -104,8 +103,7 @@ void Renderer::Resize(uint32_t width, uint32_t height) {
 	GetCommand()->ViewportHeight = height;
 }
 
-void Renderer::PushOptions(const DrawCall& options) {
-	s_Options = options;
+void Renderer::PushOptions() {
 	s_OptionsValid = true;
 }
 

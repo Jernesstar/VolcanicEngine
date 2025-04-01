@@ -114,7 +114,11 @@ Runtime::~Runtime() {
 }
 
 void Runtime::OnUpdate(TimeStep ts) {
+	UIRenderer::BeginFrame();
+
 	m_App->OnUpdate(ts);
+
+	UIRenderer::EndFrame();
 }
 
 }

@@ -102,17 +102,16 @@ void Renderer2D::DrawFullscreenQuad(Ref<Framebuffer> buffer,
 		command = RendererAPI::Get()->NewDrawCommand(pass);
 	}
 
-	// if(!command->UniformData)
 	command->UniformData
 	.SetInput("u_ScreenTexture", TextureSlot{ buffer->Get(target), 0 });
+	command->DepthTest = DepthTestingMode::Off;
+	command->Culling = CullingMode::Off;
+	command->Blending = BlendingMode::Greatest;
 
 	auto& call = command->NewDrawCall();
 	call.VertexCount = 6;
 	call.Primitive = PrimitiveType::Triangle;
 	call.Partition = PartitionType::Single;
-	call.DepthTest = DepthTestingMode::Off;
-	call.Culling = CullingMode::Off;
-	call.Blending = BlendingMode::Greatest;
 }
 
 }

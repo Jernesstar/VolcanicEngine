@@ -32,7 +32,7 @@ static void FlushCommand(DrawCommand&);
 static void FlushCall(DrawCommand&, DrawCall&);
 
 static void SetUniforms(DrawCommand& command);
-static void SetOptions(DrawCall& call);
+static void SetOptions(DrawCommand& call);
 
 struct BackendBuffer {
 	Ref<VertexArray> Array;
@@ -205,36 +205,30 @@ DrawCommand* Renderer::NewDrawCommand(DrawPass* pass) {
 }
 
 void FlushCommand(DrawCommand& command) {
-	// if(command.Pass != s_Data.LastPass) {
-		// if(s_Data.LastPass && s_Data.LastPass->Output)
-		// 	s_Data.LastPass->Output->As<OpenGL::Framebuffer>()->Unbind();
-		// if(s_Data.LastPass && s_Data.LastPass->Pipeline)
-		// 	s_Data.LastPass->Pipeline->As<OpenGL::ShaderProgram>()->Unbind();
+	if(command.Pass)
+		SetOptions(command);
 
-		// s_Data.LastPass = command.Pass;
-	// }
-
-	if(command.Pass && command.Pass->Pipeline)
-		command.Pass->Pipeline->As<OpenGL::ShaderProgram>()->Bind();
 	if(command.Pass && command.Pass->Output)
 		command.Pass->Output->As<OpenGL::Framebuffer>()->Bind();
+
+	if(command.Clear)
+		Clear();
 
 	if(command.ViewportWidth && command.ViewportHeight)
 		Resize(command.ViewportWidth, command.ViewportHeight);
 	else if(command.Pass && command.Pass->Output)
 		Resize(command.Pass->Output->GetWidth(), command.Pass->Output->GetHeight());
 
+	if(command.Pass && command.Pass->Pipeline) {
+		command.Pass->Pipeline->As<OpenGL::ShaderProgram>()->Bind();
+		SetUniforms(command);
+	}
+
 	if(command.Pass && command.Pass->Output) {
 		uint32_t i = 0;
 		for(auto& [target, idx] : command.Outputs)
 			command.Pass->Output->Attach(target, idx, i++);
 	}
-
-	if(command.Clear)
-		Clear();
-
-	if(command.Pass)
-		SetUniforms(command);
 
 	Ref<VertexArray> array;
 	if(command.Pass && command.Pass->BufferData) {
@@ -260,8 +254,6 @@ void FlushCommand(DrawCommand& command) {
 }
 
 void FlushCall(DrawCommand& command, DrawCall& call) {
-	SetOptions(call);
-
 	uint32_t primitive;
 	switch(call.Primitive) {
 		case PrimitiveType::Point:
@@ -314,7 +306,7 @@ void Clear() {
 }
 
 void Resize(uint32_t width, uint32_t height) {
-	glViewport(0, 0, width, height);
+	glViewport(0, 0, (int)width, (int)height);
 }
 
 void SetUniforms(DrawCommand& command) {
@@ -351,32 +343,32 @@ void SetUniforms(DrawCommand& command) {
 	}
 }
 
-void SetOptions(DrawCall& call) {
-	if(call.DepthTest == DepthTestingMode::On)
+void SetOptions(DrawCommand& command) {
+	if(command.DepthTest == DepthTestingMode::On)
 		glEnable(GL_DEPTH_TEST);
-	if(call.DepthTest == DepthTestingMode::Off)
+	if(command.DepthTest == DepthTestingMode::Off)
 		glDisable(GL_DEPTH_TEST);
 
-	if(call.Blending == BlendingMode::Off)
+	if(command.Blending == BlendingMode::Off)
 		glDisable(GL_BLEND);
 	else
 		glEnable(GL_BLEND);
-	if(call.Blending == BlendingMode::Greatest)
+	if(command.Blending == BlendingMode::Greatest)
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	else if(call.Blending == BlendingMode::Additive) {
+	else if(command.Blending == BlendingMode::Additive) {
 		glBlendFunc(GL_ONE, GL_ONE);
 		glBlendEquation(GL_FUNC_ADD);
 	}
 
-	if(call.Culling == CullingMode::Off)
+	if(command.Culling == CullingMode::Off)
 		glDisable(GL_CULL_FACE);
 	else {
 		glEnable(GL_CULL_FACE);
 		glFrontFace(GL_CCW);
 	}
-	if(call.Culling == CullingMode::Front)
+	if(command.Culling == CullingMode::Front)
 		glCullFace(GL_FRONT);
-	else if(call.Culling == CullingMode::Back)
+	else if(command.Culling == CullingMode::Back)
 		glCullFace(GL_BACK);
 }
 

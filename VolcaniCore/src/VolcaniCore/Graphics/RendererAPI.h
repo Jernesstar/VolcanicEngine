@@ -201,6 +201,10 @@ struct DrawUniforms {
 	}
 };
 
+enum class DepthTestingMode { On, Off };
+enum class BlendingMode { Off, Greatest, Additive };
+enum class CullingMode { Off, Front, Back };
+
 struct DrawCommand {
 	DrawPass* Pass = nullptr;
 
@@ -219,6 +223,10 @@ struct DrawCommand {
 	uint64_t IndicesCount	= 0;
 	uint64_t VerticesCount	= 0;
 	uint64_t InstancesCount = 0;
+
+	DepthTestingMode DepthTest = DepthTestingMode::On;
+	BlendingMode Blending	   = BlendingMode::Greatest;
+	CullingMode Culling		   = CullingMode::Back;
 
 	void AddIndices(const Buffer<uint32_t>& data) {
 		Pass->BufferData->AddIndices(data);
@@ -248,10 +256,6 @@ struct DrawCommand {
 	}
 };
 
-enum class DepthTestingMode { On, Off };
-enum class BlendingMode { Off, Greatest, Additive };
-enum class CullingMode { Off, Front, Back };
-
 enum class PrimitiveType { Point, Line, Triangle, Cubemap };
 enum class PartitionType { Single, Instanced, MultiDraw };
 
@@ -265,10 +269,6 @@ struct DrawCall {
 
 	PartitionType Partition = PartitionType::Instanced;
 	PrimitiveType Primitive = PrimitiveType::Triangle;
-
-	DepthTestingMode DepthTest = DepthTestingMode::On;
-	BlendingMode Blending	   = BlendingMode::Greatest;
-	CullingMode Culling		   = CullingMode::Back;
 };
 
 }

@@ -198,6 +198,9 @@ static void DrawSubMesh(Ref<Mesh> root, SubMesh& mesh, const glm::mat4& tr,
 			.SetInput("u_Material.EmissiveColor", mat.EmissiveColor);
 		}
 
+		command->DepthTest = DepthTestingMode::On;
+		command->Blending = BlendingMode::Greatest;
+		command->Culling = CullingMode::Back;
 		command->AddIndices(mesh.Indices);
 		command->AddVertices(mesh.Vertices);
 	}
@@ -206,9 +209,6 @@ static void DrawSubMesh(Ref<Mesh> root, SubMesh& mesh, const glm::mat4& tr,
 		auto& call = command->NewDrawCall();
 		call.Primitive = PrimitiveType::Triangle;
 		call.Partition = PartitionType::Instanced;
-		call.DepthTest = DepthTestingMode::On;
-		call.Blending = BlendingMode::Greatest;
-		call.Culling = CullingMode::Back;
 		call.InstanceStart = s_InstancesIndex;
 		s_InstancesIndex += 10'000;
 	}

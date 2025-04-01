@@ -54,8 +54,7 @@ Shadows::Shadows()
 			{ AttachmentTarget::Depth, { { depthTexture } } }
 		});
 
-	depthPass = RenderPass::Create("Depth", depth);
-	depthPass->SetOutput(depthMap);
+	depthPass = RenderPass::Create("Depth", depth, depthMap);
 	depthPass->SetData(Renderer3D::GetMeshBuffer());
 	shadowPass = RenderPass::Create("Shadow", shadow);
 	shadowPass->SetData(Renderer3D::GetMeshBuffer());
@@ -109,11 +108,6 @@ void Shadows::OnUpdate(TimeStep ts) {
 				return depthCamera->GetViewProjection();
 			});
 		Renderer::PopCommand();
-
-		Renderer::PushOptions(
-			{
-				.Culling = CullingMode::Front
-			});
 
 		RenderScene(depthCamera);
 
