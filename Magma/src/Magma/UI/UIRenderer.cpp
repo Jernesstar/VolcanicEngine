@@ -186,7 +186,7 @@ UIState UIRenderer::DrawImage(UI::Image& image) {
 	ImVec2 dim = ImVec2(image.Width, image.Height);
 	if(image.x != -1 && image.y != -1)
 		ImGui::SetCursorPos(ImVec2(image.x, image.y));
-	ImGui::Image((ImTextureID)(intptr_t)texture->GetID(), dim);
+	ImGui::Image((ImTextureID)(intptr_t)texture->GetID(), dim, ImVec2(0, 1), ImVec2(1, 0));
 
 	return {
 		ImGui::IsItemClicked(),

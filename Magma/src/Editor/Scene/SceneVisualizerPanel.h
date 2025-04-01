@@ -48,6 +48,7 @@ private:
 	Ref<Texture> DirectionalLightIcon;
 	Ref<Texture> PointLightIcon;
 	Ref<Texture> SpotlightIcon;
+	Ref<Texture> CameraIcon;
 
 	// Lighting and shadows
 	Ref<RenderPass> DepthPass;

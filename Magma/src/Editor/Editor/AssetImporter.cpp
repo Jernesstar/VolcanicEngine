@@ -35,8 +35,8 @@ ImageData AssetImporter::GetImageData(const std::string& path, bool flip) {
 	return image;
 }
 
-Ref<Texture> AssetImporter::GetTexture(const std::string& path) {
-	ImageData image = GetImageData(path, false);
+Ref<Texture> AssetImporter::GetTexture(const std::string& path, bool flip) {
+	ImageData image = GetImageData(path, flip);
 	auto texture = Texture::Create(image.Width, image.Height);
 	texture->SetData(image.Data);
 	return texture;
@@ -113,7 +113,7 @@ static Ref<Texture> LoadTexture(const std::string& dir,
 	auto path = GetMaterialPath(dir, material, type);
 	if(path == "")
 		return nullptr;
-	return AssetImporter::GetTexture(path);
+	return AssetImporter::GetTexture(path, false);
 }
 
 static Material LoadMaterial(const std::string& dir, const aiMaterial* mat) {

@@ -20,14 +20,15 @@ struct MaterialPaths {
 class AssetImporter {
 public:
 	static VolcaniCore::ImageData GetImageData(const std::string& path,
-		bool flip = false);
+		bool flip = true);
 
 	static Ref<VolcaniCore::Mesh> GetMesh(const std::string& path);
 	static void GetMeshData(const std::string& path,
 		VolcaniCore::List<VolcaniCore::SubMesh>& mesh,
 		VolcaniCore::List<MaterialPaths>& materialPaths);
 
-	static Ref<VolcaniCore::Texture> GetTexture(const std::string& path);
+	static Ref<VolcaniCore::Texture> GetTexture(const std::string& path,
+		bool flip = true);
 	static Ref<VolcaniCore::Cubemap> GetCubemap(const std::string& path);
 
 	static VolcaniCore::Buffer<float> GetAudioData(const std::string& path);

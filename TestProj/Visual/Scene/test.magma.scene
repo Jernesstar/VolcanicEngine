@@ -11,7 +11,7 @@ Scene:
             Camera:
               Type: Stereographic
               VerticalFOV: 45
-              Position: [0, 0, 70]
+              Position: [0, 0, 45]
               Direction: [0, 0, -1]
               ViewportWidth: 800
               ViewportHeight: 600
@@ -34,7 +34,7 @@ Scene:
         Components:
           TransformComponent:
             Transform:
-              Translation: [0, -6.19999981, 26.3999996]
+              Translation: [0, 6.69999981, 26.3999996]
               Rotation: [0, 0, 0]
               Scale: [2.5999999, 1, 1]
           MeshComponent:
@@ -48,7 +48,7 @@ Scene:
               Ambient: [1, 0, 0]
               Diffuse: [1, 0, 0]
               Specular: [1, 1, 1]
-              Position: [0.699999988, -1.39999998, 1.29999995]
+              Position: [0.699999988, 10.5, 1.29999995]
               Constant: 0.899999976
               Linear: 0
               Quadratic: 0
@@ -60,7 +60,7 @@ Scene:
             Tag: MainCharacter
           TransformComponent:
             Transform:
-              Translation: [0, -5.4000001, 0]
+              Translation: [0, 10.8999996, 0]
               Rotation: [3.14159274, 3.14159274, 0]
               Scale: [1, 1, 1]
           MeshComponent:
@@ -106,8 +106,8 @@ Scene:
               Ambient: [1, 1, 1]
               Diffuse: [1, 1, 1]
               Specular: [1, 1, 1]
-              Position: [-8.5, -2.0999999, -3.4000001]
-              Direction: [7.0999999, 0.899999976, 3.4000001]
+              Position: [-1.5, 0.400000006, 12]
+              Direction: [0, 0, -1]
               CutoffAngle: 0.200000003
               OuterCutoffAngle: 0.300000012
     - Entity:
@@ -119,5 +119,5 @@ Scene:
               Ambient: [0, 0, 0]
               Diffuse: [0, 0, 0]
               Specular: [0, 0, 0]
-              Position: [-12.8000002, -11.3000002, 0]
+              Position: [-12.8000002, 9.60000038, 0]
               Direction: [0, 0, 0]

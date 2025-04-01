@@ -214,7 +214,7 @@ void Bloom::InitMips() {
 
 void Bloom::Downsample() {
 	auto* command = Renderer::NewCommand();
-	// command->Clear = true;
+	command->Clear = true;
 	command->UniformData
 	.SetInput("u_SrcResolution",
 		glm::vec2{ src->GetWidth(), src->GetHeight() });
@@ -226,7 +226,7 @@ void Bloom::Downsample() {
 	for(const auto& mip : mipChain) {
 		command->ViewportWidth = mip.IntSize.x;
 		command->ViewportHeight = mip.IntSize.y;
-		command->DepthTest = DepthTestingMode::On;
+		command->DepthTest = DepthTestingMode::Off;
 		command->Blending = BlendingMode::Off;
 		command->Culling = CullingMode::Off;
 		command->Outputs = { { AttachmentTarget::Color, i++ } };

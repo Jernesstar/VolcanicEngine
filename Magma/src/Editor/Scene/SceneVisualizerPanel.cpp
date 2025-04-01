@@ -346,7 +346,7 @@ std::string SelectScriptClass(Ref<ScriptModule> mod) {
 EditorSceneRenderer::EditorSceneRenderer() {
 	auto camera = CreateRef<StereographicCamera>(75.0f);
 	m_Controller.SetCamera(camera);
-	m_Controller.TranslationSpeed = 10.0f;
+	m_Controller.TranslationSpeed = 25.0f;
 
 	auto window = Application::GetWindow();
 	m_Output = Framebuffer::Create(window->GetWidth(), window->GetHeight());
@@ -371,7 +371,7 @@ EditorSceneRenderer::EditorSceneRenderer() {
 		.InstanceLayout = instanceLayout,
 		.MaxIndexCount = 0,
 		.MaxVertexCount = 0,
-		.MaxInstanceCount = 101
+		.MaxInstanceCount = 102
 	};
 	BillboardBuffer = RendererAPI::Get()->NewDrawBuffer(specs);
 	
@@ -387,6 +387,8 @@ EditorSceneRenderer::EditorSceneRenderer() {
 		AssetImporter::GetTexture("Magma/assets/icons/PointLightIcon.png");
 	SpotlightIcon =
 		AssetImporter::GetTexture("Magma/assets/icons/SpotlightIcon.png");
+	CameraIcon =
+		AssetImporter::GetTexture("Magma/assets/icons/CameraIcon.png");
 
 	LightingPass =
 		RenderPass::Create("Lighting",
@@ -489,7 +491,15 @@ void EditorSceneRenderer::Begin() {
 }
 
 void EditorSceneRenderer::SubmitCamera(const Entity& entity) {
-	// Render view frustum lines
+	auto camera = entity.Get<CameraComponent>().Cam;
+
+	if(Selected == entity) {
+		// TODO: Frustum lines
+	}
+
+	RendererAPI::Get()
+	->SetBufferData(BillboardBuffer, DrawBufferIndex::Instances,
+					glm::value_ptr(camera->GetPosition()), 1, 101);
 }
 
 void EditorSceneRenderer::SubmitSkybox(const Entity& entity) {
@@ -734,6 +744,31 @@ void EditorSceneRenderer::Render() {
 		auto& call = command->NewDrawCall();
 		call.VertexCount = 6;
 		call.InstanceStart = 51;
+		call.InstanceCount = SpotlightCount;
+		call.Primitive = PrimitiveType::Triangle;
+		call.Partition = PartitionType::Instanced;
+	}
+
+	{
+		auto* command =
+			RendererAPI::Get()->NewDrawCommand(BillboardPass->Get());
+		command->DepthTest = DepthTestingMode::On;
+		command->Culling = CullingMode::Off;
+		command->Blending = BlendingMode::Greatest;
+		command->UniformData
+		.SetInput("u_View", camera->GetView());
+		command->UniformData
+		.SetInput("u_ViewProj", camera->GetViewProjection());
+		command->UniformData
+		.SetInput("u_BillboardWidth", 1.0f);
+		command->UniformData
+		.SetInput("u_BillboardHeight", 1.0f);
+		command->UniformData
+		.SetInput("u_Texture", TextureSlot{ CameraIcon, 0 });
+
+		auto& call = command->NewDrawCall();
+		call.VertexCount = 6;
+		call.InstanceStart = 101;
 		call.InstanceCount = SpotlightCount;
 		call.Primitive = PrimitiveType::Triangle;
 		call.Partition = PartitionType::Instanced;
