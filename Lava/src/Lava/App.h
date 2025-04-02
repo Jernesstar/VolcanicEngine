@@ -38,8 +38,7 @@ class RuntimeSceneRenderer : public SceneRenderer {
 		void SubmitMesh(const Entity& entity) override;
 		void Render() override;
 	
-	private:	
-
+	private:
 		// Lighting and shadows
 		Ref<RenderPass> DepthPass;
 		Ref<RenderPass> LightingPass;
@@ -67,6 +66,7 @@ public:
 
 public:
 	bool ChangeScreen;
+	bool RenderScene;
 	bool RenderUI;
 	bool Running;
 

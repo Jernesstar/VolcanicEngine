@@ -13,8 +13,8 @@ Scene:
               VerticalFOV: 45
               Position: [0, 0, 45]
               Direction: [0, 0, -1]
-              ViewportWidth: 800
-              ViewportHeight: 600
+              ViewportWidth: 1920
+              ViewportHeight: 1057
               Near: 0.00100000005
               Far: 1000
     - Entity:

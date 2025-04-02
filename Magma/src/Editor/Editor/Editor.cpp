@@ -404,6 +404,8 @@ void Editor::NewProject(const std::string& volcPath) {
 		};
 
 	m_App->ChangeScreen = false;
+	m_App->RenderScene = false;
+	m_App->RenderUI = false;
 	m_App->Running = false;
 	m_App->SetAssetManager(&m_AssetManager);
 

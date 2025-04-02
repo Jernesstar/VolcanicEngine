@@ -110,6 +110,11 @@ void SceneVisualizerPanel::Remove(ECS::Entity entity) {
 static bool s_Hovered = false;
 
 void SceneVisualizerPanel::Update(TimeStep ts) {
+	auto& editor = Application::As<EditorApp>()->GetEditor();
+	auto* tab = editor.GetProjectTab()->As<ProjectTab>();
+	if(tab->GetState() != ScreenState::Edit)
+		return;
+
 	m_Renderer.IsHovered(s_Hovered);
 	m_Renderer.Update(ts);
 }
@@ -127,8 +132,10 @@ void SceneVisualizerPanel::Draw() {
 	auto* tab = editor.GetProjectTab()->As<ProjectTab>();
 
 	Ref<Framebuffer> display;
-	if(tab->GetState() == ScreenState::Play)
+	if(tab->GetState() != ScreenState::Edit) {
+		m_Context->OnRender(App::Get()->GetRenderer());
 		display = App::Get()->GetRenderer().GetOutput();
+	}
 	else {
 		m_Context->OnRender(m_Renderer);
 		display = m_Renderer.GetOutput();
@@ -345,6 +352,7 @@ std::string SelectScriptClass(Ref<ScriptModule> mod) {
 
 EditorSceneRenderer::EditorSceneRenderer() {
 	auto camera = CreateRef<StereographicCamera>(75.0f);
+	camera->SetPosition({ 0.0f, 1.0f, 1.0f });
 	m_Controller.SetCamera(camera);
 	m_Controller.TranslationSpeed = 25.0f;
 

@@ -158,6 +158,10 @@ void App::OnUpdate(TimeStep ts) {
 	s_Screen->World->OnUpdate(ts);
 	s_Screen->World->OnRender(m_SceneRenderer);
 
+	auto output = m_SceneRenderer.GetOutput();
+	if(RenderScene)
+		Renderer2D::DrawFullscreenQuad(output, AttachmentTarget::Color);
+
 	if(!RenderUI)
 		return;
 
@@ -468,8 +472,6 @@ void RuntimeSceneRenderer::Render() {
 	.SetInput(UniformSlot{ SpotlightBuffer, "", 2 });
 
 	Renderer3D::End();
-
-	Renderer2D::DrawFullscreenQuad(m_Output, AttachmentTarget::Color);
 
 	Renderer::Flush();
 

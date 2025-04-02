@@ -162,6 +162,7 @@ void ProjectTab::RenderButtons() {
 void ProjectTab::OnPlay() {
 	m_ScreenState = ScreenState::Play;
 	App::Get()->Running = true;
+	App::Get()->RenderUI = false;
 	App::Get()->OnLoad();
 }
 
