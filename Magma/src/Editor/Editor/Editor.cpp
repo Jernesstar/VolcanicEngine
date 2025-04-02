@@ -62,6 +62,9 @@ Editor::Editor() {
 	ScriptEngine::Init();
 
 	Lava::ScriptGlue::RegisterInterface();
+
+	m_WelcomeImage.Content =
+		AssetImporter::GetTexture("Magma/assets/image/VolcanicDisplay.png");
 }
 
 Editor::~Editor() {
@@ -273,12 +276,13 @@ void Editor::RenderEmptyTab(Ref<Tab>& tab) {
 }
 
 void Editor::RenderWelcomeScreen() {
-	UI::Image image =
-		AssetImporter::GetTexture("Magma/assets/image/VolcanicDisplay.png");
-
 	ImGui::Begin("##Welcome");
 	{
-		image.Render();
+		m_WelcomeImage.x = -1;
+		m_WelcomeImage.y = -1;
+		m_WelcomeImage.Width = 800;
+		m_WelcomeImage.Height = 800;
+		m_WelcomeImage.Render();
 	}
 	ImGui::End();
 }
@@ -367,6 +371,7 @@ void Editor::NewProject() {
 void Editor::NewProject(const std::string& volcPath) {
 	m_Project.Load(volcPath);
 
+	m_AssetManager.Clear();
 	m_AssetManager.Load(m_Project.Path);
 	m_AssetManager.Reload();
 

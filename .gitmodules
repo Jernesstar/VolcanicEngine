@@ -4,10 +4,6 @@
 [submodule "VolcaniCore/vendor/glm"]
 	path = VolcaniCore/vendor/glm
 	url = https://github.com/g-truc/glm.git
-[submodule "VolcaniCore/vendor/glad"]
-	path = VolcaniCore/vendor/glad
-	url = https://github.com/Dav1dde/glad.git
-	branch = c
 [submodule "VolcaniCore/vendor/stb_image"]
 	path = Magma/vendor/stb_image
 	url = https://github.com/Jernesstar/stb_image

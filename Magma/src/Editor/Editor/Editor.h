@@ -43,6 +43,8 @@ private:
 	List<Ref<Tab>> m_Tabs;
 	List<Ref<Tab>> m_ClosedTabs;
 
+	UI::Image m_WelcomeImage;
+
 	void SetTab(Ref<Tab> tab);
 	void NewTab();
 	void OpenTab(TabType type = TabType::None);

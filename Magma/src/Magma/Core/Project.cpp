@@ -32,6 +32,7 @@ void Project::Load(const std::string& path) {
 	Name = projNode["Name"].as<std::string>();
 	App = projNode["App"].as<std::string>();
 	StartScreen = projNode["StartScreen"].as<std::string>();
+	Screens.Clear();
 	for(auto node : projNode["Screens"])
 		AddScreen(
 			node["Screen"]["Name"].as<std::string>(),

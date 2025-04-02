@@ -102,11 +102,13 @@ void Renderer2D::DrawFullscreenQuad(Ref<Framebuffer> buffer,
 		command = RendererAPI::Get()->NewDrawCommand(pass);
 	}
 
-	command->UniformData
-	.SetInput("u_ScreenTexture", TextureSlot{ buffer->Get(target), 0 });
+	command->ViewportWidth = Application::GetWindow()->GetWidth();
+	command->ViewportHeight = Application::GetWindow()->GetHeight();
 	command->DepthTest = DepthTestingMode::Off;
 	command->Culling = CullingMode::Off;
 	command->Blending = BlendingMode::Greatest;
+	command->UniformData
+	.SetInput("u_ScreenTexture", TextureSlot{ buffer->Get(target), 0 });
 
 	auto& call = command->NewDrawCall();
 	call.VertexCount = 6;

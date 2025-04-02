@@ -208,16 +208,19 @@ void FlushCommand(DrawCommand& command) {
 	if(command.Pass)
 		SetOptions(command);
 
+	if(command.ViewportWidth && command.ViewportHeight)
+		Resize(command.ViewportWidth, command.ViewportHeight);
+	else if(command.Pass && command.Pass->Output)
+		Resize(command.Pass->Output->GetWidth(), command.Pass->Output->GetHeight());
+	else
+		Resize(Application::GetWindow()->GetWidth(),
+			   Application::GetWindow()->GetHeight());
+
 	if(command.Pass && command.Pass->Output)
 		command.Pass->Output->As<OpenGL::Framebuffer>()->Bind();
 
 	if(command.Clear)
 		Clear();
-
-	if(command.ViewportWidth && command.ViewportHeight)
-		Resize(command.ViewportWidth, command.ViewportHeight);
-	else if(command.Pass && command.Pass->Output)
-		Resize(command.Pass->Output->GetWidth(), command.Pass->Output->GetHeight());
 
 	if(command.Pass && command.Pass->Pipeline) {
 		command.Pass->Pipeline->As<OpenGL::ShaderProgram>()->Bind();

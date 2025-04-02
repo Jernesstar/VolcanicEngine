@@ -34,7 +34,7 @@ private:
 	Ref<Framebuffer> mips;
 	List<BloomMip> mipChain;
 
-	uint32_t mipChainLength = 5;
+	uint32_t mipChainLength = 3;
 	float filterRadius	= 0.005f;
 	float exposure		= 1.0f;
 	float bloomStrength = 0.04f;
@@ -142,11 +142,11 @@ void Bloom::OnUpdate(TimeStep ts) {
 	}
 	Renderer::EndPass();
 
-	Renderer::StartPass(upsamplePass, false);
-	{
-		Upsample();
-	}
-	Renderer::EndPass();
+	// Renderer::StartPass(upsamplePass, false);
+	// {
+	// 	Upsample();
+	// }
+	// Renderer::EndPass();
 
 	// // Renderer2D::DrawFullscreenQuad(mips, AttachmentTarget::Color);
 

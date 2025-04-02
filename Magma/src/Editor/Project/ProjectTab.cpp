@@ -78,7 +78,6 @@ void ProjectTab::Update(TimeStep ts) {
 }
 
 void ProjectTab::Render() {
-
 	ImGui::BeginMainMenuBar();
 	{
 		if(ImGui::BeginMenu("File")) {
@@ -110,6 +109,9 @@ void ProjectTab::Render() {
 		}
 	}
 	ImGui::EndMainMenuBar();
+
+	for(auto panel : m_Panels)
+		panel->Draw();
 }
 
 void ProjectTab::RenderEssentialPanels() {

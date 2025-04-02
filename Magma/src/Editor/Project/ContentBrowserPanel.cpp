@@ -23,10 +23,10 @@ ContentBrowserPanel::ContentBrowserPanel(const std::string& path)
 	Application::PushDir();
 	m_FileIcon =
 		CreateRef<UI::Image>(
-			AssetImporter::GetTexture("Magma/assets/icons/FileIcon.png"));
+			AssetImporter::GetTexture("Magma/assets/icons/FileIcon.png", false));
 	m_FolderIcon =
 		CreateRef<UI::Image>(
-			AssetImporter::GetTexture("Magma/assets/icons/FolderIcon.png"));
+			AssetImporter::GetTexture("Magma/assets/icons/FolderIcon.png", false));
 	Application::PopDir();
 }
 
