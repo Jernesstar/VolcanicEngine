@@ -34,7 +34,7 @@ private:
 	Ref<Framebuffer> mips;
 	List<BloomMip> mipChain;
 
-	uint32_t mipChainLength = 3;
+	uint32_t mipChainLength = 7;
 	float filterRadius	= 0.005f;
 	float exposure		= 1.0f;
 	float bloomStrength = 0.04f;
@@ -134,7 +134,7 @@ void Bloom::OnUpdate(TimeStep ts) {
 	}
 	Renderer::EndPass();
 
-	Renderer2D::DrawFullscreenQuad(src, AttachmentTarget::Color);
+	// Renderer2D::DrawFullscreenQuad(src, AttachmentTarget::Color);
 
 	Renderer::StartPass(downsamplePass, false);
 	{
@@ -142,42 +142,40 @@ void Bloom::OnUpdate(TimeStep ts) {
 	}
 	Renderer::EndPass();
 
-	// Renderer::StartPass(upsamplePass, false);
-	// {
-	// 	Upsample();
-	// }
-	// Renderer::EndPass();
+	Renderer::StartPass(upsamplePass, false);
+	{
+		Upsample();
+	}
+	Renderer::EndPass();
 
 	// // Renderer2D::DrawFullscreenQuad(mips, AttachmentTarget::Color);
 
-	// Renderer::StartPass(bloomPass);
-	// {
-	// 	Renderer::GetPass()->GetUniforms()
-	// 	.Set("u_Exposure",
-	// 		[&]() -> float
-	// 		{
-	// 			return exposure;
-	// 		})
-	// 	.Set("u_BloomStrength",
-	// 		[&]() -> float
-	// 		{
-	// 			return bloomStrength;
-	// 		})
-	// 	.Set("u_BloomTexture",
-	// 		[&]() -> TextureSlot
-	// 		{
-	// 			return { mips->Get(AttachmentTarget::Color), 0 };
-	// 		})
-	// 	.Set("u_SceneTexture",
-	// 		[&]() -> TextureSlot
-	// 		{
-	// 			return { src->Get(AttachmentTarget::Color), 1 };
-	// 		});
+	Renderer::StartPass(bloomPass, false);
+	{
+		auto* command = Renderer::NewCommand();
+		command->ViewportWidth = Application::GetWindow()->GetWidth();
+		command->ViewportHeight = Application::GetWindow()->GetHeight();
+		command->DepthTest = DepthTestingMode::Off;
+		command->Blending = BlendingMode::Greatest;
+		command->Culling = CullingMode::Off;
 
-	// 	Renderer::Resize(Application::GetWindow()->GetWidth(), Application::GetWindow()->GetHeight());
-	// 	Renderer2D::DrawFullscreenQuad(mips, AttachmentTarget::Color);
-	// }
-	// Renderer::EndPass();
+		command->UniformData
+		.SetInput("u_Exposure", exposure);
+		command->UniformData
+		.SetInput("u_BloomStrength", bloomStrength);
+		command->UniformData
+		.SetInput("u_BloomTexture",
+			TextureSlot{ mips->Get(AttachmentTarget::Color), 0 });
+		command->UniformData
+		.SetInput("u_SceneTexture",
+			TextureSlot{ src->Get(AttachmentTarget::Color), 1 });
+
+		auto& call = command->NewDrawCall();
+		call.VertexCount = 6;
+		call.Primitive = PrimitiveType::Triangle;
+		call.Partition = PartitionType::Single;
+	}
+	Renderer::EndPass();
 
 	Renderer::Flush();
 	UIRenderer::EndFrame();
@@ -261,6 +259,8 @@ void Bloom::Upsample() {
 		command->Outputs = { { AttachmentTarget::Color, i - 1 } };
 		command->UniformData
 		.SetInput("u_SrcTexture", TextureSlot{ mip.Sampler, 0 });
+		command->UniformData
+		.SetInput("u_SrcResolution", mip.Size);
 
 		auto& call = command->NewDrawCall();
 		call.VertexCount = 6;

@@ -1,6 +1,6 @@
 #include "Renderer.h"
 
-#include <glad/glad.h>
+#include <glad/gl.h>
 
 #include <glm/gtc/type_ptr.hpp>
 
@@ -54,7 +54,10 @@ static DebugInfo s_Info;
 Renderer::Renderer()
 	: RendererAPI(RendererAPI::Backend::OpenGL)
 {
-	VOLCANICORE_ASSERT(gladLoadGL(), "Glad could not load OpenGL");
+	int version = gladLoadGL(glfwGetProcAddress);
+	VOLCANICORE_ASSERT(version, "Glad could not load OpenGL");
+	VOLCANICORE_LOG_INFO("Successfully loaded OpenGL version %d.%d",
+		GLAD_VERSION_MAJOR(version), GLAD_VERSION_MINOR(version));
 }
 
 void Renderer::Init() {
@@ -212,9 +215,6 @@ void FlushCommand(DrawCommand& command) {
 		Resize(command.ViewportWidth, command.ViewportHeight);
 	else if(command.Pass && command.Pass->Output)
 		Resize(command.Pass->Output->GetWidth(), command.Pass->Output->GetHeight());
-	else
-		Resize(Application::GetWindow()->GetWidth(),
-			   Application::GetWindow()->GetHeight());
 
 	if(command.Pass && command.Pass->Output)
 		command.Pass->Output->As<OpenGL::Framebuffer>()->Bind();
@@ -249,6 +249,10 @@ void FlushCommand(DrawCommand& command) {
 
 	if(command.Pass && command.Pass->BufferData)
 		array->Unbind();
+
+	else
+		Resize(Application::GetWindow()->GetWidth(),
+			   Application::GetWindow()->GetHeight());
 
 	if(command.Pass && command.Pass->Output)
 		command.Pass->Output->As<OpenGL::Framebuffer>()->Unbind();

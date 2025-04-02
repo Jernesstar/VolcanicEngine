@@ -83,9 +83,13 @@ Cube::Cube()
 	auto depth = Texture::Create(320, 180, Texture::Format::Depth);
 	auto color = Texture::Create(320, 180, Texture::Format::Normal,
 								 Texture::Sampling::Nearest);
+	auto color2 = Texture::Create(160, 90, Texture::Format::Normal,
+								 Texture::Sampling::Nearest);
+	auto color3 = Texture::Create(80, 45, Texture::Format::Normal,
+								 Texture::Sampling::Nearest);
 	auto framebuffer = Framebuffer::Create(
 		{
-			{ AttachmentTarget::Color, { color } },
+			{ AttachmentTarget::Color, { color, color2, color3 } },
 			{ AttachmentTarget::Depth, { depth } },
 		});
 

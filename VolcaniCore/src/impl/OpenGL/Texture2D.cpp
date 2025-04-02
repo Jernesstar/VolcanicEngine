@@ -1,6 +1,6 @@
 #include "Texture2D.h"
 
-#include <glad/glad.h>
+#include <glad/gl.h>
 
 #include "Core/Assert.h"
 #include "Core/FileUtils.h"

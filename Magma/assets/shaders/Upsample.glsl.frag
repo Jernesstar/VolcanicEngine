@@ -8,6 +8,7 @@
 // Remember to use edge clamping for this texture!
 
 uniform float u_FilterRadius;
+uniform vec2 u_SrcResolution;
 layout(binding = 0) uniform sampler2D u_SrcTexture;
 
 layout(location = 0) in vec2 v_TexCoords;
@@ -18,8 +19,9 @@ void main()
 {
     // The filter kernel is applied with a radius, specified in texture
     // coordinates, so that the radius will vary across mip resolutions.
+    float aspectRatio = u_SrcResolution.x / u_SrcResolution.y;
     float x = u_FilterRadius;
-    float y = u_FilterRadius;
+    float y = u_FilterRadius * aspectRatio;
 
     // Take 9 samples around current texel:
     // a - b - c

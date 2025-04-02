@@ -4,13 +4,13 @@
 [submodule "VolcaniCore/vendor/glm"]
 	path = VolcaniCore/vendor/glm
 	url = https://github.com/g-truc/glm.git
-[submodule "VolcaniCore/vendor/stb_image"]
+[submodule "Magma/vendor/stb_image"]
 	path = Magma/vendor/stb_image
 	url = https://github.com/Jernesstar/stb_image
-[submodule "VolcaniCore/vendor/assimp"]
+[submodule "Magma/vendor/assimp"]
 	path = Magma/vendor/assimp
 	url = https://github.com/Jernesstar/assimp.git
-[submodule "VolcaniCore/vendor/freetype"]
+[submodule "Magma/vendor/freetype"]
 	path = Magma/vendor/freetype
 	url = https://github.com/Jernesstar/freetype.git
 [submodule "Magma/vendor/yaml-cpp"]
@@ -44,3 +44,6 @@
 [submodule "Magma/vendor/efsw"]
 	path = Magma/vendor/efsw
 	url = https://github.com/SpartanJ/efsw.git
+[submodule "VolcaniCore/vendor/glad"]
+	path = VolcaniCore/vendor/glad
+	url = https://github.com/Jernesstar/glad.git

@@ -6,7 +6,7 @@
 
 #include <algorithm>
 
-#include <glad/glad.h>
+#include <glad/gl.h>
 
 #include "Core/Assert.h"
 
@@ -191,8 +191,9 @@ void Framebuffer::CreateColorAttachment(uint32_t index) {
 		// glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, GL_TEXTURE_2D_MULTISAMPLE, attachment.m_RendererID, 0);
 		attachment.m_Texture =
 			CreateRef<Texture2D>(attachment.m_RendererID, width, height);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index,
-								GL_TEXTURE_2D, attachment.m_RendererID, 0);
+		if(index == 0)
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index,
+									GL_TEXTURE_2D, attachment.m_RendererID, 0);
 	}
 	else if(attachment.GetType() == Attachment::Type::RenderBuffer) {
 		// TODO(Implement):

@@ -14,7 +14,7 @@ layout(binding = 0) uniform sampler2D u_SrcTexture;
 
 layout(location = 0) in vec2 v_TexCoords;
 
-out vec4 FragColor[];
+out vec4 FragColor;
 
 void main()
 {
@@ -66,5 +66,5 @@ void main()
     downsample += (j + k + l + m) * 0.125;
     // downsample = max(downsample, 0.001f);
 
-    FragColor[0] = vec4(downsample, 1.0);
+    FragColor = vec4(downsample, 1.0);
 }

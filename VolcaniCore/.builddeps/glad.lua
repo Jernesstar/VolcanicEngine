@@ -7,20 +7,9 @@ project "glad"
     targetdir ("%{RootPath}/build/%{_ACTION}/VolcaniCore/lib")
 
     files {
-        "%{VendorPaths.glad}/include/*.h",
-        "%{VendorPaths.glad}/src/glad.c"
+        "%{VendorPaths.glad}/src/gl.c"
     }
 
     includedirs {
         "%{Includes.glad}"
     }
-
-    filter "system:windows"
-        files {
-            "%{VendorPaths.glad}/src/glad_wgl.c"
-        }
-
-    filter "system:linux"
-        files {
-            "%{VendorPaths.glad}/src/glad_glx.c"
-        }

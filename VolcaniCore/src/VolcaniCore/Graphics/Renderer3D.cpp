@@ -199,7 +199,7 @@ static void DrawSubMesh(Ref<Mesh> root, SubMesh& mesh, const glm::mat4& tr,
 		}
 
 		command->DepthTest = DepthTestingMode::On;
-		command->Blending = BlendingMode::Greatest;
+		command->Blending = BlendingMode::Off;
 		command->Culling = CullingMode::Back;
 		command->AddIndices(mesh.Indices);
 		command->AddVertices(mesh.Vertices);
