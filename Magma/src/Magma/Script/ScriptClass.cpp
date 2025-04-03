@@ -18,6 +18,14 @@ ScriptClass::ScriptClass(const std::string& name, asITypeInfo* type)
 		auto method = m_Type->GetMethodByIndex(i);
 		m_Functions[method->GetName()] = method;
 	}
+
+	asIScriptObject* obj =
+	(asIScriptObject*)ScriptEngine::Get()
+						->CreateUninitializedScriptObject(m_Type);
+	for(uint32_t i = 0; i < handle->GetPropertyCount(); i++) {
+		auto typeID = handle->GetPropertyTypeId(i);
+		auto* typeInfo = ScriptEngine::Get()->GetTypeInfoById(typeID);
+	}
 }
 
 void ScriptClass::SetInstanceMethod(const List<std::string>& args) {

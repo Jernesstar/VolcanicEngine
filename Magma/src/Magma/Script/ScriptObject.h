@@ -26,6 +26,9 @@ public:
 		func.CallVoid(std::forward<Args>(args)...);
 	}
 
+	ScriptField GetProperty(const std::string& name);
+	ScriptField GetProperty(uint32_t idx);
+
 	asIScriptObject* GetHandle() const { return m_Handle; }
 	const ScriptClass* GetClass() const { return m_Class; }
 

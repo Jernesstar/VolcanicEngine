@@ -8,6 +8,19 @@ namespace Magma::Script {
 
 class ScriptModule;
 
+class ScriptField {
+	void* Data;
+	const std::string Name;
+	const std::string Type;
+
+	template<typename T>
+	T* As() const { return static_cast<T*>(Data); }
+};
+
+class ScriptFunction {
+	List<std::string> Metadata;
+};
+
 class ScriptClass {
 public:
 	const std::string Name;
