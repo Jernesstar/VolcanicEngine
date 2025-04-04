@@ -43,6 +43,16 @@ void ScriptObject::DestroyAndRelease() {
 	Release();
 }
 
+ScriptField ScriptObject::GetProperty(const std::string& name) {
+
+	return { };
+}
+
+ScriptField ScriptObject::GetProperty(uint32_t idx) {
+
+	return { };
+}
+
 ScriptFunc ScriptObject::GetFunc(const std::string& name) const {
 	auto* function = m_Class->GetFunction(name);
 	auto* ctx = m_Class->GetModule()->GetContext();

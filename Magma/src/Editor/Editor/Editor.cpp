@@ -63,8 +63,10 @@ Editor::Editor() {
 
 	Lava::ScriptGlue::RegisterInterface();
 
+	Application::PushDir();
 	m_WelcomeImage.Content =
 		AssetImporter::GetTexture("Magma/assets/image/VolcanicDisplay.png");
+	Application::PopDir();
 }
 
 Editor::~Editor() {
@@ -373,7 +375,6 @@ void Editor::NewProject(const std::string& volcPath) {
 
 	m_AssetManager.Clear();
 	m_AssetManager.Load(m_Project.Path);
-	m_AssetManager.Reload();
 
 	auto rootPath = fs::path(volcPath).parent_path();
 	m_App = CreateRef<Lava::App>(m_Project);

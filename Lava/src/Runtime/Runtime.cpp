@@ -2,6 +2,7 @@
 
 #include <VolcaniCore/Event/Events.h>
 
+#include <VolcaniCore/Graphics/Renderer.h>
 #include <VolcaniCore/Graphics/ShaderLibrary.h>
 
 #include <Magma/Script/ScriptEngine.h>
@@ -115,6 +116,7 @@ Runtime::~Runtime() {
 }
 
 void Runtime::OnUpdate(TimeStep ts) {
+	Renderer::Clear();
 	UIRenderer::BeginFrame();
 
 	m_App->OnUpdate(ts);

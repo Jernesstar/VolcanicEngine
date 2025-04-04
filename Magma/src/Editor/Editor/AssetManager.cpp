@@ -318,12 +318,7 @@ void EditorAssetManager::Load(const std::string& path) {
 			m_MeshAssets[id] = Mesh::Create(type, mat);
 		}
 	}
-}
 
-void EditorAssetManager::Reload() {
-	namespace fs = std::filesystem;
-
-	auto rootPath = fs::path(m_Path).parent_path() / "Asset";
 	List<fs::path> paths
 	{
 		(rootPath / "Mesh"),
@@ -337,10 +332,9 @@ void EditorAssetManager::Reload() {
 
 	uint32_t i = 0;
 	for(auto& folder : paths) {
-		for(auto p : FileUtils::GetFiles(folder.string())) {
-			std::string path = p;
+		for(auto path : FileUtils::GetFiles(folder.string())) {
 			if(i == 0)
-				path = FileUtils::GetFiles(p, { ".obj" })[0];
+				path = FileUtils::GetFiles(path, { ".obj" })[0];
 			if(!GetFromPath(path))
 				Add(path, (AssetType)i);
 		}

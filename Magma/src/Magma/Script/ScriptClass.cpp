@@ -22,10 +22,15 @@ ScriptClass::ScriptClass(const std::string& name, asITypeInfo* type)
 	asIScriptObject* obj =
 	(asIScriptObject*)ScriptEngine::Get()
 						->CreateUninitializedScriptObject(m_Type);
-	for(uint32_t i = 0; i < handle->GetPropertyCount(); i++) {
-		auto typeID = handle->GetPropertyTypeId(i);
+
+	for(uint32_t i = 0; i < obj->GetPropertyCount(); i++) {
+		auto typeID = obj->GetPropertyTypeId(i);
 		auto* typeInfo = ScriptEngine::Get()->GetTypeInfoById(typeID);
+		std::string name = obj->GetPropertyName(i);
+
 	}
+
+	obj->Release();
 }
 
 void ScriptClass::SetInstanceMethod(const List<std::string>& args) {

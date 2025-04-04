@@ -11,10 +11,10 @@ Scene:
             Camera:
               Type: Stereographic
               VerticalFOV: 45
-              Position: [0, 0, 45]
+              Position: [0, 0, 41]
               Direction: [0, 0, -1]
-              ViewportWidth: 1920
-              ViewportHeight: 1057
+              ViewportWidth: 1600
+              ViewportHeight: 877
               Near: 0.00100000005
               Far: 1000
     - Entity:
@@ -48,8 +48,8 @@ Scene:
               Ambient: [1, 0, 0]
               Diffuse: [1, 0, 0]
               Specular: [1, 1, 1]
-              Position: [0.699999988, 10.5, 1.29999995]
-              Constant: 0.899999976
+              Position: [0.699999988, 11.1000004, 1.29999995]
+              Constant: 1
               Linear: 0
               Quadratic: 0
     - Entity:

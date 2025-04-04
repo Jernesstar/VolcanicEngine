@@ -151,16 +151,16 @@ void App::OnUpdate(TimeStep ts) {
 	if(!s_Screen)
 		return;
 
-	Renderer::Clear();
-
 	s_Screen->ScriptObj->Call("OnUpdate", (float)ts);
 
 	s_Screen->World->OnUpdate(ts);
 	s_Screen->World->OnRender(m_SceneRenderer);
 
-	auto output = m_SceneRenderer.GetOutput();
-	if(RenderScene)
+	if(RenderScene) {
+		auto output = m_SceneRenderer.GetOutput();
 		Renderer2D::DrawFullscreenQuad(output, AttachmentTarget::Color);
+		Renderer::Flush();
+	}
 
 	if(!RenderUI)
 		return;
@@ -472,8 +472,6 @@ void RuntimeSceneRenderer::Render() {
 	.SetInput(UniformSlot{ SpotlightBuffer, "", 2 });
 
 	Renderer3D::End();
-
-	Renderer::Flush();
 
 	HasDirectionalLight = false;
 	PointLightCount = 0;

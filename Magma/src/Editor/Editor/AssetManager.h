@@ -20,7 +20,6 @@ public:
 	const auto& GetRegistry() const { return m_AssetRegistry; }
 
 	void Load(const std::string& path);
-	void Reload();
 
 	void Save();
 	void RuntimeSave(const std::string& exportPath);

@@ -3,7 +3,7 @@
 #include <glm/vec3.hpp>
 
 #include <VolcaniCore/Core/Math.h>
-#include <VolcaniCore/Graphics/Camera.h>
+#include <VolcaniCore/Graphics/StereographicCamera.h>
 
 #include "Core/AssetManager.h"
 
@@ -26,7 +26,8 @@ struct Component {
 struct CameraComponent : public Component {
 	Ref<Camera> Cam;
 
-	CameraComponent() = default;
+	CameraComponent()
+		: Cam(CreateRef<StereographicCamera>()) { }
 	CameraComponent(Ref<Camera> camera)
 		: Cam(camera) { }
 	CameraComponent(const CameraComponent& other) = default;

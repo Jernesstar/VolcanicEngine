@@ -1,12 +1,27 @@
 #pragma once
 
 #include <VolcaniCore/Core/Defines.h>
+#include <VolcaniCore/Core/List.h>
 
 #include "ScriptEngine.h"
 
 namespace Magma::Script {
 
 class ScriptClass;
+
+class ScriptField {
+	void* Data;
+	const std::string Name;
+	const std::string Type;
+	VolcaniCore::List<std::string> Metadata;
+
+	template<typename T>
+	T* As() const { return static_cast<T*>(Data); }
+};
+
+class ScriptFunction {
+	VolcaniCore::List<std::string> Metadata;
+};
 
 class ScriptObject {
 public:

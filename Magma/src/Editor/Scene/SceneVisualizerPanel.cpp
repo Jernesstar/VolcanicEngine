@@ -60,9 +60,6 @@ void SceneVisualizerPanel::SetContext(Scene* context) {
 		{
 			// Add(entity);
 		});
-
-	m_Selected = m_Context->EntityWorld.GetEntity("Player");
-	m_Renderer.Select(m_Selected);
 }
 
 static bool IsLight(ECS::Entity entity) {
@@ -351,6 +348,8 @@ std::string SelectScriptClass(Ref<ScriptModule> mod) {
 }
 
 EditorSceneRenderer::EditorSceneRenderer() {
+	Application::PushDir();
+
 	auto camera = CreateRef<StereographicCamera>(75.0f);
 	camera->SetPosition({ 0.0f, 1.0f, 1.0f });
 	m_Controller.SetCamera(camera);
@@ -452,6 +451,8 @@ EditorSceneRenderer::EditorSceneRenderer() {
 				{ "CutoffAngle",	  BufferDataType::Float },
 				{ "OuterCutoffAngle", BufferDataType::Float },
 			}, 50);
+
+	Application::PopDir();
 }
 
 EditorSceneRenderer::~EditorSceneRenderer() {
@@ -777,7 +778,7 @@ void EditorSceneRenderer::Render() {
 		auto& call = command->NewDrawCall();
 		call.VertexCount = 6;
 		call.InstanceStart = 101;
-		call.InstanceCount = SpotlightCount;
+		call.InstanceCount = 1;
 		call.Primitive = PrimitiveType::Triangle;
 		call.Partition = PartitionType::Instanced;
 	}

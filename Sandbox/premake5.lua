@@ -2,8 +2,8 @@ project "Sandbox"
     kind "ConsoleApp"
     language "C++"
     cppdialect "C++latest"
-    -- exceptionhandling "On"
-    -- rtti "Off"
+    exceptionhandling "On"
+    rtti "Off"
     staticruntime "Off"
 
     objdir ("%{RootPath}/build/%{_ACTION}/Sandbox/obj")
@@ -68,16 +68,6 @@ project "Sandbox"
         "flecs",
         "angelscript",
         "soloud",
-    }
-
-    defines {
-        "FLECS_CPP_NO_AUTO_REGISTRATION",
-
-        "FLECS_CUSTOM_BUILD",
-        "FLECS_CPP",
-        "FLECS_SYSTEM",
-        "FLECS_PIPELINE",
-        "FLECS_TIMER",
     }
 
     filter "action:vs* or system:linux"
