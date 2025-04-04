@@ -2,8 +2,8 @@ project "Sandbox"
     kind "ConsoleApp"
     language "C++"
     cppdialect "C++latest"
-    exceptionhandling "On"
-    rtti "Off"
+    -- exceptionhandling "On"
+    -- rtti "Off"
     staticruntime "Off"
 
     objdir ("%{RootPath}/build/%{_ACTION}/Sandbox/obj")
@@ -88,6 +88,7 @@ project "Sandbox"
             "kernel32",
             "psapi",
             "Ws2_32",
+            "wsock32"
         }
 
     filter "system:macosx"
@@ -99,13 +100,18 @@ project "Sandbox"
             "CoreVideo.framework"
         }
 
-    filter "configurations:Debug"
-        runtime "Debug"
-        symbols "On"
+    -- filter "configurations:Debug"
+    --     runtime "Debug"
+    --     symbols "On"
 
     filter "toolset:gcc or toolset:clang"
         buildoptions {
             "-fexceptions",
             "-Wno-format-security",
             "-Wno-pointer-arith"
+        }
+
+    filter "toolset:msc"
+        buildoptions {
+            "/NODEFAULTLIB:library"
         }

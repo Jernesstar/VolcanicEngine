@@ -60,6 +60,9 @@ void SceneVisualizerPanel::SetContext(Scene* context) {
 		{
 			// Add(entity);
 		});
+
+	m_Selected = m_Context->EntityWorld.GetEntity("Player");
+	m_Renderer.Select(m_Selected);
 }
 
 static bool IsLight(ECS::Entity entity) {
@@ -128,18 +131,6 @@ void SceneVisualizerPanel::Draw() {
 	auto& editor = Application::As<EditorApp>()->GetEditor();
 	auto* tab = editor.GetProjectTab()->As<ProjectTab>();
 
-	Ref<Framebuffer> display;
-	if(tab->GetState() != ScreenState::Edit) {
-		m_Context->OnRender(App::Get()->GetRenderer());
-		display = App::Get()->GetRenderer().GetOutput();
-	}
-	else {
-		m_Context->OnRender(m_Renderer);
-		display = m_Renderer.GetOutput();
-	}
-
-	m_Image.Content = display->Get(AttachmentTarget::Color);
-
 	auto flags = ImGuiWindowFlags_NoScrollbar
 			   | ImGuiWindowFlags_NoScrollWithMouse
 			   | ImGuiWindowFlags_NoNavInputs;
@@ -147,10 +138,13 @@ void SceneVisualizerPanel::Draw() {
 	ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4{ 0.0f, 0.0f, 0.0f, 1.0f });
 	ImGui::Begin("Scene Visualizer", &Open, flags);
 	{
+		ImGuizmo::SetDrawlist(ImGui::GetForegroundDrawList());
+
 		ImGui::PopStyleVar();
 		ImGui::PopStyleColor();
 
-		s_Hovered = ImGui::IsWindowHovered();
+		s_Hovered = ImGui::IsWindowHovered()
+				&& !(ImGuizmo::IsOver() || ImGuizmo::IsUsingAny());
 
 		ImVec2 pos = ImGui::GetCursorPos();
 		ImVec2 size = ImGui::GetContentRegionAvail();
@@ -190,6 +184,18 @@ void SceneVisualizerPanel::Draw() {
 			ImGui::Text("Instances: %li", info.Instances);
 		}
 		ImGui::EndChild();
+
+		Ref<Framebuffer> display;
+		if(tab->GetState() != ScreenState::Edit) {
+			m_Context->OnRender(App::Get()->GetRenderer());
+			display = App::Get()->GetRenderer().GetOutput();
+		}
+		else {
+			m_Context->OnRender(m_Renderer);
+			display = m_Renderer.GetOutput();
+		}
+
+		m_Image.Content = display->Get(AttachmentTarget::Color);
 
 		bool open = false;
 		if(options.add.asset.Type == AssetType::Mesh)
@@ -309,14 +315,15 @@ void SceneVisualizerPanel::Draw() {
 				VOLCANICORE_LOG_INFO("Not hit");
 		}
 
+		ImGuizmo::SetRect(pos.x, pos.y, width, height);
 		if(m_Selected && m_Selected.Has<TransformComponent>()) {
-			auto view = glm::value_ptr(camera->GetView());
-			auto proj = glm::value_ptr(camera->GetProjection());
-			auto oper = ImGuizmo::OPERATION::ROTATE;
+			const float* view = glm::value_ptr(camera->GetView());
+			const float* proj = glm::value_ptr(camera->GetProjection());
+			auto oper = ImGuizmo::OPERATION::TRANSLATE;
 			auto mode = ImGuizmo::MODE::WORLD;
-			auto mat = (glm::mat4)(Transform)m_Selected.Get<TransformComponent>();
-			auto ptr = glm::value_ptr(mat);
-			// ImGuizmo::SetDrawlist();
+			auto mat = (glm::mat4)(Transform)m_Selected.Set<TransformComponent>();
+			float* ptr = glm::value_ptr(mat);
+			ImGuizmo::DrawCubes(view, proj, ptr, 1);
 			ImGuizmo::Enable(true);
 			ImGuizmo::Manipulate(view, proj, oper, mode, ptr);
 		}
@@ -351,7 +358,7 @@ EditorSceneRenderer::EditorSceneRenderer() {
 	Application::PushDir();
 
 	auto camera = CreateRef<StereographicCamera>(75.0f);
-	camera->SetPosition({ 0.0f, 1.0f, 1.0f });
+	camera->SetPosition({ 0.0f, 1.0f, 15.0f });
 	m_Controller.SetCamera(camera);
 	m_Controller.TranslationSpeed = 25.0f;
 

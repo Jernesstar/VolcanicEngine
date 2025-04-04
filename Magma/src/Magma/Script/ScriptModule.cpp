@@ -64,17 +64,20 @@ void ScriptModule::Load(const std::string& path) {
 		return;
 	}
 
+	CScriptBuilder builder;
+	bool loadMetadata = true;
 	if(fs::path(path).extension() == ".as") {
-		CScriptBuilder builder;
 		builder.StartNewModule(engine, Name.c_str());
 		builder.AddSectionFromFile(path.c_str());
 		builder.BuildModule();
+		builder.DefineWord("EDITOR");
 		m_Handle = builder.GetModule();
 	}
 	else {
 		m_Handle = engine->GetModule(Name.c_str(), asGM_ALWAYS_CREATE);
 		ByteCodeStream stream(path, 0);
 		m_Handle->LoadByteCode(&stream);
+		loadMetadata = false;
 	}
 
 	for(uint32_t i = 0; i < m_Handle->GetObjectTypeCount(); i++) {
@@ -82,6 +85,7 @@ void ScriptModule::Load(const std::string& path) {
 		std::string name = type->GetName();
 		auto scriptClass = CreateRef<ScriptClass>(name, type);
 		scriptClass->m_Module = this;
+
 		m_Classes[name] = scriptClass;
 	}
 }

@@ -1,7 +1,7 @@
 project "glfw"
     kind "StaticLib"
     language "C"
-    staticruntime "On"
+    staticruntime "Off"
 
     objdir ("%{RootPath}/build/%{_ACTION}/VolcaniCore/obj")
     targetdir ("%{RootPath}/build/%{_ACTION}/VolcaniCore/lib")

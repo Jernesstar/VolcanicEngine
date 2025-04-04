@@ -472,6 +472,7 @@ void RuntimeSceneRenderer::Render() {
 	.SetInput(UniformSlot{ SpotlightBuffer, "", 2 });
 
 	Renderer3D::End();
+	Renderer::Flush();
 
 	HasDirectionalLight = false;
 	PointLightCount = 0;

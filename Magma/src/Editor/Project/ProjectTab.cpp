@@ -164,6 +164,8 @@ void ProjectTab::OnPlay() {
 	App::Get()->Running = true;
 	App::Get()->RenderUI = false;
 	App::Get()->OnLoad();
+
+	
 }
 
 void ProjectTab::OnPause() {
@@ -177,6 +179,9 @@ void ProjectTab::OnResume() {
 }
 
 void ProjectTab::OnStop() {
+	if(m_ScreenState == ScreenState::Edit)
+		return;
+
 	m_ScreenState = ScreenState::Edit;
 	App::Get()->Running = false;
 	App::Get()->OnClose();

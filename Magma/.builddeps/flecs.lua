@@ -1,12 +1,14 @@
 project "flecs"
     kind "StaticLib"
     language "C"
+    cdialect "C99"
     staticruntime "Off"
 
     objdir ("%{RootPath}/build/%{_ACTION}/Magma/obj")
     targetdir ("%{RootPath}/build/%{_ACTION}/Magma/lib")
 
     files {
+        "%{VendorPaths.flecs}/distr/flecs.h",
         "%{VendorPaths.flecs}/distr/flecs.c",
     }
 
@@ -16,7 +18,10 @@ project "flecs"
 
     defines {
         -- "flecs_EXPORTS",
+        "flecs_STATIC",
+        "FLECS_STATIC",
         "FLECS_DEBUG",
+        -- "FLECS_NDEBUG",
         -- "FLECS_CPP_NO_AUTO_REGISTRATION",
 
         -- "FLECS_CUSTOM_BUILD",
@@ -31,8 +36,4 @@ project "flecs"
     }
 
     filter "toolset:gcc"
-        cdialect "gnu99"
-        links {
-            "Ws2_32"
-        }
-
+       cdialect "gnu99"

@@ -62,7 +62,10 @@ public:
 	flecs::entity GetHandle() const { return m_Handle; }
 
 	std::string GetName() const {
-		return m_Handle.name().c_str();
+		auto name = m_Handle.name();
+		if(name.length())
+			return m_Handle.name().c_str();
+		return "";
 	}
 
 	void SetName(const std::string& name) {

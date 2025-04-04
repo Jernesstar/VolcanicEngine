@@ -393,7 +393,7 @@ void DeserializeEntity(YAML::Node entityNode, Scene& scene) {
 	uint64_t entityID = entityNode["ID"].as<uint64_t>();
 	Entity entity = scene.EntityWorld.AddEntity(entityID);
 	auto name = entityNode["Name"].as<std::string>();
-	if(name != "")
+	if(name != "" && name.find_first_not_of(' ') != std::string::npos)
 		entity.SetName(name);
 
 	auto& assetManager =

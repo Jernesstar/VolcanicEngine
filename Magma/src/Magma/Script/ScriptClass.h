@@ -50,6 +50,7 @@ private:
 private:
 	asITypeInfo* m_Type;
 	asIScriptFunction* m_Factory;
+	VolcaniCore::List<std::string> Metadata;
 	Map<std::string, uint32_t> m_FieldMap;
 	Map<std::string, asIScriptFunction*> m_Functions;
 
