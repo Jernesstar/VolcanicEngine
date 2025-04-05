@@ -70,6 +70,10 @@ project "Sandbox"
         "soloud",
     }
 
+    defines {
+        "flecs_STATIC"
+    }
+
     filter "action:vs* or system:linux"
         links { "PhysX" }
 

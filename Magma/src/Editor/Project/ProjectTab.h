@@ -12,6 +12,23 @@ namespace Magma {
 
 enum class ScreenState { Edit, Play, Pause };
 
+struct RunConfiguration {
+	struct SceneConfiguration {
+		std::string Name;
+		std::string Screen;
+		std::string UI;
+	};
+
+	struct UIConfiguration {
+		std::string Name;
+		std::string Screen;
+		std::string Scene;
+	};
+
+	List<SceneConfiguration> SceneConfigs;
+	List<UIConfiguration> UIConfigs;
+};
+
 class ProjectTab : public Tab {
 public:
 	ProjectTab();

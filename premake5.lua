@@ -27,6 +27,7 @@ include "Magma"
 include "Lava"
 include "Ash"
 include "Sandbox"
+include "Test"
 
 RootPath = _MAIN_SCRIPT_DIR;
 VolcaniCoreVendorDir = "%{RootPath}/VolcaniCore/vendor"

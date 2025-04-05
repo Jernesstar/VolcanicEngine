@@ -22,6 +22,9 @@
 
 #include "EditorApp.h"
 
+#undef near
+#undef far
+
 using namespace Magma::ECS;
 using namespace Magma::Physics;
 using namespace Lava;

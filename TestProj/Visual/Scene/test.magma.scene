@@ -48,7 +48,7 @@ Scene:
               Ambient: [1, 0, 0]
               Diffuse: [1, 0, 0]
               Specular: [1, 1, 1]
-              Position: [0.699999988, 11.1000004, 1.29999995]
+              Position: [0.699999988, 8.69999981, -6.4000001]
               Constant: 1
               Linear: 0
               Quadratic: 0
@@ -60,9 +60,9 @@ Scene:
             Tag: MainCharacter
           TransformComponent:
             Transform:
-              Translation: [0, 10.8999996, 0]
-              Rotation: [3.14159274, 3.14159274, 0]
-              Scale: [1, 1, 1]
+              Translation: [-0.237000003, 20.6523991, -4.90570021]
+              Rotation: [-1.79009783, 0.802535772, 2.54633069]
+              Scale: [24.1207218, 12.8125048, 16.1932735]
           MeshComponent:
             AssetID: 10036008063945961451
           ScriptComponent:

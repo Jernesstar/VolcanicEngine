@@ -1,25 +1,8 @@
-#include <iostream>
-#include <memory>
-
-#include <VolcaniCore/Core/List.h>
-
-using namespace VolcaniCore;
-
-void func() {
-	List<uint32_t> list;
-
-	list.Add(1);
-	list.Add(1);
-	list.Add(1);
-	list.Add(1);
-
-	list.Clear();
-}
+#include <flecs.h>
 
 int main() {
-	std::cout << "Begin\n";
-	func();
-	std::cout << "End\n";
+	flecs::world world;
+	flecs::entity entity = world.entity("TestEntity");
 
 	return 0;
 }

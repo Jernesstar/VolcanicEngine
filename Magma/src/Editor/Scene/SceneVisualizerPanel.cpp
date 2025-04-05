@@ -138,22 +138,45 @@ void SceneVisualizerPanel::Draw() {
 	ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4{ 0.0f, 0.0f, 0.0f, 1.0f });
 	ImGui::Begin("Scene Visualizer", &Open, flags);
 	{
-		ImGuizmo::SetDrawlist(ImGui::GetForegroundDrawList());
+		ImVec2 pos = ImGui::GetCursorPos();
+		ImVec2 size = ImGui::GetContentRegionAvail();
+		auto width = size.x;
+		auto height = size.y;
+
+		ImGuiIO& io = ImGui::GetIO();
+		ImGuizmo::SetDrawlist();
+		ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y,
+			io.DisplaySize.x, io.DisplaySize.y);
+
+		s_Hovered = ImGui::IsWindowHovered()
+			&& !(ImGuizmo::IsOver() || ImGuizmo::IsUsingAny());
+
+		m_Image.SetPosition(pos.x, pos.y);
+		m_Image.Draw();
+	
+		auto camera = m_Renderer.GetCameraController().GetCamera();
+		if(m_Selected && m_Selected.Has<TransformComponent>()) {
+			const float* view = glm::value_ptr(camera->GetView());
+			const float* proj = glm::value_ptr(camera->GetProjection());
+			auto oper = ImGuizmo::OPERATION::ROTATE;
+			auto mode = ImGuizmo::MODE::WORLD;
+			auto& tc = m_Selected.Set<TransformComponent>();
+			auto mat = (glm::mat4)(Transform)tc;
+			float* ptr = glm::value_ptr(mat);
+
+			ImGuizmo::Enable(true);
+			// ImGuizmo::DrawCubes(view, proj, ptr, 1);
+			ImGuizmo::Manipulate(view, proj, oper, mode, ptr);
+			ImGuizmo::DecomposeMatrixToComponents(ptr,
+				&tc.Translation.x, &tc.Rotation.x, &tc.Scale.x);
+			tc.Rotation = glm::radians(tc.Rotation);
+		}
 
 		ImGui::PopStyleVar();
 		ImGui::PopStyleColor();
 
 		s_Hovered = ImGui::IsWindowHovered()
 				&& !(ImGuizmo::IsOver() || ImGuizmo::IsUsingAny());
-
-		ImVec2 pos = ImGui::GetCursorPos();
-		ImVec2 size = ImGui::GetContentRegionAvail();
-		auto width = size.x;
-		auto height = size.y;
-
-		m_Image.SetPosition(pos.x, pos.y);
-		// m_Image.SetSize(size.x, size.y);
-		m_Image.Draw();
 
 		if(ImGui::BeginDragDropTarget())
 		{
@@ -270,7 +293,6 @@ void SceneVisualizerPanel::Draw() {
 			ImGui::EndPopup();
 		}
 
-		auto camera = m_Renderer.GetCameraController().GetCamera();
 		if(ImGui::IsMouseClicked(1) && ImGui::IsWindowHovered()) {
 			// auto& world = m_Context->EntityWorld;
 
@@ -313,19 +335,6 @@ void SceneVisualizerPanel::Draw() {
 				VOLCANICORE_LOG_INFO("Hit something");
 			else
 				VOLCANICORE_LOG_INFO("Not hit");
-		}
-
-		ImGuizmo::SetRect(pos.x, pos.y, width, height);
-		if(m_Selected && m_Selected.Has<TransformComponent>()) {
-			const float* view = glm::value_ptr(camera->GetView());
-			const float* proj = glm::value_ptr(camera->GetProjection());
-			auto oper = ImGuizmo::OPERATION::TRANSLATE;
-			auto mode = ImGuizmo::MODE::WORLD;
-			auto mat = (glm::mat4)(Transform)m_Selected.Set<TransformComponent>();
-			float* ptr = glm::value_ptr(mat);
-			ImGuizmo::DrawCubes(view, proj, ptr, 1);
-			ImGuizmo::Enable(true);
-			ImGuizmo::Manipulate(view, proj, oper, mode, ptr);
 		}
 	}
 
@@ -670,11 +679,11 @@ void EditorSceneRenderer::Render() {
 			Renderer3D::DrawMesh(mesh, tc, command);
 		}
 
-		auto width = (float)Application::GetWindow()->GetWidth();
-		auto height = (float)Application::GetWindow()->GetHeight();
-
 		Renderer::StartPass(OutlinePass);
 		{
+			auto width = m_Output->GetWidth();
+			auto height = m_Output->GetHeight();
+
 			auto* command = Renderer::GetCommand();
 			command->UniformData
 			.SetInput("u_PixelSize", 1.0f / glm::vec2(width, height));
@@ -695,7 +704,7 @@ void EditorSceneRenderer::Render() {
 			RendererAPI::Get()->NewDrawCommand(BillboardPass->Get());
 		command->DepthTest = DepthTestingMode::On;
 		command->Culling = CullingMode::Off;
-		command->Blending = BlendingMode::Greatest;	
+		command->Blending = BlendingMode::Greatest;
 		command->UniformData
 		.SetInput("u_View", camera->GetView());
 		command->UniformData

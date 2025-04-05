@@ -50,6 +50,10 @@ project "Magma"
         "soloud"
     }
 
+    defines {
+        "flecs_STATIC"
+    }
+
     filter "action:vs* or system:linux"
         links { "PhysX" }
 
@@ -146,6 +150,10 @@ project "Editor"
         "flecs",
         "angelscript",
         "soloud"
+    }
+
+    defines {
+        "flecs_STATIC"
     }
 
     filter "toolset:msc or system:linux"
