@@ -88,8 +88,8 @@ void VertexArray::AddVertexBuffer(Ref<VertexBuffer> vertexBuffer) {
 									  normalized, stride, (void*)offset);
 				if(layout.StructureOfArrays) // Instanced
 					glVertexAttribDivisor(m_BufferIndex, 1);
-				m_BufferIndex++;
 
+				m_BufferIndex++;
 				break;
 			}
 			case BufferDataType::Mat2:

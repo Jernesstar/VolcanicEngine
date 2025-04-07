@@ -10,13 +10,13 @@ Scene:
           CameraComponent:
             Camera:
               Type: Stereographic
-              VerticalFOV: 45
-              Position: [0, 0, 41]
+              VerticalFOV: 23
+              Position: [0, 0, 72]
               Direction: [0, 0, -1]
-              ViewportWidth: 1920
-              ViewportHeight: 1057
-              Near: 0.00100000005
-              Far: 1000
+              ViewportWidth: 54
+              ViewportHeight: 14
+              Near: 39.0009995
+              Far: 340.001007
     - Entity:
         Name: Ball
         ID: 552
@@ -24,8 +24,8 @@ Scene:
           TransformComponent:
             Transform:
               Translation: [0, 0, 0]
-              Rotation: [0, 0, 0]
-              Scale: [1, 1, 1]
+              Rotation: [-2.57740092, 1.43767679, -2.60986114]
+              Scale: [0.999996603, 0.999989808, 1.00016212]
           MeshComponent:
             AssetID: 4186775327602265389
     - Entity:
@@ -34,9 +34,9 @@ Scene:
         Components:
           TransformComponent:
             Transform:
-              Translation: [-2.29999995, 1.5, 3.70000005]
-              Rotation: [0, 0, 0]
-              Scale: [2.5999999, 1, 1]
+              Translation: [-1.79999995, 1.10000002, 7.19999981]
+              Rotation: [0, -0, 0]
+              Scale: [1, 1, 1]
           MeshComponent:
             AssetID: 10036008063945961451
     - Entity:
@@ -60,11 +60,11 @@ Scene:
             Tag: MainCharacter
           TransformComponent:
             Transform:
-              Translation: [-0.237000003, 20.6523991, -4.90570021]
-              Rotation: [-1.79009783, 0.802535772, 2.54633069]
-              Scale: [24.1207218, 12.8125048, 16.1932735]
+              Translation: [0.400000006, 0.952400029, 13.4942999]
+              Rotation: [-0.153007671, -0.732280493, -0.1523256]
+              Scale: [0.999963462, 0.999977291, 0.999976575]
           MeshComponent:
-            AssetID: 10036008063945961451
+            AssetID: 15277418182178081176
           ScriptComponent:
             ModuleID: 2691709289590626850
             Class: PlayerController

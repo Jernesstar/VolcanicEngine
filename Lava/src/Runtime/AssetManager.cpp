@@ -47,8 +47,10 @@ void RuntimeAssetManager::Load(Asset asset) {
 		
 		reader.SetPosition(offset);
 		reader.Read(mesh->SubMeshes);
+		uint64_t materialCount;
+		reader.Read(materialCount);
 
-		if(!HasRefs(asset)) {
+		if(!materialCount) {
 			mesh->Materials.Emplace();
 			reader.Read(mesh->Materials[0].DiffuseColor);
 			reader.Read(mesh->Materials[0].SpecularColor);
@@ -56,14 +58,21 @@ void RuntimeAssetManager::Load(Asset asset) {
 			return;
 		}
 
-		List<Asset>& refs = m_References[asset.ID];
-		uint64_t refIdx = 0;
+		reader.SetPosition(reader.GetPosition() - sizeof(uint64_t));
 		List<uint8_t> materialFlags;
 		reader.Read(materialFlags);
+
+		uint64_t refIdx = 0;
+		List<Asset> refs;
+		if(HasRefs(asset))
+			refs = m_References[asset.ID];
 
 		for(uint64_t i = 0; i < materialFlags.Count(); i++) {
 			std::bitset<3> flags(materialFlags[i]);
 			mesh->Materials.Emplace();
+			reader.Read(mesh->Materials[i].DiffuseColor);
+			reader.Read(mesh->Materials[i].SpecularColor);
+			reader.Read(mesh->Materials[i].EmissiveColor);
 
 			if(flags.test(0)) {
 				Load(refs[refIdx]);

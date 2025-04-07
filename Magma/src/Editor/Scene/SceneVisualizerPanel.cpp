@@ -41,7 +41,7 @@ using namespace Lava;
 namespace Magma {
 
 SceneVisualizerPanel::SceneVisualizerPanel(Scene* context)
-	: Panel("SceneVisualizer")
+	: Panel("SceneVisualizer"), m_Renderer(this)
 {
 	m_Image.Width = Application::GetWindow()->GetWidth();
 	m_Image.Height = Application::GetWindow()->GetHeight();
@@ -58,11 +58,29 @@ void SceneVisualizerPanel::SetContext(Scene* context) {
 	.ForEach<TransformComponent, MeshComponent>(
 		[this](Entity& entity)
 		{
-			// Add(entity);
+			Add(entity);
 		});
 
-	m_Selected = m_Context->EntityWorld.GetEntity("Player");
-	m_Renderer.Select(m_Selected);
+	m_Context->EntityWorld
+	.ForEach<DirectionalLightComponent>(
+		[this](Entity& entity)
+		{
+			Add(entity);
+		});
+
+	m_Context->EntityWorld
+	.ForEach<PointLightComponent>(
+		[this](Entity& entity)
+		{
+			Add(entity);
+		});
+
+	m_Context->EntityWorld
+	.ForEach<SpotlightComponent>(
+		[this](Entity& entity)
+		{
+			Add(entity);
+		});
 }
 
 static bool IsLight(ECS::Entity entity) {
@@ -165,7 +183,6 @@ void SceneVisualizerPanel::Draw() {
 			float* ptr = glm::value_ptr(mat);
 
 			ImGuizmo::Enable(true);
-			// ImGuizmo::DrawCubes(view, proj, ptr, 1);
 			ImGuizmo::Manipulate(view, proj, oper, mode, ptr);
 			ImGuizmo::DecomposeMatrixToComponents(ptr,
 				&tc.Translation.x, &tc.Rotation.x, &tc.Scale.x);
@@ -294,19 +311,20 @@ void SceneVisualizerPanel::Draw() {
 		}
 
 		if(ImGui::IsMouseClicked(1) && ImGui::IsWindowHovered()) {
-			// auto& world = m_Context->EntityWorld;
+			glm::vec2 absPos =
+				glm::vec2{ ImGui::GetMousePos().x, ImGui::GetMousePos().y }
+			  - glm::vec2{ pos.x, pos.y };
 
-			glm::vec2 pos = { ImGui::GetMousePos().x, ImGui::GetMousePos().y };
 			glm::vec4 originNDC
 			{
-				(pos.x / width - 0.5f) * 2.0f,
-				(pos.y / height - 0.5f) * 2.0f,
+				(absPos.x / width - 0.5f) * 2.0f,
+				(absPos.y / height - 0.5f) * 2.0f,
 				-1.0f, 1.0f
 			};
 			glm::vec4 endNDC
 			{
-				(pos.x / width - 0.5f) * 2.0f,
-				(pos.y / height - 0.5f) * 2.0f,
+				(absPos.x / width - 0.5f) * 2.0f,
+				(absPos.y / height - 0.5f) * 2.0f,
 				1.0f, 1.0f
 			};
 
@@ -363,7 +381,9 @@ std::string SelectScriptClass(Ref<ScriptModule> mod) {
 	return "";
 }
 
-EditorSceneRenderer::EditorSceneRenderer() {
+EditorSceneRenderer::EditorSceneRenderer(SceneVisualizerPanel* panel)
+	: Panel(panel)
+{
 	Application::PushDir();
 
 	auto camera = CreateRef<StereographicCamera>(75.0f);
@@ -427,9 +447,13 @@ EditorSceneRenderer::EditorSceneRenderer() {
 
 	OutlinePass =
 		RenderPass::Create("Outline",
-			ShaderPipeline::Create("Magma/assets/shaders", "Outline"),
-			m_Output);
+			ShaderPipeline::Create("Magma/assets/shaders", "Outline"), m_Output);
 	OutlinePass->SetData(Renderer2D::GetScreenBuffer());
+
+	LinePass =
+		RenderPass::Create("Line",
+			ShaderPipeline::Create("Magma/assets/shaders", "Line"), m_Output);
+	LinePass->SetData(Renderer3D::GetLineBuffer());
 
 	DirectionalLightBuffer =
 		UniformBuffer::Create(
@@ -517,14 +541,74 @@ void EditorSceneRenderer::Begin() {
 
 void EditorSceneRenderer::SubmitCamera(const Entity& entity) {
 	auto camera = entity.Get<CameraComponent>().Cam;
-
-	if(Selected == entity) {
-		// TODO: Frustum lines
-	}
-
 	RendererAPI::Get()
 	->SetBufferData(BillboardBuffer, DrawBufferIndex::Instances,
 					glm::value_ptr(camera->GetPosition()), 1, 101);
+
+	if(Selected != entity)
+		return;
+
+	glm::mat4 inverse = glm::inverse(camera->GetViewProjection());
+
+	glm::vec4 p0 = inverse * glm::vec4(-1, -1, -1, 1); // Front bottom left
+	glm::vec4 p1 = inverse * glm::vec4( 1, -1, -1, 1); // Front bottom right
+	glm::vec4 p2 = inverse * glm::vec4( 1,  1, -1, 1); // Front top right
+	glm::vec4 p3 = inverse * glm::vec4(-1,  1, -1, 1); // Front top left
+	glm::vec4 p4 = inverse * glm::vec4(-1, -1,  1, 1); // Back bottom left
+	glm::vec4 p5 = inverse * glm::vec4( 1, -1,  1, 1); // Back bottom right
+	glm::vec4 p6 = inverse * glm::vec4( 1,  1,  1, 1); // Back top right
+	glm::vec4 p7 = inverse * glm::vec4(-1,  1,  1, 1); // Back top left
+
+	Point points[] =
+	{
+		{ p0 / p0.w, glm::vec3(1.0f) },
+		{ p1 / p1.w, glm::vec3(1.0f) },
+		{ p2 / p2.w, glm::vec3(1.0f) },
+		{ p3 / p3.w, glm::vec3(1.0f) },
+		{ p4 / p4.w, glm::vec3(1.0f) },
+		{ p5 / p5.w, glm::vec3(1.0f) },
+		{ p6 / p6.w, glm::vec3(1.0f) },
+		{ p7 / p7.w, glm::vec3(1.0f) },
+		{ camera->GetPosition(), glm::vec3(1.0f) }
+	};
+
+	constexpr uint32_t indexCount = 24;
+	uint32_t indices[] =
+	{
+		8, 7, // Left Top
+		8, 6, // Right Top
+		8, 4, // Left Bottom
+		8, 5, // Right Bottom
+
+		3, 2, // Front Top
+		0, 1, // Front Bottom
+		3, 0, // Front Left
+		2, 1, // Front Right
+
+		7, 6, // Back Top
+		4, 5, // Back Bottom
+		7, 4, // Back Left
+		6, 5, // Back Right
+	};
+
+	auto* command = RendererAPI::Get()->NewDrawCommand(LinePass->Get());
+	command->DepthTest = DepthTestingMode::On;
+	command->Culling = CullingMode::Off;
+	command->Blending = BlendingMode::Greatest;
+	command->UniformData
+	.SetInput("u_ViewProj", m_Controller.GetCamera()->GetViewProjection());
+
+	auto* buffer = LinePass->Get()->BufferData;
+	RendererAPI::Get()
+	->SetBufferData(buffer, DrawBufferIndex::Vertices, points, 9, 0);
+	RendererAPI::Get()
+	->SetBufferData(buffer, DrawBufferIndex::Indices, indices, indexCount);
+
+	auto& call = command->NewDrawCall();
+	call.VertexCount = 9;
+	call.IndexCount = indexCount;
+	call.Partition = PartitionType::Single;
+	call.Primitive = PrimitiveType::Line;
 }
 
 void EditorSceneRenderer::SubmitSkybox(const Entity& entity) {
@@ -660,7 +744,9 @@ void EditorSceneRenderer::Render() {
 
 	Renderer3D::End();
 
-	if(Selected) {
+	if(Selected
+	&& Selected.Has<TransformComponent>() && Selected.Has<MeshComponent>())
+	{
 		auto* assetManager = App::Get()->GetAssetManager();
 		auto& tc = Selected.Get<TransformComponent>();
 		auto& mc = Selected.Get<MeshComponent>();
@@ -798,6 +884,26 @@ void EditorSceneRenderer::Render() {
 		call.Primitive = PrimitiveType::Triangle;
 		call.Partition = PartitionType::Instanced;
 	}
+
+#ifdef MAGMA_PHYSICS
+	auto* scene = Panel->GetPhysicsWorld().Get();
+	const PxRenderBuffer& rb = scene->getRenderBuffer();
+
+	for(uint32_t i = 0; i < rb.getNbPoints(); i++) {
+		const PxDebugPoint& point = rb.getPoints()[i];
+
+	}
+
+	for(uint32_t i = 0; i < rb.getNbLines(); i++) {
+		const PxDebugLine& l = rb.getLines()[i];
+		Line line{
+			{ { l.pos0.x, l.pos0.y, l.pos0.z }, glm::vec3(1.0f) },
+			{ { l.pos1.x, l.pos1.y, l.pos1.z }, glm::vec3(1.0f) },
+		};
+
+		Renderer3D::DrawLine(line);
+	}
+#endif
 
 	Renderer::Flush();
 

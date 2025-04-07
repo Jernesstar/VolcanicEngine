@@ -101,10 +101,6 @@ Raycast::Raycast() {
 
 	world = CreateRef<Physics::World>();
 	CreateActors();
-
-	// auto scene = world->Get();
-	// scene->setVisualizationParameter(PxVisualizationParameter::eSCALE, 1.0f);
-	// scene->setVisualizationParameter(PxVisualizationParameter::eACTOR_AXES, 1.0f);
 }
 
 Raycast::~Raycast() {

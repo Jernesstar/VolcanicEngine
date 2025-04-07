@@ -110,6 +110,12 @@ struct DrawBuffer {
 						data.Get(), data.GetCount(), InstancesCount);
 	}
 
+	void AddInstance(const void* data) {
+		RendererAPI::Get()
+		->SetBufferData(this, DrawBufferIndex::Instances, data, 1,
+						InstancesCount);
+	}
+
 	void Clear(DrawBufferIndex idx) {
 		RendererAPI::Get()->SetBufferData(this, idx, nullptr, 0);
 	}

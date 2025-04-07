@@ -9,8 +9,10 @@
 
 namespace VolcaniCore {
 
-static DrawBuffer* s_CubemapBuffer;
 static DrawBuffer* s_MeshBuffer;
+static DrawBuffer* s_LineBuffer;
+static DrawBuffer* s_CubemapBuffer;
+
 static Map<SubMesh*, DrawCommand*> s_Meshes;
 static uint64_t s_InstancesIndex = 0;
 
@@ -39,9 +41,28 @@ void Renderer3D::Init() {
 	{
 		vertexLayout,
 		instanceLayout,
-		Renderer::MaxVertices,
 		Renderer::MaxIndices,
+		Renderer::MaxVertices,
 		Renderer::MaxInstances
+	};
+
+	BufferLayout lineLayout =
+		{
+			{
+				{ "Position", BufferDataType::Vec3 },
+				{ "Color",    BufferDataType::Vec3 },
+			},
+			true, // Dynamic
+			false // Instanced
+		};
+
+	DrawBufferSpecification lineSpecs
+	{
+		lineLayout,
+		{ },
+		1'000'000,
+		2'000'000,
+		0
 	};
 
 	float cubemapVertices[] =
@@ -95,7 +116,7 @@ void Renderer3D::Init() {
 				{ "Position", BufferDataType::Vec3 },
 			},
 			true, // Dynamic
-			false // Structure of arrays
+			false // Instanced
 		};
 	DrawBufferSpecification specsCubemap
 		{
@@ -104,17 +125,23 @@ void Renderer3D::Init() {
 		};
 
 	s_MeshBuffer = RendererAPI::Get()->NewDrawBuffer(specs);
+	s_LineBuffer = RendererAPI::Get()->NewDrawBuffer(lineSpecs);
 	s_CubemapBuffer =
 		RendererAPI::Get()->NewDrawBuffer(specsCubemap, cubemapVertices);
 }
 
 void Renderer3D::Close() {
 	RendererAPI::Get()->ReleaseBuffer(s_MeshBuffer);
+	RendererAPI::Get()->ReleaseBuffer(s_LineBuffer);
 	RendererAPI::Get()->ReleaseBuffer(s_CubemapBuffer);
 }
 
 DrawBuffer* Renderer3D::GetMeshBuffer() {
 	return s_MeshBuffer;
+}
+
+DrawBuffer* Renderer3D::GetLineBuffer() {
+	return s_LineBuffer;
 }
 
 DrawBuffer* Renderer3D::GetCubemapBuffer() {
@@ -123,6 +150,7 @@ DrawBuffer* Renderer3D::GetCubemapBuffer() {
 
 void Renderer3D::StartFrame() {
 	s_MeshBuffer->Clear();
+	s_LineBuffer->Clear();
 }
 
 void Renderer3D::EndFrame() {
@@ -262,7 +290,21 @@ void Renderer3D::DrawPoint(const Point& point, const glm::mat4& tr,
 void Renderer3D::DrawLine(const Line& line, const glm::mat4& tr,
 						  DrawCommand* comand)
 {
-	// TODO(Implement):
+	RendererAPI::Get()
+	->SetBufferData(s_LineBuffer, DrawBufferIndex::Vertices, &line.P0,
+					1, s_LineBuffer->VerticesCount);
+	RendererAPI::Get()
+	->SetBufferData(s_LineBuffer, DrawBufferIndex::Vertices, &line.P1,
+					1, s_LineBuffer->VerticesCount);
+
+	uint32_t indices[] =
+	{
+		(uint32_t)s_LineBuffer->IndicesCount,
+		(uint32_t)s_LineBuffer->IndicesCount + 1
+	};
+	RendererAPI::Get()
+	->SetBufferData(s_LineBuffer, DrawBufferIndex::Indices, indices,
+					2, s_LineBuffer->IndicesCount);
 }
 
 void Renderer3D::DrawText(Ref<Text> text, const glm::mat4& tr,

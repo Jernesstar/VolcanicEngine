@@ -13,9 +13,11 @@
 
 namespace Magma {
 
+class SceneVisualizerPanel;
+
 class EditorSceneRenderer : public SceneRenderer {
 public:
-	EditorSceneRenderer();
+	EditorSceneRenderer(SceneVisualizerPanel* panel);
 	~EditorSceneRenderer();
 
 	void Update(TimeStep ts) override;
@@ -32,6 +34,8 @@ public:
 	void IsHovered(bool hovered) { Hovered = hovered; }
 
 private:
+	SceneVisualizerPanel* Panel;
+
 	Entity Selected;
 	bool Hovered = false;
 
@@ -41,6 +45,9 @@ private:
 	// Outlining
 	Ref<RenderPass> MaskPass;
 	Ref<RenderPass> OutlinePass;
+
+	// Lines
+	Ref<RenderPass> LinePass;
 
 	// Billboards
 	Ref<RenderPass> BillboardPass;
@@ -83,17 +90,18 @@ public:
 	void Remove(ECS::Entity entity);
 	void Select(ECS::Entity entity) {
 		m_Selected = entity;
+		m_Renderer.Select(m_Selected);
 	}
 	ECS::Entity GetSelected() { return m_Selected; }
 
+	Physics::World& GetPhysicsWorld() { return m_World; }
+
 private:
 	Scene* m_Context;
+	EditorSceneRenderer m_Renderer;
 	Physics::World m_World;
 	Entity m_Selected;
 	UI::Image m_Image;
-
-private:
-	EditorSceneRenderer m_Renderer;
 };
 
 }

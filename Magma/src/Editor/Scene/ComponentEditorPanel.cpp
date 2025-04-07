@@ -100,12 +100,28 @@ void DrawComponent<CameraComponent>(Entity& entity) {
 
 	uint32_t max = 3000;
 	uint32_t min = 0;
-	auto vW = camera->GetViewportWidth();
+	uint32_t vW = camera->GetViewportWidth();
 	bool w = ImGui::SliderScalar("Viewport Width", ImGuiDataType_U32, &vW, &min, &max);
-	auto vH = camera->GetViewportHeight();
+	uint32_t vH = camera->GetViewportHeight();
 	bool h = ImGui::SliderScalar("Viewport Height", ImGuiDataType_U32, &vH, &min, &max);
 	if(w || h)
 		camera->Resize(vW, vH);
+
+	float near = camera->GetNear();
+	float far = camera->GetFar();
+	bool newNear =
+		ImGui::DragFloat("Near", &near, 1.0f, 0.001f, 1000.0f, "%.4f");
+	bool newFar =
+		ImGui::DragFloat("Far", &far, 1.0f, 0.001f, 1000.0f, "%.4f");
+	if(newNear || newFar)
+		camera->SetProjection(near, far);
+
+	if(camera->GetType() == Camera::Type::Stereo) {
+		auto cam = camera->As<StereographicCamera>();
+		float fov = cam->GetVerticalFOV();
+		if(ImGui::DragFloat("FOV", &fov, 1.0f, 0.001f, 180.0f, "%.4f"))
+			cam->SetVerticalFOV(fov);
+	}
 }
 
 template<>

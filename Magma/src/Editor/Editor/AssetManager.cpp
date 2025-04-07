@@ -469,6 +469,8 @@ void EditorAssetManager::RuntimeSave(const std::string& exportPath) {
 
 		if(asset.Type == AssetType::Mesh) {
 			pack.Write(meshFile.GetPosition());
+			Load(asset);
+			auto mesh = Get<Mesh>(asset);
 
 			if(path != "") {
 				List<MaterialPaths> materials;
@@ -483,10 +485,15 @@ void EditorAssetManager::RuntimeSave(const std::string& exportPath) {
 					flags |= (mat.Emissive != "") << 2;
 					meshFile.Write((uint8_t)flags.to_ulong());
 				}
+				for(uint64_t i = 0; i < materials.Count(); i++) {
+					meshFile.Write(mesh->Materials[i].DiffuseColor);
+					meshFile.Write(mesh->Materials[i].SpecularColor);
+					meshFile.Write(mesh->Materials[i].EmissiveColor);
+				}
 			}
 			else {
-				auto mesh = Get<Mesh>(asset);
 				meshFile.Write(mesh->SubMeshes);
+				meshFile.Write((uint64_t)0);
 				meshFile.Write(mesh->Materials[0].DiffuseColor);
 				meshFile.Write(mesh->Materials[0].SpecularColor);
 				meshFile.Write(mesh->Materials[0].EmissiveColor);

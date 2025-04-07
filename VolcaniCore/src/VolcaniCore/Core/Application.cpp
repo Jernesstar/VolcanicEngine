@@ -93,12 +93,14 @@ void Application::PopDir() {
 }
 
 void Application::SetCurrentDir() {
-	char* env = getenv("VOLC_PATH");
-	VOLCANICORE_ASSERT(env);
-
-	s_LibraryPath = env;
 	s_Path = fs::current_path().string();
 	s_OldPath = s_Path;
+
+	char* env = getenv("VOLC_PATH");
+	if(!env)
+		return;
+
+	s_LibraryPath = env;
 }
 
 }

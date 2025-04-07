@@ -16,6 +16,9 @@ World::World() {
 	sceneDesc.simulationEventCallback = &m_ContactCallback;
 	// sceneDesc.flags			= PxSceneFlag::eENABLE_ACTIVE_ACTORS;
 	m_Scene = GetPhysicsLib()->createScene(sceneDesc);
+
+	m_Scene->setVisualizationParameter(PxVisualizationParameter::eSCALE, 1.0f);
+	m_Scene->setVisualizationParameter(PxVisualizationParameter::eACTOR_AXES, 1.0f);
 #endif
 }
 

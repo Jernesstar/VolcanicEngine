@@ -20,6 +20,7 @@ public:
 	static void StartFrame();
 	static void EndFrame();
 	static DrawBuffer* GetMeshBuffer();
+	static DrawBuffer* GetLineBuffer();
 	static DrawBuffer* GetCubemapBuffer();
 
 	static void Begin(Ref<Camera> camera);
