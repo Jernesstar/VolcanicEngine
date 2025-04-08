@@ -13,8 +13,8 @@ Scene:
               VerticalFOV: 23
               Position: [0, 0, 72]
               Direction: [0, 0, -1]
-              ViewportWidth: 54
-              ViewportHeight: 14
+              ViewportWidth: 1600
+              ViewportHeight: 877
               Near: 39.0009995
               Far: 340.001007
     - Entity:
@@ -121,3 +121,14 @@ Scene:
               Specular: [0, 0, 0]
               Position: [-12.8000002, 9.60000038, 0]
               Direction: [0, 0, 0]
+    - Entity:
+        Name: ""
+        ID: 567
+        Components:
+          TransformComponent:
+            Transform:
+              Translation: [-5, 4.5999999, 0]
+              Rotation: [0, -0, 0]
+              Scale: [1, 1, 1]
+          MeshComponent:
+            AssetID: 4186775327602265389

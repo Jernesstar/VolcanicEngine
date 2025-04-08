@@ -101,9 +101,13 @@ void DrawComponent<CameraComponent>(Entity& entity) {
 	uint32_t max = 3000;
 	uint32_t min = 0;
 	uint32_t vW = camera->GetViewportWidth();
-	bool w = ImGui::SliderScalar("Viewport Width", ImGuiDataType_U32, &vW, &min, &max);
+	bool w =
+		ImGui::DragScalar("Viewport Width", ImGuiDataType_U32,
+			&vW, 1.0f, &min, &max);
 	uint32_t vH = camera->GetViewportHeight();
-	bool h = ImGui::SliderScalar("Viewport Height", ImGuiDataType_U32, &vH, &min, &max);
+	bool h =
+		ImGui::DragScalar("Viewport Height", ImGuiDataType_U32,
+			&vH, 1.0f, &min, &max);
 	if(w || h)
 		camera->Resize(vW, vH);
 

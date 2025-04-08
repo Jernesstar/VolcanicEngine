@@ -43,7 +43,7 @@ Sound::Sound() {
 	s_SoundEngine.init();
 
 	sound = CreateRef<SoLoud::Wav>();
-	VOLCANICORE_ASSERT(sound->load("TestProj/Visual/Asset/Audio/Woosh2.wav") == 0);
+	VOLCANICORE_ASSERT(sound->load("TestProj/Asset/Audio/Woosh2.wav") == 0);
 }
 
 Sound::~Sound() {

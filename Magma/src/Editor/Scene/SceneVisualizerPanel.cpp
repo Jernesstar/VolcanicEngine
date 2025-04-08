@@ -264,7 +264,6 @@ void SceneVisualizerPanel::Draw() {
 				|| ImGui::IsKeyPressed(ImGuiKey_Enter, false))
 				{
 					exit = true;
-					
 					if(asset.Type != AssetType::Script) {
 						if(str == "")
 							newEntity = world.AddEntity();
@@ -362,10 +361,8 @@ void SceneVisualizerPanel::Draw() {
 std::string SelectScriptClass(Ref<ScriptModule> mod) {
 	static std::string select = "";
 
-	ImGui::PushID(mod.get());
 	ImGui::OpenPopup("Select Script Class");
-
-	ImGui::BeginPopup("Select Script Class");
+	ImGui::BeginPopupModal("Select Script Class");
 	{
 		for(const auto& [name, _] : mod->GetClasses()) {
 			bool pressed = ImGui::Button(name.c_str());
@@ -376,7 +373,6 @@ std::string SelectScriptClass(Ref<ScriptModule> mod) {
 		}
 	}
 	ImGui::EndPopup();
-	ImGui::PopID();
 
 	return "";
 }

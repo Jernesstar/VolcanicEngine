@@ -83,6 +83,9 @@ public:
 	void OnClose();
 	void OnUpdate(TimeStep ts);
 
+	void LoadScene(const std::string& name);
+	void LoadUI(const std::string& name);
+
 	void SwitchScreen(const std::string& name);
 	void PushScreen(const std::string& name);
 	void PopScreen(const std::string& name);

@@ -98,6 +98,10 @@ App::App(const Project& project)
 		"AppClass", "void PushScreen(const string &in)", &App::PushScreen);
 	ScriptEngine::RegisterMethod<App>(
 		"AppClass", "void PopScreen()", &App::PopScreen);
+	ScriptEngine::RegisterMethod<App>(
+		"AppClass", "void LoadScene(const string &in)", &App::LoadScene);
+	ScriptEngine::RegisterMethod<App>(
+		"AppClass", "void LoadUI(const string &in)", &App::LoadUI);
 
 	ScriptEngine::Get()->RegisterGlobalFunction(
 		"SceneClass& get_Scene() property", asFUNCTION(GetScene), asCALL_CDECL);
@@ -194,6 +198,14 @@ void App::OnUpdate(TimeStep ts) {
 		});
 }
 
+void App::LoadScene(const std::string& name) {
+	s_Screen->World->Name = name;
+}
+
+void App::LoadUI(const std::string& name) {
+	s_Screen->UI.Name = name;
+}
+
 void App::SwitchScreen(const std::string& name) {
 	s_ShouldSwitchScreen = true;
 	s_NewScreenName = name;
@@ -237,6 +249,9 @@ void App::ScreenSet(const std::string& name) {
 	s_Screen = new RuntimeScreen(screen);
 
 	ScreenLoad(s_Screen->Script);
+	auto scriptClass = s_Screen->Script->GetClass(name);
+	s_Screen->ScriptObj = scriptClass->Instantiate();
+
 	if(screen.Scene != "") {
 		SceneLoad(*s_Screen->World);
 		s_Screen->World->RegisterSystems();
@@ -261,8 +276,6 @@ void App::ScreenSet(const std::string& name) {
 			});
 	}
 
-	auto scriptClass = s_Screen->Script->GetClass(name);
-	s_Screen->ScriptObj = scriptClass->Instantiate();
 	s_Screen->ScriptObj->Call("OnLoad");
 }
 
