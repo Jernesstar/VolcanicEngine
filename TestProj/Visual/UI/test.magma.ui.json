@@ -3,10 +3,10 @@
         {
             "ID": "Window1",
             "Type": "Window",
-            "Width": 503,
-            "Height": 159,
-            "x": 0,
-            "y": 0,
+            "Width": 526,
+            "Height": 341,
+            "x": 649,
+            "y": 284,
             "xAlignment": "Center",
             "yAlignment": "Center",
             "UsePosition": false,
@@ -15,7 +15,7 @@
             "Class": "",
             "BorderWidth": 0,
             "BorderHeight": 0,
-            "BorderColor": [1.0, 0.0, 0.0, 1.0]
+            "BorderColor": [0.0, 0.0, 0.0, 0.0]
         },
         {
             "ID": "Button1",
@@ -23,8 +23,8 @@
             "Parent": "Window1",
             "Width": 70,
             "Height": 40,
-            "x": 30,
-            "y": 41,
+            "x": 4,
+            "y": 1,
             "xAlignment": "Left",
             "yAlignment": "Top",
             "UsePosition": false,

@@ -25,22 +25,25 @@ static void TraverseElement(UIElement* element,
 
 UIPage::UIPage() {
 	m_Layers.Push("Root");
+	LayerNodes["Root"] = List<UINode>();
 }
 
 UIPage::UIPage(const std::string& name)
 	: Name(name)
 {
 	m_Layers.Push("Root");
+	LayerNodes["Root"] = List<UINode>();
 }
 
 UIPage& UIPage::operator=(const UIPage& other) {
-	LayerNodes = other.LayerNodes;
 	Windows = other.Windows;
 	Buttons = other.Buttons;
 	Dropdowns = other.Dropdowns;
 	Texts = other.Texts;
 	TextInputs = other.TextInputs;
 	Images = other.Images;
+	LayerNodes = other.LayerNodes;
+	m_Layers = other.m_Layers;
 
 	for(auto& val : Windows)
 		val.m_Root = this;
@@ -86,7 +89,7 @@ void UIPage::Traverse(const Func<void, UIElement*>& func, bool dfs) {
 }
 
 void UIPage::Traverse(const Func<void, UIElement*, TraversalStage>& func) {
-	// Won't change the layers while we are traversing them
+	// Prevent changing the layers while we are traversing them
 	auto layers = m_Layers;
 
 	for(auto layer : layers)
@@ -207,6 +210,9 @@ void UIPage::Delete(const std::string& id) {
 
 void UIPage::Clear() {
 	LayerNodes.clear();
+	LayerNodes["Root"] = List<UINode>();
+	m_Layers = { "Root" };
+
 	Windows.Clear();
 	Buttons.Clear();
 	Dropdowns.Clear();

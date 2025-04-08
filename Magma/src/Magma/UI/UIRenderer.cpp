@@ -75,6 +75,8 @@ UIState UIRenderer::DrawWindow(UI::Window& window) {
 			break;
 		case XAlignment::Right:
 			alignX = width;
+			x = -x;
+			break;
 	}
 	switch(window.yAlignment) {
 		case YAlignment::Center:
@@ -82,6 +84,8 @@ UIState UIRenderer::DrawWindow(UI::Window& window) {
 			break;
 		case YAlignment::Bottom:
 			alignY = height;
+			y = -y;
+			break;
 	}
 
 	ImGui::SetNextWindowPos(

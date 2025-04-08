@@ -1,6 +1,7 @@
 #pragma once
 
 #include <VolcaniCore/Core/Defines.h>
+#include <VolcaniCore/Core/Log.h>
 #include <VolcaniCore/Core/Template.h>
 #include <VolcaniCore/Core/List.h>
 #include <VolcaniCore/Core/Time.h>
@@ -46,6 +47,8 @@ public:
 		for(auto panel : m_Panels)
 			if(panel->Name == name)
 				return panel;
+
+		VOLCANICORE_LOG_WARNING("Could not find panel '%s'", name.c_str());
 		return nullptr;
 	}
 

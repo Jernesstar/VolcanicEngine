@@ -1,5 +1,7 @@
 #include "UIVisualizerPanel.h"
 
+#include <algorithm>
+
 #include <imgui/imgui.h>
 #include <imgui/imgui_internal.h>
 #include <imgui/misc/cpp/imgui_stdlib.h>
@@ -35,6 +37,7 @@ void UIVisualizerPanel::SetContext(UIPage* page) {
 		return;
 
 	m_Context = page;
+	m_Running->Clear();
 	*m_Running = *page;
 
 	UINode root = m_Running->Add(UIElementType::Window, "UI_VISUALIZER_PANEL");
@@ -42,8 +45,10 @@ void UIVisualizerPanel::SetContext(UIPage* page) {
 	m_Running->Add(root);
 
 	UIElement* window = m_Running->Get(root);
-	for(UIElement* element : page->GetFirstOrderElements())
-		window->Add(element->GetNode());
+
+	for(auto [layer, nodes] : page->LayerNodes)
+		for(auto node : nodes)
+			window->Add(node);
 
 	for(UIElement* element : window->GetChildren()) {
 		element->xAlignment = XAlignment::Left;
@@ -232,7 +237,7 @@ void UIVisualizerPanel::Draw() {
 		}
 
 		UIElement* window = m_Running->Get("UI_VISUALIZER_PANEL");
-		window->SetPosition(origin.x, origin.y);
+		window->SetPosition(std::max(0.0f, origin.x), std::max(0.0f, origin.y));
 		window->SetSize(size.x, size.y);
 
 		// Push a dummy window so the rest will be children
@@ -284,12 +289,10 @@ void UIVisualizerPanel::Draw() {
 
 		if(m_Selected) {
 			if(elementHovered && ImGui::IsMouseDragging(0)) {
-				m_Selected->x += io.MouseDelta.x;
-				m_Selected->y += io.MouseDelta.y;
-				if(m_Selected->x < 0)
-					m_Selected->x = 0;
-				if(m_Selected->y < 0)
-					m_Selected->y = 0;
+				float finalX = m_Selected->x + io.MouseDelta.x;
+				float finalY = m_Selected->y + io.MouseDelta.y;
+				m_Selected->x = (uint32_t)std::max(0.0f, finalX);
+				m_Selected->y = (uint32_t)std::max(0.0f, finalY);
 			}
 
 			UIElement* other = m_Context->Get(m_Selected->GetID());

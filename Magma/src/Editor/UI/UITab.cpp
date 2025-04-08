@@ -40,8 +40,8 @@ UITab::UITab()
 UITab::UITab(const std::string& path)
 	: Tab(TabType::UI)
 {
-	Load(path);
 	Setup();
+	Load(path);
 }
 
 UITab::~UITab() {
@@ -111,6 +111,10 @@ void UITab::Setup() {
 	AddPanel<UIHierarchyPanel>(&m_Root)->SetTab(this);
 	AddPanel<UIVisualizerPanel>(&m_Root)->SetTab(this);
 	AddPanel<UIElementEditorPanel>(&m_Root)->SetTab(this);
+
+	GetPanel("UIHierarchy")->Open = true;
+	GetPanel("UIVisualizer")->Open = true;
+	GetPanel("UIElementEditor")->Open = true;
 }
 
 void UITab::Load(const std::string& path) {

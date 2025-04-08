@@ -40,7 +40,7 @@ UIElement& UIElement::SetSize(uint32_t width, uint32_t height) {
 	this->Height = height;
 	return *this;
 }
-UIElement& UIElement::SetPosition(int32_t x, int32_t y) {
+UIElement& UIElement::SetPosition(uint32_t x, uint32_t y) {
 	this->x = x;
 	this->y = y;
 	return *this;
