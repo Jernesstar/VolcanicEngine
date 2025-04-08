@@ -34,7 +34,7 @@ private:
 	Ref<Framebuffer> mips;
 	List<BloomMip> mipChain;
 
-	uint32_t mipChainLength = 7;
+	uint32_t mipChainLength = 11;
 	float filterRadius	= 0.005f;
 	float exposure		= 1.0f;
 	float bloomStrength = 0.04f;

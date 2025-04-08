@@ -23,8 +23,18 @@ static void TraverseElement(UIElement* element,
 	func(element, TraversalStage::End);
 }
 
+UIPage::UIPage() {
+	m_Layers.Push("Root");
+}
+
+UIPage::UIPage(const std::string& name)
+	: Name(name)
+{
+	m_Layers.Push("Root");
+}
+
 UIPage& UIPage::operator=(const UIPage& other) {
-	FirstOrders = other.FirstOrders;
+	LayerNodes = other.LayerNodes;
 	Windows = other.Windows;
 	Buttons = other.Buttons;
 	Dropdowns = other.Dropdowns;
@@ -76,8 +86,12 @@ void UIPage::Traverse(const Func<void, UIElement*>& func, bool dfs) {
 }
 
 void UIPage::Traverse(const Func<void, UIElement*, TraversalStage>& func) {
-	for(UIElement* element : GetFirstOrderElements())
-		TraverseElement(element, func);
+	// Won't change the layers while we are traversing them
+	auto layers = m_Layers;
+
+	for(auto layer : layers)
+		for(UIElement* element : GetFirstOrderElements(layer))
+			TraverseElement(element, func);
 }
 
 UINode UIPage::Add(UIElementType type, const std::string& id) {
@@ -130,15 +144,15 @@ UINode UIPage::Add(UIElementType type, const std::string& id) {
 }
 
 void UIPage::PushLayer(const std::string& name) {
-
+	m_Layers.Push(name);
 }
 
 void UIPage::PopLayer() {
-
+	m_Layers.Pop();
 }
 
-void UIPage::Add(const UINode& node) {
-	FirstOrders.Add(node);
+void UIPage::Add(const UINode& node, const std::string& layer) {
+	LayerNodes[layer].Add(node);
 }
 
 void UIPage::Delete(const UINode& node) {
@@ -177,11 +191,22 @@ void UIPage::Delete(const UINode& node) {
 }
 
 void UIPage::Delete(const std::string& id) {
-
+	if(auto res = Windows.Find([&](auto& val) { return val.GetID() == id; }))
+		Windows.Pop(res.Index);
+	if(auto res = Buttons.Find([&](auto& val) { return val.GetID() == id; }))
+		Buttons.Pop(res.Index);
+	if(auto res = Dropdowns.Find([&](auto& val) { return val.GetID() == id; }))
+		Dropdowns.Pop(res.Index);
+	if(auto res = Texts.Find([&](auto& val) { return val.GetID() == id; }))
+		Texts.Pop(res.Index);
+	if(auto res = TextInputs.Find([&](auto& val) { return val.GetID() == id; }))
+		TextInputs.Pop(res.Index);
+	if(auto res = Images.Find([&](auto& val) { return val.GetID() == id; }))
+		Images.Pop(res.Index);
 }
 
 void UIPage::Clear() {
-	FirstOrders.Clear();
+	LayerNodes.clear();
 	Windows.Clear();
 	Buttons.Clear();
 	Dropdowns.Clear();
@@ -250,9 +275,9 @@ UIElement* UIPage::Get(const std::string& id) const {
 	return nullptr;
 }
 
-List<UIElement*> UIPage::GetFirstOrderElements() const {
+List<UIElement*> UIPage::GetFirstOrderElements(const std::string& layer) const {
 	List<UIElement*> res;
-	for(auto node : FirstOrders)
+	for(auto node : LayerNodes.at(layer))
 		res.Add(Get(node));
 
 	return res;

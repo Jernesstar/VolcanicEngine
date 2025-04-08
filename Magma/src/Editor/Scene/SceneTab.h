@@ -23,18 +23,18 @@ public:
 
 	void SetScene(const std::string& path);
 
+	void NewScene();
+	void OpenScene();
+	void SaveScene();
+
+	void AddEntity();
+
 private:
 	Scene m_Scene;
 	std::string m_ScenePath;
 
 private:
 	void Setup();
-
-	void NewScene();
-	void OpenScene();
-	void SaveScene();
-
-	void AddEntity();
 };
 
 }

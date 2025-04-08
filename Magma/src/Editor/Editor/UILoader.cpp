@@ -182,6 +182,7 @@ void Serialize(const UIElement* ui, JSONSerializer& serializer) {
 							return "None";
 					}
 				}())
+		.WriteKey("UsePosition").Write(ui->UsePosition)
 		.WriteKey("Color").Write(ui->Color)
 		.WriteKey("ModuleID").Write((uint64_t)ui->ModuleID)
 		.WriteKey("Class").Write(ui->Class);
@@ -275,6 +276,9 @@ Theme UILoader::LoadTheme(const std::string& path) {
 			if(yAlign.Get<std::string>() == "Bottom")
 				theme.yAlignment = YAlignment::Bottom;
 		}
+		if(windowTheme.HasMember("UsePosition")) {
+
+		}
 
 		if(windowTheme.HasMember("Color"))
 			theme.Color =
@@ -327,6 +331,7 @@ static void WriteUI(BinaryWriter* writer, const UIElement* element) {
 	writer->Write(element->y);
 	writer->Write((uint32_t)element->xAlignment);
 	writer->Write((uint32_t)element->yAlignment);
+	writer->Write(element->UsePosition);
 	writer->WriteData(&element->Color.r, sizeof(glm::vec4));
 	writer->Write(element->Children);
 	writer->Write((uint64_t)element->ModuleID);
@@ -410,7 +415,7 @@ void UILoader::RuntimeSave(const UIPage& page, const std::string& projectPath,
 		.Write(page.TextInputs)
 		.Write(page.Images);
 
-	writer.Write(page.FirstOrders);
+	writer.Write(page.LayerNodes);
 }
 
 template<typename T>
@@ -533,8 +538,8 @@ void LoadElement(UIPage& page, const rapidjson::Value& elementNode,
 	element->Width = TryGet<uint32_t>(elementNode, "Width", theme.Width);
 	element->Height = TryGet<uint32_t>(elementNode, "Height", theme.Height);
 
-	element->x = TryGet<int32_t>(elementNode, "x", theme.x);
-	element->y = TryGet<int32_t>(elementNode, "y", theme.y);
+	element->x = TryGet<uint32_t>(elementNode, "x", theme.x);
+	element->y = TryGet<uint32_t>(elementNode, "y", theme.y);
 
 	element->xAlignment = theme.xAlignment;
 	if(elementNode.HasMember("xAlignment")) {
@@ -556,6 +561,11 @@ void LoadElement(UIPage& page, const rapidjson::Value& elementNode,
 			element->yAlignment = YAlignment::Center;
 		else if(xAlign == "Bottom")
 			element->yAlignment = YAlignment::Bottom;
+	}
+
+	// element->UsePosition = theme.UsePosition;
+	if(elementNode.HasMember("UsePosition")) {
+		element->UsePosition = elementNode["UsePosition"].Get<bool>();
 	}
 
 	element->Color = theme.Color;

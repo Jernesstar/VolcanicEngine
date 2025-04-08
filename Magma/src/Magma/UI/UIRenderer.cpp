@@ -164,7 +164,7 @@ UIState UIRenderer::DrawButton(UI::Button& button) {
 	}
 
 	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 0, 0 });
-	if(button.x >= 0 && button.y >= 0)
+	if(button.UsePosition)
 		ImGui::SetCursorPos(ImVec2(button.x, button.y));
 	ButtonFunction(button.Display, ImVec2(button.Width, button.Height));
 	ImGui::PopStyleVar();

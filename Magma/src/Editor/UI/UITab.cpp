@@ -32,7 +32,7 @@ static Theme s_Theme;
 Theme& UITab::GetTheme() { return s_Theme; }
 
 UITab::UITab()
-	: Tab(TabType::UI), m_Root("")
+	: Tab(TabType::UI)
 {
 	Setup();
 }
@@ -41,12 +41,6 @@ UITab::UITab(const std::string& path)
 	: Tab(TabType::UI)
 {
 	Load(path);
-	Setup();
-}
-
-UITab::UITab(const UI::UIPage& page)
-	: Tab(TabType::UI), m_Root(page)
-{
 	Setup();
 }
 
@@ -127,6 +121,7 @@ void UITab::Load(const std::string& path) {
 
 	UILoader::EditorLoad(m_Root, path, s_Theme);
 	m_Name = "UI: " + m_Root.Name;
+	GetPanel("UIVisualizer")->As<UIVisualizerPanel>()->SetContext(&m_Root);
 }
 
 void UITab::Save(const std::string& path) {
@@ -141,6 +136,8 @@ void UITab::NewUI() {
 }
 
 void UITab::OpenUI() {
+	menu.file.openUI = true;
+
 	IGFD::FileDialogConfig config;
 	config.path = ".";
 	auto instance = ImGuiFileDialog::Instance();

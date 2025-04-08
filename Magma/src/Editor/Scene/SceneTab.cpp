@@ -54,6 +54,8 @@ void SceneTab::Setup() {
 	GetPanel("SceneHierarchy")->Open = true;
 	GetPanel("SceneVisualizer")->Open = true;
 	GetPanel("ComponentEditor")->Open = true;
+
+	m_Name = "Scene: " + m_Scene.Name;
 }
 
 void SceneTab::SetScene(const std::string& path) {
@@ -132,6 +134,8 @@ void SceneTab::NewScene() {
 }
 
 void SceneTab::OpenScene() {
+	menu.file.openScene = true;
+
 	IGFD::FileDialogConfig config;
 	config.path = ".";
 	auto instance = ImGuiFileDialog::Instance();

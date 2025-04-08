@@ -146,6 +146,12 @@ static Vec4 NormalizeVec4(const Vec4& vec) {
 	return glm::normalize(vec);
 }
 
+static Vec3& AddAssignVec3(Vec3 vec, Vec3& dest)
+{
+	dest += vec;
+	return dest;
+}
+
 void RegisterTypes() {
 	auto* engine = ScriptEngine::Get();
 
@@ -169,6 +175,9 @@ void RegisterTypes() {
 	engine->RegisterObjectProperty("Vec3", "float x", asOFFSET(Vec3, x));
 	engine->RegisterObjectProperty("Vec3", "float y", asOFFSET(Vec3, y));
 	engine->RegisterObjectProperty("Vec3", "float z", asOFFSET(Vec3, z));
+
+	engine->RegisterObjectMethod("Vec3", "Vec3 &opAddAssign(Vec3)",
+		asFUNCTION(AddAssignVec3), asCALL_CDECL_OBJLAST);
 
 	engine->RegisterGlobalFunction("Vec3 normalize(const Vec3 &in)",
 		asFUNCTION(NormalizeVec3), asCALL_CDECL);
@@ -366,6 +375,8 @@ void RegisterAssetManager() {
 	engine->RegisterObjectType("Sound", 0, asOBJ_REF | asOBJ_NOCOUNT);
 	engine->RegisterObjectMethod("Sound", "void Play()", asMETHOD(Sound, Play),
 		asCALL_THISCALL);
+	engine->RegisterObjectProperty("Sound", "float Volume",
+		asOFFSET(Sound, Volume));
 
 	engine->RegisterObjectMethod("AssetManagerClass",
 		"Sound@ GetSound(Asset)", asFUNCTION(GetSound), asCALL_CDECL_OBJLAST);

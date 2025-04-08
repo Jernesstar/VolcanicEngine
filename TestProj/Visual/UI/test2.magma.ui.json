@@ -1,14 +1,20 @@
 {
-    "Elements":
-    [
+    "Elements": [
         {
             "ID": "Window2",
             "Type": "Window",
-            "Width": 250,
+            "Width": 249,
             "Height": 250,
-            "x": 100,
-            "y": 100,
-            "Color": [0.0, 0.0, 0.0, 1.0]
-        }
-    ]
+            "x": 36,
+            "y": 26,
+            "xAlignment": "Center",
+            "yAlignment": "Center",
+            "UsePosition": false,
+            "Color": [0.0, 0.0, 0.0, 1.0],
+            "ModuleID": 0,
+            "Class": "",
+            "BorderWidth": 0,
+            "BorderHeight": 0,
+            "BorderColor": [0.0, 0.0, 0.0, 0.0]
+        }]
 }

@@ -40,17 +40,18 @@ class UIElement : public VolcaniCore::Derivable<UIElement> {
 public:
 	uint32_t Width = 0;
 	uint32_t Height = 0;
-	int32_t x = 0;
-	int32_t y = 0;
+	uint32_t x = 0;
+	uint32_t y = 0;
 	XAlignment xAlignment = XAlignment::Left;
 	YAlignment yAlignment = YAlignment::Top;
+	bool UsePosition = true;
 	glm::vec4 Color = glm::vec4(0.0f);
 	// TODO(Implement): Border
-	// BorderElement Border;
 	VolcaniCore::List<UINode> Children;
 	std::string Class = "";
 	VolcaniCore::UUID ModuleID = 0;
 	Ref<Script::ScriptObject> ScriptInstance = nullptr;
+	// std::string Layer = "Root";
 
 public:
 	UIElement(UIElementType type)

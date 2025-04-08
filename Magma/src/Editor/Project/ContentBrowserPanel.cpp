@@ -101,7 +101,7 @@ void ContentBrowserPanel::Draw() {
 			}
 			ImGui::PopClipRect();
 
-			static float padding = 18.0f;
+			static float padding = 24.0f;
 			static float thumbnailSize = 100.0f;
 			static float cellSize = thumbnailSize + padding;
 
@@ -130,8 +130,8 @@ void ContentBrowserPanel::Draw() {
 					button.Width = thumbnailSize;
 					button.Height = thumbnailSize;
 					button.Display = m_FileIcon;
-					button.x = -1;
-					button.y = -1;
+					button.UsePosition = false;
+
 					if(UI::UIRenderer::DrawButton(button).Clicked) {
 						s_Asset = asset;
 						auto panel =
@@ -149,15 +149,15 @@ void ContentBrowserPanel::Draw() {
 						image.Content = m_FileIcon->Content;
 						image.Width = thumbnailSize;
 						image.Height = thumbnailSize;
-						image.x = -1;
-						image.y = -1;
+						image.UsePosition = false;
+
 						UI::UIRenderer::DrawImage(image);
 
 						ImGui::EndDragDropSource();
 					}
 					if(display != "")
 						ImGui::TextWrapped(display.c_str());
-					ImGui::Text("Asset %lu", asset.ID / (uint64_t)1e15);
+					ImGui::Text("%llu", (uint64_t)asset.ID);
 				}
 
 				ImGui::EndTable();

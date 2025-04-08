@@ -3,18 +3,19 @@
         {
             "ID": "Window1",
             "Type": "Window",
-            "Width": 526,
-            "Height": 341,
+            "Width": 503,
+            "Height": 159,
             "x": 0,
             "y": 0,
             "xAlignment": "Center",
             "yAlignment": "Center",
+            "UsePosition": false,
             "Color": [0.859375, 0.76171875, 0.5859375, 1.0],
             "ModuleID": 0,
             "Class": "",
             "BorderWidth": 0,
             "BorderHeight": 0,
-            "BorderColor": [0.0, 0.0, 0.0, 0.0]
+            "BorderColor": [1.0, 0.0, 0.0, 1.0]
         },
         {
             "ID": "Button1",
@@ -26,6 +27,7 @@
             "y": 41,
             "xAlignment": "Left",
             "yAlignment": "Top",
+            "UsePosition": false,
             "Color": [0.8095238208770752, 0.0, 0.0, 1.0],
             "ModuleID": 9099402520052546251,
             "Class": "Button1",

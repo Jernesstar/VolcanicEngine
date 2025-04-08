@@ -37,12 +37,12 @@ void UIVisualizerPanel::SetContext(UIPage* page) {
 	m_Context = page;
 	*m_Running = *page;
 
-	auto root = m_Running->Add(UIElementType::Window, "UI_VISUALIZER_PANEL");
-	m_Running->FirstOrders.Clear();
+	UINode root = m_Running->Add(UIElementType::Window, "UI_VISUALIZER_PANEL");
+	m_Running->LayerNodes.clear();
 	m_Running->Add(root);
 
 	UIElement* window = m_Running->Get(root);
-	for(auto* element : page->GetFirstOrderElements())
+	for(UIElement* element : page->GetFirstOrderElements())
 		window->Add(element->GetNode());
 
 	for(UIElement* element : window->GetChildren()) {

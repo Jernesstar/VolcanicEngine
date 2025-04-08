@@ -15,7 +15,7 @@ namespace Magma {
 struct ThemeElement {
 	uint32_t Width = 0;
 	uint32_t Height = 0;
-	int32_t x = 0, y = 0; // Could be more accurately named xOffset and yOffset
+	uint32_t x = 0, y = 0; // Could be more accurately named xOffset and yOffset
 	XAlignment xAlignment;
 	YAlignment yAlignment;
 	glm::vec4 Color = glm::vec4(0.0f);

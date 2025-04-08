@@ -31,12 +31,11 @@ public:
 	List<TextInput> TextInputs;
 	List<Image> Images;
 
-	List<UINode> FirstOrders;
+	Map<std::string, List<UINode>> LayerNodes;
 
 public:
-	UIPage() = default;
-	UIPage(const std::string &name)
-		: Name(name) { }
+	UIPage();
+	UIPage(const std::string &name);
 	UIPage(const UIPage& other) {
 		*this = other;
 	}
@@ -52,16 +51,19 @@ public:
 	void Traverse(const Func<void, UIElement*, TraversalStage>& func);
 
 	UINode Add(UIElementType type, const std::string& id);
-	void Add(const UINode& node);
+	void Add(const UINode& node, const std::string& layer = "Root");
 
 	void Delete(const UINode& node);
 	void Delete(const std::string& id);
 
 	void Clear();
-	List<UIElement*> GetFirstOrderElements() const;
+	List<UIElement*> GetFirstOrderElements(const std::string& layer = "Root") const;
 
 	UIElement* Get(const UINode& node) const;
 	UIElement* Get(const std::string& id) const;
+
+private:
+	List<std::string> m_Layers;
 };
 
 }

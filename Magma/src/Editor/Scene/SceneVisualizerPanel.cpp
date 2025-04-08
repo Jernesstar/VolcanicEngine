@@ -197,18 +197,18 @@ void SceneVisualizerPanel::Draw() {
 
 		if(ImGui::BeginDragDropTarget())
 		{
-			if(auto payload = ImGui::AcceptDragDropPayload("ASSET")) {
+			if(auto payload = ImGui::AcceptDragDropPayload("ASSET"))
 				options.add.asset = *(Asset*)payload->Data;
 
-				if(options.add.asset.Type == AssetType::Mesh)
-					ImGui::OpenPopup("Create Entity with MeshComponent");
-				else if(options.add.asset.Type == AssetType::Audio)
-					ImGui::OpenPopup("Create Entity with AudioComponent");
-				else if(options.add.asset.Type == AssetType::Script)
-					ImGui::OpenPopup("Create Entity with ScriptComponent");
-			}
 			ImGui::EndDragDropTarget();
 		}
+
+		if(options.add.asset.Type == AssetType::Mesh)
+			ImGui::OpenPopup("Create Entity with MeshComponent");
+		else if(options.add.asset.Type == AssetType::Audio)
+			ImGui::OpenPopup("Create Entity with AudioComponent");
+		else if(options.add.asset.Type == AssetType::Script)
+			ImGui::OpenPopup("Create Entity with ScriptComponent");
 
 		ImGui::SetCursorPos(pos);
 
@@ -243,13 +243,14 @@ void SceneVisualizerPanel::Draw() {
 		else if(options.add.asset.Type == AssetType::Audio)
 			open = ImGui::BeginPopupModal("Create Entity with AudioComponent");
 		else if(options.add.asset.Type == AssetType::Script)
-			open = ImGui::BeginPopupModal("Create Entity with ScriptComponent");
+			open = ImGui::BeginPopupModal("Create Entity with ScriptComponent", nullptr);
 
 		if(open) {
 			static std::string str;
 			static std::string hint = "Enter entity name";
 			ImGui::InputTextWithHint("##Input", hint.c_str(), &str);
 			static bool exit = false;
+			static bool tryExit = false;
 			static Entity newEntity;
 
 			auto& asset = options.add.asset;
@@ -258,27 +259,40 @@ void SceneVisualizerPanel::Draw() {
 
 			if(ImGui::Button("Cancel"))
 				ImGui::CloseCurrentPopup();
-			else {
-				ImGui::SameLine();
-				if(ImGui::Button("Create")
-				|| ImGui::IsKeyPressed(ImGuiKey_Enter, false))
-				{
-					exit = true;
-					if(asset.Type != AssetType::Script) {
-						if(str == "")
-							newEntity = world.AddEntity();
-						else {
-							if(world.GetEntity(str).IsValid()) {
-								exit = false;
-								str = "";
-								hint = "Entity name must be unique";
-							}
-							else
-								newEntity = world.AddEntity(str);
-						}
-
-						assetManager.Load(asset);
+			ImGui::SameLine();
+			if(ImGui::Button("Create")
+			|| ImGui::IsKeyPressed(ImGuiKey_Enter, false))
+			{
+				exit = true;
+				if(str == "")
+					newEntity = world.AddEntity();
+				else {
+					if(world.GetEntity(str).IsValid()) {
+						exit = false;
+						str = "";
+						hint = "Entity name must be unique";
 					}
+					else
+						newEntity = world.AddEntity(str);
+				}
+				if(asset.Type == AssetType::Script)
+					tryExit = true;
+
+				assetManager.Load(asset);
+			}
+
+			if(asset.Type == AssetType::Script && tryExit) {
+				exit = false;
+
+				auto mod = assetManager.Get<ScriptModule>(asset);
+				std::string name = SelectScriptClass(mod);
+				if(name != "") {
+					exit = true;
+					tryExit = false;
+
+					auto _class = mod->GetClass(name);
+					auto obj = _class->Construct();
+					newEntity.Add<ScriptComponent>(asset, obj);
 				}
 			}
 
@@ -287,20 +301,7 @@ void SceneVisualizerPanel::Draw() {
 					newEntity.Add<MeshComponent>(asset);
 				else if(asset.Type == AssetType::Audio)
 					newEntity.Add<AudioComponent>(asset);
-				else if(asset.Type == AssetType::Script) {
-					exit = false;
 
-					auto mod = assetManager.Get<ScriptModule>(asset);
-					std::string name = SelectScriptClass(mod);
-					if(name != "") {
-						exit = true;
-						auto _class = mod->GetClass(name);
-						auto obj = _class->Instantiate(newEntity);
-						newEntity.Add<ScriptComponent>(asset, obj);
-					}
-				}
-			}
-			if(exit) {
 				exit = false;
 				asset.Type = AssetType::None;
 				ImGui::CloseCurrentPopup();
@@ -362,7 +363,7 @@ std::string SelectScriptClass(Ref<ScriptModule> mod) {
 	static std::string select = "";
 
 	ImGui::OpenPopup("Select Script Class");
-	ImGui::BeginPopupModal("Select Script Class");
+	if(ImGui::BeginPopupModal("Select Script Class"));
 	{
 		for(const auto& [name, _] : mod->GetClasses()) {
 			bool pressed = ImGui::Button(name.c_str());
@@ -371,8 +372,15 @@ std::string SelectScriptClass(Ref<ScriptModule> mod) {
 				ImGui::CloseCurrentPopup();
 			}
 		}
+
+		ImGui::EndPopup();
 	}
-	ImGui::EndPopup();
+
+	if(select != "") {
+		std::string val = select;
+		select = "";
+		return val;
+	}
 
 	return "";
 }

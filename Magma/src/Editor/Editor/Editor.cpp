@@ -265,13 +265,23 @@ void Editor::Render() {
 void Editor::RenderEmptyTab(Ref<Tab>& tab) {
 	ImGui::Begin("##Empty");
 	{
+		if(ImGui::Button("New Scene")) {
+			tab.reset();
+			tab = CreateRef<SceneTab>();
+		}
+		if(ImGui::Button("New UI")) {
+			tab.reset();
+			tab = CreateRef<UITab>();
+		}
 		if(ImGui::Button("Open Scene")) {
 			tab.reset();
 			tab = CreateRef<SceneTab>();
+			tab->As<SceneTab>()->OpenScene();
 		}
 		if(ImGui::Button("Open UI")) {
 			tab.reset();
 			tab = CreateRef<UITab>();
+			tab->As<UITab>()->OpenUI();
 		}
 	}
 	ImGui::End();
@@ -280,8 +290,7 @@ void Editor::RenderEmptyTab(Ref<Tab>& tab) {
 void Editor::RenderWelcomeScreen() {
 	ImGui::Begin("##Welcome");
 	{
-		m_WelcomeImage.x = -1;
-		m_WelcomeImage.y = -1;
+		m_WelcomeImage.UsePosition = false;
 		m_WelcomeImage.Width = 800;
 		m_WelcomeImage.Height = 800;
 		m_WelcomeImage.Render();
@@ -491,21 +500,22 @@ void Editor::ExportProject(const std::string& exportPath) {
 			).string() + ".as");
 		mod->Save(
 			(fs::path(exportPath) / "Class" / screen.Name).string() + ".class");
+	}
 
-		if(screen.Scene != "") {
-			auto path =
-				fs::path(m_Project.Path) / "Visual" / "Scene" / screen.Scene;
-			Scene scene;
-			SceneLoader::EditorLoad(scene, path.string() + ".magma.scene");
-			SceneLoader::RuntimeSave(scene, m_Project.Path, exportPath);
-		}
-		if(screen.UI != "") {
-			auto path = fs::path(m_Project.Path) / "Visual" / "UI" / screen.UI;
-			UIPage uiPage;
-			UILoader::EditorLoad(uiPage, path.string() + ".magma.ui.json",
-								 UITab::GetTheme());
-			UILoader::RuntimeSave(uiPage, m_Project.Path, exportPath);
-		}
+	fs::path sceneFolder = fs::path(m_Project.Path) / "Visual" / "Scene";
+	for(auto path : FileUtils::GetFiles(sceneFolder.string())) {
+		Scene scene;
+		SceneLoader::EditorLoad(scene, path);
+		SceneLoader::RuntimeSave(scene, m_Project.Path, exportPath);
+	}
+	fs::path uiFolder = fs::path(m_Project.Path) / "Visual" / "UI";
+	for(auto path : FileUtils::GetFiles(uiFolder.string())) {
+		if(fs::path(path).filename().string() == "theme.magma.ui.json")
+			continue;
+
+		UIPage uiPage;
+		UILoader::EditorLoad(uiPage, path, UITab::GetTheme());
+		UILoader::RuntimeSave(uiPage, m_Project.Path, exportPath);
 	}
 
 	auto mod = CreateRef<ScriptModule>(m_Project.App);

@@ -48,6 +48,7 @@ static void ReadUI(BinaryReader* reader, UIElement* element) {
 	reader->Read(yAlign);
 	element->xAlignment = (XAlignment)xAlign;
 	element->yAlignment = (YAlignment)yAlign;
+	reader->Read(element->UsePosition);
 	reader->ReadData(&element->Color.r, sizeof(glm::vec4));
 	reader->Read(element->Children);
 	uint64_t assetID;
@@ -142,7 +143,7 @@ void UILoader::Load(UIPage& page, const std::string& path) {
 		.Read(page.TextInputs, "", &page)
 		.Read(page.Images, "", &page);
 
-	reader.Read(page.FirstOrders);
+	reader.Read(page.LayerNodes);
 	s_CurrentPage = nullptr;
 }
 

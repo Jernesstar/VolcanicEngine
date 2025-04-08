@@ -174,7 +174,7 @@ void EditElement<UIElement>(UIElement* element) {
 	ImGui::DragScalarN("##Dimension", ImGuiDataType_U32, dim, 2, 0.4f);
 	auto* pos = &element->x;
 	ImGui::Text("Position"); ImGui::SameLine(120.0f);
-	ImGui::DragInt2("##Position", pos, 0.5f, 0, 1000);
+	ImGui::DragScalarN("##Position", ImGuiDataType_U32, pos, 2, 0.5f);
 
 	if(element->GetType() != UIElementType::Image)
 		EditColor(element->Color);

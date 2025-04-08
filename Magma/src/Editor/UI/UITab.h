@@ -16,7 +16,6 @@ public:
 public:
 	UITab();
 	UITab(const std::string& path);
-	UITab(const UI::UIPage& page);
 	~UITab();
 
 	void Update(TimeStep ts) override;
@@ -25,14 +24,6 @@ public:
 	void Load(const std::string& path);
 	void Save(const std::string& path);
 
-private:
-	UI::UIPage m_Root;
-	Theme m_Theme;
-	std::string m_UIPath;
-
-private:
-	void Setup();
-
 	void NewUI();
 	void OpenUI();
 	void SaveUI();
@@ -40,6 +31,14 @@ private:
 	void AddWindow();
 	void AddButton();
 	void AddImage();
+
+private:
+	UI::UIPage m_Root;
+	Theme m_Theme;
+	std::string m_UIPath;
+
+private:
+	void Setup();
 };
 
 }
