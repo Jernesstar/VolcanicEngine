@@ -237,7 +237,7 @@ void UIVisualizerPanel::Draw() {
 		}
 
 		UIElement* window = m_Running->Get("UI_VISUALIZER_PANEL");
-		window->SetPosition(std::max(0.0f, origin.x), std::max(0.0f, origin.y));
+		window->SetPosition(origin.x, origin.y);
 		window->SetSize(size.x, size.y);
 
 		// Push a dummy window so the rest will be children
@@ -254,7 +254,7 @@ void UIVisualizerPanel::Draw() {
 					if(element == window)
 						return;
 
-					UIElement* other = m_Context->Get(element->GetID());
+					UIElement* other = m_Context->Get(element->GetNode());
 					element->x = other->x;
 					element->y = other->y;
 					element->Width = other->Width;
@@ -291,8 +291,8 @@ void UIVisualizerPanel::Draw() {
 			if(elementHovered && ImGui::IsMouseDragging(0)) {
 				float finalX = m_Selected->x + io.MouseDelta.x;
 				float finalY = m_Selected->y + io.MouseDelta.y;
-				m_Selected->x = (uint32_t)std::max(0.0f, finalX);
-				m_Selected->y = (uint32_t)std::max(0.0f, finalY);
+				m_Selected->x = std::max(0.0f, finalX);
+				m_Selected->y = std::max(0.0f, finalY);
 			}
 
 			UIElement* other = m_Context->Get(m_Selected->GetID());

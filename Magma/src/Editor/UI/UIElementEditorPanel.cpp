@@ -10,7 +10,18 @@
 
 #include <Magma/UI/UI.h>
 
+#include <Magma/Script/ScriptEngine.h>
+
+#include <Magma/Core/AssetManager.h>
+
+#include <Editor/EditorApp.h>
+#include <Editor/AssetManager.h>
+#include <Editor/AssetImporter.h>
+
+static Ref<UI::Image> s_FileIcon;
+
 using namespace Magma::UI;
+using namespace Magma::Script;
 
 namespace Magma {
 
@@ -18,6 +29,11 @@ UIElementEditorPanel::UIElementEditorPanel(UI::UIPage* page)
 	: Panel("UIElementEditor")
 {
 	SetContext(page);
+	Application::PushDir();
+	s_FileIcon =
+		CreateRef<UI::Image>(
+			AssetImporter::GetTexture("Magma/assets/icons/FileIcon.png"));
+	Application::PopDir();
 }
 
 void UIElementEditorPanel::SetContext(UI::UIPage* page) {
@@ -82,12 +98,67 @@ static void EditColor(glm::vec4& color) {
 	ImGui::NewLine();
 }
 
+static Asset s_Asset;
+
+static void SelectScript() {
+	namespace fs = std::filesystem;
+
+	ImGui::OpenPopup("Select Script");
+	if(ImGui::BeginPopupModal("Select Script")) {
+		static float padding = 18.0f;
+		static float thumbnailSize = 100.0f;
+		static float cellSize = thumbnailSize + padding;
+
+		float panelWidth = ImGui::GetContentRegionAvail().x;
+		int32_t columnCount = (int32_t)(panelWidth / cellSize);
+		columnCount = columnCount ? columnCount : 1;
+
+		Editor& editor = Application::As<EditorApp>()->GetEditor();
+		EditorAssetManager& assetManager = editor.GetAssetManager();
+		if(ImGui::BeginTable("AssetsTable", columnCount))
+		{
+			for(auto& [asset, _] : assetManager.GetRegistry()) {
+				if(!asset.Primary)
+					continue;
+				if(asset.Type != AssetType::Script)
+					continue;
+
+				ImGui::TableNextColumn();
+
+				std::string display = assetManager.GetPath(asset.ID);
+				if(display != "")
+					display = fs::path(display).filename().string();
+
+				UI::Button button;
+				button.Width = thumbnailSize;
+				button.Height = thumbnailSize;
+				button.Display = s_FileIcon;
+				button.UsePosition = false;
+
+				if(UI::UIRenderer::DrawButton(button).Clicked)
+					s_Asset = asset;
+
+				if(display != "")
+					ImGui::TextWrapped(display.c_str());
+				ImGui::Text("Asset %llu", (uint64_t)asset.ID);
+			}
+
+			ImGui::EndTable();
+		}
+
+		if(ImGui::Button("Close"))
+			ImGui::CloseCurrentPopup();
+
+		ImGui::EndPopup();
+	}
+}
+
 template<typename TUIElement>
 static void EditElement(UIElement* element);
 
 template<>
-void EditElement<Window>(UIElement* element) {
-	auto* window = element->As<Window>();
+void EditElement<UI::Window>(UIElement* element) {
+	auto* window = element->As<UI::Window>();
 	ImGui::SeparatorText("Border");
 	ImGui::Indent(22.0f);
 
@@ -174,7 +245,7 @@ void EditElement<UIElement>(UIElement* element) {
 	ImGui::DragScalarN("##Dimension", ImGuiDataType_U32, dim, 2, 0.4f);
 	auto* pos = &element->x;
 	ImGui::Text("Position"); ImGui::SameLine(120.0f);
-	ImGui::DragScalarN("##Position", ImGuiDataType_U32, pos, 2, 0.5f);
+	ImGui::DragFloat2("##Position", pos, 0.5f, 0.0f, 1000.0f);
 
 	if(element->GetType() != UIElementType::Image)
 		EditColor(element->Color);
@@ -196,7 +267,7 @@ void EditElement<UIElement>(UIElement* element) {
 
 	switch(element->GetType()) {
 		case UIElementType::Window:
-			EditElement<Window>(element);
+			EditElement<UI::Window>(element);
 			break;
 		case UIElementType::Button:
 			EditElement<Button>(element);
@@ -213,6 +284,94 @@ void EditElement<UIElement>(UIElement* element) {
 		case UIElementType::Dropdown:
 			EditElement<Dropdown>(element);
 			break;
+	}
+
+	ImGui::Unindent(22.0f);
+	ImGui::SeparatorText("Script Fields");
+
+	auto obj = element->ScriptInstance;
+	if(!obj) {
+		if(ImGui::Button("Create Script Object"))
+			s_Asset.Type = AssetType::Script;
+
+		if(s_Asset.Type != AssetType::None)
+			SelectScript();
+		if(s_Asset.ID) {
+			element->ModuleID = s_Asset.ID;
+			
+		}
+
+		return;
+	}
+
+	auto* handle = obj->GetHandle();
+	for(uint32_t i = 0; i < handle->GetPropertyCount(); i++) {
+		auto typeID = handle->GetPropertyTypeId(i);
+		auto* typeInfo = ScriptEngine::Get()->GetTypeInfoById(typeID);
+
+		if(typeInfo) {
+			ImGui::Text(typeInfo->GetName());
+			ImGui::SameLine(100.0f);
+			ImGui::Text(handle->GetPropertyName(i));
+			continue;
+		}
+
+		void* address = handle->GetAddressOfProperty(i);
+		if(typeID == asTYPEID_BOOL) {
+			ImGui::Text("bool"); ImGui::SameLine(100.0f);
+			ImGui::Text(handle->GetPropertyName(i)); ImGui::SameLine(200.0f);
+			ImGui::Checkbox("##Bool", (bool*)address);
+		}
+		else if(typeID == asTYPEID_INT8) {
+			ImGui::Text("int8"); ImGui::SameLine(100.0f);
+			ImGui::Text(handle->GetPropertyName(i)); ImGui::SameLine(200.0f);
+			ImGui::InputScalar("##Signed 8bit", ImGuiDataType_S8, address);
+		}
+		else if(typeID == asTYPEID_INT16) {
+			ImGui::Text("int16"); ImGui::SameLine(100.0f);
+			ImGui::Text(handle->GetPropertyName(i)); ImGui::SameLine(200.0f);
+			ImGui::InputScalar("##Signed 16bit", ImGuiDataType_S16, address);
+		}
+		else if(typeID == asTYPEID_INT32) {
+			ImGui::Text("int32"); ImGui::SameLine(100.0f);
+			ImGui::Text(handle->GetPropertyName(i)); ImGui::SameLine(200.0f);
+			ImGui::InputScalar("##Signed 32bit", ImGuiDataType_S32, address);
+		}
+		else if(typeID == asTYPEID_INT64) {
+			ImGui::Text("int64"); ImGui::SameLine(100.0f);
+			ImGui::Text(handle->GetPropertyName(i)); ImGui::SameLine(200.0f);
+			ImGui::InputScalar("##Signed 64bit", ImGuiDataType_S64, address);
+		}
+		else if(typeID == asTYPEID_UINT8) {
+			ImGui::Text("uint8"); ImGui::SameLine(100.0f);
+			ImGui::Text(handle->GetPropertyName(i)); ImGui::SameLine(200.0f);
+			ImGui::InputScalar("##Unsigned 8bit", ImGuiDataType_U8, address);
+		}
+		else if(typeID == asTYPEID_UINT16) {
+			ImGui::Text("uint16"); ImGui::SameLine(100.0f);
+			ImGui::Text(handle->GetPropertyName(i)); ImGui::SameLine(200.0f);
+			ImGui::InputScalar("##Unsigned 16bit", ImGuiDataType_U16, address);
+		}
+		else if(typeID == asTYPEID_UINT32) {
+			ImGui::Text("uint32"); ImGui::SameLine(100.0f);
+			ImGui::Text(handle->GetPropertyName(i)); ImGui::SameLine(200.0f);
+			ImGui::InputScalar("##Unsigned 32bit", ImGuiDataType_U32, address);
+		}
+		else if(typeID == asTYPEID_UINT64) {
+			ImGui::Text("uint64"); ImGui::SameLine(100.0f);
+			ImGui::Text(handle->GetPropertyName(i)); ImGui::SameLine(200.0f);
+			ImGui::InputScalar("##Unsigned 64bit", ImGuiDataType_U64, address);
+		}
+		else if(typeID == asTYPEID_FLOAT) {
+			ImGui::Text("float"); ImGui::SameLine(100.0f);
+			ImGui::Text(handle->GetPropertyName(i)); ImGui::SameLine(200.0f);
+			ImGui::InputFloat("##Float", (float*)address, 0.0f, 0.0f, "%.10f");
+		}
+		else if(typeID == asTYPEID_DOUBLE) {
+			ImGui::Text("double"); ImGui::SameLine(100.0f);
+			ImGui::Text(handle->GetPropertyName(i)); ImGui::SameLine(200.0f);
+			ImGui::InputDouble("##Double", (double*)address);
+		}
 	}
 }
 

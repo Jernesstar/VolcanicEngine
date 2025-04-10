@@ -52,8 +52,6 @@ UIState UIRenderer::DrawWindow(UI::Window& window) {
 		return { };
 	}
 
-	int32_t alignX = 0;
-	int32_t alignY = 0;
 	ImGuiViewport* viewport = ImGui::GetMainViewport();
 
 	float width = viewport->Size.x;
@@ -69,6 +67,8 @@ UIState UIRenderer::DrawWindow(UI::Window& window) {
 		y = parent->y;
 	}
 
+	float alignX = 0;
+	float alignY = 0;
 	switch(window.xAlignment) {
 		case XAlignment::Center:
 			alignX = width / 2;
@@ -134,8 +134,10 @@ UIState UIRenderer::DrawWindow(UI::Window& window) {
 		s_Stack.Add(UIType::Window);
 	}
 
-	window.Width = ImGui::GetWindowSize().x;
-	window.Height = ImGui::GetWindowSize().y;
+	if(ImGui::IsMouseDragging(ImGuiMouseButton_Left)) {
+		window.Width = ImGui::GetWindowSize().x;
+		window.Height = ImGui::GetWindowSize().y;
+	}
 
 	// TODO(Implement): WindowState
 	return {

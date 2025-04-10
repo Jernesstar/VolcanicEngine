@@ -538,8 +538,8 @@ void LoadElement(UIPage& page, const rapidjson::Value& elementNode,
 	element->Width = TryGet<uint32_t>(elementNode, "Width", theme.Width);
 	element->Height = TryGet<uint32_t>(elementNode, "Height", theme.Height);
 
-	element->x = TryGet<uint32_t>(elementNode, "x", theme.x);
-	element->y = TryGet<uint32_t>(elementNode, "y", theme.y);
+	element->x = std::abs(TryGet<float>(elementNode, "x", theme.x));
+	element->y = std::abs(TryGet<float>(elementNode, "y", theme.y));
 
 	element->xAlignment = theme.xAlignment;
 	if(elementNode.HasMember("xAlignment")) {

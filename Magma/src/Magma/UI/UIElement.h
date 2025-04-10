@@ -40,8 +40,8 @@ class UIElement : public VolcaniCore::Derivable<UIElement> {
 public:
 	uint32_t Width = 0;
 	uint32_t Height = 0;
-	uint32_t x = 0;
-	uint32_t y = 0;
+	float x = 0;
+	float y = 0;
 	XAlignment xAlignment = XAlignment::Left;
 	YAlignment yAlignment = YAlignment::Top;
 	bool UsePosition = true;

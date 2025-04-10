@@ -495,7 +495,7 @@ void RegisterECS() {
 		asOFFSET(Transform, Scale));
 
 	engine->RegisterObjectMethod("RigidBody",
-		"Transform get_PhysicsTransform() const property",
+		"Transform get_GetTransform() const property",
 		asMETHOD(Physics::RigidBody, GetTransform), asCALL_THISCALL);
 	// engine->RegisterObjectMethod("RigidBody", "void ApplyForce(Vec3 force)",
 	// 	asMETHOD(Physics::DynamicBody::ApplyForce));
