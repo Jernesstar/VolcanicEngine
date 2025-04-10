@@ -16,6 +16,9 @@
 #include <Editor/AssetManager.h>
 #include <Editor/AssetImporter.h>
 
+#undef near
+#undef far
+
 #define FOCUS_COMPONENT(Name) \
 template<> \
 void ComponentEditorPanel::SetFocus<Name##Component>() { \

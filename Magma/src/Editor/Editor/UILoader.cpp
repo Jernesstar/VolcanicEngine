@@ -254,9 +254,9 @@ Theme UILoader::LoadTheme(const std::string& path) {
 			theme.Height = windowTheme["Height"].Get<uint32_t>();
 
 		if(windowTheme.HasMember("x"))
-			theme.x = windowTheme["x"].Get<int32_t>();
+			theme.x = windowTheme["x"].Get<float>();
 		if(windowTheme.HasMember("y"))
-			theme.y = windowTheme["y"].Get<int32_t>();
+			theme.y = windowTheme["y"].Get<float>();
 
 		if(windowTheme.HasMember("xAlignment")) {
 			const auto& xAlign = windowTheme["xAlignment"];
@@ -436,7 +436,7 @@ void LoadElement(UIPage& page, const rapidjson::Value& elementNode,
 		parent = elementNode["Parent"].Get<std::string>();
 
 	UINode node;
-	UIElement* element;
+	UIElement* element = nullptr;
 	ThemeElement theme;
 
 	if(typeStr == "Window") {
@@ -583,6 +583,24 @@ void LoadElement(UIPage& page, const rapidjson::Value& elementNode,
 		element->ModuleID = elementNode["ModuleID"].Get<uint64_t>();
 	if(elementNode.HasMember("Class"))
 		element->Class = elementNode["Class"].Get<std::string>();
+
+	if(element->ModuleID && element->Class != "") {
+		Editor& editor = Application::As<EditorApp>()->GetEditor();
+		EditorAssetManager& assetManager = editor.GetAssetManager();
+		Asset asset = { element->ModuleID, AssetType::Script };
+
+		if(!assetManager.IsValid(asset))
+			return;
+
+		assetManager.Load(asset);
+		auto mod = assetManager.Get<ScriptModule>(asset);
+		Ref<ScriptClass> _class = mod->GetClass(element->Class);
+
+		if(!_class)
+			return;
+
+		element->ScriptInstance = _class->Construct();
+	}
 }
 
 }

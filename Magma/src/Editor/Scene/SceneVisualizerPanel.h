@@ -102,6 +102,8 @@ private:
 	Physics::World m_World;
 	Entity m_Selected;
 	UI::Image m_Image;
+
+	friend class ProjectTab;
 };
 
 }

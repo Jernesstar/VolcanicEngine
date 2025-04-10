@@ -88,7 +88,7 @@ void UIHierarchyPanel::Draw() {
 
 			if(s_AddToElement)
 				if(ImGui::MenuItem("Delete")) {
-					// m_Running->Delete(s_AddToElement->GetID());
+					m_Context->Delete(s_AddToElement->GetNode());
 				}
 
 			ImGui::EndPopup();
@@ -170,6 +170,10 @@ void UIHierarchyPanel::Draw() {
 				if(exit) {
 					UINode newNode = m_Context->Add(type, str);
 					UIElement* element = m_Context->Get(newNode);
+
+					if(element->Is(UIElementType::Button))
+						element->As<UI::Button>()->Display =
+							CreateRef<UI::Text>();
 
 					if(s_AddToElement)
 						s_AddToElement->Add(newNode);

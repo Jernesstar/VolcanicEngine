@@ -93,7 +93,7 @@ void ContentBrowserPanel::Draw() {
 			ImGui::PushClipRect(rect.Min, rect.Max, false);
 			{
 				float x = style.FramePadding.x
-						+ ImGui::GetCurrentContext()->FontSize;
+						+ ImGui::GetCurrentContext()->FontSize
 						+ style.ItemInnerSpacing.x;
 				float y = style.FramePadding.y;
 				ImGui::SetCursorPos({ x, y });

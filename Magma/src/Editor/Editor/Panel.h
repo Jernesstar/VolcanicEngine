@@ -24,7 +24,7 @@ public:
 	void SetTab(Tab* tab) { m_Tab = tab; }
 
 protected:
-	Tab* m_Tab;
+	Tab* m_Tab = nullptr;
 };
 
 }

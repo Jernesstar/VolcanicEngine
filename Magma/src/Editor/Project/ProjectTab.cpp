@@ -12,6 +12,10 @@
 #include "Editor/AssetImporter.h"
 #include "Editor/SceneLoader.h"
 
+#include "Scene/SceneHierarchyPanel.h"
+#include "Scene/SceneVisualizerPanel.h"
+#include "Scene/ComponentEditorPanel.h"
+
 #include "ContentBrowserPanel.h"
 #include "AssetEditorPanel.h"
 
@@ -162,10 +166,22 @@ void ProjectTab::RenderButtons() {
 void ProjectTab::OnPlay() {
 	m_ScreenState = ScreenState::Play;
 	App::Get()->Running = true;
-	App::Get()->RenderUI = false;
 	App::Get()->OnLoad();
 
-	
+	auto& editor = Application::As<EditorApp>()->GetEditor();
+	Ref<Tab> current = editor.GetCurrentTab();
+
+	if(current->Type == TabType::Scene) {
+		auto tab = current->As<SceneTab>();
+		auto visualizer =
+			tab->GetPanel("SceneVisualizer")->As<SceneVisualizerPanel>();
+		Ref<Framebuffer> display = App::Get()->GetRenderer().GetOutput();
+		visualizer->m_Image.Content = display->Get(AttachmentTarget::Color);
+
+		auto* scene = tab->GetScene();
+		App::Get()->LoadScene(scene);
+		// App::Get()->ScreenSet();
+	}
 }
 
 void ProjectTab::OnPause() {
@@ -181,6 +197,17 @@ void ProjectTab::OnResume() {
 void ProjectTab::OnStop() {
 	if(m_ScreenState == ScreenState::Edit)
 		return;
+
+	auto& editor = Application::As<EditorApp>()->GetEditor();
+	Ref<Tab> current = editor.GetCurrentTab();
+
+	if(current->Type == TabType::Scene) {
+		auto tab = current->As<SceneTab>();
+		auto visualizer =
+			tab->GetPanel("SceneVisualizer")->As<SceneVisualizerPanel>();
+		Ref<Framebuffer> display = visualizer->m_Renderer.GetOutput();
+		visualizer->m_Image.Content = display->Get(AttachmentTarget::Color);
+	}
 
 	m_ScreenState = ScreenState::Edit;
 	App::Get()->Running = false;

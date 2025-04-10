@@ -42,6 +42,9 @@ static bool s_ShouldPushScreen = false;
 static bool s_ShouldPopScreen = false;
 static std::string s_NewScreenName = "";
 
+static Scene* s_ShouldLoadScene = nullptr;
+static UIPage* s_ShouldLoadUI = nullptr;
+
 struct RuntimeScreen {
 	Ref<Scene> World;
 	UIPage UI;
@@ -198,12 +201,12 @@ void App::OnUpdate(TimeStep ts) {
 		});
 }
 
-void App::LoadScene(const std::string& name) {
-	s_Screen->World->Name = name;
+void App::LoadScene(Scene* scene) {
+	s_ShouldLoadScene = scene;
 }
 
-void App::LoadUI(const std::string& name) {
-	s_Screen->UI.Name = name;
+void App::LoadUI(UIPage* ui) {
+	s_ShouldLoadUI = ui;
 }
 
 void App::SwitchScreen(const std::string& name) {
@@ -252,11 +255,29 @@ void App::ScreenSet(const std::string& name) {
 	auto scriptClass = s_Screen->Script->GetClass(name);
 	s_Screen->ScriptObj = scriptClass->Instantiate();
 
-	if(screen.Scene != "") {
+	if(s_ShouldLoadScene) {
+		*s_Screen->World = *s_ShouldLoadScene;
+		s_ShouldLoadScene = nullptr;
+		s_Screen->World->RegisterSystems();
+	}
+	else if(screen.Scene != "") {
 		SceneLoad(*s_Screen->World);
 		s_Screen->World->RegisterSystems();
 	}
-	if(screen.UI != "") {
+
+	if(s_ShouldLoadUI) {
+		s_Screen->UI = *s_ShouldLoadUI;
+		s_ShouldLoadUI = nullptr;
+		s_Screen->UI.Traverse(
+			[&](UIElement* element)
+			{
+				if(!element->ModuleID || element->Class == "")
+					return;
+
+				element->ScriptInstance->Init();
+			});
+	}
+	else if(screen.UI != "") {
 		UILoad(s_Screen->UI);
 		s_Screen->UI.Traverse(
 			[&](UIElement* element)

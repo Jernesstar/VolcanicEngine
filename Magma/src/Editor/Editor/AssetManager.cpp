@@ -93,7 +93,7 @@ void FileWatcher::handleFileAction(
 	const std::string& file, efsw::Action action, std::string oldFilename)
 {
 	auto fullPath = (fs::path(dir) / file).string();
-	auto assetDir = fs::path(dir).filename().string();
+	auto assetDir = fs::path(dir).parent_path().filename().string();
 	AssetType type = AssetTypeFromString(assetDir);
 
 	if(action == efsw::Actions::Add)
@@ -133,21 +133,25 @@ void FileWatcher::Remove(AssetType type, const std::string& path) {
 }
 
 void FileWatcher::ReloadMesh(const std::string& path) {
+	VOLCANICORE_LOG_INFO("Reloading Mesh at path '%s'", path.c_str());
 	auto id = m_AssetManager->GetFromPath(path);
 	m_AssetManager->m_MeshAssets[id] = AssetImporter::GetMesh(path);
 }
 
 void FileWatcher::ReloadTexture(const std::string& path) {
+	VOLCANICORE_LOG_INFO("Reloading Texture at path '%s'", path.c_str());
 	auto id = m_AssetManager->GetFromPath(path);
 	m_AssetManager->m_TextureAssets[id] = AssetImporter::GetTexture(path);
 }
 
 void FileWatcher::ReloadAudio(const std::string& path) {
+	VOLCANICORE_LOG_INFO("Reloading Audio at path '%s'", path.c_str());
 	auto id = m_AssetManager->GetFromPath(path);
 	m_AssetManager->m_AudioAssets[id] = AssetImporter::GetAudio(path);
 }
 
 void FileWatcher::ReloadScript(const std::string& path) {
+	VOLCANICORE_LOG_INFO("Reloading Script at path '%s'", path.c_str());
 	auto id = m_AssetManager->GetFromPath(path);
 	auto name = fs::path(path).filename().stem().string();
 	Ref<ScriptModule> mod = CreateRef<ScriptModule>(name);

@@ -173,7 +173,9 @@ void SceneVisualizerPanel::Draw() {
 		m_Image.Draw();
 	
 		auto camera = m_Renderer.GetCameraController().GetCamera();
-		if(m_Selected && m_Selected.Has<TransformComponent>()) {
+		if(tab->GetState() == ScreenState::Edit
+		&& m_Selected && m_Selected.Has<TransformComponent>())
+		{
 			const float* view = glm::value_ptr(camera->GetView());
 			const float* proj = glm::value_ptr(camera->GetProjection());
 			auto oper = ImGuizmo::OPERATION::ROTATE;
@@ -225,17 +227,8 @@ void SceneVisualizerPanel::Draw() {
 		}
 		ImGui::EndChild();
 
-		Ref<Framebuffer> display;
-		if(tab->GetState() != ScreenState::Edit) {
-			m_Context->OnRender(App::Get()->GetRenderer());
-			display = App::Get()->GetRenderer().GetOutput();
-		}
-		else {
+		if(tab->GetState() == ScreenState::Edit)
 			m_Context->OnRender(m_Renderer);
-			display = m_Renderer.GetOutput();
-		}
-
-		m_Image.Content = display->Get(AttachmentTarget::Color);
 
 		bool open = false;
 		if(options.add.asset.Type == AssetType::Mesh)

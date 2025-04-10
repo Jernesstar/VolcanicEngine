@@ -45,10 +45,8 @@ void UIVisualizerPanel::SetContext(UIPage* page) {
 	m_Running->Add(root);
 
 	UIElement* window = m_Running->Get(root);
-
-	for(auto [layer, nodes] : page->LayerNodes)
-		for(auto node : nodes)
-			window->Add(node);
+	for(UIElement* element : page->GetFirstOrderElements())
+		window->Add(element->GetNode());
 
 	for(UIElement* element : window->GetChildren()) {
 		element->xAlignment = XAlignment::Left;
@@ -262,7 +260,7 @@ void UIVisualizerPanel::Draw() {
 					element->Color = other->Color;
 					if(element->GetType() == UIElementType::Text)
 						element->As<Text>()->Content = other->As<Text>()->Content;
-					// Exclude all the elements that were recently first orders
+					// Exclude all the elements that were recently first-order
 					if(other->GetParent()) {
 						element->xAlignment = other->xAlignment;
 						element->yAlignment = other->yAlignment;

@@ -22,6 +22,7 @@ public:
 	void Render() override;
 
 	void SetScene(const std::string& path);
+	Scene* GetScene() { return &m_Scene; }
 
 	void NewScene();
 	void OpenScene();

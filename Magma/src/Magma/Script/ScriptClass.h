@@ -26,6 +26,7 @@ public:
 		obj->AddRef();
 		auto newObj = CreateRef<ScriptObject>(obj);
 		newObj->m_Class = this;
+		newObj->m_Initialized = true;
 
 		return newObj;
 	}
@@ -36,6 +37,8 @@ public:
 								->CreateUninitializedScriptObject(m_Type);
 		auto newObj = CreateRef<ScriptObject>(obj);
 		newObj->m_Class = this;
+		newObj->m_Initialized = false;
+
 		return newObj;
 	}
 
@@ -57,6 +60,7 @@ private:
 	ScriptModule* m_Module;
 
 	friend class ScriptModule;
+	friend class ScriptObject;
 };
 
 }

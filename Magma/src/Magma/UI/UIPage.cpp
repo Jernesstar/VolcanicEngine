@@ -26,6 +26,12 @@ static void TraverseElement(UIElement* element,
 UIPage::UIPage() {
 	m_Layers.Push("Root");
 	LayerNodes["Root"] = List<UINode>();
+	Windows.Allocate(10);
+	Buttons.Allocate(10);
+	Dropdowns.Allocate(10);
+	Texts.Allocate(10);
+	TextInputs.Allocate(10);
+	Images.Allocate(10);
 }
 
 UIPage::UIPage(const std::string& name)
@@ -33,6 +39,12 @@ UIPage::UIPage(const std::string& name)
 {
 	m_Layers.Push("Root");
 	LayerNodes["Root"] = List<UINode>();
+	Windows.Allocate(10);
+	Buttons.Allocate(10);
+	Dropdowns.Allocate(10);
+	Texts.Allocate(10);
+	TextInputs.Allocate(10);
+	Images.Allocate(10);
 }
 
 UIPage& UIPage::operator=(const UIPage& other) {

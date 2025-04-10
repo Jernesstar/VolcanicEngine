@@ -1,5 +1,10 @@
 #include "UIElementEditorPanel.h"
 
+#ifdef _MSC_VER
+#define NOMINMAX
+#define WIN32_LEAN_AND_MEAN
+#endif
+
 #include <imgui/imgui.h>
 #include <imgui/imgui_internal.h>
 #include <imgui/misc/cpp/imgui_stdlib.h>
@@ -99,6 +104,8 @@ static void EditColor(glm::vec4& color) {
 }
 
 static Asset s_Asset;
+static bool s_ClassSelect;
+static std::string s_Class;
 
 static void SelectScript() {
 	namespace fs = std::filesystem;
@@ -146,8 +153,26 @@ static void SelectScript() {
 			ImGui::EndTable();
 		}
 
-		if(ImGui::Button("Close"))
+		if(ImGui::Button("Close")) {
+			s_Asset.Type = AssetType::None;
 			ImGui::CloseCurrentPopup();
+		}
+
+		ImGui::EndPopup();
+	}
+}
+
+static void SelectClass(Ref<ScriptModule> mod) {
+	ImGui::OpenPopup("Select Script Class");
+	if(ImGui::BeginPopupModal("Select Script Class"));
+	{
+		for(const auto& [name, _] : mod->GetClasses()) {
+			bool pressed = ImGui::Button(name.c_str());
+			if(pressed) {
+				s_Class = name;
+				ImGui::CloseCurrentPopup();
+			}
+		}
 
 		ImGui::EndPopup();
 	}
@@ -294,11 +319,32 @@ void EditElement<UIElement>(UIElement* element) {
 		if(ImGui::Button("Create Script Object"))
 			s_Asset.Type = AssetType::Script;
 
+		Editor& editor = Application::As<EditorApp>()->GetEditor();
+		EditorAssetManager& assetManager = editor.GetAssetManager();
+		Asset asset = { element->ModuleID, AssetType::Script };
+
 		if(s_Asset.Type != AssetType::None)
 			SelectScript();
 		if(s_Asset.ID) {
 			element->ModuleID = s_Asset.ID;
-			
+			s_ClassSelect = true;
+			s_Asset = { };
+
+			asset = { element->ModuleID, AssetType::Script };
+			assetManager.Load(asset);
+		}
+		if(s_ClassSelect) {
+			SelectClass(assetManager.Get<ScriptModule>(asset));
+		}
+		if(s_Class != "") {
+			element->Class = s_Class;
+
+			auto mod = assetManager.Get<ScriptModule>(asset);
+			auto _class = mod->GetClass(s_Class);
+			element->ScriptInstance = _class->Construct();
+
+			s_ClassSelect = false;
+			s_Class = "";
 		}
 
 		return;
@@ -308,15 +354,17 @@ void EditElement<UIElement>(UIElement* element) {
 	for(uint32_t i = 0; i < handle->GetPropertyCount(); i++) {
 		auto typeID = handle->GetPropertyTypeId(i);
 		auto* typeInfo = ScriptEngine::Get()->GetTypeInfoById(typeID);
+		void* address = handle->GetAddressOfProperty(i);
 
 		if(typeInfo) {
 			ImGui::Text(typeInfo->GetName());
 			ImGui::SameLine(100.0f);
-			ImGui::Text(handle->GetPropertyName(i));
-			continue;
+			ImGui::Text(handle->GetPropertyName(i)); ImGui::SameLine(200.0f);
+
+			if(typeInfo->GetName() == std::string("string"))
+				ImGui::InputText("##Text", (std::string*)address);
 		}
 
-		void* address = handle->GetAddressOfProperty(i);
 		if(typeID == asTYPEID_BOOL) {
 			ImGui::Text("bool"); ImGui::SameLine(100.0f);
 			ImGui::Text(handle->GetPropertyName(i)); ImGui::SameLine(200.0f);

@@ -46,12 +46,7 @@ enum class UIType {
 
 static List<UIType> s_Stack;
 
-UIState UIRenderer::DrawWindow(UI::Window& window) {
-	if(window.Width == 0 || window.Height == 0) {
-		s_Stack.Add(UIType::DummyWindow);
-		return { };
-	}
-
+static ImVec2 CalcPosition(UIElement* element) {
 	ImGuiViewport* viewport = ImGui::GetMainViewport();
 
 	float width = viewport->Size.x;
@@ -59,8 +54,8 @@ UIState UIRenderer::DrawWindow(UI::Window& window) {
 	float x = viewport->Pos.x;
 	float y = viewport->Pos.y;
 
-	if(window.GetParent()) {
-		UIElement* parent = window.GetParent();
+	if(element->GetParent()) {
+		UIElement* parent = element->GetParent();
 		width = parent->Width;
 		height = parent->Height;
 		x = parent->x;
@@ -69,7 +64,7 @@ UIState UIRenderer::DrawWindow(UI::Window& window) {
 
 	float alignX = 0;
 	float alignY = 0;
-	switch(window.xAlignment) {
+	switch(element->xAlignment) {
 		case XAlignment::Center:
 			alignX = width / 2;
 			break;
@@ -78,7 +73,7 @@ UIState UIRenderer::DrawWindow(UI::Window& window) {
 			x = -x;
 			break;
 	}
-	switch(window.yAlignment) {
+	switch(element->yAlignment) {
 		case YAlignment::Center:
 			alignY = height / 2;
 			break;
@@ -88,8 +83,16 @@ UIState UIRenderer::DrawWindow(UI::Window& window) {
 			break;
 	}
 
-	ImGui::SetNextWindowPos(
-		ImVec2{ x + alignX + window.x, y + alignY + window.y });
+	return ImVec2{ x + alignX + element->x, y + alignY + element->y };
+}
+
+UIState UIRenderer::DrawWindow(UI::Window& window) {
+	if(window.Width == 0 || window.Height == 0) {
+		s_Stack.Add(UIType::DummyWindow);
+		return { };
+	}
+
+	ImGui::SetNextWindowPos(CalcPosition(&window));
 
 	if(s_Stack
 	&& (s_Stack[-1] == UIType::Window || s_Stack[-1] == UIType::DummyWindow
@@ -134,10 +137,8 @@ UIState UIRenderer::DrawWindow(UI::Window& window) {
 		s_Stack.Add(UIType::Window);
 	}
 
-	if(ImGui::IsMouseDragging(ImGuiMouseButton_Left)) {
-		window.Width = ImGui::GetWindowSize().x;
-		window.Height = ImGui::GetWindowSize().y;
-	}
+	window.Width = ImGui::GetWindowSize().x;
+	window.Height = ImGui::GetWindowSize().y;
 
 	// TODO(Implement): WindowState
 	return {
@@ -190,7 +191,7 @@ UIState UIRenderer::DrawImage(UI::Image& image) {
 	auto texture = image.Content->As<OpenGL::Texture2D>();
 
 	ImVec2 dim = ImVec2(image.Width, image.Height);
-	if(image.x != -1 && image.y != -1)
+	if(image.UsePosition)
 		ImGui::SetCursorPos(ImVec2(image.x, image.y));
 	ImGui::Image((ImTextureID)(intptr_t)texture->GetID(), dim, ImVec2(0, 1), ImVec2(1, 0));
 

@@ -46,7 +46,6 @@ public:
 	YAlignment yAlignment = YAlignment::Top;
 	bool UsePosition = true;
 	glm::vec4 Color = glm::vec4(0.0f);
-	// TODO(Implement): Border
 	VolcaniCore::List<UINode> Children;
 	std::string Class = "";
 	VolcaniCore::UUID ModuleID = 0;
@@ -69,7 +68,7 @@ public:
 	UIState GetState() const { return m_State; }
 
 	UIElement& SetSize(uint32_t width, uint32_t height);
-	UIElement& SetPosition(uint32_t x, uint32_t y);
+	UIElement& SetPosition(float x, float y);
 	UIElement& CenterX();
 	UIElement& CenterY();
 	UIElement& Center();

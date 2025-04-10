@@ -59,4 +59,8 @@ ScriptFunc ScriptObject::GetFunc(const std::string& name) const {
 	return ScriptFunc{ function, ctx, m_Handle };
 }
 
+ScriptFunc ScriptObject::GetClassFunc() const {
+	return m_Class->GetFunc();
+}
+
 }
