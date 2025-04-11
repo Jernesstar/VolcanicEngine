@@ -102,11 +102,11 @@ static glm::vec3 GetLightPosition(ECS::Entity entity) {
 
 void SceneVisualizerPanel::Add(ECS::Entity entity) {
 	if(IsLight(entity)) {
-		auto shape = Shape::Create(Shape::Type::Box);
-		auto body = RigidBody::Create(RigidBody::Type::Static, shape);
-		body->SetTransform({ .Translation = GetLightPosition(entity) });
-		body->Data = (void*)(uint64_t)entity.GetHandle();
-		m_World.AddActor(body);
+		// auto shape = Shape::Create(Shape::Type::Box);
+		// auto body = RigidBody::Create(RigidBody::Type::Static, shape);
+		// body->SetTransform({ .Translation = GetLightPosition(entity) });
+		// body->Data = (void*)(uint64_t)entity.GetHandle();
+		// m_World.AddActor(body);
 
 		return;
 	}
@@ -114,11 +114,15 @@ void SceneVisualizerPanel::Add(ECS::Entity entity) {
 	const auto& tc = entity.Get<TransformComponent>();
 	const auto& mc = entity.Get<MeshComponent>();
 
+	auto& editor = Application::As<EditorApp>()->GetEditor();
+	auto& assetManager = editor.GetAssetManager();
+	// assetManager.Load(mc.MeshAsset);
+	// auto mesh = assetManager.Get<Mesh>(mc.MeshAsset);
+
 	// auto shape = Shape::Create(mesh);
 	// auto body = RigidBody::Create(RigidBody::Type::Static, shape);
 	// body->SetTransform(tc);
 	// body->Data = (void*)(uint64_t)entity.GetHandle();
-	// m_Selected = entity;
 }
 
 void SceneVisualizerPanel::Remove(ECS::Entity entity) {
@@ -534,6 +538,13 @@ void EditorSceneRenderer::Begin() {
 	}
 
 	BillboardBuffer->Clear(DrawBufferIndex::Instances);
+
+	LineCommand = RendererAPI::Get()->NewDrawCommand(LinePass->Get());
+	LineCommand->DepthTest = DepthTestingMode::On;
+	LineCommand->Culling = CullingMode::Off;
+	LineCommand->Blending = BlendingMode::Greatest;
+	LineCommand->UniformData
+	.SetInput("u_ViewProj", m_Controller.GetCamera()->GetViewProjection());
 }
 
 void EditorSceneRenderer::SubmitCamera(const Entity& entity) {
@@ -570,7 +581,7 @@ void EditorSceneRenderer::SubmitCamera(const Entity& entity) {
 	};
 
 	constexpr uint32_t indexCount = 24;
-	uint32_t indices[] =
+	uint32_t indices[indexCount] =
 	{
 		8, 7, // Left Top
 		8, 6, // Right Top
@@ -588,24 +599,20 @@ void EditorSceneRenderer::SubmitCamera(const Entity& entity) {
 		6, 5, // Back Right
 	};
 
-	auto* command = RendererAPI::Get()->NewDrawCommand(LinePass->Get());
-	command->DepthTest = DepthTestingMode::On;
-	command->Culling = CullingMode::Off;
-	command->Blending = BlendingMode::Greatest;
-	command->UniformData
-	.SetInput("u_ViewProj", m_Controller.GetCamera()->GetViewProjection());
-
 	auto* buffer = LinePass->Get()->BufferData;
 	RendererAPI::Get()
 	->SetBufferData(buffer, DrawBufferIndex::Vertices, points, 9, 0);
 	RendererAPI::Get()
 	->SetBufferData(buffer, DrawBufferIndex::Indices, indices, indexCount);
 
-	auto& call = command->NewDrawCall();
+	auto& call = LineCommand->NewDrawCall();
 	call.VertexCount = 9;
 	call.IndexCount = indexCount;
 	call.Partition = PartitionType::Single;
 	call.Primitive = PrimitiveType::Line;
+
+	LineCommand->IndicesIndex = 24;
+	LineCommand->VerticesIndex = 9;
 }
 
 void EditorSceneRenderer::SubmitSkybox(const Entity& entity) {
@@ -668,8 +675,8 @@ struct Spotlight {
 
 void EditorSceneRenderer::SubmitLight(const Entity& entity) {
 	glm::vec3 position;
-	uint32_t start;
-	uint32_t count;
+	uint64_t start = 0;
+	uint64_t count = 0;
 
 	if(entity.Has<DirectionalLightComponent>()) {
 		DirectionalLight light = entity.Get<DirectionalLightComponent>();
@@ -677,8 +684,6 @@ void EditorSceneRenderer::SubmitLight(const Entity& entity) {
 		HasDirectionalLight = true;
 
 		position = light.Position;
-		start = 0;
-		count = 0;
 	}
 	else if(entity.Has<PointLightComponent>()) {
 		PointLight light = entity.Get<PointLightComponent>();
@@ -891,15 +896,35 @@ void EditorSceneRenderer::Render() {
 
 	}
 
+	List<Point> points(rb.getNbLines() * 2);
+	List<uint32_t> indices(rb.getNbLines() * 2);
+
 	for(uint32_t i = 0; i < rb.getNbLines(); i++) {
 		const PxDebugLine& l = rb.getLines()[i];
-		Line line{
-			{ { l.pos0.x, l.pos0.y, l.pos0.z }, glm::vec3(1.0f) },
-			{ { l.pos1.x, l.pos1.y, l.pos1.z }, glm::vec3(1.0f) },
-		};
-
-		Renderer3D::DrawLine(line);
+		Point p0 = { { l.pos0.x, l.pos0.y, l.pos0.z }, glm::vec3(1.0f) };
+		Point p1 = { { l.pos1.x, l.pos1.y, l.pos1.z }, glm::vec3(1.0f) };
+		points.Add(p0);
+		points.Add(p1);
+		indices.Add(i);
+		indices.Add(i + 1);
 	}
+
+	auto* buffer = LinePass->Get()->BufferData;
+	RendererAPI::Get()
+	->SetBufferData(buffer, DrawBufferIndex::Indices, indices.GetBuffer().Get(),
+					indices.Count(), LineCommand->IndicesIndex);
+	RendererAPI::Get()
+	->SetBufferData(buffer, DrawBufferIndex::Vertices, points.GetBuffer().Get(),
+					points.Count(), LineCommand->VerticesIndex);
+
+	auto& call = LineCommand->NewDrawCall();
+	call.IndexStart = LineCommand->IndicesIndex;
+	call.IndexCount = indices.Count();
+	call.VertexStart = LineCommand->VerticesIndex;
+	call.VertexCount = points.Count();
+	call.Partition = PartitionType::Single;
+	call.Primitive = PrimitiveType::Line;
+
 #endif
 
 	Renderer::Flush();

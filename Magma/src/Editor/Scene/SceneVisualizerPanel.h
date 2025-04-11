@@ -48,6 +48,7 @@ private:
 
 	// Lines
 	Ref<RenderPass> LinePass;
+	DrawCommand* LineCommand;
 
 	// Billboards
 	Ref<RenderPass> BillboardPass;

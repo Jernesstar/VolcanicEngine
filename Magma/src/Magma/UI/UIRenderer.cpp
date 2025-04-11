@@ -56,8 +56,8 @@ static ImVec2 CalcPosition(UIElement* element) {
 
 	if(element->GetParent()) {
 		UIElement* parent = element->GetParent();
-		width = parent->Width;
-		height = parent->Height;
+		width = (float)parent->Width;
+		height = (float)parent->Height;
 		x = parent->x;
 		y = parent->y;
 	}
@@ -106,7 +106,7 @@ UIState UIRenderer::DrawWindow(UI::Window& window) {
 						 | ImGuiWindowFlags_NoScrollWithMouse
 						 | ImGuiWindowFlags_NoTitleBar
 						 | ImGuiWindowFlags_NoCollapse;
-		ImVec2 size(window.Width, window.Height);
+		ImVec2 size((float)window.Width, (float)window.Height);
 
 		ImGui::PushStyleColor(ImGuiCol_FrameBg, window.Color);
 		ImGui::BeginChild(window.GetID().c_str(), size, childFlags, windowFlags);
@@ -123,7 +123,7 @@ UIState UIRenderer::DrawWindow(UI::Window& window) {
 						 | ImGuiWindowFlags_NoBringToFrontOnFocus
 						 | ImGuiWindowFlags_NoNavFocus;
 
-		ImGui::SetNextWindowSize(ImVec2(window.Width, window.Height));
+		ImGui::SetNextWindowSize(ImVec2((float)window.Width, (float)window.Height));
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 10.0f);
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 10.0f);
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
@@ -137,8 +137,8 @@ UIState UIRenderer::DrawWindow(UI::Window& window) {
 		s_Stack.Add(UIType::Window);
 	}
 
-	window.Width = ImGui::GetWindowSize().x;
-	window.Height = ImGui::GetWindowSize().y;
+	window.Width = (uint32_t)ImGui::GetWindowSize().x;
+	window.Height = (uint32_t)ImGui::GetWindowSize().y;
 
 	// TODO(Implement): WindowState
 	return {
