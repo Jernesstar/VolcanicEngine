@@ -7,7 +7,7 @@
 using namespace Magma::ECS;
 
 struct GameEvent {
-	const std::string ID;
+	std::string ID;
 };
 
 namespace Magma {
@@ -29,6 +29,7 @@ public:
 
 public:
 	TimeStep m_TimeStep;
+	GameEvent m_Event;
 
 	flecs::entity m_KeyPressedCallbackEntity;
 	flecs::entity m_KeyReleasedCallbackEntity;

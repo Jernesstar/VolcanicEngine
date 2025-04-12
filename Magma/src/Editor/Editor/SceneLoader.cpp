@@ -292,39 +292,43 @@ void SerializeEntity(YAMLSerializer& serializer, const Entity& entity) {
 	}
 	if(entity.Has<RigidBodyComponent>()) {
 		auto body = entity.Get<RigidBodyComponent>().Body;
-		auto type = body->GetType();
-		auto t = type == RigidBody::Type::Static ? "Static" : "Dynamic";
-
 		serializer.WriteKey("RigidBodyComponent")
-		.BeginMapping()
-			.WriteKey("Body").BeginMapping()
-				.WriteKey("Type").Write(t);
+		.BeginMapping();
 
-		if(body->HasShape()) {
-			std::string shapeType;
-			switch(body->GetShape()->GetType()) {
-				case Shape::Type::Box:
-					shapeType = "Box";
-					break;
-				case Shape::Type::Sphere:
-					shapeType = "Sphere";
-					break;
-				case Shape::Type::Plane:
-					shapeType = "Plane";
-					break;
-				case Shape::Type::Capsule:
-					shapeType = "Capsule";
-					break;
-				case Shape::Type::Mesh:
-					shapeType = "Mesh";
-					break;
+		if(body) {
+			auto type = body->GetType();
+			auto t = type == RigidBody::Type::Static ? "Static" : "Dynamic";
+
+			serializer.WriteKey("Body")
+				.BeginMapping()
+					.WriteKey("Type").Write(t);
+
+			if(body->HasShape()) {
+				std::string shapeType;
+				switch(body->GetShape()->GetType()) {
+					case Shape::Type::Box:
+						shapeType = "Box";
+						break;
+					case Shape::Type::Sphere:
+						shapeType = "Sphere";
+						break;
+					case Shape::Type::Plane:
+						shapeType = "Plane";
+						break;
+					case Shape::Type::Capsule:
+						shapeType = "Capsule";
+						break;
+					case Shape::Type::Mesh:
+						shapeType = "Mesh";
+						break;
+				}
+
+				serializer.WriteKey("ShapeType").Write(shapeType);
 			}
 
-			serializer.WriteKey("ShapeType").Write(shapeType);
+			serializer.EndMapping(); // Body
 		}
-		serializer
-			.EndMapping() // Body
-		.EndMapping(); // RigidBodyComponent
+		serializer.EndMapping(); // RigidBodyComponent
 	}
 	if(entity.Has<DirectionalLightComponent>()) {
 		const auto& light = entity.Get<DirectionalLightComponent>();
@@ -546,27 +550,35 @@ void DeserializeEntity(YAML::Node entityNode, Scene& scene) {
 	auto rigidBodyComponentNode = components["RigidBodyComponent"];
 	if(rigidBodyComponentNode) {
 		auto rigidBodyNode = rigidBodyComponentNode["Body"];
-		auto typeStr	   = rigidBodyNode["Type"].as<std::string>();
-		auto shapeTypeStr  = rigidBodyNode["Shape Type"].as<std::string>();
+		if(rigidBodyNode) {
+			auto typeStr	   = rigidBodyNode["Type"].as<std::string>();
+			auto shapeTypeStr  = rigidBodyNode["ShapeType"].as<std::string>();
 
-		RigidBody::Type type = (typeStr == "Static") ? RigidBody::Type::Static
-							 						 : RigidBody::Type::Dynamic;
-		Shape::Type shapeType;
-		if(shapeTypeStr == "Box")	  shapeType = Shape::Type::Box;
-		if(shapeTypeStr == "Sphere")  shapeType = Shape::Type::Sphere;
-		if(shapeTypeStr == "Plane")	  shapeType = Shape::Type::Plane;
-		if(shapeTypeStr == "Capsule") shapeType = Shape::Type::Capsule;
-		if(shapeTypeStr == "Mesh")	  shapeType = Shape::Type::Mesh;
+			RigidBody::Type type =
+				(typeStr == "Static") ? RigidBody::Type::Static
+									  : RigidBody::Type::Dynamic;
+			Shape::Type shapeType;
+			if(shapeTypeStr == "Box")	  shapeType = Shape::Type::Box;
+			if(shapeTypeStr == "Sphere")  shapeType = Shape::Type::Sphere;
+			if(shapeTypeStr == "Plane")	  shapeType = Shape::Type::Plane;
+			if(shapeTypeStr == "Capsule") shapeType = Shape::Type::Capsule;
+			if(shapeTypeStr == "Mesh")	  shapeType = Shape::Type::Mesh;
+	
+			Ref<RigidBody> body;
+			if(shapeType == Shape::Type::Mesh)
+				body = RigidBody::Create(type);
+			else {
+				Ref<Shape> shape = Shape::Create(shapeType);
+				body = RigidBody::Create(type, shape);
+			}
 
-		Ref<RigidBody> body;
-		if(shapeType == Shape::Type::Mesh)
-			body = RigidBody::Create(type);
-		else {
-			Ref<Shape> shape = Shape::Create(shapeType);
-			body = RigidBody::Create(type, shape);
+			entity.Add<RigidBodyComponent>(body);
 		}
-
-		entity.Add<RigidBodyComponent>(body);
+		else {
+			Ref<Shape> shape = Shape::Create(Shape::Type::Box);
+			auto body = RigidBody::Create(RigidBody::Type::Static, shape);
+			entity.Add<RigidBodyComponent>(body);
+		}
 	}
 
 	auto directionalLightComponentNode = components["DirectionalLightComponent"];

@@ -26,7 +26,7 @@ Scene::Scene(const std::string& name)
 		.system<RigidBodyComponent>()
 		.kind(phase)
 		.run(
-			[&](flecs::iter& it)
+			[=, this](flecs::iter& it)
 			{
 				while(it.next()) {
 					auto sys = EntityWorld.Get<PhysicsSystem>();
@@ -53,7 +53,7 @@ Scene::Scene(const std::string& name)
 		.system<ScriptComponent>()
 		.kind(phase)
 		.run(
-			[&](flecs::iter& it)
+			[=, this](flecs::iter& it)
 			{
 				while(it.next()) {
 					auto sys = EntityWorld.Get<ScriptSystem>();
@@ -71,7 +71,7 @@ Scene::Scene(const std::string& name)
 	.with<RigidBodyComponent>()
 	.event(flecs::Monitor)
 	.each(
-		[&](flecs::iter& it, size_t i)
+		[=, this](flecs::iter& it, size_t i)
 		{
 			auto sys = EntityWorld.Get<PhysicsSystem>();
 			if(!sys)
@@ -92,7 +92,7 @@ Scene::Scene(const std::string& name)
 	.with<ScriptComponent>()
 	.event(flecs::Monitor)
 	.each(
-		[&](flecs::iter& it, size_t i)
+		[=, this](flecs::iter& it, size_t i)
 		{
 			auto sys = EntityWorld.Get<ScriptSystem>();
 			if(!sys)

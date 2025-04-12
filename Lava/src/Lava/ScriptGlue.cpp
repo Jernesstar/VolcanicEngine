@@ -422,6 +422,13 @@ static Physics::RigidBody* GetRigidBody(RigidBodyComponent* rc) {
 	return rc->Body.get();
 }
 
+static void RigidBodyApplyForce(Vec3 force, RigidBody* body) {
+	if(body->GetType() != RigidBody::Type::Dynamic)
+		return;
+
+	body->As<Physics::DynamicBody>()->ApplyForce(force);
+}
+
 void RegisterECS() {
 	auto* engine = ScriptEngine::Get();
 
@@ -495,10 +502,10 @@ void RegisterECS() {
 		asOFFSET(Transform, Scale));
 
 	engine->RegisterObjectMethod("RigidBody",
-		"Transform get_GetTransform() const property",
+		"Transform GetTransform() const",
 		asMETHOD(Physics::RigidBody, GetTransform), asCALL_THISCALL);
-	// engine->RegisterObjectMethod("RigidBody", "void ApplyForce(Vec3 force)",
-	// 	asMETHOD(Physics::DynamicBody::ApplyForce));
+	engine->RegisterObjectMethod("RigidBody", "void ApplyForce(Vec3 force)",
+		asFUNCTION(RigidBodyApplyForce), asCALL_CDECL_OBJLAST);
 
 	engine->RegisterObjectMethod("RigidBodyComponent", "RigidBody@ get_Body()",
 		asFUNCTION(GetRigidBody), asCALL_CDECL_OBJLAST);

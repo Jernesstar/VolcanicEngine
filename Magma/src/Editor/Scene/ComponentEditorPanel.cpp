@@ -30,6 +30,8 @@ bool ComponentEditorPanel::IsFocused<Name##Component>(Entity& entity) { \
 	return m_Context == entity && focus.component.Name; \
 }
 
+using namespace Magma::Physics;
+
 namespace Magma {
 
 static Asset s_Asset = { };
@@ -176,7 +178,7 @@ void DrawComponent<CameraComponent>(Entity& entity) {
 	if(ImGui::DragFloat3("Position", &pos.x, 1.0f, -FLT_MAX/2.0f, +FLT_MAX/2.0f))
 		camera->SetPosition(pos);
 	auto dir = camera->GetDirection();
-	if(ImGui::DragFloat3("Direction", &dir.x, 1.0f, -FLT_MAX/2.0f, +FLT_MAX/2.0f));
+	if(ImGui::DragFloat3("Direction", &dir.x, 1.0f, -FLT_MAX/2.0f, +FLT_MAX/2.0f))
 		camera->SetDirection(dir);
 
 	uint32_t max = 3000;
@@ -400,6 +402,36 @@ void DrawComponent<RigidBodyComponent>(Entity& entity) {
 	auto& component = entity.Set<RigidBodyComponent>();
 	ImGui::SeparatorText("RigidBodyComponent");
 
+	Ref<RigidBody> body = component.Body;
+	if(!body) {
+		if(ImGui::Button("Create RigidBody")) {
+
+		}
+
+		return;
+	}
+
+	ImGui::Text("Type"); ImGui::SameLine(100.0f);
+	switch(body->GetType()) {
+		case RigidBody::Type::Static:
+		{
+			ImGui::Text("Static");
+			if(ImGui::Button("Switch to Dynamic")) {
+				
+			}
+
+			break;
+		}
+		case RigidBody::Type::Dynamic:
+		{
+			ImGui::Text("Dynamic");
+			if(ImGui::Button("Switch to Static")) {
+
+			}
+
+			break;
+		}
+	}
 }
 
 template<>

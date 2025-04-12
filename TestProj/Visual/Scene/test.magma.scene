@@ -10,13 +10,13 @@ Scene:
           CameraComponent:
             Camera:
               Type: Stereographic
-              VerticalFOV: 23
-              Position: [0, 0, 72]
+              VerticalFOV: 30
+              Position: [0, 2, 77]
               Direction: [0, 0, -1]
               ViewportWidth: 1920
               ViewportHeight: 1057
-              Near: 39.0009995
-              Far: 340.001007
+              Near: 48.0009995
+              Far: 122.000999
     - Entity:
         Name: Ball
         ID: 552
@@ -52,51 +52,6 @@ Scene:
               Constant: 1
               Linear: 0
               Quadratic: 0
-    - Entity:
-        Name: Player
-        ID: 560
-        Components:
-          TagComponent:
-            Tag: MainCharacter
-          TransformComponent:
-            Transform:
-              Translation: [0.400000006, 0.952400029, 13.4942999]
-              Rotation: [-0.206385106, -0.89431721, 0.0752492249]
-              Scale: [0.999951005, 0.999957681, 0.999964654]
-          MeshComponent:
-            AssetID: 15277418182178081176
-          ScriptComponent:
-            ModuleID: 2691709289590626850
-            Class: PlayerController
-            Fields:
-              - Field:
-                  Name: Class
-              - Field:
-                  Name: Handle
-                  Type: Entity
-                  Value: 560
-              - Field:
-                  Name: asset
-                  Type: Asset
-                  Value:
-                    ID: 0
-                    Type: 0
-              - Field:
-                  Name: SomeBool
-                  Type: bool
-                  Value: false
-              - Field:
-                  Name: Signed8
-                  Type: int8
-                  Value: 0
-              - Field:
-                  Name: Unsigned32
-                  Type: uint32
-                  Value: 0
-              - Field:
-                  Name: Float
-                  Type: float
-                  Value: 0
     - Entity:
         Name: ""
         ID: 565
@@ -138,3 +93,24 @@ Scene:
         Components:
           AudioComponent:
             AssetID: 16624656892553940704
+    - Entity:
+        Name: PhysicsBody
+        ID: 571
+        Components:
+          RigidBodyComponent:
+            Body:
+              Type: Static
+              ShapeType: Box
+    - Entity:
+        Name: Player
+        ID: 560
+        Components:
+          TagComponent:
+            Tag: MainCharacter
+          TransformComponent:
+            Transform:
+              Translation: [0.400000006, 0.952400029, 13.4942999]
+              Rotation: [-0.639108837, -0.755493343, 0.385580689]
+              Scale: [0.999946237, 0.999953926, 0.999964237]
+          MeshComponent:
+            AssetID: 15277418182178081176

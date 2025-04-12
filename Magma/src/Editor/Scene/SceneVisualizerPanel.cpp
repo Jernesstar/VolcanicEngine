@@ -610,9 +610,6 @@ void EditorSceneRenderer::SubmitCamera(const Entity& entity) {
 	call.IndexCount = indexCount;
 	call.Partition = PartitionType::Single;
 	call.Primitive = PrimitiveType::Line;
-
-	LineCommand->IndicesIndex = 24;
-	LineCommand->VerticesIndex = 9;
 }
 
 void EditorSceneRenderer::SubmitSkybox(const Entity& entity) {
@@ -890,40 +887,36 @@ void EditorSceneRenderer::Render() {
 #ifdef MAGMA_PHYSICS
 	auto* scene = Panel->GetPhysicsWorld().Get();
 	const PxRenderBuffer& rb = scene->getRenderBuffer();
+	if(rb.getNbLines()) {
+		List<Point> points(rb.getNbLines() * 2);
+		List<uint32_t> indices(rb.getNbLines() * 2);
+	
+		for(uint32_t i = 0; i < rb.getNbLines(); i++) {
+			const PxDebugLine& l = rb.getLines()[i];
+			Point p0 = { { l.pos0.x, l.pos0.y, l.pos0.z }, glm::vec3(1.0f) };
+			Point p1 = { { l.pos1.x, l.pos1.y, l.pos1.z }, glm::vec3(1.0f) };
+			points.Add(p0);
+			points.Add(p1);
+			indices.Add(i);
+			indices.Add(i + 1);
+		}
 
-	for(uint32_t i = 0; i < rb.getNbPoints(); i++) {
-		const PxDebugPoint& point = rb.getPoints()[i];
+		auto* buffer = LinePass->Get()->BufferData;
+		RendererAPI::Get()
+		->SetBufferData(buffer, DrawBufferIndex::Indices,
+			indices.GetBuffer().Get(), indices.Count(), 24);
+		RendererAPI::Get()
+		->SetBufferData(buffer, DrawBufferIndex::Vertices,
+			points.GetBuffer().Get(), points.Count(), 9);
 
+		auto& call = LineCommand->NewDrawCall();
+		call.IndexStart = 24;
+		call.IndexCount = indices.Count();
+		call.VertexStart = 9;
+		call.VertexCount = points.Count();
+		call.Partition = PartitionType::Single;
+		call.Primitive = PrimitiveType::Line;
 	}
-
-	List<Point> points(rb.getNbLines() * 2);
-	List<uint32_t> indices(rb.getNbLines() * 2);
-
-	for(uint32_t i = 0; i < rb.getNbLines(); i++) {
-		const PxDebugLine& l = rb.getLines()[i];
-		Point p0 = { { l.pos0.x, l.pos0.y, l.pos0.z }, glm::vec3(1.0f) };
-		Point p1 = { { l.pos1.x, l.pos1.y, l.pos1.z }, glm::vec3(1.0f) };
-		points.Add(p0);
-		points.Add(p1);
-		indices.Add(i);
-		indices.Add(i + 1);
-	}
-
-	auto* buffer = LinePass->Get()->BufferData;
-	RendererAPI::Get()
-	->SetBufferData(buffer, DrawBufferIndex::Indices, indices.GetBuffer().Get(),
-					indices.Count(), LineCommand->IndicesIndex);
-	RendererAPI::Get()
-	->SetBufferData(buffer, DrawBufferIndex::Vertices, points.GetBuffer().Get(),
-					points.Count(), LineCommand->VerticesIndex);
-
-	auto& call = LineCommand->NewDrawCall();
-	call.IndexStart = LineCommand->IndicesIndex;
-	call.IndexCount = indices.Count();
-	call.VertexStart = LineCommand->VerticesIndex;
-	call.VertexCount = points.Count();
-	call.Partition = PartitionType::Single;
-	call.Primitive = PrimitiveType::Line;
 
 #endif
 
