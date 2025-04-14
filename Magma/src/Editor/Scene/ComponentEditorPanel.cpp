@@ -234,11 +234,11 @@ void DrawComponent<TransformComponent>(Entity& entity) {
 	auto ro = glm::value_ptr(roD);
 	auto sc = glm::value_ptr(component.Scale);
 	ImGui::Text("Translation"); ImGui::SameLine(120.0f);
-	ImGui::DragFloat3("##Translation", tr, 0.1f, -FLT_MAX, +FLT_MAX, "%.4f");
+	ImGui::DragFloat3("##Translation", tr, 0.5f, -FLT_MAX, +FLT_MAX, "%.5f");
 	ImGui::Text("Rotation"); ImGui::SameLine(120.0f);
-	ImGui::DragFloat3("##Rotation", ro, 1.0f, 0.0f, 360.0f, "%.4f");
+	ImGui::DragFloat3("##Rotation", ro, 0.5f, 0.0001f, 360.0f, "%.5f");
 	ImGui::Text("Scale"); ImGui::SameLine(120.0f);
-	ImGui::DragFloat3("##Scale", sc, 0.1f, 0.0f, +FLT_MAX, "%.4f");
+	ImGui::DragFloat3("##Scale", sc, 0.5f, 0.0001f, +FLT_MAX, "%.5f");
 
 	component.Rotation = glm::radians(roD);
 }
@@ -270,7 +270,7 @@ void DrawComponent<MeshComponent>(Entity& entity) {
 	auto& component = entity.Set<MeshComponent>();
 	ImGui::SeparatorText("MeshComponent");
 
-	ImGui::Text("Asset ID: %lu", (uint64_t)component.MeshAsset.ID);
+	ImGui::Text("Asset ID: %llu", (uint64_t)component.MeshAsset.ID);
 	std::string text = component.MeshAsset.ID ? "Change Asset" : "Set Asset";
 	if(ImGui::Button(text.c_str()))
 		s_Selecting = AssetType::Mesh;
@@ -462,9 +462,8 @@ void DrawComponent<RigidBodyComponent>(Entity& entity) {
 	ImGui::DragFloat3("##Translation", &tr.Translation.x, 0.1f,
 		-FLT_MAX, +FLT_MAX, "%.4f");
 	ImGui::DragFloat3("##Rotation", &tr.Rotation.x, 0.1f,
-		-FLT_MAX, +FLT_MAX, "%.4f");
-	ImGui::DragFloat3("##Scale", &tr.Scale.x, 0.1f,
-		-FLT_MAX, +FLT_MAX, "%.4f");
+		0.0001f, 360.0f, "%.4f");
+	ImGui::DragFloat3("##Scale", &tr.Scale.x, 0.5f, 0.0001f, +FLT_MAX, "%.4f");
 }
 
 template<>

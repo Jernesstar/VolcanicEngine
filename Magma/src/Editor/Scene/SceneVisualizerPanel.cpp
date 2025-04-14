@@ -47,6 +47,29 @@ SceneVisualizerPanel::SceneVisualizerPanel(Scene* context)
 	m_Image.Width = m_Image.Content->GetWidth();
 	m_Image.Height = m_Image.Content->GetHeight();
 
+	m_GizmoTranslate.Display =
+		CreateRef<UI::Image>(
+			AssetImporter::GetTexture("Magma/assets/icons/GizmoTranslate.png",
+			false));
+	m_GizmoRotate.Display =
+		CreateRef<UI::Image>(
+			AssetImporter::GetTexture("Magma/assets/icons/GizmoRotate.png",
+			false));
+	m_GizmoScale.Display =
+		CreateRef<UI::Image>(
+			AssetImporter::GetTexture("Magma/assets/icons/GizmoScale.png",
+			false));
+
+	m_GizmoTranslate.SetSize(50, 50);
+	m_GizmoRotate.SetSize(50, 50);
+	m_GizmoScale.SetSize(50, 50);
+
+	m_GizmoTranslate.UsePosition = false;
+	m_GizmoRotate.UsePosition = false;
+	m_GizmoScale.UsePosition = false;
+
+	Application::PopDir();
+
 	SetContext(context);
 }
 
@@ -126,13 +149,14 @@ void SceneVisualizerPanel::Add(ECS::Entity entity) {
 
 	auto& editor = Application::As<EditorApp>()->GetEditor();
 	auto& assetManager = editor.GetAssetManager();
-	// assetManager.Load(mc.MeshAsset);
-	// auto mesh = assetManager.Get<Mesh>(mc.MeshAsset);
+	assetManager.Load(mc.MeshAsset);
+	auto mesh = assetManager.Get<Mesh>(mc.MeshAsset);
 
-	// auto shape = Shape::Create(mesh);
-	// auto body = RigidBody::Create(RigidBody::Type::Static, shape);
-	// body->SetTransform(tc);
-	// body->Data = (void*)(uint64_t)entity.GetHandle();
+	auto shape = Shape::Create(mesh);
+	auto body = RigidBody::Create(RigidBody::Type::Static, shape);
+	body->SetTransform(tc);
+	body->Data = (void*)(uint64_t)entity.GetHandle();
+	m_World.AddActor(body);
 }
 
 void SceneVisualizerPanel::Remove(ECS::Entity entity) {
@@ -182,7 +206,10 @@ void SceneVisualizerPanel::Draw() {
 		vMax.x += ImGui::GetWindowPos().x;
 		vMax.y += ImGui::GetWindowPos().y;
 
-		ImGui::GetForegroundDrawList()->AddRect(vMin, vMax, IM_COL32(255, 255, 0, 255) );
+		ImVec2 size = { vMax.x - vMin.x, vMax.y - vMin.y };
+
+		ImGui::GetForegroundDrawList()
+			->AddRect(vMin, vMax, IM_COL32(255, 255, 0, 255));
 
 		ImVec2 pos = ImGui::GetCursorPos();
 		ImVec2 screenPos = ImGui::GetCursorScreenPos();
@@ -198,15 +225,26 @@ void SceneVisualizerPanel::Draw() {
 		m_Image.Draw();
 
 		auto camera = m_Renderer.GetCameraController().GetCamera();
-		if(tab->GetState() == ScreenState::Edit
-		&& m_Selected && m_Selected.Has<TransformComponent>())
-		{
+		if(tab->GetState() == ScreenState::Edit && m_Selected && m_GizmoMode) {
 			const float* view = glm::value_ptr(camera->GetView());
 			const float* proj = glm::value_ptr(camera->GetProjection());
-			auto oper = ImGuizmo::OPERATION::ROTATE;
 			auto mode = ImGuizmo::MODE::WORLD;
-			auto& tc = m_Selected.Set<TransformComponent>();
-			auto mat = (glm::mat4)(Transform)tc;
+			ImGuizmo::OPERATION oper;
+			if(m_GizmoMode == 1)
+				oper = ImGuizmo::OPERATION::TRANSLATE;
+			else if(m_GizmoMode == 2)
+				oper = ImGuizmo::OPERATION::ROTATE;
+			else if(m_GizmoMode == 3)
+				oper = ImGuizmo::OPERATION::SCALE;
+
+			Transform tc;
+			if(m_Selected.Has<TransformComponent>())
+				tc = m_Selected.Set<TransformComponent>();
+			// if(IsLight(m_Selected)) {
+
+			// }
+
+			auto mat = tc.GetTransform();
 			float* ptr = glm::value_ptr(mat);
 
 			ImGuizmo::Enable(true);
@@ -214,6 +252,9 @@ void SceneVisualizerPanel::Draw() {
 			ImGuizmo::DecomposeMatrixToComponents(ptr,
 				&tc.Translation.x, &tc.Rotation.x, &tc.Scale.x);
 			tc.Rotation = glm::radians(tc.Rotation);
+
+			if(m_Selected.Has<TransformComponent>())
+				m_Selected.Set<TransformComponent>() = tc;
 		}
 
 		s_Hovered = ImGui::IsWindowHovered()
@@ -235,9 +276,8 @@ void SceneVisualizerPanel::Draw() {
 
 		ImGui::SetCursorPos(pos);
 
-		auto windowFlags = ImGuiWindowFlags_MenuBar;
 		auto childFlags = ImGuiChildFlags_Border;
-		ImGui::BeginChild("Debug", { 150, 160 }, childFlags, windowFlags);
+		ImGui::BeginChild("Debug", { 150, 140 }, childFlags, 0);
 		{
 			auto info = Renderer::GetDebugInfo();
 			ImGui::Text("FPS: %0.1f", info.FPS);
@@ -248,10 +288,28 @@ void SceneVisualizerPanel::Draw() {
 		}
 		ImGui::EndChild();
 
-		if(tab->GetState() == ScreenState::Edit) {
-			m_Renderer.Resize(vMax.x - vMin.x, vMax.y - vMin.y);
-			m_Context->OnRender(m_Renderer);
+		ImGui::SetNextWindowBgAlpha(0.8f);
+		ImGui::SetCursorPos({ pos.x + size.x - 180, pos.y + 10 });
+
+		ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(1.0f, 1.0f, 1.0f, 0.8f));
+		ImGui::BeginChild("##Buttons", { 170, 60 });
+		{
+			m_GizmoTranslate.Render(); ImGui::SameLine();
+			m_GizmoRotate.Render(); ImGui::SameLine();
+			m_GizmoScale.Render();
+
+			if(m_GizmoTranslate.GetState().Clicked)
+				m_GizmoMode = 1;
+			if(m_GizmoRotate.GetState().Clicked)
+				m_GizmoMode = 2;
+			if(m_GizmoScale.GetState().Clicked)
+				m_GizmoMode = 3;
 		}
+		ImGui::EndChild();
+		ImGui::PopStyleColor();
+
+		if(tab->GetState() == ScreenState::Edit)
+			m_Context->OnRender(m_Renderer);
 
 		bool open = false;
 		if(options.add.asset.Type == AssetType::Mesh)
@@ -327,17 +385,16 @@ void SceneVisualizerPanel::Draw() {
 		}
 
 		if(ImGui::IsMouseClicked(1) && ImGui::IsWindowHovered()) {
-			glm::vec2 absPos =
-				glm::vec2
-				{
-					ImGui::GetMousePos().x - vMin.x,
-					ImGui::GetMousePos().y - vMin.y
-				};
+			glm::vec2 absPos
+			{
+				ImGui::GetMousePos().x - vMin.x,
+				ImGui::GetMousePos().y - vMin.y
+			};
 			VOLCANICORE_LOG_INFO("{ %f, %f }", absPos.x, absPos.y);
 
-			float windowWidth = io.DisplaySize.x;
-			float windowHeight = io.DisplaySize.y;
-			glm::vec4 originNDC // -1 -> 1
+			float windowWidth = m_Renderer.GetOutput()->GetWidth();
+			float windowHeight = m_Renderer.GetOutput()->GetHeight();
+			glm::vec4 originNDC // 0 -> windowSize => -1 -> 1
 			{
 				(absPos.x / windowWidth - 0.5f) * 2.0f,
 				(absPos.y / windowHeight - 0.5f) * 2.0f,
@@ -346,7 +403,7 @@ void SceneVisualizerPanel::Draw() {
 			glm::vec4 endNDC
 			{
 				(absPos.x / windowWidth - 0.5f) * 2.0f,
-				(absPos.y / windowHeight - 0.5f) * 2.0f,
+				-(absPos.y / windowHeight - 0.5f) * 2.0f,
 				1.0f, 1.0f
 			};
 
@@ -356,10 +413,7 @@ void SceneVisualizerPanel::Draw() {
 			worldStart /= worldStart.w;
 			worldEnd   /= worldEnd.w;
 			glm::vec3 rayDir = glm::vec3(worldEnd - worldStart);
-			float maxDist = 10000.0f;
-			m_Renderer.DrawRay(worldStart, worldEnd);
-			Entity cube = m_Context->EntityWorld.GetEntity("Cube2");
-			cube.Set<TransformComponent>().Translation = glm::vec3(worldStart);
+			float maxDist = 1'000'000.0f;
 
 			auto hitInfo = m_World.Raycast(worldStart, rayDir, maxDist);
 			if(hitInfo)
@@ -532,15 +586,6 @@ EditorSceneRenderer::~EditorSceneRenderer() {
 void EditorSceneRenderer::Update(TimeStep ts) {
 	if(Hovered)
 		m_Controller.OnUpdate(ts);
-}
-
-void EditorSceneRenderer::Resize(uint32_t width, uint32_t height) {
-	m_Controller.GetCamera()->Resize(width, height);
-}
-
-void EditorSceneRenderer::DrawRay(const glm::vec3& o, const glm::vec3& end) {
-	RayOrigin = o;
-	RayEnd = end;
 }
 
 void EditorSceneRenderer::Begin() {
@@ -921,26 +966,6 @@ void EditorSceneRenderer::Render() {
 		call.Primitive = PrimitiveType::Triangle;
 		call.Partition = PartitionType::Instanced;
 	}
-
-	auto* buffer = LinePass->Get()->BufferData;
-
-	uint32_t indices[] = { 0, 1 };
-	RendererAPI::Get()
-	->SetBufferData(buffer, DrawBufferIndex::Indices, indices, 2, 24);
-	Point P0 = { RayOrigin, glm::vec3(1.0f) };
-	Point P1 = { RayEnd, glm::vec3(1.0f) };
-	RendererAPI::Get()
-	->SetBufferData(buffer, DrawBufferIndex::Vertices, &P0, 1, 9);
-	RendererAPI::Get()
-	->SetBufferData(buffer, DrawBufferIndex::Vertices, &P1, 1, 10);
-
-	auto& call = LineCommand->NewDrawCall();
-	call.IndexStart = 24;
-	call.IndexCount = 2;
-	call.VertexStart = 9;
-	call.VertexCount = 2;
-	call.Partition = PartitionType::Single;
-	call.Primitive = PrimitiveType::Line;
 
 #ifdef MAGMA_PHYSICS
 	auto* scene = Panel->GetPhysicsWorld().Get();

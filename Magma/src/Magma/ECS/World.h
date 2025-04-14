@@ -112,13 +112,8 @@ public:
 
 private:
 	flecs::world m_World;
-
 	flecs::query<> m_AllEntitiesQuery;
-
-	flecs::entity m_EventHandler;
-
 	Map<uint64_t, void*> m_Systems;
-	Map<uint64_t, List<Func<void, const Event&>>> m_Events;
 };
 
 }

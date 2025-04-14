@@ -5,6 +5,8 @@
 #include <imgui/misc/cpp/imgui_stdlib.h>
 #include <ImGuiFileDialog/ImGuiFileDialog.h>
 
+#include <Magma/Core/YAMLSerializer.h>
+
 #include <Lava/App.h>
 
 #include "Editor/EditorApp.h"
@@ -35,11 +37,7 @@ struct {
 	} edit;
 } static menu;
 
-ProjectTab::ProjectTab()
-	: Tab(TabType::Project)
-{
-	Setup();
-}
+static std::string s_Path;
 
 ProjectTab::ProjectTab(const std::string& path)
 	: Tab(TabType::Project)
@@ -50,6 +48,7 @@ ProjectTab::ProjectTab(const std::string& path)
 	GetPanel("ContentBrowser")->As<ContentBrowserPanel>()->Open = true;
 
 	m_Name = Application::As<EditorApp>()->GetEditor().GetProject().Name;
+	s_Path = path;
 	Setup();
 }
 
@@ -72,10 +71,42 @@ void ProjectTab::Setup() {
 		CreateRef<UI::Image>(
 			AssetImporter::GetTexture("Magma/assets/icons/StopButton.png"));
 	Application::PopDir();
+
+	auto path = (fs::path(s_Path) / "Editor" / "Run.yaml").string();
+	if(!FileUtils::FileExists(path))
+		return;
+
+	YAML::Node file;
+	try {
+		file = YAML::LoadFile(path);
+	}
+	catch(YAML::ParserException e) {
+		VOLCANICORE_ASSERT_ARGS(false, "Could not load file %s: %s",
+								path.c_str(), e.what());
+	}
+
+	for(auto sceneIterNode : file["Scenes"]) {
+		auto node = sceneIterNode["Scene"];
+		m_Configs.SceneConfigs.Emplace(
+			node["Name"].as<std::string>(),
+			node["Screen"].as<std::string>(),
+			node["UI"].as<std::string>()
+		);
+	}
+
+	for(auto uiIterNode : file["UIPages"]) {
+		auto node = uiIterNode["UI"];
+		m_Configs.UIConfigs.Emplace(
+			node["Name"].as<std::string>(),
+			node["Screen"].as<std::string>(),
+			node["UI"].as<std::string>()
+		);
+	}
 }
 
 void ProjectTab::Update(TimeStep ts) {
 	App::Get()->OnUpdate(ts);
+	// TODO(Implement): Call on close when the script app calls SwitchScreen
 
 	for(auto panel : m_Panels)
 		panel->Update(ts);
@@ -180,7 +211,17 @@ void ProjectTab::OnPlay() {
 
 		auto* scene = tab->GetScene();
 		App::Get()->LoadScene(scene);
-		// App::Get()->ScreenSet();
+		auto [found, idx] = m_Configs.SceneConfigs.Find(
+			[&](auto& element) -> bool
+			{
+				return element.Name == scene->Name;
+			});
+
+		if(found)
+			App::Get()->ScreenSet(m_Configs.SceneConfigs[idx].Screen);
+		else
+			VOLCANICORE_LOG_WARNING("Cound not find screen for scene '%s'",
+				scene->Name.c_str());
 	}
 }
 

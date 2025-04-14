@@ -164,7 +164,7 @@ static void SelectScript() {
 
 static void SelectClass(Ref<ScriptModule> mod) {
 	ImGui::OpenPopup("Select Script Class");
-	if(ImGui::BeginPopupModal("Select Script Class"));
+	if(ImGui::BeginPopupModal("Select Script Class"))
 	{
 		for(const auto& [name, _] : mod->GetClasses()) {
 			bool pressed = ImGui::Button(name.c_str());

@@ -63,7 +63,7 @@ Raycast::Raycast() {
 			worldStart /= worldStart.w;
 			worldEnd   /= worldEnd.w;
 			glm::vec3 rayDir = glm::vec3(worldEnd - worldStart);
-			float maxDist = 10000.0f;
+			float maxDist = 1'000'000.0f;
 
 			auto hitInfo = world->Raycast(worldStart, rayDir, maxDist);
 			selected = hitInfo.Actor;
@@ -121,12 +121,14 @@ void Raycast::CreateActors() {
 
 void Raycast::OnUpdate(TimeStep ts) {
 	controller.OnUpdate(ts);
+	// controller.GetCamera()->Resize(1920, 1080);
 	world->OnUpdate(ts);
 
-	// 1. Draw scene without selected object
+	// 1. Draw scene
 	Renderer::StartPass(drawPass);
 	{
 		Renderer::Clear();
+		// Renderer::Resize(1920, 1080);
 		Renderer3D::Begin(camera);
 
 		for(Ref<RigidBody> actor : *world) {

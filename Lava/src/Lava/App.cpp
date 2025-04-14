@@ -161,6 +161,7 @@ void App::OnUpdate(TimeStep ts) {
 	s_Screen->ScriptObj->Call("OnUpdate", (float)ts);
 
 	s_Screen->World->OnUpdate(ts);
+	m_SceneRenderer.Update(ts);
 	s_Screen->World->OnRender(m_SceneRenderer);
 
 	if(RenderScene) {
@@ -210,25 +211,36 @@ void App::LoadUI(UIPage* ui) {
 }
 
 void App::SwitchScreen(const std::string& name) {
+	if (!ChangeScreen) {
+		Running = false;
+		return;
+	}
+
 	s_ShouldSwitchScreen = true;
 	s_NewScreenName = name;
 }
 
 void App::PushScreen(const std::string& name) {
+	if (!ChangeScreen) {
+		Running = false;
+		return;
+	}
+
 	s_ShouldPushScreen = true;
 	s_NewScreenName = name;
 }
 
 void App::PopScreen(const std::string& name) {
+	if (!ChangeScreen) {
+		Running = false;
+		return;
+	}
+
 	s_ShouldPopScreen = true;
 	s_NewScreenName = name;
 }
 
 void App::ScreenSet(const std::string& name) {
-	if(!ChangeScreen) {
-		Running = false;
-		return;
-	}
 	if(name == "")
 		return;
 

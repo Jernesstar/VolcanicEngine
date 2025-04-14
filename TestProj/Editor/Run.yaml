@@ -1,5 +1,5 @@
 Scenes:
-  Scene:
-    Name: Level1
-    Screen: TestPlay
-    UI: ""
+  - Scene:
+      Name: test
+      Screen: TestHome
+      UI: ""

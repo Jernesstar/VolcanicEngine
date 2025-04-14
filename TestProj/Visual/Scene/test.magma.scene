@@ -24,8 +24,8 @@ Scene:
           TransformComponent:
             Transform:
               Translation: [0, 0, 0]
-              Rotation: [-3.05482531, 1.25107479, -3.07256413]
-              Scale: [0.99997592, 0.999988079, 1.0001328]
+              Rotation: [0, 0, 0]
+              Scale: [1, 1, 1]
           MeshComponent:
             AssetID: 4186775327602265389
     - Entity:
@@ -34,9 +34,9 @@ Scene:
         Components:
           TransformComponent:
             Transform:
-              Translation: [-0.000975082221, 0.999542236, 24.0608196]
-              Rotation: [-0.622793019, -0.606331944, -1.77265394]
-              Scale: [0.999988556, 1.000018, 0.999971151]
+              Translation: [-59.8565598, -22.8597183, -12.5907888]
+              Rotation: [0, -0, 0]
+              Scale: [22.2000008, 11, 10.5]
           MeshComponent:
             AssetID: 10036008063945961451
     - Entity:
@@ -82,9 +82,9 @@ Scene:
         Components:
           TransformComponent:
             Transform:
-              Translation: [-5, 4.5999999, 0]
-              Rotation: [0, -0, 0]
-              Scale: [1, 1, 1]
+              Translation: [5, 4.5999999, 0]
+              Rotation: [0, 0, 0.00305288355]
+              Scale: [0.999973834, 0.999973834, 1]
           MeshComponent:
             AssetID: 4186775327602265389
     - Entity:
@@ -109,8 +109,8 @@ Scene:
             Tag: MainCharacter
           TransformComponent:
             Transform:
-              Translation: [-0.000952444621, 0.999699533, 14.9990015]
-              Rotation: [-0.639108837, -0.755493343, 0.385580689]
-              Scale: [0.999946237, 0.999953926, 0.999964237]
+              Translation: [0.000952444621, 0.999699533, 14.9990015]
+              Rotation: [0, 0, 0]
+              Scale: [1, 1, 1]
           MeshComponent:
             AssetID: 15277418182178081176

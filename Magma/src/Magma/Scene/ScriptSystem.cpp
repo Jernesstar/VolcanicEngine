@@ -11,27 +11,27 @@ struct GameEventListener { };
 ScriptSystem::ScriptSystem(ECS::World* world)
 	: System(world)
 {
-	m_EntityWorld->GetNative()
-	.observer()
-	.event<GameEvent>()
-	.run(
-		[this](flecs::iter& it)
-		{
-			m_EntityWorld->GetNative()
-			.query<ScriptComponent>()
-			.each(
-				[this, event=m_Event](flecs::entity e, ScriptComponent& sc)
-				{
-					auto eventID =
-						m_EntityWorld->GetNative().lookup(event.ID.c_str());
-					if(!eventID)
-						return;
-					if(!e.has<GameEventListener>(eventID))
-						return;
+	// m_EntityWorld->GetNative()
+	// .observer()
+	// .event<GameEvent>()
+	// .run(
+	// 	[this](flecs::iter& it)
+	// 	{
+	// 		m_EntityWorld->GetNative()
+	// 		.query<ScriptComponent>()
+	// 		.each(
+	// 			[this, event=m_Event](flecs::entity e, ScriptComponent& sc)
+	// 			{
+	// 				auto eventID =
+	// 					m_EntityWorld->GetNative().lookup(event.ID.c_str());
+	// 				if(!eventID)
+	// 					return;
+	// 				if(!e.has<GameEventListener>(eventID))
+	// 					return;
 
-					sc.Instance->Call("OnGameEvent", &event);
-				});
-		});
+	// 				sc.Instance->Call("OnGameEvent", &event);
+	// 			});
+	// 	});
 
 	m_KeyPressedCallbackID =
 	Events::RegisterListener<KeyPressedEvent>(
@@ -40,7 +40,7 @@ ScriptSystem::ScriptSystem(ECS::World* world)
 			m_EntityWorld->GetNative()
 			.query<ScriptComponent>()
 			.each(
-				[event=event](ScriptComponent& sc)
+				[=](ScriptComponent& sc)
 				{
 					sc.Instance->Call("OnKeyEvent", event);
 				});
@@ -52,7 +52,7 @@ ScriptSystem::ScriptSystem(ECS::World* world)
 				m_EntityWorld->GetNative()
 				.query<ScriptComponent>()
 				.each(
-					[event=event](ScriptComponent& sc)
+					[=](ScriptComponent& sc)
 					{
 						sc.Instance->Call("OnKeyEvent", event);
 					});
@@ -64,7 +64,7 @@ ScriptSystem::ScriptSystem(ECS::World* world)
 				m_EntityWorld->GetNative()
 				.query<ScriptComponent>()
 				.each(
-					[event=event](ScriptComponent& sc)
+					[=](ScriptComponent& sc)
 					{
 						sc.Instance->Call("OnKeyEvent", event);
 					});
@@ -99,8 +99,8 @@ void ScriptSystem::Listen(Entity& entity, const std::string& id) {
 }
 
 void ScriptSystem::Broadcast(Entity& entity, const std::string& id) {
-	entity.GetHandle().enqueue<GameEvent>({ id });
-	m_Event = GameEvent{ id };
+	// entity.GetHandle().enqueue<GameEvent>({ id });
+	// m_Event = GameEvent{ id };
 }
 
 void ScriptSystem::OnComponentAdd(Entity& entity) {

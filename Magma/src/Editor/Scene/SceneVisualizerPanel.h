@@ -30,15 +30,11 @@ public:
 	void SubmitMesh(const Entity& entity) override;
 	void Render() override;
 
-	void Resize(uint32_t width, uint32_t height);
-	void DrawRay(const glm::vec3& origin, const glm::vec3& end);
 	void Select(Entity entity) { Selected = entity; }
 	void IsHovered(bool hovered) { Hovered = hovered; }
 
 private:
 	SceneVisualizerPanel* Panel;
-	glm::vec3 RayOrigin;
-	glm::vec3 RayEnd;
 
 	Entity Selected;
 	bool Hovered = false;
@@ -106,7 +102,12 @@ private:
 	EditorSceneRenderer m_Renderer;
 	Physics::World m_World;
 	Entity m_Selected;
+
 	UI::Image m_Image;
+	UI::Button m_GizmoTranslate;
+	UI::Button m_GizmoRotate;
+	UI::Button m_GizmoScale;
+	uint32_t m_GizmoMode = 0;
 
 	friend class ProjectTab;
 };

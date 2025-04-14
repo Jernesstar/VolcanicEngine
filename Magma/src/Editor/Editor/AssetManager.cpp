@@ -4,7 +4,6 @@
 #include <bitset>
 
 #include <efsw/efsw.hpp>
-#include <angelscript/add_on/scriptbuilder/scriptbuilder.h>
 
 #include <VolcaniCore/Core/Application.h>
 #include <VolcaniCore/Core/FileUtils.h>

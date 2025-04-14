@@ -31,7 +31,6 @@ struct RunConfiguration {
 
 class ProjectTab : public Tab {
 public:
-	ProjectTab();
 	ProjectTab(const std::string& path);
 	~ProjectTab();
 
@@ -45,6 +44,7 @@ public:
 private:
 	UI::Button m_PlayButton, m_PauseButton, m_ResumeButton, m_StopButton;
 	ScreenState m_ScreenState = ScreenState::Edit;
+	RunConfiguration m_Configs;
 
 private:
 	void Setup();

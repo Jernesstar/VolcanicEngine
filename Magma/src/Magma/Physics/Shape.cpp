@@ -148,13 +148,13 @@ PxShape* CookMesh(Ref<Mesh> mesh) {
 	auto material = GetPhysicsLib()->createMaterial(0.5f, 0.5f, 0.6f);
 
 	PxTriangleMeshDesc desc;
-	desc.points.count  = mesh->SubMeshes[0].Vertices.GetCount();
+	desc.points.count  = mesh->SubMeshes[-1].Vertices.GetCount();
 	desc.points.stride = sizeof(Vertex);
-	desc.points.data   = mesh->SubMeshes[0].Vertices.Get();
+	desc.points.data   = mesh->SubMeshes[-1].Vertices.Get();
 
-	desc.triangles.count  = mesh->SubMeshes[0].Indices.GetCount();
+	desc.triangles.count  = mesh->SubMeshes[-1].Indices.GetCount() / 3;
 	desc.triangles.stride = 3 * sizeof(uint32_t);
-	desc.triangles.data   = mesh->SubMeshes[0].Indices.Get();
+	desc.triangles.data   = mesh->SubMeshes[-1].Indices.Get();
 
 	PxTolerancesScale scale;
 	PxCookingParams params(scale);

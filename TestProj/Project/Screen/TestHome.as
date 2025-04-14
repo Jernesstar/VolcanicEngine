@@ -1,9 +1,11 @@
 
 class TestHome : IScreen
 {
-
     TestHome()
     {
+// #ifndef EDITOR
+//         // App.LoadScene("Scene");
+// #endif
     }
 
     void OnLoad()
