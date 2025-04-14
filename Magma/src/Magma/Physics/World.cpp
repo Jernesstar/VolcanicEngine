@@ -19,6 +19,9 @@ World::World() {
 
 	m_Scene->setVisualizationParameter(PxVisualizationParameter::eSCALE, 1.0f);
 	m_Scene->setVisualizationParameter(PxVisualizationParameter::eACTOR_AXES, 1.0f);
+	// m_Scene->setVisualizationParameter(PxVisualizationParameter::eBODY_AXES, 1.0f);
+	m_Scene->setVisualizationParameter(PxVisualizationParameter::eCOLLISION_SHAPES, 1.0f);
+	// m_Scene->setVisualizationParameter(PxVisualizationParameter::eCOLLISION_AXES, 1.0f);
 #endif
 }
 

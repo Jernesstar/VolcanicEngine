@@ -327,16 +327,18 @@ void DrawComponent<ScriptComponent>(Entity& entity) {
 	for(uint32_t i = 0; i < handle->GetPropertyCount(); i++) {
 		auto typeID = handle->GetPropertyTypeId(i);
 		auto* typeInfo = ScriptEngine::Get()->GetTypeInfoById(typeID);
+		void* address = handle->GetAddressOfProperty(i);
 
 		if(typeInfo) {
-			ImGui::Text(typeInfo->GetName());
-			ImGui::SameLine(100.0f);
-			ImGui::Text(handle->GetPropertyName(i));
-			continue;
-		}
+			ImGui::Text(typeInfo->GetName()); ImGui::SameLine(100.0f);
+			ImGui::Text(handle->GetPropertyName(i)); ImGui::SameLine(200.0f);
 
-		void* address = handle->GetAddressOfProperty(i);
-		if(typeID == asTYPEID_BOOL) {
+			if(typeInfo->GetName() == std::string("string"))
+				ImGui::InputText("##String", (std::string*)address);
+			else if(typeInfo->GetName() == std::string("Vec3"))
+				ImGui::InputFloat3("##Vec3", (float*)address);
+		}
+		else if(typeID == asTYPEID_BOOL) {
 			ImGui::Text("bool"); ImGui::SameLine(100.0f);
 			ImGui::Text(handle->GetPropertyName(i)); ImGui::SameLine(200.0f);
 			ImGui::Checkbox("##Bool", (bool*)address);
@@ -432,6 +434,37 @@ void DrawComponent<RigidBodyComponent>(Entity& entity) {
 			break;
 		}
 	}
+
+	ImGui::Text("Shape Type"); ImGui::SameLine(100.0f);
+	auto shape = body->GetShape();
+	switch(shape->GetType()) {
+		case Shape::Type::Box:
+			ImGui::Text("Box");
+			break;
+		case Shape::Type::Sphere:
+			ImGui::Text("Sphere");
+			break;
+		case Shape::Type::Plane:
+			ImGui::Text("Plane");
+			break;
+		case Shape::Type::Capsule:
+			ImGui::Text("Capsule");
+			break;
+		case Shape::Type::Mesh:
+			ImGui::Text("Mesh");
+			break;
+	}
+	if(ImGui::Button("Switch Shape Type")) {
+
+	}
+
+	auto tr = body->GetTransform();
+	ImGui::DragFloat3("##Translation", &tr.Translation.x, 0.1f,
+		-FLT_MAX, +FLT_MAX, "%.4f");
+	ImGui::DragFloat3("##Rotation", &tr.Rotation.x, 0.1f,
+		-FLT_MAX, +FLT_MAX, "%.4f");
+	ImGui::DragFloat3("##Scale", &tr.Scale.x, 0.1f,
+		-FLT_MAX, +FLT_MAX, "%.4f");
 }
 
 template<>

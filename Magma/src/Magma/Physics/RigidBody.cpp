@@ -46,6 +46,7 @@ StaticBody::StaticBody(Ref<Shape> shape, const Transform& t)
 #ifdef MAGMA_PHYSICS
 	m_Actor = GetPhysicsLib()->createRigidStatic(PxTransform(PxVec3(0.0f)));
 	m_Actor->userData = static_cast<void*>(this);
+	m_Actor->setActorFlag(PxActorFlag::eVISUALIZATION, true);
 #endif
 
 	SetShape(shape);

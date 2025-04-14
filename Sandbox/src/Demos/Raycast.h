@@ -121,7 +121,7 @@ void Raycast::CreateActors() {
 
 void Raycast::OnUpdate(TimeStep ts) {
 	controller.OnUpdate(ts);
-	// world->OnUpdate(ts);
+	world->OnUpdate(ts);
 
 	// 1. Draw scene without selected object
 	Renderer::StartPass(drawPass);
@@ -131,10 +131,6 @@ void Raycast::OnUpdate(TimeStep ts) {
 
 		for(Ref<RigidBody> actor : *world) {
 			// actor->UpdateTransform();
-
-			if(actor.get() == selected)
-				continue;
-
 			Renderer3D::DrawMesh(cube, actor->GetTransform());
 		}
 
@@ -146,21 +142,16 @@ void Raycast::OnUpdate(TimeStep ts) {
 		return;
 
 	// 2. Draw selected object into mask texture with color white
-	Renderer::StartPass(maskPass);
+	Renderer::StartPass(maskPass, false);
 	{
-		Renderer::Clear();
+		auto* command = Renderer::NewCommand();
+		command->Clear = true;
+		command->UniformData
+		.SetInput("u_ViewProj", camera->GetViewProjection());
+		command->UniformData
+		.SetInput("u_Color", glm::vec4(1.0f));
 
-		Renderer::PushCommand();
-		Renderer::GetPass()->GetUniforms()
-		.Set("u_Color",
-			[]() -> glm::vec4
-			{
-				return glm::vec4(1.0f);
-			});
-		Renderer::PopCommand();
-
-		Renderer3D::Begin(camera);
-		Renderer3D::DrawMesh(cube, selected->GetTransform());
+		Renderer3D::DrawMesh(cube, selected->GetTransform(), command);
 		Renderer3D::End();
 	}
 	Renderer::EndPass();
@@ -168,34 +159,23 @@ void Raycast::OnUpdate(TimeStep ts) {
 	// 3. Render full-screen quad that creates outline
 	Renderer::StartPass(outlinePass);
 	{
-		Renderer::GetPass()->GetUniforms()
-		.Set("u_PixelSize",
-			[this]() -> glm::vec2
-			{
-				return pixelSize;
-			})
-		.Set("u_Color",
-			[this]() -> glm::vec3
-			{
-				return outlineColor;
-			});
+		auto width = Application::GetWindow()->GetWidth();
+		auto height = Application::GetWindow()->GetHeight();
+
+		auto* command = Renderer::GetCommand();
+		command->UniformData
+		.SetInput("u_PixelSize", 1.0f / glm::vec2(width, height));
+		command->UniformData
+		.SetInput("u_Color", glm::vec3(0.0f, 0.0f, 1.0f));
 
 		auto mask = maskPass->GetOutput();
 		Renderer2D::DrawFullscreenQuad(mask, AttachmentTarget::Color);
 	}
 	Renderer::EndPass();
 
-	// 4. Draw selected object
-	Renderer::StartPass(drawPass);
-	{
-		Renderer3D::Begin(camera);
-		Renderer3D::DrawMesh(cube, selected->GetTransform());
-		Renderer3D::End();
-	}
-	Renderer::EndPass();
-
-	// auto scene = world.Get();
-	// const PxRenderBuffer& rb = scene->getRenderBuffer();
+#ifdef MAGMA_PHYSICS
+	auto scene = world->Get();
+	const PxRenderBuffer& rb = scene->getRenderBuffer();
 
 	// for(PxU32 i=0; i < rb.getNbPoints(); i++)
 	// {
@@ -203,11 +183,12 @@ void Raycast::OnUpdate(TimeStep ts) {
 
 	// }
 
-	// for(PxU32 i=0; i < rb.getNbLines(); i++)
-	// {
-	// 	const PxDebugLine& line = rb.getLines()[i];
+	for(PxU32 i=0; i < rb.getNbLines(); i++)
+	{
+		const PxDebugLine& line = rb.getLines()[i];
 
-	// }
+	}
+#endif
 }
 
 }

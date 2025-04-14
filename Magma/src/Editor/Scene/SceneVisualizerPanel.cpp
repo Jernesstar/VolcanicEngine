@@ -43,9 +43,9 @@ namespace Magma {
 SceneVisualizerPanel::SceneVisualizerPanel(Scene* context)
 	: Panel("SceneVisualizer"), m_Renderer(this)
 {
-	m_Image.Width = Application::GetWindow()->GetWidth();
-	m_Image.Height = Application::GetWindow()->GetHeight();
 	m_Image.Content = m_Renderer.GetOutput()->Get(AttachmentTarget::Color);
+	m_Image.Width = m_Image.Content->GetWidth();
+	m_Image.Height = m_Image.Content->GetHeight();
 
 	SetContext(context);
 }
@@ -81,32 +81,42 @@ void SceneVisualizerPanel::SetContext(Scene* context) {
 		{
 			Add(entity);
 		});
-}
 
-static bool IsLight(ECS::Entity entity) {
-	return entity.Has<DirectionalLightComponent>()
-		|| entity.Has<PointLightComponent>()
-		|| entity.Has<SpotlightComponent>();
-}
-
-static glm::vec3 GetLightPosition(ECS::Entity entity) {
-	if(entity.Has<DirectionalLightComponent>())
-		return entity.Get<DirectionalLightComponent>().Position;
-	if(entity.Has<PointLightComponent>())
-		return entity.Get<PointLightComponent>().Position;
-	if(entity.Has<SpotlightComponent>())
-		return entity.Get<SpotlightComponent>().Position;
-
-	return glm::vec3(0.0f);
+	m_Context->EntityWorld
+	.ForEach<CameraComponent>(
+		[this](Entity& entity)
+		{
+			Add(entity);
+		});
 }
 
 void SceneVisualizerPanel::Add(ECS::Entity entity) {
-	if(IsLight(entity)) {
-		// auto shape = Shape::Create(Shape::Type::Box);
-		// auto body = RigidBody::Create(RigidBody::Type::Static, shape);
-		// body->SetTransform({ .Translation = GetLightPosition(entity) });
-		// body->Data = (void*)(uint64_t)entity.GetHandle();
-		// m_World.AddActor(body);
+	glm::vec3 position;
+	bool billboard = false;
+
+	if(entity.Has<DirectionalLightComponent>()) {
+		position = entity.Get<DirectionalLightComponent>().Position;
+		billboard = true;
+	}
+	if(entity.Has<PointLightComponent>()) {
+		position = entity.Get<PointLightComponent>().Position;
+		billboard = true;
+	}
+	if(entity.Has<SpotlightComponent>()) {
+		position = entity.Get<SpotlightComponent>().Position;
+		billboard = true;
+	}
+	if(entity.Has<CameraComponent>()) {
+		position = entity.Get<CameraComponent>().Cam->GetPosition();
+		billboard = true;
+	}
+
+	if(billboard) {
+		auto shape = Shape::Create(Shape::Type::Box);
+		auto body = RigidBody::Create(RigidBody::Type::Static, shape);
+		body->SetTransform({ .Translation = position });
+		body->Data = (void*)(uint64_t)entity.GetHandle();
+		m_World.AddActor(body);
 
 		return;
 	}
@@ -137,6 +147,7 @@ void SceneVisualizerPanel::Update(TimeStep ts) {
 	if(tab->GetState() != ScreenState::Edit)
 		return;
 
+	m_World.OnUpdate(ts);
 	m_Renderer.IsHovered(s_Hovered);
 	m_Renderer.Update(ts);
 }
@@ -160,22 +171,32 @@ void SceneVisualizerPanel::Draw() {
 	ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4{ 0.0f, 0.0f, 0.0f, 1.0f });
 	ImGui::Begin("Scene Visualizer", &Open, flags);
 	{
+		ImGui::PopStyleVar();
+		ImGui::PopStyleColor();
+
+		ImVec2 vMin = ImGui::GetWindowContentRegionMin();
+		ImVec2 vMax = ImGui::GetWindowContentRegionMax();
+
+		vMin.x += ImGui::GetWindowPos().x;
+		vMin.y += ImGui::GetWindowPos().y;
+		vMax.x += ImGui::GetWindowPos().x;
+		vMax.y += ImGui::GetWindowPos().y;
+
+		ImGui::GetForegroundDrawList()->AddRect(vMin, vMax, IM_COL32(255, 255, 0, 255) );
+
 		ImVec2 pos = ImGui::GetCursorPos();
-		ImVec2 size = ImGui::GetContentRegionAvail();
-		auto width = size.x;
-		auto height = size.y;
+		ImVec2 screenPos = ImGui::GetCursorScreenPos();
+		ImVec2 windowPos = ImGui::GetWindowPos();
 
 		ImGuiIO& io = ImGui::GetIO();
 		ImGuizmo::SetDrawlist();
-		ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y,
+		ImGuizmo::SetRect(windowPos.x, windowPos.y,
 			io.DisplaySize.x, io.DisplaySize.y);
 
-		s_Hovered = ImGui::IsWindowHovered()
-			&& !(ImGuizmo::IsOver() || ImGuizmo::IsUsingAny());
+		s_Hovered = ImGui::IsWindowHovered() && !ImGuizmo::IsUsingAny();
 
-		m_Image.SetPosition(pos.x, pos.y);
 		m_Image.Draw();
-	
+
 		auto camera = m_Renderer.GetCameraController().GetCamera();
 		if(tab->GetState() == ScreenState::Edit
 		&& m_Selected && m_Selected.Has<TransformComponent>())
@@ -195,9 +216,6 @@ void SceneVisualizerPanel::Draw() {
 			tc.Rotation = glm::radians(tc.Rotation);
 		}
 
-		ImGui::PopStyleVar();
-		ImGui::PopStyleColor();
-
 		s_Hovered = ImGui::IsWindowHovered()
 				&& !(ImGuizmo::IsOver() || ImGuizmo::IsUsingAny());
 
@@ -205,7 +223,6 @@ void SceneVisualizerPanel::Draw() {
 		{
 			if(auto payload = ImGui::AcceptDragDropPayload("ASSET"))
 				options.add.asset = *(Asset*)payload->Data;
-
 			ImGui::EndDragDropTarget();
 		}
 
@@ -231,8 +248,10 @@ void SceneVisualizerPanel::Draw() {
 		}
 		ImGui::EndChild();
 
-		if(tab->GetState() == ScreenState::Edit)
+		if(tab->GetState() == ScreenState::Edit) {
+			m_Renderer.Resize(vMax.x - vMin.x, vMax.y - vMin.y);
 			m_Context->OnRender(m_Renderer);
+		}
 
 		bool open = false;
 		if(options.add.asset.Type == AssetType::Mesh)
@@ -309,19 +328,25 @@ void SceneVisualizerPanel::Draw() {
 
 		if(ImGui::IsMouseClicked(1) && ImGui::IsWindowHovered()) {
 			glm::vec2 absPos =
-				glm::vec2{ ImGui::GetMousePos().x, ImGui::GetMousePos().y }
-			  - glm::vec2{ pos.x, pos.y };
+				glm::vec2
+				{
+					ImGui::GetMousePos().x - vMin.x,
+					ImGui::GetMousePos().y - vMin.y
+				};
+			VOLCANICORE_LOG_INFO("{ %f, %f }", absPos.x, absPos.y);
 
-			glm::vec4 originNDC
+			float windowWidth = io.DisplaySize.x;
+			float windowHeight = io.DisplaySize.y;
+			glm::vec4 originNDC // -1 -> 1
 			{
-				(absPos.x / width - 0.5f) * 2.0f,
-				(absPos.y / height - 0.5f) * 2.0f,
+				(absPos.x / windowWidth - 0.5f) * 2.0f,
+				(absPos.y / windowHeight - 0.5f) * 2.0f,
 				-1.0f, 1.0f
 			};
 			glm::vec4 endNDC
 			{
-				(absPos.x / width - 0.5f) * 2.0f,
-				(absPos.y / height - 0.5f) * 2.0f,
+				(absPos.x / windowWidth - 0.5f) * 2.0f,
+				(absPos.y / windowHeight - 0.5f) * 2.0f,
 				1.0f, 1.0f
 			};
 
@@ -332,6 +357,9 @@ void SceneVisualizerPanel::Draw() {
 			worldEnd   /= worldEnd.w;
 			glm::vec3 rayDir = glm::vec3(worldEnd - worldStart);
 			float maxDist = 10000.0f;
+			m_Renderer.DrawRay(worldStart, worldEnd);
+			Entity cube = m_Context->EntityWorld.GetEntity("Cube2");
+			cube.Set<TransformComponent>().Translation = glm::vec3(worldStart);
 
 			auto hitInfo = m_World.Raycast(worldStart, rayDir, maxDist);
 			if(hitInfo)
@@ -360,7 +388,7 @@ std::string SelectScriptClass(Ref<ScriptModule> mod) {
 	static std::string select = "";
 
 	ImGui::OpenPopup("Select Script Class");
-	if(ImGui::BeginPopupModal("Select Script Class"));
+	if(ImGui::BeginPopupModal("Select Script Class"))
 	{
 		for(const auto& [name, _] : mod->GetClasses()) {
 			bool pressed = ImGui::Button(name.c_str());
@@ -389,6 +417,7 @@ EditorSceneRenderer::EditorSceneRenderer(SceneVisualizerPanel* panel)
 
 	auto camera = CreateRef<StereographicCamera>(75.0f);
 	camera->SetPosition({ 0.0f, 1.0f, 15.0f });
+	camera->Resize(1920, 1080);
 	m_Controller.SetCamera(camera);
 	m_Controller.TranslationSpeed = 25.0f;
 
@@ -503,6 +532,15 @@ EditorSceneRenderer::~EditorSceneRenderer() {
 void EditorSceneRenderer::Update(TimeStep ts) {
 	if(Hovered)
 		m_Controller.OnUpdate(ts);
+}
+
+void EditorSceneRenderer::Resize(uint32_t width, uint32_t height) {
+	m_Controller.GetCamera()->Resize(width, height);
+}
+
+void EditorSceneRenderer::DrawRay(const glm::vec3& o, const glm::vec3& end) {
+	RayOrigin = o;
+	RayEnd = end;
 }
 
 void EditorSceneRenderer::Begin() {
@@ -884,6 +922,26 @@ void EditorSceneRenderer::Render() {
 		call.Partition = PartitionType::Instanced;
 	}
 
+	auto* buffer = LinePass->Get()->BufferData;
+
+	uint32_t indices[] = { 0, 1 };
+	RendererAPI::Get()
+	->SetBufferData(buffer, DrawBufferIndex::Indices, indices, 2, 24);
+	Point P0 = { RayOrigin, glm::vec3(1.0f) };
+	Point P1 = { RayEnd, glm::vec3(1.0f) };
+	RendererAPI::Get()
+	->SetBufferData(buffer, DrawBufferIndex::Vertices, &P0, 1, 9);
+	RendererAPI::Get()
+	->SetBufferData(buffer, DrawBufferIndex::Vertices, &P1, 1, 10);
+
+	auto& call = LineCommand->NewDrawCall();
+	call.IndexStart = 24;
+	call.IndexCount = 2;
+	call.VertexStart = 9;
+	call.VertexCount = 2;
+	call.Partition = PartitionType::Single;
+	call.Primitive = PrimitiveType::Line;
+
 #ifdef MAGMA_PHYSICS
 	auto* scene = Panel->GetPhysicsWorld().Get();
 	const PxRenderBuffer& rb = scene->getRenderBuffer();
@@ -897,8 +955,8 @@ void EditorSceneRenderer::Render() {
 			Point p1 = { { l.pos1.x, l.pos1.y, l.pos1.z }, glm::vec3(1.0f) };
 			points.Add(p0);
 			points.Add(p1);
-			indices.Add(i);
-			indices.Add(i + 1);
+			indices.Add(2*i);
+			indices.Add(2*i + 1);
 		}
 
 		auto* buffer = LinePass->Get()->BufferData;
@@ -917,7 +975,6 @@ void EditorSceneRenderer::Render() {
 		call.Partition = PartitionType::Single;
 		call.Primitive = PrimitiveType::Line;
 	}
-
 #endif
 
 	Renderer::Flush();

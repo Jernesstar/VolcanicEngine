@@ -30,11 +30,15 @@ public:
 	void SubmitMesh(const Entity& entity) override;
 	void Render() override;
 
+	void Resize(uint32_t width, uint32_t height);
+	void DrawRay(const glm::vec3& origin, const glm::vec3& end);
 	void Select(Entity entity) { Selected = entity; }
 	void IsHovered(bool hovered) { Hovered = hovered; }
 
 private:
 	SceneVisualizerPanel* Panel;
+	glm::vec3 RayOrigin;
+	glm::vec3 RayEnd;
 
 	Entity Selected;
 	bool Hovered = false;

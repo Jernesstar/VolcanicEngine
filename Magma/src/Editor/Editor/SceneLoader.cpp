@@ -574,11 +574,8 @@ void DeserializeEntity(YAML::Node entityNode, Scene& scene) {
 
 			entity.Add<RigidBodyComponent>(body);
 		}
-		else {
-			Ref<Shape> shape = Shape::Create(Shape::Type::Box);
-			auto body = RigidBody::Create(RigidBody::Type::Static, shape);
-			entity.Add<RigidBodyComponent>(body);
-		}
+		else
+			entity.Add<RigidBodyComponent>();
 	}
 
 	auto directionalLightComponentNode = components["DirectionalLightComponent"];

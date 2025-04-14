@@ -250,8 +250,8 @@ void FlushCommand(DrawCommand& command) {
 	if(command.Pass && command.Pass->BufferData)
 		array->Unbind();
 
-		// Resize(Application::GetWindow()->GetWidth(),
-		// 	   Application::GetWindow()->GetHeight());
+	Resize(Application::GetWindow()->GetWidth(),
+			Application::GetWindow()->GetHeight());
 
 	if(command.Pass && command.Pass->Output)
 		command.Pass->Output->As<OpenGL::Framebuffer>()->Unbind();

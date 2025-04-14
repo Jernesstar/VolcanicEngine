@@ -30,6 +30,10 @@ Ref<Shape> Shape::Create(Shape::Type type) {
 			break;
 	}
 
+#ifdef MAGMA_PHYSICS
+	shape->m_Shape->setFlag(PxShapeFlag::eVISUALIZATION, true);
+#endif
+
 	return shape;
 }
 
