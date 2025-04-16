@@ -36,6 +36,43 @@ World::World() {
 	m_AllEntitiesQuery = m_World.query_builder().with<Component>().build();
 }
 
+World& World::operator =(const World& other) {
+	other.ForEach(
+		[&](const Entity& entity)
+		{
+			Entity newEntity = AddEntity((UUID)(uint64_t)entity.GetHandle());
+			if(entity.GetName() != "")
+				newEntity.SetName(entity.GetName());
+
+			if(entity.Has<CameraComponent>())
+				newEntity.Add<CameraComponent>(entity.Get<CameraComponent>());
+			if(entity.Has<TagComponent>())
+				newEntity.Add<TagComponent>(entity.Get<TagComponent>());
+			if(entity.Has<TransformComponent>())
+				newEntity.Add<TransformComponent>(entity.Get<TransformComponent>());
+			if(entity.Has<AudioComponent>())
+				newEntity.Add<AudioComponent>(entity.Get<AudioComponent>());
+			if(entity.Has<MeshComponent>())
+				newEntity.Add<MeshComponent>(entity.Get<MeshComponent>());
+			if(entity.Has<SkyboxComponent>())
+				newEntity.Add<SkyboxComponent>(entity.Get<SkyboxComponent>());
+			if(entity.Has<ScriptComponent>())
+				newEntity.Add<ScriptComponent>(entity.Get<ScriptComponent>());
+			if(entity.Has<RigidBodyComponent>())
+				newEntity.Add<RigidBodyComponent>(entity.Get<RigidBodyComponent>());
+			if(entity.Has<DirectionalLightComponent>())
+				newEntity.Add<DirectionalLightComponent>(entity.Get<DirectionalLightComponent>());
+			if(entity.Has<PointLightComponent>())
+				newEntity.Add<PointLightComponent>(entity.Get<PointLightComponent>());
+			if(entity.Has<SpotlightComponent>())
+				newEntity.Add<SpotlightComponent>(entity.Get<SpotlightComponent>());
+			if(entity.Has<ParticleEmitterComponent>())
+				newEntity.Add<ParticleEmitterComponent>(entity.Get<ParticleEmitterComponent>());
+		});
+
+	return *this;
+}
+
 void World::OnUpdate(TimeStep ts) {
 	m_World.progress(ts);
 }

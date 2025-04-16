@@ -23,6 +23,8 @@ public:
 	World();
 	~World() = default;
 
+	World& operator =(const World& other);
+
 	void OnUpdate(TimeStep ts);
 
 	Entity GetEntity(const std::string& name);

@@ -251,7 +251,7 @@ void App::ScreenSet(const std::string& name) {
 			[name](const Screen& screen) -> bool
 			{
 				return screen.Name == name;
-			}); 
+			});
 	if(!found) {
 		VOLCANICORE_LOG_INFO("Screen '%s' was not found", name.c_str());
 		return;
@@ -271,6 +271,20 @@ void App::ScreenSet(const std::string& name) {
 		*s_Screen->World = *s_ShouldLoadScene;
 		s_ShouldLoadScene = nullptr;
 		s_Screen->World->RegisterSystems();
+
+		s_Screen->World->EntityWorld
+		.ForEach<ScriptComponent>(
+			[&](Entity& entity)
+			{
+				auto& sc = entity.Set<ScriptComponent>();
+				auto old = sc.Instance;
+				if(old && sc.ModuleAsset && old->GetClass()) {
+					m_AssetManager->Load(sc.ModuleAsset);
+					auto mod = m_AssetManager->Get<ScriptModule>(sc.ModuleAsset);
+					auto _class = mod->GetClass(old->GetClass()->Name);
+					sc.Instance = _class->Instantiate(entity);
+				}
+			});
 	}
 	else if(screen.Scene != "") {
 		SceneLoad(*s_Screen->World);
@@ -313,20 +327,10 @@ void App::ScreenSet(const std::string& name) {
 }
 
 void App::ScreenPush(const std::string& name) {
-	if(!ChangeScreen) {
-		Running = false;
-		return;
-	}
-
 
 }
 
 void App::ScreenPop() {
-	if(!ChangeScreen) {
-		Running = false;
-		return;
-	}
-
 
 }
 

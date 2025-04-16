@@ -106,7 +106,10 @@ void ProjectTab::Setup() {
 
 void ProjectTab::Update(TimeStep ts) {
 	App::Get()->OnUpdate(ts);
-	// TODO(Implement): Call on close when the script app calls SwitchScreen
+	// The scene was stopped but it wasn't because of the button
+	// i.e SwitchScreen was called inside the script
+	if(!App::Get()->Running && m_ScreenState == ScreenState::Play)
+		OnStop();
 
 	for(auto panel : m_Panels)
 		panel->Update(ts);
@@ -223,6 +226,7 @@ void ProjectTab::OnPlay() {
 			VOLCANICORE_LOG_WARNING("Cound not find screen for scene '%s'",
 				scene->Name.c_str());
 	}
+
 }
 
 void ProjectTab::OnPause() {

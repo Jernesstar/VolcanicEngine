@@ -238,23 +238,97 @@ void SceneVisualizerPanel::Draw() {
 				oper = ImGuizmo::OPERATION::SCALE;
 
 			Transform tc;
-			if(m_Selected.Has<TransformComponent>())
+			bool canRotate = true;
+			bool canScale = true;
+			bool enabled = false;
+
+			if(m_Selected.Has<TransformComponent>()) {
 				tc = m_Selected.Set<TransformComponent>();
-			// if(IsLight(m_Selected)) {
+				enabled = true;
+			}
+			if(m_Selected.Has<DirectionalLightComponent>()) {
+				tc.Translation =
+					m_Selected.Get<DirectionalLightComponent>().Position;
+				tc.Rotation =
+					m_Selected.Get<DirectionalLightComponent>().Direction;
+				canRotate = true;
+				canScale = false;
+				enabled = true;
+			}
+			if(m_Selected.Has<PointLightComponent>()) {
+				tc.Translation =
+					m_Selected.Get<PointLightComponent>().Position;
+				canRotate = false;
+				canScale = false;
+				enabled = true;
+			}
+			if(m_Selected.Has<SpotlightComponent>()) {
+				tc.Translation =
+					m_Selected.Get<SpotlightComponent>().Position;
+				tc.Rotation =
+					m_Selected.Get<SpotlightComponent>().Direction;
+				canRotate = true;
+				canScale = false;
+				enabled = true;
+			}
+			if(m_Selected.Has<CameraComponent>()) {
+				tc.Translation =
+					m_Selected.Get<CameraComponent>().Cam->GetPosition();
+				tc.Rotation =
+					m_Selected.Get<CameraComponent>().Cam->GetDirection();
+				canRotate = true;
+				canScale = false;
+				enabled = true;
+			}
 
-			// }
+			if(m_GizmoMode == 2 && !canRotate)
+				enabled = false;
+			if(m_GizmoMode == 3 && !canScale)
+				enabled == false;
 
-			auto mat = tc.GetTransform();
-			float* ptr = glm::value_ptr(mat);
+			ImGuizmo::Enable(enabled);
 
-			ImGuizmo::Enable(true);
-			ImGuizmo::Manipulate(view, proj, oper, mode, ptr);
-			ImGuizmo::DecomposeMatrixToComponents(ptr,
-				&tc.Translation.x, &tc.Rotation.x, &tc.Scale.x);
-			tc.Rotation = glm::radians(tc.Rotation);
+			if(enabled) {
+				auto mat = tc.GetTransform();
+				float* ptr = glm::value_ptr(mat);
 
-			if(m_Selected.Has<TransformComponent>())
-				m_Selected.Set<TransformComponent>() = tc;
+				ImGuizmo::Manipulate(view, proj, oper, mode, ptr);
+				ImGuizmo::DecomposeMatrixToComponents(ptr,
+					&tc.Translation.x, &tc.Rotation.x, &tc.Scale.x);
+				tc.Rotation = glm::radians(tc.Rotation);
+
+				if(m_Selected.Has<TransformComponent>())
+					m_Selected.Set<TransformComponent>() = tc;
+				if(m_Selected.Has<DirectionalLightComponent>()) {
+					auto& dc = m_Selected.Set<DirectionalLightComponent>();
+					dc.Position = tc.Translation;
+					dc.Direction = tc.Rotation;
+				}
+				if(m_Selected.Has<PointLightComponent>()) {
+					auto& pc = m_Selected.Set<PointLightComponent>();
+					pc.Position = tc.Translation;
+				}
+				if(m_Selected.Has<SpotlightComponent>()) {
+					auto& sc = m_Selected.Set<SpotlightComponent>();
+					sc.Position = tc.Translation;
+					sc.Direction = tc.Rotation;
+				}
+				if(m_Selected.Has<CameraComponent>()) {
+					auto camera = m_Selected.Set<CameraComponent>().Cam;
+					camera->SetPosition(tc.Translation);
+
+					float pitchDelta = tc.Rotation.x;
+					float yawDelta   = tc.Rotation.y;
+					glm::vec3 up(0.0f, 1.0f, 0.0f);
+					glm::vec3 forward = camera->GetDirection();
+					glm::vec3 right = glm::normalize(glm::cross(forward, up));
+
+					glm::quat q = glm::cross(glm::angleAxis(-pitchDelta, right),
+											glm::angleAxis(-yawDelta, up));
+					glm::vec3 finalDir = glm::rotate(glm::normalize(q), forward);
+					camera->SetDirection(tc.Rotation);
+				}
+			}
 		}
 
 		s_Hovered = ImGui::IsWindowHovered()
@@ -390,7 +464,6 @@ void SceneVisualizerPanel::Draw() {
 				ImGui::GetMousePos().x - vMin.x,
 				ImGui::GetMousePos().y - vMin.y
 			};
-			VOLCANICORE_LOG_INFO("{ %f, %f }", absPos.x, absPos.y);
 
 			float windowWidth = m_Renderer.GetOutput()->GetWidth();
 			float windowHeight = m_Renderer.GetOutput()->GetHeight();
@@ -427,11 +500,6 @@ void SceneVisualizerPanel::Draw() {
 			auto hierarchy =
 				m_Tab->GetPanel("SceneHierarchy")->As<SceneHierarchyPanel>();
 			hierarchy->Select(m_Selected);
-
-			if(hitInfo)
-				VOLCANICORE_LOG_INFO("Hit something");
-			else
-				VOLCANICORE_LOG_INFO("Not hit");
 		}
 	}
 
@@ -594,7 +662,7 @@ void EditorSceneRenderer::Begin() {
 	{
 		auto* command = RendererAPI::Get()->NewDrawCommand(GridPass->Get());
 		command->Clear = true;
-		command->DepthTest = DepthTestingMode::Off;
+		command->DepthTest = DepthTestingMode::On;
 		command->Culling = CullingMode::Off;
 		command->Blending = BlendingMode::Greatest;
 		command->UniformData

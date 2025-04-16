@@ -24,7 +24,7 @@ Scene:
           TransformComponent:
             Transform:
               Translation: [0, 0, 0]
-              Rotation: [0, 0, 0]
+              Rotation: [0, -0, 0]
               Scale: [1, 1, 1]
           MeshComponent:
             AssetID: 4186775327602265389
@@ -34,7 +34,7 @@ Scene:
         Components:
           TransformComponent:
             Transform:
-              Translation: [-59.8565598, -22.8597183, -12.5907888]
+              Translation: [-15.9685726, -11.9331913, -77.1027679]
               Rotation: [0, -0, 0]
               Scale: [22.2000008, 11, 10.5]
           MeshComponent:
@@ -48,7 +48,7 @@ Scene:
               Ambient: [1, 0, 0]
               Diffuse: [1, 0, 0]
               Specular: [1, 1, 1]
-              Position: [0.699999988, 8.69999981, -6.4000001]
+              Position: [-6.26962805, 12.414813, -3.7692461]
               Constant: 1
               Linear: 0
               Quadratic: 0
@@ -61,7 +61,7 @@ Scene:
               Ambient: [1, 1, 1]
               Diffuse: [1, 1, 1]
               Specular: [1, 1, 1]
-              Position: [-1.5, 0.400000006, 12]
+              Position: [-7.41549826, 2.76117945, 2.74833131]
               Direction: [0, 0, -1]
               CutoffAngle: 0.200000003
               OuterCutoffAngle: 0.300000012
@@ -75,7 +75,7 @@ Scene:
               Diffuse: [0, 0, 0]
               Specular: [0, 0, 0]
               Position: [-12.8000002, 9.60000038, 0]
-              Direction: [0, 0, 0]
+              Direction: [0, -0, 0]
     - Entity:
         Name: ""
         ID: 977
@@ -83,7 +83,7 @@ Scene:
           TransformComponent:
             Transform:
               Translation: [5, 4.5999999, 0]
-              Rotation: [0, 0, 0.00305288355]
+              Rotation: [0, -0, 0.00305269379]
               Scale: [0.999973834, 0.999973834, 1]
           MeshComponent:
             AssetID: 4186775327602265389
@@ -109,7 +109,7 @@ Scene:
             Tag: MainCharacter
           TransformComponent:
             Transform:
-              Translation: [0.000952444621, 0.999699533, 14.9990015]
+              Translation: [1, 1, 15]
               Rotation: [0, 0, 0]
               Scale: [1, 1, 1]
           MeshComponent:

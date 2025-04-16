@@ -234,11 +234,11 @@ void DrawComponent<TransformComponent>(Entity& entity) {
 	auto ro = glm::value_ptr(roD);
 	auto sc = glm::value_ptr(component.Scale);
 	ImGui::Text("Translation"); ImGui::SameLine(120.0f);
-	ImGui::DragFloat3("##Translation", tr, 0.5f, -FLT_MAX, +FLT_MAX, "%.5f");
+	ImGui::DragFloat3("##Translation", tr, 0.5f, -FLT_MAX, +FLT_MAX, "%.2f");
 	ImGui::Text("Rotation"); ImGui::SameLine(120.0f);
-	ImGui::DragFloat3("##Rotation", ro, 0.5f, 0.0001f, 360.0f, "%.5f");
+	ImGui::DragFloat3("##Rotation", ro, 0.5f, 0.0001f, 360.0f, "%.2f");
 	ImGui::Text("Scale"); ImGui::SameLine(120.0f);
-	ImGui::DragFloat3("##Scale", sc, 0.5f, 0.0001f, +FLT_MAX, "%.5f");
+	ImGui::DragFloat3("##Scale", sc, 0.5f, 0.0001f, +FLT_MAX, "%.2f");
 
 	component.Rotation = glm::radians(roD);
 }
@@ -386,7 +386,7 @@ void DrawComponent<ScriptComponent>(Entity& entity) {
 		else if(typeID == asTYPEID_FLOAT) {
 			ImGui::Text("float"); ImGui::SameLine(100.0f);
 			ImGui::Text(handle->GetPropertyName(i)); ImGui::SameLine(200.0f);
-			ImGui::InputFloat("##Float", (float*)address, 0.0f, 0.0f, "%.10f");
+			ImGui::InputFloat("##Float", (float*)address, 0.0f, 0.0f, "%.3f");
 		}
 		else if(typeID == asTYPEID_DOUBLE) {
 			ImGui::Text("double"); ImGui::SameLine(100.0f);
