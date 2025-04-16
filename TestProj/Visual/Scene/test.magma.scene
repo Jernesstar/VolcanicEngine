@@ -14,7 +14,7 @@ Scene:
               Position: [0, 2, 77]
               Direction: [0, 0, -1]
               ViewportWidth: 1920
-              ViewportHeight: 1057
+              ViewportHeight: 1061
               Near: 48.0009995
               Far: 122.000999
     - Entity:
@@ -61,8 +61,8 @@ Scene:
               Ambient: [1, 1, 1]
               Diffuse: [1, 1, 1]
               Specular: [1, 1, 1]
-              Position: [-7.41549826, 2.76117945, 2.74833131]
-              Direction: [0, 0, -1]
+              Position: [-1.45145547, 1.17734766, 9.42599583]
+              Direction: [0, -0, -0.999999285]
               CutoffAngle: 0.200000003
               OuterCutoffAngle: 0.300000012
     - Entity:
@@ -114,3 +114,35 @@ Scene:
               Scale: [1, 1, 1]
           MeshComponent:
             AssetID: 15277418182178081176
+          ScriptComponent:
+            ModuleID: 2691709289590626850
+            Class: PlayerController
+            Fields:
+              - Field:
+                  Name: Class
+              - Field:
+                  Name: Handle
+                  Type: Entity
+                  Value: 960
+              - Field:
+                  Name: asset
+                  Type: Asset
+                  Value:
+                    ID: 0
+                    Type: 0
+              - Field:
+                  Name: SomeBool
+                  Type: bool
+                  Value: false
+              - Field:
+                  Name: Signed8
+                  Type: int8
+                  Value: 0
+              - Field:
+                  Name: Unsigned32
+                  Type: uint32
+                  Value: 0
+              - Field:
+                  Name: Float
+                  Type: float
+                  Value: 0

@@ -41,24 +41,8 @@ public:
 		func.CallVoid(std::forward<Args>(args)...);
 	}
 
-	template<typename... Args>
-	void Init(Args&&... args) {
-		if(m_Initialized)
-			return;
-		m_Initialized = true;
-
-		// Instantiate new object
-		ScriptFunc func = GetClassFunc();
-		asIScriptObject* obj =
-			func.CallReturn<asIScriptObject*>(std::forward<Args>(args)...);
-		obj->AddRef();
-
-		// Copy old data
-		obj->CopyFrom(m_Handle);
-
-		// Release old object
-		m_Handle->Release();
-		m_Handle = obj;
+	void Copy(Ref<ScriptObject> other) {
+		m_Handle->CopyFrom(other->m_Handle);
 	}
 
 	ScriptField GetProperty(const std::string& name);
@@ -73,12 +57,10 @@ private:
 	void DestroyAndRelease();
 
 	ScriptFunc GetFunc(const std::string& name) const;
-	ScriptFunc GetClassFunc() const;
 
 private:
 	asIScriptObject* m_Handle = nullptr;
 	int m_RefCount;
-	bool m_Initialized;
 
 	const ScriptClass* m_Class;
 

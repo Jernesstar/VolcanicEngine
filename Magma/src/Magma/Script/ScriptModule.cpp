@@ -83,9 +83,9 @@ void ScriptModule::Load(const std::string& path) {
 	for(uint32_t i = 0; i < m_Handle->GetObjectTypeCount(); i++) {
 		asITypeInfo* type = m_Handle->GetObjectTypeByIndex(i);
 		std::string name = type->GetName();
+
 		auto scriptClass = CreateRef<ScriptClass>(name, type);
 		scriptClass->m_Module = this;
-
 		m_Classes[name] = scriptClass;
 	}
 }

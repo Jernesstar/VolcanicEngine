@@ -104,6 +104,7 @@ private:
 	Entity m_Selected;
 
 	UI::Image m_Image;
+	UI::Button m_Cursor;
 	UI::Button m_GizmoTranslate;
 	UI::Button m_GizmoRotate;
 	UI::Button m_GizmoScale;

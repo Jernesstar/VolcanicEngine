@@ -479,8 +479,10 @@ void DeserializeEntity(YAML::Node entityNode, Scene& scene) {
 		auto className = scriptComponentNode["Class"].as<std::string>();
 		Asset asset = { id, AssetType::Script };
 
-		if(className == "" || !id || !assetManager.IsValid(asset))
+		if(!id || !assetManager.IsValid(asset))
 			entity.Add<ScriptComponent>();
+		else if(className == "")
+			entity.Add<ScriptComponent>(asset);
 		else {
 			assetManager.Load(asset);
 			auto mod = assetManager.Get<ScriptModule>(asset);

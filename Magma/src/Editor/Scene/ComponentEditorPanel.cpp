@@ -300,6 +300,35 @@ void DrawComponent<SkyboxComponent>(Entity& entity) {
 	}
 }
 
+static bool s_SelectingClass = false;
+
+std::string SelectScriptClass(Ref<ScriptModule> mod) {
+	static std::string select = "";
+
+	ImGui::OpenPopup("Select Script Class");
+	if(ImGui::BeginPopupModal("Select Script Class"))
+	{
+		for(const auto& [name, _] : mod->GetClasses()) {
+			bool pressed = ImGui::Button(name.c_str());
+			if(pressed) {
+				select = name;
+				s_SelectingClass = false;
+				ImGui::CloseCurrentPopup();
+			}
+		}
+
+		ImGui::EndPopup();
+	}
+
+	if(select != "") {
+		std::string val = select;
+		select = "";
+		return val;
+	}
+
+	return "";
+}
+
 template<>
 void DrawComponent<ScriptComponent>(Entity& entity) {
 	if(!entity.Has<ScriptComponent>())
@@ -308,7 +337,7 @@ void DrawComponent<ScriptComponent>(Entity& entity) {
 	auto& component = entity.Set<ScriptComponent>();
 	ImGui::SeparatorText("ScriptComponent");
 
-	ImGui::Text("Asset ID: %lu", (uint64_t)component.ModuleAsset.ID);
+	ImGui::Text("Asset ID: %llu", (uint64_t)component.ModuleAsset.ID);
 	std::string text = component.ModuleAsset.ID ? "Change Module" : "Set Module";
 	if(ImGui::Button(text.c_str()))
 		s_Selecting = AssetType::Script;
@@ -318,8 +347,29 @@ void DrawComponent<ScriptComponent>(Entity& entity) {
 		s_Asset = { };
 	}
 
-	if(!component.Instance)
+	if(!component.ModuleAsset)
 		return;
+
+	auto& editor = Application::As<EditorApp>()->GetEditor();
+	auto& assetManager = editor.GetAssetManager();
+
+	if(!component.Instance) {
+		std::string name;
+		if(ImGui::Button("Create Instance")) {
+			assetManager.Load(component.ModuleAsset);
+			s_SelectingClass = true;
+		}
+		if(s_SelectingClass) {
+			auto mod = assetManager.Get<ScriptModule>(component.ModuleAsset);
+			name = SelectScriptClass(mod);
+			if(name != "") {
+				auto _class = mod->GetClass(name);
+				component.Instance = _class->Construct();
+			}
+		}
+
+		return;
+	}
 
 	ImGui::SeparatorText("Fields");
 
@@ -330,13 +380,15 @@ void DrawComponent<ScriptComponent>(Entity& entity) {
 		void* address = handle->GetAddressOfProperty(i);
 
 		if(typeInfo) {
-			ImGui::Text(typeInfo->GetName()); ImGui::SameLine(100.0f);
+			ImGui::Text(typeInfo->GetName()); ImGui::SameLine();
 			ImGui::Text(handle->GetPropertyName(i)); ImGui::SameLine(200.0f);
 
 			if(typeInfo->GetName() == std::string("string"))
 				ImGui::InputText("##String", (std::string*)address);
 			else if(typeInfo->GetName() == std::string("Vec3"))
 				ImGui::InputFloat3("##Vec3", (float*)address);
+			else
+				ImGui::NewLine();
 		}
 		else if(typeID == asTYPEID_BOOL) {
 			ImGui::Text("bool"); ImGui::SameLine(100.0f);

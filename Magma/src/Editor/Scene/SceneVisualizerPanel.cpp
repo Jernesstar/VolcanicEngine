@@ -47,6 +47,10 @@ SceneVisualizerPanel::SceneVisualizerPanel(Scene* context)
 	m_Image.Width = m_Image.Content->GetWidth();
 	m_Image.Height = m_Image.Content->GetHeight();
 
+	Application::PushDir();
+	m_Cursor.Display =
+		CreateRef<UI::Image>(
+			AssetImporter::GetTexture("Magma/assets/icons/Cursor.png", false));
 	m_GizmoTranslate.Display =
 		CreateRef<UI::Image>(
 			AssetImporter::GetTexture("Magma/assets/icons/GizmoTranslate.png",
@@ -59,16 +63,13 @@ SceneVisualizerPanel::SceneVisualizerPanel(Scene* context)
 		CreateRef<UI::Image>(
 			AssetImporter::GetTexture("Magma/assets/icons/GizmoScale.png",
 			false));
-
-	m_GizmoTranslate.SetSize(50, 50);
-	m_GizmoRotate.SetSize(50, 50);
-	m_GizmoScale.SetSize(50, 50);
-
-	m_GizmoTranslate.UsePosition = false;
-	m_GizmoRotate.UsePosition = false;
-	m_GizmoScale.UsePosition = false;
-
 	Application::PopDir();
+
+	m_Cursor.SetSize(35, 35);
+	m_GizmoTranslate.SetSize(35, 35);
+	m_GizmoRotate.SetSize(35, 35);
+	m_GizmoScale.SetSize(35, 35);
+
 
 	SetContext(context);
 }
@@ -208,8 +209,8 @@ void SceneVisualizerPanel::Draw() {
 
 		ImVec2 size = { vMax.x - vMin.x, vMax.y - vMin.y };
 
-		ImGui::GetForegroundDrawList()
-			->AddRect(vMin, vMax, IM_COL32(255, 255, 0, 255));
+		// ImGui::GetForegroundDrawList()
+		// 	->AddRect(vMin, vMax, IM_COL32(255, 255, 0, 255));
 
 		ImVec2 pos = ImGui::GetCursorPos();
 		ImVec2 screenPos = ImGui::GetCursorScreenPos();
@@ -363,15 +364,24 @@ void SceneVisualizerPanel::Draw() {
 		ImGui::EndChild();
 
 		ImGui::SetNextWindowBgAlpha(0.8f);
-		ImGui::SetCursorPos({ pos.x + size.x - 180, pos.y + 10 });
+		ImGui::SetCursorPos({ pos.x + size.x - 170, pos.y + 10 });
 
-		ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(1.0f, 1.0f, 1.0f, 0.8f));
-		ImGui::BeginChild("##Buttons", { 170, 60 });
+		ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(1.0f, 1.0f, 1.0f, 0.1f));
+		ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 15.0f);
+		ImGui::BeginChild("##Buttons", { 165, 45 });
 		{
-			m_GizmoTranslate.Render(); ImGui::SameLine();
-			m_GizmoRotate.Render(); ImGui::SameLine();
+			m_Cursor.SetPosition(5, 5);
+			m_GizmoTranslate.SetPosition(45, 5);
+			m_GizmoRotate.SetPosition(85, 5);
+			m_GizmoScale.SetPosition(125, 5);
+
+			m_Cursor.Render();
+			m_GizmoTranslate.Render();
+			m_GizmoRotate.Render();
 			m_GizmoScale.Render();
 
+			if(m_Cursor.GetState().Clicked)
+				m_GizmoMode = 0;
 			if(m_GizmoTranslate.GetState().Clicked)
 				m_GizmoMode = 1;
 			if(m_GizmoRotate.GetState().Clicked)
@@ -380,6 +390,7 @@ void SceneVisualizerPanel::Draw() {
 				m_GizmoMode = 3;
 		}
 		ImGui::EndChild();
+		ImGui::PopStyleVar();
 		ImGui::PopStyleColor();
 
 		if(tab->GetState() == ScreenState::Edit)
@@ -549,7 +560,7 @@ EditorSceneRenderer::EditorSceneRenderer(SceneVisualizerPanel* panel)
 	GridPass =
 		RenderPass::Create("Grid",
 			ShaderPipeline::Create("Magma/assets/shaders", "Grid"), m_Output);
-	GridPass->SetData(Renderer3D::GetMeshBuffer());
+	GridPass->SetData(Renderer2D::GetScreenBuffer());
 
 	BufferLayout instanceLayout =
 	{
@@ -660,26 +671,9 @@ void EditorSceneRenderer::Begin() {
 	auto camera = m_Controller.GetCamera();
 
 	{
-		auto* command = RendererAPI::Get()->NewDrawCommand(GridPass->Get());
-		command->Clear = true;
-		command->DepthTest = DepthTestingMode::On;
-		command->Culling = CullingMode::Off;
-		command->Blending = BlendingMode::Greatest;
-		command->UniformData
-		.SetInput("u_ViewProj", camera->GetViewProjection());
-		command->UniformData
-		.SetInput("u_CameraPosition", camera->GetPosition());
-
-		auto& call = command->NewDrawCall();
-		call.VertexCount = 6;
-		call.Primitive = PrimitiveType::Triangle;
-		call.Partition = PartitionType::Single;
-	}
-
-	{
 		LightingCommand =
 			RendererAPI::Get()->NewDrawCommand(LightingPass->Get());
-		LightingCommand->Clear = false;
+		LightingCommand->Clear = true;
 		LightingCommand->UniformData
 		.SetInput("u_ViewProj", camera->GetViewProjection());
 		LightingCommand->UniformData
@@ -935,6 +929,22 @@ void EditorSceneRenderer::Render() {
 	Renderer3D::End();
 
 	auto camera = m_Controller.GetCamera();
+	{
+		auto* command = RendererAPI::Get()->NewDrawCommand(GridPass->Get());
+		command->DepthTest = DepthTestingMode::On;
+		command->Culling = CullingMode::Off;
+		command->Blending = BlendingMode::Greatest;
+		command->UniformData
+		.SetInput("u_ViewProj", camera->GetViewProjection());
+		command->UniformData
+		.SetInput("u_CameraPosition", camera->GetPosition());
+
+		auto& call = command->NewDrawCall();
+		call.VertexCount = 6;
+		call.Primitive = PrimitiveType::Triangle;
+		call.Partition = PartitionType::Single;
+	}
+
 	{
 		auto* command =
 			RendererAPI::Get()->NewDrawCommand(BillboardPass->Get());

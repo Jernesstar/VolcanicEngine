@@ -278,11 +278,9 @@ void App::ScreenSet(const std::string& name) {
 			{
 				auto& sc = entity.Set<ScriptComponent>();
 				auto old = sc.Instance;
-				if(old && sc.ModuleAsset && old->GetClass()) {
-					m_AssetManager->Load(sc.ModuleAsset);
-					auto mod = m_AssetManager->Get<ScriptModule>(sc.ModuleAsset);
-					auto _class = mod->GetClass(old->GetClass()->Name);
-					sc.Instance = _class->Instantiate(entity);
+				if(old && old->GetClass()) {
+					sc.Instance = old->GetClass()->Instantiate(entity);
+					sc.Instance->Copy(old);
 				}
 			});
 	}
@@ -299,8 +297,7 @@ void App::ScreenSet(const std::string& name) {
 			{
 				if(!element->ModuleID || element->Class == "")
 					return;
-
-				element->ScriptInstance->Init();
+				
 			});
 	}
 	else if(screen.UI != "") {

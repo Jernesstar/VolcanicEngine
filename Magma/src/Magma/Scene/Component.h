@@ -90,8 +90,8 @@ struct ScriptComponent : public Component {
 	Ref<Script::ScriptObject> Instance;
 
 	ScriptComponent() = default;
-	ScriptComponent(const Asset& asset, Ref<Script::ScriptObject> instance)
-		: ModuleAsset(asset), Instance(instance) { }
+	ScriptComponent(const Asset& asset, Ref<Script::ScriptObject> obj = nullptr)
+		: ModuleAsset(asset), Instance(obj) { }
 	ScriptComponent(const ScriptComponent& other) = default;
 };
 
