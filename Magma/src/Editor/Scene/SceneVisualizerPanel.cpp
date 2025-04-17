@@ -285,7 +285,7 @@ void SceneVisualizerPanel::Draw() {
 			if(m_GizmoMode == 2 && !canRotate)
 				enabled = false;
 			if(m_GizmoMode == 3 && !canScale)
-				enabled == false;
+				enabled = false;
 
 			ImGuizmo::Enable(enabled);
 

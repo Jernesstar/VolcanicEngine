@@ -13,8 +13,8 @@ Scene:
               VerticalFOV: 30
               Position: [0, 2, 77]
               Direction: [0, 0, -1]
-              ViewportWidth: 1920
-              ViewportHeight: 1061
+              ViewportWidth: 1600
+              ViewportHeight: 877
               Near: 48.0009995
               Far: 122.000999
     - Entity:
@@ -109,7 +109,7 @@ Scene:
             Tag: MainCharacter
           TransformComponent:
             Transform:
-              Translation: [1, 1, 15]
+              Translation: [219.392242, 1, -296.347839]
               Rotation: [0, 0, 0]
               Scale: [1, 1, 1]
           MeshComponent:
