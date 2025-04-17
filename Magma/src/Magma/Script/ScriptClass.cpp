@@ -27,7 +27,7 @@ ScriptClass::ScriptClass(const std::string& name, asITypeInfo* type)
 		auto typeID = obj->GetPropertyTypeId(i);
 		auto* typeInfo = ScriptEngine::Get()->GetTypeInfoById(typeID);
 		std::string name = obj->GetPropertyName(i);
-
+		
 	}
 
 	obj->Release();

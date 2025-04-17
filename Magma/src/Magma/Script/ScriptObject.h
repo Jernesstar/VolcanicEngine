@@ -12,7 +12,7 @@ class ScriptClass;
 class ScriptField {
 	void* Data;
 	const std::string Name;
-	const std::string Type;
+	asITypeInfo* Type;
 	VolcaniCore::List<std::string> Metadata;
 
 	template<typename T>

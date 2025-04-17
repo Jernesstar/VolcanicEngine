@@ -329,6 +329,10 @@ std::string SelectScriptClass(Ref<ScriptModule> mod) {
 	return "";
 }
 
+static void TilemapEditor(Ref<ScriptObject> obj) {
+
+}
+
 template<>
 void DrawComponent<ScriptComponent>(Entity& entity) {
 	if(!entity.Has<ScriptComponent>())
@@ -387,6 +391,12 @@ void DrawComponent<ScriptComponent>(Entity& entity) {
 				ImGui::InputText("##String", (std::string*)address);
 			else if(typeInfo->GetName() == std::string("Vec3"))
 				ImGui::InputFloat3("##Vec3", (float*)address);
+			else if(typeInfo->GetName() == std::string("List")
+			&& handle->GetField(i).MetadataIncludes("Tilemap Data")
+			&& ImGui::Button("Edit Tilemap"))
+			{
+				TilemapEditorPopup(obj);
+			}
 			else
 				ImGui::NewLine();
 		}
