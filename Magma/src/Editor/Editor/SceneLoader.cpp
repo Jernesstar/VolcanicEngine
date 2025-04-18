@@ -201,12 +201,12 @@ void SerializeEntity(YAMLSerializer& serializer, const Entity& entity) {
 				std::string name = handle->GetPropertyName(i);
 				auto typeID = handle->GetPropertyTypeId(i);
 				auto* typeInfo = ScriptEngine::Get()->GetTypeInfoById(typeID);
-	
+
 				serializer.BeginMapping()
 					.WriteKey("Field").BeginMapping();
 
 				serializer.WriteKey("Name").Write(name);
-	
+
 				// Script Type
 				if(typeInfo && typeID & asTYPEID_SCRIPTOBJECT) {
 						serializer.EndMapping()
@@ -696,6 +696,68 @@ template<>
 BinaryWriter& BinaryWriter::WriteObject(const ScriptComponent& comp) {
 	Write((uint64_t)comp.ModuleAsset.ID);
 	Write(comp.Instance ? comp.Instance->GetClass()->Name : std::string(""));
+	if(!comp.Instance) {
+		Write((uint32_t)0);
+		return *this;
+	}
+
+	auto obj = comp.Instance;
+	auto* handle = obj->GetHandle();
+	Write(handle->GetPropertyCount());
+
+	for(uint32_t i = 0; i < handle->GetPropertyCount(); i++) {
+		ScriptField field = obj->GetProperty(i);
+		Write(field.TypeID);
+		if(!field.HasMetadata("EditorField")) {
+			Write((uint32_t)0);
+			continue;
+		}
+
+		if(field.TypeID == asTYPEID_BOOL) {
+			Write(sizeof(bool));
+			Write(*field.As<bool>());
+		}
+		else if(field.TypeID == asTYPEID_INT8) {
+			Write(sizeof(int8_t));
+			Write(*field.As<int8_t>());
+		}
+		else if(field.TypeID == asTYPEID_INT16) {
+			Write(sizeof(int16_t));
+			Write(*field.As<int16_t>());
+		}
+		else if(field.TypeID == asTYPEID_INT32) {
+			Write(sizeof(int32_t));
+			Write(*field.As<int32_t>());
+		}
+		else if(field.TypeID == asTYPEID_INT64) {
+			Write(sizeof(int64_t));
+			Write(*field.As<int64_t>());
+		}
+		else if(field.TypeID == asTYPEID_UINT8) {
+			Write(sizeof(uint8_t));
+			Write(*field.As<uint8_t>());
+		}
+		else if(field.TypeID == asTYPEID_UINT16) {
+			Write(sizeof(uint16_t));
+			Write(*field.As<uint16_t>());
+		}
+		else if(field.TypeID == asTYPEID_UINT32) {
+			Write(sizeof(uint32_t));
+			Write(*field.As<uint32_t>());
+		}
+		else if(field.TypeID == asTYPEID_UINT64) {
+			Write(sizeof(uint64_t));
+			Write(*field.As<uint64_t>());
+		}
+		else if(field.TypeID == asTYPEID_FLOAT) {
+			Write(sizeof(float));
+			Write(*field.As<float>());
+		}
+		else if(field.TypeID == asTYPEID_DOUBLE) {
+			Write(sizeof(double));
+			Write(*field.As<double>());
+		}
+	}
 
 	return *this;
 }

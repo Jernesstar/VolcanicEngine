@@ -7,13 +7,21 @@ class SomeScriptClass
 
 class PlayerController : IEntityController
 {
-    SomeScriptClass Class;
     Entity Handle;
+    SomeScriptClass Class;
     Asset asset = Asset(16624656892553940704, AssetType::Audio);
-    bool SomeBool;
-    int8 Signed8;
-    uint32 Unsigned32;
-    float Float;
+ 
+    [EditorField] bool SomeBool;
+    [EditorField] int8 Signed8;
+    [EditorField] uint32 Unsigned32;
+    [EditorField] float Float;
+
+    [EditorField]
+    [Tilemap]
+    array<uint32> Tilemap;
+
+    [EditorField] uint32 Width;
+    [EditorField] uint32 Height;
 
     PlayerController(Entity entity)
     {

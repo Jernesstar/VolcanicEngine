@@ -5,7 +5,18 @@
 #include "ScriptClass.h"
 #include "ScriptModule.h"
 
+using namespace VolcaniCore;
+
 namespace Magma::Script {
+
+bool ScriptField::Is(ScriptQualifier q) {
+	switch(q) {
+		case ScriptQualifier::AppObject:
+			return TypeID & asTYPEID_APPOBJECT;
+		case ScriptQualifier::ScriptObject:
+			return TypeID & asTYPEID_SCRIPTOBJECT;
+	}
+}
 
 ScriptObject::ScriptObject() {
 	m_RefCount = 1;
@@ -44,13 +55,24 @@ void ScriptObject::DestroyAndRelease() {
 }
 
 ScriptField ScriptObject::GetProperty(const std::string& name) {
+	if(!m_Class->m_FieldMap.count(name))
+		return { };
 
-	return { };
+	return GetProperty(m_Class->m_FieldMap.at(name));
 }
 
 ScriptField ScriptObject::GetProperty(uint32_t idx) {
+	VOLCANICORE_ASSERT(idx < m_Handle->GetPropertyCount());
 
-	return { };
+	auto address = m_Handle->GetAddressOfProperty(idx);
+	std::string name = m_Handle->GetPropertyName(idx);
+	auto id = m_Handle->GetPropertyTypeId(idx);
+	auto type = ScriptEngine::Get()->GetTypeInfoById(id);
+	List<std::string> metadata;
+	if(m_Class->m_FieldMetadata.count(name))
+		metadata = m_Class->m_FieldMetadata.at(name);
+
+	return { address, name, id, type, metadata };
 }
 
 ScriptFunc ScriptObject::GetFunc(const std::string& name) const {

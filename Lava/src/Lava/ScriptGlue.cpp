@@ -13,6 +13,7 @@
 #include <angelscript/add_on/scriptstdstring/scriptstdstring.h>
 #include <angelscript/add_on/scripthelper/scripthelper.h>
 #include <angelscript/add_on/scriptmath/scriptmath.h>
+#include <angelscript/add_on/scriptarray/scriptarray.h>
 
 #include "App.h"
 
@@ -54,6 +55,7 @@ void ScriptGlue::RegisterInterface() {
 	RegisterStdString(engine);
 	RegisterScriptHandle(engine);
 	RegisterScriptMath(engine);
+	RegisterScriptArray(engine, true);
 
 	RegisterEvents();
 	ScriptEngine::RegisterInterface("IApp")
@@ -146,8 +148,7 @@ static Vec4 NormalizeVec4(const Vec4& vec) {
 	return glm::normalize(vec);
 }
 
-static Vec3& AddAssignVec3(Vec3 vec, Vec3& dest)
-{
+static Vec3& AddAssignVec3(Vec3 vec, Vec3& dest) {
 	dest += vec;
 	return dest;
 }

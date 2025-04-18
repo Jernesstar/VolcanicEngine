@@ -40,7 +40,7 @@ World& World::operator =(const World& other) {
 	other.ForEach(
 		[&](const Entity& entity)
 		{
-			Entity newEntity = AddEntity((UUID)(uint64_t)entity.GetHandle());
+			Entity newEntity = AddEntity();
 			if(entity.GetName() != "")
 				newEntity.SetName(entity.GetName());
 

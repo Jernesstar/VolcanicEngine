@@ -119,6 +119,8 @@ BinaryReader& BinaryReader::ReadObject(ScriptComponent& comp) {
 		comp.Instance = _class->Instantiate(s_CurrentEntity);
 	}
 
+	
+
 	return *this;
 }
 

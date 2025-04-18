@@ -88,6 +88,23 @@ void ScriptModule::Load(const std::string& path) {
 		scriptClass->m_Module = this;
 		m_Classes[name] = scriptClass;
 	}
+
+	if(!loadMetadata)
+		return;
+
+	for(auto [_, _class] : m_Classes) {
+		auto type = _class->m_Type;
+		auto id = type->GetTypeId();
+		for(auto str : builder.GetMetadataForType(id))
+			_class->m_Metadata.Add(str);
+
+		for(uint32_t i = 0; i < type->GetPropertyCount(); i++)
+			for(auto str : builder.GetMetadataForTypeProperty(id, i)) {
+				const char* name;
+				type->GetProperty(i, &name);
+				_class->m_FieldMetadata[name].Add(str);
+			}
+	}
 }
 
 void ScriptModule::Save(const std::string& path) {

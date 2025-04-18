@@ -13,8 +13,8 @@ Scene:
               VerticalFOV: 30
               Position: [0, 2, 77]
               Direction: [0, 0, -1]
-              ViewportWidth: 1600
-              ViewportHeight: 877
+              ViewportWidth: 1920
+              ViewportHeight: 1057
               Near: 48.0009995
               Far: 122.000999
     - Entity:
@@ -48,7 +48,7 @@ Scene:
               Ambient: [1, 0, 0]
               Diffuse: [1, 0, 0]
               Specular: [1, 1, 1]
-              Position: [-6.26962805, 12.414813, -3.7692461]
+              Position: [-6.26962805, 12.414813, -1.33900237]
               Constant: 1
               Linear: 0
               Quadratic: 0
@@ -74,7 +74,7 @@ Scene:
               Ambient: [0, 0, 0]
               Diffuse: [0, 0, 0]
               Specular: [0, 0, 0]
-              Position: [-12.8000002, 9.60000038, 0]
+              Position: [-12.8000002, 9.60000038, 1.03875196]
               Direction: [0, -0, 0]
     - Entity:
         Name: ""
@@ -109,8 +109,8 @@ Scene:
             Tag: MainCharacter
           TransformComponent:
             Transform:
-              Translation: [219.392242, 1, -296.347839]
-              Rotation: [0, 0, 0]
+              Translation: [-23.8131142, 1, 8.51014519]
+              Rotation: [0, -0, 0]
               Scale: [1, 1, 1]
           MeshComponent:
             AssetID: 15277418182178081176
@@ -119,11 +119,11 @@ Scene:
             Class: PlayerController
             Fields:
               - Field:
-                  Name: Class
-              - Field:
                   Name: Handle
                   Type: Entity
                   Value: 960
+              - Field:
+                  Name: Class
               - Field:
                   Name: asset
                   Type: Asset
@@ -133,16 +133,26 @@ Scene:
               - Field:
                   Name: SomeBool
                   Type: bool
-                  Value: false
+                  Value: true
               - Field:
                   Name: Signed8
                   Type: int8
-                  Value: 0
+                  Value: 32
               - Field:
                   Name: Unsigned32
                   Type: uint32
-                  Value: 0
+                  Value: 32
               - Field:
                   Name: Float
                   Type: float
+                  Value: 3.14159012
+              - Field:
+                  Name: Tilemap
+              - Field:
+                  Name: Width
+                  Type: uint32
+                  Value: 0
+              - Field:
+                  Name: Height
+                  Type: uint32
                   Value: 0

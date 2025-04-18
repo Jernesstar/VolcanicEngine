@@ -19,18 +19,11 @@ ScriptClass::ScriptClass(const std::string& name, asITypeInfo* type)
 		m_Functions[method->GetName()] = method;
 	}
 
-	asIScriptObject* obj =
-	(asIScriptObject*)ScriptEngine::Get()
-						->CreateUninitializedScriptObject(m_Type);
-
-	for(uint32_t i = 0; i < obj->GetPropertyCount(); i++) {
-		auto typeID = obj->GetPropertyTypeId(i);
-		auto* typeInfo = ScriptEngine::Get()->GetTypeInfoById(typeID);
-		std::string name = obj->GetPropertyName(i);
-		
+	for(uint32_t i = 0; i < m_Type->GetPropertyCount(); i++) {
+		const char* name;
+		m_Type->GetProperty(i, &name, nullptr);
+		m_FieldMap[name] = i;
 	}
-
-	obj->Release();
 }
 
 void ScriptClass::SetInstanceMethod(const List<std::string>& args) {

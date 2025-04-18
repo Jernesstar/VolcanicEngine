@@ -9,14 +9,23 @@ namespace Magma::Script {
 
 class ScriptClass;
 
-class ScriptField {
-	void* Data;
-	const std::string Name;
-	asITypeInfo* Type;
+enum class ScriptQualifier { AppObject, ScriptObject };
+
+struct ScriptField {
+	void* Data = nullptr;
+	const std::string Name = "";
+	int TypeID = 0;
+	asITypeInfo* Type = nullptr;
 	VolcaniCore::List<std::string> Metadata;
 
 	template<typename T>
 	T* As() const { return static_cast<T*>(Data); }
+
+	bool HasMetadata(const std::string& metadata) {
+		return Metadata.Find([&](auto& val) { return val == metadata; }).Found;
+	}
+
+	bool Is(ScriptQualifier q);
 };
 
 class ScriptFunction {

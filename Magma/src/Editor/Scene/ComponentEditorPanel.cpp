@@ -6,6 +6,8 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
+#include <angelscript/add_on/scriptarray/scriptarray.h>
+
 #include <VolcaniCore/Core/Log.h>
 
 #include <Magma/UI/UIRenderer.h>
@@ -329,8 +331,29 @@ std::string SelectScriptClass(Ref<ScriptModule> mod) {
 	return "";
 }
 
-static void TilemapEditor(Ref<ScriptObject> obj) {
+static bool s_TilemapEdit = false;
 
+static void TilemapEditorPopup(Ref<ScriptObject> obj, const std::string& name) {
+	auto* width = obj->GetProperty("Width").As<uint32_t>();
+	auto* height = obj->GetProperty("Height").As<uint32_t>();
+	auto* data = obj->GetProperty(name).As<CScriptArray>();
+
+	ImGui::OpenPopup("Tilemap Editor");
+	if(ImGui::BeginPopupModal("Tilemap Editor")) {
+		if(ImGui::Button("Close")) {
+			s_TilemapEdit = false;
+			ImGui::CloseCurrentPopup();
+		}
+
+		if(!width || !height)
+			ImGui::Text("Invalid configuration; Define Width and Height");
+		else {
+			ImGui::InputScalar("Width", ImGuiDataType_U32, width);
+			ImGui::InputScalar("Height", ImGuiDataType_U32, height);
+		}
+
+		ImGui::EndPopup();
+	}
 }
 
 template<>
@@ -384,18 +407,21 @@ void DrawComponent<ScriptComponent>(Entity& entity) {
 		void* address = handle->GetAddressOfProperty(i);
 
 		if(typeInfo) {
-			ImGui::Text(typeInfo->GetName()); ImGui::SameLine();
+			std::string name = typeInfo->GetName();
+			ImGui::Text(name.c_str()); ImGui::SameLine();
 			ImGui::Text(handle->GetPropertyName(i)); ImGui::SameLine(200.0f);
 
-			if(typeInfo->GetName() == std::string("string"))
+			if(name == "string")
 				ImGui::InputText("##String", (std::string*)address);
-			else if(typeInfo->GetName() == std::string("Vec3"))
+			else if(name == "Vec3")
 				ImGui::InputFloat3("##Vec3", (float*)address);
-			else if(typeInfo->GetName() == std::string("List")
-			&& handle->GetField(i).MetadataIncludes("Tilemap Data")
-			&& ImGui::Button("Edit Tilemap"))
-			{
-				TilemapEditorPopup(obj);
+			else if(name == "array") {
+				auto property = component.Instance->GetProperty(i);
+				if(property.HasMetadata("Tilemap")
+				&& ImGui::Button("Edit Tilemap"))
+					s_TilemapEdit = true;
+				if(s_TilemapEdit)
+					TilemapEditorPopup(component.Instance, name);
 			}
 			else
 				ImGui::NewLine();
