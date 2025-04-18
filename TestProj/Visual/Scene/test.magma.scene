@@ -109,7 +109,7 @@ Scene:
             Tag: MainCharacter
           TransformComponent:
             Transform:
-              Translation: [-23.8131142, 1, 8.51014519]
+              Translation: [1.3453567, 1, 8.51014519]
               Rotation: [0, -0, 0]
               Scale: [1, 1, 1]
           MeshComponent:

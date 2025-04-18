@@ -197,10 +197,9 @@ void SerializeEntity(YAMLSerializer& serializer, const Entity& entity) {
 
 			auto* handle = obj->GetHandle();
 			for(uint32_t i = 0; i < handle->GetPropertyCount(); i++) {
-				void* address = handle->GetAddressOfProperty(i);
-				std::string name = handle->GetPropertyName(i);
-				auto typeID = handle->GetPropertyTypeId(i);
-				auto* typeInfo = ScriptEngine::Get()->GetTypeInfoById(typeID);
+				ScriptField field = obj->GetProperty(i);
+				if(!field.HasMetadata("EditorField"))
+					continue;
 
 				serializer.BeginMapping()
 					.WriteKey("Field").BeginMapping();
@@ -208,77 +207,77 @@ void SerializeEntity(YAMLSerializer& serializer, const Entity& entity) {
 				serializer.WriteKey("Name").Write(name);
 
 				// Script Type
-				if(typeInfo && typeID & asTYPEID_SCRIPTOBJECT) {
+				if(field.Is(ScriptQualifier::ScriptObject)) {
 						serializer.EndMapping()
 					.EndMapping();
 					continue;
 				}
 
-				if(typeID == asTYPEID_BOOL) {
+				if(field.TypeID == asTYPEID_BOOL) {
 					serializer
 						.WriteKey("Type").Write(std::string("bool"))
-						.WriteKey("Value").Write(*(bool*)address);
+						.WriteKey("Value").Write(*field.As<bool>());
 				}
-				else if(typeID == asTYPEID_INT8) {
+				else if(field.TypeID == asTYPEID_INT8) {
 					serializer
 						.WriteKey("Type").Write(std::string("int8"))
-						.WriteKey("Value").Write((int32_t)*(int8_t*)address);
+						.WriteKey("Value").Write((int32_t)*field.As<int8_t>());
 				}
-				else if(typeID == asTYPEID_INT16) {
+				else if(field.TypeID == asTYPEID_INT16) {
 					serializer
 						.WriteKey("Type").Write(std::string("int16"))
-						.WriteKey("Value").Write((int32_t)*(int16_t*)address);
+						.WriteKey("Value").Write((int32_t)*field.As<int16_t>());
 				}
-				else if(typeID == asTYPEID_INT32) {
+				else if(field.TypeID == asTYPEID_INT32) {
 					serializer
 						.WriteKey("Type").Write(std::string("int32"))
-						.WriteKey("Value").Write(*(int32_t*)address);
+						.WriteKey("Value").Write(*field.As<int32_t>());
 				}
-				else if(typeID == asTYPEID_INT64) {
+				else if(field.TypeID == asTYPEID_INT64) {
 					serializer
 						.WriteKey("Type").Write(std::string("int64"))
-						.WriteKey("Value").Write(*(int64_t*)address);
+						.WriteKey("Value").Write(*field.As<int64_t>());
 				}
-				else if(typeID == asTYPEID_UINT8) {
+				else if(field.TypeID == asTYPEID_UINT8) {
 					serializer
 						.WriteKey("Type").Write(std::string("uint8"))
-						.WriteKey("Value").Write((uint32_t)*(uint8_t*)address);
+						.WriteKey("Value").Write((uint32_t)*field.As<uint8_t>());
 				}
-				else if(typeID == asTYPEID_UINT16) {
+				else if(field.TypeID == asTYPEID_UINT16) {
 					serializer
 						.WriteKey("Type").Write(std::string("uint16"))
-						.WriteKey("Value").Write((uint32_t)*(uint16_t*)address);
+						.WriteKey("Value").Write((uint32_t)*field.As<uint16_t>());
 				}
-				else if(typeID == asTYPEID_UINT32) {
+				else if(field.TypeID == asTYPEID_UINT32) {
 					serializer
 						.WriteKey("Type").Write(std::string("uint32"))
-						.WriteKey("Value").Write(*(uint32_t*)address);
+						.WriteKey("Value").Write(*field.As<uint32_t>());
 				}
-				else if(typeID == asTYPEID_UINT64) {
+				else if(field.TypeID == asTYPEID_UINT64) {
 					serializer
 						.WriteKey("Type").Write(std::string("uint64"))
-						.WriteKey("Value").Write(*(uint64_t*)address);
+						.WriteKey("Value").Write(*field.As<uint64_t>());
 				}
-				else if(typeID == asTYPEID_FLOAT) {
+				else if(field.TypeID == asTYPEID_FLOAT) {
 					serializer
 						.WriteKey("Type").Write(std::string("float"))
-						.WriteKey("Value").Write(*(float*)address);
+						.WriteKey("Value").Write(*field.As<float>());
 				}
-				else if(typeID == asTYPEID_DOUBLE) {
+				else if(field.TypeID == asTYPEID_DOUBLE) {
 					serializer
 						.WriteKey("Type").Write(std::string("double"))
-						.WriteKey("Value").Write(*(float*)(double*)address);
+						.WriteKey("Value").Write(*(float*)field.As<double>());
 				}
-				else if(std::string(typeInfo->GetName()) == "Entity") {
+				else if(std::string(field.Type->GetName()) == "Entity") {
 					serializer
 						.WriteKey("Type").Write(std::string("Entity"))
 						.WriteKey("Value")
-							.Write((uint64_t)((Entity*)address)->GetHandle());
+							.Write((uint64_t)field.As<Entity>()->GetHandle());
 				}
-				else if(std::string(typeInfo->GetName()) == "Asset") {
+				else if(std::string(field.Type->GetName()) == "Asset") {
 					serializer
 						.WriteKey("Type").Write(std::string("Asset"))
-						.WriteKey("Value").Write(*(Asset*)address);
+						.WriteKey("Value").Write(*field.As<Asset>());
 				}
 					serializer.EndMapping()
 				.EndMapping();
@@ -707,56 +706,34 @@ BinaryWriter& BinaryWriter::WriteObject(const ScriptComponent& comp) {
 
 	for(uint32_t i = 0; i < handle->GetPropertyCount(); i++) {
 		ScriptField field = obj->GetProperty(i);
-		Write(field.TypeID);
 		if(!field.HasMetadata("EditorField")) {
 			Write((uint32_t)0);
 			continue;
 		}
 
-		if(field.TypeID == asTYPEID_BOOL) {
-			Write(sizeof(bool));
+		Write(field.TypeID);
+		if(field.TypeID == asTYPEID_BOOL)
 			Write(*field.As<bool>());
-		}
-		else if(field.TypeID == asTYPEID_INT8) {
-			Write(sizeof(int8_t));
+		else if(field.TypeID == asTYPEID_INT8)
 			Write(*field.As<int8_t>());
-		}
-		else if(field.TypeID == asTYPEID_INT16) {
-			Write(sizeof(int16_t));
+		else if(field.TypeID == asTYPEID_INT16)
 			Write(*field.As<int16_t>());
-		}
-		else if(field.TypeID == asTYPEID_INT32) {
-			Write(sizeof(int32_t));
+		else if(field.TypeID == asTYPEID_INT32)
 			Write(*field.As<int32_t>());
-		}
-		else if(field.TypeID == asTYPEID_INT64) {
-			Write(sizeof(int64_t));
+		else if(field.TypeID == asTYPEID_INT64)
 			Write(*field.As<int64_t>());
-		}
-		else if(field.TypeID == asTYPEID_UINT8) {
-			Write(sizeof(uint8_t));
+		else if(field.TypeID == asTYPEID_UINT8)
 			Write(*field.As<uint8_t>());
-		}
-		else if(field.TypeID == asTYPEID_UINT16) {
-			Write(sizeof(uint16_t));
+		else if(field.TypeID == asTYPEID_UINT16)
 			Write(*field.As<uint16_t>());
-		}
-		else if(field.TypeID == asTYPEID_UINT32) {
-			Write(sizeof(uint32_t));
+		else if(field.TypeID == asTYPEID_UINT32)
 			Write(*field.As<uint32_t>());
-		}
-		else if(field.TypeID == asTYPEID_UINT64) {
-			Write(sizeof(uint64_t));
+		else if(field.TypeID == asTYPEID_UINT64)
 			Write(*field.As<uint64_t>());
-		}
-		else if(field.TypeID == asTYPEID_FLOAT) {
-			Write(sizeof(float));
+		else if(field.TypeID == asTYPEID_FLOAT)
 			Write(*field.As<float>());
-		}
-		else if(field.TypeID == asTYPEID_DOUBLE) {
-			Write(sizeof(double));
+		else if(field.TypeID == asTYPEID_DOUBLE)
 			Write(*field.As<double>());
-		}
 	}
 
 	return *this;

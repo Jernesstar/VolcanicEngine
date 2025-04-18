@@ -50,9 +50,7 @@ public:
 		func.CallVoid(std::forward<Args>(args)...);
 	}
 
-	void Copy(Ref<ScriptObject> other) {
-		m_Handle->CopyFrom(other->m_Handle);
-	}
+	void Copy(Ref<ScriptObject> other);
 
 	ScriptField GetProperty(const std::string& name);
 	ScriptField GetProperty(uint32_t idx);
