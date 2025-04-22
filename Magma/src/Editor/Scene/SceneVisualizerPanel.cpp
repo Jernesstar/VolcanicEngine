@@ -32,6 +32,7 @@
 
 #include "SceneTab.h"
 #include "SceneHierarchyPanel.h"
+#include "ComponentEditorPanel.h"
 
 using namespace Magma::ECS;
 using namespace Magma::Script;
@@ -69,7 +70,6 @@ SceneVisualizerPanel::SceneVisualizerPanel(Scene* context)
 	m_GizmoTranslate.SetSize(35, 35);
 	m_GizmoRotate.SetSize(35, 35);
 	m_GizmoScale.SetSize(35, 35);
-
 
 	SetContext(context);
 }
@@ -1078,6 +1078,15 @@ void EditorSceneRenderer::Render() {
 		call.Partition = PartitionType::Single;
 		call.Primitive = PrimitiveType::Line;
 	}
+
+	Panel* editor = Panel->GetTab()
+		->GetPanel("ComponentEditor")->As<ComponentEditorPanel>();
+	if(Selected && Selected.Has<RigidBodyComponent>()
+	&& editor->IsFocused<RigidBodyComponent>(Selected))
+	{
+		
+	}
+
 #endif
 
 	Renderer::Flush();

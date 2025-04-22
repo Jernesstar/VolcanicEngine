@@ -22,6 +22,7 @@ public:
 	virtual void Draw() { }
 
 	void SetTab(Tab* tab) { m_Tab = tab; }
+	Tab* GetTab() { return m_Tab; }
 
 protected:
 	Tab* m_Tab = nullptr;

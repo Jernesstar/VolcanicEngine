@@ -204,14 +204,7 @@ void SerializeEntity(YAMLSerializer& serializer, const Entity& entity) {
 				serializer.BeginMapping()
 					.WriteKey("Field").BeginMapping();
 
-				serializer.WriteKey("Name").Write(name);
-
-				// Script Type
-				if(field.Is(ScriptQualifier::ScriptObject)) {
-						serializer.EndMapping()
-					.EndMapping();
-					continue;
-				}
+				serializer.WriteKey("Name").Write(field.Name);
 
 				if(field.TypeID == asTYPEID_BOOL) {
 					serializer
@@ -279,6 +272,15 @@ void SerializeEntity(YAMLSerializer& serializer, const Entity& entity) {
 						.WriteKey("Type").Write(std::string("Asset"))
 						.WriteKey("Value").Write(*field.As<Asset>());
 				}
+				// Script Type
+				else if(field.Is(ScriptQualifier::ScriptObject)) {
+					auto* type = field.Type;
+					for(uint32_t i = 0; i < type->GetPropertyCount(); i++) {
+						uint64_t offset;
+						type->GetProperty()
+					}
+				}
+
 					serializer.EndMapping()
 				.EndMapping();
 			}
@@ -395,6 +397,69 @@ void SerializeEntity(YAMLSerializer& serializer, const Entity& entity) {
 	serializer.EndMapping(); // Entity
 }
 
+static void LoadScript(Entity entity, Asset asset, const std::string& className,
+						YAML::Node node)
+{
+	assetManager.Load(asset);
+	auto mod = assetManager.Get<ScriptModule>(asset);
+	if(!mod) {
+		VOLCANICORE_LOG_INFO(
+			"Could not load class module %lu, needed for Entity %lu",
+			(uint64_t)id, (uint64_t)entityID);
+		entity.Add<ScriptComponent>(asset);
+		return;
+	}
+
+	auto _class = mod->GetClass(className);
+	if(!_class) {
+		VOLCANICORE_LOG_INFO(
+			"Could not find class '%s' in module %lu, needed for Entity %lu",
+			className.c_str(), (uint64_t)id, (uint64_t)entityID);
+		entity.Add<ScriptComponent>(asset);
+		return;
+	}
+
+	auto instance = _class->Construct();
+	for(auto fieldNode : scriptComponentNode["Fields"]) {
+		auto node = fieldNode["Field"];
+		std::string name = node["Name"].as<std::string>();
+		std::string type = node["Type"].as<std::string>();
+		void* address = instance->GetProperty(name);
+		YAML::Node valNode = node["Value"];
+
+		if(type == "bool")
+			*(bool*)address = valNode.as<bool>();
+		else if(type == "int8")
+			*(int8_t*)address = (int8_t)valNode.as<int32_t>();
+		else if(type == "int16")
+			*(int16_t*)address = (int16_t)valNode.as<int32_t>();
+		else if(type == "int32")
+			*(int32_t*)address = valNode.as<int32_t>();
+		else if(type == "int64")
+			*(int64_t*)address = valNode.as<int64_t>();
+		else if(type == "uint8")
+			*(uint8_t*)address = (uint8_t)valNode.as<uint32_t>();
+		else if(type == "uint16")
+			*(uint16_t*)address = (uint16_t)valNode.as<uint32_t>();
+		else if(type == "uint32")
+			*(uint32_t*)address = valNode.as<uint32_t>();
+		else if(type == "uint64")
+			*(uint64_t*)address = valNode.as<uint64_t>();
+		else if(type == "float")
+			*(float*)address = valNode.as<float>();
+		else if(type == "double")
+			*(double*)address = valNode.as<float>();
+		else if(type == "Entity")
+			*(Entity*)address = entity;
+		else if(type == "Asset") {
+			((Asset*)address)->ID = valNode["ID"].as<uint64_t>();
+			((Asset*)address)->Type = (AssetType)valNode["Type"].as<uint32_t>();
+		}
+	}
+
+	entity.Add<ScriptComponent>(asset, instance);
+}
+
 void DeserializeEntity(YAML::Node entityNode, Scene& scene) {
 	uint64_t entityID = entityNode["ID"].as<uint64_t>();
 	Entity entity = scene.EntityWorld.AddEntity(entityID);
@@ -482,70 +547,8 @@ void DeserializeEntity(YAML::Node entityNode, Scene& scene) {
 			entity.Add<ScriptComponent>();
 		else if(className == "")
 			entity.Add<ScriptComponent>(asset);
-		else {
-			assetManager.Load(asset);
-			auto mod = assetManager.Get<ScriptModule>(asset);
-			if(!mod) {
-				VOLCANICORE_LOG_INFO(
-					"Could not find class module %lu, needed for Entity %lu",
-					(uint64_t)id, (uint64_t)entityID);
-			}
-			else {
-				auto _class = mod->GetClass(className);
-				if(!_class) {
-					VOLCANICORE_LOG_INFO(
-						"Could not find class '%s' in module %lu, needed for Entity %lu",
-						className.c_str(), (uint64_t)id, (uint64_t)entityID);
-				}
-				else {
-					auto instance = _class->Construct();
-					auto obj = instance->GetHandle();
-					uint32_t i = 0;
-					for(auto fieldNode : scriptComponentNode["Fields"]) {
-						void* address = obj->GetAddressOfProperty(i++);
-						auto node = fieldNode["Field"];
-						if(!node["Type"])
-							continue;
-
-						std::string name = node["Name"].as<std::string>();
-						std::string type = node["Type"].as<std::string>();
-
-						if(type == "bool")
-							*(bool*)address = node["Value"].as<bool>();
-						else if(type == "int8")
-							*(int8_t*)address = (int8_t)node["Value"].as<int32_t>();
-						else if(type == "int16")
-							*(int16_t*)address = (int16_t)node["Value"].as<int32_t>();
-						else if(type == "int32")
-							*(int32_t*)address = node["Value"].as<int32_t>();
-						else if(type == "int64")
-							*(int64_t*)address = node["Value"].as<int64_t>();
-						else if(type == "uint8")
-							*(uint8_t*)address = (uint8_t)node["Value"].as<uint32_t>();
-						else if(type == "uint16")
-							*(uint16_t*)address = (uint16_t)node["Value"].as<uint32_t>();
-						else if(type == "uint32")
-							*(uint32_t*)address = node["Value"].as<uint32_t>();
-						else if(type == "uint64")
-							*(uint64_t*)address = node["Value"].as<uint64_t>();
-						else if(type == "float")
-							*(float*)address = node["Value"].as<float>();
-						else if(type == "double")
-							*(double*)address = node["Value"].as<float>();
-						else if(type == "Entity")
-							*(Entity*)address = entity;
-						else if(type == "Asset") {
-							((Asset*)address)->ID =
-								node["Value"]["ID"].as<uint64_t>();
-							((Asset*)address)->Type =
-								(AssetType)node["Value"]["Type"].as<uint32_t>();
-						}
-					}
-
-					entity.Add<ScriptComponent>(asset, instance);
-				}
-			}
-		}
+		else
+			LoadScript(entity, asset, className, scriptComponentNode);
 	}
 
 	auto rigidBodyComponentNode = components["RigidBodyComponent"];
@@ -622,7 +625,8 @@ void DeserializeEntity(YAML::Node entityNode, Scene& scene) {
 			particleEmitterComponentNode["Position"].as<glm::vec3>(),
 			particleEmitterComponentNode["MaxParticleCount"].as<uint64_t>(),
 			particleEmitterComponentNode["ParticleLifetime"].as<float>(),
-			Asset{ particleEmitterComponentNode["AssetID"].as<uint64_t>(), AssetType::Texture });
+			Asset{ particleEmitterComponentNode["AssetID"].as<uint64_t>(),
+					AssetType::Texture });
 	}
 }
 

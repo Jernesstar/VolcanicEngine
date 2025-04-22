@@ -337,6 +337,13 @@ static void TilemapEditorPopup(Ref<ScriptObject> obj, const std::string& name) {
 	auto* width = obj->GetProperty("Width").As<uint32_t>();
 	auto* height = obj->GetProperty("Height").As<uint32_t>();
 	auto* data = obj->GetProperty(name).As<CScriptArray>();
+	if(!data) {
+		asITypeInfo* type =
+			ScriptEngine::Get()->GetTypeInfoByDecl("array<uint32>");
+		data = CScriptArray::Create(type, 9);
+		*width = 3;
+		*height = 3;
+	}
 
 	ImGui::OpenPopup("Tilemap Editor");
 	if(ImGui::BeginPopupModal("Tilemap Editor")) {
@@ -354,14 +361,24 @@ static void TilemapEditorPopup(Ref<ScriptObject> obj, const std::string& name) {
 		bool w = ImGui::InputScalar("Width", ImGuiDataType_U32, width);
 		bool h = ImGui::InputScalar("Height", ImGuiDataType_U32, height);
 
-		// if(w)
-		// 	data->Resize();
-		// if(h)
-		// 	data->Resize();
+		uint32_t count = 0;
+		if(w || h)
+			data->Resize((*width) * (*height));
 
-		for(uint32_t x = 0; x < *width; x++) {
-			for(uint32_t y = 0; y < *height; y++) {
-				
+		UI::Button button;
+		button.Display = CreateRef<UI::Text>();
+		for(uint32_t y = 0; y < *height; y++) {
+			for(uint32_t x = 0; x < *width; x++) {
+				uint32_t* val = (uint32_t*)data->At(y * width + x);
+				button.Display->As<UI::Text>()->Content = std::to_string(*val);
+				button.x = x * 20.0f;
+				button.y = y * 20.0f;
+				button.SetSize(18.0f, 18.0f);
+				button.Render();
+				if(ImGui::IsMouseReleased(1) && ImGui::IsItemHovered())
+					(*val) = 0;
+				else if(button.GetState().Clicked)
+					(*val)++;
 			}
 		}
 
@@ -520,7 +537,7 @@ void DrawComponent<RigidBodyComponent>(Entity& entity) {
 		{
 			ImGui::Text("Static");
 			if(ImGui::Button("Switch to Dynamic")) {
-				
+
 			}
 
 			break;
