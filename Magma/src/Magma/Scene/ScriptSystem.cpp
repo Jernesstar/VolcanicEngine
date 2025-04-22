@@ -76,21 +76,25 @@ void ScriptSystem::Listen(Entity& entity, const std::string& id) {
 		entity.GetName().c_str(), id.c_str());
 }
 
-void ScriptSystem::Broadcast(Entity& entity, const std::string& id) {
+void ScriptSystem::Broadcast(Entity& entity, asIScriptObject* event) {
+	event->AddRef();
+
+	auto eventName = event->GetObjectType()->GetName();
 	m_EntityWorld->
 	ForEach<ScriptComponent>(
-		[this, event=m_Event](Entity& other)
+		[this, =](Entity& entity)
 		{
-			auto sc = other.Get<ScriptComponent>();
-			auto eventID =
-				m_EntityWorld->GetNative().lookup(event.ID.c_str());
+			auto eventID = m_EntityWorld->GetNative().lookup(eventName);
 			if(!eventID)
 				return;
-			if(!other.GetHandle().has<GameEventListener>(eventID))
+			if(!entity.GetHandle().has<GameEventListener>(eventID))
 				return;
 
-			sc.Instance->Call("OnGameEvent", &event);
+			auto sc = entity.Get<ScriptComponent>();
+			sc.Instance->Call("OnGameEvent", event);
 		});
+
+	event->Release();
 }
 
 void ScriptSystem::OnComponentAdd(Entity& entity) {

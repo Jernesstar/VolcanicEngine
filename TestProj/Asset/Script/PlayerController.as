@@ -16,9 +16,8 @@ class PlayerController : IEntityController
     [EditorField] uint32 Unsigned32;
     [EditorField] float Float;
 
-    [EditorField]
     [Tilemap]
-    array<uint32> Tilemap;
+    [EditorField] array<uint32> Tilemap;
 
     [EditorField] uint32 Width;
     [EditorField] uint32 Height;
@@ -40,7 +39,7 @@ class PlayerController : IEntityController
         print("Loaded: " + loaded);
 
         ScriptSystem@ sys = Scene.GetScriptSystem();
-        // sys.ListenForEvent(Handle, "PlayerDied");
+        sys.ListenForEvent(Handle, "PlayerDied");
     }
 
     void OnUpdate(float ts)
@@ -82,32 +81,33 @@ class PlayerController : IEntityController
 
     void OnMouseEvent(MouseEvent@ event)
     {
-        // print("Mouse");
-        // if(event.Type != MouseEventType::Pressed)
-        //     return;
-        // print("Press");
+        print("Mouse");
+        if(event.Type != EventType::MousePressed)
+            return;
+        print("Press");
 
-        // MousePressedEvent@ e = cast<MousePressedEvent>(event);
+        MousePressedEvent@ e = cast<MousePressedEvent>(event);
+        print("Button is " + e.Button);
     }
 
     void OnPhysicsEvent(PhysicsEvent@ event)
     {
-        // if(event.Type == PhysicsEventType::MousePress) {
-        //     print("Pressed");
-        //     return;
-        // }
+        if(event.Type == PhysicsEventType::MousePress) {
+            print("Pressed");
+            return;
+        }
 
-        // if(event.EntityHandle.GetTagComponent().Tag == "Lava") {
+        if(event.EntityHandle.GetTagComponent().Tag == "Lava") {
             ScriptSystem@ sys = Scene.GetScriptSystem();
             sys.BroadcastEvent(Handle, "PlayerDied");
-        // }
+        }
     }
 
     void OnGameEvent(GameEvent@ event)
     {
-        // if(event.ID == "PlayerDied")
-        // {
-        //     print("Game over");
-        // }
+        if(cast<PlayerDied>(event))
+        {
+            print("Game over");
+        }
     }
 }

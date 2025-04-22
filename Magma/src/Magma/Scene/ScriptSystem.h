@@ -6,10 +6,6 @@
 
 using namespace Magma::ECS;
 
-struct GameEvent {
-	std::string ID;
-};
-
 namespace Magma {
 
 class ScriptSystem : public System<ScriptComponent> {
@@ -21,7 +17,7 @@ public:
 	void Run(Phase phase) override;
 
 	void Listen(Entity& entity, const std::string& id);
-	void Broadcast(Entity& entity, const std::string& id);
+	void Broadcast(Entity& entity, asIScriptObject* event);
 
 	void OnComponentAdd(Entity& entity) override;
 	void OnComponentSet(Entity& entity) override;
@@ -29,7 +25,6 @@ public:
 
 public:
 	TimeStep m_TimeStep;
-	GameEvent m_Event;
 
 	flecs::entity m_KeyPressedCallbackEntity;
 	flecs::entity m_KeyReleasedCallbackEntity;

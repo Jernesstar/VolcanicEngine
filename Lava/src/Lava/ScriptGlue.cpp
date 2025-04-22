@@ -303,13 +303,19 @@ void RegisterEvents() {
 		asFUNCTION(KeyCharacterEventCast), asCALL_CDECL_OBJLAST);
 
 	engine->RegisterObjectType("MouseEvent", 0, asOBJ_REF | asOBJ_NOCOUNT);
+	engine->RegisterObjectProperty("MouseEvent", "const EventType Type",
+		asOFFSET(MouseEvent, Type));
+
+	engine->RegisterObjectType("MousePressedEvent", 0, asOBJ_REF | asOBJ_NOCOUNT);
+	engine->RegisterObjectProperty("MousePressedEvent", "const EventType Type",
+		asOFFSET(MousePressedEvent, Type));
+	engine->RegisterObjectProperty("MousePressedEvent", "const Mouse Button",
+		asOFFSET(MousePressedEvent, Button));
 
 	engine->RegisterObjectType("PhysicsEvent", 0, asOBJ_REF | asOBJ_NOCOUNT);
 	// engine->RegisterObjectProperty("PhysicsEvent", "PhysicsEventType Type")
 
-	engine->RegisterObjectType("GameEvent", 0, asOBJ_REF | asOBJ_NOCOUNT);
-	// engine->RegisterObjectProperty("GameEvent", "string ID",
-	// 	asOFFSET(GameEvent, ID));
+	ScriptEngine::RegisterInterface("GameEvent");
 }
 
 static uint64_t GetAssetID(Asset* asset) {
