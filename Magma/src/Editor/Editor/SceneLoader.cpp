@@ -2,6 +2,8 @@
 
 #include <bitset>
 
+#include <angelscript/add_on/scriptarray/scriptarray.h>
+
 #include <VolcaniCore/Core/Assert.h>
 #include <VolcaniCore/Core/FileUtils.h>
 #include <VolcaniCore/Core/List.h>
@@ -10,12 +12,9 @@
 #include <VolcaniCore/Graphics/OrthographicCamera.h>
 
 #include <Magma/Core/YAMLSerializer.h>
-
 #include <Magma/Core/BinaryWriter.h>
 #include <Magma/Core/BinaryReader.h>
-
 #include <Magma/Script/ScriptClass.h>
-
 #include <Magma/Scene/Component.h>
 
 #include <Lava/App.h>
@@ -272,12 +271,28 @@ void SerializeEntity(YAMLSerializer& serializer, const Entity& entity) {
 						.WriteKey("Type").Write(std::string("Asset"))
 						.WriteKey("Value").Write(*field.As<Asset>());
 				}
+				else if(std::string(field.Type->GetName()) == "array") {
+					serializer
+						.WriteKey("Type").Write(std::string("array"))
+						.WriteKey("Value");
+
+					serializer.SetOptions(Serializer::Options::ArrayOneLine);
+					serializer
+							.BeginSequence();
+					auto* data = field.As<CScriptArray>();
+					for(uint32_t i = 0; i < data->GetSize(); i++)
+						serializer
+							.Write(*(uint32_t*)data->At(i));
+
+					serializer
+						.EndSequence();
+				}
 				// Script Type
 				else if(field.Is(ScriptQualifier::ScriptObject)) {
 					auto* type = field.Type;
 					for(uint32_t i = 0; i < type->GetPropertyCount(); i++) {
 						uint64_t offset;
-						type->GetProperty()
+						// type->GetProperty()
 					}
 				}
 
@@ -398,14 +413,17 @@ void SerializeEntity(YAMLSerializer& serializer, const Entity& entity) {
 }
 
 static void LoadScript(Entity entity, Asset asset, const std::string& className,
-						YAML::Node node)
+						YAML::Node& scriptComponentNode)
 {
+	auto& assetManager =
+		Application::As<EditorApp>()->GetEditor().GetAssetManager();
+
 	assetManager.Load(asset);
 	auto mod = assetManager.Get<ScriptModule>(asset);
 	if(!mod) {
 		VOLCANICORE_LOG_INFO(
-			"Could not load class module %lu, needed for Entity %lu",
-			(uint64_t)id, (uint64_t)entityID);
+			"Could not load script module %lu, needed for Entity %lu",
+			(uint64_t)asset.ID, (uint64_t)entity.GetHandle());
 		entity.Add<ScriptComponent>(asset);
 		return;
 	}
@@ -414,7 +432,7 @@ static void LoadScript(Entity entity, Asset asset, const std::string& className,
 	if(!_class) {
 		VOLCANICORE_LOG_INFO(
 			"Could not find class '%s' in module %lu, needed for Entity %lu",
-			className.c_str(), (uint64_t)id, (uint64_t)entityID);
+			className.c_str(), (uint64_t)asset.ID, (uint64_t)entity.GetHandle());
 		entity.Add<ScriptComponent>(asset);
 		return;
 	}
@@ -422,38 +440,48 @@ static void LoadScript(Entity entity, Asset asset, const std::string& className,
 	auto instance = _class->Construct();
 	for(auto fieldNode : scriptComponentNode["Fields"]) {
 		auto node = fieldNode["Field"];
+		YAML::Node value = node["Value"];
 		std::string name = node["Name"].as<std::string>();
 		std::string type = node["Type"].as<std::string>();
-		void* address = instance->GetProperty(name);
-		YAML::Node valNode = node["Value"];
+		void* address = instance->GetProperty(name).Data;
 
 		if(type == "bool")
-			*(bool*)address = valNode.as<bool>();
+			*(bool*)address = value.as<bool>();
 		else if(type == "int8")
-			*(int8_t*)address = (int8_t)valNode.as<int32_t>();
+			*(int8_t*)address = (int8_t)value.as<int32_t>();
 		else if(type == "int16")
-			*(int16_t*)address = (int16_t)valNode.as<int32_t>();
+			*(int16_t*)address = (int16_t)value.as<int32_t>();
 		else if(type == "int32")
-			*(int32_t*)address = valNode.as<int32_t>();
+			*(int32_t*)address = value.as<int32_t>();
 		else if(type == "int64")
-			*(int64_t*)address = valNode.as<int64_t>();
+			*(int64_t*)address = value.as<int64_t>();
 		else if(type == "uint8")
-			*(uint8_t*)address = (uint8_t)valNode.as<uint32_t>();
+			*(uint8_t*)address = (uint8_t)value.as<uint32_t>();
 		else if(type == "uint16")
-			*(uint16_t*)address = (uint16_t)valNode.as<uint32_t>();
+			*(uint16_t*)address = (uint16_t)value.as<uint32_t>();
 		else if(type == "uint32")
-			*(uint32_t*)address = valNode.as<uint32_t>();
+			*(uint32_t*)address = value.as<uint32_t>();
 		else if(type == "uint64")
-			*(uint64_t*)address = valNode.as<uint64_t>();
+			*(uint64_t*)address = value.as<uint64_t>();
 		else if(type == "float")
-			*(float*)address = valNode.as<float>();
+			*(float*)address = value.as<float>();
 		else if(type == "double")
-			*(double*)address = valNode.as<float>();
-		else if(type == "Entity")
-			*(Entity*)address = entity;
+			*(double*)address = value.as<float>();
+		// else if(type == "Entity")
+		// 	*(Entity*)address = entity;
 		else if(type == "Asset") {
-			((Asset*)address)->ID = valNode["ID"].as<uint64_t>();
-			((Asset*)address)->Type = (AssetType)valNode["Type"].as<uint32_t>();
+			((Asset*)address)->ID = value["ID"].as<uint64_t>();
+			((Asset*)address)->Type = (AssetType)value["Type"].as<uint32_t>();
+		}
+		else if(type == "array") {
+			asITypeInfo* type =
+				ScriptEngine::Get()->GetTypeInfoByDecl("array<uint32>");
+			auto data = value.as<List<uint32_t>>();
+			if(data) {
+				auto array = CScriptArray::Create(type, data.At(0));
+				*(CScriptArray*)address = *array;
+				array->Release();
+			}
 		}
 	}
 

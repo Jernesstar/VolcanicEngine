@@ -34,7 +34,7 @@ public:
 	void IsHovered(bool hovered) { Hovered = hovered; }
 
 private:
-	SceneVisualizerPanel* Panel;
+	SceneVisualizerPanel* RootPanel;
 
 	Entity Selected;
 	bool Hovered = false;

@@ -11,7 +11,6 @@
 #include <VolcaniCore/Core/Log.h>
 
 #include <Magma/UI/UIRenderer.h>
-
 #include <Magma/Scene/Component.h>
 
 #include <Editor/EditorApp.h>
@@ -310,7 +309,10 @@ std::string SelectScriptClass(Ref<ScriptModule> mod) {
 	ImGui::OpenPopup("Select Script Class");
 	if(ImGui::BeginPopupModal("Select Script Class"))
 	{
-		for(const auto& [name, _] : mod->GetClasses()) {
+		for(const auto& [name, _class] : mod->GetClasses()) {
+			if(!_class->Implements("IEntityController"))
+				continue;
+
 			bool pressed = ImGui::Button(name.c_str());
 			if(pressed) {
 				select = name;
@@ -337,12 +339,17 @@ static void TilemapEditorPopup(Ref<ScriptObject> obj, const std::string& name) {
 	auto* width = obj->GetProperty("Width").As<uint32_t>();
 	auto* height = obj->GetProperty("Height").As<uint32_t>();
 	auto* data = obj->GetProperty(name).As<CScriptArray>();
-	if(!data) {
+
+	if(!width || !height || !data)
+		return;
+
+	uint32_t size = (*width) * (*height);
+	if(!data->GetSize() || size != data->GetSize()) {
 		asITypeInfo* type =
 			ScriptEngine::Get()->GetTypeInfoByDecl("array<uint32>");
-		data = CScriptArray::Create(type, 9);
-		*width = 3;
-		*height = 3;
+		auto* array = CScriptArray::Create(type, size);
+		*data = *array;
+		array->Release();
 	}
 
 	ImGui::OpenPopup("Tilemap Editor");
@@ -352,33 +359,39 @@ static void TilemapEditorPopup(Ref<ScriptObject> obj, const std::string& name) {
 			ImGui::CloseCurrentPopup();
 		}
 
-		if(!width || !height) {
-			ImGui::Text("Invalid configuration; Define Width and Height");
-			ImGui::EndPopup();
-			return;
-		}
-
 		bool w = ImGui::InputScalar("Width", ImGuiDataType_U32, width);
 		bool h = ImGui::InputScalar("Height", ImGuiDataType_U32, height);
 
-		uint32_t count = 0;
 		if(w || h)
 			data->Resize((*width) * (*height));
 
 		UI::Button button;
 		button.Display = CreateRef<UI::Text>();
+		// button.Color = { };
+		button.SetSize(18.0f, 18.0f);
+
 		for(uint32_t y = 0; y < *height; y++) {
 			for(uint32_t x = 0; x < *width; x++) {
-				uint32_t* val = (uint32_t*)data->At(y * width + x);
-				button.Display->As<UI::Text>()->Content = std::to_string(*val);
-				button.x = x * 20.0f;
-				button.y = y * 20.0f;
-				button.SetSize(18.0f, 18.0f);
+				uint32_t i = y * (*width) + x;
+				uint32_t val = *(uint32_t*)data->At(i);
+
+				button.Display->As<UI::Text>()->Content = std::to_string(val);
+				button.x = 12 + x * 23.0f;
+				button.y = 120 + y * 23.0f;
 				button.Render();
-				if(ImGui::IsMouseReleased(1) && ImGui::IsItemHovered())
-					(*val) = 0;
-				else if(button.GetState().Clicked)
-					(*val)++;
+
+				if(ImGui::IsMouseDoubleClicked(1) && ImGui::IsItemHovered()) {
+					val = 0;
+					data->SetValue(i, &val);
+				}
+				if(button.GetState().Clicked) {
+					val++;
+					data->SetValue(i, &val);
+				}
+				if(ImGui::IsMouseClicked(1) && ImGui::IsItemHovered()) {
+					val--;
+					data->SetValue(i, &val);
+				}
 			}
 		}
 
@@ -437,21 +450,21 @@ void DrawComponent<ScriptComponent>(Entity& entity) {
 			continue;
 
 		if(field.Type) {
-			std::string name = field.Type->GetName();
-			ImGui::Text(name.c_str()); ImGui::SameLine();
+			std::string typeName = field.Type->GetName();
+			ImGui::Text(typeName.c_str()); ImGui::SameLine();
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(200.0f);
 
-			if(name == "string")
+			if(typeName == "string")
 				ImGui::InputText("##String", field.As<std::string>());
-			else if(name == "Vec3")
+			else if(typeName == "Vec3")
 				ImGui::InputFloat3("##Vec3", &field.As<Vec3>()->r);
-			else if(name == "array") {
+			else if(typeName == "array") {
 				auto property = component.Instance->GetProperty(i);
 				if(property.HasMetadata("Tilemap")
 				&& ImGui::Button("Edit Tilemap"))
 					s_TilemapEdit = true;
 				if(s_TilemapEdit)
-					TilemapEditorPopup(component.Instance, name);
+					TilemapEditorPopup(component.Instance, field.Name);
 			}
 			else
 				ImGui::NewLine();
@@ -459,57 +472,57 @@ void DrawComponent<ScriptComponent>(Entity& entity) {
 		else if(field.TypeID == asTYPEID_BOOL) {
 			ImGui::Text("bool"); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(200.0f);
-			ImGui::Checkbox("##Bool", field.As<bool>());
+			ImGui::Checkbox(std::string("##Bool##" + field.Name).c_str(), field.As<bool>());
 		}
 		else if(field.TypeID == asTYPEID_INT8) {
 			ImGui::Text("int8"); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(200.0f);
-			ImGui::InputScalar("##S8", ImGuiDataType_S8, field.Data);
+			ImGui::InputScalar(std::string("##S8##" + field.Name).c_str(), ImGuiDataType_S8, field.Data);
 		}
 		else if(field.TypeID == asTYPEID_INT16) {
 			ImGui::Text("int16"); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(200.0f);
-			ImGui::InputScalar("##S16", ImGuiDataType_S16, field.Data);
+			ImGui::InputScalar(std::string("##S16##" + field.Name).c_str(), ImGuiDataType_S16, field.Data);
 		}
 		else if(field.TypeID == asTYPEID_INT32) {
 			ImGui::Text("int32"); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(200.0f);
-			ImGui::InputScalar("##S32", ImGuiDataType_S32, field.Data);
+			ImGui::InputScalar(std::string("##S32##" + field.Name).c_str(), ImGuiDataType_S32, field.Data);
 		}
 		else if(field.TypeID == asTYPEID_INT64) {
 			ImGui::Text("int64"); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(200.0f);
-			ImGui::InputScalar("##S64", ImGuiDataType_S64, field.Data);
+			ImGui::InputScalar(std::string("##S64##" + field.Name).c_str(), ImGuiDataType_S64, field.Data);
 		}
 		else if(field.TypeID == asTYPEID_UINT8) {
 			ImGui::Text("uint8"); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(200.0f);
-			ImGui::InputScalar("##U8", ImGuiDataType_U8, field.Data);
+			ImGui::InputScalar(std::string("##U8##" + field.Name).c_str(), ImGuiDataType_U8, field.Data);
 		}
 		else if(field.TypeID == asTYPEID_UINT16) {
 			ImGui::Text("uint16"); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(200.0f);
-			ImGui::InputScalar("##U16", ImGuiDataType_U16, field.Data);
+			ImGui::InputScalar(std::string("##U16##" + field.Name).c_str(), ImGuiDataType_U16, field.Data);
 		}
 		else if(field.TypeID == asTYPEID_UINT32) {
 			ImGui::Text("uint32"); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(200.0f);
-			ImGui::InputScalar("##U32", ImGuiDataType_U32, field.Data);
+			ImGui::InputScalar(std::string("##U32##" + field.Name).c_str(), ImGuiDataType_U32, field.Data);
 		}
 		else if(field.TypeID == asTYPEID_UINT64) {
 			ImGui::Text("uint64"); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(200.0f);
-			ImGui::InputScalar("##U64", ImGuiDataType_U64, field.Data);
+			ImGui::InputScalar(std::string("##U64##" + field.Name).c_str(), ImGuiDataType_U64, field.Data);
 		}
 		else if(field.TypeID == asTYPEID_FLOAT) {
 			ImGui::Text("float"); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(200.0f);
-			ImGui::InputFloat("##Float", field.As<float>(), 0.0f, 0.0f, "%.3f");
+			ImGui::InputFloat(std::string("##Float##" + field.Name).c_str(), field.As<float>(), 0.0f, 0.0f, "%.3f");
 		}
 		else if(field.TypeID == asTYPEID_DOUBLE) {
 			ImGui::Text("double"); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(200.0f);
-			ImGui::InputDouble("##Double", field.As<double>());
+			ImGui::InputDouble(std::string("##Double##" + field.Name).c_str(), field.As<double>());
 		}
 	}
 }

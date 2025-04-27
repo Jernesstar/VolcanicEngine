@@ -341,7 +341,7 @@ void Editor::OpenTab(TabType type) {
 	if(instance->Display("ChooseFile")) {
 		if(instance->IsOk()) {
 			std::string path = instance->GetFilePathName();
-			if(type == TabType::Scene)
+			if(fs::path(path).extension().string() == ".scene")
 				NewTab(CreateRef<SceneTab>(path));
 			else
 				NewTab(CreateRef<UITab>(path));

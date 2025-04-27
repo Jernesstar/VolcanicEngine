@@ -111,8 +111,8 @@ BinaryReader& BinaryReader::ReadObject(ScriptComponent& comp) {
 	std::string className;
 	Read(className);
 
-	if(id! || className == "")
-		return;
+	if(!id || className == "")
+		return *this;
 
 	auto* assetManager = App::Get()->GetAssetManager();
 	assetManager->Load(asset);

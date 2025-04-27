@@ -308,9 +308,9 @@ void RegisterEvents() {
 
 	engine->RegisterObjectType("MousePressedEvent", 0, asOBJ_REF | asOBJ_NOCOUNT);
 	engine->RegisterObjectProperty("MousePressedEvent", "const EventType Type",
-		asOFFSET(MousePressedEvent, Type));
+		asOFFSET(MouseButtonPressedEvent, Type));
 	engine->RegisterObjectProperty("MousePressedEvent", "const Mouse Button",
-		asOFFSET(MousePressedEvent, Button));
+		asOFFSET(MouseButtonPressedEvent, Button));
 
 	engine->RegisterObjectType("PhysicsEvent", 0, asOBJ_REF | asOBJ_NOCOUNT);
 	// engine->RegisterObjectProperty("PhysicsEvent", "PhysicsEventType Type")

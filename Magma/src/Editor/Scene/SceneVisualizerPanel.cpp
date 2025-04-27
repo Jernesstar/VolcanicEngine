@@ -544,7 +544,7 @@ std::string SelectScriptClass(Ref<ScriptModule> mod) {
 }
 
 EditorSceneRenderer::EditorSceneRenderer(SceneVisualizerPanel* panel)
-	: Panel(panel)
+	: RootPanel(panel)
 {
 	Application::PushDir();
 
@@ -1046,7 +1046,7 @@ void EditorSceneRenderer::Render() {
 	}
 
 #ifdef MAGMA_PHYSICS
-	auto* scene = Panel->GetPhysicsWorld().Get();
+	auto* scene = RootPanel->GetPhysicsWorld().Get();
 	const PxRenderBuffer& rb = scene->getRenderBuffer();
 	if(rb.getNbLines()) {
 		List<Point> points(rb.getNbLines() * 2);
@@ -1079,7 +1079,7 @@ void EditorSceneRenderer::Render() {
 		call.Primitive = PrimitiveType::Line;
 	}
 
-	Panel* editor = Panel->GetTab()
+	auto* editor = RootPanel->GetTab()
 		->GetPanel("ComponentEditor")->As<ComponentEditorPanel>();
 	if(Selected && Selected.Has<RigidBodyComponent>()
 	&& editor->IsFocused<RigidBodyComponent>(Selected))

@@ -13,8 +13,8 @@ Scene:
               VerticalFOV: 30
               Position: [0, 2, 77]
               Direction: [0, 0, -1]
-              ViewportWidth: 1920
-              ViewportHeight: 1057
+              ViewportWidth: 1600
+              ViewportHeight: 877
               Near: 48.0009995
               Far: 122.000999
     - Entity:
@@ -119,40 +119,30 @@ Scene:
             Class: PlayerController
             Fields:
               - Field:
-                  Name: Handle
-                  Type: Entity
-                  Value: 960
-              - Field:
-                  Name: Class
-              - Field:
-                  Name: asset
-                  Type: Asset
-                  Value:
-                    ID: 0
-                    Type: 0
-              - Field:
                   Name: SomeBool
                   Type: bool
-                  Value: true
+                  Value: false
               - Field:
                   Name: Signed8
                   Type: int8
-                  Value: 32
+                  Value: 0
               - Field:
                   Name: Unsigned32
                   Type: uint32
-                  Value: 32
+                  Value: 0
               - Field:
                   Name: Float
                   Type: float
-                  Value: 3.14159012
+                  Value: 0
               - Field:
                   Name: Tilemap
+                  Type: array
+                  Value: []
               - Field:
                   Name: Width
                   Type: uint32
-                  Value: 0
+                  Value: 9
               - Field:
                   Name: Height
                   Type: uint32
-                  Value: 0
+                  Value: 9

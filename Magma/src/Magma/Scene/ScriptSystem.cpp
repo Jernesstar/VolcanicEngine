@@ -82,7 +82,7 @@ void ScriptSystem::Broadcast(Entity& entity, asIScriptObject* event) {
 	auto eventName = event->GetObjectType()->GetName();
 	m_EntityWorld->
 	ForEach<ScriptComponent>(
-		[this, =](Entity& entity)
+		[=, this](Entity& entity)
 		{
 			auto eventID = m_EntityWorld->GetNative().lookup(eventName);
 			if(!eventID)

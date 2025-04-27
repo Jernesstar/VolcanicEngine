@@ -26,6 +26,18 @@ ScriptClass::ScriptClass(const std::string& name, asITypeInfo* type)
 	}
 }
 
+bool ScriptClass::Implements(const std::string& interfaceName) {
+	asITypeInfo* interface =
+		ScriptEngine::Get()->GetTypeInfoByName(interfaceName.c_str());
+	return m_Type->Implements(interface);
+}
+
+bool ScriptClass::DerivesFrom(const std::string& className) {
+	asITypeInfo* interface =
+		ScriptEngine::Get()->GetTypeInfoByName(className.c_str());
+	return m_Type->DerivesFrom(interface);
+}
+
 void ScriptClass::SetInstanceMethod(const List<std::string>& args) {
 	std::string method = Name + " @" + Name + "(";
 	for(auto& arg : args)

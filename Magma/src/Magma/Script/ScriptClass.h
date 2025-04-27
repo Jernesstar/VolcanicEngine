@@ -16,6 +16,9 @@ public:
 	ScriptClass(const std::string& name, asITypeInfo* type);
 	~ScriptClass() = default;
 
+	bool Implements(const std::string& interfaceName);
+	bool DerivesFrom(const std::string& className);
+
 	void SetInstanceMethod(const VolcaniCore::List<std::string>& args);
 
 	template<typename... Args>

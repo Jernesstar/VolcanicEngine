@@ -5,6 +5,11 @@ class SomeScriptClass
     uint32 Int = 0;
 }
 
+class PlayerDied
+{
+
+}
+
 class PlayerController : IEntityController
 {
     Entity Handle;
@@ -81,31 +86,31 @@ class PlayerController : IEntityController
 
     void OnMouseEvent(MouseEvent@ event)
     {
-        print("Mouse");
-        if(event.Type != EventType::MousePressed)
-            return;
-        print("Press");
+        // print("Mouse");
+        // if(event.Type != EventType::MousePressed)
+        //     return;
+        // print("Press");
 
-        MousePressedEvent@ e = cast<MousePressedEvent>(event);
-        print("Button is " + e.Button);
+        // MousePressedEvent@ e = cast<MousePressedEvent>(event);
+        // print("Button is " + e.Button);
     }
 
     void OnPhysicsEvent(PhysicsEvent@ event)
     {
-        if(event.Type == PhysicsEventType::MousePress) {
-            print("Pressed");
-            return;
-        }
+        // if(event.Type == PhysicsEventType::MousePress) {
+        //     print("Pressed");
+        //     return;
+        // }
 
-        if(event.EntityHandle.GetTagComponent().Tag == "Lava") {
-            ScriptSystem@ sys = Scene.GetScriptSystem();
-            sys.BroadcastEvent(Handle, "PlayerDied");
-        }
+        // if(event.EntityHandle.GetTagComponent().Tag == "Lava") {
+        //     ScriptSystem@ sys = Scene.GetScriptSystem();
+        //     sys.BroadcastEvent(Handle, "PlayerDied");
+        // }
     }
 
     void OnGameEvent(GameEvent@ event)
     {
-        if(cast<PlayerDied>(event))
+        if(cast<PlayerDied>(event) != null)
         {
             print("Game over");
         }
