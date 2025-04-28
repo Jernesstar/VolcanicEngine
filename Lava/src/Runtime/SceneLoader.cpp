@@ -2,6 +2,8 @@
 
 #include <bitset>
 
+#include <angelscript/add_on/scriptarray/scriptarray.h>
+
 #include <VolcaniCore/Core/Assert.h>
 #include <VolcaniCore/Core/FileUtils.h>
 #include <VolcaniCore/Core/List.h>
@@ -17,6 +19,9 @@
 #include <Magma/Scene/Component.h>
 
 #include <Lava/App.h>
+
+#undef near
+#undef far
 
 using namespace Magma::ECS;
 using namespace Magma::Physics;
@@ -102,7 +107,25 @@ BinaryReader& BinaryReader::ReadObject(SkyboxComponent& comp) {
 static Entity s_CurrentEntity;
 
 template<>
+BinaryReader& BinaryReader::ReadObject(Asset& asset) {
+	uint64_t id;
+	Read(id);
+	asset.ID = id;
+	uint32_t type;
+	Read(type);
+	asset.Type = (AssetType)type;
+	Read(asset.Primary);
+
+	return *this;
+}
+
+template<>
 BinaryReader& BinaryReader::ReadObject(ScriptComponent& comp) {
+	uint32_t propertyCount;
+	Read(propertyCount);
+	if(!propertyCount)
+		return *this;
+
 	uint64_t id;
 	Read(id);
 	Asset asset = { id, AssetType::Script };
@@ -111,15 +134,67 @@ BinaryReader& BinaryReader::ReadObject(ScriptComponent& comp) {
 	std::string className;
 	Read(className);
 
-	if(!id || className == "")
-		return *this;
+	// auto* assetManager = App::Get()->GetAssetManager();
+	// assetManager->Load(asset);
 
-	auto* assetManager = App::Get()->GetAssetManager();
-	assetManager->Load(asset);
-	auto mod = assetManager->Get<ScriptModule>(asset);
-	auto _class = mod->GetClass(className);
-	comp.Instance = _class->Instantiate(s_CurrentEntity);
+	// auto mod = assetManager->Get<ScriptModule>(asset);
+	// auto _class = mod->GetClass(className);
+	// comp.Instance = _class->Instantiate(s_CurrentEntity);
  
+	// for(uint32_t i = 0; i < propertyCount; i++) {
+	// 	int typeID;
+	// 	Read(typeID);
+	// 	if(typeID == -1)
+	// 		continue;
+
+	// 	ScriptField field = comp.Instance->GetProperty(i);
+	// 	std::string typeName;
+	// 	if(field.Type)
+	// 		typeName = field.Type->GetName();
+
+	// 	if(field.TypeID == asTYPEID_BOOL)
+	// 		Read(*field.As<bool>());
+	// 	else if(field.TypeID == asTYPEID_INT8)
+	// 		Read(*field.As<int8_t>());
+	// 	else if(field.TypeID == asTYPEID_INT16)
+	// 		Read(*field.As<int16_t>());
+	// 	else if(field.TypeID == asTYPEID_INT32)
+	// 		Read(*field.As<int32_t>());
+	// 	else if(field.TypeID == asTYPEID_INT64)
+	// 		Read(*field.As<int64_t>());
+	// 	else if(field.TypeID == asTYPEID_UINT8)
+	// 		Read(*field.As<uint8_t>());
+	// 	else if(field.TypeID == asTYPEID_UINT16)
+	// 		Read(*field.As<uint16_t>());
+	// 	else if(field.TypeID == asTYPEID_UINT32)
+	// 		Read(*field.As<uint32_t>());
+	// 	else if(field.TypeID == asTYPEID_UINT64)
+	// 		Read(*field.As<uint64_t>());
+	// 	else if(field.TypeID == asTYPEID_FLOAT)
+	// 		Read(*field.As<float>());
+	// 	else if(field.TypeID == asTYPEID_DOUBLE)
+	// 		Read(*field.As<double>());
+	// 	else if(typeName == "Asset")
+	// 		Read(*field.As<Asset>());
+	// 	else if(typeName == "string")
+	// 		Read(*field.As<std::string>());
+	// 	else if(typeName == "Vec3")
+	// 		Read(*field.As<glm::vec3>());
+	// 	else if(typeName == "array") {
+	// 		auto* array = field.As<CScriptArray>();
+	// 		auto subType = array->GetArrayObjectType();
+
+	// 		uint32_t count;
+	// 		Read(count);
+	// 		Buffer<void> data(subType->GetSize(), count);
+	// 		ReadData(data.Get(), subType->GetSize() * count);
+
+	// 		array->Reserve(count);
+	// 		for(uint32_t i = 0; i < count; i++)
+	// 			array->InsertLast((char*)data.Get() + i);
+	// 	}
+	// }
+
 	return *this;
 }
 

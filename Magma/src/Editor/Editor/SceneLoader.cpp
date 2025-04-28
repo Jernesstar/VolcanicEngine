@@ -724,49 +724,75 @@ BinaryWriter& BinaryWriter::WriteObject(const SkyboxComponent& comp) {
 }
 
 template<>
+BinaryWriter& BinaryWriter::WriteObject(const Asset& asset) {
+	Write((uint64_t)asset.ID);
+	Write((uint32_t)asset.Type);
+	Write((bool)asset.Primary);
+	return *this;
+}
+
+template<>
 BinaryWriter& BinaryWriter::WriteObject(const ScriptComponent& comp) {
-	Write((uint64_t)comp.ModuleAsset.ID);
-	Write(comp.Instance ? comp.Instance->GetClass()->Name : std::string(""));
+	auto obj = comp.Instance;
 	if(!comp.Instance) {
 		Write((uint32_t)0);
 		return *this;
 	}
-
-	auto obj = comp.Instance;
 	auto* handle = obj->GetHandle();
 	Write(handle->GetPropertyCount());
 
-	for(uint32_t i = 0; i < handle->GetPropertyCount(); i++) {
-		ScriptField field = obj->GetProperty(i);
-		if(!field.HasMetadata("EditorField")) {
-			Write((uint32_t)0);
-			continue;
-		}
+	Write((uint64_t)comp.ModuleAsset.ID);
+	Write(obj->GetClass()->Name);
 
-		Write(field.TypeID);
-		if(field.TypeID == asTYPEID_BOOL)
-			Write(*field.As<bool>());
-		else if(field.TypeID == asTYPEID_INT8)
-			Write(*field.As<int8_t>());
-		else if(field.TypeID == asTYPEID_INT16)
-			Write(*field.As<int16_t>());
-		else if(field.TypeID == asTYPEID_INT32)
-			Write(*field.As<int32_t>());
-		else if(field.TypeID == asTYPEID_INT64)
-			Write(*field.As<int64_t>());
-		else if(field.TypeID == asTYPEID_UINT8)
-			Write(*field.As<uint8_t>());
-		else if(field.TypeID == asTYPEID_UINT16)
-			Write(*field.As<uint16_t>());
-		else if(field.TypeID == asTYPEID_UINT32)
-			Write(*field.As<uint32_t>());
-		else if(field.TypeID == asTYPEID_UINT64)
-			Write(*field.As<uint64_t>());
-		else if(field.TypeID == asTYPEID_FLOAT)
-			Write(*field.As<float>());
-		else if(field.TypeID == asTYPEID_DOUBLE)
-			Write(*field.As<double>());
-	}
+	// for(uint32_t i = 0; i < handle->GetPropertyCount(); i++) {
+	// 	ScriptField field = obj->GetProperty(i);
+	// 	if(!field.HasMetadata("EditorField")) {
+	// 		Write((int)-1);
+	// 		continue;
+	// 	}
+	// 	Write(field.TypeID);
+
+	// 	std::string typeName;
+	// 	if(field.Type)
+	// 		typeName = field.Type->GetName();
+
+	// 	if(field.TypeID == asTYPEID_BOOL)
+	// 		Write(*field.As<bool>());
+	// 	else if(field.TypeID == asTYPEID_INT8)
+	// 		Write(*field.As<int8_t>());
+	// 	else if(field.TypeID == asTYPEID_INT16)
+	// 		Write(*field.As<int16_t>());
+	// 	else if(field.TypeID == asTYPEID_INT32)
+	// 		Write(*field.As<int32_t>());
+	// 	else if(field.TypeID == asTYPEID_INT64)
+	// 		Write(*field.As<int64_t>());
+	// 	else if(field.TypeID == asTYPEID_UINT8)
+	// 		Write(*field.As<uint8_t>());
+	// 	else if(field.TypeID == asTYPEID_UINT16)
+	// 		Write(*field.As<uint16_t>());
+	// 	else if(field.TypeID == asTYPEID_UINT32)
+	// 		Write(*field.As<uint32_t>());
+	// 	else if(field.TypeID == asTYPEID_UINT64)
+	// 		Write(*field.As<uint64_t>());
+	// 	else if(field.TypeID == asTYPEID_FLOAT)
+	// 		Write(*field.As<float>());
+	// 	else if(field.TypeID == asTYPEID_DOUBLE)
+	// 		Write(*field.As<double>());
+	// 	else if(typeName == "Asset")
+	// 		Write(*field.As<Asset>());
+	// 	else if(typeName == "string")
+	// 		Write(*field.As<std::string>());
+	// 	else if(typeName == "Vec3")
+	// 		Write(*field.As<glm::vec3>());
+	// 	else if(typeName == "array") {
+	// 		auto* array = field.As<CScriptArray>();
+	// 		auto subType = array->GetArrayObjectType();
+	// 		auto count = array->GetSize();
+	// 		Write((uint32_t)count);
+	// 		// Works for primitive and POD types
+	// 		WriteData(array->GetBuffer(), subType->GetSize() * count);
+	// 	}
+	// }
 
 	return *this;
 }

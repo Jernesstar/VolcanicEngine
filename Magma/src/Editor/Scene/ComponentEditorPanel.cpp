@@ -472,57 +472,68 @@ void DrawComponent<ScriptComponent>(Entity& entity) {
 		else if(field.TypeID == asTYPEID_BOOL) {
 			ImGui::Text("bool"); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(200.0f);
-			ImGui::Checkbox(std::string("##Bool##" + field.Name).c_str(), field.As<bool>());
+			ImGui::Checkbox(std::string("##Bool##" + field.Name).c_str(),
+				field.As<bool>());
 		}
 		else if(field.TypeID == asTYPEID_INT8) {
 			ImGui::Text("int8"); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(200.0f);
-			ImGui::InputScalar(std::string("##S8##" + field.Name).c_str(), ImGuiDataType_S8, field.Data);
+			ImGui::InputScalar(std::string("##S8##" + field.Name).c_str(),
+				ImGuiDataType_S8, field.Data);
 		}
 		else if(field.TypeID == asTYPEID_INT16) {
 			ImGui::Text("int16"); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(200.0f);
-			ImGui::InputScalar(std::string("##S16##" + field.Name).c_str(), ImGuiDataType_S16, field.Data);
+			ImGui::InputScalar(std::string("##S16##" + field.Name).c_str(),
+				ImGuiDataType_S16, field.Data);
 		}
 		else if(field.TypeID == asTYPEID_INT32) {
 			ImGui::Text("int32"); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(200.0f);
-			ImGui::InputScalar(std::string("##S32##" + field.Name).c_str(), ImGuiDataType_S32, field.Data);
+			ImGui::InputScalar(std::string("##S32##" + field.Name).c_str(),
+				ImGuiDataType_S32, field.Data);
 		}
 		else if(field.TypeID == asTYPEID_INT64) {
 			ImGui::Text("int64"); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(200.0f);
-			ImGui::InputScalar(std::string("##S64##" + field.Name).c_str(), ImGuiDataType_S64, field.Data);
+			ImGui::InputScalar(std::string("##S64##" + field.Name).c_str(),
+								ImGuiDataType_S64, field.Data);
 		}
 		else if(field.TypeID == asTYPEID_UINT8) {
 			ImGui::Text("uint8"); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(200.0f);
-			ImGui::InputScalar(std::string("##U8##" + field.Name).c_str(), ImGuiDataType_U8, field.Data);
+			ImGui::InputScalar(std::string("##U8##" + field.Name).c_str(),
+				ImGuiDataType_U8, field.Data);
 		}
 		else if(field.TypeID == asTYPEID_UINT16) {
 			ImGui::Text("uint16"); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(200.0f);
-			ImGui::InputScalar(std::string("##U16##" + field.Name).c_str(), ImGuiDataType_U16, field.Data);
+			ImGui::InputScalar(std::string("##U16##" + field.Name).c_str(),
+				ImGuiDataType_U16, field.Data);
 		}
 		else if(field.TypeID == asTYPEID_UINT32) {
 			ImGui::Text("uint32"); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(200.0f);
-			ImGui::InputScalar(std::string("##U32##" + field.Name).c_str(), ImGuiDataType_U32, field.Data);
+			ImGui::InputScalar(std::string("##U32##" + field.Name).c_str(),
+				ImGuiDataType_U32, field.Data);
 		}
 		else if(field.TypeID == asTYPEID_UINT64) {
 			ImGui::Text("uint64"); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(200.0f);
-			ImGui::InputScalar(std::string("##U64##" + field.Name).c_str(), ImGuiDataType_U64, field.Data);
+			ImGui::InputScalar(std::string("##U64##" + field.Name).c_str(),
+				ImGuiDataType_U64, field.Data);
 		}
 		else if(field.TypeID == asTYPEID_FLOAT) {
 			ImGui::Text("float"); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(200.0f);
-			ImGui::InputFloat(std::string("##Float##" + field.Name).c_str(), field.As<float>(), 0.0f, 0.0f, "%.3f");
+			ImGui::InputFloat(std::string("##Float##" + field.Name).c_str(),
+				field.As<float>(), 0.0f, 0.0f, "%.3f");
 		}
 		else if(field.TypeID == asTYPEID_DOUBLE) {
 			ImGui::Text("double"); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(200.0f);
-			ImGui::InputDouble(std::string("##Double##" + field.Name).c_str(), field.As<double>());
+			ImGui::InputDouble(std::string("##Double##" + field.Name).c_str(),
+				field.As<double>());
 		}
 	}
 }
