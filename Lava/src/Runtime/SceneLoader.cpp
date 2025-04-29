@@ -179,12 +179,17 @@ BinaryReader& BinaryReader::ReadObject(ScriptComponent& comp) {
 		else if(typeName == "array") {
 			auto* array = field.As<CScriptArray>();
 			auto subTypeID = array->GetArrayObjectType()->GetSubTypeId();
-			auto subType = ScriptEngine::Get()->GetTypeInfoById(subTypeID);
+			auto* subType = ScriptEngine::Get()->GetTypeInfoById(subTypeID);
+			uint64_t size = 0;
+			if(!subType)
+				size = ScriptEngine::Get()->GetSizeOfPrimitiveType(subTypeID);
+			else
+				size = subType->GetSize();
 
 			uint32_t count;
 			Read(count);
-			Buffer<void> data(subType->GetSize(), count);
-			ReadData(data.Get(), subType->GetSize() * count);
+			Buffer<void> data(size, count);
+			ReadData(data.Get(), size * count);
 
 			array->Reserve(count);
 			for(uint32_t i = 0; i < count; i++)

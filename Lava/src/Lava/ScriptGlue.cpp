@@ -69,16 +69,12 @@ void ScriptGlue::RegisterInterface() {
 		.AddMethod("void OnUpdate(float ts)");
 
 	ScriptEngine::RegisterInterface("IEntityController")
+		.AddMethod("void OnStart()")
 		.AddMethod("void OnUpdate(float ts)")
-		// KeyPressed, KeyReleased, KeyCharacter
 		.AddMethod("void OnKeyEvent(KeyEvent@)")
-		// MousePressed, MouseReleased
 		.AddMethod("void OnMouseEvent(MouseEvent@)")
-		// MouseClicked, Collided
 		.AddMethod("void OnPhysicsEvent(PhysicsEvent@)")
-		// PlayerDied, LevelComplete, Collided
-		.AddMethod("void OnGameEvent(GameEvent@)")
-		;
+		.AddMethod("void OnGameEvent(GameEvent@)");
 
 	ScriptEngine::RegisterInterface("IUIController")
 		.AddMethod("void OnClick()")
@@ -303,14 +299,14 @@ void RegisterEvents() {
 		asFUNCTION(KeyCharacterEventCast), asCALL_CDECL_OBJLAST);
 
 	engine->RegisterObjectType("MouseEvent", 0, asOBJ_REF | asOBJ_NOCOUNT);
-	engine->RegisterObjectProperty("MouseEvent", "const EventType Type",
-		asOFFSET(MouseEvent, Type));
+	// engine->RegisterObjectProperty("MouseEvent", "const EventType Type",
+	// 	asOFFSET(MouseEvent, Type));
 
-	engine->RegisterObjectType("MousePressedEvent", 0, asOBJ_REF | asOBJ_NOCOUNT);
-	engine->RegisterObjectProperty("MousePressedEvent", "const EventType Type",
-		asOFFSET(MouseButtonPressedEvent, Type));
-	engine->RegisterObjectProperty("MousePressedEvent", "const Mouse Button",
-		asOFFSET(MouseButtonPressedEvent, Button));
+	// engine->RegisterObjectType("MousePressedEvent", 0, asOBJ_REF | asOBJ_NOCOUNT);
+	// engine->RegisterObjectProperty("MousePressedEvent", "const EventType Type",
+	// 	asOFFSET(MouseButtonPressedEvent, Type));
+	// engine->RegisterObjectProperty("MousePressedEvent", "const Mouse Button",
+	// 	asOFFSET(MouseButtonPressedEvent, Button));
 
 	engine->RegisterObjectType("PhysicsEvent", 0, asOBJ_REF | asOBJ_NOCOUNT);
 	// engine->RegisterObjectProperty("PhysicsEvent", "PhysicsEventType Type")
@@ -434,6 +430,66 @@ static void RigidBodyApplyForce(Vec3 force, RigidBody* body) {
 		return;
 
 	body->As<Physics::DynamicBody>()->ApplyForce(force);
+}
+
+static CameraComponent& AddCameraComponent(Entity* entity) {
+	entity->Add<CameraComponent>();
+	return entity->Set<CameraComponent>();
+}
+
+static TagComponent& AddTagComponent(Entity* entity) {
+	entity->Add<TagComponent>();
+	return entity->Set<TagComponent>();
+}
+
+static TransformComponent& AddTransformComponent(Entity* entity) {
+	entity->Add<TransformComponent>();
+	return entity->Set<TransformComponent>();
+}
+
+static AudioComponent& AddAudioComponent(Entity* entity) {
+	entity->Add<AudioComponent>();
+	return entity->Set<AudioComponent>();
+}
+
+static MeshComponent& AddMeshComponent(Entity* entity) {
+	entity->Add<MeshComponent>();
+	return entity->Set<MeshComponent>();
+}
+
+static SkyboxComponent& AddSkyboxComponent(Entity* entity) {
+	entity->Add<SkyboxComponent>();
+	return entity->Set<SkyboxComponent>();
+}
+
+static ScriptComponent& AddScriptComponent(Entity* entity) {
+	entity->Add<ScriptComponent>();
+	return entity->Set<ScriptComponent>();
+}
+
+static RigidBodyComponent& AddRigidBodyComponent(Entity* entity) {
+	entity->Add<RigidBodyComponent>();
+	return entity->Set<RigidBodyComponent>();
+}
+
+static DirectionalLightComponent& AddDirectionalLightComponent(Entity* entity) {
+	entity->Add<DirectionalLightComponent>();
+	return entity->Set<DirectionalLightComponent>();
+}
+
+static PointLightComponent& AddPointLightComponent(Entity* entity) {
+	entity->Add<PointLightComponent>();
+	return entity->Set<PointLightComponent>();
+}
+
+static SpotlightComponent& AddSpotlightComponent(Entity* entity) {
+	entity->Add<SpotlightComponent>();
+	return entity->Set<SpotlightComponent>();
+}
+
+static ParticleEmitterComponent& AddParticleEmitterComponent(Entity* entity) {
+	entity->Add<ParticleEmitterComponent>();
+	return entity->Set<ParticleEmitterComponent>();
 }
 
 void RegisterECS() {
@@ -569,9 +625,46 @@ void RegisterECS() {
 	engine->RegisterObjectMethod("Entity", "bool HasSpotlightComponent() const",
 		asMETHODPR(Entity, Has<SpotlightComponent>, () const, bool),
 		asCALL_THISCALL);
-	engine->RegisterObjectMethod("Entity", "bool HasParticleSystemComponent() const",
+	engine->RegisterObjectMethod("Entity", "bool HasParticleEmitterComponent() const",
 		asMETHODPR(Entity, Has<ParticleEmitterComponent>, () const, bool),
 		asCALL_THISCALL);
+
+	engine->RegisterObjectMethod("Entity",
+		"CameraComponent@ AddCameraComponent()",
+		asFUNCTION(AddCameraComponent), asCALL_CDECL_OBJLAST);
+	engine->RegisterObjectMethod("Entity",
+		"TagComponent@ AddTagComponent()",
+		asFUNCTION(AddTagComponent), asCALL_CDECL_OBJLAST);
+	engine->RegisterObjectMethod("Entity",
+		"TransformComponent@ AddTransformComponent()",
+		asFUNCTION(AddTransformComponent), asCALL_CDECL_OBJLAST);
+	engine->RegisterObjectMethod("Entity",
+		"AudioComponent@ AddAudioComponent()",
+		asFUNCTION(AddAudioComponent), asCALL_CDECL_OBJLAST);
+	engine->RegisterObjectMethod("Entity",
+		"MeshComponent@ AddMeshComponent()",
+		asFUNCTION(AddMeshComponent), asCALL_CDECL_OBJLAST);
+	engine->RegisterObjectMethod("Entity",
+		"SkyboxComponent@ AddSkyboxComponent()",
+		asFUNCTION(AddSkyboxComponent), asCALL_CDECL_OBJLAST);
+	engine->RegisterObjectMethod("Entity",
+		"ScriptComponent@ AddScriptComponent()",
+		asFUNCTION(AddScriptComponent), asCALL_CDECL_OBJLAST);
+	engine->RegisterObjectMethod("Entity",
+		"RigidBodyComponent@ AddRigidBodyComponent()",
+		asFUNCTION(AddRigidBodyComponent), asCALL_CDECL_OBJLAST);
+	engine->RegisterObjectMethod("Entity",
+		"DirectionalLightComponent@ AddDirectionalLightComponent()",
+		asFUNCTION(AddDirectionalLightComponent), asCALL_CDECL_OBJLAST);
+	engine->RegisterObjectMethod("Entity",
+		"PointLightComponent@ AddPointLightComponent()",
+		asFUNCTION(AddPointLightComponent), asCALL_CDECL_OBJLAST);
+	engine->RegisterObjectMethod("Entity",
+		"SpotlightComponent@ AddSpotlightComponent()",
+		asFUNCTION(AddSpotlightComponent), asCALL_CDECL_OBJLAST);
+	engine->RegisterObjectMethod("Entity",
+		"ParticleEmitterComponent@ AddParticleEmitterComponent()",
+		asFUNCTION(AddParticleEmitterComponent), asCALL_CDECL_OBJLAST);
 
 	engine->RegisterObjectMethod("Entity",
 		"const CameraComponent@ GetCameraComponent()",
@@ -618,7 +711,7 @@ void RegisterECS() {
 		asMETHODPR(Entity, Get<SpotlightComponent>, () const,
 			const SpotlightComponent&), asCALL_THISCALL);
 	engine->RegisterObjectMethod("Entity",
-		"const ParticleEmitterComponent@ GetParticleSystemComponent()",
+		"const ParticleEmitterComponent@ GetParticleEmitterComponent()",
 		asMETHODPR(Entity, Get<ParticleEmitterComponent>, () const,
 			const ParticleEmitterComponent&), asCALL_THISCALL);
 
@@ -667,7 +760,7 @@ void RegisterECS() {
 		asMETHODPR(Entity, Set<SpotlightComponent>, (),
 			SpotlightComponent&), asCALL_THISCALL);
 	engine->RegisterObjectMethod("Entity",
-		"ParticleEmitterComponent@ SetParticleSystemComponent()",
+		"ParticleEmitterComponent@ SetParticleEmitterComponent()",
 		asMETHODPR(Entity, Set<ParticleEmitterComponent>, (),
 			ParticleEmitterComponent&), asCALL_THISCALL);
 }
@@ -706,6 +799,12 @@ void RegisterScene() {
 		asMETHOD(ScriptSystem, Broadcast), asCALL_THISCALL);
 
 	engine->RegisterObjectType("SceneClass", 0, asOBJ_REF | asOBJ_NOHANDLE);
+	engine->RegisterObjectMethod("SceneClass", "Entity NewEntity()",
+		asMETHODPR(ECS::World, AddEntity, (), Entity),
+		asCALL_THISCALL, 0, asOFFSET(Scene, EntityWorld));
+	engine->RegisterObjectMethod("SceneClass", "Entity NewEntity(const string &in)",
+		asMETHODPR(ECS::World, AddEntity, (const std::string&), Entity),
+		asCALL_THISCALL, 0, asOFFSET(Scene, EntityWorld));
 	engine->RegisterObjectMethod("SceneClass", "Entity FindEntity(const string &in)",
 		asMETHODPR(ECS::World, GetEntity, (const std::string&), Entity),
 		asCALL_THISCALL, 0, asOFFSET(Scene, EntityWorld));

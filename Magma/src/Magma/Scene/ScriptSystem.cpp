@@ -12,39 +12,36 @@ ScriptSystem::ScriptSystem(ECS::World* world)
 	: System(world)
 {
 	m_KeyPressedCallbackID =
-	Events::RegisterListener<KeyPressedEvent>(
-		[this](KeyPressedEvent& event)
-		{
-			m_EntityWorld->GetNative()
-			.query<ScriptComponent>()
-			.each(
-				[=](ScriptComponent& sc)
-				{
-					sc.Instance->Call("OnKeyEvent", event);
-				});
-		});
+		Events::RegisterListener<KeyPressedEvent>(
+			[this](KeyPressedEvent& event)
+			{
+				m_EntityWorld->ForEach<ScriptComponent>(
+					[=](Entity& entity)
+					{
+						auto obj = entity.Get<ScriptComponent>().Instance;
+						obj->Call("OnKeyEvent", event);
+					});
+			});
 	m_KeyReleasedCallbackID =
 		Events::RegisterListener<KeyReleasedEvent>(
 			[this](KeyReleasedEvent& event)
 			{
-				m_EntityWorld->GetNative()
-				.query<ScriptComponent>()
-				.each(
-					[=](ScriptComponent& sc)
+				m_EntityWorld->ForEach<ScriptComponent>(
+					[=](Entity& entity)
 					{
-						sc.Instance->Call("OnKeyEvent", event);
+						auto obj = entity.Get<ScriptComponent>().Instance;
+						obj->Call("OnKeyEvent", event);
 					});
 			});
 	m_KeyCharCallbackID =
 		Events::RegisterListener<KeyCharEvent>(
 			[this](KeyCharEvent& event)
 			{
-				m_EntityWorld->GetNative()
-				.query<ScriptComponent>()
-				.each(
-					[=](ScriptComponent& sc)
+				m_EntityWorld->ForEach<ScriptComponent>(
+					[=](Entity& entity)
 					{
-						sc.Instance->Call("OnKeyEvent", event);
+						auto obj = entity.Get<ScriptComponent>().Instance;
+						obj->Call("OnKeyEvent", event);
 					});
 			});
 }

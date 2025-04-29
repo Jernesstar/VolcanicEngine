@@ -175,6 +175,15 @@ void DrawComponent<CameraComponent>(Entity& entity) {
 	auto camera = component.Cam;
 	ImGui::SeparatorText("CameraComponent");
 
+	if(!camera) {
+		if(ImGui::Button("Create Stereographic"))
+			camera = Camera::Create(Camera::Type::Stereo);
+		if(ImGui::Button("Create Orthographic"))
+			camera = Camera::Create(Camera::Type::Ortho);
+
+		return;
+	}
+
 	auto pos = camera->GetPosition();
 	if(ImGui::DragFloat3("Position", &pos.x, 1.0f, -FLT_MAX/2.0f, +FLT_MAX/2.0f))
 		camera->SetPosition(pos);

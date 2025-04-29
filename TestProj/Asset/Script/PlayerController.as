@@ -14,7 +14,8 @@ class PlayerController : IEntityController
 {
     Entity Handle;
     SomeScriptClass Class;
-    Asset asset = Asset(16624656892553940704, AssetType::Audio);
+    Asset soundAsset = Asset(16624656892553940704, AssetType::Audio);
+    Asset meshAsset = Asset(10036008063945961451, AssetType::Mesh);
  
     [EditorField] bool SomeBool;
     [EditorField] int8 Signed8;
@@ -39,12 +40,29 @@ class PlayerController : IEntityController
         const TagComponent@ tc = Handle.GetTagComponent();
         print(tc.Tag);
 
-        AssetManager.Load(asset);
-        bool loaded = AssetManager.IsLoaded(asset);
+        AssetManager.Load(soundAsset);
+        bool loaded = AssetManager.IsLoaded(soundAsset);
         print("Loaded: " + loaded);
 
         ScriptSystem@ sys = Scene.GetScriptSystem();
         sys.ListenForEvent(Handle, "PlayerDied");
+    }
+
+    void OnStart()
+    {
+        print("OnStart");
+        // AssetManager.Load(meshAsset);
+
+        for(uint32 i = 0; i < Tilemap.length(); i++) {
+            uint32 data = Tilemap[i];
+            print("Index: " + data);
+            Entity new = Scene.NewEntity();
+            TransformComponent@ tc = new.AddTransformComponent();
+            tc.Translation.x = i;
+            tc.Translation.y = data;
+            // MeshComponent@ mc = new.AddMeshComponent();
+            // mc.MeshAsset = meshAsset;
+        }
     }
 
     void OnUpdate(float ts)
@@ -76,10 +94,11 @@ class PlayerController : IEntityController
         if(@e == null)
             return;
 
+        print("Key: " + e.Key);
         if(e.Key == Key::Space and !e.IsRepeat)
         {
             print("Playing sound");
-            Sound@ sound = AssetManager.GetSound(asset);
+            Sound@ sound = AssetManager.GetSound(soundAsset);
             sound.Play();
         }
     }

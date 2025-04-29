@@ -277,15 +277,27 @@ void App::ScreenSet(const std::string& name) {
 			{
 				auto& sc = entity.Set<ScriptComponent>();
 				auto old = sc.Instance;
-				if(old && old->GetClass()) {
+				if(old) {
 					sc.Instance = old->GetClass()->Instantiate(entity);
 					sc.Instance->Copy(old);
 				}
+				else
+					return;
+
+				sc.Instance->Call("OnStart");
 			});
 	}
 	else if(screen.Scene != "") {
 		s_Screen->World->RegisterSystems();
 		SceneLoad(*s_Screen->World);
+
+		s_Screen->World->EntityWorld
+		.ForEach<ScriptComponent>(
+			[&](Entity& entity)
+			{
+				auto obj = entity.Get<ScriptComponent>().Instance;
+				obj->Call("OnStart");
+			});
 	}
 
 	if(s_ShouldLoadUI) {
@@ -400,9 +412,8 @@ void RuntimeSceneRenderer::Begin() {
 
 void RuntimeSceneRenderer::SubmitCamera(const Entity& entity) {
 	auto camera = entity.Get<CameraComponent>().Cam;
-	auto width = Application::GetWindow()->GetWidth();
-	auto height = Application::GetWindow()->GetHeight();
-	camera->Resize(width, height);
+	if(!camera)
+		return;
 
 	LightingCommand->UniformData
 	.SetInput("u_ViewProj", camera->GetViewProjection());

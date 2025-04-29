@@ -779,9 +779,15 @@ BinaryWriter& BinaryWriter::WriteObject(const ScriptComponent& comp) {
 			auto subTypeID = array->GetArrayObjectType()->GetSubTypeId();
 			auto* subType = ScriptEngine::Get()->GetTypeInfoById(subTypeID);
 			auto count = array->GetSize();
+			uint64_t size = 0;
+			if(!subType)
+				size = ScriptEngine::Get()->GetSizeOfPrimitiveType(subTypeID);
+			else
+				size = subType->GetSize();
+
 			Write((uint32_t)count);
 			// Works for primitive and POD types
-			WriteData(array->GetBuffer(), subType->GetSize() * count);
+			WriteData(array->GetBuffer(), size * count);
 		}
 	}
 

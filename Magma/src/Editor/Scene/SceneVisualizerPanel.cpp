@@ -694,6 +694,9 @@ void EditorSceneRenderer::Begin() {
 
 void EditorSceneRenderer::SubmitCamera(const Entity& entity) {
 	auto camera = entity.Get<CameraComponent>().Cam;
+	if(!camera)
+		return;
+
 	RendererAPI::Get()
 	->SetBufferData(BillboardBuffer, DrawBufferIndex::Instances,
 					glm::value_ptr(camera->GetPosition()), 1, 101);
