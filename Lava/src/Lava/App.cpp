@@ -241,10 +241,9 @@ void App::PopScreen(const std::string& name) {
 }
 
 void App::ScreenSet(const std::string& name) {
+	s_ShouldSwitchScreen = false;
 	if(name == "")
 		return;
-
-	s_ShouldSwitchScreen = false;
 
 	auto [found, idx] =
 		m_Project.Screens.Find(
@@ -285,8 +284,8 @@ void App::ScreenSet(const std::string& name) {
 			});
 	}
 	else if(screen.Scene != "") {
-		SceneLoad(*s_Screen->World);
 		s_Screen->World->RegisterSystems();
+		SceneLoad(*s_Screen->World);
 	}
 
 	if(s_ShouldLoadUI) {

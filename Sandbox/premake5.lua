@@ -76,6 +76,7 @@ project "Sandbox"
 
     filter "action:vs* or system:linux"
         links { "PhysX" }
+        debugdir ".."
 
     filter "system:linux"
         links {

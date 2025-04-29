@@ -1,7 +1,11 @@
 #include "ScriptObject.h"
 
+#include <angelscript/add_on/scriptarray/scriptarray.h>
+
 #include <VolcaniCore/Core/Assert.h>
 #include <VolcaniCore/Core/Math.h>
+
+#include <Magma/Core/AssetManager.h>
 
 #include "ScriptClass.h"
 #include "ScriptModule.h"
@@ -17,6 +21,8 @@ bool ScriptField::Is(ScriptQualifier q) {
 		case ScriptQualifier::ScriptObject:
 			return TypeID & asTYPEID_SCRIPTOBJECT;
 	}
+
+	return false;
 }
 
 ScriptObject::ScriptObject() {
@@ -56,18 +62,20 @@ void ScriptObject::DestroyAndRelease() {
 }
 
 void ScriptObject::Copy(Ref<ScriptObject> other) {
+	if(other->GetClass()->Name != GetClass()->Name)
+		return;
+
 	for(uint32_t i = 0; i < m_Handle->GetPropertyCount(); i++) {
 		ScriptField field = other->GetProperty(i);
 		if(!field.HasMetadata("EditorField"))
 			continue;
 
-		void* us = m_Handle->GetAddressOfProperty(i);
-		void* them = other->m_Handle->GetAddressOfProperty(i);
-		size_t size = 0;
+		std::string fieldType;
+		if(field.Type)
+			fieldType = field.Type->GetName();
 
-		if(field.Name == "Vec3")
-			size = sizeof(Vec3);
-		else if(field.TypeID == asTYPEID_BOOL)
+		size_t size = 0;
+		if(field.TypeID == asTYPEID_BOOL)
 			size = sizeof(bool);
 		else if(field.TypeID == asTYPEID_INT8)
 			size = sizeof(int8_t);
@@ -89,9 +97,23 @@ void ScriptObject::Copy(Ref<ScriptObject> other) {
 			size = sizeof(float);
 		else if(field.TypeID == asTYPEID_DOUBLE)
 			size = sizeof(double);
+		else if(fieldType == "Asset")
+			size = sizeof(Vec3);
+		else if(fieldType == "Vec3")
+			size = sizeof(Asset);
 
-		if(size)
+		if(size) {
+			void* us = m_Handle->GetAddressOfProperty(i);
+			void* them = other->m_Handle->GetAddressOfProperty(i);
 			memcpy(us, them, size);
+			continue;
+		}
+
+		ScriptField ours = GetProperty(i);
+		if(fieldType == "string")
+			*ours.As<std::string>() = *field.As<std::string>();
+		else if(fieldType == "array")
+			*ours.As<CScriptArray>() = *field.As<CScriptArray>();
 	}
 }
 

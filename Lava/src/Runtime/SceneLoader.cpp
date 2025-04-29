@@ -121,11 +121,6 @@ BinaryReader& BinaryReader::ReadObject(Asset& asset) {
 
 template<>
 BinaryReader& BinaryReader::ReadObject(ScriptComponent& comp) {
-	uint32_t propertyCount;
-	Read(propertyCount);
-	if(!propertyCount)
-		return *this;
-
 	uint64_t id;
 	Read(id);
 	Asset asset = { id, AssetType::Script };
@@ -134,20 +129,21 @@ BinaryReader& BinaryReader::ReadObject(ScriptComponent& comp) {
 	std::string className;
 	Read(className);
 
-	// auto* assetManager = App::Get()->GetAssetManager();
-	// assetManager->Load(asset);
+	auto* assetManager = App::Get()->GetAssetManager();
+	assetManager->Load(asset);
 
-	// auto mod = assetManager->Get<ScriptModule>(asset);
-	// auto _class = mod->GetClass(className);
-	// comp.Instance = _class->Instantiate(s_CurrentEntity);
- 
-	// for(uint32_t i = 0; i < propertyCount; i++) {
+	auto mod = assetManager->Get<ScriptModule>(asset);
+	auto _class = mod->GetClass(className);
+	comp.Instance = _class->Instantiate(s_CurrentEntity);
+
+	// auto obj = comp.Instance;
+	// for(uint32_t i = 0; i < obj->GetHandle()->GetPropertyCount(); i++) {
 	// 	int typeID;
 	// 	Read(typeID);
 	// 	if(typeID == -1)
 	// 		continue;
 
-	// 	ScriptField field = comp.Instance->GetProperty(i);
+	// 	ScriptField field = obj->GetProperty(i);
 	// 	std::string typeName;
 	// 	if(field.Type)
 	// 		typeName = field.Type->GetName();
@@ -300,6 +296,11 @@ BinaryReader& BinaryReader::ReadObject(Entity& entity) {
 		Read(entity.Set<SpotlightComponent>());
 	if(componentBits.test(11))
 		Read(entity.Set<ParticleEmitterComponent>());
+
+	if (entity.Has<ScriptComponent>()) {
+		auto& c = entity.Get<ScriptComponent>();
+		return *this;
+	}
 
 	return *this;
 }

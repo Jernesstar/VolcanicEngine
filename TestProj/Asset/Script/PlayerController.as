@@ -23,17 +23,17 @@ class PlayerController : IEntityController
 
     [Tilemap]
     [EditorField] array<uint32> Tilemap;
-
     [EditorField] uint32 Width;
     [EditorField] uint32 Height;
 
     PlayerController(Entity entity)
     {
+        Handle = entity;
+
         TestGame@ game = cast<TestGame>(ScriptApp);
         game.NewMethod();
         print("Coins: " + game.State.Coins);
 
-        Handle = entity;
         print("Name: " + entity.Name);
         print("Alive: " + entity.Alive);
         const TagComponent@ tc = Handle.GetTagComponent();
@@ -110,7 +110,8 @@ class PlayerController : IEntityController
 
     void OnGameEvent(GameEvent@ event)
     {
-        if(cast<PlayerDied>(event) != null)
+        PlayerDied@ e = cast<PlayerDied>(event);
+        if(@e != null)
         {
             print("Game over");
         }

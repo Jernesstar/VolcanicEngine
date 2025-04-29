@@ -702,7 +702,7 @@ void RegisterScene() {
 		"void ListenForEvent(Entity, const string &in)",
 		asMETHOD(ScriptSystem, Listen), asCALL_THISCALL);
 	engine->RegisterObjectMethod("ScriptSystem",
-		"void BroadcastEvent(Entity, const string &in)",
+		"void BroadcastEvent(Entity, GameEvent@)",
 		asMETHOD(ScriptSystem, Broadcast), asCALL_THISCALL);
 
 	engine->RegisterObjectType("SceneClass", 0, asOBJ_REF | asOBJ_NOHANDLE);

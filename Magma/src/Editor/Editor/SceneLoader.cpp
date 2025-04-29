@@ -474,14 +474,10 @@ static void LoadScript(Entity entity, Asset asset, const std::string& className,
 			((Asset*)address)->Type = (AssetType)value["Type"].as<uint32_t>();
 		}
 		else if(type == "array") {
-			asITypeInfo* type =
-				ScriptEngine::Get()->GetTypeInfoByDecl("array<uint32>");
 			auto data = value.as<List<uint32_t>>();
-			if(data) {
-				auto array = CScriptArray::Create(type, data.At(0));
-				*(CScriptArray*)address = *array;
-				array->Release();
-			}
+			if(data)
+				for(uint32_t i = 0; i < data.Count(); i++)
+					((CScriptArray*)address)->InsertLast(data.At(i));
 		}
 	}
 
@@ -734,12 +730,7 @@ BinaryWriter& BinaryWriter::WriteObject(const Asset& asset) {
 template<>
 BinaryWriter& BinaryWriter::WriteObject(const ScriptComponent& comp) {
 	auto obj = comp.Instance;
-	if(!comp.Instance) {
-		Write((uint32_t)0);
-		return *this;
-	}
 	auto* handle = obj->GetHandle();
-	Write(handle->GetPropertyCount());
 
 	Write((uint64_t)comp.ModuleAsset.ID);
 	Write(obj->GetClass()->Name);
@@ -867,6 +858,8 @@ BinaryWriter& BinaryWriter::WriteObject(const Entity& entity) {
 	componentBits |= ((uint16_t)entity.Has<MeshComponent>()				<< 4);
 	componentBits |= ((uint16_t)entity.Has<SkyboxComponent>()			<< 5);
 	componentBits |= ((uint16_t)entity.Has<ScriptComponent>()			<< 6);
+	if(entity.Has<ScriptComponent>() && !entity.Get<ScriptComponent>().Instance)
+		componentBits.set(6, false);
 	componentBits |= ((uint16_t)entity.Has<RigidBodyComponent>()		<< 7);
 	componentBits |= ((uint16_t)entity.Has<DirectionalLightComponent>() << 8);
 	componentBits |= ((uint16_t)entity.Has<PointLightComponent>()		<< 9);
@@ -875,29 +868,29 @@ BinaryWriter& BinaryWriter::WriteObject(const Entity& entity) {
 
 	Write((uint16_t)componentBits.to_ulong());
 
-	if(entity.Has<CameraComponent>())
+	if(componentBits.test(0))
 		Write(entity.Get<CameraComponent>());
-	if(entity.Has<TagComponent>())
+	if(componentBits.test(1))
 		Write(entity.Get<TagComponent>());
-	if(entity.Has<TransformComponent>())
+	if(componentBits.test(2))
 		Write(entity.Get<TransformComponent>());
-	if(entity.Has<AudioComponent>())
+	if(componentBits.test(3))
 		Write(entity.Get<AudioComponent>());
-	if(entity.Has<MeshComponent>())
+	if(componentBits.test(4))
 		Write(entity.Get<MeshComponent>());
-	if(entity.Has<SkyboxComponent>())
+	if(componentBits.test(5))
 		Write(entity.Get<SkyboxComponent>());
-	if(entity.Has<ScriptComponent>())
+	if(componentBits.test(6))
 		Write(entity.Get<ScriptComponent>());
-	if(entity.Has<RigidBodyComponent>())
+	if(componentBits.test(7))
 		Write(entity.Get<RigidBodyComponent>());
-	if(entity.Has<DirectionalLightComponent>())
+	if(componentBits.test(8))
 		Write(entity.Get<DirectionalLightComponent>());
-	if(entity.Has<PointLightComponent>())
+	if(componentBits.test(9))
 		Write(entity.Get<PointLightComponent>());
-	if(entity.Has<SpotlightComponent>())
+	if(componentBits.test(10))
 		Write(entity.Get<SpotlightComponent>());
-	if(entity.Has<ParticleEmitterComponent>())
+	if(componentBits.test(11))
 		Write(entity.Get<ParticleEmitterComponent>());
 
 	return *this;

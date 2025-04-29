@@ -43,20 +43,16 @@ void PhysicsSystem::Run(Phase phase) {
 }
 
 void PhysicsSystem::OnComponentAdd(Entity& entity) {
-	auto& rc = entity.Get<RigidBodyComponent>();
-	rc.Body->Data = (void*)(uint64_t)entity.GetHandle();
-	m_World.AddActor(rc.Body);
-
-	m_World.AddContactCallback(
-		[this](Ref<RigidBody> body1, Ref<RigidBody> body2)
-		{
-			Entity entity1 = m_EntityWorld->GetEntity((uint64_t)body1->Data);
-			Entity entity2 = m_EntityWorld->GetEntity((uint64_t)body2->Data);
-			if(entity1.Has<ScriptComponent>()) {
-				auto obj = entity1.Get<ScriptComponent>().Instance;
-				obj->Call("OnPhysicsEvent", CollisionEvent{ entity2 });
-			}
-		});
+	// m_World.AddContactCallback(
+	// 	[this](Ref<RigidBody> body1, Ref<RigidBody> body2)
+	// 	{
+	// 		Entity entity1 = m_EntityWorld->GetEntity((uint64_t)body1->Data);
+	// 		Entity entity2 = m_EntityWorld->GetEntity((uint64_t)body2->Data);
+	// 		if(entity1.Has<ScriptComponent>()) {
+	// 			auto obj = entity1.Get<ScriptComponent>().Instance;
+	// 			obj->Call("OnPhysicsEvent", CollisionEvent{ entity2 });
+	// 		}
+	// 	});
 	// // Creating RigidBodyComponent then MeshComponent ==> bounding volume
 	// // Creating MeshComponent then RigidBodyComponent ==> tightly-fitting volume
 
@@ -75,7 +71,9 @@ void PhysicsSystem::OnComponentAdd(Entity& entity) {
 }
 
 void PhysicsSystem::OnComponentSet(Entity& entity) {
-
+	auto& rc = entity.Get<RigidBodyComponent>();
+	rc.Body->Data = (void*)(uint64_t)entity.GetHandle();
+	m_World.AddActor(rc.Body);
 }
 
 void PhysicsSystem::OnComponentRemove(Entity& entity) {
