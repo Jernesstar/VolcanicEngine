@@ -26,8 +26,7 @@ struct Component {
 struct CameraComponent : public Component {
 	Ref<Camera> Cam;
 
-	CameraComponent()
-		: Cam(CreateRef<StereographicCamera>()) { }
+	CameraComponent() = default;
 	CameraComponent(Ref<Camera> camera)
 		: Cam(camera) { }
 	CameraComponent(const CameraComponent& other) = default;
@@ -90,9 +89,10 @@ struct ScriptComponent : public Component {
 	Ref<Script::ScriptObject> Instance;
 
 	ScriptComponent() = default;
-	ScriptComponent(const Asset& asset, Ref<Script::ScriptObject> obj = nullptr)
+	ScriptComponent(const Asset& asset, Ref<Script::ScriptObject> obj)
 		: ModuleAsset(asset), Instance(obj) { }
 	ScriptComponent(const ScriptComponent& other) = default;
+	ScriptComponent(ScriptComponent&& other) = default;
 };
 
 struct RigidBodyComponent : public Component {

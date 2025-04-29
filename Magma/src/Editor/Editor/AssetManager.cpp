@@ -505,7 +505,7 @@ void EditorAssetManager::RuntimeSave(const std::string& exportPath) {
 		else if(asset.Type == AssetType::Texture) {
 			pack.Write(textureFile.GetPosition());
 
-			ImageData image = AssetImporter::GetImageData(path);
+			ImageData image = AssetImporter::GetImageData(path, false);
 			textureFile.Write(image.Width);
 			textureFile.Write(image.Height);
 			textureFile.Write(image.Data);

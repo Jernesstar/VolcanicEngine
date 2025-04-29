@@ -136,60 +136,61 @@ BinaryReader& BinaryReader::ReadObject(ScriptComponent& comp) {
 	auto _class = mod->GetClass(className);
 	comp.Instance = _class->Instantiate(s_CurrentEntity);
 
-	// auto obj = comp.Instance;
-	// for(uint32_t i = 0; i < obj->GetHandle()->GetPropertyCount(); i++) {
-	// 	int typeID;
-	// 	Read(typeID);
-	// 	if(typeID == -1)
-	// 		continue;
+	auto obj = comp.Instance;
+	for(uint32_t i = 0; i < obj->GetHandle()->GetPropertyCount(); i++) {
+		int typeID;
+		Read(typeID);
+		if(typeID == -1)
+			continue;
 
-	// 	ScriptField field = obj->GetProperty(i);
-	// 	std::string typeName;
-	// 	if(field.Type)
-	// 		typeName = field.Type->GetName();
+		ScriptField field = obj->GetProperty(i);
+		std::string typeName;
+		if(field.Type)
+			typeName = field.Type->GetName();
 
-	// 	if(field.TypeID == asTYPEID_BOOL)
-	// 		Read(*field.As<bool>());
-	// 	else if(field.TypeID == asTYPEID_INT8)
-	// 		Read(*field.As<int8_t>());
-	// 	else if(field.TypeID == asTYPEID_INT16)
-	// 		Read(*field.As<int16_t>());
-	// 	else if(field.TypeID == asTYPEID_INT32)
-	// 		Read(*field.As<int32_t>());
-	// 	else if(field.TypeID == asTYPEID_INT64)
-	// 		Read(*field.As<int64_t>());
-	// 	else if(field.TypeID == asTYPEID_UINT8)
-	// 		Read(*field.As<uint8_t>());
-	// 	else if(field.TypeID == asTYPEID_UINT16)
-	// 		Read(*field.As<uint16_t>());
-	// 	else if(field.TypeID == asTYPEID_UINT32)
-	// 		Read(*field.As<uint32_t>());
-	// 	else if(field.TypeID == asTYPEID_UINT64)
-	// 		Read(*field.As<uint64_t>());
-	// 	else if(field.TypeID == asTYPEID_FLOAT)
-	// 		Read(*field.As<float>());
-	// 	else if(field.TypeID == asTYPEID_DOUBLE)
-	// 		Read(*field.As<double>());
-	// 	else if(typeName == "Asset")
-	// 		Read(*field.As<Asset>());
-	// 	else if(typeName == "string")
-	// 		Read(*field.As<std::string>());
-	// 	else if(typeName == "Vec3")
-	// 		Read(*field.As<glm::vec3>());
-	// 	else if(typeName == "array") {
-	// 		auto* array = field.As<CScriptArray>();
-	// 		auto subType = array->GetArrayObjectType();
+		if(field.TypeID == asTYPEID_BOOL)
+			Read(*field.As<bool>());
+		else if(field.TypeID == asTYPEID_INT8)
+			Read(*field.As<int8_t>());
+		else if(field.TypeID == asTYPEID_INT16)
+			Read(*field.As<int16_t>());
+		else if(field.TypeID == asTYPEID_INT32)
+			Read(*field.As<int32_t>());
+		else if(field.TypeID == asTYPEID_INT64)
+			Read(*field.As<int64_t>());
+		else if(field.TypeID == asTYPEID_UINT8)
+			Read(*field.As<uint8_t>());
+		else if(field.TypeID == asTYPEID_UINT16)
+			Read(*field.As<uint16_t>());
+		else if(field.TypeID == asTYPEID_UINT32)
+			Read(*field.As<uint32_t>());
+		else if(field.TypeID == asTYPEID_UINT64)
+			Read(*field.As<uint64_t>());
+		else if(field.TypeID == asTYPEID_FLOAT)
+			Read(*field.As<float>());
+		else if(field.TypeID == asTYPEID_DOUBLE)
+			Read(*field.As<double>());
+		else if(typeName == "Asset")
+			Read(*field.As<Asset>());
+		else if(typeName == "string")
+			Read(*field.As<std::string>());
+		else if(typeName == "Vec3")
+			Read(*field.As<glm::vec3>());
+		else if(typeName == "array") {
+			auto* array = field.As<CScriptArray>();
+			auto subTypeID = array->GetArrayObjectType()->GetSubTypeId();
+			auto subType = ScriptEngine::Get()->GetTypeInfoById(subTypeID);
 
-	// 		uint32_t count;
-	// 		Read(count);
-	// 		Buffer<void> data(subType->GetSize(), count);
-	// 		ReadData(data.Get(), subType->GetSize() * count);
+			uint32_t count;
+			Read(count);
+			Buffer<void> data(subType->GetSize(), count);
+			ReadData(data.Get(), subType->GetSize() * count);
 
-	// 		array->Reserve(count);
-	// 		for(uint32_t i = 0; i < count; i++)
-	// 			array->InsertLast((char*)data.Get() + i);
-	// 	}
-	// }
+			array->Reserve(count);
+			for(uint32_t i = 0; i < count; i++)
+				array->InsertLast((char*)data.Get() + i);
+		}
+	}
 
 	return *this;
 }
@@ -296,11 +297,6 @@ BinaryReader& BinaryReader::ReadObject(Entity& entity) {
 		Read(entity.Set<SpotlightComponent>());
 	if(componentBits.test(11))
 		Read(entity.Set<ParticleEmitterComponent>());
-
-	if (entity.Has<ScriptComponent>()) {
-		auto& c = entity.Get<ScriptComponent>();
-		return *this;
-	}
 
 	return *this;
 }

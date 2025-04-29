@@ -44,8 +44,8 @@ public:
 	TComponent& Set() {
 		if(!Has<TComponent>())
 			Add<TComponent>();
-		else
-			m_Handle.modified<TComponent>();
+		// else
+		// 	m_Handle.modified<TComponent>();
 		return *m_Handle.get_mut<TComponent>();
 	}
 

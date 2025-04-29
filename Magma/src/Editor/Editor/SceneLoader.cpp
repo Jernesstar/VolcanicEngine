@@ -424,7 +424,7 @@ static void LoadScript(Entity entity, Asset asset, const std::string& className,
 		VOLCANICORE_LOG_INFO(
 			"Could not load script module %lu, needed for Entity %lu",
 			(uint64_t)asset.ID, (uint64_t)entity.GetHandle());
-		entity.Add<ScriptComponent>(asset);
+		entity.Add<ScriptComponent>(asset, nullptr);
 		return;
 	}
 
@@ -433,7 +433,7 @@ static void LoadScript(Entity entity, Asset asset, const std::string& className,
 		VOLCANICORE_LOG_INFO(
 			"Could not find class '%s' in module %lu, needed for Entity %lu",
 			className.c_str(), (uint64_t)asset.ID, (uint64_t)entity.GetHandle());
-		entity.Add<ScriptComponent>(asset);
+		entity.Add<ScriptComponent>(asset, nullptr);
 		return;
 	}
 
@@ -475,9 +475,8 @@ static void LoadScript(Entity entity, Asset asset, const std::string& className,
 		}
 		else if(type == "array") {
 			auto data = value.as<List<uint32_t>>();
-			if(data)
-				for(uint32_t i = 0; i < data.Count(); i++)
-					((CScriptArray*)address)->InsertLast(data.At(i));
+			for(uint32_t i = 0; i < data.Count(); i++)
+				((CScriptArray*)address)->InsertLast(data.At(i));
 		}
 	}
 
@@ -570,7 +569,7 @@ void DeserializeEntity(YAML::Node entityNode, Scene& scene) {
 		if(!id || !assetManager.IsValid(asset))
 			entity.Add<ScriptComponent>();
 		else if(className == "")
-			entity.Add<ScriptComponent>(asset);
+			entity.Add<ScriptComponent>(asset, nullptr);
 		else
 			LoadScript(entity, asset, className, scriptComponentNode);
 	}
@@ -735,55 +734,56 @@ BinaryWriter& BinaryWriter::WriteObject(const ScriptComponent& comp) {
 	Write((uint64_t)comp.ModuleAsset.ID);
 	Write(obj->GetClass()->Name);
 
-	// for(uint32_t i = 0; i < handle->GetPropertyCount(); i++) {
-	// 	ScriptField field = obj->GetProperty(i);
-	// 	if(!field.HasMetadata("EditorField")) {
-	// 		Write((int)-1);
-	// 		continue;
-	// 	}
-	// 	Write(field.TypeID);
+	for(uint32_t i = 0; i < handle->GetPropertyCount(); i++) {
+		ScriptField field = obj->GetProperty(i);
+		if(!field.HasMetadata("EditorField")) {
+			Write((int)-1);
+			continue;
+		}
+		Write(field.TypeID);
 
-	// 	std::string typeName;
-	// 	if(field.Type)
-	// 		typeName = field.Type->GetName();
+		std::string typeName;
+		if(field.Type)
+			typeName = field.Type->GetName();
 
-	// 	if(field.TypeID == asTYPEID_BOOL)
-	// 		Write(*field.As<bool>());
-	// 	else if(field.TypeID == asTYPEID_INT8)
-	// 		Write(*field.As<int8_t>());
-	// 	else if(field.TypeID == asTYPEID_INT16)
-	// 		Write(*field.As<int16_t>());
-	// 	else if(field.TypeID == asTYPEID_INT32)
-	// 		Write(*field.As<int32_t>());
-	// 	else if(field.TypeID == asTYPEID_INT64)
-	// 		Write(*field.As<int64_t>());
-	// 	else if(field.TypeID == asTYPEID_UINT8)
-	// 		Write(*field.As<uint8_t>());
-	// 	else if(field.TypeID == asTYPEID_UINT16)
-	// 		Write(*field.As<uint16_t>());
-	// 	else if(field.TypeID == asTYPEID_UINT32)
-	// 		Write(*field.As<uint32_t>());
-	// 	else if(field.TypeID == asTYPEID_UINT64)
-	// 		Write(*field.As<uint64_t>());
-	// 	else if(field.TypeID == asTYPEID_FLOAT)
-	// 		Write(*field.As<float>());
-	// 	else if(field.TypeID == asTYPEID_DOUBLE)
-	// 		Write(*field.As<double>());
-	// 	else if(typeName == "Asset")
-	// 		Write(*field.As<Asset>());
-	// 	else if(typeName == "string")
-	// 		Write(*field.As<std::string>());
-	// 	else if(typeName == "Vec3")
-	// 		Write(*field.As<glm::vec3>());
-	// 	else if(typeName == "array") {
-	// 		auto* array = field.As<CScriptArray>();
-	// 		auto subType = array->GetArrayObjectType();
-	// 		auto count = array->GetSize();
-	// 		Write((uint32_t)count);
-	// 		// Works for primitive and POD types
-	// 		WriteData(array->GetBuffer(), subType->GetSize() * count);
-	// 	}
-	// }
+		if(field.TypeID == asTYPEID_BOOL)
+			Write(*field.As<bool>());
+		else if(field.TypeID == asTYPEID_INT8)
+			Write(*field.As<int8_t>());
+		else if(field.TypeID == asTYPEID_INT16)
+			Write(*field.As<int16_t>());
+		else if(field.TypeID == asTYPEID_INT32)
+			Write(*field.As<int32_t>());
+		else if(field.TypeID == asTYPEID_INT64)
+			Write(*field.As<int64_t>());
+		else if(field.TypeID == asTYPEID_UINT8)
+			Write(*field.As<uint8_t>());
+		else if(field.TypeID == asTYPEID_UINT16)
+			Write(*field.As<uint16_t>());
+		else if(field.TypeID == asTYPEID_UINT32)
+			Write(*field.As<uint32_t>());
+		else if(field.TypeID == asTYPEID_UINT64)
+			Write(*field.As<uint64_t>());
+		else if(field.TypeID == asTYPEID_FLOAT)
+			Write(*field.As<float>());
+		else if(field.TypeID == asTYPEID_DOUBLE)
+			Write(*field.As<double>());
+		else if(typeName == "Asset")
+			Write(*field.As<Asset>());
+		else if(typeName == "string")
+			Write(*field.As<std::string>());
+		else if(typeName == "Vec3")
+			Write(*field.As<glm::vec3>());
+		else if(typeName == "array") {
+			auto* array = field.As<CScriptArray>();
+			auto subTypeID = array->GetArrayObjectType()->GetSubTypeId();
+			auto* subType = ScriptEngine::Get()->GetTypeInfoById(subTypeID);
+			auto count = array->GetSize();
+			Write((uint32_t)count);
+			// Works for primitive and POD types
+			WriteData(array->GetBuffer(), subType->GetSize() * count);
+		}
+	}
 
 	return *this;
 }
