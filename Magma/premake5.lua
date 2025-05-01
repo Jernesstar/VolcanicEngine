@@ -145,6 +145,7 @@ project "Editor"
         "imgui",
         "ImGuiFileDialog",
         "ImGuizmo",
+        "ImGuiColorTextEdit",
 
         "yaml-cpp",
         "flecs",
@@ -186,6 +187,7 @@ project "Editor"
 
 include "Magma/.builddeps/ImGuiFileDialog"
 include "Magma/.builddeps/ImGuizmo"
+include "Magma/.builddeps/ImGuiColorTextEdit"
 include "Magma/.builddeps/assimp"
 include "Magma/.builddeps/freetype"
 include "Magma/.builddeps/stb_image"

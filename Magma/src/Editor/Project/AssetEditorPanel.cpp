@@ -9,6 +9,10 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
+#include "Editor/EditorApp.h"
+
+#include "Project/ScriptEditorPanel.h"
+
 namespace fs = std::filesystem;
 
 using namespace VolcaniCore;
@@ -55,6 +59,16 @@ static void EditAsset(Asset asset) {
 
 	ImGui::Text("Type: %s", type.c_str());
 	ImGui::Text("ID: %llu", (uint64_t)asset.ID);
+
+	if(asset.Type == AssetType::Script) {
+		if(ImGui::Button("Edit Script")) {
+			auto& editor = Application::As<EditorApp>()->GetEditor();
+			auto tab = editor.GetProjectTab();
+			auto panel = tab->GetPanel("ScriptEditor")->As<ScriptEditorPanel>();
+			panel->Open = true;
+			panel->EditFile(asset);
+		}
+	}
 }
 
 void AssetEditorPanel::Draw() {

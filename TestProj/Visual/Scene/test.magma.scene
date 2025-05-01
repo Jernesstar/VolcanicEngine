@@ -109,7 +109,7 @@ Scene:
             Tag: MainCharacter
           TransformComponent:
             Transform:
-              Translation: [1.3453567, 1, 8.51014519]
+              Translation: [0.789677322, 1, 8.51014519]
               Rotation: [0, -0, 0]
               Scale: [1, 1, 1]
           MeshComponent:
@@ -146,16 +146,3 @@ Scene:
                   Name: Height
                   Type: uint32
                   Value: 2
-    - Entity:
-        Name: Light2
-        ID: 1111
-        Components:
-          PointLightComponent:
-            Light:
-              Ambient: [0, 0, 0]
-              Diffuse: [1, 1, 1]
-              Specular: [1, 1, 1]
-              Position: [3, 2.70000005, 10.3999996]
-              Constant: 1
-              Linear: 9.99999975e-05
-              Quadratic: 0

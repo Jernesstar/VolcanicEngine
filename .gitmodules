@@ -47,3 +47,6 @@
 [submodule "VolcaniCore/vendor/glad"]
 	path = VolcaniCore/vendor/glad
 	url = https://github.com/Jernesstar/glad.git
+[submodule "Magma/vendor/ImGuiColorTextEdit"]
+	path = Magma/vendor/ImGuiColorTextEdit
+	url = https://github.com/BalazsJako/ImGuiColorTextEdit.git

@@ -67,7 +67,7 @@ void ScriptObject::Copy(Ref<ScriptObject> other) {
 
 	for(uint32_t i = 0; i < m_Handle->GetPropertyCount(); i++) {
 		ScriptField ours = GetProperty(i);
-		ScriptField field = other->GetProperty(ours.Name);
+		ScriptField field = other->GetProperty(i);
 		if(!field.Data)
 			continue;
 		if(!field.HasMetadata("EditorField"))

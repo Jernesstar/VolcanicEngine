@@ -55,9 +55,14 @@ struct hash<Magma::Asset> {
 
 namespace Magma {
 
-class AssetManager {
+class AssetManager : public VolcaniCore::Derivable<AssetManager> {
 public:
-	AssetManager() = default;
+	static AssetManager* Get() { return s_Instance; }
+
+public:
+	AssetManager() {
+		s_Instance = this;
+	}
 	virtual ~AssetManager() = default;
 
 	virtual void Load(Asset asset) = 0;
@@ -98,6 +103,9 @@ protected:
 	Map<VolcaniCore::UUID, Ref<VolcaniCore::Cubemap>> m_CubemapAssets;
 	Map<VolcaniCore::UUID, Ref<Sound>> m_AudioAssets;
 	Map<VolcaniCore::UUID, Ref<ScriptModule>> m_ScriptAssets;
+
+private:
+	inline static AssetManager* s_Instance;
 
 private:
 	Ref<VolcaniCore::Mesh> GetMesh(Asset asset) {

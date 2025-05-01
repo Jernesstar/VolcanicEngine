@@ -20,6 +20,7 @@
 
 #include "ContentBrowserPanel.h"
 #include "AssetEditorPanel.h"
+#include "ScriptEditorPanel.h"
 
 using namespace Lava;
 
@@ -44,6 +45,7 @@ ProjectTab::ProjectTab(const std::string& path)
 {
 	AddPanel<AssetEditorPanel>()->SetTab(this);
 	AddPanel<ContentBrowserPanel>(path)->SetTab(this);
+	AddPanel<ScriptEditorPanel>()->SetTab(this);
 	GetPanel("AssetEditor")->As<AssetEditorPanel>()->Open = true;
 	GetPanel("ContentBrowser")->As<ContentBrowserPanel>()->Open = true;
 
@@ -106,7 +108,7 @@ void ProjectTab::Setup() {
 
 void ProjectTab::Update(TimeStep ts) {
 	App::Get()->OnUpdate(ts);
-	// The scene was stopped but it wasn't because of the button
+	// The scene was stopped but it wasn't because of the stop button
 	// i.e SwitchScreen was called inside the script
 	if(!App::Get()->Running && m_ScreenState == ScreenState::Play)
 		OnStop();
@@ -154,7 +156,9 @@ void ProjectTab::Render() {
 
 void ProjectTab::RenderEssentialPanels() {
 	GetPanel("ContentBrowser")->Draw();
-	GetPanel("AssetEditor")->Draw();
+	GetPanel("AssetEditor")->Draw(); 
+	if(GetPanel("ScriptEditor")->Open)
+		GetPanel("ScriptEditor")->Draw();
 }
 
 void ProjectTab::RenderButtons() {
