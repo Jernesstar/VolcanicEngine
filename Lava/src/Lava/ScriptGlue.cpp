@@ -492,6 +492,102 @@ static ParticleEmitterComponent& AddParticleEmitterComponent(Entity* entity) {
 	return entity->Set<ParticleEmitterComponent>();
 }
 
+static const CameraComponent* GetCameraComponent(Entity* entity) {
+	return &entity->Get<CameraComponent>();
+}
+
+static const TagComponent* GetTagComponent(Entity* entity) {
+	return &entity->Get<TagComponent>();
+}
+
+static const TransformComponent* GetTransformComponent(Entity* entity) {
+	return &entity->Get<TransformComponent>();
+}
+
+static const AudioComponent* GetAudioComponent(Entity* entity) {
+	return &entity->Get<AudioComponent>();
+}
+
+static const MeshComponent* GetMeshComponent(Entity* entity) {
+	return &entity->Get<MeshComponent>();
+}
+
+static const SkyboxComponent* GetSkyboxComponent(Entity* entity) {
+	return &entity->Get<SkyboxComponent>();
+}
+
+static const ScriptComponent* GetScriptComponent(Entity* entity) {
+	return &entity->Get<ScriptComponent>();
+}
+
+static const RigidBodyComponent* GetRigidBodyComponent(Entity* entity) {
+	return &entity->Get<RigidBodyComponent>();
+}
+
+static const DirectionalLightComponent* GetDirectionalLightComponent(Entity* entity) {
+	return &entity->Get<DirectionalLightComponent>();
+}
+
+static const PointLightComponent* GetPointLightComponent(Entity* entity) {
+	return &entity->Get<PointLightComponent>();
+}
+
+static const SpotlightComponent* GetSpotlightComponent(Entity* entity) {
+	return &entity->Get<SpotlightComponent>();
+}
+
+static const ParticleEmitterComponent* GetParticleEmitterComponent(Entity* entity) {
+	return &entity->Get<ParticleEmitterComponent>();
+}
+
+static CameraComponent* SetCameraComponent(Entity* entity) {
+	return &entity->Set<CameraComponent>();
+}
+
+static TagComponent* SetTagComponent(Entity* entity) {
+	return &entity->Set<TagComponent>();
+}
+
+static TransformComponent* SetTransformComponent(Entity* entity) {
+	return &entity->Set<TransformComponent>();
+}
+
+static AudioComponent* SetAudioComponent(Entity* entity) {
+	return &entity->Set<AudioComponent>();
+}
+
+static MeshComponent* SetMeshComponent(Entity* entity) {
+	return &entity->Set<MeshComponent>();
+}
+
+static SkyboxComponent* SetSkyboxComponent(Entity* entity) {
+	return &entity->Set<SkyboxComponent>();
+}
+
+static ScriptComponent* SetScriptComponent(Entity* entity) {
+	return &entity->Set<ScriptComponent>();
+}
+
+static RigidBodyComponent* SetRigidBodyComponent(Entity* entity) {
+	return &entity->Set<RigidBodyComponent>();
+}
+
+static DirectionalLightComponent* SetDirectionalLightComponent(Entity* entity) {
+	return &entity->Set<DirectionalLightComponent>();
+}
+
+static PointLightComponent* SetPointLightComponent(Entity* entity) {
+	return &entity->Set<PointLightComponent>();
+}
+
+static SpotlightComponent* SetSpotlightComponent(Entity* entity) {
+	return &entity->Set<SpotlightComponent>();
+}
+
+static ParticleEmitterComponent* SetParticleEmitterComponent(Entity* entity) {
+	return &entity->Set<ParticleEmitterComponent>();
+}
+
 void RegisterECS() {
 	auto* engine = ScriptEngine::Get();
 
@@ -668,101 +764,77 @@ void RegisterECS() {
 
 	engine->RegisterObjectMethod("Entity",
 		"const CameraComponent@ GetCameraComponent()",
-		asMETHODPR(Entity, Get<CameraComponent>, () const,
-			const CameraComponent&), asCALL_THISCALL);
+		asFUNCTION(GetCameraComponent), asCALL_CDECL_OBJLAST);
 	engine->RegisterObjectMethod("Entity",
 		"const TagComponent@ GetTagComponent()",
-		asMETHODPR(Entity, Get<TagComponent>, () const,
-			const TagComponent&), asCALL_THISCALL);
+		asFUNCTION(GetTagComponent), asCALL_CDECL_OBJLAST);
 	engine->RegisterObjectMethod("Entity",
 		"const TransformComponent@ GetTransformComponent()",
-		asMETHODPR(Entity, Get<TransformComponent>, () const,
-			const TransformComponent&), asCALL_THISCALL);
+		asFUNCTION(GetTransformComponent), asCALL_CDECL_OBJLAST);
 	engine->RegisterObjectMethod("Entity",
 		"const AudioComponent@ GetAudioComponent()",
-		asMETHODPR(Entity, Get<AudioComponent>, () const,
-			const AudioComponent&), asCALL_THISCALL);
+		asFUNCTION(GetAudioComponent), asCALL_CDECL_OBJLAST);
 	engine->RegisterObjectMethod("Entity",
 		"const MeshComponent@ GetMeshComponent()",
-		asMETHODPR(Entity, Get<MeshComponent>, () const,
-			const MeshComponent&), asCALL_THISCALL);
+		asFUNCTION(GetMeshComponent), asCALL_CDECL_OBJLAST);
 	engine->RegisterObjectMethod("Entity",
 		"const SkyboxComponent@ GetSkyboxComponent()",
-		asMETHODPR(Entity, Get<SkyboxComponent>, () const,
-			const SkyboxComponent&), asCALL_THISCALL);
+		asFUNCTION(GetSkyboxComponent), asCALL_CDECL_OBJLAST);
 	engine->RegisterObjectMethod("Entity",
 		"const ScriptComponent@ GetScriptComponent()",
-		asMETHODPR(Entity, Get<ScriptComponent>, () const,
-			const ScriptComponent&), asCALL_THISCALL);
+		asFUNCTION(GetScriptComponent), asCALL_CDECL_OBJLAST);
 	engine->RegisterObjectMethod("Entity",
 		"const RigidBodyComponent@ GetRigidBodyComponent()",
-		asMETHODPR(Entity, Get<RigidBodyComponent>, () const,
-			const RigidBodyComponent&), asCALL_THISCALL);
+		asFUNCTION(GetRigidBodyComponent), asCALL_CDECL_OBJLAST);
 	engine->RegisterObjectMethod("Entity",
 		"const DirectionalLightComponent@ GetDirectionalLightComponent()",
-		asMETHODPR(Entity, Get<DirectionalLightComponent>, () const,
-			const DirectionalLightComponent&), asCALL_THISCALL);
+		asFUNCTION(GetDirectionalLightComponent), asCALL_CDECL_OBJLAST);
 	engine->RegisterObjectMethod("Entity",
 		"const PointLightComponent@ GetPointLightComponent()",
-		asMETHODPR(Entity, Get<PointLightComponent>, () const,
-			const PointLightComponent&), asCALL_THISCALL);
+		asFUNCTION(GetPointLightComponent), asCALL_CDECL_OBJLAST);
 	engine->RegisterObjectMethod("Entity",
 		"const SpotlightComponent@ GetSpotlightComponent()",
-		asMETHODPR(Entity, Get<SpotlightComponent>, () const,
-			const SpotlightComponent&), asCALL_THISCALL);
+		asFUNCTION(GetSpotlightComponent), asCALL_CDECL_OBJLAST);
 	engine->RegisterObjectMethod("Entity",
 		"const ParticleEmitterComponent@ GetParticleEmitterComponent()",
-		asMETHODPR(Entity, Get<ParticleEmitterComponent>, () const,
-			const ParticleEmitterComponent&), asCALL_THISCALL);
+		asFUNCTION(GetParticleEmitterComponent), asCALL_CDECL_OBJLAST);
 
 	engine->RegisterObjectMethod("Entity",
 		"CameraComponent@ SetCameraComponent()",
-		asMETHODPR(Entity, Set<CameraComponent>, (),
-			CameraComponent&), asCALL_THISCALL);
+		asFUNCTION(SetCameraComponent), asCALL_CDECL_OBJLAST);
 	engine->RegisterObjectMethod("Entity",
 		"TagComponent@ SetTagComponent()",
-		asMETHODPR(Entity, Set<TagComponent>, (),
-			TagComponent&), asCALL_THISCALL);
+		asFUNCTION(SetTagComponent), asCALL_CDECL_OBJLAST);
 	engine->RegisterObjectMethod("Entity",
 		"TransformComponent@ SetTransformComponent()",
-		asMETHODPR(Entity, Set<TransformComponent>, (),
-			TransformComponent&), asCALL_THISCALL);
+		asFUNCTION(SetTransformComponent), asCALL_CDECL_OBJLAST);
 	engine->RegisterObjectMethod("Entity",
 		"AudioComponent@ SetAudioComponent()",
-		asMETHODPR(Entity, Set<AudioComponent>, (),
-			AudioComponent&), asCALL_THISCALL);
+		asFUNCTION(SetAudioComponent), asCALL_CDECL_OBJLAST);
 	engine->RegisterObjectMethod("Entity",
 		"MeshComponent@ SetMeshComponent()",
-		asMETHODPR(Entity, Set<MeshComponent>, (),
-			MeshComponent&), asCALL_THISCALL);
+		asFUNCTION(SetMeshComponent), asCALL_CDECL_OBJLAST);
 	engine->RegisterObjectMethod("Entity",
 		"SkyboxComponent@ SetSkyboxComponent()",
-		asMETHODPR(Entity, Set<SkyboxComponent>, (),
-			SkyboxComponent&), asCALL_THISCALL);
+		asFUNCTION(SetSkyboxComponent), asCALL_CDECL_OBJLAST);
 	engine->RegisterObjectMethod("Entity",
 		"ScriptComponent@ SetScriptComponent()",
-		asMETHODPR(Entity, Set<ScriptComponent>, (),
-			ScriptComponent&), asCALL_THISCALL);
+		asFUNCTION(SetScriptComponent), asCALL_CDECL_OBJLAST);
 	engine->RegisterObjectMethod("Entity",
 		"RigidBodyComponent@ SetRigidBodyComponent()",
-		asMETHODPR(Entity, Set<RigidBodyComponent>, (),
-			RigidBodyComponent&), asCALL_THISCALL);
+		asFUNCTION(SetRigidBodyComponent), asCALL_CDECL_OBJLAST);
 	engine->RegisterObjectMethod("Entity",
 		"DirectionalLightComponent@ SetDirectionalLightComponent()",
-		asMETHODPR(Entity, Set<DirectionalLightComponent>, (),
-			DirectionalLightComponent&), asCALL_THISCALL);
+		asFUNCTION(SetDirectionalLightComponent), asCALL_CDECL_OBJLAST);
 	engine->RegisterObjectMethod("Entity",
 		"PointLightComponent@ SetPointLightComponent()",
-		asMETHODPR(Entity, Set<PointLightComponent>, (),
-			PointLightComponent&), asCALL_THISCALL);
+		asFUNCTION(SetPointLightComponent), asCALL_CDECL_OBJLAST);
 	engine->RegisterObjectMethod("Entity",
 		"SpotlightComponent@ SetSpotlightComponent()",
-		asMETHODPR(Entity, Set<SpotlightComponent>, (),
-			SpotlightComponent&), asCALL_THISCALL);
+		asFUNCTION(SetSpotlightComponent), asCALL_CDECL_OBJLAST);
 	engine->RegisterObjectMethod("Entity",
 		"ParticleEmitterComponent@ SetParticleEmitterComponent()",
-		asMETHODPR(Entity, Set<ParticleEmitterComponent>, (),
-			ParticleEmitterComponent&), asCALL_THISCALL);
+		asFUNCTION(SetParticleEmitterComponent), asCALL_CDECL_OBJLAST);
 }
 
 static HitInfo PhysicsRaycastScreen(uint32_t x, uint32_t y, PhysicsSystem* sys) {

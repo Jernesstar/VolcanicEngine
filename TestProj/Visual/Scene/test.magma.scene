@@ -137,12 +137,12 @@ Scene:
               - Field:
                   Name: Tilemap
                   Type: array
-                  Value: [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+                  Value: [1, 0, 0, 1]
               - Field:
                   Name: Width
                   Type: uint32
-                  Value: 9
+                  Value: 2
               - Field:
                   Name: Height
                   Type: uint32
-                  Value: 9
+                  Value: 2

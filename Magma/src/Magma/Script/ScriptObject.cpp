@@ -66,7 +66,10 @@ void ScriptObject::Copy(Ref<ScriptObject> other) {
 		return;
 
 	for(uint32_t i = 0; i < m_Handle->GetPropertyCount(); i++) {
-		ScriptField field = other->GetProperty(i);
+		ScriptField ours = GetProperty(i);
+		ScriptField field = other->GetProperty(ours.Name);
+		if(!field.Data)
+			continue;
 		if(!field.HasMetadata("EditorField"))
 			continue;
 
@@ -75,28 +78,8 @@ void ScriptObject::Copy(Ref<ScriptObject> other) {
 			fieldType = field.Type->GetName();
 
 		size_t size = 0;
-		if(field.TypeID == asTYPEID_BOOL)
-			size = sizeof(bool);
-		else if(field.TypeID == asTYPEID_INT8)
-			size = sizeof(int8_t);
-		else if(field.TypeID == asTYPEID_INT16)
-			size = sizeof(int16_t);
-		else if(field.TypeID == asTYPEID_INT32)
-			size = sizeof(int32_t);
-		else if(field.TypeID == asTYPEID_INT64)
-			size = sizeof(int64_t);
-		else if(field.TypeID == asTYPEID_UINT8)
-			size = sizeof(uint8_t);
-		else if(field.TypeID == asTYPEID_UINT16)
-			size = sizeof(uint16_t);
-		else if(field.TypeID == asTYPEID_UINT32)
-			size = sizeof(uint32_t);
-		else if(field.TypeID == asTYPEID_UINT64)
-			size = sizeof(uint64_t);
-		else if(field.TypeID == asTYPEID_FLOAT)
-			size = sizeof(float);
-		else if(field.TypeID == asTYPEID_DOUBLE)
-			size = sizeof(double);
+		if(field.TypeID > 0 && field.TypeID <= 11) // (Void, Double]
+			size = ScriptEngine::Get()->GetSizeOfPrimitiveType(field.TypeID);
 		else if(fieldType == "Asset")
 			size = sizeof(Vec3);
 		else if(fieldType == "Vec3")
@@ -109,7 +92,6 @@ void ScriptObject::Copy(Ref<ScriptObject> other) {
 			continue;
 		}
 
-		ScriptField ours = GetProperty(i);
 		if(fieldType == "string")
 			*ours.As<std::string>() = *field.As<std::string>();
 		else if(fieldType == "array")

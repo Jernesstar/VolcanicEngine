@@ -80,9 +80,14 @@ public:
 	void ReloadAudio(const std::string& path);
 	void ReloadScript(const std::string& path);
 
+	void AddCallback(const Func<void, Asset>& callback);
+
 private:
 	EditorAssetManager* m_AssetManager;
+	List<Func<void, Asset>> m_Callbacks;
 };
+
+static bool s_Flip = false;
 
 FileWatcher::FileWatcher(EditorAssetManager* assetManager)
 	: m_AssetManager(assetManager) { }
@@ -100,19 +105,28 @@ void FileWatcher::handleFileAction(
 	else if(action == efsw::Actions::Delete)
 		Remove(type, fullPath);
 	else if(action == efsw::Actions::Modified) {
-		switch(type) {
-			case AssetType::Mesh:
-				ReloadMesh(fullPath);
-				break;
-			case AssetType::Texture:
-				ReloadTexture(fullPath);
-				break;
-			case AssetType::Audio:
-				ReloadAudio(fullPath);
-				break;
-			case AssetType::Script:
-				ReloadScript(fullPath);
-				break;
+		// Two modified events are emitted for each change
+		// So ignore the first and use only the second
+		if(!s_Flip) {
+			s_Flip = true;
+			return;
+		}
+		else {
+			s_Flip = false;
+			switch(type) {
+				case AssetType::Mesh:
+					ReloadMesh(fullPath);
+					break;
+				case AssetType::Texture:
+					ReloadTexture(fullPath);
+					break;
+				case AssetType::Audio:
+					ReloadAudio(fullPath);
+					break;
+				case AssetType::Script:
+					ReloadScript(fullPath);
+					break;
+			}
 		}
 	}
 	else if(action == efsw::Actions::Moved) {
@@ -121,14 +135,24 @@ void FileWatcher::handleFileAction(
 	else {
 		std::cout << "Should never happen!" << "\n";
 	}
+
+	Asset asset = { m_AssetManager->GetFromPath(fullPath), type };
+	for(auto callback : m_Callbacks)
+		callback(asset);
 }
 
 void FileWatcher::Add(AssetType type, const std::string& path) {
+	VOLCANICORE_LOG_INFO("New AssetType::%s added at path '%s'",
+		AssetTypeToString(type).c_str(), path.c_str());
 	m_AssetManager->Add(path, type);
 }
 
 void FileWatcher::Remove(AssetType type, const std::string& path) {
 
+}
+
+void FileWatcher::AddCallback(const Func<void, Asset>& callback) {
+	m_Callbacks.Add(callback);
 }
 
 void FileWatcher::ReloadMesh(const std::string& path) {
@@ -159,7 +183,7 @@ void FileWatcher::ReloadScript(const std::string& path) {
 }
 
 static efsw::FileWatcher* s_FileWatcher;
-static efsw::FileWatchListener* s_Listener;
+static FileWatcher* s_Listener;
 static List<efsw::WatchID> s_WatcherIDs;
 
 EditorAssetManager::EditorAssetManager() {
@@ -215,6 +239,10 @@ void EditorAssetManager::Unload(Asset asset) {
 		m_AudioAssets.erase(asset.ID);
 	else if(asset.Type == AssetType::Script)
 		m_ScriptAssets.erase(asset.ID);
+}
+
+void EditorAssetManager::AddReloadCallback(const Func<void, Asset>& callback) {
+	s_Listener->AddCallback(callback);
 }
 
 Asset EditorAssetManager::Add(const std::string& path, AssetType type) {

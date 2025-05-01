@@ -11,6 +11,7 @@ public:
 
 	void Load(Asset asset) override;
 	void Unload(Asset asset) override;
+	void AddReloadCallback(const Func<void, Asset>& callback);
 
 	Asset Add(const std::string& path, AssetType type);
 
@@ -20,7 +21,6 @@ public:
 	const auto& GetRegistry() const { return m_AssetRegistry; }
 
 	void Load(const std::string& path);
-
 	void Save();
 	void RuntimeSave(const std::string& exportPath);
 

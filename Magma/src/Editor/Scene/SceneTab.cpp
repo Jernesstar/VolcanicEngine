@@ -5,7 +5,9 @@
 #include <imgui/misc/cpp/imgui_stdlib.h>
 #include <ImGuiFileDialog/ImGuiFileDialog.h>
 
+#include "Editor/EditorApp.h"
 #include "Editor/Tab.h"
+#include "Editor/AssetManager.h"
 #include "Editor/AssetImporter.h"
 #include "Editor/SceneLoader.h"
 
@@ -56,6 +58,34 @@ void SceneTab::Setup() {
 	GetPanel("ComponentEditor")->Open = true;
 
 	m_Name = "Scene: " + m_Scene.Name;
+
+	auto& editor = Application::As<EditorApp>()->GetEditor();
+	auto& assetManager = editor.GetAssetManager();
+	assetManager
+	.AddReloadCallback(
+		[&](Asset asset)
+		{
+			if(asset.Type == AssetType::Script) {
+				m_Scene.EntityWorld
+				.ForEach<ScriptComponent>(
+					[&](Entity entity)
+					{
+						VOLCANICORE_LOG_INFO("Script instance reload");
+						auto& sc = entity.Set<ScriptComponent>();
+						if(!sc.Instance)
+							return;
+						if(sc.ModuleAsset != asset)
+							return;
+
+						auto old = sc.Instance;
+						auto mod = assetManager.Get<ScriptModule>(asset);
+						auto _class = mod->GetClass(old->GetClass()->Name);
+						sc.Instance = _class->Construct();
+						sc.Instance->Copy(old);
+						old.reset();
+					});
+			}
+		});
 }
 
 void SceneTab::SetScene(const std::string& path) {

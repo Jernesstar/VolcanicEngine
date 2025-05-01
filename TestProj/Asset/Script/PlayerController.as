@@ -51,15 +51,16 @@ class PlayerController : IEntityController
     void OnStart()
     {
         print("OnStart");
-        // AssetManager.Load(meshAsset);
+        AssetManager.Load(meshAsset);
 
         for(uint32 i = 0; i < Tilemap.length(); i++) {
             uint32 data = Tilemap[i];
             print("Index: " + data);
             Entity new = Scene.NewEntity();
             TransformComponent@ tc = new.AddTransformComponent();
-            tc.Translation.x = i;
-            tc.Translation.y = data;
+            tc.Translation.x = 5.0;
+            // tc.Translation.x = float(i);
+            // tc.Translation.y = data;
             // MeshComponent@ mc = new.AddMeshComponent();
             // mc.MeshAsset = meshAsset;
         }

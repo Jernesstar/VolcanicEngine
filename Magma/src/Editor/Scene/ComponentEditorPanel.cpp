@@ -423,6 +423,7 @@ void DrawComponent<ScriptComponent>(Entity& entity) {
 
 	if(s_Asset.Type != AssetType::None) {
 		component.ModuleAsset = s_Asset;
+		component.Instance.reset();
 		s_Asset = { };
 	}
 
@@ -460,7 +461,7 @@ void DrawComponent<ScriptComponent>(Entity& entity) {
 
 		if(field.Type) {
 			std::string typeName = field.Type->GetName();
-			ImGui::Text(typeName.c_str()); ImGui::SameLine();
+			ImGui::Text(typeName.c_str()); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(200.0f);
 
 			if(typeName == "string")
@@ -494,13 +495,13 @@ void DrawComponent<ScriptComponent>(Entity& entity) {
 			ImGui::Text("int16"); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(200.0f);
 			ImGui::InputScalar(std::string("##S16##" + field.Name).c_str(),
-				ImGuiDataType_S16, field.Data);
+								ImGuiDataType_S16, field.Data);
 		}
 		else if(field.TypeID == asTYPEID_INT32) {
 			ImGui::Text("int32"); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(200.0f);
 			ImGui::InputScalar(std::string("##S32##" + field.Name).c_str(),
-				ImGuiDataType_S32, field.Data);
+								ImGuiDataType_S32, field.Data);
 		}
 		else if(field.TypeID == asTYPEID_INT64) {
 			ImGui::Text("int64"); ImGui::SameLine(100.0f);
@@ -512,37 +513,37 @@ void DrawComponent<ScriptComponent>(Entity& entity) {
 			ImGui::Text("uint8"); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(200.0f);
 			ImGui::InputScalar(std::string("##U8##" + field.Name).c_str(),
-				ImGuiDataType_U8, field.Data);
+								ImGuiDataType_U8, field.Data);
 		}
 		else if(field.TypeID == asTYPEID_UINT16) {
 			ImGui::Text("uint16"); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(200.0f);
 			ImGui::InputScalar(std::string("##U16##" + field.Name).c_str(),
-				ImGuiDataType_U16, field.Data);
+								ImGuiDataType_U16, field.Data);
 		}
 		else if(field.TypeID == asTYPEID_UINT32) {
 			ImGui::Text("uint32"); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(200.0f);
 			ImGui::InputScalar(std::string("##U32##" + field.Name).c_str(),
-				ImGuiDataType_U32, field.Data);
+								ImGuiDataType_U32, field.Data);
 		}
 		else if(field.TypeID == asTYPEID_UINT64) {
 			ImGui::Text("uint64"); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(200.0f);
 			ImGui::InputScalar(std::string("##U64##" + field.Name).c_str(),
-				ImGuiDataType_U64, field.Data);
+								ImGuiDataType_U64, field.Data);
 		}
 		else if(field.TypeID == asTYPEID_FLOAT) {
 			ImGui::Text("float"); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(200.0f);
 			ImGui::InputFloat(std::string("##Float##" + field.Name).c_str(),
-				field.As<float>(), 0.0f, 0.0f, "%.3f");
+								field.As<float>(), 0.0f, 0.0f, "%.3f");
 		}
 		else if(field.TypeID == asTYPEID_DOUBLE) {
 			ImGui::Text("double"); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(200.0f);
 			ImGui::InputDouble(std::string("##Double##" + field.Name).c_str(),
-				field.As<double>());
+								field.As<double>());
 		}
 	}
 }
