@@ -31,7 +31,7 @@ public:
 	PhysicsSystem(ECS::World* world);
 
 	void Update(TimeStep ts) override;
-	void Run(Phase phase) override;
+	void Run(Entity& entity, TimeStep ts, Phase phase) override;
 
 	void OnComponentAdd(Entity& entity) override;
 	void OnComponentSet(Entity& entity) override;

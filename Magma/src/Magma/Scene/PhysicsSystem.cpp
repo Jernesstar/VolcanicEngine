@@ -19,26 +19,19 @@ void PhysicsSystem::Update(TimeStep ts) {
 	m_World.OnUpdate(ts);
 }
 
-void PhysicsSystem::Run(Phase phase) {
+void PhysicsSystem::Run(Entity& entity, TimeStep ts, Phase phase) {
+	if(!entity.Has<TransformComponent>())
+		return;
+
 	if(phase == Phase::PreUpdate) {
-		m_EntityWorld
-		->ForEach<RigidBodyComponent, TransformComponent>(
-			[this](Entity& entity)
-			{
-				auto [rc] = GetRequired(entity);
-				auto t = entity.Get<TransformComponent>();
-				rc.Body->SetTransform(t);
-			});
+		auto [rc] = GetRequired(entity);
+		auto& t = entity.Get<TransformComponent>();
+		rc.Body->SetTransform(t);
 	}
-	if(phase == Phase::PostUpdate) {
-		m_EntityWorld
-		->ForEach<RigidBodyComponent, TransformComponent>(
-			[this](Entity& entity)
-			{
-				auto [rc] = GetRequired(entity);
-				auto& tc = entity.Set<TransformComponent>();
-				tc = rc.Body->GetTransform();
-			});
+	else if(phase == Phase::PostUpdate) {
+		auto [rc] = GetRequired(entity);
+		auto& tc = entity.Set<TransformComponent>();
+		tc = rc.Body->GetTransform();
 	}
 }
 

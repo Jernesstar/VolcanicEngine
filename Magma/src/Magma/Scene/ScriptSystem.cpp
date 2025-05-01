@@ -53,16 +53,12 @@ ScriptSystem::~ScriptSystem() {
 }
 
 void ScriptSystem::Update(TimeStep ts) {
-	m_TimeStep = ts;
+
 }
 
-void ScriptSystem::Run(Phase phase) {
-	m_EntityWorld->ForEach<ScriptComponent>(
-		[this](Entity& entity)
-		{
-			auto [sc] = GetRequired(entity);
-			sc.Instance->Call("OnUpdate", (float)m_TimeStep);
-		});
+void ScriptSystem::Run(Entity& entity, TimeStep ts, Phase phase) {
+	auto [sc] = GetRequired(entity);
+	sc.Instance->Call("OnUpdate", (float)ts);
 }
 
 void ScriptSystem::Listen(Entity& entity, const std::string& id) {
@@ -74,7 +70,7 @@ void ScriptSystem::Listen(Entity& entity, const std::string& id) {
 }
 
 void ScriptSystem::Broadcast(Entity& entity, asIScriptObject* event) {
-	event->AddRef();
+	// event->AddRef();
 
 	auto eventName = event->GetObjectType()->GetName();
 	m_EntityWorld->

@@ -266,53 +266,52 @@ void App::ScreenSet(const std::string& name) {
 	auto scriptClass = s_Screen->Script->GetClass(name);
 	s_Screen->ScriptObj = scriptClass->Instantiate();
 
+	bool scene = false;
 	if(s_ShouldLoadScene) {
 		*s_Screen->World = *s_ShouldLoadScene;
 		s_ShouldLoadScene = nullptr;
 		s_Screen->World->RegisterSystems();
-
-		s_Screen->World->EntityWorld
-		.ForEach<ScriptComponent>(
-			[&](Entity& entity)
-			{
-				auto& sc = entity.Set<ScriptComponent>();
-				auto old = sc.Instance;
-				if(old) {
-					sc.Instance = old->GetClass()->Instantiate(entity);
-					sc.Instance->Copy(old);
-				}
-				else
-					return;
-
-				sc.Instance->Call("OnStart");
-			});
+		scene = true;
 	}
 	else if(screen.Scene != "") {
 		s_Screen->World->RegisterSystems();
 		SceneLoad(*s_Screen->World);
-
+		scene = true;
+	}
+	if(scene) {
+		List<Entity> list;
 		s_Screen->World->EntityWorld
 		.ForEach<ScriptComponent>(
-			[&](Entity& entity)
+			[&](Entity entity)
 			{
-				auto obj = entity.Get<ScriptComponent>().Instance;
-				obj->Call("OnStart");
+				auto& sc = entity.Set<ScriptComponent>();
+				if(!sc.Instance)
+					return;
+				list.Add(entity);
+			});
+
+		list.ForEach(
+			[](Entity& entity)
+			{
+				auto& sc = entity.Set<ScriptComponent>();
+				auto old = sc.Instance;
+				sc.Instance = old->GetClass()->Instantiate(entity);
+				sc.Instance->Copy(old);
+				sc.Instance->Call("OnStart");
 			});
 	}
 
+	bool ui = false;
 	if(s_ShouldLoadUI) {
 		s_Screen->UI = *s_ShouldLoadUI;
 		s_ShouldLoadUI = nullptr;
-		s_Screen->UI.Traverse(
-			[&](UIElement* element)
-			{
-				if(!element->ModuleID || element->Class == "")
-					return;
-				
-			});
+		ui = true;
 	}
 	else if(screen.UI != "") {
 		UILoad(s_Screen->UI);
+		ui = true;
+	}
+	if(ui) {
 		s_Screen->UI.Traverse(
 			[&](UIElement* element)
 			{
@@ -501,6 +500,10 @@ void RuntimeSceneRenderer::SubmitMesh(const Entity& entity) {
 	auto& tc = entity.Get<TransformComponent>();
 	auto& mc = entity.Get<MeshComponent>();
 	auto* assetManager = App::Get()->GetAssetManager();
+
+	if(!assetManager->IsValid(mc.MeshAsset))
+		return;
+
 	assetManager->Load(mc.MeshAsset);
 	auto mesh = assetManager->Get<Mesh>(mc.MeshAsset);
 

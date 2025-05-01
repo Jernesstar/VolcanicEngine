@@ -932,6 +932,7 @@ void EditorSceneRenderer::Render() {
 	Renderer3D::End();
 
 	auto camera = m_Controller.GetCamera();
+
 	{
 		auto* command = RendererAPI::Get()->NewDrawCommand(GridPass->Get());
 		command->DepthTest = DepthTestingMode::On;

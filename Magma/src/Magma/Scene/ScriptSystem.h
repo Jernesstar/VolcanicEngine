@@ -14,7 +14,7 @@ public:
 	~ScriptSystem();
 
 	void Update(TimeStep ts) override;
-	void Run(Phase phase) override;
+	void Run(Entity& entity, TimeStep ts, Phase phase) override;
 
 	void Listen(Entity& entity, const std::string& id);
 	void Broadcast(Entity& entity, asIScriptObject* event);
@@ -24,8 +24,6 @@ public:
 	void OnComponentRemove(Entity& entity) override;
 
 public:
-	TimeStep m_TimeStep;
-
 	flecs::entity m_KeyPressedCallbackEntity;
 	flecs::entity m_KeyReleasedCallbackEntity;
 	flecs::entity m_KeyCharCallbackEntity;

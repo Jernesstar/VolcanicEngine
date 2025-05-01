@@ -28,14 +28,18 @@ Scene::Scene(const std::string& name)
 		.run(
 			[=, this](flecs::iter& it)
 			{
-				while(it.next()) {
-					auto sys = EntityWorld.Get<PhysicsSystem>();
-					if(!sys)
-						return;
+				auto sys = EntityWorld.Get<PhysicsSystem>();
+				if(!sys)
+					return;
 
-					if(ourPhase == Phase::OnUpdate)
-						sys->Update(it.delta_time());
-					sys->Run(ourPhase);
+				if(ourPhase == Phase::OnUpdate)
+					sys->Update(it.delta_time());
+
+				while(it.next()) {
+					for(auto i : it) {
+						Entity entity{ it.entity(i) };
+						sys->Run(entity, it.delta_time(), ourPhase);
+					}
 				}
 			});
 	}
@@ -55,13 +59,18 @@ Scene::Scene(const std::string& name)
 		.run(
 			[=, this](flecs::iter& it)
 			{
-				while(it.next()) {
-					auto sys = EntityWorld.Get<ScriptSystem>();
-					if(!sys)
-						return;
+				auto sys = EntityWorld.Get<ScriptSystem>();
+				if(!sys)
+					return;
 
+				if(ourPhase == Phase::OnUpdate)
 					sys->Update(it.delta_time());
-					sys->Run(ourPhase);
+
+				while(it.next()) {
+					for(auto i : it) {
+						Entity entity{ it.entity(i) };
+						sys->Run(entity, it.delta_time(), ourPhase);
+					}
 				}
 			});
 	}
@@ -77,14 +86,16 @@ Scene::Scene(const std::string& name)
 			if(!sys)
 				return;
 
-			Entity entity{ it.entity(i) };
+			while(it.next()) {
+				Entity entity{ it.entity(i) };
 
-			if(it.event() == flecs::OnAdd)
-				sys->OnComponentAdd(entity);
-			else if(it.event() == flecs::OnSet)
-				sys->OnComponentSet(entity);
-			else if(it.event() == flecs::OnRemove)
-				sys->OnComponentRemove(entity);
+				if(it.event() == flecs::OnAdd)
+					sys->OnComponentAdd(entity);
+				else if(it.event() == flecs::OnSet)
+					sys->OnComponentSet(entity);
+				else if(it.event() == flecs::OnRemove)
+					sys->OnComponentRemove(entity);
+			}
 		});
 
 	EntityWorld.GetNative()
@@ -98,14 +109,16 @@ Scene::Scene(const std::string& name)
 			if(!sys)
 				return;
 
-			Entity entity{ it.entity(i) };
+			while(it.next()) {
+				Entity entity{ it.entity(i) };
 
-			if(it.event() == flecs::OnAdd)
-				sys->OnComponentAdd(entity);
-			else if(it.event() == flecs::OnSet)
-				sys->OnComponentSet(entity);
-			else if(it.event() == flecs::OnRemove)
-				sys->OnComponentRemove(entity);
+				if(it.event() == flecs::OnAdd)
+					sys->OnComponentAdd(entity);
+				else if(it.event() == flecs::OnSet)
+					sys->OnComponentSet(entity);
+				else if(it.event() == flecs::OnRemove)
+					sys->OnComponentRemove(entity);
+			}
 		});
 }
 

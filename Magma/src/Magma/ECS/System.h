@@ -36,7 +36,7 @@ public:
 	virtual ~System() = default;
 
 	virtual void Update(TimeStep ts) = 0;
-	virtual void Run(Phase phase) = 0;
+	virtual void Run(Entity& entity, TimeStep ts, Phase phase) = 0;
 
 	virtual void OnComponentAdd(Entity& entity) = 0;
 	virtual void OnComponentSet(Entity& entity) = 0;

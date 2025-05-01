@@ -58,11 +58,10 @@ class PlayerController : IEntityController
             print("Index: " + data);
             Entity new = Scene.NewEntity();
             TransformComponent@ tc = new.AddTransformComponent();
-            tc.Translation.x = 5.0;
-            // tc.Translation.x = float(i);
-            // tc.Translation.y = data;
-            // MeshComponent@ mc = new.AddMeshComponent();
-            // mc.MeshAsset = meshAsset;
+            tc.Translation.x = float(i);
+            tc.Translation.y = data;
+            MeshComponent@ mc = new.AddMeshComponent();
+            mc.MeshAsset = meshAsset;
         }
     }
 

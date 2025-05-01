@@ -16,7 +16,7 @@ Scene:
               ViewportWidth: 1600
               ViewportHeight: 877
               Near: 48.0009995
-              Far: 122.000999
+              Far: 172.001007
     - Entity:
         Name: Ball
         ID: 952
@@ -24,7 +24,7 @@ Scene:
           TransformComponent:
             Transform:
               Translation: [0, 0, 0]
-              Rotation: [0, -0, 0]
+              Rotation: [0, 0, 0]
               Scale: [1, 1, 1]
           MeshComponent:
             AssetID: 4186775327602265389
@@ -46,9 +46,9 @@ Scene:
           PointLightComponent:
             Light:
               Ambient: [1, 0, 0]
-              Diffuse: [1, 0, 0]
+              Diffuse: [1, 1, 1]
               Specular: [1, 1, 1]
-              Position: [-6.26962805, 12.414813, -1.33900237]
+              Position: [-6.4696002, 12.4147997, 2.66100001]
               Constant: 1
               Linear: 0
               Quadratic: 0
@@ -71,10 +71,10 @@ Scene:
         Components:
           DirectionalLightComponent:
             Light:
-              Ambient: [0, 0, 0]
-              Diffuse: [0, 0, 0]
-              Specular: [0, 0, 0]
-              Position: [-12.8000002, 9.60000038, 1.03875196]
+              Ambient: [1, 1, 1]
+              Diffuse: [1, 1, 1]
+              Specular: [1, 1, 1]
+              Position: [-12.8000002, 9.5, 1.03875196]
               Direction: [0, -0, 0]
     - Entity:
         Name: ""
@@ -146,3 +146,16 @@ Scene:
                   Name: Height
                   Type: uint32
                   Value: 2
+    - Entity:
+        Name: Light2
+        ID: 1111
+        Components:
+          PointLightComponent:
+            Light:
+              Ambient: [0, 0, 0]
+              Diffuse: [1, 1, 1]
+              Specular: [1, 1, 1]
+              Position: [3, 2.70000005, 10.3999996]
+              Constant: 1
+              Linear: 9.99999975e-05
+              Quadratic: 0

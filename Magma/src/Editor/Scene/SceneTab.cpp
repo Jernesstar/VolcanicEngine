@@ -1,3 +1,4 @@
+
 #include "SceneTab.h"
 
 #include <imgui/imgui.h>
@@ -71,18 +72,18 @@ void SceneTab::Setup() {
 					[&](Entity entity)
 					{
 						VOLCANICORE_LOG_INFO("Script instance reload");
-						auto& sc = entity.Set<ScriptComponent>();
-						if(!sc.Instance)
-							return;
-						if(sc.ModuleAsset != asset)
-							return;
+						// auto& sc = entity.Set<ScriptComponent>();
+						// if(!sc.Instance)
+						// 	return;
+						// if(sc.ModuleAsset != asset)
+						// 	return;
 
-						auto old = sc.Instance;
-						auto mod = assetManager.Get<ScriptModule>(asset);
-						auto _class = mod->GetClass(old->GetClass()->Name);
-						sc.Instance = _class->Construct();
-						sc.Instance->Copy(old);
-						old.reset();
+						// auto old = sc.Instance;
+						// auto mod = assetManager.Get<ScriptModule>(asset);
+						// auto _class = mod->GetClass(old->GetClass()->Name);
+						// sc.Instance = _class->Construct();
+						// sc.Instance->Copy(old);
+						// old.reset();
 					});
 			}
 		});
