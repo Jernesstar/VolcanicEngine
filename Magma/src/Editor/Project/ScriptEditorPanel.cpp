@@ -18,9 +18,28 @@ namespace Magma {
 ScriptEditorPanel::ScriptEditorPanel()
 	: Panel("ScriptEditor")
 {
-	const auto& lang = TextEditor::LanguageDefinition::AngelScript();
+	auto lang = TextEditor::LanguageDefinition::AngelScript();
+
+	Map<std::string, std::string> identifiers =
+	{
+		{ "array", "class array" },
+		{ "Vec3", "class Vec3" },
+		{ "Vec4", "class Vec4" },
+		{ "Asset", "class Asset" },
+		{ "Entity", "class Entity" },
+		{ "TransformComponent", "class Components::TransformComponent" },
+	};
+	for(auto [decl, def] : identifiers) {
+		TextEditor::Identifier id;
+		id.mDeclaration = def;
+		lang.mIdentifiers.insert({ decl, id });
+	}
+
 	m_Editor.SetLanguageDefinition(lang);
-	m_Editor.SetPalette(TextEditor::GetDarkPalette());
+
+	auto palette = TextEditor::GetDarkPalette();
+
+	m_Editor.SetPalette(palette);
 }
 
 void ScriptEditorPanel::EditFile(const Asset& asset) {
@@ -38,8 +57,9 @@ void ScriptEditorPanel::Update(TimeStep ts) {
 
 void ScriptEditorPanel::Draw() {
 	auto* assetManager = AssetManager::Get()->As<EditorAssetManager>();
+	auto path = assetManager->GetPath(m_CurrentAsset.ID);
 
-	ImGui::SetWindowSize(ImVec2(800, 600), ImGuiCond_FirstUseEver);
+	// ImGui::SetWindowSize(ImVec2(800, 600), ImGuiCond_FirstUseEver);
 	ImGui::Begin("Script Editor", &Open,
 		ImGuiWindowFlags_HorizontalScrollbar | ImGuiWindowFlags_MenuBar);
 	if(ImGui::BeginMenuBar())
@@ -47,12 +67,11 @@ void ScriptEditorPanel::Draw() {
 		if(ImGui::BeginMenu("File"))
 		{
 			if(ImGui::MenuItem("Save")) {
-				// auto textToSave = m_Editor.GetText();
-				// save text....
+				std::string textToSave = m_Editor.GetText();
+				FileUtils::WriteToFile(path, textToSave);
 			}
-			if(ImGui::MenuItem("Quit", "Alt-F4")) {
-				// break
-			}
+			if(ImGui::MenuItem("Quit", "Alt-F4"))
+				Open = false;
 			ImGui::EndMenu();
 		}
 		if(ImGui::BeginMenu("Edit"))
@@ -107,12 +126,11 @@ void ScriptEditorPanel::Draw() {
 	}
 
 	auto cpos = m_Editor.GetCursorPosition();
-	auto file = assetManager->GetPath(m_CurrentAsset.ID);
 	ImGui::Text("%3d/%-3d %3d lines | %s | %s | %s | %s",
 		cpos.mLine + 1, cpos.mColumn + 1, m_Editor.GetTotalLines(),
 		m_Editor.IsOverwrite() ? "Ovr" : "Ins",
 		m_Editor.CanUndo() ? "*" : " ",
-		m_Editor.GetLanguageDefinition().mName.c_str(), file.c_str());
+		m_Editor.GetLanguageDefinition().mName.c_str(), path.c_str());
 
 	m_Editor.Render("ScriptEditor");
 

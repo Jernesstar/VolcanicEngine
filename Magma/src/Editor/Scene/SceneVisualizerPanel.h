@@ -66,6 +66,7 @@ private:
 	Ref<UniformBuffer> SpotlightBuffer;
 	DrawCommand* LightingCommand;
 
+	bool HasCamera = false;
 	bool HasDirectionalLight = false;
 	uint32_t PointLightCount = 0;
 	uint32_t SpotlightCount = 0;

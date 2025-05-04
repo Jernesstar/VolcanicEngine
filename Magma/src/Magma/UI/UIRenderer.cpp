@@ -140,7 +140,6 @@ UIState UIRenderer::DrawWindow(UI::Window& window) {
 	window.Width = (uint32_t)ImGui::GetWindowSize().x;
 	window.Height = (uint32_t)ImGui::GetWindowSize().y;
 
-	// TODO(Implement): WindowState
 	return {
 		ImGui::IsMouseClicked(0) && ImGui::IsWindowHovered(),
 		ImGui::IsWindowHovered(),

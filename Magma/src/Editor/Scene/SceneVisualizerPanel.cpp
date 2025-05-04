@@ -697,6 +697,7 @@ void EditorSceneRenderer::SubmitCamera(const Entity& entity) {
 	if(!camera)
 		return;
 
+	HasCamera = true;
 	RendererAPI::Get()
 	->SetBufferData(BillboardBuffer, DrawBufferIndex::Instances,
 					glm::value_ptr(camera->GetPosition()), 1, 101);
@@ -1044,7 +1045,7 @@ void EditorSceneRenderer::Render() {
 		auto& call = command->NewDrawCall();
 		call.VertexCount = 6;
 		call.InstanceStart = 101;
-		call.InstanceCount = 1;
+		call.InstanceCount = (uint32_t)HasCamera;
 		call.Primitive = PrimitiveType::Triangle;
 		call.Partition = PartitionType::Instanced;
 	}
@@ -1095,6 +1096,7 @@ void EditorSceneRenderer::Render() {
 
 	Renderer::Flush();
 
+	HasCamera = false;
 	HasDirectionalLight = false;
 	PointLightCount = 0;
 	SpotlightCount = 0;

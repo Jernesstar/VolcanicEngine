@@ -59,7 +59,7 @@ class PlayerController : IEntityController
             Entity new = Scene.NewEntity();
             TransformComponent@ tc = new.AddTransformComponent();
             tc.Translation.x = float(i);
-            // tc.Translation.y = data;
+            tc.Translation.y = data;
             MeshComponent@ mc = new.AddMeshComponent();
             mc.MeshAsset = meshAsset;
         }

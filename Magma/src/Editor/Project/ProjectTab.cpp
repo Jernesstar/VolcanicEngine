@@ -151,12 +151,13 @@ void ProjectTab::Render() {
 	ImGui::EndMainMenuBar();
 
 	for(auto panel : m_Panels)
-		panel->Draw();
+		if(panel->Open)
+			panel->Draw();
 }
 
 void ProjectTab::RenderEssentialPanels() {
 	GetPanel("ContentBrowser")->Draw();
-	GetPanel("AssetEditor")->Draw(); 
+	GetPanel("AssetEditor")->Draw();
 	if(GetPanel("ScriptEditor")->Open)
 		GetPanel("ScriptEditor")->Draw();
 }
@@ -166,9 +167,9 @@ void ProjectTab::RenderButtons() {
 	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.f, 0.f, 0.f, 0.f));
 	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.f, 0.f, 0.f, 0.f));
 
-	float x = Application::GetWindow()->GetWidth() - 100.0f;
-	float y = 27.0f;
-	float size = 18.0f;
+	float x = Application::GetWindow()->GetWidth() - 90.0f;
+	float y = 24.0f;
+	float size = 17.5f;
 
 	UI::Button* button = &m_PlayButton;
 	if(m_ScreenState == ScreenState::Play)

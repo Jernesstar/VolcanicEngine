@@ -57,7 +57,7 @@ void ContentBrowserPanel::Draw() {
 		auto windowFlags = ImGuiWindowFlags_MenuBar;
 		auto childFlags = ImGuiChildFlags_Border;
 
-		ImVec2 size = { 350, ImGui::GetContentRegionAvail().y };
+		ImVec2 size = { 300, ImGui::GetContentRegionAvail().y };
 		ImGui::BeginChild("File-Hierarchy-View", size, childFlags, windowFlags);
 		{
 			ImVec2 windowStart = ImGui::GetCursorPos();
@@ -157,7 +157,8 @@ void ContentBrowserPanel::Draw() {
 					}
 					if(display != "")
 						ImGui::TextWrapped(display.c_str());
-					ImGui::Text("%llu", (uint64_t)asset.ID);
+					else
+						ImGui::Text("%llu", (uint64_t)asset.ID);
 				}
 
 				ImGui::EndTable();

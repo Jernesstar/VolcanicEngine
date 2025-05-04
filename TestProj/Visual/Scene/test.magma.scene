@@ -121,19 +121,19 @@ Scene:
               - Field:
                   Name: SomeBool
                   Type: bool
-                  Value: false
+                  Value: true
               - Field:
                   Name: Signed8
                   Type: int8
-                  Value: 0
+                  Value: 127
               - Field:
                   Name: Unsigned32
                   Type: uint32
-                  Value: 0
+                  Value: 32
               - Field:
                   Name: Float
                   Type: float
-                  Value: 0
+                  Value: 3.14100003
               - Field:
                   Name: Tilemap
                   Type: array

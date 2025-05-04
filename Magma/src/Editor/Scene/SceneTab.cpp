@@ -168,10 +168,14 @@ void SceneTab::NewScene() {
 }
 
 void SceneTab::OpenScene() {
+	namespace fs = std::filesystem;
+
 	menu.file.openScene = true;
 
+	auto& editor = Application::As<EditorApp>()->GetEditor();
+	auto& proj = editor.GetProject();
 	IGFD::FileDialogConfig config;
-	config.path = ".";
+	config.path = (fs::path(proj.Path) / "Visual" / "Scene").string();
 	auto instance = ImGuiFileDialog::Instance();
 	instance->OpenDialog("ChooseFile", "Choose File", ".magma.scene", config);
 

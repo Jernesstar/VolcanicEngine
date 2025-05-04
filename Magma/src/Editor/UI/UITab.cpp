@@ -12,6 +12,8 @@
 #include "UIVisualizerPanel.h"
 #include "UIElementEditorPanel.h"
 
+#include "Editor/EditorApp.h"
+
 namespace Magma {
 
 struct {
@@ -140,10 +142,14 @@ void UITab::NewUI() {
 }
 
 void UITab::OpenUI() {
+	namespace fs = std::filesystem;
+
 	menu.file.openUI = true;
 
+	auto& editor = Application::As<EditorApp>()->GetEditor();
+	auto& proj = editor.GetProject();
 	IGFD::FileDialogConfig config;
-	config.path = ".";
+	config.path = (fs::path(proj.Path) / "Visual" / "UI").string();
 	auto instance = ImGuiFileDialog::Instance();
 	instance->OpenDialog("ChooseFile", "Choose File", ".magma.ui.json", config);
 

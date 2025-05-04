@@ -389,15 +389,13 @@ static void TilemapEditorPopup(Ref<ScriptObject> obj, const std::string& name) {
 				button.y = 120 + y * 23.0f;
 				button.Render();
 
-				if(ImGui::IsMouseDoubleClicked(1) && ImGui::IsItemHovered()) {
-					val = 0;
-					data->SetValue(i, &val);
-				}
-				if(button.GetState().Clicked) {
+				if(ImGui::IsMouseClicked(0) && ImGui::IsItemHovered()) {
 					val++;
 					data->SetValue(i, &val);
 				}
-				if(ImGui::IsMouseClicked(1) && ImGui::IsItemHovered()) {
+				else if(ImGui::IsMouseClicked(1) && ImGui::IsItemHovered()
+				&& val > 0)
+				{
 					val--;
 					data->SetValue(i, &val);
 				}
