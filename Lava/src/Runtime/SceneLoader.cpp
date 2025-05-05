@@ -18,7 +18,7 @@
 
 #include <Magma/Scene/Component.h>
 
-#include <Lava/App.h>
+#include <Lava/Core/App.h>
 
 #undef near
 #undef far
@@ -172,28 +172,28 @@ BinaryReader& BinaryReader::ReadObject(ScriptComponent& comp) {
 			Read(*field.As<double>());
 		else if(typeName == "Asset")
 			Read(*field.As<Asset>());
-		else if(typeName == "string")
-			Read(*field.As<std::string>());
 		else if(typeName == "Vec3")
 			Read(*field.As<glm::vec3>());
+		else if(typeName == "string")
+			Read(*field.As<std::string>());
 		else if(typeName == "array") {
 			auto* array = field.As<CScriptArray>();
 			auto subTypeID = array->GetArrayObjectType()->GetSubTypeId();
 			auto* subType = ScriptEngine::Get()->GetTypeInfoById(subTypeID);
 			uint64_t size = 0;
-			if(!subType)
-				size = ScriptEngine::Get()->GetSizeOfPrimitiveType(subTypeID);
-			else
+			if(subType)
 				size = subType->GetSize();
+			else
+				size = ScriptEngine::Get()->GetSizeOfPrimitiveType(subTypeID);
 
 			uint32_t count;
 			Read(count);
 			Buffer<void> data(size, count);
-			ReadData(data.Get(), size * count);
+			ReadData(data.Get(), (uint64_t)size * count);
 
 			array->Reserve(count);
 			for(uint32_t i = 0; i < count; i++)
-				array->InsertLast((char*)data.Get() + i);
+				array->InsertLast((char*)data.Get() + size * i);
 		}
 	}
 

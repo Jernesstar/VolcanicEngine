@@ -15,7 +15,7 @@ class PlayerController : IEntityController
     Entity Handle;
     SomeScriptClass Class;
     Asset soundAsset = Asset(16624656892553940704, AssetType::Audio);
-    Asset meshAsset = Asset(10036008063945961451, AssetType::Mesh);
+    [EditorField] Asset meshAsset;
  
     [EditorField] bool SomeBool;
     [EditorField] int8 Signed8;
@@ -53,15 +53,21 @@ class PlayerController : IEntityController
         print("OnStart");
         AssetManager.Load(meshAsset);
 
-        for(uint32 i = 0; i < Tilemap.length(); i++) {
-            uint32 data = Tilemap[i];
-            print("Index: " + data);
-            Entity new = Scene.NewEntity();
-            TransformComponent@ tc = new.AddTransformComponent();
-            tc.Translation.x = float(i);
-            tc.Translation.y = data;
-            MeshComponent@ mc = new.AddMeshComponent();
-            mc.MeshAsset = meshAsset;
+        for(uint32 y = 0; y < Height; y++) {
+            for(uint32 x = 0; x < Width; x++) {
+                uint32 i = (y * Width) + x;
+                uint32 data = Tilemap[i];
+                print("Index: " + data);
+                if(data == 0)
+                    continue;
+
+                Entity new = Scene.NewEntity();
+                TransformComponent@ tc = new.AddTransformComponent();
+                tc.Translation.x = x;
+                tc.Translation.y = y;
+                MeshComponent@ mc = new.AddMeshComponent();
+                mc.MeshAsset = meshAsset;
+            }
         }
     }
 
@@ -69,17 +75,17 @@ class PlayerController : IEntityController
     {
         TransformComponent@ tc = Handle.SetTransformComponent();
 
-        if(KeyPressed(Key::Left))
+        if(Input::KeyPressed(Key::Left))
             tc.Translation.x -= 0.05f * ts;
-        if(KeyPressed(Key::Right))
+        if(Input::KeyPressed(Key::Right))
             tc.Translation.x += 0.05f * ts;
-        if(KeyPressed(Key::Up))
+        if(Input::KeyPressed(Key::Up))
             tc.Translation.z -= 0.05f * ts;
-        if(KeyPressed(Key::Down))
+        if(Input::KeyPressed(Key::Down))
             tc.Translation.z += 0.05f * ts;
-        if(KeyPressed(Key::Q))
+        if(Input::KeyPressed(Key::Q))
             tc.Translation.y += 0.05f * ts;
-        if(KeyPressed(Key::E))
+        if(Input::KeyPressed(Key::E))
             tc.Translation.y -= 0.05f * ts;
     }
 

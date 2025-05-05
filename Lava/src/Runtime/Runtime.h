@@ -3,7 +3,7 @@
 #include <VolcaniCore/Core/Application.h>
 #include <VolcaniCore/Core/CommandLineArgs.h>
 
-#include <Lava/App.h>
+#include <Lava/Core/App.h>
 
 #include "AssetManager.h"
 

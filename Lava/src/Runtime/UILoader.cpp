@@ -12,7 +12,7 @@
 #include <Magma/Core/BinaryWriter.h>
 #include <Magma/Core/BinaryReader.h>
 
-#include <Lava/App.h>
+#include <Lava/Core/App.h>
 
 #include "Runtime.h"
 #include "AssetManager.h"

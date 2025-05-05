@@ -172,7 +172,7 @@ void DrawComponent<CameraComponent>(Entity& entity) {
 		return;
 
 	auto& component = entity.Set<CameraComponent>();
-	auto camera = component.Cam;
+	auto& camera = component.Cam;
 	ImGui::SeparatorText("CameraComponent");
 
 	if(!camera) {
@@ -329,6 +329,10 @@ std::string SelectScriptClass(Ref<ScriptModule> mod) {
 				ImGui::CloseCurrentPopup();
 			}
 		}
+		if(ImGui::Button("Close")) {
+			s_SelectingClass = false;
+			ImGui::CloseCurrentPopup();
+		}
 
 		ImGui::EndPopup();
 	}
@@ -462,17 +466,24 @@ void DrawComponent<ScriptComponent>(Entity& entity) {
 			ImGui::Text(typeName.c_str()); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(200.0f);
 
+			if(typeName == "Vec3")
+				ImGui::InputFloat3("##Vec3", &field.As<Vec3>()->r);
 			if(typeName == "string")
 				ImGui::InputText("##String", field.As<std::string>());
-			else if(typeName == "Vec3")
-				ImGui::InputFloat3("##Vec3", &field.As<Vec3>()->r);
 			else if(typeName == "array") {
-				auto property = component.Instance->GetProperty(i);
-				if(property.HasMetadata("Tilemap")
+				if(field.HasMetadata("Tilemap")
 				&& ImGui::Button("Edit Tilemap"))
 					s_TilemapEdit = true;
 				if(s_TilemapEdit)
 					TilemapEditorPopup(component.Instance, field.Name);
+			}
+			else if(typeName == "Asset") {
+				if(ImGui::Button("Select Asset"))
+					s_Selecting = AssetType::Script;
+				if(s_Selecting != AssetType::None) {
+					*field.As<Asset>() = s_Asset;
+					s_Asset = { };
+				}
 			}
 			else
 				ImGui::NewLine();

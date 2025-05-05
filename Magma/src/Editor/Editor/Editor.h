@@ -8,7 +8,7 @@
 
 #include <Magma/Core/Project.h>
 
-#include <Lava/App.h>
+#include <Lava/Core/App.h>
 
 #include "Tab.h"
 #include "Project/ProjectTab.h"

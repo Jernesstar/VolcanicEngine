@@ -115,34 +115,5 @@ Scene:
           MeshComponent:
             AssetID: 15277418182178081176
           ScriptComponent:
-            ModuleID: 2691709289590626850
-            Class: PlayerController
-            Fields:
-              - Field:
-                  Name: SomeBool
-                  Type: bool
-                  Value: true
-              - Field:
-                  Name: Signed8
-                  Type: int8
-                  Value: 127
-              - Field:
-                  Name: Unsigned32
-                  Type: uint32
-                  Value: 32
-              - Field:
-                  Name: Float
-                  Type: float
-                  Value: 3.14100003
-              - Field:
-                  Name: Tilemap
-                  Type: array
-                  Value: [1, 0, 0, 1]
-              - Field:
-                  Name: Width
-                  Type: uint32
-                  Value: 2
-              - Field:
-                  Name: Height
-                  Type: uint32
-                  Value: 2
+            ModuleID: 10036008063945961451
+            Class: ""

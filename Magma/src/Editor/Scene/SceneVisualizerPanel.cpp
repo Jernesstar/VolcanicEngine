@@ -23,7 +23,7 @@
 #include <Magma/Scene/PhysicsSystem.h>
 #include <Magma/Scene/SceneRenderer.h>
 
-#include <Lava/App.h>
+#include <Lava/Core/App.h>
 
 #include "Editor/AssetManager.h"
 #include "Editor/AssetImporter.h"
@@ -551,6 +551,7 @@ EditorSceneRenderer::EditorSceneRenderer(SceneVisualizerPanel* panel)
 	auto camera = CreateRef<StereographicCamera>(75.0f);
 	camera->SetPosition({ 0.0f, 1.0f, 15.0f });
 	camera->Resize(1920, 1080);
+	camera->SetProjection(0.001f, 10'000.0f);
 	m_Controller.SetCamera(camera);
 	m_Controller.TranslationSpeed = 25.0f;
 

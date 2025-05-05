@@ -295,8 +295,10 @@ void App::ScreenSet(const std::string& name) {
 			{
 				auto& sc = entity.Set<ScriptComponent>();
 				auto old = sc.Instance;
-				sc.Instance = old->GetClass()->Instantiate(entity);
-				sc.Instance->Copy(old);
+				if(!old->IsInitialized()) {
+					sc.Instance = old->GetClass()->Instantiate(entity);
+					sc.Instance->Copy(old);
+				}
 				sc.Instance->Call("OnStart");
 			});
 	}

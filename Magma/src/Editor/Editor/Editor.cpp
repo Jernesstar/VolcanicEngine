@@ -19,7 +19,7 @@
 
 #include <Magma/UI/UIRenderer.h>
 
-#include <Lava/ScriptGlue.h>
+#include <Lava/Core/ScriptGlue.h>
 
 #include "Project/ProjectTab.h"
 

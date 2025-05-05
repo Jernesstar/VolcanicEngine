@@ -137,6 +137,19 @@ static void Vec4ListConstructor(float* list, Vec4* ptr) {
 	new(ptr) Vec4(list[0], list[1], list[2], list[3]);
 }
 
+static Vec3& AddAssignVec3(Vec3 vec, Vec3& dest) {
+	dest += vec;
+	return dest;
+}
+
+static Vec3 NegateVec3(const Vec3& dest) {
+	return -dest;
+}
+
+static float DegreesToRadians(float degrees) {
+	return glm::radians(degrees);
+}
+
 static Vec3 NormalizeVec3(const Vec3& vec) {
 	return glm::normalize(vec);
 }
@@ -144,14 +157,10 @@ static Vec4 NormalizeVec4(const Vec4& vec) {
 	return glm::normalize(vec);
 }
 
-static Vec3& AddAssignVec3(Vec3 vec, Vec3& dest) {
-	dest += vec;
-	return dest;
-}
-
 void RegisterTypes() {
 	auto* engine = ScriptEngine::Get();
 
+	engine->SetDefaultNamespace("Math");
 	engine->RegisterObjectType("Vec3", sizeof(Vec3),
 		asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_ALLFLOATS
 		| asGetTypeTraits<Vec3>());
@@ -175,9 +184,15 @@ void RegisterTypes() {
 
 	engine->RegisterObjectMethod("Vec3", "Vec3 &opAddAssign(Vec3)",
 		asFUNCTION(AddAssignVec3), asCALL_CDECL_OBJLAST);
+	engine->RegisterObjectMethod("Vec3", "Vec3 opNeg()",
+		asFUNCTION(NegateVec3), asCALL_CDECL_OBJLAST);
 
 	engine->RegisterGlobalFunction("Vec3 normalize(const Vec3 &in)",
 		asFUNCTION(NormalizeVec3), asCALL_CDECL);
+	engine->RegisterGlobalFunction("Vec3 radians(float deg)",
+		asFUNCTION(DegreesToRadians), asCALL_CDECL);
+
+	engine->SetDefaultNamespace("");
 }
 
 static KeyPressedEvent* KeyPressedEventCast(KeyEvent* event) {
@@ -249,10 +264,12 @@ void RegisterEvents() {
 	engine->RegisterEnumValue("Key", "Down",  264);
 	engine->RegisterEnumValue("Key", "Up",    265);
 
+	engine->SetDefaultNamespace("Input");
 	engine->RegisterGlobalFunction("bool KeyPressed(Key key)",
 		asFUNCTION(Input::KeyPressed), asCALL_CDECL);
 	engine->RegisterGlobalFunction("bool MousePressed(Mouse button)",
 		asFUNCTION(Input::MouseButtonPressed), asCALL_CDECL);
+	engine->SetDefaultNamespace("");
 
 	engine->RegisterEnum("EventType");
 	engine->RegisterEnumValue("EventType", "KeyPressed",	0);
@@ -352,8 +369,9 @@ void RegisterAssetManager() {
 
 	engine->RegisterObjectProperty("Asset", "const AssetType Type",
 		asOFFSET(Asset, Type));
-	// engine->RegisterObjectMethod("Asset", "bool get_Primary() const property",
-	// 	asFUNCTION(GetAssetPrimaryFlag), asCALL_CDECL_OBJLAST);
+	engine->RegisterObjectProperty("Asset", "const bool Primary",
+		asOFFSET(Asset, Primary));
+
 	engine->RegisterObjectBehaviour("Asset", asBEHAVE_CONSTRUCT,
 		"void f()", asFUNCTION(AssetDefaultCtor), asCALL_CDECL_OBJLAST);
 	engine->RegisterObjectBehaviour("Asset", asBEHAVE_CONSTRUCT,
@@ -589,16 +607,16 @@ void RegisterECS() {
 
 	engine->RegisterObjectType("CameraComponent", 0, asOBJ_REF | asOBJ_NOCOUNT);
 	engine->RegisterObjectMethod("CameraComponent",
-		"Vec3 get_Position() const property", asFUNCTION(GetCameraPosition),
+		"Math::Vec3 get_Position() const property", asFUNCTION(GetCameraPosition),
 		asCALL_CDECL_OBJLAST);
 	engine->RegisterObjectMethod("CameraComponent",
-		"void set_Position(const Vec3 &in) property",
+		"void set_Position(const Math::Vec3 &in) property",
 		asFUNCTION(SetCameraPosition), asCALL_CDECL_OBJLAST);
 	engine->RegisterObjectMethod("CameraComponent",
-		"Vec3 get_Direction() const property", asFUNCTION(GetCameraDirection),
+		"Math::Vec3 get_Direction() const property", asFUNCTION(GetCameraDirection),
 		asCALL_CDECL_OBJLAST);
 	engine->RegisterObjectMethod("CameraComponent",
-		"void set_Direction(const Vec3 &in) property",
+		"void set_Direction(const Math::Vec3 &in) property",
 		asFUNCTION(SetCameraDirection), asCALL_CDECL_OBJLAST);
 	engine->RegisterObjectMethod("CameraComponent",
 		"uint32 get_Width() const property", asFUNCTION(GetCameraWidth),
@@ -618,11 +636,11 @@ void RegisterECS() {
 		asOFFSET(TagComponent, Tag));
 
 	engine->RegisterObjectType("TransformComponent", 0, asOBJ_REF | asOBJ_NOCOUNT);
-	engine->RegisterObjectProperty("TransformComponent", "Vec3 Translation",
+	engine->RegisterObjectProperty("TransformComponent", "Math::Vec3 Translation",
 		asOFFSET(TransformComponent, Translation));
-	engine->RegisterObjectProperty("TransformComponent", "Vec3 Rotation",
+	engine->RegisterObjectProperty("TransformComponent", "Math::Vec3 Rotation",
 		asOFFSET(TransformComponent, Rotation));
-	engine->RegisterObjectProperty("TransformComponent", "Vec3 Scale",
+	engine->RegisterObjectProperty("TransformComponent", "Math::Vec3 Scale",
 		asOFFSET(TransformComponent, Scale));
 
 	engine->RegisterObjectType("AudioComponent", 0, asOBJ_REF | asOBJ_NOCOUNT);
@@ -649,17 +667,17 @@ void RegisterECS() {
 
 	engine->RegisterObjectType("Transform", sizeof(Transform),
 		asOBJ_VALUE | asOBJ_POD | asGetTypeTraits<Transform>());
-	engine->RegisterObjectProperty("Transform", "Vec3 Translation",
+	engine->RegisterObjectProperty("Transform", "Math::Vec3 Translation",
 		asOFFSET(Transform, Translation));
-	engine->RegisterObjectProperty("Transform", "Vec3 Rotation",
+	engine->RegisterObjectProperty("Transform", "Math::Vec3 Rotation",
 		asOFFSET(Transform, Rotation));
-	engine->RegisterObjectProperty("Transform", "Vec3 Scale",
+	engine->RegisterObjectProperty("Transform", "Math::Vec3 Scale",
 		asOFFSET(Transform, Scale));
 
 	engine->RegisterObjectMethod("RigidBody",
 		"Transform GetTransform() const",
 		asMETHOD(Physics::RigidBody, GetTransform), asCALL_THISCALL);
-	engine->RegisterObjectMethod("RigidBody", "void ApplyForce(Vec3 force)",
+	engine->RegisterObjectMethod("RigidBody", "void ApplyForce(const Math::Vec3 &in)",
 		asFUNCTION(RigidBodyApplyForce), asCALL_CDECL_OBJLAST);
 
 	engine->RegisterObjectMethod("RigidBodyComponent", "RigidBody@ get_Body()",

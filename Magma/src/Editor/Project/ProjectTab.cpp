@@ -7,7 +7,7 @@
 
 #include <Magma/Core/YAMLSerializer.h>
 
-#include <Lava/App.h>
+#include <Lava/Core/App.h>
 
 #include "Editor/EditorApp.h"
 #include "Editor/Tab.h"

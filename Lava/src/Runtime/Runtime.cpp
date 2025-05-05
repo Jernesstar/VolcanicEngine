@@ -13,7 +13,7 @@
 
 #include <Magma/UI/UIRenderer.h>
 
-#include <Lava/ScriptGlue.h>
+#include <Lava/Core/ScriptGlue.h>
 
 #include "SceneLoader.h"
 #include "UILoader.h"

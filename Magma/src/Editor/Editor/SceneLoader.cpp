@@ -17,7 +17,7 @@
 #include <Magma/Script/ScriptClass.h>
 #include <Magma/Scene/Component.h>
 
-#include <Lava/App.h>
+#include <Lava/Core/App.h>
 
 #include "EditorApp.h"
 
@@ -770,21 +770,21 @@ BinaryWriter& BinaryWriter::WriteObject(const ScriptComponent& comp) {
 			Write(*field.As<double>());
 		else if(typeName == "Asset")
 			Write(*field.As<Asset>());
-		else if(typeName == "string")
-			Write(*field.As<std::string>());
 		else if(typeName == "Vec3")
 			Write(*field.As<glm::vec3>());
+		else if(typeName == "string")
+			Write(*field.As<std::string>());
 		else if(typeName == "array") {
 			auto* array = field.As<CScriptArray>();
 			auto subTypeID = array->GetArrayObjectType()->GetSubTypeId();
 			auto* subType = ScriptEngine::Get()->GetTypeInfoById(subTypeID);
-			auto count = array->GetSize();
 			uint64_t size = 0;
-			if(!subType)
-				size = ScriptEngine::Get()->GetSizeOfPrimitiveType(subTypeID);
-			else
+			if(subType)
 				size = subType->GetSize();
+			else
+				size = ScriptEngine::Get()->GetSizeOfPrimitiveType(subTypeID);
 
+			uint32_t count = array->GetSize();
 			Write((uint32_t)count);
 			// Works for primitive and POD types
 			WriteData(array->GetBuffer(), size * count);

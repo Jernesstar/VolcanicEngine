@@ -55,6 +55,7 @@ public:
 	ScriptField GetProperty(const std::string& name);
 	ScriptField GetProperty(uint32_t idx);
 
+	bool IsInitialized() const { return m_Initialized; }
 	asIScriptObject* GetHandle() const { return m_Handle; }
 	const ScriptClass* GetClass() const { return m_Class; }
 
@@ -68,6 +69,7 @@ private:
 private:
 	asIScriptObject* m_Handle = nullptr;
 	int m_RefCount;
+	bool m_Initialized = false;
 
 	const ScriptClass* m_Class;
 
