@@ -352,73 +352,83 @@ void EditElement<UIElement>(UIElement* element) {
 
 	auto* handle = obj->GetHandle();
 	for(uint32_t i = 0; i < handle->GetPropertyCount(); i++) {
-		auto typeID = handle->GetPropertyTypeId(i);
-		auto* typeInfo = ScriptEngine::Get()->GetTypeInfoById(typeID);
-		void* address = handle->GetAddressOfProperty(i);
+		ScriptField field = obj->GetProperty(i);
+		if(!field.HasMetadata("EditorField"))
+			continue;
 
-		if(typeInfo) {
-			ImGui::Text(typeInfo->GetName());
-			ImGui::SameLine(100.0f);
-			ImGui::Text(handle->GetPropertyName(i)); ImGui::SameLine(200.0f);
+		if(field.Type) {
+			std::string typeName = field.Type->GetName();
+			ImGui::Text(typeName.c_str()); ImGui::SameLine(100.0f);
+			ImGui::Text(field.Name.c_str()); ImGui::SameLine(180.0f);
 
-			if(typeInfo->GetName() == std::string("string"))
-				ImGui::InputText("##Text", (std::string*)address);
+			// else
+				ImGui::NewLine();
 		}
-
-		if(typeID == asTYPEID_BOOL) {
+		else if(field.TypeID == asTYPEID_BOOL) {
 			ImGui::Text("bool"); ImGui::SameLine(100.0f);
-			ImGui::Text(handle->GetPropertyName(i)); ImGui::SameLine(200.0f);
-			ImGui::Checkbox("##Bool", (bool*)address);
+			ImGui::Text(field.Name.c_str()); ImGui::SameLine(180.0f);
+			ImGui::Checkbox(std::string("##Bool##" + field.Name).c_str(),
+							field.As<bool>());
 		}
-		else if(typeID == asTYPEID_INT8) {
+		else if(field.TypeID == asTYPEID_INT8) {
 			ImGui::Text("int8"); ImGui::SameLine(100.0f);
-			ImGui::Text(handle->GetPropertyName(i)); ImGui::SameLine(200.0f);
-			ImGui::InputScalar("##Signed 8bit", ImGuiDataType_S8, address);
+			ImGui::Text(field.Name.c_str()); ImGui::SameLine(180.0f);
+			ImGui::InputScalar(std::string("##S8##" + field.Name).c_str(),
+								ImGuiDataType_S8, field.Data);
 		}
-		else if(typeID == asTYPEID_INT16) {
+		else if(field.TypeID == asTYPEID_INT16) {
 			ImGui::Text("int16"); ImGui::SameLine(100.0f);
-			ImGui::Text(handle->GetPropertyName(i)); ImGui::SameLine(200.0f);
-			ImGui::InputScalar("##Signed 16bit", ImGuiDataType_S16, address);
+			ImGui::Text(field.Name.c_str()); ImGui::SameLine(180.0f);
+			ImGui::InputScalar(std::string("##S16##" + field.Name).c_str(),
+								ImGuiDataType_S16, field.Data);
 		}
-		else if(typeID == asTYPEID_INT32) {
+		else if(field.TypeID == asTYPEID_INT32) {
 			ImGui::Text("int32"); ImGui::SameLine(100.0f);
-			ImGui::Text(handle->GetPropertyName(i)); ImGui::SameLine(200.0f);
-			ImGui::InputScalar("##Signed 32bit", ImGuiDataType_S32, address);
+			ImGui::Text(field.Name.c_str()); ImGui::SameLine(180.0f);
+			ImGui::InputScalar(std::string("##S32##" + field.Name).c_str(),
+								ImGuiDataType_S32, field.Data);
 		}
-		else if(typeID == asTYPEID_INT64) {
+		else if(field.TypeID == asTYPEID_INT64) {
 			ImGui::Text("int64"); ImGui::SameLine(100.0f);
-			ImGui::Text(handle->GetPropertyName(i)); ImGui::SameLine(200.0f);
-			ImGui::InputScalar("##Signed 64bit", ImGuiDataType_S64, address);
+			ImGui::Text(field.Name.c_str()); ImGui::SameLine(180.0f);
+			ImGui::InputScalar(std::string("##S64##" + field.Name).c_str(),
+								ImGuiDataType_S64, field.Data);
 		}
-		else if(typeID == asTYPEID_UINT8) {
+		else if(field.TypeID == asTYPEID_UINT8) {
 			ImGui::Text("uint8"); ImGui::SameLine(100.0f);
-			ImGui::Text(handle->GetPropertyName(i)); ImGui::SameLine(200.0f);
-			ImGui::InputScalar("##Unsigned 8bit", ImGuiDataType_U8, address);
+			ImGui::Text(field.Name.c_str()); ImGui::SameLine(180.0f);
+			ImGui::InputScalar(std::string("##U8##" + field.Name).c_str(),
+								ImGuiDataType_U8, field.Data);
 		}
-		else if(typeID == asTYPEID_UINT16) {
+		else if(field.TypeID == asTYPEID_UINT16) {
 			ImGui::Text("uint16"); ImGui::SameLine(100.0f);
-			ImGui::Text(handle->GetPropertyName(i)); ImGui::SameLine(200.0f);
-			ImGui::InputScalar("##Unsigned 16bit", ImGuiDataType_U16, address);
+			ImGui::Text(field.Name.c_str()); ImGui::SameLine(180.0f);
+			ImGui::InputScalar(std::string("##U16##" + field.Name).c_str(),
+								ImGuiDataType_U16, field.Data);
 		}
-		else if(typeID == asTYPEID_UINT32) {
+		else if(field.TypeID == asTYPEID_UINT32) {
 			ImGui::Text("uint32"); ImGui::SameLine(100.0f);
-			ImGui::Text(handle->GetPropertyName(i)); ImGui::SameLine(200.0f);
-			ImGui::InputScalar("##Unsigned 32bit", ImGuiDataType_U32, address);
+			ImGui::Text(field.Name.c_str()); ImGui::SameLine(180.0f);
+			ImGui::InputScalar(std::string("##U32##" + field.Name).c_str(),
+								ImGuiDataType_U32, field.Data);
 		}
-		else if(typeID == asTYPEID_UINT64) {
+		else if(field.TypeID == asTYPEID_UINT64) {
 			ImGui::Text("uint64"); ImGui::SameLine(100.0f);
-			ImGui::Text(handle->GetPropertyName(i)); ImGui::SameLine(200.0f);
-			ImGui::InputScalar("##Unsigned 64bit", ImGuiDataType_U64, address);
+			ImGui::Text(field.Name.c_str()); ImGui::SameLine(180.0f);
+			ImGui::InputScalar(std::string("##U64##" + field.Name).c_str(),
+								ImGuiDataType_U64, field.Data);
 		}
-		else if(typeID == asTYPEID_FLOAT) {
+		else if(field.TypeID == asTYPEID_FLOAT) {
 			ImGui::Text("float"); ImGui::SameLine(100.0f);
-			ImGui::Text(handle->GetPropertyName(i)); ImGui::SameLine(200.0f);
-			ImGui::InputFloat("##Float", (float*)address, 0.0f, 0.0f, "%.10f");
+			ImGui::Text(field.Name.c_str()); ImGui::SameLine(180.0f);
+			ImGui::InputFloat(std::string("##Float##" + field.Name).c_str(),
+								field.As<float>(), 0.0f, 0.0f, "%.3f");
 		}
-		else if(typeID == asTYPEID_DOUBLE) {
+		else if(field.TypeID == asTYPEID_DOUBLE) {
 			ImGui::Text("double"); ImGui::SameLine(100.0f);
-			ImGui::Text(handle->GetPropertyName(i)); ImGui::SameLine(200.0f);
-			ImGui::InputDouble("##Double", (double*)address);
+			ImGui::Text(field.Name.c_str()); ImGui::SameLine(180.0f);
+			ImGui::InputDouble(std::string("##Double##" + field.Name).c_str(),
+								field.As<double>());
 		}
 	}
 }

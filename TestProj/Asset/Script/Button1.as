@@ -3,6 +3,8 @@ class Button1 : IUIController
 {
     string ID;
 
+    [EditorField] uint32 Int;
+
     Button1(string id)
     {
         ID = id;

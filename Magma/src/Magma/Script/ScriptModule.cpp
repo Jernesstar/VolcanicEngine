@@ -113,8 +113,10 @@ void ScriptModule::Save(const std::string& path) {
 }
 
 Ref<ScriptClass> ScriptModule::GetClass(const std::string& name) const {
-	if(!m_Classes.count(name))
+	if(!m_Classes.count(name)) {
+		VOLCANICORE_LOG_WARNING("Could not find class '%s'", name.c_str());
 		return nullptr;
+	}
 	return m_Classes.at(name);
 }
 

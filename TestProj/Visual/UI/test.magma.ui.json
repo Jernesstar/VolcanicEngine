@@ -18,23 +18,6 @@
             "BorderColor": [0.0, 0.0, 0.0, 0.0]
         },
         {
-            "ID": "Button1",
-            "Type": "Button",
-            "Parent": "Window1",
-            "Width": 278,
-            "Height": 92,
-            "x": 229.0,
-            "y": 146.0,
-            "xAlignment": "Left",
-            "yAlignment": "Top",
-            "UsePosition": true,
-            "Color": [0.8095238208770752, 0.0, 0.0, 1.0],
-            "ModuleID": 9099402520052546251,
-            "Class": "Button1",
-            "Text": "Button1",
-            "TextColor": [0.0, 0.0, 0.0, 0.0]
-        },
-        {
             "ID": "Text1",
             "Type": "Text",
             "Parent": "Window1",
@@ -67,5 +50,30 @@
             "Class": "",
             "Text": "Press the button to play",
             "TextColor": [1.0, 0.0, 0.0, 1.0]
-        }]
+        },
+        {
+            "ID": "Button1",
+            "Type": "Button",
+            "Parent": "Window1",
+            "Width": 278,
+            "Height": 92,
+            "x": 229.0,
+            "y": 146.0,
+            "xAlignment": "Left",
+            "yAlignment": "Top",
+            "UsePosition": true,
+            "Color": [0.8095238208770752, 0.0, 0.0, 1.0],
+            "ModuleID": 9099402520052546251,
+            "Class": "Button1",
+            "Text": "Button1",
+            "TextColor": [0.0, 0.0, 0.0, 0.0],
+            "Fields": [
+                {
+                    "Name": "Int",
+                    "Type": "uint32",
+                    "Value": 1
+                }
+            ]
+        }
+    ]
 }

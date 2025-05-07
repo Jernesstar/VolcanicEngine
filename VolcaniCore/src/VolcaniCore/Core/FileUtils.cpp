@@ -42,7 +42,7 @@ std::string FileUtils::ReadFile(const std::string& filePath) {
 
 	in.seekg(0, std::ios::end);
 	size_t size = in.tellg();
-	VOLCANICORE_ASSERT_ARGS(size != -1,
+	VOLCANICORE_ASSERT_ARGS(size,
 		"Could not read from file '%s'", filePath.c_str());
 
 	std::string str;

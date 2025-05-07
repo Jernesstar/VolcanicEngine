@@ -2,18 +2,17 @@
 
 #include <fstream>
 
-#include <VolcaniCore/Core/Application.h>
+#include <angelscript/add_on/scriptarray/scriptarray.h>
 
+#include <VolcaniCore/Core/Application.h>
 #include <VolcaniCore/Core/Log.h>
 #include <VolcaniCore/Core/List.h>
 #include <VolcaniCore/Core/Algo.h>
 #include <VolcaniCore/Core/FileUtils.h>
 
 #include <Magma/Core/JSONSerializer.h>
-
 #include <Magma/Core/BinaryWriter.h>
 #include <Magma/Core/BinaryReader.h>
-
 #include <Magma/UI/UI.h>
 
 #include "EditorApp.h"
@@ -46,12 +45,12 @@ void UILoader::EditorLoad(UIPage& page, const std::string& path,
 		return;
 	}
 
-	std::string file = FileUtils::ReadFile(path);
 	Document doc;
+	std::string file = FileUtils::ReadFile(path);
 	doc.Parse(file);
 
 	if(doc.HasParseError()) {
-		VOLCANICORE_LOG_INFO("%i", (uint32_t)doc.GetParseError());
+		VOLCANICORE_LOG_INFO("Parsing error %i", (uint32_t)doc.GetParseError());
 		return;
 	}
 	if(!doc.IsObject()) {
@@ -208,6 +207,117 @@ void Serialize(const UIElement* ui, JSONSerializer& serializer) {
 			break;
 	}
 
+	if(ui->ScriptInstance) {
+		serializer.WriteKey("Fields").BeginSequence();
+
+		auto* handle = ui->ScriptInstance->GetHandle();
+		for(uint32_t i = 0; i < handle->GetPropertyCount(); i++) {
+			ScriptField field = ui->ScriptInstance->GetProperty(i);
+			if(!field.HasMetadata("EditorField"))
+				continue;
+
+			serializer.BeginMapping();
+
+			serializer.WriteKey("Name").Write(field.Name);
+
+			if(field.TypeID == asTYPEID_BOOL) {
+				serializer
+					.WriteKey("Type").Write(std::string("bool"))
+					.WriteKey("Value").Write(*field.As<bool>());
+			}
+			else if(field.TypeID == asTYPEID_INT8) {
+				serializer
+					.WriteKey("Type").Write(std::string("int8"))
+					.WriteKey("Value").Write((int32_t)*field.As<int8_t>());
+			}
+			else if(field.TypeID == asTYPEID_INT16) {
+				serializer
+					.WriteKey("Type").Write(std::string("int16"))
+					.WriteKey("Value").Write((int32_t)*field.As<int16_t>());
+			}
+			else if(field.TypeID == asTYPEID_INT32) {
+				serializer
+					.WriteKey("Type").Write(std::string("int32"))
+					.WriteKey("Value").Write(*field.As<int32_t>());
+			}
+			else if(field.TypeID == asTYPEID_INT64) {
+				serializer
+					.WriteKey("Type").Write(std::string("int64"))
+					.WriteKey("Value").Write(*field.As<int64_t>());
+			}
+			else if(field.TypeID == asTYPEID_UINT8) {
+				serializer
+					.WriteKey("Type").Write(std::string("uint8"))
+					.WriteKey("Value").Write((uint32_t)*field.As<uint8_t>());
+			}
+			else if(field.TypeID == asTYPEID_UINT16) {
+				serializer
+					.WriteKey("Type").Write(std::string("uint16"))
+					.WriteKey("Value").Write((uint32_t)*field.As<uint16_t>());
+			}
+			else if(field.TypeID == asTYPEID_UINT32) {
+				serializer
+					.WriteKey("Type").Write(std::string("uint32"))
+					.WriteKey("Value").Write(*field.As<uint32_t>());
+			}
+			else if(field.TypeID == asTYPEID_UINT64) {
+				serializer
+					.WriteKey("Type").Write(std::string("uint64"))
+					.WriteKey("Value").Write(*field.As<uint64_t>());
+			}
+			else if(field.TypeID == asTYPEID_FLOAT) {
+				serializer
+					.WriteKey("Type").Write(std::string("float"))
+					.WriteKey("Value").Write(*field.As<float>());
+			}
+			else if(field.TypeID == asTYPEID_DOUBLE) {
+				serializer
+					.WriteKey("Type").Write(std::string("double"))
+					.WriteKey("Value").Write(*(float*)field.As<double>());
+			}
+			else if(std::string(field.Type->GetName()) == "Entity") {
+				serializer
+					.WriteKey("Type").Write(std::string("Entity"))
+					.WriteKey("Value")
+						.Write((uint64_t)field.As<Entity>()->GetHandle());
+			}
+			else if(std::string(field.Type->GetName()) == "Asset") {
+				serializer
+					.WriteKey("Type").Write(std::string("Asset"))
+					.WriteKey("Value").Write(*field.As<Asset>());
+			}
+			else if(std::string(field.Type->GetName()) == "array") {
+				serializer
+					.WriteKey("Type").Write(std::string("array"))
+					.WriteKey("Value");
+
+				serializer.SetOptions(Serializer::Options::ArrayOneLine);
+				serializer
+						.BeginSequence();
+				auto* data = field.As<CScriptArray>();
+				for(uint32_t i = 0; i < data->GetSize(); i++)
+					serializer
+						.Write(*(uint32_t*)data->At(i));
+
+				serializer
+					.EndSequence();
+			}
+			// Script Type
+			else if(field.Is(ScriptQualifier::ScriptObject)) {
+				auto* type = field.Type;
+				for(uint32_t i = 0; i < type->GetPropertyCount(); i++) {
+					uint64_t offset;
+					// type->GetProperty()
+				}
+			}
+
+			serializer.EndMapping();
+		}
+
+		serializer
+			.EndSequence();
+	}
+
 	serializer.EndMapping();
 
 	for(auto child : ui->GetChildren())
@@ -336,6 +446,67 @@ static void WriteUI(BinaryWriter* writer, const UIElement* element) {
 	writer->Write(element->Children);
 	writer->Write((uint64_t)element->ModuleID);
 	writer->Write(element->Class);
+
+	if(element->Class == "")
+		return;
+
+	auto handle = element->ScriptInstance->GetHandle();
+	for(uint32_t i = 0; i < handle->GetPropertyCount(); i++) {
+		ScriptField field = element->ScriptInstance->GetProperty(i);
+		if(!field.HasMetadata("EditorField")) {
+			writer->Write((int)-1);
+			continue;
+		}
+		writer->Write(field.TypeID);
+
+		std::string typeName;
+		if(field.Type)
+			typeName = field.Type->GetName();
+
+		if(field.TypeID == asTYPEID_BOOL)
+			writer->Write(*field.As<bool>());
+		else if(field.TypeID == asTYPEID_INT8)
+			writer->Write(*field.As<int8_t>());
+		else if(field.TypeID == asTYPEID_INT16)
+			writer->Write(*field.As<int16_t>());
+		else if(field.TypeID == asTYPEID_INT32)
+			writer->Write(*field.As<int32_t>());
+		else if(field.TypeID == asTYPEID_INT64)
+			writer->Write(*field.As<int64_t>());
+		else if(field.TypeID == asTYPEID_UINT8)
+			writer->Write(*field.As<uint8_t>());
+		else if(field.TypeID == asTYPEID_UINT16)
+			writer->Write(*field.As<uint16_t>());
+		else if(field.TypeID == asTYPEID_UINT32)
+			writer->Write(*field.As<uint32_t>());
+		else if(field.TypeID == asTYPEID_UINT64)
+			writer->Write(*field.As<uint64_t>());
+		else if(field.TypeID == asTYPEID_FLOAT)
+			writer->Write(*field.As<float>());
+		else if(field.TypeID == asTYPEID_DOUBLE)
+			writer->Write(*field.As<double>());
+		else if(typeName == "Asset")
+			writer->Write(*field.As<Asset>());
+		else if(typeName == "Vec3")
+			writer->Write(*field.As<glm::vec3>());
+		else if(typeName == "string")
+			writer->Write(*field.As<std::string>());
+		else if(typeName == "array") {
+			auto* array = field.As<CScriptArray>();
+			auto subTypeID = array->GetArrayObjectType()->GetSubTypeId();
+			auto* subType = ScriptEngine::Get()->GetTypeInfoById(subTypeID);
+			uint64_t size = 0;
+			if(subType)
+				size = subType->GetSize();
+			else
+				size = ScriptEngine::Get()->GetSizeOfPrimitiveType(subTypeID);
+
+			uint32_t count = array->GetSize();
+			writer->Write((uint32_t)count);
+			// Works for primitive and POD types
+			writer->WriteData(array->GetBuffer(), size * count);
+		}
+	}
 }
 
 template<>
@@ -600,6 +771,52 @@ void LoadElement(UIPage& page, const rapidjson::Value& elementNode,
 			return;
 
 		element->ScriptInstance = _class->Construct();
+	}
+	else
+		return;
+
+	if(!elementNode.HasMember("Fields"))
+		return;
+
+	for(const auto& fieldNode : elementNode["Fields"].GetArray()) {
+		const auto& value = fieldNode["Value"];
+		std::string name = fieldNode["Name"].Get<std::string>();
+		std::string type = fieldNode["Type"].Get<std::string>();
+		void* address = element->ScriptInstance->GetProperty(name).Data;
+
+		if(type == "bool")
+			*(bool*)address = value.Get<bool>();
+		else if(type == "int8")
+			*(int8_t*)address = (int8_t)value.Get<int32_t>();
+		else if(type == "int16")
+			*(int16_t*)address = (int16_t)value.Get<int32_t>();
+		else if(type == "int32")
+			*(int32_t*)address = value.Get<int32_t>();
+		else if(type == "int64")
+			*(int64_t*)address = value.Get<int64_t>();
+		else if(type == "uint8")
+			*(uint8_t*)address = (uint8_t)value.Get<uint32_t>();
+		else if(type == "uint16")
+			*(uint16_t*)address = (uint16_t)value.Get<uint32_t>();
+		else if(type == "uint32")
+			*(uint32_t*)address = value.Get<uint32_t>();
+		else if(type == "uint64")
+			*(uint64_t*)address = value.Get<uint64_t>();
+		else if(type == "float")
+			*(float*)address = value.Get<float>();
+		else if(type == "double")
+			*(double*)address = value.Get<float>();
+		// else if(type == "Entity")
+		// 	*(Entity*)address = entity;
+		else if(type == "Asset") {
+			((Asset*)address)->ID = value["ID"].Get<uint64_t>();
+			((Asset*)address)->Type = (AssetType)value["Type"].Get<uint32_t>();
+		}
+		// else if(type == "array") {
+		// 	auto data = value.Get<List<uint32_t>>();
+		// 	for(uint32_t i = 0; i < data.Count(); i++)
+		// 		((CScriptArray*)address)->InsertLast(data.At(i));
+		// }
 	}
 }
 

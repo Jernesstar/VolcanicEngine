@@ -492,7 +492,7 @@ void Editor::ExportProject() {
 void Editor::ExportProject(const std::string& exportPath) {
 	menu.project.exportProject = false;
 
-	if(!fs::is_directory(exportPath)) {
+	if(!fs::is_directory(exportPath) || !fs::exists(exportPath)) {
 		VOLCANICORE_LOG_INFO("'%s' is not a valid directory");
 		return;
 	}

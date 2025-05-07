@@ -313,24 +313,6 @@ void App::ScreenSet(const std::string& name) {
 		UILoad(s_Screen->UI);
 		ui = true;
 	}
-	if(ui) {
-		s_Screen->UI.Traverse(
-			[&](UIElement* element)
-			{
-				if(!element->ModuleID || element->Class == "")
-					return;
-	
-				Asset asset = { element->ModuleID, AssetType::Script };
-				m_AssetManager->Load(asset);
-				auto mod = m_AssetManager->Get<ScriptModule>(asset);
-				Ref<ScriptClass> _class = mod->GetClass(element->Class);
-	
-				if(!_class)
-					return;
-	
-				element->ScriptInstance = _class->Instantiate(element->GetID());
-			});
-	}
 
 	s_Screen->ScriptObj->Call("OnLoad");
 }

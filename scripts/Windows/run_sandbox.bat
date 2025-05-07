@@ -1,3 +1,3 @@
 @echo off
 
-"build/Sandbox/bin/Sandbox" %*
+"build/gmake2/Sandbox/bin/Sandbox" %*
