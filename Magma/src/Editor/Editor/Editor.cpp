@@ -40,6 +40,7 @@ struct {
 		bool runProject    = false;
 		bool saveProject   = false;
 		bool exportProject = false;
+		bool exportProjectTo = false;
 
 		bool addScreen     = false;
 	} project;
@@ -156,6 +157,8 @@ void Editor::Render() {
 				ImGui::Separator();
 				if(ImGui::MenuItem("Export"))
 					menu.project.exportProject = true;
+				if(ImGui::MenuItem("Export To"))
+					menu.project.exportProjectTo = true;
 
 				ImGui::EndMenu();
 			}
@@ -240,6 +243,8 @@ void Editor::Render() {
 	if(menu.project.saveProject)
 		SaveProject();
 	if(menu.project.exportProject)
+		ExportProject(m_Project.ExportPath);
+	if(menu.project.exportProjectTo)
 		ExportProject();
 
 	if(menu.tab.newTab)
@@ -475,7 +480,7 @@ void Editor::ExportProject() {
 			exportPath = instance->GetCurrentPath();
 
 		instance->Close();
-		menu.project.exportProject = false;
+		menu.project.exportProjectTo = false;
 	}
 
 	if(exportPath == "")
@@ -485,6 +490,13 @@ void Editor::ExportProject() {
 }
 
 void Editor::ExportProject(const std::string& exportPath) {
+	menu.project.exportProject = false;
+
+	if(!fs::is_directory(exportPath)) {
+		VOLCANICORE_LOG_INFO("'%s' is not a valid directory");
+		return;
+	}
+
 	fs::create_directories(exportPath);
 	fs::create_directories(fs::path(exportPath) / "Class");
 	fs::create_directories(fs::path(exportPath) / "Scene");

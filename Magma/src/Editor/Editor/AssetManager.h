@@ -4,6 +4,9 @@
 
 namespace Magma {
 
+extern std::string AssetTypeToString(AssetType type);
+extern AssetType AssetTypeFromString(const std::string& str);
+
 class EditorAssetManager : public AssetManager {
 public:
 	EditorAssetManager();

@@ -3,9 +3,9 @@ class TestHome : IScreen
 {
     TestHome()
     {
-// #ifndef EDITOR
-//         // App.LoadScene("Scene");
-// #endif
+#if EDITOR
+        print("This is the Editor");
+#endif
     }
 
     void OnLoad()

@@ -35,6 +35,7 @@ using namespace Magma::Physics;
 
 namespace Magma {
 
+static bool s_ForScript = false;
 static Asset s_Asset = { };
 static AssetType s_Selecting = AssetType::None;
 static Ref<UI::Image> s_FileIcon;
@@ -106,7 +107,7 @@ FOCUS_COMPONENT(ParticleEmitter)
 
 static void AssetSelect() {
 	namespace fs = std::filesystem;
-	if(s_Selecting == AssetType::None)
+	if(!s_ForScript && s_Selecting == AssetType::None)
 		return;
 
 	ImGui::OpenPopup("Select Asset");
@@ -126,7 +127,7 @@ static void AssetSelect() {
 			for(auto& [asset, _] : assetManager.GetRegistry()) {
 				if(!asset.Primary)
 					continue;
-				if(asset.Type != s_Selecting)
+				if(!s_ForScript && asset.Type != s_Selecting)
 					continue;
 
 				ImGui::TableNextColumn();
@@ -144,6 +145,7 @@ static void AssetSelect() {
 				if(UI::UIRenderer::DrawButton(button).Clicked) {
 					s_Asset = asset;
 					s_Selecting = AssetType::None;
+					s_ForScript = false;
 				}
 
 				if(display != "")
@@ -266,7 +268,7 @@ void DrawComponent<AudioComponent>(Entity& entity) {
 	if(ImGui::Button(text.c_str()))
 		s_Selecting = AssetType::Audio;
 
-	if(s_Asset.Type != AssetType::None) {
+	if(s_Asset.Type != AssetType::None && !s_ForScript) {
 		component.AudioAsset = s_Asset;
 		s_Asset = { };
 	}
@@ -285,7 +287,7 @@ void DrawComponent<MeshComponent>(Entity& entity) {
 	if(ImGui::Button(text.c_str()))
 		s_Selecting = AssetType::Mesh;
 
-	if(s_Asset.Type != AssetType::None) {
+	if(s_Asset.Type != AssetType::None && !s_ForScript) {
 		component.MeshAsset = s_Asset;
 		s_Asset = { };
 	}
@@ -304,7 +306,7 @@ void DrawComponent<SkyboxComponent>(Entity& entity) {
 	if(ImGui::Button(text.c_str()))
 		s_Selecting = AssetType::Cubemap;
 
-	if(s_Asset.Type != AssetType::None) {
+	if(s_Asset.Type != AssetType::None && !s_ForScript) {
 		component.CubemapAsset = s_Asset;
 		s_Asset = { };
 	}
@@ -423,7 +425,7 @@ void DrawComponent<ScriptComponent>(Entity& entity) {
 	if(ImGui::Button(text.c_str()))
 		s_Selecting = AssetType::Script;
 
-	if(s_Asset.Type != AssetType::None) {
+	if(s_Asset.Type != AssetType::None && !s_ForScript) {
 		component.ModuleAsset = s_Asset;
 		component.Instance.reset();
 		s_Asset = { };
@@ -464,7 +466,7 @@ void DrawComponent<ScriptComponent>(Entity& entity) {
 		if(field.Type) {
 			std::string typeName = field.Type->GetName();
 			ImGui::Text(typeName.c_str()); ImGui::SameLine(100.0f);
-			ImGui::Text(field.Name.c_str()); ImGui::SameLine(200.0f);
+			ImGui::Text(field.Name.c_str()); ImGui::SameLine(180.0f);
 
 			if(typeName == "Vec3")
 				ImGui::InputFloat3("##Vec3", &field.As<Vec3>()->r);
@@ -478,11 +480,19 @@ void DrawComponent<ScriptComponent>(Entity& entity) {
 					TilemapEditorPopup(component.Instance, field.Name);
 			}
 			else if(typeName == "Asset") {
-				if(ImGui::Button("Select Asset"))
-					s_Selecting = AssetType::Script;
-				if(s_Selecting != AssetType::None) {
+				Asset asset = *field.As<Asset>();
+				ImGui::Text("Type: %s", AssetTypeToString(asset.Type).c_str());
+				ImGui::SameLine(270.0f);
+				ImGui::Text("ID: %llu", (uint64_t)asset.ID);
+
+				if(ImGui::Button("Select Asset")) {
+					s_Selecting = AssetType::None;
+					s_ForScript = true;
+				}
+				if(s_Asset.Type != AssetType::None) {
 					*field.As<Asset>() = s_Asset;
 					s_Asset = { };
+					s_ForScript = false;
 				}
 			}
 			else
@@ -490,67 +500,67 @@ void DrawComponent<ScriptComponent>(Entity& entity) {
 		}
 		else if(field.TypeID == asTYPEID_BOOL) {
 			ImGui::Text("bool"); ImGui::SameLine(100.0f);
-			ImGui::Text(field.Name.c_str()); ImGui::SameLine(200.0f);
+			ImGui::Text(field.Name.c_str()); ImGui::SameLine(180.0f);
 			ImGui::Checkbox(std::string("##Bool##" + field.Name).c_str(),
 				field.As<bool>());
 		}
 		else if(field.TypeID == asTYPEID_INT8) {
 			ImGui::Text("int8"); ImGui::SameLine(100.0f);
-			ImGui::Text(field.Name.c_str()); ImGui::SameLine(200.0f);
+			ImGui::Text(field.Name.c_str()); ImGui::SameLine(180.0f);
 			ImGui::InputScalar(std::string("##S8##" + field.Name).c_str(),
 				ImGuiDataType_S8, field.Data);
 		}
 		else if(field.TypeID == asTYPEID_INT16) {
 			ImGui::Text("int16"); ImGui::SameLine(100.0f);
-			ImGui::Text(field.Name.c_str()); ImGui::SameLine(200.0f);
+			ImGui::Text(field.Name.c_str()); ImGui::SameLine(180.0f);
 			ImGui::InputScalar(std::string("##S16##" + field.Name).c_str(),
 								ImGuiDataType_S16, field.Data);
 		}
 		else if(field.TypeID == asTYPEID_INT32) {
 			ImGui::Text("int32"); ImGui::SameLine(100.0f);
-			ImGui::Text(field.Name.c_str()); ImGui::SameLine(200.0f);
+			ImGui::Text(field.Name.c_str()); ImGui::SameLine(180.0f);
 			ImGui::InputScalar(std::string("##S32##" + field.Name).c_str(),
 								ImGuiDataType_S32, field.Data);
 		}
 		else if(field.TypeID == asTYPEID_INT64) {
 			ImGui::Text("int64"); ImGui::SameLine(100.0f);
-			ImGui::Text(field.Name.c_str()); ImGui::SameLine(200.0f);
+			ImGui::Text(field.Name.c_str()); ImGui::SameLine(180.0f);
 			ImGui::InputScalar(std::string("##S64##" + field.Name).c_str(),
 								ImGuiDataType_S64, field.Data);
 		}
 		else if(field.TypeID == asTYPEID_UINT8) {
 			ImGui::Text("uint8"); ImGui::SameLine(100.0f);
-			ImGui::Text(field.Name.c_str()); ImGui::SameLine(200.0f);
+			ImGui::Text(field.Name.c_str()); ImGui::SameLine(180.0f);
 			ImGui::InputScalar(std::string("##U8##" + field.Name).c_str(),
 								ImGuiDataType_U8, field.Data);
 		}
 		else if(field.TypeID == asTYPEID_UINT16) {
 			ImGui::Text("uint16"); ImGui::SameLine(100.0f);
-			ImGui::Text(field.Name.c_str()); ImGui::SameLine(200.0f);
+			ImGui::Text(field.Name.c_str()); ImGui::SameLine(180.0f);
 			ImGui::InputScalar(std::string("##U16##" + field.Name).c_str(),
 								ImGuiDataType_U16, field.Data);
 		}
 		else if(field.TypeID == asTYPEID_UINT32) {
 			ImGui::Text("uint32"); ImGui::SameLine(100.0f);
-			ImGui::Text(field.Name.c_str()); ImGui::SameLine(200.0f);
+			ImGui::Text(field.Name.c_str()); ImGui::SameLine(180.0f);
 			ImGui::InputScalar(std::string("##U32##" + field.Name).c_str(),
 								ImGuiDataType_U32, field.Data);
 		}
 		else if(field.TypeID == asTYPEID_UINT64) {
 			ImGui::Text("uint64"); ImGui::SameLine(100.0f);
-			ImGui::Text(field.Name.c_str()); ImGui::SameLine(200.0f);
+			ImGui::Text(field.Name.c_str()); ImGui::SameLine(180.0f);
 			ImGui::InputScalar(std::string("##U64##" + field.Name).c_str(),
 								ImGuiDataType_U64, field.Data);
 		}
 		else if(field.TypeID == asTYPEID_FLOAT) {
 			ImGui::Text("float"); ImGui::SameLine(100.0f);
-			ImGui::Text(field.Name.c_str()); ImGui::SameLine(200.0f);
+			ImGui::Text(field.Name.c_str()); ImGui::SameLine(180.0f);
 			ImGui::InputFloat(std::string("##Float##" + field.Name).c_str(),
 								field.As<float>(), 0.0f, 0.0f, "%.3f");
 		}
 		else if(field.TypeID == asTYPEID_DOUBLE) {
 			ImGui::Text("double"); ImGui::SameLine(100.0f);
-			ImGui::Text(field.Name.c_str()); ImGui::SameLine(200.0f);
+			ImGui::Text(field.Name.c_str()); ImGui::SameLine(180.0f);
 			ImGui::InputDouble(std::string("##Double##" + field.Name).c_str(),
 								field.As<double>());
 		}
@@ -708,14 +718,14 @@ void DrawComponent<ParticleEmitterComponent>(Entity& entity) {
 	if(ImGui::Button(text.c_str()))
 		s_Selecting = AssetType::Texture;
 
-	if(s_Asset.Type != AssetType::None) {
+	if(s_Asset.Type != AssetType::None && !s_ForScript) {
 		component.ImageAsset = s_Asset;
 		s_Asset = { };
 	}
 }
 
 void ComponentEditorPanel::Draw() {
-	if(s_Selecting != AssetType::None)
+	if(s_ForScript || s_Selecting != AssetType::None)
 		AssetSelect();
 
 	ImGui::Begin("Component Editor", &Open);

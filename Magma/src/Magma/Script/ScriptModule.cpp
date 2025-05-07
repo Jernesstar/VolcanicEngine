@@ -68,9 +68,9 @@ void ScriptModule::Load(const std::string& path) {
 	bool loadMetadata = true;
 	if(fs::path(path).extension() == ".as") {
 		builder.StartNewModule(engine, Name.c_str());
+		builder.DefineWord("EDITOR");
 		builder.AddSectionFromFile(path.c_str());
 		builder.BuildModule();
-		builder.DefineWord("EDITOR");
 		m_Handle = builder.GetModule();
 	}
 	else {

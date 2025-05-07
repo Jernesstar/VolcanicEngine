@@ -34,7 +34,7 @@ BinaryReader& BinaryReader::ReadObject(SubMesh& mesh) {
 namespace Lava {
 
 void RuntimeAssetManager::Load(Asset asset) {
-	if(IsLoaded(asset))
+	if(!IsValid(asset) || IsLoaded(asset))
 		return;
 
 	m_AssetRegistry[asset] = true;
@@ -135,7 +135,7 @@ void RuntimeAssetManager::Load(Asset asset) {
 }
 
 void RuntimeAssetManager::Unload(Asset asset) {
-	if(!IsLoaded(asset))
+	if(!IsValid(asset) || !IsLoaded(asset))
 		return;
 
 	m_AssetRegistry[asset] = false;

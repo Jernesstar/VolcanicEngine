@@ -10,7 +10,6 @@
 #include <VolcaniCore/Core/Math.h>
 
 #include <Magma/Core/YAMLSerializer.h>
-
 #include <Magma/Core/BinaryWriter.h>
 #include <Magma/Core/BinaryReader.h>
 
@@ -22,7 +21,7 @@ namespace fs = std::filesystem;
 
 namespace Magma {
 
-static std::string AssetTypeToString(AssetType type) {
+std::string AssetTypeToString(AssetType type) {
 	switch(type) {
 		case AssetType::Mesh:
 			return "Mesh";
@@ -43,11 +42,9 @@ static std::string AssetTypeToString(AssetType type) {
 	return "None";
 }
 
-static AssetType AssetTypeFromString(const std::string& str) {
+AssetType AssetTypeFromString(const std::string& str) {
 	if(str == "Mesh")
 		return AssetType::Mesh;
-	else if(str == "Texture")
-		return AssetType::Texture;
 	else if(str == "Texture")
 		return AssetType::Texture;
 	else if(str == "Cubemap")
@@ -199,7 +196,7 @@ EditorAssetManager::~EditorAssetManager() {
 }
 
 void EditorAssetManager::Load(Asset asset) {
-	if(IsLoaded(asset))
+	if(!IsValid(asset) || IsLoaded(asset))
 		return;
 
 	m_AssetRegistry[asset] = true;
@@ -224,7 +221,7 @@ void EditorAssetManager::Load(Asset asset) {
 }
 
 void EditorAssetManager::Unload(Asset asset) {
-	if(!IsLoaded(asset))
+	if(!IsValid(asset) || !IsLoaded(asset))
 		return;
 
 	m_AssetRegistry[asset] = false;

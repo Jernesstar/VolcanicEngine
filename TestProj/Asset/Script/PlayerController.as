@@ -14,7 +14,7 @@ class PlayerController : IEntityController
 {
     Entity Handle;
     SomeScriptClass Class;
-    Asset soundAsset = Asset(16624656892553940704, AssetType::Audio);
+    [EditorField] Asset soundAsset;
     [EditorField] Asset meshAsset;
  
     [EditorField] bool SomeBool;
@@ -30,15 +30,20 @@ class PlayerController : IEntityController
     PlayerController(Entity entity)
     {
         Handle = entity;
+    }
+
+    void OnStart()
+    {
+        print("OnStart");
 
         TestGame@ game = cast<TestGame>(ScriptApp);
         game.NewMethod();
         print("Coins: " + game.State.Coins);
 
-        print("Name: " + entity.Name);
-        print("Alive: " + entity.Alive);
-        const TagComponent@ tc = Handle.GetTagComponent();
-        print(tc.Tag);
+        print("Name: " + Handle.Name);
+        print("Alive: " + Handle.Alive);
+        const TagComponent@ tag = Handle.GetTagComponent();
+        print(tag.Tag);
 
         AssetManager.Load(soundAsset);
         bool loaded = AssetManager.IsLoaded(soundAsset);
@@ -46,11 +51,7 @@ class PlayerController : IEntityController
 
         ScriptSystem@ sys = Scene.GetScriptSystem();
         sys.ListenForEvent(Handle, "PlayerDied");
-    }
 
-    void OnStart()
-    {
-        print("OnStart");
         AssetManager.Load(meshAsset);
 
         for(uint32 y = 0; y < Height; y++) {

@@ -115,5 +115,46 @@ Scene:
           MeshComponent:
             AssetID: 15277418182178081176
           ScriptComponent:
-            ModuleID: 10036008063945961451
-            Class: ""
+            ModuleID: 2691709289590626850
+            Class: PlayerController
+            Fields:
+              - Field:
+                  Name: soundAsset
+                  Type: Asset
+                  Value:
+                    ID: 0
+                    Type: 0
+              - Field:
+                  Name: meshAsset
+                  Type: Asset
+                  Value:
+                    ID: 0
+                    Type: 0
+              - Field:
+                  Name: SomeBool
+                  Type: bool
+                  Value: false
+              - Field:
+                  Name: Signed8
+                  Type: int8
+                  Value: 0
+              - Field:
+                  Name: Unsigned32
+                  Type: uint32
+                  Value: 0
+              - Field:
+                  Name: Float
+                  Type: float
+                  Value: 0
+              - Field:
+                  Name: Tilemap
+                  Type: array
+                  Value: []
+              - Field:
+                  Name: Width
+                  Type: uint32
+                  Value: 0
+              - Field:
+                  Name: Height
+                  Type: uint32
+                  Value: 0

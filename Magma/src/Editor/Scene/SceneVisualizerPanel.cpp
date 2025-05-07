@@ -8,20 +8,17 @@
 
 #include <VolcaniCore/Core/Application.h>
 #include <VolcaniCore/Core/Input.h>
-
 #include <VolcaniCore/Graphics/Renderer.h>
 #include <VolcaniCore/Graphics/RendererAPI.h>
 #include <VolcaniCore/Graphics/Renderer2D.h>
 #include <VolcaniCore/Graphics/Renderer3D.h>
 #include <VolcaniCore/Graphics/StereographicCamera.h>
 
-#include <Magma/Script/ScriptModule.h>
-
 #include <Magma/UI/UIRenderer.h>
-
 #include <Magma/Scene/Component.h>
 #include <Magma/Scene/PhysicsSystem.h>
 #include <Magma/Scene/SceneRenderer.h>
+#include <Magma/Script/ScriptModule.h>
 
 #include <Lava/Core/App.h>
 
@@ -352,7 +349,7 @@ void SceneVisualizerPanel::Draw() {
 		ImGui::SetCursorPos(pos);
 
 		auto childFlags = ImGuiChildFlags_Border;
-		ImGui::BeginChild("Debug", { 150, 140 }, childFlags, 0);
+		ImGui::BeginChild("Debug", { 135, 120 }, childFlags, 0);
 		{
 			auto info = Renderer::GetDebugInfo();
 			ImGui::Text("FPS: %0.1f", info.FPS);

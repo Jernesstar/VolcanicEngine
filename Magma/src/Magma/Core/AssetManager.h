@@ -69,15 +69,16 @@ public:
 	virtual void Unload(Asset asset) = 0;
 
 	bool IsLoaded(Asset asset) const {
-		return IsValid(asset) && m_AssetRegistry.at(asset);
+		return m_AssetRegistry.at(asset);
 	}
 
 	bool HasRefs(Asset asset) const {
-		return IsValid(asset) && m_References.count(asset.ID);
+		return m_References.count(asset.ID);
 	}
 
 	bool IsValid(Asset asset) const {
-		return asset.Type != AssetType::None && m_AssetRegistry.count(asset);
+		return asset.ID && asset.Type != AssetType::None
+			&& m_AssetRegistry.count(asset);
 	}
 
 	void Clear() {
