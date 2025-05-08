@@ -122,18 +122,18 @@ Scene:
                   Name: soundAsset
                   Type: Asset
                   Value:
-                    ID: 0
-                    Type: 0
+                    ID: 16624656892553940704
+                    Type: 4
               - Field:
                   Name: meshAsset
                   Type: Asset
                   Value:
-                    ID: 0
+                    ID: 10036008063945961451
                     Type: 0
               - Field:
                   Name: SomeBool
                   Type: bool
-                  Value: false
+                  Value: true
               - Field:
                   Name: Signed8
                   Type: int8
@@ -149,12 +149,16 @@ Scene:
               - Field:
                   Name: Tilemap
                   Type: array
-                  Value: []
+                  Value: [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1]
               - Field:
                   Name: Width
                   Type: uint32
-                  Value: 0
+                  Value: 9
               - Field:
                   Name: Height
                   Type: uint32
-                  Value: 0
+                  Value: 9
+              - Field:
+                  Name: SomeVec3
+                  Type: Vec3
+                  Value: [0, 0, 0]

@@ -260,11 +260,10 @@ void SerializeEntity(YAMLSerializer& serializer, const Entity& entity) {
 						.WriteKey("Type").Write(std::string("double"))
 						.WriteKey("Value").Write(*(float*)field.As<double>());
 				}
-				else if(std::string(field.Type->GetName()) == "Entity") {
+				else if(std::string(field.Type->GetName()) == "Vec3") {
 					serializer
-						.WriteKey("Type").Write(std::string("Entity"))
-						.WriteKey("Value")
-							.Write((uint64_t)field.As<Entity>()->GetHandle());
+						.WriteKey("Type").Write(std::string("Vec3"))
+						.WriteKey("Value").Write(*field.As<Vec3>());
 				}
 				else if(std::string(field.Type->GetName()) == "Asset") {
 					serializer
@@ -467,8 +466,8 @@ static void LoadScript(Entity entity, Asset asset, const std::string& className,
 			*(float*)address = value.as<float>();
 		else if(type == "double")
 			*(double*)address = value.as<float>();
-		// else if(type == "Entity")
-		// 	*(Entity*)address = entity;
+		else if(type == "Vec3")
+			*(Vec3*)address = value.as<Vec3>();
 		else if(type == "Asset") {
 			((Asset*)address)->ID = value["ID"].as<uint64_t>();
 			((Asset*)address)->Type = (AssetType)value["Type"].as<uint32_t>();

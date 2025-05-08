@@ -26,6 +26,7 @@ class PlayerController : IEntityController
     [EditorField] array<uint32> Tilemap;
     [EditorField] uint32 Width;
     [EditorField] uint32 Height;
+    [EditorField] Vec3 SomeVec3;
 
     PlayerController(Entity entity)
     {
