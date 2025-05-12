@@ -88,6 +88,40 @@ static AssetManager& GetAssetManagerInstance() {
 	return *App::Get()->GetAssetManager();
 }
 
+static void ScriptLoadScene(const std::string& name, App* app) {
+	s_Screen->World->Name = name;
+	app->SceneLoad(*s_Screen->World);
+
+	List<Entity> list;
+	s_Screen->World->EntityWorld
+	.ForEach<ScriptComponent>(
+		[&](Entity entity)
+		{
+			auto& sc = entity.Set<ScriptComponent>();
+			if(!sc.Instance)
+				return;
+			list.Add(entity);
+		});
+
+	list.ForEach(
+		[](Entity& entity)
+		{
+			auto& sc = entity.Set<ScriptComponent>();
+			auto old = sc.Instance;
+			if(!old->IsInitialized()) {
+				sc.Instance = old->GetClass()->Instantiate(entity);
+				sc.Instance->Copy(old);
+			}
+
+			sc.Instance->Call("OnStart");
+		});
+}
+
+static void ScriptLoadUI(const std::string& name, App* app) {
+	s_Screen->UI.Name = name;
+	app->UILoad(s_Screen->UI);
+}
+
 App::App(const Project& project)
 	: m_Project(project)
 {
@@ -101,10 +135,12 @@ App::App(const Project& project)
 		"AppClass", "void PushScreen(const string &in)", &App::PushScreen);
 	ScriptEngine::RegisterMethod<App>(
 		"AppClass", "void PopScreen()", &App::PopScreen);
-	ScriptEngine::RegisterMethod<App>(
-		"AppClass", "void LoadScene(const string &in)", &App::LoadScene);
-	ScriptEngine::RegisterMethod<App>(
-		"AppClass", "void LoadUI(const string &in)", &App::LoadUI);
+	ScriptEngine::Get()->RegisterObjectMethod(
+		"AppClass", "void LoadScene(const string &in)",
+		asFUNCTION(ScriptLoadScene), asCALL_CDECL_OBJLAST);
+	ScriptEngine::Get()->RegisterObjectMethod(
+		"AppClass", "void LoadUI(const string &in)",
+		asFUNCTION(ScriptLoadUI), asCALL_CDECL_OBJLAST);
 
 	ScriptEngine::Get()->RegisterGlobalFunction(
 		"SceneClass& get_Scene() property", asFUNCTION(GetScene), asCALL_CDECL);
@@ -112,7 +148,7 @@ App::App(const Project& project)
 		"UIPageClass& get_UIPage() property", asFUNCTION(GetUI), asCALL_CDECL);
 
 	ScriptEngine::Get()->RegisterGlobalFunction(
-		"IApp@ get_ScriptApp() property",
+		+"IApp@ get_ScriptApp() property",
 		asFUNCTION(GetScriptApp), asCALL_CDECL);
 	ScriptEngine::Get()->RegisterGlobalFunction(
 		"AssetManagerClass& get_AssetManager() property",
@@ -266,54 +302,46 @@ void App::ScreenSet(const std::string& name) {
 	auto scriptClass = s_Screen->Script->GetClass(name);
 	s_Screen->ScriptObj = scriptClass->Instantiate();
 
-	bool scene = false;
 	if(s_ShouldLoadScene) {
 		*s_Screen->World = *s_ShouldLoadScene;
 		s_ShouldLoadScene = nullptr;
 		s_Screen->World->RegisterSystems();
-		scene = true;
 	}
 	else if(screen.Scene != "") {
 		s_Screen->World->RegisterSystems();
 		SceneLoad(*s_Screen->World);
-		scene = true;
-	}
-	if(scene) {
-		List<Entity> list;
-		s_Screen->World->EntityWorld
-		.ForEach<ScriptComponent>(
-			[&](Entity entity)
-			{
-				auto& sc = entity.Set<ScriptComponent>();
-				if(!sc.Instance)
-					return;
-				list.Add(entity);
-			});
-
-		list.ForEach(
-			[](Entity& entity)
-			{
-				auto& sc = entity.Set<ScriptComponent>();
-				auto old = sc.Instance;
-				if(!old->IsInitialized()) {
-					sc.Instance = old->GetClass()->Instantiate(entity);
-					sc.Instance->Copy(old);
-				}
-				sc.Instance->Call("OnStart");
-			});
 	}
 
-	bool ui = false;
 	if(s_ShouldLoadUI) {
 		s_Screen->UI = *s_ShouldLoadUI;
 		s_ShouldLoadUI = nullptr;
-		ui = true;
 	}
-	else if(screen.UI != "") {
+	else if(screen.UI != "")
 		UILoad(s_Screen->UI);
-		ui = true;
-	}
 
+	List<Entity> list;
+	s_Screen->World->EntityWorld
+	.ForEach<ScriptComponent>(
+		[&](Entity entity)
+		{
+			auto& sc = entity.Set<ScriptComponent>();
+			if(!sc.Instance)
+				return;
+			list.Add(entity);
+		});
+
+	list.ForEach(
+		[](Entity& entity)
+		{
+			auto& sc = entity.Set<ScriptComponent>();
+			auto old = sc.Instance;
+			if(!old->IsInitialized()) {
+				sc.Instance = old->GetClass()->Instantiate(entity);
+				sc.Instance->Copy(old);
+			}
+
+			sc.Instance->Call("OnStart");
+		});
 	s_Screen->ScriptObj->Call("OnLoad");
 }
 

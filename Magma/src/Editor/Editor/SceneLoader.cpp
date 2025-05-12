@@ -45,7 +45,7 @@ template<>
 Serializer& Serializer::Write(const Asset& value) {
 	BeginMapping();
 		WriteKey("ID").Write((uint64_t)value.ID);
-		WriteKey("Type").Write((uint32_t)value.Type);
+		WriteKey("Type").Write(AssetTypeToString(value.Type));
 	EndMapping();
 	return *this;
 }
@@ -289,10 +289,10 @@ void SerializeEntity(YAMLSerializer& serializer, const Entity& entity) {
 				// Script Type
 				else if(field.Is(ScriptQualifier::ScriptObject)) {
 					auto* type = field.Type;
-					for(uint32_t i = 0; i < type->GetPropertyCount(); i++) {
-						uint64_t offset;
-						// type->GetProperty()
-					}
+					// for(uint32_t i = 0; i < type->GetPropertyCount(); i++) {
+					// 	uint64_t offset;
+					// 	type->GetProperty()
+					// }
 				}
 
 					serializer.EndMapping()
@@ -470,7 +470,8 @@ static void LoadScript(Entity entity, Asset asset, const std::string& className,
 			*(Vec3*)address = value.as<Vec3>();
 		else if(type == "Asset") {
 			((Asset*)address)->ID = value["ID"].as<uint64_t>();
-			((Asset*)address)->Type = (AssetType)value["Type"].as<uint32_t>();
+			((Asset*)address)->Type =
+				AssetTypeFromString(value["Type"].as<std::string>());
 		}
 		else if(type == "array") {
 			auto data = value.as<List<uint32_t>>();

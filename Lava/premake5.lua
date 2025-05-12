@@ -46,6 +46,11 @@ project "Lava"
         -- "rapidjson",
     }
 
+    defines {
+        "flecs_STATIC",
+        "NOMINMAX",
+    }
+
     filter "action:vs* or system:linux"
         links { "PhysX" }
 

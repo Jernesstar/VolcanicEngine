@@ -166,7 +166,10 @@ static void SelectClass(Ref<ScriptModule> mod) {
 	ImGui::OpenPopup("Select Script Class");
 	if(ImGui::BeginPopupModal("Select Script Class"))
 	{
-		for(const auto& [name, _] : mod->GetClasses()) {
+		for(const auto& [name, _class] : mod->GetClasses()) {
+			if(!_class->Implements("IUIController"))
+				continue;
+
 			bool pressed = ImGui::Button(name.c_str());
 			if(pressed) {
 				s_Class = name;

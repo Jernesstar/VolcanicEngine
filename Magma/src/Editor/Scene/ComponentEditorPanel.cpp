@@ -46,7 +46,7 @@ ComponentEditorPanel::ComponentEditorPanel()
 	Application::PushDir();
 	s_FileIcon =
 		CreateRef<UI::Image>(
-			AssetImporter::GetTexture("Magma/assets/icons/FileIcon.png"));
+			AssetImporter::GetTexture("Magma/assets/icons/FileIcon.png", false));
 	Application::PopDir();
 }
 

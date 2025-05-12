@@ -42,7 +42,7 @@ class PlayerController : IEntityController
         print("Coins: " + game.State.Coins);
 
         print("Name: " + Handle.Name);
-        print("Alive: " + Handle.Alive);
+        print("Alive: " + Handle.IsAlive());
         const TagComponent@ tag = Handle.GetTagComponent();
         print(tag.Tag);
 
@@ -108,6 +108,9 @@ class PlayerController : IEntityController
             print("Playing sound");
             Sound@ sound = AssetManager.GetSound(soundAsset);
             sound.Play();
+        }
+        if(e.Key == Key::V) {
+            print("hello");
         }
     }
 

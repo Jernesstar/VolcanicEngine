@@ -202,9 +202,9 @@ void RegisterTypes() {
 		asFUNCTION(NormalizeVec3), asCALL_CDECL);
 	engine->RegisterGlobalFunction("float radians(float deg)",
 		asFUNCTION(DegreesToRadians), asCALL_CDECL);
-	engine->RegisterGlobalFunction("float radians(const Vec3 &in)",
+	engine->RegisterGlobalFunction("Vec3 radians(const Vec3 &in)",
 		asFUNCTION(DegreesToRadiansVec3), asCALL_CDECL);
-	engine->RegisterGlobalFunction("float sin(const Vec3 &in)",
+	engine->RegisterGlobalFunction("Vec3 sin(const Vec3 &in)",
 		asFUNCTION(SinVec3), asCALL_CDECL);
 
 	// engine->SetDefaultNamespace("");
@@ -448,6 +448,7 @@ static void SetCameraHeight(uint32_t height, CameraComponent* cc) {
 }
 
 static asIScriptObject* GetScriptInstance(ScriptComponent* sc) {
+	sc->Instance->GetHandle()->AddRef();
 	return sc->Instance->GetHandle();
 }
 
@@ -462,14 +463,14 @@ static void RigidBodyApplyForce(Vec3 force, RigidBody* body) {
 	body->As<Physics::DynamicBody>()->ApplyForce(force);
 }
 
-static CameraComponent& AddCameraComponent(Entity& entity) {
+static CameraComponent* AddCameraComponent(Entity& entity) {
 	entity.Add<CameraComponent>();
-	return entity.Set<CameraComponent>();
+	return &entity.Set<CameraComponent>();
 }
 
-static TagComponent& AddTagComponent(Entity& entity) {
+static TagComponent* AddTagComponent(Entity& entity) {
 	entity.Add<TagComponent>();
-	return entity.Set<TagComponent>();
+	return &entity.Set<TagComponent>();
 }
 
 static TransformComponent* AddTransformComponent(Entity& entity) {
@@ -674,7 +675,8 @@ void RegisterECS() {
 	engine->RegisterObjectType("ScriptComponent", 0, asOBJ_REF | asOBJ_NOCOUNT);
 	engine->RegisterObjectProperty("ScriptComponent", "Asset ModuleAsset",
 		asOFFSET(ScriptComponent, ModuleAsset));
-	engine->RegisterObjectMethod("ScriptComponent", "IEntityController@ get_Instance()",
+	engine->RegisterObjectMethod("ScriptComponent",
+		"IEntityController@ get_Instance() property",
 		asFUNCTION(GetScriptInstance), asCALL_CDECL_OBJLAST);
 
 	engine->RegisterObjectType("RigidBodyComponent", 0, asOBJ_REF | asOBJ_NOCOUNT);
@@ -713,8 +715,12 @@ void RegisterECS() {
 		asGetTypeTraits<Entity>());
 	engine->RegisterObjectMethod("Entity", "string get_Name() const property",
 		asMETHOD(Entity, GetName), asCALL_THISCALL);
-	engine->RegisterObjectMethod("Entity", "bool get_Alive() const property",
+	engine->RegisterObjectMethod("Entity", "void set_Name(const string &in) property",
+		asMETHOD(Entity, SetName), asCALL_THISCALL);
+	engine->RegisterObjectMethod("Entity", "bool IsAlive() const",
 		asMETHOD(Entity, IsAlive), asCALL_THISCALL);
+	engine->RegisterObjectMethod("Entity", "bool IsValid() const",
+		asMETHOD(Entity, IsValid), asCALL_THISCALL);
 	engine->RegisterObjectMethod("Entity", "void Kill()",
 		asMETHOD(Entity, Kill), asCALL_THISCALL);
 

@@ -123,13 +123,13 @@ Scene:
                   Type: Asset
                   Value:
                     ID: 16624656892553940704
-                    Type: 4
+                    Type: Audio
               - Field:
                   Name: meshAsset
                   Type: Asset
                   Value:
                     ID: 10036008063945961451
-                    Type: 0
+                    Type: Mesh
               - Field:
                   Name: SomeBool
                   Type: bool

@@ -94,8 +94,10 @@ void Editor::Load(const CommandLineArgs& args) {
 		NewProject(args["--project"]);
 
 		if(args["--export"]) {
-			ExportProject(args["--export"]);
+			auto path = fs::canonical(args["--export"].Args[0]).string();
+			ExportProject(path);
 			Application::Close();
+			return;
 		}
 
 		NewTab(CreateRef<ProjectTab>(m_Project.Path));
