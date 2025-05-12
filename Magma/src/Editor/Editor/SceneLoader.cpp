@@ -443,6 +443,8 @@ static void LoadScript(Entity entity, Asset asset, const std::string& className,
 		std::string name = node["Name"].as<std::string>();
 		std::string type = node["Type"].as<std::string>();
 		void* address = instance->GetProperty(name).Data;
+		if(!address)
+			continue;
 
 		if(type == "bool")
 			*(bool*)address = value.as<bool>();

@@ -90,6 +90,8 @@ static AssetManager& GetAssetManagerInstance() {
 
 static void ScriptLoadScene(const std::string& name, App* app) {
 	s_Screen->World->Name = name;
+
+	s_Screen->World->RegisterSystems();
 	app->SceneLoad(*s_Screen->World);
 
 	List<Entity> list;
@@ -307,10 +309,8 @@ void App::ScreenSet(const std::string& name) {
 		s_ShouldLoadScene = nullptr;
 		s_Screen->World->RegisterSystems();
 	}
-	else if(screen.Scene != "") {
-		s_Screen->World->RegisterSystems();
-		SceneLoad(*s_Screen->World);
-	}
+	else if(screen.Scene != "")
+		ScriptLoadScene(screen.Scene, this);
 
 	if(s_ShouldLoadUI) {
 		s_Screen->UI = *s_ShouldLoadUI;
@@ -319,29 +319,6 @@ void App::ScreenSet(const std::string& name) {
 	else if(screen.UI != "")
 		UILoad(s_Screen->UI);
 
-	List<Entity> list;
-	s_Screen->World->EntityWorld
-	.ForEach<ScriptComponent>(
-		[&](Entity entity)
-		{
-			auto& sc = entity.Set<ScriptComponent>();
-			if(!sc.Instance)
-				return;
-			list.Add(entity);
-		});
-
-	list.ForEach(
-		[](Entity& entity)
-		{
-			auto& sc = entity.Set<ScriptComponent>();
-			auto old = sc.Instance;
-			if(!old->IsInitialized()) {
-				sc.Instance = old->GetClass()->Instantiate(entity);
-				sc.Instance->Copy(old);
-			}
-
-			sc.Instance->Call("OnStart");
-		});
 	s_Screen->ScriptObj->Call("OnLoad");
 }
 
@@ -534,7 +511,7 @@ void RuntimeSceneRenderer::Render() {
 	LightingCommand->UniformData
 	.SetInput("u_SpotlightCount", (int32_t)SpotlightCount);
 	LightingCommand->UniformData
-	.SetInput("u_SceneVisualizer", 0);
+	.SetInput("u_SceneVisualizer", 1);
 
 	LightingCommand->UniformData
 	.SetInput(UniformSlot{ DirectionalLightBuffer, "", 0 });

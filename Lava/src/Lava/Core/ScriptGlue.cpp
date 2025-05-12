@@ -139,6 +139,19 @@ static Vec3& AddAssignVec3(Vec3 vec, Vec3& dest) {
 	return dest;
 }
 
+static Vec3& SubAssignVec3(Vec3 vec, Vec3& dest) {
+	dest -= vec;
+	return dest;
+}
+
+static Vec3 AddVec3(const Vec3& v1, const Vec3& v2) {
+	return v1 + v2;
+}
+
+static Vec3 SubVec3(const Vec3& v1, const Vec3& v2) {
+	return v1 - v2;
+}
+
 static Vec3 NegateVec3(const Vec3& dest) {
 	return -dest;
 }
@@ -191,11 +204,17 @@ void RegisterTypes() {
 	engine->RegisterObjectProperty("Vec3", "float y", asOFFSET(Vec3, y));
 	engine->RegisterObjectProperty("Vec3", "float z", asOFFSET(Vec3, z));
 
-	engine->RegisterObjectMethod("Vec3", "Vec3 &opAddAssign(Vec3)",
+	engine->RegisterObjectMethod("Vec3", "Vec3 &opAddAssign(const Vec3 &in)",
 		asFUNCTION(AddAssignVec3), asCALL_CDECL_OBJLAST);
-	engine->RegisterObjectMethod("Vec3", "Vec3 opNeg()",
+	engine->RegisterObjectMethod("Vec3", "Vec3 &opSubAssign(const Vec3 &in)",
+		asFUNCTION(SubAssignVec3), asCALL_CDECL_OBJLAST);
+	engine->RegisterObjectMethod("Vec3", "Vec3 opAdd(const Vec3 &in) const",
+		asFUNCTION(SubAssignVec3), asCALL_CDECL_OBJLAST);
+	engine->RegisterObjectMethod("Vec3", "Vec3 opSub(const Vec3 &in) const",
+		asFUNCTION(SubAssignVec3), asCALL_CDECL_OBJLAST);
+	engine->RegisterObjectMethod("Vec3", "Vec3 opNeg() const",
 		asFUNCTION(NegateVec3), asCALL_CDECL_OBJLAST);
-	engine->RegisterObjectMethod("Vec3", "Vec3 opMul(float r)",
+	engine->RegisterObjectMethod("Vec3", "Vec3 opMul(float r) const",
 		asFUNCTION(MultiplyVec3), asCALL_CDECL_OBJLAST);
 
 	engine->RegisterGlobalFunction("Vec3 normalize(const Vec3 &in)",
@@ -368,8 +387,7 @@ void RegisterAssetManager() {
 	auto* engine = ScriptEngine::Get();
 
 	engine->RegisterObjectType("Asset", sizeof(Asset),
-		asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_ALLINTS
-		| asGetTypeTraits<Asset>());
+		asOBJ_VALUE | asOBJ_POD | asGetTypeTraits<Asset>());
 	engine->RegisterObjectMethod("Asset", "uint64 get_ID() const property",
 		asFUNCTION(GetAssetID), asCALL_CDECL_OBJLAST);
 
