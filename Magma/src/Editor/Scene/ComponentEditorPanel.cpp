@@ -182,7 +182,17 @@ void DrawComponent<CameraComponent>(Entity& entity) {
 			camera = Camera::Create(Camera::Type::Stereo);
 		if(ImGui::Button("Create Orthographic"))
 			camera = Camera::Create(Camera::Type::Ortho);
+		return;
+	}
 
+	auto typeStr = camera->GetType() == Camera::Type::Ortho ?
+		"Type: Orthographic" : "Type: Stereographic";
+	ImGui::Text(typeStr); ImGui::SameLine();
+	if(ImGui::Button("Switch")) {
+		if(camera->GetType() == Camera::Type::Stereo)
+			camera = Camera::Create(Camera::Type::Ortho);
+		else if(camera->GetType() == Camera::Type::Ortho)
+			camera = Camera::Create(Camera::Type::Stereo);
 		return;
 	}
 

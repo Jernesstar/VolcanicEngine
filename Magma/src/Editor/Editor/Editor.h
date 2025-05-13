@@ -31,12 +31,21 @@ public:
 	void Render();
 
 	void NewTab(Ref<Tab> tab);
-	Ref<Tab> GetCurrentTab() { return m_Tabs[m_CurrentTab]; }
-	ProjectTab* GetProjectTab() { return m_Tabs[0]->As<ProjectTab>(); }
+	static Ref<Tab> GetCurrentTab() {
+		return s_Instance->m_Tabs[s_Instance->m_CurrentTab];
+	}
+	static ProjectTab* GetProjectTab() {
+		return s_Instance->m_Tabs[0]->As<ProjectTab>();
+	}
 
-	Project& GetProject() { return m_Project; }
-	EditorAssetManager& GetAssetManager() { return m_AssetManager; }
-	Ref<Lava::App>& GetApp() { return m_App; }
+	static EditorAssetManager& GetAssetManager() {
+		return s_Instance->m_AssetManager;
+	}
+	static Project& GetProject() { return s_Instance->m_Project; }
+	static Ref<Lava::App>& GetApp() { return s_Instance->m_App; }
+
+private:
+	inline static Editor* s_Instance;
 
 private:
 	Project m_Project;

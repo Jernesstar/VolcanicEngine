@@ -14,8 +14,8 @@ Sound::~Sound() {
 
 }
 
-void Sound::Play() {
-	AudioEngine::Get()->play(m_Sound, Volume);
+void Sound::Play(float volume) {
+	AudioEngine::Get()->play(m_Sound, volume);
 }
 
 }

@@ -71,6 +71,10 @@ class PlayerController : IEntityController
                 mc.MeshAsset = meshAsset;
             }
         }
+
+        auto v1 = Vec3(0.0f);
+        v1 += Vec3(1.0f);
+        print("Addition: " + v1.x);
     }
 
     void OnUpdate(float ts)
@@ -78,17 +82,17 @@ class PlayerController : IEntityController
         TransformComponent@ tc = Handle.SetTransformComponent();
 
         if(Input::KeyPressed(Key::Left))
-            tc.Translation.x -= 0.05f * ts;
+            tc.Translation.x -= 0.005f * ts;
         if(Input::KeyPressed(Key::Right))
-            tc.Translation.x += 0.05f * ts;
+            tc.Translation.x += 0.005f * ts;
         if(Input::KeyPressed(Key::Up))
-            tc.Translation.z -= 0.05f * ts;
+            tc.Translation.z -= 0.005f * ts;
         if(Input::KeyPressed(Key::Down))
-            tc.Translation.z += 0.05f * ts;
+            tc.Translation.z += 0.005f * ts;
         if(Input::KeyPressed(Key::Q))
-            tc.Translation.y += 0.05f * ts;
+            tc.Translation.y += 0.005f * ts;
         if(Input::KeyPressed(Key::E))
-            tc.Translation.y -= 0.05f * ts;
+            tc.Translation.y -= 0.005f * ts;
     }
 
     void OnKeyEvent(KeyEvent@ event)

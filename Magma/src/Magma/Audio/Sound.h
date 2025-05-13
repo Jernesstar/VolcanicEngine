@@ -10,13 +10,10 @@ namespace Magma::Audio {
 
 class Sound {
 public:
-	float Volume = -1.0f;
-
-public:
 	Sound();
 	~Sound();
 
-	void Play();
+	void Play(float volume = -1.0f);
 
 	SoLoud::Wav& GetInternal() { return m_Sound; }
 

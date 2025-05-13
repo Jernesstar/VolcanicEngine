@@ -163,6 +163,10 @@ void ProjectTab::RenderEssentialPanels() {
 }
 
 void ProjectTab::RenderButtons() {
+	auto type = Editor::GetCurrentTab()->Type;
+	if(type != TabType::Scene && type != TabType::UI)
+		return;
+
 	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.f, 0.f, 0.f, 0.f));
 	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.f, 0.f, 0.f, 0.f));
 	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.f, 0.f, 0.f, 0.f));

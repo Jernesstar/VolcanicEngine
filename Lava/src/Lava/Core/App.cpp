@@ -89,8 +89,7 @@ static AssetManager& GetAssetManagerInstance() {
 }
 
 static void ScriptLoadScene(const std::string& name, App* app) {
-	s_Screen->World->Name = name;
-
+	s_Screen->World = CreateRef<Scene>(name);
 	s_Screen->World->RegisterSystems();
 	app->SceneLoad(*s_Screen->World);
 
@@ -99,7 +98,7 @@ static void ScriptLoadScene(const std::string& name, App* app) {
 	.ForEach<ScriptComponent>(
 		[&](Entity entity)
 		{
-			auto& sc = entity.Set<ScriptComponent>();
+		auto& sc = entity.Set<ScriptComponent>();
 			if(!sc.Instance)
 				return;
 			list.Add(entity);
@@ -308,6 +307,30 @@ void App::ScreenSet(const std::string& name) {
 		*s_Screen->World = *s_ShouldLoadScene;
 		s_ShouldLoadScene = nullptr;
 		s_Screen->World->RegisterSystems();
+
+		List<Entity> list;
+		s_Screen->World->EntityWorld
+		.ForEach<ScriptComponent>(
+			[&](Entity entity)
+			{
+				auto& sc = entity.Set<ScriptComponent>();
+				if(!sc.Instance)
+					return;
+				list.Add(entity);
+			});
+
+		list.ForEach(
+			[](Entity& entity)
+			{
+				auto& sc = entity.Set<ScriptComponent>();
+				auto old = sc.Instance;
+				if(!old->IsInitialized()) {
+					sc.Instance = old->GetClass()->Instantiate(entity);
+					sc.Instance->Copy(old);
+				}
+
+				sc.Instance->Call("OnStart");
+			});
 	}
 	else if(screen.Scene != "")
 		ScriptLoadScene(screen.Scene, this);

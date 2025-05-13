@@ -58,6 +58,8 @@ struct {
 } static menu;
 
 Editor::Editor() {
+	s_Instance = this;
+
 	Physics::Init();
 	AudioEngine::Init();
 	ScriptEngine::Init();

@@ -134,12 +134,12 @@ static void Vec4ListConstructor(float* list, Vec4* ptr) {
 	new(ptr) Vec4(list[0], list[1], list[2], list[3]);
 }
 
-static Vec3& AddAssignVec3(Vec3 vec, Vec3& dest) {
+static Vec3& AddAssignVec3(const Vec3& vec, Vec3& dest) {
 	dest += vec;
 	return dest;
 }
 
-static Vec3& SubAssignVec3(Vec3 vec, Vec3& dest) {
+static Vec3& SubAssignVec3(const Vec3& vec, Vec3& dest) {
 	dest -= vec;
 	return dest;
 }
@@ -160,6 +160,14 @@ static Vec3 MultiplyVec3(float r, const Vec3& dest) {
 	return r * dest;
 }
 
+static Vec3 FloatDivideVec3(float r, const Vec3& dest) {
+	return r / dest;
+}
+
+static Vec3 FloatDividedByVec3(float r, const Vec3& dest) {
+	return dest / r;
+}
+
 static float DegreesToRadians(float degrees) {
 	return glm::radians(degrees);
 }
@@ -170,6 +178,10 @@ static glm::vec3 DegreesToRadiansVec3(const Vec3& degrees) {
 
 static glm::vec3 SinVec3(const Vec3& radians) {
 	return glm::sin(radians);
+}
+
+static glm::vec3 CosVec3(const Vec3& radians) {
+	return glm::cos(radians);
 }
 
 static Vec3 NormalizeVec3(const Vec3& vec) {
@@ -189,14 +201,13 @@ void RegisterTypes() {
 	engine->RegisterObjectBehaviour("Vec3", asBEHAVE_CONSTRUCT,
 		"void f()", asFUNCTION(Vec3DefaultConstructor), asCALL_CDECL_OBJLAST);
 	engine->RegisterObjectBehaviour("Vec3", asBEHAVE_CONSTRUCT,
-		"void f(const Vec3 &in)",
-		asFUNCTION(Vec3CopyConstructor), asCALL_CDECL_OBJLAST);
+		"void f(const Vec3 &in)", asFUNCTION(Vec3CopyConstructor),
+		asCALL_CDECL_OBJLAST);
 	engine->RegisterObjectBehaviour("Vec3", asBEHAVE_CONSTRUCT,
-		"void f(float)",
-		asFUNCTION(Vec3ConvConstructor), asCALL_CDECL_OBJLAST);
+		"void f(float)", asFUNCTION(Vec3ConvConstructor), asCALL_CDECL_OBJLAST);
 	engine->RegisterObjectBehaviour("Vec3", asBEHAVE_CONSTRUCT,
-		"void f(float, float, float)",
-		asFUNCTION(Vec3InitConstructor), asCALL_CDECL_OBJLAST);
+		"void f(float, float, float)", asFUNCTION(Vec3InitConstructor),
+		asCALL_CDECL_OBJLAST);
 	engine->RegisterObjectBehaviour("Vec3", asBEHAVE_LIST_CONSTRUCT,
 		"void f(const int &in) { float, float, float }",
 		asFUNCTION(Vec3ListConstructor), asCALL_CDECL_OBJLAST);
@@ -209,22 +220,30 @@ void RegisterTypes() {
 	engine->RegisterObjectMethod("Vec3", "Vec3 &opSubAssign(const Vec3 &in)",
 		asFUNCTION(SubAssignVec3), asCALL_CDECL_OBJLAST);
 	engine->RegisterObjectMethod("Vec3", "Vec3 opAdd(const Vec3 &in) const",
-		asFUNCTION(SubAssignVec3), asCALL_CDECL_OBJLAST);
+		asFUNCTION(AddVec3), asCALL_CDECL_OBJFIRST);
 	engine->RegisterObjectMethod("Vec3", "Vec3 opSub(const Vec3 &in) const",
-		asFUNCTION(SubAssignVec3), asCALL_CDECL_OBJLAST);
+		asFUNCTION(SubVec3), asCALL_CDECL_OBJFIRST);
 	engine->RegisterObjectMethod("Vec3", "Vec3 opNeg() const",
 		asFUNCTION(NegateVec3), asCALL_CDECL_OBJLAST);
 	engine->RegisterObjectMethod("Vec3", "Vec3 opMul(float r) const",
 		asFUNCTION(MultiplyVec3), asCALL_CDECL_OBJLAST);
+	engine->RegisterObjectMethod("Vec3", "Vec3 opMul_r(float r) const",
+		asFUNCTION(MultiplyVec3), asCALL_CDECL_OBJLAST);
+	engine->RegisterObjectMethod("Vec3", "Vec3 opDiv(float r) const",
+		asFUNCTION(FloatDivideVec3), asCALL_CDECL_OBJLAST);
+	engine->RegisterObjectMethod("Vec3", "Vec3 opDiv_r(float r) const",
+		asFUNCTION(FloatDividedByVec3), asCALL_CDECL_OBJLAST);
 
-	engine->RegisterGlobalFunction("Vec3 normalize(const Vec3 &in)",
-		asFUNCTION(NormalizeVec3), asCALL_CDECL);
 	engine->RegisterGlobalFunction("float radians(float deg)",
 		asFUNCTION(DegreesToRadians), asCALL_CDECL);
 	engine->RegisterGlobalFunction("Vec3 radians(const Vec3 &in)",
 		asFUNCTION(DegreesToRadiansVec3), asCALL_CDECL);
 	engine->RegisterGlobalFunction("Vec3 sin(const Vec3 &in)",
 		asFUNCTION(SinVec3), asCALL_CDECL);
+	engine->RegisterGlobalFunction("Vec3 cos(const Vec3 &in)",
+		asFUNCTION(CosVec3), asCALL_CDECL);
+	engine->RegisterGlobalFunction("Vec3 normalize(const Vec3 &in)",
+		asFUNCTION(NormalizeVec3), asCALL_CDECL);
 
 	// engine->SetDefaultNamespace("");
 }
@@ -366,8 +385,8 @@ void RegisterEvents() {
 	ScriptEngine::RegisterInterface("GameEvent");
 }
 
-static uint64_t GetAssetID(Asset& asset) {
-	return (uint64_t)asset.ID;
+static uint64_t GetAssetID(Asset* asset) {
+	return (uint64_t)asset->ID;
 }
 
 static void AssetDefaultCtor(Asset* ptr) {
@@ -424,11 +443,8 @@ void RegisterAssetManager() {
 	// 	asMETHOD(AssetManager, GetNamedAsset), asCALL_THISCALL);
 
 	engine->RegisterObjectType("Sound", 0, asOBJ_REF | asOBJ_NOCOUNT);
-	engine->RegisterObjectMethod("Sound", "void Play()", asMETHOD(Sound, Play),
-		asCALL_THISCALL);
-	engine->RegisterObjectProperty("Sound", "float Volume",
-		asOFFSET(Sound, Volume));
-
+	engine->RegisterObjectMethod("Sound", "void Play()",
+		asMETHOD(Sound, Play), asCALL_THISCALL);
 	engine->RegisterObjectMethod("AssetManagerClass",
 		"Sound@ GetSound(Asset)", asFUNCTION(GetSound), asCALL_CDECL_OBJLAST);
 }
@@ -481,160 +497,160 @@ static void RigidBodyApplyForce(Vec3 force, RigidBody* body) {
 	body->As<Physics::DynamicBody>()->ApplyForce(force);
 }
 
-static CameraComponent* AddCameraComponent(Entity& entity) {
-	entity.Add<CameraComponent>();
-	return &entity.Set<CameraComponent>();
+static CameraComponent* AddCameraComponent(Entity* entity) {
+	entity->Add<CameraComponent>();
+	return &entity->Set<CameraComponent>();
 }
 
-static TagComponent* AddTagComponent(Entity& entity) {
-	entity.Add<TagComponent>();
-	return &entity.Set<TagComponent>();
+static TagComponent* AddTagComponent(Entity* entity) {
+	entity->Add<TagComponent>();
+	return &entity->Set<TagComponent>();
 }
 
-static TransformComponent* AddTransformComponent(Entity& entity) {
-	entity.Add<TransformComponent>();
-	return &entity.Set<TransformComponent>();
+static TransformComponent* AddTransformComponent(Entity* entity) {
+	entity->Add<TransformComponent>();
+	return &entity->Set<TransformComponent>();
 }
 
-static AudioComponent* AddAudioComponent(Entity& entity) {
-	entity.Add<AudioComponent>();
-	return &entity.Set<AudioComponent>();
+static AudioComponent* AddAudioComponent(Entity* entity) {
+	entity->Add<AudioComponent>();
+	return &entity->Set<AudioComponent>();
 }
 
-static MeshComponent* AddMeshComponent(Entity& entity) {
-	entity.Add<MeshComponent>();
-	return &entity.Set<MeshComponent>();
+static MeshComponent* AddMeshComponent(Entity* entity) {
+	entity->Add<MeshComponent>();
+	return &entity->Set<MeshComponent>();
 }
 
-static SkyboxComponent* AddSkyboxComponent(Entity& entity) {
-	entity.Add<SkyboxComponent>();
-	return &entity.Set<SkyboxComponent>();
+static SkyboxComponent* AddSkyboxComponent(Entity* entity) {
+	entity->Add<SkyboxComponent>();
+	return &entity->Set<SkyboxComponent>();
 }
 
-static ScriptComponent* AddScriptComponent(Entity& entity) {
-	entity.Add<ScriptComponent>();
-	return &entity.Set<ScriptComponent>();
+static ScriptComponent* AddScriptComponent(Entity* entity) {
+	entity->Add<ScriptComponent>();
+	return &entity->Set<ScriptComponent>();
 }
 
-static RigidBodyComponent* AddRigidBodyComponent(Entity& entity) {
-	entity.Add<RigidBodyComponent>();
-	return &entity.Set<RigidBodyComponent>();
+static RigidBodyComponent* AddRigidBodyComponent(Entity* entity) {
+	entity->Add<RigidBodyComponent>();
+	return &entity->Set<RigidBodyComponent>();
 }
 
-static DirectionalLightComponent* AddDirectionalLightComponent(Entity& entity) {
-	entity.Add<DirectionalLightComponent>();
-	return &entity.Set<DirectionalLightComponent>();
+static DirectionalLightComponent* AddDirectionalLightComponent(Entity* entity) {
+	entity->Add<DirectionalLightComponent>();
+	return &entity->Set<DirectionalLightComponent>();
 }
 
-static PointLightComponent* AddPointLightComponent(Entity& entity) {
-	entity.Add<PointLightComponent>();
-	return &entity.Set<PointLightComponent>();
+static PointLightComponent* AddPointLightComponent(Entity* entity) {
+	entity->Add<PointLightComponent>();
+	return &entity->Set<PointLightComponent>();
 }
 
-static SpotlightComponent* AddSpotlightComponent(Entity& entity) {
-	entity.Add<SpotlightComponent>();
-	return &entity.Set<SpotlightComponent>();
+static SpotlightComponent* AddSpotlightComponent(Entity* entity) {
+	entity->Add<SpotlightComponent>();
+	return &entity->Set<SpotlightComponent>();
 }
 
-static ParticleEmitterComponent* AddParticleEmitterComponent(Entity& entity) {
-	entity.Add<ParticleEmitterComponent>();
-	return &entity.Set<ParticleEmitterComponent>();
+static ParticleEmitterComponent* AddParticleEmitterComponent(Entity* entity) {
+	entity->Add<ParticleEmitterComponent>();
+	return &entity->Set<ParticleEmitterComponent>();
 }
 
-static const CameraComponent* GetCameraComponent(const Entity& entity) {
-	return &entity.Get<CameraComponent>();
+static const CameraComponent* GetCameraComponent(const Entity* entity) {
+	return &entity->Get<CameraComponent>();
 }
 
-static const TagComponent* GetTagComponent(const Entity& entity) {
-	return &entity.Get<TagComponent>();
+static const TagComponent* GetTagComponent(const Entity* entity) {
+	return &entity->Get<TagComponent>();
 }
 
-static const TransformComponent* GetTransformComponent(const Entity& entity) {
-	return &entity.Get<TransformComponent>();
+static const TransformComponent* GetTransformComponent(const Entity* entity) {
+	return &entity->Get<TransformComponent>();
 }
 
-static const AudioComponent* GetAudioComponent(const Entity& entity) {
-	return &entity.Get<AudioComponent>();
+static const AudioComponent* GetAudioComponent(const Entity* entity) {
+	return &entity->Get<AudioComponent>();
 }
 
-static const MeshComponent* GetMeshComponent(const Entity& entity) {
-	return &entity.Get<MeshComponent>();
+static const MeshComponent* GetMeshComponent(const Entity* entity) {
+	return &entity->Get<MeshComponent>();
 }
 
-static const SkyboxComponent* GetSkyboxComponent(const Entity& entity) {
-	return &entity.Get<SkyboxComponent>();
+static const SkyboxComponent* GetSkyboxComponent(const Entity* entity) {
+	return &entity->Get<SkyboxComponent>();
 }
 
-static const ScriptComponent* GetScriptComponent(const Entity& entity) {
-	return &entity.Get<ScriptComponent>();
+static const ScriptComponent* GetScriptComponent(const Entity* entity) {
+	return &entity->Get<ScriptComponent>();
 }
 
-static const RigidBodyComponent* GetRigidBodyComponent(const Entity& entity) {
-	return &entity.Get<RigidBodyComponent>();
+static const RigidBodyComponent* GetRigidBodyComponent(const Entity* entity) {
+	return &entity->Get<RigidBodyComponent>();
 }
 
-static const DirectionalLightComponent* GetDirectionalLightComponent(const Entity& entity) {
-	return &entity.Get<DirectionalLightComponent>();
+static const DirectionalLightComponent* GetDirectionalLightComponent(const Entity* entity) {
+	return &entity->Get<DirectionalLightComponent>();
 }
 
-static const PointLightComponent* GetPointLightComponent(const Entity& entity) {
-	return &entity.Get<PointLightComponent>();
+static const PointLightComponent* GetPointLightComponent(const Entity* entity) {
+	return &entity->Get<PointLightComponent>();
 }
 
-static const SpotlightComponent* GetSpotlightComponent(const Entity& entity) {
-	return &entity.Get<SpotlightComponent>();
+static const SpotlightComponent* GetSpotlightComponent(const Entity* entity) {
+	return &entity->Get<SpotlightComponent>();
 }
 
-static const ParticleEmitterComponent* GetParticleEmitterComponent(const Entity& entity) {
-	return &entity.Get<ParticleEmitterComponent>();
+static const ParticleEmitterComponent* GetParticleEmitterComponent(const Entity* entity) {
+	return &entity->Get<ParticleEmitterComponent>();
 }
 
-static CameraComponent* SetCameraComponent(Entity& entity) {
-	return &entity.Set<CameraComponent>();
+static CameraComponent* SetCameraComponent(Entity* entity) {
+	return &entity->Set<CameraComponent>();
 }
 
-static TagComponent* SetTagComponent(Entity& entity) {
-	return &entity.Set<TagComponent>();
+static TagComponent* SetTagComponent(Entity* entity) {
+	return &entity->Set<TagComponent>();
 }
 
-static TransformComponent* SetTransformComponent(Entity& entity) {
-	return &entity.Set<TransformComponent>();
+static TransformComponent* SetTransformComponent(Entity* entity) {
+	return &entity->Set<TransformComponent>();
 }
 
-static AudioComponent* SetAudioComponent(Entity& entity) {
-	return &entity.Set<AudioComponent>();
+static AudioComponent* SetAudioComponent(Entity* entity) {
+	return &entity->Set<AudioComponent>();
 }
 
-static MeshComponent* SetMeshComponent(Entity& entity) {
-	return &entity.Set<MeshComponent>();
+static MeshComponent* SetMeshComponent(Entity* entity) {
+	return &entity->Set<MeshComponent>();
 }
 
-static SkyboxComponent* SetSkyboxComponent(Entity& entity) {
-	return &entity.Set<SkyboxComponent>();
+static SkyboxComponent* SetSkyboxComponent(Entity* entity) {
+	return &entity->Set<SkyboxComponent>();
 }
 
-static ScriptComponent* SetScriptComponent(Entity& entity) {
-	return &entity.Set<ScriptComponent>();
+static ScriptComponent* SetScriptComponent(Entity* entity) {
+	return &entity->Set<ScriptComponent>();
 }
 
-static RigidBodyComponent* SetRigidBodyComponent(Entity& entity) {
-	return &entity.Set<RigidBodyComponent>();
+static RigidBodyComponent* SetRigidBodyComponent(Entity* entity) {
+	return &entity->Set<RigidBodyComponent>();
 }
 
-static DirectionalLightComponent* SetDirectionalLightComponent(Entity& entity) {
-	return &entity.Set<DirectionalLightComponent>();
+static DirectionalLightComponent* SetDirectionalLightComponent(Entity* entity) {
+	return &entity->Set<DirectionalLightComponent>();
 }
 
-static PointLightComponent* SetPointLightComponent(Entity& entity) {
-	return &entity.Set<PointLightComponent>();
+static PointLightComponent* SetPointLightComponent(Entity* entity) {
+	return &entity->Set<PointLightComponent>();
 }
 
-static SpotlightComponent* SetSpotlightComponent(Entity& entity) {
-	return &entity.Set<SpotlightComponent>();
+static SpotlightComponent* SetSpotlightComponent(Entity* entity) {
+	return &entity->Set<SpotlightComponent>();
 }
 
-static ParticleEmitterComponent* SetParticleEmitterComponent(Entity& entity) {
-	return &entity.Set<ParticleEmitterComponent>();
+static ParticleEmitterComponent* SetParticleEmitterComponent(Entity* entity) {
+	return &entity->Set<ParticleEmitterComponent>();
 }
 
 void RegisterECS() {
