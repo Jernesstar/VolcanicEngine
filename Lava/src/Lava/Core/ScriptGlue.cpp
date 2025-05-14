@@ -382,7 +382,9 @@ void RegisterEvents() {
 	engine->RegisterObjectType("PhysicsEvent", 0, asOBJ_REF | asOBJ_NOCOUNT);
 	// engine->RegisterObjectProperty("PhysicsEvent", "PhysicsEventType Type")
 
-	ScriptEngine::RegisterInterface("GameEvent");
+	// TODO: Replace with class
+	ScriptEngine::RegisterInterface("GameEvent")
+		.AddMethod("string GetID() const");
 }
 
 static uint64_t GetAssetID(Asset* asset) {
@@ -969,6 +971,10 @@ void RegisterUI() {
 	// engine->RegisterObjectProperty("UIElement", "");
 
 	engine->RegisterObjectType("UIPageClass", 0, asOBJ_REF | asOBJ_NOHANDLE);
+	engine->RegisterObjectMethod("UIPageClass", "void ResetLayers()",
+		asMETHOD(UIPage, SetLayer), asCALL_THISCALL);
+	engine->RegisterObjectMethod("UIPageClass", "void SetLayer(const string &in)",
+		asMETHOD(UIPage, SetLayer), asCALL_THISCALL);
 	engine->RegisterObjectMethod("UIPageClass", "void PushLayer(const string &in)",
 		asMETHOD(UIPage, PushLayer), asCALL_THISCALL);
 	engine->RegisterObjectMethod("UIPageClass", "void PopLayer()",

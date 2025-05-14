@@ -44,6 +44,7 @@ public:
 	UIPage& operator =(const UIPage& other);
 
 	void Render();
+	void SetLayer(const std::string& name = "Root");
 	void PushLayer(const std::string& name);
 	void PopLayer();
 

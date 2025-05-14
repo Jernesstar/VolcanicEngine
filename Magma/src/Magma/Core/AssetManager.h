@@ -20,6 +20,7 @@ using namespace Magma::Script;
 namespace Magma {
 
 enum class AssetType {
+	None,
 	Mesh,
 	Texture,
 	Cubemap,
@@ -27,7 +28,6 @@ enum class AssetType {
 	Audio,
 	Script,
 	Shader,
-	None
 };
 
 struct Asset {

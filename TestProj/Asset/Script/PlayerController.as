@@ -113,9 +113,6 @@ class PlayerController : IEntityController
             Sound@ sound = AssetManager.GetSound(soundAsset);
             sound.Play();
         }
-        if(e.Key == Key::V) {
-            print("hello");
-        }
     }
 
     void OnMouseEvent(MouseEvent@ event)

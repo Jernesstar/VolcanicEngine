@@ -158,6 +158,11 @@ UINode UIPage::Add(UIElementType type, const std::string& id) {
 	return { UIElementType::None, 0 };
 }
 
+void UIPage::SetLayer(const std::string& name) {
+	m_Layers.Clear();
+	m_Layers.Add(name);
+}
+
 void UIPage::PushLayer(const std::string& name) {
 	m_Layers.Push(name);
 }
