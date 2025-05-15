@@ -133,7 +133,7 @@ Scene:
               - Field:
                   Name: SomeBool
                   Type: bool
-                  Value: true
+                  Value: false
               - Field:
                   Name: Signed8
                   Type: int8
@@ -149,15 +149,15 @@ Scene:
               - Field:
                   Name: Tilemap
                   Type: array
-                  Value: [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1]
+                  Value: []
               - Field:
                   Name: Width
                   Type: uint32
-                  Value: 9
+                  Value: 0
               - Field:
                   Name: Height
                   Type: uint32
-                  Value: 9
+                  Value: 0
               - Field:
                   Name: SomeVec3
                   Type: Vec3

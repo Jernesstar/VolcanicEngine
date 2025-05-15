@@ -60,6 +60,15 @@ static void EditAsset(Asset asset) {
 	ImGui::Text("Type: %s", type.c_str());
 	ImGui::Text("ID: %llu", (uint64_t)asset.ID);
 
+	std::string name = AssetManager::Get()->GetAssetName(asset);
+	ImGui::Text("Name: "); ImGui::SameLine();
+	bool active = ImGui::InputTextWithHint("##AssetName", "Unnamed asset", &name);
+
+	if(active && ImGui::IsKeyPressed(ImGuiKey_Enter, false)) {
+		AssetManager::Get()->RemoveName(asset);
+		AssetManager::Get()->NameAsset(asset, name);
+	}
+
 	if(asset.Type == AssetType::Script) {
 		if(ImGui::Button("Edit Script")) {
 			auto& editor = Application::As<EditorApp>()->GetEditor();

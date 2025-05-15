@@ -5,9 +5,9 @@ class SomeScriptClass
     uint32 Int = 0;
 }
 
-class PlayerDied
+class PlayerDied : GameEvent
 {
-
+    string GetID() const { return "PlayerDied"; }
 }
 
 class PlayerController : IEntityController
@@ -59,7 +59,6 @@ class PlayerController : IEntityController
             for(uint32 x = 0; x < Width; x++) {
                 uint32 i = (y * Width) + x;
                 uint32 data = Tilemap[i];
-                print("Index: " + data);
                 if(data == 0)
                     continue;
 
@@ -71,10 +70,6 @@ class PlayerController : IEntityController
                 mc.MeshAsset = meshAsset;
             }
         }
-
-        auto v1 = Vec3(0.0f);
-        v1 += Vec3(1.0f);
-        print("Addition: " + v1.x);
     }
 
     void OnUpdate(float ts)
@@ -113,6 +108,10 @@ class PlayerController : IEntityController
             Sound@ sound = AssetManager.GetSound(soundAsset);
             sound.Play();
         }
+
+        ScriptSystem@ sys = Scene.GetScriptSystem();
+        PlayerDied@ gameEvent = PlayerDied();
+        sys.BroadcastEvent(Handle, @gameEvent);
     }
 
     void OnMouseEvent(MouseEvent@ event)

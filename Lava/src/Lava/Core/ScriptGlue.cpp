@@ -134,16 +134,6 @@ static void Vec4ListConstructor(float* list, Vec4* ptr) {
 	new(ptr) Vec4(list[0], list[1], list[2], list[3]);
 }
 
-static Vec3& AddAssignVec3(const Vec3& vec, Vec3& dest) {
-	dest += vec;
-	return dest;
-}
-
-static Vec3& SubAssignVec3(const Vec3& vec, Vec3& dest) {
-	dest -= vec;
-	return dest;
-}
-
 static Vec3 AddVec3(const Vec3& v1, const Vec3& v2) {
 	return v1 + v2;
 }
@@ -166,29 +156,6 @@ static Vec3 FloatDivideVec3(float r, const Vec3& dest) {
 
 static Vec3 FloatDividedByVec3(float r, const Vec3& dest) {
 	return dest / r;
-}
-
-static float DegreesToRadians(float degrees) {
-	return glm::radians(degrees);
-}
-
-static glm::vec3 DegreesToRadiansVec3(const Vec3& degrees) {
-	return glm::radians(degrees);
-}
-
-static glm::vec3 SinVec3(const Vec3& radians) {
-	return glm::sin(radians);
-}
-
-static glm::vec3 CosVec3(const Vec3& radians) {
-	return glm::cos(radians);
-}
-
-static Vec3 NormalizeVec3(const Vec3& vec) {
-	return glm::normalize(vec);
-}
-static Vec4 NormalizeVec4(const Vec4& vec) {
-	return glm::normalize(vec);
 }
 
 void RegisterTypes() {
@@ -216,9 +183,9 @@ void RegisterTypes() {
 	engine->RegisterObjectProperty("Vec3", "float z", asOFFSET(Vec3, z));
 
 	engine->RegisterObjectMethod("Vec3", "Vec3 &opAddAssign(const Vec3 &in)",
-		asFUNCTION(AddAssignVec3), asCALL_CDECL_OBJLAST);
+		asMETHODPR(Vec3, operator+=, (const Vec3 &), Vec3&), asCALL_THISCALL);
 	engine->RegisterObjectMethod("Vec3", "Vec3 &opSubAssign(const Vec3 &in)",
-		asFUNCTION(SubAssignVec3), asCALL_CDECL_OBJLAST);
+		asMETHODPR(Vec3, operator-=, (const Vec3 &), Vec3&), asCALL_THISCALL);
 	engine->RegisterObjectMethod("Vec3", "Vec3 opAdd(const Vec3 &in) const",
 		asFUNCTION(AddVec3), asCALL_CDECL_OBJFIRST);
 	engine->RegisterObjectMethod("Vec3", "Vec3 opSub(const Vec3 &in) const",
@@ -235,15 +202,19 @@ void RegisterTypes() {
 		asFUNCTION(FloatDividedByVec3), asCALL_CDECL_OBJLAST);
 
 	engine->RegisterGlobalFunction("float radians(float deg)",
-		asFUNCTION(DegreesToRadians), asCALL_CDECL);
+		asFUNCTIONPR(glm::radians, (float), float), asCALL_CDECL);
 	engine->RegisterGlobalFunction("Vec3 radians(const Vec3 &in)",
-		asFUNCTION(DegreesToRadiansVec3), asCALL_CDECL);
+		asFUNCTIONPR(glm::radians, (const Vec3&), Vec3), asCALL_CDECL);
+	engine->RegisterGlobalFunction("float degrees(float deg)",
+		asFUNCTIONPR(glm::degrees, (float), float), asCALL_CDECL);
+	engine->RegisterGlobalFunction("Vec3 degrees(const Vec3 &in)",
+		asFUNCTIONPR(glm::degrees, (const Vec3&), Vec3), asCALL_CDECL);
 	engine->RegisterGlobalFunction("Vec3 sin(const Vec3 &in)",
-		asFUNCTION(SinVec3), asCALL_CDECL);
+		asFUNCTIONPR(glm::sin, (const Vec3&), Vec3), asCALL_CDECL);
 	engine->RegisterGlobalFunction("Vec3 cos(const Vec3 &in)",
-		asFUNCTION(CosVec3), asCALL_CDECL);
+		asFUNCTIONPR(glm::cos, (const Vec3&), Vec3), asCALL_CDECL);
 	engine->RegisterGlobalFunction("Vec3 normalize(const Vec3 &in)",
-		asFUNCTION(NormalizeVec3), asCALL_CDECL);
+		asFUNCTIONPR(glm::normalize, (const Vec3&), Vec3), asCALL_CDECL);
 
 	// engine->SetDefaultNamespace("");
 }
@@ -404,6 +375,10 @@ static Sound* GetSound(Asset asset, AssetManager* manager) {
 	return manager->Get<Sound>(asset).get();
 }
 
+static void PlaySound(Sound* sound) {
+	sound->Play();
+}
+
 void RegisterAssetManager() {
 	auto* engine = ScriptEngine::Get();
 
@@ -440,13 +415,15 @@ void RegisterAssetManager() {
 		asMETHOD(AssetManager, Load), asCALL_THISCALL);
 	engine->RegisterObjectMethod("AssetManagerClass", "bool Unload(Asset)",
 		asMETHOD(AssetManager, Unload), asCALL_THISCALL);
-	// engine->RegisterObjectMethod("AssetManagerClass",
-	// 	"Asset GetNamedAsset(const string &in)",
-	// 	asMETHOD(AssetManager, GetNamedAsset), asCALL_THISCALL);
+	engine->RegisterObjectMethod("AssetManagerClass",
+		"Asset GetNamedAsset(const string &in)",
+		asMETHOD(AssetManager, GetNamedAsset), asCALL_THISCALL);
 
 	engine->RegisterObjectType("Sound", 0, asOBJ_REF | asOBJ_NOCOUNT);
-	engine->RegisterObjectMethod("Sound", "void Play()",
+	engine->RegisterObjectMethod("Sound", "void Play(float volume)",
 		asMETHOD(Sound, Play), asCALL_THISCALL);
+	engine->RegisterObjectMethod("Sound", "void Play()",
+		asFUNCTION(PlaySound), asCALL_CDECL_OBJLAST);
 	engine->RegisterObjectMethod("AssetManagerClass",
 		"Sound@ GetSound(Asset)", asFUNCTION(GetSound), asCALL_CDECL_OBJLAST);
 }

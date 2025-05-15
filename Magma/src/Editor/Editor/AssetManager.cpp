@@ -297,6 +297,8 @@ void EditorAssetManager::Load(const std::string& path) {
 		AssetType type = AssetTypeFromString(node["Type"].as<std::string>());
 		Asset asset = { id, type };
 		m_AssetRegistry[asset] = false;
+		if(node["Name"])
+			NameAsset(asset, node["Name"].as<std::string>());
 
 		if(node["Path"])
 			m_Paths[id] =
@@ -391,6 +393,9 @@ void EditorAssetManager::Save() {
 		serializer.WriteKey("Asset").BeginMapping();
 		serializer.WriteKey("ID").Write((uint64_t)asset.ID);
 		serializer.WriteKey("Type").Write(AssetTypeToString(asset.Type));
+		auto name = GetAssetName(asset);
+		if(name != "")
+			serializer.WriteKey("Name").Write(name);
 
 		std::string path = GetPath(asset.ID);
 		if(path != "")
@@ -493,6 +498,13 @@ void EditorAssetManager::RuntimeSave(const std::string& exportPath) {
 	for(auto [asset, _] : m_AssetRegistry) {
 		pack.Write((uint64_t)asset.ID);
 		pack.Write((uint32_t)asset.Type);
+		auto name = GetAssetName(asset);
+		if(name != "") {
+			pack.Write(true);
+			pack.Write(name);
+		}
+		else
+			pack.Write(false);
 		auto path = m_Paths[asset.ID];
 
 		if(asset.Type == AssetType::Mesh) {

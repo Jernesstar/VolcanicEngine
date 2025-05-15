@@ -68,6 +68,34 @@ public:
 	virtual void Load(Asset asset) = 0;
 	virtual void Unload(Asset asset) = 0;
 
+	template<typename T>
+	Ref<T> Get(Asset asset);
+
+	void NameAsset(Asset asset, const std::string& name) {
+		m_NamedAssets[name] = asset;
+	}
+
+	std::string GetAssetName(Asset target) {
+		for(auto [name, asset] : m_NamedAssets) {
+			if(asset == target)
+				return name;
+		}
+
+		return "";
+	}
+
+	Asset GetNamedAsset(const std::string& name) const {
+		if(!m_NamedAssets.count(name))
+			return { };
+		return m_NamedAssets.at(name);
+	}
+
+	void RemoveName(Asset asset) {
+		auto name = GetAssetName(asset);
+		if(name != "")
+			m_NamedAssets.erase(name);
+	}
+
 	bool IsLoaded(Asset asset) const {
 		return m_AssetRegistry.at(asset);
 	}
@@ -92,12 +120,10 @@ public:
 		m_ScriptAssets.clear();
 	}
 
-	template<typename T>
-	Ref<T> Get(Asset asset);
-
 protected:
 	std::map<Asset, bool> m_AssetRegistry;
 	Map<VolcaniCore::UUID, VolcaniCore::List<Asset>> m_References;
+	Map<std::string, Asset> m_NamedAssets;
 
 	Map<VolcaniCore::UUID, Ref<VolcaniCore::Mesh>> m_MeshAssets;
 	Map<VolcaniCore::UUID, Ref<VolcaniCore::Texture>> m_TextureAssets;

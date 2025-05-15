@@ -164,9 +164,16 @@ void RuntimeAssetManager::Load() {
 	for(uint64_t i = 0; i < count; i++) {
 		uint64_t id;
 		uint32_t typeInt;
+		bool named;
 		reader.Read(id);
 		reader.Read(typeInt);
+		reader.Read(named);
 		Asset asset{ id, (AssetType)typeInt };
+		if(named) {
+			std::string name;
+			reader.Read(name);
+			NameAsset(asset, name);
+		}
 		uint64_t offset;
 		reader.Read(offset);
 		m_AssetRegistry[asset] = false;

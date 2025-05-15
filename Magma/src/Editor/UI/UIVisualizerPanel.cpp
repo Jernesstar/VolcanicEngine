@@ -319,6 +319,18 @@ void UIVisualizerPanel::Draw() {
 			drawList->AddRect(
 				minPos, maxPos, ImColor(0, 0, 200, 255), 0, 0, 4.0f);
 		}
+
+		// ImGui::SetCursorPos({  });
+		for(auto [layer, _] : m_Context->LayerNodes) {
+			ImGui::BeginChild(("##" + layer).c_str(), { 100, 50 });
+			{
+				if(ImGui::IsMouseDown(0) && ImGui::IsItemHovered()) {
+
+				}
+				ImGui::Text(layer.c_str());
+			}
+			ImGui::EndChild();
+		}
 	}
 	ImGui::End();
 }

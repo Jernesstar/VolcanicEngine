@@ -122,9 +122,9 @@ void ContentBrowserPanel::Draw() {
 
 					ImGui::TableNextColumn();
 
-					std::string display = assetManager.GetPath(asset.ID);
-					if(display != "")
-						display = fs::path(display).filename().string();
+					std::string path = assetManager.GetPath(asset.ID);
+					if(path != "")
+						path = fs::path(path).filename().string();
 
 					UI::Button button;
 					button.Width = thumbnailSize;
@@ -155,8 +155,11 @@ void ContentBrowserPanel::Draw() {
 
 						ImGui::EndDragDropSource();
 					}
-					if(display != "")
-						ImGui::TextWrapped(display.c_str());
+					auto name = assetManager.GetAssetName(asset);
+					if(name != "")
+						ImGui::Text(name.c_str());
+					else if(path != "")
+						ImGui::TextWrapped(path.c_str());
 					else
 						ImGui::Text("%llu", (uint64_t)asset.ID);
 				}

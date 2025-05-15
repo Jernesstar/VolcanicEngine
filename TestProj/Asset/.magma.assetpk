@@ -27,4 +27,5 @@ AssetPack:
     - Asset:
         ID: 16624656892553940704
         Type: Audio
+        Name: Jump
         Path: Audio/Woosh2.wav
