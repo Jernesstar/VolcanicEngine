@@ -260,7 +260,7 @@ BinaryReader& BinaryReader::ReadObject(ParticleEmitterComponent& comp) {
 
 	uint64_t id;
 	Read(id);
-	comp.ImageAsset = { id, AssetType::Texture };
+	comp.MaterialAsset = { id, AssetType::Texture };
 
 	return *this;
 }

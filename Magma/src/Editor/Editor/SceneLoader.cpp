@@ -402,7 +402,7 @@ void SerializeEntity(YAMLSerializer& serializer, const Entity& entity) {
 			.WriteKey("Position").Write(system.Position)
 			.WriteKey("MaxParticleCount").Write(system.MaxParticleCount)
 			.WriteKey("ParticleLifetime").Write(system.ParticleLifetime)
-			.WriteKey("AssetID").Write((uint64_t)system.ImageAsset.ID)
+			.WriteKey("AssetID").Write((uint64_t)system.MaterialAsset.ID)
 		.EndMapping(); // ParticleEmitterComponent
 	}
 
@@ -848,7 +848,7 @@ BinaryWriter& BinaryWriter::WriteObject(const ParticleEmitterComponent& comp) {
 	Write(comp.Position);
 	Write(comp.MaxParticleCount);
 	Write(comp.ParticleLifetime);
-	Write((uint64_t)comp.ImageAsset.ID);
+	Write((uint64_t)comp.MaterialAsset.ID);
 
 	return *this;
 }

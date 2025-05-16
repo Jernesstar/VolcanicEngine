@@ -109,9 +109,9 @@ class PlayerController : IEntityController
             sound.Play();
         }
 
-        ScriptSystem@ sys = Scene.GetScriptSystem();
-        PlayerDied@ gameEvent = PlayerDied();
-        sys.BroadcastEvent(Handle, @gameEvent);
+        // ScriptSystem@ sys = Scene.GetScriptSystem();
+        // PlayerDied@ gameEvent = PlayerDied();
+        // sys.BroadcastEvent(Handle, @gameEvent);
     }
 
     void OnMouseEvent(MouseEvent@ event)

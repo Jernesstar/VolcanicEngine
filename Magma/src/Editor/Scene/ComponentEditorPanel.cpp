@@ -274,8 +274,8 @@ void DrawComponent<AudioComponent>(Entity& entity) {
 	ImGui::SeparatorText("AudioComponent");
 
 	ImGui::Text("Asset ID: %lu", (uint64_t)component.AudioAsset.ID);
-	std::string text = component.AudioAsset.ID ? "Change Asset" : "Set Asset";
-	if(ImGui::Button(text.c_str()))
+	auto text = component.AudioAsset.ID ? "Change Asset" : "Set Asset";
+	if(ImGui::Button(text))
 		s_Selecting = AssetType::Audio;
 
 	if(s_Asset.Type != AssetType::None && !s_ForScript) {
@@ -293,8 +293,8 @@ void DrawComponent<MeshComponent>(Entity& entity) {
 	ImGui::SeparatorText("MeshComponent");
 
 	ImGui::Text("Asset ID: %llu", (uint64_t)component.MeshAsset.ID);
-	std::string text = component.MeshAsset.ID ? "Change Asset" : "Set Asset";
-	if(ImGui::Button(text.c_str()))
+	auto text = component.MeshAsset.ID ? "Change Asset" : "Set Asset";
+	if(ImGui::Button(text))
 		s_Selecting = AssetType::Mesh;
 
 	if(s_Asset.Type != AssetType::None && !s_ForScript) {
@@ -312,8 +312,8 @@ void DrawComponent<SkyboxComponent>(Entity& entity) {
 	ImGui::SeparatorText("SkyboxComponent");
 
 	ImGui::Text("Asset ID: %lu", (uint64_t)component.CubemapAsset.ID);
-	std::string text = component.CubemapAsset.ID ? "Change Asset" : "Set Asset";
-	if(ImGui::Button(text.c_str()))
+	auto text = component.CubemapAsset.ID ? "Change Asset" : "Set Asset";
+	if(ImGui::Button(text))
 		s_Selecting = AssetType::Cubemap;
 
 	if(s_Asset.Type != AssetType::None && !s_ForScript) {
@@ -431,8 +431,8 @@ void DrawComponent<ScriptComponent>(Entity& entity) {
 	ImGui::SeparatorText("ScriptComponent");
 
 	ImGui::Text("Asset ID: %llu", (uint64_t)component.ModuleAsset.ID);
-	std::string text = component.ModuleAsset.ID ? "Change Module" : "Set Module";
-	if(ImGui::Button(text.c_str()))
+	auto text = component.ModuleAsset.ID ? "Change Module" : "Set Module";
+	if(ImGui::Button(text))
 		s_Selecting = AssetType::Script;
 
 	if(s_Asset.Type != AssetType::None && !s_ForScript) {
@@ -720,14 +720,14 @@ void DrawComponent<ParticleEmitterComponent>(Entity& entity) {
 	ImGui::Text("Particle Life Time"); ImGui::SameLine(200.0f);
 	ImGui::DragFloat("##LifeTime", &component.ParticleLifetime,
 		1.0f, 1.0f, 10000.0f);
-	ImGui::Text("Image Asset: %li", (uint64_t)component.ImageAsset.ID);
+	ImGui::Text("Image Asset: %li", (uint64_t)component.MaterialAsset.ID);
 
-	std::string text = component.ImageAsset.ID ? "Change Asset" : "Set Asset";
-	if(ImGui::Button(text.c_str()))
+	auto text = component.MaterialAsset.ID ? "Change Asset" : "Set Asset";
+	if(ImGui::Button(text))
 		s_Selecting = AssetType::Texture;
 
 	if(s_Asset.Type != AssetType::None && !s_ForScript) {
-		component.ImageAsset = s_Asset;
+		component.MaterialAsset = s_Asset;
 		s_Asset = { };
 	}
 }

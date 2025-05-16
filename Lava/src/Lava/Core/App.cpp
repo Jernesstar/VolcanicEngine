@@ -534,7 +534,7 @@ void RuntimeSceneRenderer::Render() {
 	LightingCommand->UniformData
 	.SetInput("u_SpotlightCount", (int32_t)SpotlightCount);
 	LightingCommand->UniformData
-	.SetInput("u_SceneVisualizer", 1);
+	.SetInput("u_SceneVisualizer", 0);
 
 	LightingCommand->UniformData
 	.SetInput(UniformSlot{ DirectionalLightBuffer, "", 0 });

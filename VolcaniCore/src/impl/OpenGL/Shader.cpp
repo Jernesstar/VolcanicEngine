@@ -112,7 +112,7 @@ void ShaderProgram::Lock() {
 	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 }
 
-void ShaderProgram::Compute(uint32_t x, uint32_t y, uint32_t z) {
+void ShaderProgram::Compute(uint32_t x, uint32_t y, uint32_t z) const {
 	glDispatchCompute(x, y, z);
 }
 
