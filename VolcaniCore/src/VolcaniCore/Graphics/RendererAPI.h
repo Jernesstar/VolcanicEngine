@@ -234,6 +234,8 @@ struct DrawCommand {
 	BlendingMode Blending	   = BlendingMode::Greatest;
 	CullingMode Culling		   = CullingMode::Back;
 
+	uint32_t ComputeX = 0, ComputeY = 1, ComputeZ = 1;
+
 	void AddIndices(const Buffer<uint32_t>& data) {
 		Pass->BufferData->AddIndices(data);
 		IndicesCount += data.GetCount();

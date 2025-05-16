@@ -37,6 +37,9 @@ public:
 	void Bind() const;
 	void Unbind() const;
 
+	void Lock();
+	void Compute(uint32_t x, uint32_t y, uint32_t z) const;
+
 private:
 	uint32_t m_ProgramID;
 	List<uint32_t> m_ShaderIDs;

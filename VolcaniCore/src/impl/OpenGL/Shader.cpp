@@ -108,6 +108,14 @@ void ShaderProgram::SetBuffer(const std::string& name, uint32_t binding) {
 	glUniformBlockBinding(m_ProgramID, location, binding);
 }
 
+void ShaderProgram::Lock() {
+	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+}
+
+void ShaderProgram::Compute(uint32_t x, uint32_t y, uint32_t z) {
+	glDispatchCompute(x, y, z);
+}
+
 uint32_t GetShaderType(ShaderType type) {
 	switch(type) {
 		case ShaderType::Vertex:   return GL_VERTEX_SHADER;
