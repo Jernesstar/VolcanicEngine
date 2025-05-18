@@ -90,8 +90,24 @@ Collision::Collision() {
 	world = CreateRef<Physics::World>();
 	createWall(*world);
 
-	// auto plane = RigidBody::Create(RigidBody::Type::Static, Shape(Shape::Type::Plane));
-	// world.AddActor(plane);
+	// auto shape = Shape::Create(Shape::Type::Plane);
+	// auto plane =
+	// 	RigidBody::Create(RigidBody::Type::Static, shape,
+	// 		Transform
+	// 		{
+	// 			.Translation = { 0.0f, -10.0f, 0.0f },
+	// 			.Scale = { 100.0f, 0.0f, 100.0f }
+	// 		});
+	// world->AddActor(plane);
+	Ref<Shape> box = Shape::Create(Shape::Type::Box);
+	auto floor =
+	RigidBody::Create(RigidBody::Type::Static, box,
+		Transform
+		{
+			.Translation = { 0.0f, -2.0f, 0.0f }
+		});
+	floor->SetGravity(false);
+	world->AddActor(floor);
 
 	camera = CreateRef<StereographicCamera>(75.0f);
 	camera->SetPosition({ 0.0f, 0.5f, 3.0f });

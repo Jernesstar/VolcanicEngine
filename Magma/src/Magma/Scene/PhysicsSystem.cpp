@@ -13,6 +13,20 @@ namespace Magma {
 PhysicsSystem::PhysicsSystem(ECS::World* world)
 	: System(world)
 {
+	m_World.AddContactCallback(
+		[this](RigidBody* body1, RigidBody* body2)
+		{
+			Entity entity1 = m_EntityWorld->GetEntity((uint64_t)body1->Data);
+			Entity entity2 = m_EntityWorld->GetEntity((uint64_t)body2->Data);
+			if(entity1.Has<ScriptComponent>()) {
+				auto obj = entity1.Get<ScriptComponent>().Instance;
+				obj->Call("OnPhysicsEvent", CollisionEvent{ entity2 });
+			}
+			if(entity2.Has<ScriptComponent>()) {
+				auto obj = entity2.Get<ScriptComponent>().Instance;
+				obj->Call("OnPhysicsEvent", CollisionEvent{ entity1 });
+			}
+		});
 }
 
 void PhysicsSystem::Update(TimeStep ts) {
@@ -36,16 +50,6 @@ void PhysicsSystem::Run(Entity& entity, TimeStep ts, Phase phase) {
 }
 
 void PhysicsSystem::OnComponentAdd(Entity& entity) {
-	// m_World.AddContactCallback(
-	// 	[this](Ref<RigidBody> body1, Ref<RigidBody> body2)
-	// 	{
-	// 		Entity entity1 = m_EntityWorld->GetEntity((uint64_t)body1->Data);
-	// 		Entity entity2 = m_EntityWorld->GetEntity((uint64_t)body2->Data);
-	// 		if(entity1.Has<ScriptComponent>()) {
-	// 			auto obj = entity1.Get<ScriptComponent>().Instance;
-	// 			obj->Call("OnPhysicsEvent", CollisionEvent{ entity2 });
-	// 		}
-	// 	});
 	// // Creating RigidBodyComponent then MeshComponent ==> bounding volume
 	// // Creating MeshComponent then RigidBodyComponent ==> tightly-fitting volume
 
@@ -79,7 +83,6 @@ void PhysicsSystem::Collides(Entity& e1, Entity& e2) {
 
 	auto actor1 = e1.Get<RigidBodyComponent>().Body;
 	auto actor2 = e2.Get<RigidBodyComponent>().Body;
-
 }
 
 }

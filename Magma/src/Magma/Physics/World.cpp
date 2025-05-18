@@ -78,26 +78,10 @@ HitInfo World::Raycast(const glm::vec3& start, const glm::vec3& direction,
 }
 
 void World::AddContactCallback(
-	const std::function<void(Ref<RigidBody>, Ref<RigidBody>)>& callback)
+	const Func<void, RigidBody*, RigidBody*>& callback)
 {
 #ifdef MAGMA_PHYSICS
 	m_ContactCallback.AddCallback(callback);
-#endif
-}
-
-void World::AddContactCallback(Ref<RigidBody> actor1, Ref<RigidBody> actor2,
-	const std::function<void(Ref<RigidBody>, Ref<RigidBody>)>& callback)
-{
-#ifdef MAGMA_PHYSICS
-	m_ContactCallback.AddCallback(
-	[callback, actor1, actor2]
-	(Ref<RigidBody> body1, Ref<RigidBody> body2) {
-		if(((*body1 == *actor1) && (*body2 == *actor2))
-		|| ((*body1 == *actor2) && (*body2 == *actor1)))
-		{
-			callback(body1, body2);
-		}
-	});
 #endif
 }
 
@@ -126,7 +110,7 @@ void ContactCallback::onContact(const PxContactPairHeader& pairHeader,
 	RigidBody* a2 = static_cast<RigidBody*>(pairHeader.actors[1]->userData);
 
 	for(auto callback : m_Callbacks) {
-		callback(Ref<RigidBody>(a1), Ref<RigidBody>(a2));
+		callback(a1, a2);
 	}
 }
 #endif

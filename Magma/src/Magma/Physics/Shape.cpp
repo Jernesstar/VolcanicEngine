@@ -52,7 +52,8 @@ Ref<Shape> Shape::CreateBox(float radius) {
 #ifdef MAGMA_PHYSICS
 	auto* mat = GetPhysicsLib()->createMaterial(0.5f, 0.5f, 0.6f);
 	shape->m_Shape =
-		GetPhysicsLib()->createShape(PxBoxGeometry(0.5f, 0.5f, 0.5f), *mat);
+		GetPhysicsLib()->createShape(
+			PxBoxGeometry(radius, radius, radius), *mat);
 #endif
 
 	return shape;

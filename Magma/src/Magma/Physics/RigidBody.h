@@ -25,6 +25,8 @@ public:
 	RigidBody(RigidBody::Type type, Ref<Shape> shape, const Transform& t = { });
 	~RigidBody();
 
+	void SetGravity(bool gravity);
+
 #ifdef MAGMA_PHYSICS
 	bool operator ==(const RigidBody& other) const {
 		return m_Actor == other.m_Actor;

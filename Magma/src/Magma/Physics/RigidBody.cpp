@@ -40,6 +40,12 @@ void RigidBody::SetTransform(const Transform& t) {
 #endif
 }
 
+void RigidBody::SetGravity(bool gravity) {
+#ifdef MAGMA_PHYSICS
+	m_Actor->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, !gravity);
+#endif
+}
+
 StaticBody::StaticBody(Ref<Shape> shape, const Transform& t)
 	: RigidBody(RigidBody::Type::Static, shape, t)
 {

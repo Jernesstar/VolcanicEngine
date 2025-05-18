@@ -20,9 +20,9 @@ namespace Magma::Physics {
 class ContactCallback : public PxSimulationEventCallback {
 public:
 	void AddCallback(
-		const std::function<void(Ref<RigidBody>, Ref<RigidBody>)>& callback)
+		const Func<void, RigidBody*, RigidBody*>& callback)
 	{
-		m_Callbacks.push_back(callback);
+		m_Callbacks.Add(callback);
 	}
 
 private:
@@ -35,7 +35,7 @@ private:
 				   const PxContactPair* pairs, PxU32 nbPairs);
 
 private:
-	std::vector<std::function<void(Ref<RigidBody>, Ref<RigidBody>)>> m_Callbacks;
+	List<Func<void, RigidBody*, RigidBody*>> m_Callbacks;
 };
 
 #endif
@@ -71,10 +71,7 @@ public:
 					const glm::vec3& direction, float maxDist = 10000.0f);
 
 	void AddContactCallback(
-		const std::function<void(Ref<RigidBody>, Ref<RigidBody>)>& callback);
-
-	void AddContactCallback(Ref<RigidBody> actor1, Ref<RigidBody> actor2,
-		const std::function<void(Ref<RigidBody>, Ref<RigidBody>)>& callback);
+		const Func<void, RigidBody*, RigidBody*>& callback);
 
 	const List<Ref<RigidBody>>& GetActors() const { return m_Actors; }
 
