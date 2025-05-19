@@ -89,7 +89,6 @@ private:
 	ContactCallback m_ContactCallback;
 #endif
 
-	uint64_t m_ActorCount = 0;
 	uint64_t m_MaxActorCount = 0;
 	List<Ref<RigidBody>> m_Actors;
 

@@ -464,6 +464,7 @@ void DrawComponent<ScriptComponent>(Entity& entity) {
 
 		return;
 	}
+	ImGui::Text("Class: %s", component.Instance->GetClass()->Name.c_str());
 
 	ImGui::SeparatorText("Fields");
 

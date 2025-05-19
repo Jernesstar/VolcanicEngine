@@ -1,52 +1,5 @@
 #pragma once
 
-static void createWall(Physics::World& world) {
-	Ref<Shape> box = Shape::Create(Shape::Type::Box);
-	for(uint32_t i = 0; i < 4; i++) {
-		for(uint32_t j = 0; j < 4; j++) {
-			Ref<RigidBody> body =
-				RigidBody::Create(RigidBody::Type::Dynamic, box,
-					Transform
-					{
-						.Translation = { j*2 - (4 - i), i*2 + 1, 0.0f },
-					});
-
-			world.AddActor(body);
-		}
-	}
-}
-
-// PxFilterFlags FilterShaderExample(
-// 	PxFilterObjectAttributes attributes0, PxFilterData filterData0,
-// 	PxFilterObjectAttributes attributes1, PxFilterData filterData1,
-// 	PxPairFlags& pairFlags, const void* constantBlock, PxU32 constantBlockSize)
-// {
-// 	// // let triggers through
-// 	// if(PxFilterObjectIsTrigger(attributes0) || PxFilterObjectIsTrigger(attributes1))
-// 	// {
-// 	// 	pairFlags = PxPairFlag::eTRIGGER_DEFAULT;
-// 	// 	return PxFilterFlag::eDEFAULT;
-// 	// }
-// 	// // generate contacts for all that were not filtered above
-// 	// pairFlags = PxPairFlag::eCONTACT_DEFAULT;
-
-// 	// // trigger the contact callback for pairs (A,B) where
-// 	// // the filtermask of A contains the ID of B and vice versa.
-// 	// if((filterData0.word0 & filterData1.word1) && (filterData1.word0 & filterData0.word1))
-// 	// 	pairFlags |= PxPairFlag::eNOTIFY_TOUCH_FOUND;
-
-// 	// return PxFilterFlag::eDEFAULT;
-
-// 	// all initial and persisting reports for everything, with per-point data
-// 	pairFlags = PxPairFlag::eSOLVE_CONTACT
-// 				| PxPairFlag::eDETECT_DISCRETE_CONTACT
-// 				| PxPairFlag::eNOTIFY_TOUCH_FOUND
-// 				| PxPairFlag::eNOTIFY_TOUCH_PERSISTS
-// 				| PxPairFlag::eNOTIFY_CONTACT_POINTS;
-
-// 	return PxFilterFlag::eDEFAULT;
-// }
-
 namespace Demo {
 
 class Collision : public Application {
@@ -88,7 +41,6 @@ Collision::Collision() {
 	Physics::Init();
 
 	world = CreateRef<Physics::World>();
-	createWall(*world);
 
 	// auto shape = Shape::Create(Shape::Type::Plane);
 	// auto plane =
@@ -100,14 +52,28 @@ Collision::Collision() {
 	// 		});
 	// world->AddActor(plane);
 	Ref<Shape> box = Shape::Create(Shape::Type::Box);
+	auto body =
+		RigidBody::Create(RigidBody::Type::Dynamic, box,
+			Transform
+			{
+				.Translation = { 0.0f, 2.0f, 0.0f }
+			});
+	Ref<Shape> box2 = Shape::Create(Shape::Type::Box);
 	auto floor =
-	RigidBody::Create(RigidBody::Type::Static, box,
-		Transform
-		{
-			.Translation = { 0.0f, -2.0f, 0.0f }
-		});
+		RigidBody::Create(RigidBody::Type::Dynamic, box2,
+			Transform
+			{
+				.Translation = { 0.0f, -2.0f, 0.0f }
+			});
 	floor->SetGravity(false);
 	world->AddActor(floor);
+	world->AddActor(body);
+
+	world->AddContactCallback(
+		[](RigidBody* a, RigidBody* b)
+		{
+			VOLCANICORE_LOG_INFO("Collision");
+		});
 
 	camera = CreateRef<StereographicCamera>(75.0f);
 	camera->SetPosition({ 0.0f, 0.5f, 3.0f });

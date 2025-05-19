@@ -23,8 +23,8 @@ Scene:
         Components:
           TransformComponent:
             Transform:
-              Translation: [0, 0, 0]
-              Rotation: [0, 0, 0]
+              Translation: [12.2379541, 2.33556843, 0]
+              Rotation: [0, -0, 0]
               Scale: [1, 1, 1]
           MeshComponent:
             AssetID: 4186775327602265389

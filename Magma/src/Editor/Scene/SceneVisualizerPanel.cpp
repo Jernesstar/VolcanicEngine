@@ -1082,13 +1082,13 @@ void EditorSceneRenderer::Render() {
 		call.Primitive = PrimitiveType::Line;
 	}
 
-	auto* editor = RootPanel->GetTab()
-		->GetPanel("ComponentEditor")->As<ComponentEditorPanel>();
-	if(Selected && Selected.Has<RigidBodyComponent>()
-	&& editor->IsFocused<RigidBodyComponent>(Selected))
-	{
+	// auto* editor = RootPanel->GetTab()
+	// 	->GetPanel("ComponentEditor")->As<ComponentEditorPanel>();
+	// if(Selected && Selected.Has<RigidBodyComponent>()
+	// && editor->IsFocused<RigidBodyComponent>(Selected))
+	// {
 		
-	}
+	// }
 
 #endif
 

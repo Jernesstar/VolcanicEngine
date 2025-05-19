@@ -44,7 +44,7 @@ EditorApp::EditorApp(const CommandLineArgs& args)
 	// ShaderLibrary::Add("Bloom",
 	// 	ShaderPipeline::Create("Magma/assets/shaders/", "Bloom"));
 
-	float fontSize = 16.0f;
+	float fontSize = 15.0f;
 	ImGuiIO& io = ImGui::GetIO();
 	io.Fonts->AddFontFromFileTTF(
 		"Magma/assets/fonts/JetBrainsMono-Bold.ttf", fontSize);

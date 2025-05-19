@@ -14,7 +14,10 @@ Ref<RigidBody> RigidBody::Create(RigidBody::Type type, Ref<Shape> shape,
 
 RigidBody::RigidBody(RigidBody::Type type, Ref<Shape> shape,
 					 const Transform& t)
-	: m_Type(type), m_Shape(shape), m_Transform(t) { }
+	: m_Type(type), m_Shape(shape), m_Transform(t)
+{
+
+}
 
 RigidBody::~RigidBody() {
 #ifdef MAGMA_PHYSICS
@@ -51,12 +54,11 @@ StaticBody::StaticBody(Ref<Shape> shape, const Transform& t)
 {
 #ifdef MAGMA_PHYSICS
 	m_Actor = GetPhysicsLib()->createRigidStatic(PxTransform(PxVec3(0.0f)));
+	SetTransform(t);
+	SetShape(shape);
 	m_Actor->userData = static_cast<void*>(this);
 	m_Actor->setActorFlag(PxActorFlag::eVISUALIZATION, true);
 #endif
-
-	SetShape(shape);
-	SetTransform(t);
 }
 
 void StaticBody::SetShape(Ref<Shape> shape) {
@@ -66,23 +68,19 @@ void StaticBody::SetShape(Ref<Shape> shape) {
 #endif
 }
 
-// TODO(Fix): attachShape for non-kinematic dynamic bodies not supported
 DynamicBody::DynamicBody(Ref<Shape> shape, const Transform& t)
 	: RigidBody(RigidBody::Type::Dynamic, shape, t)
 {
 #ifdef MAGMA_PHYSICS
 	m_Actor = GetPhysicsLib()->createRigidDynamic(PxTransform(PxVec3(0.0f)));
+	SetTransform(t);
+	SetShape(shape);
 	m_Actor->userData = static_cast<void*>(this);
-	// m_Actor
-	// ->is<PxRigidBody>()->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
-
 	PxRigidBodyExt::updateMassAndInertia(*m_Actor->is<PxRigidDynamic>(), 10.0f);
 #endif
-
-	SetShape(shape);
-	SetTransform(t);
 }
 
+// TODO(Fix): attachShape for non-kinematic dynamic bodies not supported
 void DynamicBody::SetShape(Ref<Shape> shape) {
 #ifdef MAGMA_PHYSICS
 	// m_Shape->m_Shape =
