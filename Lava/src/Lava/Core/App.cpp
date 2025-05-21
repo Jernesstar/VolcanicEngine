@@ -58,13 +58,12 @@ struct RuntimeScreen {
 	}
 
 	~RuntimeScreen() {
-		UI.Clear();
-		World.reset();
-
 		ScriptObj->Call("OnClose");
-
 		ScriptObj.reset();
 		Script.reset();
+
+		UI.Clear();
+		World.reset();
 	}
 };
 

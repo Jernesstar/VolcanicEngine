@@ -36,7 +36,7 @@ class ScriptObject {
 public:
 	ScriptObject();
 	ScriptObject(asIScriptObject* handle);
-	virtual ~ScriptObject();
+	~ScriptObject();
 
 	template<typename T, typename... Args>
 	T Call(const std::string& name, Args&&... args) const {
