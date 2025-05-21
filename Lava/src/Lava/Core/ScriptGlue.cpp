@@ -370,6 +370,18 @@ static void AssetInitCtor(uint64_t id, AssetType type, Asset* ptr) {
 	new (ptr) Asset{ id, type };
 }
 
+static bool AssetIsValid(Asset* asset) {
+	return AssetManager::Get()->IsValid(*asset);
+}
+
+static bool AssetIsLoaded(Asset* asset) {
+	return AssetManager::Get()->IsLoaded(*asset);
+}
+
+static std::string AssetGetName(Asset* asset) {
+	return AssetManager::Get()->GetAssetName(*asset);
+}
+
 static Sound* GetSound(Asset asset, AssetManager* manager) {
 	manager->Load(asset);
 	return manager->Get<Sound>(asset).get();
@@ -406,11 +418,15 @@ void RegisterAssetManager() {
 		"void f()", asFUNCTION(AssetDefaultCtor), asCALL_CDECL_OBJLAST);
 	engine->RegisterObjectBehaviour("Asset", asBEHAVE_CONSTRUCT,
 		"void f(uint64, AssetType)", asFUNCTION(AssetInitCtor), asCALL_CDECL_OBJLAST);
+	engine->RegisterObjectMethod("Asset", "bool get_IsValid() const property",
+		asFUNCTION(AssetIsValid), asCALL_CDECL_OBJLAST);
+	engine->RegisterObjectMethod("Asset", "bool get_IsLoaded() const property",
+		asFUNCTION(AssetIsLoaded), asCALL_CDECL_OBJLAST);
+	engine->RegisterObjectMethod("Asset", "string get_Name() const property",
+		asFUNCTION(AssetGetName), asCALL_CDECL_OBJLAST);
 
 	engine->RegisterObjectType("AssetManagerClass", 0,
 		asOBJ_REF | asOBJ_NOHANDLE);
-	engine->RegisterObjectMethod("AssetManagerClass", "bool IsLoaded(Asset) const",
-		asMETHOD(AssetManager, IsLoaded), asCALL_THISCALL);
 	engine->RegisterObjectMethod("AssetManagerClass", "bool Load(Asset)",
 		asMETHOD(AssetManager, Load), asCALL_THISCALL);
 	engine->RegisterObjectMethod("AssetManagerClass", "bool Unload(Asset)",

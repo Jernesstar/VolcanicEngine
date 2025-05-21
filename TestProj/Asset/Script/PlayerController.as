@@ -47,8 +47,8 @@ class PlayerController : IEntityController
         print(tag.Tag);
 
         AssetManager.Load(soundAsset);
-        bool loaded = AssetManager.IsLoaded(soundAsset);
-        print("Loaded: " + loaded);
+        print("Loaded: " + soundAsset.IsLoaded);
+        print("Name: " + soundAsset.Name);
 
         ScriptSystem@ sys = Scene.GetScriptSystem();
         sys.ListenForEvent(Handle, "PlayerDied");

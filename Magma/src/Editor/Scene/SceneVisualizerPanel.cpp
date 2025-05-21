@@ -147,6 +147,9 @@ void SceneVisualizerPanel::Add(ECS::Entity entity) {
 
 	auto& editor = Application::As<EditorApp>()->GetEditor();
 	auto& assetManager = editor.GetAssetManager();
+	if(!assetManager.IsValid(mc.MeshAsset))
+		return;
+
 	assetManager.Load(mc.MeshAsset);
 	auto mesh = assetManager.Get<Mesh>(mc.MeshAsset);
 

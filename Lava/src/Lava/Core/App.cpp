@@ -14,13 +14,10 @@
 #include <VolcaniCore/Graphics/ShaderLibrary.h>
 
 #include <Magma/Scene/Component.h>
-
 #include <Magma/Script/ScriptModule.h>
 #include <Magma/Script/ScriptClass.h>
 #include <Magma/Script/ScriptObject.h>
-
 #include <Magma/UI/UIRenderer.h>
-
 #include <Magma/Physics/Physics.h>
 
 #include "ScriptGlue.h"

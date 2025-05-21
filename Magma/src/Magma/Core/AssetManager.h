@@ -72,28 +72,26 @@ public:
 	Ref<T> Get(Asset asset);
 
 	void NameAsset(Asset asset, const std::string& name) {
-		m_NamedAssets[name] = asset;
-	}
-
-	std::string GetAssetName(Asset target) {
-		for(auto [name, asset] : m_NamedAssets) {
-			if(asset == target)
-				return name;
-		}
-
-		return "";
-	}
-
-	Asset GetNamedAsset(const std::string& name) const {
-		if(!m_NamedAssets.count(name))
-			return { };
-		return m_NamedAssets.at(name);
+		m_NamedAssets[asset] = name;
 	}
 
 	void RemoveName(Asset asset) {
-		auto name = GetAssetName(asset);
-		if(name != "")
-			m_NamedAssets.erase(name);
+		m_NamedAssets.erase(asset);
+	}
+
+	std::string GetAssetName(Asset asset) {
+		if(!m_NamedAssets.count(asset))
+			return "";
+		return m_NamedAssets.at(asset);
+	}
+
+	Asset GetNamedAsset(const std::string& lookup) const {
+		for(auto [asset, name] : m_NamedAssets) {
+			if(name == lookup)
+				return asset;
+		}
+
+		return { };
 	}
 
 	bool IsLoaded(Asset asset) const {
@@ -123,7 +121,7 @@ public:
 protected:
 	std::map<Asset, bool> m_AssetRegistry;
 	Map<VolcaniCore::UUID, VolcaniCore::List<Asset>> m_References;
-	Map<std::string, Asset> m_NamedAssets;
+	Map<Asset, std::string> m_NamedAssets;
 
 	Map<VolcaniCore::UUID, Ref<VolcaniCore::Mesh>> m_MeshAssets;
 	Map<VolcaniCore::UUID, Ref<VolcaniCore::Texture>> m_TextureAssets;
