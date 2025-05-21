@@ -144,8 +144,6 @@ void UITab::NewUI() {
 void UITab::OpenUI() {
 	namespace fs = std::filesystem;
 
-	menu.file.openUI = true;
-
 	auto& editor = Application::As<EditorApp>()->GetEditor();
 	auto& proj = editor.GetProject();
 	IGFD::FileDialogConfig config;

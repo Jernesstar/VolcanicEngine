@@ -77,11 +77,11 @@ public:
 	void ReloadAudio(const std::string& path);
 	void ReloadScript(const std::string& path);
 
-	void AddCallback(const Func<void, Asset>& callback);
+	void AddCallback(const Func<void, Asset, bool>& callback);
 
 private:
 	EditorAssetManager* m_AssetManager;
-	List<Func<void, Asset>> m_Callbacks;
+	List<Func<void, Asset, bool>> m_Callbacks;
 };
 
 static bool s_Flip = false;
@@ -96,6 +96,7 @@ void FileWatcher::handleFileAction(
 	auto fullPath = (fs::path(dir) / file).string();
 	auto assetDir = fs::path(dir).parent_path().filename().string();
 	AssetType type = AssetTypeFromString(assetDir);
+	Asset asset = { m_AssetManager->GetFromPath(fullPath), type };
 
 	if(action == efsw::Actions::Add)
 		Add(type, fullPath);
@@ -110,6 +111,9 @@ void FileWatcher::handleFileAction(
 		}
 		else {
 			s_Flip = false;
+			for(auto callback : m_Callbacks)
+				callback(asset, 0);
+
 			switch(type) {
 				case AssetType::Mesh:
 					ReloadMesh(fullPath);
@@ -124,6 +128,9 @@ void FileWatcher::handleFileAction(
 					ReloadScript(fullPath);
 					break;
 			}
+
+			for(auto callback : m_Callbacks)
+				callback(asset, 1);
 		}
 	}
 	else if(action == efsw::Actions::Moved) {
@@ -132,10 +139,6 @@ void FileWatcher::handleFileAction(
 	else {
 		std::cout << "Should never happen!" << "\n";
 	}
-
-	Asset asset = { m_AssetManager->GetFromPath(fullPath), type };
-	for(auto callback : m_Callbacks)
-		callback(asset);
 }
 
 void FileWatcher::Add(AssetType type, const std::string& path) {
@@ -148,7 +151,7 @@ void FileWatcher::Remove(AssetType type, const std::string& path) {
 
 }
 
-void FileWatcher::AddCallback(const Func<void, Asset>& callback) {
+void FileWatcher::AddCallback(const Func<void, Asset, bool>& callback) {
 	m_Callbacks.Add(callback);
 }
 
@@ -176,6 +179,8 @@ void FileWatcher::ReloadScript(const std::string& path) {
 	auto name = fs::path(path).filename().stem().string();
 	Ref<ScriptModule> mod = CreateRef<ScriptModule>(name);
 	mod->Load(path);
+	if(mod->HasErrors())
+		return;
 	m_AssetManager->m_ScriptAssets[id] = mod;
 }
 
@@ -238,7 +243,9 @@ void EditorAssetManager::Unload(Asset asset) {
 		m_ScriptAssets.erase(asset.ID);
 }
 
-void EditorAssetManager::AddReloadCallback(const Func<void, Asset>& callback) {
+void EditorAssetManager::AddReloadCallback(
+		const Func<void, Asset, bool>& callback)
+{
 	s_Listener->AddCallback(callback);
 }
 

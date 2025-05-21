@@ -70,7 +70,11 @@ void ScriptModule::Load(const std::string& path) {
 		builder.StartNewModule(engine, Name.c_str());
 		builder.DefineWord("EDITOR");
 		builder.AddSectionFromFile(path.c_str());
-		builder.BuildModule();
+		int r = builder.BuildModule();
+		if(r < 0) {
+			m_HasErrors = true;
+			return;
+		}
 		m_Handle = builder.GetModule();
 	}
 	else {

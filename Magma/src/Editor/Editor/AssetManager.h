@@ -14,7 +14,7 @@ public:
 
 	void Load(Asset asset) override;
 	void Unload(Asset asset) override;
-	void AddReloadCallback(const Func<void, Asset>& callback);
+	void AddReloadCallback(const Func<void, Asset, bool>& callback);
 
 	Asset Add(const std::string& path, AssetType type);
 

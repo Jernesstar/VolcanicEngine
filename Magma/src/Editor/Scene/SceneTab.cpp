@@ -6,6 +6,8 @@
 #include <imgui/misc/cpp/imgui_stdlib.h>
 #include <ImGuiFileDialog/ImGuiFileDialog.h>
 
+#include <VolcaniCore/Core/FileUtils.h>
+
 #include "Editor/EditorApp.h"
 #include "Editor/Tab.h"
 #include "Editor/AssetManager.h"
@@ -64,31 +66,78 @@ void SceneTab::Setup() {
 	auto& assetManager = editor.GetAssetManager();
 	assetManager
 	.AddReloadCallback(
-		[&](Asset asset)
+		[&](Asset asset, bool stage)
 		{
-			if(asset.Type == AssetType::Script) {
+			auto& editor = Application::As<EditorApp>()->GetEditor();
+			auto& proj = editor.GetProject();
+			Application::PushDir(proj.Path);
+
+			if(asset.Type == AssetType::Script && stage == 0) {
+				VOLCANICORE_LOG_INFO("Script instance pre-reload");
+
+				YAMLSerializer serializer;
+				serializer.BeginMapping(); // File
+				serializer.WriteKey("Objects");
+				serializer.BeginSequence();
+
 				m_Scene.EntityWorld
 				.ForEach<ScriptComponent>(
 					[&](Entity entity)
 					{
-						// VOLCANICORE_LOG_INFO("Script instance reload");
-						// auto& sc = entity.Set<ScriptComponent>();
-						// if(!sc.Instance)
-						// 	return;
-						// if(sc.ModuleAsset != asset)
-						// 	return;
+						auto& sc = entity.Set<ScriptComponent>();
+						if(!sc.Instance)
+							return;
+						if(sc.ModuleAsset != asset)
+							return;
 
-						// auto old = sc.Instance;
-						// auto mod = assetManager.Get<ScriptModule>(asset);
-						// std::string typeName =
-						// 	old->GetHandle()->GetObjectType()->GetName();
-
-						// auto _class = mod->GetClass(typeName);
-						// sc.Instance = _class->Construct();
-						// sc.Instance->Copy(old);
-						// old.reset();
+						serializer.BeginMapping();
+						serializer.WriteKey("Entity")
+							.BeginMapping();
+						serializer.WriteKey("ID")
+							.Write((uint64_t)entity.GetHandle());
+						SaveScript(serializer, sc.Instance);
+						serializer.EndMapping();
+						serializer.EndMapping();
 					});
+				serializer.EndSequence();
+				serializer.EndMapping(); // File
+
+				serializer.Finalize("Editor/reload.yaml");
 			}
+			if(asset.Type == AssetType::Script && stage == 1) {
+				VOLCANICORE_LOG_INFO("Script instance post-reload");
+
+				YAML::Node file;
+				try {
+					file = YAML::LoadFile("Editor/reload.yaml");
+				}
+				catch(YAML::ParserException e) {
+					VOLCANICORE_LOG_ERROR("Reload error: %s", e.what());
+					Application::PopDir();
+					return;
+				}
+
+				auto objects = file["Objects"];
+				for(auto entityNode : objects) {
+					auto node = entityNode["Entity"];
+					auto id = node["ID"].as<uint64_t>();
+					auto entity = m_Scene.EntityWorld.GetEntity(id);
+
+					auto& sc = entity.Set<ScriptComponent>();
+					if(!sc.Instance)
+						return;
+					if(sc.ModuleAsset != asset)
+						return;
+
+					auto mod = assetManager.Get<ScriptModule>(asset);
+					std::string name =
+						sc.Instance->GetHandle()->GetObjectType()->GetName();
+					sc.Instance =
+						LoadScript(entity, sc.ModuleAsset, name, node);
+				};
+			}
+
+			Application::PopDir();
 		});
 }
 
@@ -100,8 +149,7 @@ void SceneTab::SetScene(const std::string& path) {
 
 void SceneTab::Update(TimeStep ts) {
 	for(auto panel : m_Panels)
-		if(panel->Open)
-			panel->Update(ts);
+		panel->Update(ts);
 }
 
 void SceneTab::Render() {
@@ -169,8 +217,6 @@ void SceneTab::NewScene() {
 
 void SceneTab::OpenScene() {
 	namespace fs = std::filesystem;
-
-	menu.file.openScene = true;
 
 	auto& editor = Application::As<EditorApp>()->GetEditor();
 	auto& proj = editor.GetProject();

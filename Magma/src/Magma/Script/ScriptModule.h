@@ -19,7 +19,7 @@ public:
 
 	void Load(const std::string& path);
 	void Save(const std::string& path);
-
+	bool HasErrors() const { return m_HasErrors; }
 	Ref<ScriptClass> GetClass(const std::string& name) const;
 	const auto& GetClasses() const { return m_Classes; }
 
@@ -28,6 +28,7 @@ public:
 private:
 	asIScriptModule* m_Handle;
 	asIScriptContext* m_Ctx;
+	bool m_HasErrors = false;
 
 	Map<std::string, Ref<ScriptClass>> m_Classes;
 };

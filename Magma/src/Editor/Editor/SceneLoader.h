@@ -1,8 +1,16 @@
 #pragma once
 
+#include <Magma/Core/YAMLSerializer.h>
+#include <Magma/Core/AssetManager.h>
+#include <Magma/Script/ScriptObject.h>
 #include <Magma/Scene/Scene.h>
 
 namespace Magma {
+
+extern void SaveScript(YAMLSerializer& serializer,
+	Ref<Script::ScriptObject> obj);
+extern Ref<Script::ScriptObject> LoadScript(Entity entity, Asset asset,
+	const std::string& className, YAML::Node& scriptComponentNode);
 
 class SceneLoader {
 public:

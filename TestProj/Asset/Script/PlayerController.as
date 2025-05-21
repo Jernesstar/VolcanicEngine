@@ -109,7 +109,7 @@ class PlayerController : IEntityController
             sound.Play();
         }
 
-        // ScriptSystem@ sys = Scene.GetScriptSystem();
+        ScriptSystem@ sys = Scene.GetScriptSystem();
         // PlayerDied@ gameEvent = PlayerDied();
         // sys.BroadcastEvent(Handle, @gameEvent);
     }

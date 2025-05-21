@@ -102,6 +102,118 @@ void SceneLoader::EditorSave(const Scene& scene, const std::string& path) {
 	serializer.Finalize(path);
 }
 
+void SaveScript(YAMLSerializer& serializer, Ref<ScriptObject> obj) {
+	serializer.WriteKey("Fields").BeginSequence();
+
+	auto* handle = obj->GetHandle();
+	for(uint32_t i = 0; i < handle->GetPropertyCount(); i++) {
+		ScriptField field = obj->GetProperty(i);
+		if(!field.HasMetadata("EditorField"))
+			continue;
+
+		serializer.BeginMapping()
+			.WriteKey("Field").BeginMapping();
+
+		serializer.WriteKey("Name").Write(field.Name);
+
+		if(field.TypeID == asTYPEID_BOOL) {
+			serializer
+				.WriteKey("Type").Write(std::string("bool"))
+				.WriteKey("Value").Write(*field.As<bool>());
+		}
+		else if(field.TypeID == asTYPEID_INT8) {
+			serializer
+				.WriteKey("Type").Write(std::string("int8"))
+				.WriteKey("Value").Write((int32_t)*field.As<int8_t>());
+		}
+		else if(field.TypeID == asTYPEID_INT16) {
+			serializer
+				.WriteKey("Type").Write(std::string("int16"))
+				.WriteKey("Value").Write((int32_t)*field.As<int16_t>());
+		}
+		else if(field.TypeID == asTYPEID_INT32) {
+			serializer
+				.WriteKey("Type").Write(std::string("int32"))
+				.WriteKey("Value").Write(*field.As<int32_t>());
+		}
+		else if(field.TypeID == asTYPEID_INT64) {
+			serializer
+				.WriteKey("Type").Write(std::string("int64"))
+				.WriteKey("Value").Write(*field.As<int64_t>());
+		}
+		else if(field.TypeID == asTYPEID_UINT8) {
+			serializer
+				.WriteKey("Type").Write(std::string("uint8"))
+				.WriteKey("Value").Write((uint32_t)*field.As<uint8_t>());
+		}
+		else if(field.TypeID == asTYPEID_UINT16) {
+			serializer
+				.WriteKey("Type").Write(std::string("uint16"))
+				.WriteKey("Value").Write((uint32_t)*field.As<uint16_t>());
+		}
+		else if(field.TypeID == asTYPEID_UINT32) {
+			serializer
+				.WriteKey("Type").Write(std::string("uint32"))
+				.WriteKey("Value").Write(*field.As<uint32_t>());
+		}
+		else if(field.TypeID == asTYPEID_UINT64) {
+			serializer
+				.WriteKey("Type").Write(std::string("uint64"))
+				.WriteKey("Value").Write(*field.As<uint64_t>());
+		}
+		else if(field.TypeID == asTYPEID_FLOAT) {
+			serializer
+				.WriteKey("Type").Write(std::string("float"))
+				.WriteKey("Value").Write(*field.As<float>());
+		}
+		else if(field.TypeID == asTYPEID_DOUBLE) {
+			serializer
+				.WriteKey("Type").Write(std::string("double"))
+				.WriteKey("Value").Write(*(float*)field.As<double>());
+		}
+		else if(std::string(field.Type->GetName()) == "Vec3") {
+			serializer
+				.WriteKey("Type").Write(std::string("Vec3"))
+				.WriteKey("Value").Write(*field.As<Vec3>());
+		}
+		else if(std::string(field.Type->GetName()) == "Asset") {
+			serializer
+				.WriteKey("Type").Write(std::string("Asset"))
+				.WriteKey("Value").Write(*field.As<Asset>());
+		}
+		else if(std::string(field.Type->GetName()) == "array") {
+			serializer
+				.WriteKey("Type").Write(std::string("array"))
+				.WriteKey("Value");
+
+			serializer.SetOptions(Serializer::Options::ArrayOneLine);
+			serializer
+					.BeginSequence();
+			auto* data = field.As<CScriptArray>();
+			for(uint32_t i = 0; i < data->GetSize(); i++)
+				serializer
+					.Write(*(uint32_t*)data->At(i));
+
+			serializer
+				.EndSequence();
+		}
+		// Script Type
+		else if(field.Is(ScriptQualifier::ScriptObject)) {
+			// auto* type = field.Type;
+			// for(uint32_t i = 0; i < type->GetPropertyCount(); i++) {
+			// 	uint64_t offset;
+			// 	type->GetProperty()
+			// }
+		}
+
+			serializer.EndMapping()
+		.EndMapping();
+	}
+
+	serializer
+		.EndSequence();
+}
+
 void SerializeEntity(YAMLSerializer& serializer, const Entity& entity) {
 	serializer.WriteKey("Entity").BeginMapping(); // Entity
 
@@ -191,117 +303,8 @@ void SerializeEntity(YAMLSerializer& serializer, const Entity& entity) {
 			.WriteKey("ModuleID").Write((uint64_t)comp.ModuleAsset.ID)
 			.WriteKey("Class").Write(name);
 
-		if(obj) {
-			serializer.WriteKey("Fields").BeginSequence();
-
-			auto* handle = obj->GetHandle();
-			for(uint32_t i = 0; i < handle->GetPropertyCount(); i++) {
-				ScriptField field = obj->GetProperty(i);
-				if(!field.HasMetadata("EditorField"))
-					continue;
-
-				serializer.BeginMapping()
-					.WriteKey("Field").BeginMapping();
-
-				serializer.WriteKey("Name").Write(field.Name);
-
-				if(field.TypeID == asTYPEID_BOOL) {
-					serializer
-						.WriteKey("Type").Write(std::string("bool"))
-						.WriteKey("Value").Write(*field.As<bool>());
-				}
-				else if(field.TypeID == asTYPEID_INT8) {
-					serializer
-						.WriteKey("Type").Write(std::string("int8"))
-						.WriteKey("Value").Write((int32_t)*field.As<int8_t>());
-				}
-				else if(field.TypeID == asTYPEID_INT16) {
-					serializer
-						.WriteKey("Type").Write(std::string("int16"))
-						.WriteKey("Value").Write((int32_t)*field.As<int16_t>());
-				}
-				else if(field.TypeID == asTYPEID_INT32) {
-					serializer
-						.WriteKey("Type").Write(std::string("int32"))
-						.WriteKey("Value").Write(*field.As<int32_t>());
-				}
-				else if(field.TypeID == asTYPEID_INT64) {
-					serializer
-						.WriteKey("Type").Write(std::string("int64"))
-						.WriteKey("Value").Write(*field.As<int64_t>());
-				}
-				else if(field.TypeID == asTYPEID_UINT8) {
-					serializer
-						.WriteKey("Type").Write(std::string("uint8"))
-						.WriteKey("Value").Write((uint32_t)*field.As<uint8_t>());
-				}
-				else if(field.TypeID == asTYPEID_UINT16) {
-					serializer
-						.WriteKey("Type").Write(std::string("uint16"))
-						.WriteKey("Value").Write((uint32_t)*field.As<uint16_t>());
-				}
-				else if(field.TypeID == asTYPEID_UINT32) {
-					serializer
-						.WriteKey("Type").Write(std::string("uint32"))
-						.WriteKey("Value").Write(*field.As<uint32_t>());
-				}
-				else if(field.TypeID == asTYPEID_UINT64) {
-					serializer
-						.WriteKey("Type").Write(std::string("uint64"))
-						.WriteKey("Value").Write(*field.As<uint64_t>());
-				}
-				else if(field.TypeID == asTYPEID_FLOAT) {
-					serializer
-						.WriteKey("Type").Write(std::string("float"))
-						.WriteKey("Value").Write(*field.As<float>());
-				}
-				else if(field.TypeID == asTYPEID_DOUBLE) {
-					serializer
-						.WriteKey("Type").Write(std::string("double"))
-						.WriteKey("Value").Write(*(float*)field.As<double>());
-				}
-				else if(std::string(field.Type->GetName()) == "Vec3") {
-					serializer
-						.WriteKey("Type").Write(std::string("Vec3"))
-						.WriteKey("Value").Write(*field.As<Vec3>());
-				}
-				else if(std::string(field.Type->GetName()) == "Asset") {
-					serializer
-						.WriteKey("Type").Write(std::string("Asset"))
-						.WriteKey("Value").Write(*field.As<Asset>());
-				}
-				else if(std::string(field.Type->GetName()) == "array") {
-					serializer
-						.WriteKey("Type").Write(std::string("array"))
-						.WriteKey("Value");
-
-					serializer.SetOptions(Serializer::Options::ArrayOneLine);
-					serializer
-							.BeginSequence();
-					auto* data = field.As<CScriptArray>();
-					for(uint32_t i = 0; i < data->GetSize(); i++)
-						serializer
-							.Write(*(uint32_t*)data->At(i));
-
-					serializer
-						.EndSequence();
-				}
-				// Script Type
-				else if(field.Is(ScriptQualifier::ScriptObject)) {
-					auto* type = field.Type;
-					// for(uint32_t i = 0; i < type->GetPropertyCount(); i++) {
-					// 	uint64_t offset;
-					// 	type->GetProperty()
-					// }
-				}
-
-					serializer.EndMapping()
-				.EndMapping();
-			}
-
-			serializer
-				.EndSequence();
-		}
+		if(obj)
+			SaveScript(serializer, obj);
 
 		serializer.EndMapping();
 	}
@@ -411,8 +414,8 @@ void SerializeEntity(YAMLSerializer& serializer, const Entity& entity) {
 	serializer.EndMapping(); // Entity
 }
 
-static void LoadScript(Entity entity, Asset asset, const std::string& className,
-						YAML::Node& scriptComponentNode)
+Ref<ScriptObject> LoadScript(Entity entity, Asset asset,
+	const std::string& className, YAML::Node& scriptComponentNode)
 {
 	auto& assetManager =
 		Application::As<EditorApp>()->GetEditor().GetAssetManager();
@@ -423,8 +426,7 @@ static void LoadScript(Entity entity, Asset asset, const std::string& className,
 		VOLCANICORE_LOG_INFO(
 			"Could not load script module %lu, needed for Entity %lu",
 			(uint64_t)asset.ID, (uint64_t)entity.GetHandle());
-		entity.Add<ScriptComponent>(asset, nullptr);
-		return;
+		return nullptr;
 	}
 
 	auto _class = mod->GetClass(className);
@@ -432,8 +434,7 @@ static void LoadScript(Entity entity, Asset asset, const std::string& className,
 		VOLCANICORE_LOG_INFO(
 			"Could not find class '%s' in module %lu, needed for Entity %lu",
 			className.c_str(), (uint64_t)asset.ID, (uint64_t)entity.GetHandle());
-		entity.Add<ScriptComponent>(asset, nullptr);
-		return;
+		return nullptr;
 	}
 
 	auto instance = _class->Construct();
@@ -482,7 +483,7 @@ static void LoadScript(Entity entity, Asset asset, const std::string& className,
 		}
 	}
 
-	entity.Add<ScriptComponent>(asset, instance);
+	return instance;
 }
 
 void DeserializeEntity(YAML::Node entityNode, Scene& scene) {
@@ -572,8 +573,11 @@ void DeserializeEntity(YAML::Node entityNode, Scene& scene) {
 			entity.Add<ScriptComponent>();
 		else if(className == "")
 			entity.Add<ScriptComponent>(asset, nullptr);
-		else
-			LoadScript(entity, asset, className, scriptComponentNode);
+		else {
+			auto obj =
+				LoadScript(entity, asset, className, scriptComponentNode);
+			entity.Add<ScriptComponent>(asset, obj);
+		}
 	}
 
 	auto rigidBodyComponentNode = components["RigidBodyComponent"];
