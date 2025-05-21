@@ -216,6 +216,8 @@ void ProjectTab::OnPlay() {
 
 	if(current->Type == TabType::Scene) {
 		auto tab = current->As<SceneTab>();
+		tab->SaveScene();
+
 		auto visualizer =
 			tab->GetPanel("SceneVisualizer")->As<SceneVisualizerPanel>();
 		Ref<Framebuffer> display = App::Get()->GetRenderer().GetOutput();

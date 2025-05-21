@@ -27,6 +27,7 @@ public:
 	void NewScene();
 	void OpenScene();
 	void SaveScene();
+	void SaveAs();
 
 	void AddEntity();
 

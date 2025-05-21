@@ -54,7 +54,7 @@ asIScriptFunction* ScriptClass::GetFunction(const std::string& name) const {
 }
 
 ScriptFunc ScriptClass::GetFunc() const {
-	return ScriptFunc{ m_Factory, m_Module->GetContext() };
+	return ScriptFunc{ m_Factory, ScriptEngine::GetContext() };
 }
 
 }

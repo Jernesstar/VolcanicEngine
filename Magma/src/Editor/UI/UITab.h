@@ -27,6 +27,7 @@ public:
 	void NewUI();
 	void OpenUI();
 	void SaveUI();
+	void SaveAs();
 
 	void AddWindow();
 	void AddButton();

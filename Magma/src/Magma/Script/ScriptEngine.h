@@ -33,6 +33,8 @@ public:
 			asCALL_THISCALL);
 	}
 
+	static asIScriptContext* GetContext();
+
 	static InterfaceBuilder RegisterInterface(const std::string& name);
 };
 
@@ -40,6 +42,10 @@ struct ScriptFunc {
 	asIScriptFunction* Func;
 	asIScriptContext* Context;
 	asIScriptObject* Object = nullptr;
+
+	~ScriptFunc() {
+		Context->Unprepare();
+	}
 
 	template<typename T, typename... Args>
 	T CallReturn(Args&&... args) {
@@ -55,8 +61,6 @@ struct ScriptFunc {
 			}, std::forward<Args>(args)...);
 
 		Context->Execute();
-		// Context->Unprepare();
-
 		return Get<T>();
 	}
 
@@ -74,7 +78,6 @@ struct ScriptFunc {
 			}, std::forward<Args>(args)...);
 
 		Context->Execute();
-		// Context->Unprepare();
 	}
 
 private:

@@ -25,7 +25,7 @@ struct {
 		bool newScene = false;
 		bool openScene = false;
 		bool saveScene = false;
-		bool saveAsScene = false;
+		bool saveAs = false;
 	} file;
 	struct {
 		bool addEntity = false;
@@ -163,7 +163,7 @@ void SceneTab::Render() {
 			if(ImGui::MenuItem("Save", "Ctrl+S"))
 				menu.file.saveScene = true;
 			if(ImGui::MenuItem("Save As", "Ctrl+Shift+S"))
-				menu.file.saveAsScene = true;
+				menu.file.saveAs = true;
 
 			ImGui::EndMenu();
 		}
@@ -191,15 +191,10 @@ void SceneTab::Render() {
 		NewScene();
 	if(menu.file.openScene)
 		OpenScene();
-	if(menu.file.saveScene) {
-		menu.file.saveScene = false;
-		if(m_ScenePath == "")
-			SaveScene();
-		else
-			SceneLoader::EditorSave(m_Scene, m_ScenePath);
-	}
-	if(menu.file.saveAsScene)
+	if(menu.file.saveScene)
 		SaveScene();
+	if(menu.file.saveAs)
+		SaveAs();
 
 	if(menu.edit.addEntity)
 		AddEntity();
@@ -217,6 +212,7 @@ void SceneTab::NewScene() {
 
 void SceneTab::OpenScene() {
 	namespace fs = std::filesystem;
+	menu.file.openScene = true;
 
 	auto& editor = Application::As<EditorApp>()->GetEditor();
 	auto& proj = editor.GetProject();
@@ -237,6 +233,15 @@ void SceneTab::OpenScene() {
 }
 
 void SceneTab::SaveScene() {
+	menu.file.saveScene = false;
+
+	if(m_ScenePath == "")
+		SaveScene();
+	else
+		SceneLoader::EditorSave(m_Scene, m_ScenePath);
+}
+
+void SceneTab::SaveAs() {
 	IGFD::FileDialogConfig config;
 	config.path = ".";
 	auto instance = ImGuiFileDialog::Instance();
@@ -250,7 +255,7 @@ void SceneTab::SaveScene() {
 		}
 
 		instance->Close();
-		menu.file.saveAsScene = false;
+		menu.file.saveAs = false;
 	}
 }
 

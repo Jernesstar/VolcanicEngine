@@ -122,8 +122,7 @@ ScriptField ScriptObject::GetProperty(uint32_t idx) {
 
 ScriptFunc ScriptObject::GetFunc(const std::string& name) const {
 	auto* function = m_Class->GetFunction(name);
-	auto* ctx = m_Class->GetModule()->GetContext();
-	return { function, ctx, m_Handle };
+	return { function, ScriptEngine::GetContext(), m_Handle };
 }
 
 }

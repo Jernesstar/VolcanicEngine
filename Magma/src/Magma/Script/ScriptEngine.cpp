@@ -30,11 +30,14 @@ void ScriptEngine::Init() {
 	s_Engine = asCreateScriptEngine();
 
 	s_Engine->SetMessageCallback(asFUNCTION(MessageCallback), 0, asCALL_CDECL);
+
+	for(uint32_t i = 0; i < 5; i++)
+		s_Contexts.Add(s_Engine->CreateContext());
 }
 
 void ScriptEngine::Shutdown() {
-	// for(asIScriptContext* context : s_Contexts)
-	// 	context->Release();
+	for(asIScriptContext* context : s_Contexts)
+		context->Release();
 	if(s_Engine)
 		s_Engine->ShutDownAndRelease();
 }
@@ -52,6 +55,18 @@ void ScriptEngine::RegisterSingleton(const std::string& className,
 
 	s_Engine->RegisterGlobalProperty(
 		(className + " " + instanceName).c_str(), instance);
+}
+
+asIScriptContext* ScriptEngine::GetContext() {
+	for(auto context : s_Contexts) {
+		if(context->GetState() == asEXECUTION_ACTIVE)
+			continue;
+		return context;
+	}
+
+	auto* newContext = s_Engine->CreateContext();
+	s_Contexts.Add(newContext);
+	return newContext;
 }
 
 InterfaceBuilder ScriptEngine::RegisterInterface(const std::string& name) {

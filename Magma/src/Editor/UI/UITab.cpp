@@ -21,6 +21,7 @@ struct {
 		bool newUI = false;
 		bool openUI = false;
 		bool saveUI = false;
+		bool saveAs = false;
 	} file;
 	struct {
 		bool addWindow = false;
@@ -68,6 +69,8 @@ void UITab::Render() {
 				menu.file.openUI = true;
 			if(ImGui::MenuItem("Save", "Ctrl+S"))
 				menu.file.saveUI = true;
+			if(ImGui::MenuItem("Save As", "Ctrl+Shift+S"))
+				menu.file.saveAs = true;
 
 			ImGui::EndMenu();
 		}
@@ -98,6 +101,8 @@ void UITab::Render() {
 		OpenUI();
 	if(menu.file.saveUI)
 		SaveUI();
+	if(menu.file.saveAs)
+		SaveAs();
 
 	if(menu.edit.addWindow)
 		AddWindow();
@@ -133,6 +138,7 @@ void UITab::Load(const std::string& path) {
 void UITab::Save(const std::string& path) {
 	UILoader::EditorSave(m_Root, path);
 	m_Name = "UI: " + m_Root.Name;
+	m_UIPath = path;
 }
 
 void UITab::NewUI() {
@@ -143,6 +149,7 @@ void UITab::NewUI() {
 
 void UITab::OpenUI() {
 	namespace fs = std::filesystem;
+	menu.file.openUI = true;
 
 	auto& editor = Application::As<EditorApp>()->GetEditor();
 	auto& proj = editor.GetProject();
@@ -163,6 +170,10 @@ void UITab::OpenUI() {
 }
 
 void UITab::SaveUI() {
+	UILoader::EditorSave(m_Root, m_UIPath);
+}
+
+void UITab::SaveAs() {
 	IGFD::FileDialogConfig config;
 	config.path = ".";
 	auto instance = ImGuiFileDialog::Instance();

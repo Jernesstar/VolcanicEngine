@@ -23,11 +23,8 @@ public:
 	Ref<ScriptClass> GetClass(const std::string& name) const;
 	const auto& GetClasses() const { return m_Classes; }
 
-	asIScriptContext* GetContext() const { return m_Ctx; }
-
 private:
 	asIScriptModule* m_Handle;
-	asIScriptContext* m_Ctx;
 	bool m_HasErrors = false;
 
 	Map<std::string, Ref<ScriptClass>> m_Classes;

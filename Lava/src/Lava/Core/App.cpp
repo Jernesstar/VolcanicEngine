@@ -89,6 +89,7 @@ static AssetManager& GetAssetManagerInstance() {
 }
 
 static void ScriptLoadScene(const std::string& name, App* app) {
+	s_Screen->World.reset();
 	s_Screen->World = CreateRef<Scene>(name);
 	s_Screen->World->RegisterSystems();
 	app->SceneLoad(*s_Screen->World);
@@ -98,7 +99,7 @@ static void ScriptLoadScene(const std::string& name, App* app) {
 	.ForEach<ScriptComponent>(
 		[&](Entity entity)
 		{
-		auto& sc = entity.Set<ScriptComponent>();
+			auto& sc = entity.Set<ScriptComponent>();
 			if(!sc.Instance)
 				return;
 			list.Add(entity);
@@ -109,7 +110,7 @@ static void ScriptLoadScene(const std::string& name, App* app) {
 		{
 			auto& sc = entity.Set<ScriptComponent>();
 			auto old = sc.Instance;
-			if(!old->IsInitialized()) {
+			if(!old->IsInitialized()) { // i.e Editor
 				sc.Instance = old->GetClass()->Instantiate(entity);
 				sc.Instance->Copy(old);
 			}
@@ -149,7 +150,7 @@ App::App(const Project& project)
 		"UIPageClass& get_UIPage() property", asFUNCTION(GetUI), asCALL_CDECL);
 
 	ScriptEngine::Get()->RegisterGlobalFunction(
-		+"IApp@ get_ScriptApp() property",
+		"IApp@ get_ScriptApp() property",
 		asFUNCTION(GetScriptApp), asCALL_CDECL);
 	ScriptEngine::Get()->RegisterGlobalFunction(
 		"AssetManagerClass& get_AssetManager() property",

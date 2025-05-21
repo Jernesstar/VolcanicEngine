@@ -51,7 +51,8 @@ project "Magma"
     }
 
     defines {
-        "flecs_STATIC"
+        "flecs_STATIC",
+        "NOMINMAX"
     }
 
     filter "action:vs* or system:linux"
@@ -154,7 +155,8 @@ project "Editor"
     }
 
     defines {
-        "flecs_STATIC"
+        "flecs_STATIC",
+        "NOMINMAX"
     }
 
     filter "toolset:msc or system:linux"

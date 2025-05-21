@@ -47,11 +47,10 @@ private:
 ScriptModule::ScriptModule(const std::string& name)
 	: Name(name)
 {
-	m_Ctx = ScriptEngine::Get()->CreateContext();
 }
 
 ScriptModule::~ScriptModule() {
-	m_Ctx->Release();
+
 }
 
 void ScriptModule::Load(const std::string& path) {
