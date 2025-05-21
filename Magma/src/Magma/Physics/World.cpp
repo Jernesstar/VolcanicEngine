@@ -12,21 +12,21 @@ PxFilterFlags FilterShader(
 	PxFilterObjectAttributes attributes1, PxFilterData filterData1,
 	PxPairFlags& pairFlags, const void* constantBlock, PxU32 constantBlockSize)
 {
-	VOLCANICORE_LOG_INFO("HERe");
 	// All initial and persisting reports for everything, with per-point data
 	pairFlags = PxPairFlag::eSOLVE_CONTACT
 		| PxPairFlag::eDETECT_DISCRETE_CONTACT
 		| PxPairFlag::eNOTIFY_TOUCH_FOUND
 		| PxPairFlag::eNOTIFY_TOUCH_PERSISTS
-		| PxPairFlag::eNOTIFY_CONTACT_POINTS;
+		// | PxPairFlag::eNOTIFY_CONTACT_POINTS
+		;
 	return PxFilterFlag::eDEFAULT;
 }
 #endif
 
 World::World() {
 #ifdef MAGMA_PHYSICS
-	PxSceneDesc sceneDesc(Physics::GetPhysicsLib()->getTolerancesScale());
-	sceneDesc.cpuDispatcher	= Physics::GetDispatcher();
+	PxSceneDesc sceneDesc(GetPhysicsLib()->getTolerancesScale());
+	sceneDesc.cpuDispatcher	= GetDispatcher();
 	sceneDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f);
 	sceneDesc.filterShader = FilterShader;
 	sceneDesc.kineKineFilteringMode = physx::PxPairFilteringMode::eKEEP;

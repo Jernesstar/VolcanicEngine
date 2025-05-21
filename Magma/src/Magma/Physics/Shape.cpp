@@ -54,6 +54,7 @@ Ref<Shape> Shape::CreateBox(float radius) {
 	shape->m_Shape =
 		GetPhysicsLib()->createShape(
 			PxBoxGeometry(radius, radius, radius), *mat);
+	mat->release();
 #endif
 
 	return shape;
@@ -62,9 +63,9 @@ Ref<Shape> Shape::CreateBox(float radius) {
 Ref<Shape> Shape::CreateSphere(float radius) {
 	Ref<Shape> shape = CreateRef<Shape>(Shape::Type::Box);
 #ifdef MAGMA_PHYSICS
-	auto* material = GetPhysicsLib()->createMaterial(0.5f, 0.5f, 0.6f);
-	shape->m_Shape =
-		GetPhysicsLib()->createShape(PxSphereGeometry(0.5f), *material);
+	auto* mat = GetPhysicsLib()->createMaterial(0.5f, 0.5f, 0.6f);
+	shape->m_Shape = GetPhysicsLib()->createShape(PxSphereGeometry(0.5f), *mat);
+	mat->release();
 #endif
 
 	return shape;
@@ -74,8 +75,8 @@ Ref<Shape> Shape::CreatePlane(const Transform& tr) {
 	Ref<Shape> shape = CreateRef<Shape>(Shape::Type::Plane);
 #ifdef MAGMA_PHYSICS
 	auto* mat = GetPhysicsLib()->createMaterial(0.5f, 0.5f, 0.6f);
-	shape->m_Shape =
-		GetPhysicsLib()->createShape(PxPlaneGeometry(), *mat);
+	shape->m_Shape = GetPhysicsLib()->createShape(PxPlaneGeometry(), *mat);
+	mat->release();
 #endif
 	return shape;
 }
@@ -85,7 +86,9 @@ Ref<Shape> Shape::CreateCapsule(float radius, float halfRadius) {
 #ifdef MAGMA_PHYSICS
 	auto* mat = GetPhysicsLib()->createMaterial(0.5f, 0.5f, 0.6f);
 	shape->m_Shape =
-		GetPhysicsLib()->createShape(PxCapsuleGeometry(radius, halfRadius), *mat);
+		GetPhysicsLib()->createShape(
+			PxCapsuleGeometry(radius, halfRadius), *mat);
+	mat->release();
 #endif
 
 	return shape;
@@ -116,15 +119,12 @@ Shape& Shape::operator =(const Shape& other) {
 Shape::~Shape() {
 #ifdef MAGMA_PHYSICS
 	m_Shape->release();
-
 #endif
 }
 
 #ifdef MAGMA_PHYSICS
 
 PxShape* CookConvex(Buffer<Vertex> data) {
-	auto material = GetPhysicsLib()->createMaterial(0.5f, 0.5f, 0.6f);
-
 	PxConvexMeshDesc desc;
 	desc.points.count  = 5;
 	desc.points.stride = sizeof(Vertex);
@@ -142,12 +142,14 @@ PxShape* CookConvex(Buffer<Vertex> data) {
 
 	PxDefaultMemoryInputData input(buf.getData(), buf.getSize());
 	PxConvexMesh* mesh = GetPhysicsLib()->createConvexMesh(input);
-	return GetPhysicsLib()->createShape(PxConvexMeshGeometry(mesh), *material);
+
+	auto* mat = GetPhysicsLib()->createMaterial(0.5f, 0.5f, 0.6f);
+	auto res = GetPhysicsLib()->createShape(PxConvexMeshGeometry(mesh), *mat);
+	mat->release();
+	return res;
 }
 
 PxShape* CookMesh(Ref<Mesh> mesh) {
-	auto material = GetPhysicsLib()->createMaterial(0.5f, 0.5f, 0.6f);
-
 	PxTriangleMeshDesc desc;
 	desc.points.count  = mesh->SubMeshes[-1].Vertices.GetCount();
 	desc.points.stride = sizeof(Vertex);
@@ -170,7 +172,11 @@ PxShape* CookMesh(Ref<Mesh> mesh) {
 
 	PxDefaultMemoryInputData input(buf.getData(), buf.getSize());
 	PxTriangleMesh* m = GetPhysicsLib()->createTriangleMesh(input);
-	return GetPhysicsLib()->createShape(PxTriangleMeshGeometry(m), *material);
+
+	auto* mat = GetPhysicsLib()->createMaterial(0.5f, 0.5f, 0.6f);
+	auto res = GetPhysicsLib()->createShape(PxTriangleMeshGeometry(m), *mat);
+	mat->release();
+	return res;
 }
 
 #endif

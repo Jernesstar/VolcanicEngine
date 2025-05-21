@@ -80,24 +80,22 @@ DynamicBody::DynamicBody(Ref<Shape> shape, const Transform& t)
 #endif
 }
 
-// TODO(Fix): attachShape for non-kinematic dynamic bodies not supported
 void DynamicBody::SetShape(Ref<Shape> shape) {
 #ifdef MAGMA_PHYSICS
-	// m_Shape->m_Shape =
-	// 	PxRigidActorExt::createExclusiveShape(*m_Actor,
-	// 		shape->m_Shape->getGeometry(), *shape->m_Shape->getMaterials()[0]);
+	m_Actor->is<PxRigidDynamic>()->attachShape(*shape->m_Shape);
+	m_Actor->setActorFlag(PxActorFlag::eVISUALIZATION, true);
 #endif
 }
 
 void DynamicBody::SetMass(float mass) {
 #ifdef MAGMA_PHYSICS
-	m_Actor->is<PxRigidBody>()->setMass(mass);
+	m_Actor->is<PxRigidDynamic>()->setMass(mass);
 #endif
 }
 
 void DynamicBody::ApplyForce(const glm::vec3& f) {
 #ifdef MAGMA_PHYSICS
-	m_Actor->is<PxRigidBody>()->
+	m_Actor->is<PxRigidDynamic>()->
 		addForce(PxVec3{ f.x, f.y, f.z }, PxForceMode::Enum::eFORCE, true);
 #endif
 }
