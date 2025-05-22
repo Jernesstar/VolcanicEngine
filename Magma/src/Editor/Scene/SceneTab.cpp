@@ -124,16 +124,19 @@ void SceneTab::Setup() {
 					auto entity = m_Scene.EntityWorld.GetEntity(id);
 
 					auto& sc = entity.Set<ScriptComponent>();
-					if(!sc.Instance)
-						return;
-					if(sc.ModuleAsset != asset)
-						return;
+					if(!sc.Instance) {
+						VOLCANICORE_LOG_INFO("Exception 1");
+						continue;
+					}
+					if(sc.ModuleAsset != asset) {
+						VOLCANICORE_LOG_INFO("Exception 2");
+						continue;
+					}
 
 					auto mod = assetManager.Get<ScriptModule>(asset);
 					std::string name =
 						sc.Instance->GetHandle()->GetObjectType()->GetName();
-					sc.Instance =
-						LoadScript(entity, sc.ModuleAsset, name, node);
+					sc.Instance = LoadScript(entity, asset, name, node);
 				};
 			}
 

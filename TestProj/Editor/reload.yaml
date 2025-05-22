@@ -21,15 +21,15 @@ Objects:
         - Field:
             Name: Signed8
             Type: int8
-            Value: 0
+            Value: 68
         - Field:
             Name: Unsigned32
             Type: uint32
-            Value: 0
+            Value: 85
         - Field:
             Name: Float
             Type: float
-            Value: 0
+            Value: 9.69999981
         - Field:
             Name: Tilemap
             Type: array

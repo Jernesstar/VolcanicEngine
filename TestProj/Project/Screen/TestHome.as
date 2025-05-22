@@ -13,11 +13,11 @@ class TestHome : IScreen
     void OnLoad()
     {
         Entity player = Scene.FindEntity("Player");
-        if(!player.IsValid()) {
+        if(!player.IsValid) {
             print("Error");
         }
         else {
-            print("Found");
+            print("Found Player Entity");
             @Controller = player.SetScriptComponent().Instance;
         }
 

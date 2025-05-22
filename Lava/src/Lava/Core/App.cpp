@@ -96,9 +96,8 @@ static void ScriptLoadScene(const std::string& name, App* app) {
 		[&](Entity entity)
 		{
 			auto& sc = entity.Set<ScriptComponent>();
-			if(!sc.Instance)
-				return;
-			list.Add(entity);
+			if(sc.Instance)
+				list.Add(entity);
 		});
 
 	list.ForEach(
@@ -310,10 +309,9 @@ void App::ScreenSet(const std::string& name) {
 		.ForEach<ScriptComponent>(
 			[&](Entity entity)
 			{
-				auto& sc = entity.Set<ScriptComponent>();
-				if(!sc.Instance)
-					return;
-				list.Add(entity);
+				const auto& sc = entity.Get<ScriptComponent>();
+				if(sc.Instance)
+					list.Add(entity);
 			});
 
 		list.ForEach(
@@ -321,11 +319,8 @@ void App::ScreenSet(const std::string& name) {
 			{
 				auto& sc = entity.Set<ScriptComponent>();
 				auto old = sc.Instance;
-				if(!old->IsInitialized()) {
-					sc.Instance = old->GetClass()->Instantiate(entity);
-					sc.Instance->Copy(old);
-				}
-
+				sc.Instance = old->GetClass()->Instantiate(entity);
+				sc.Instance->Copy(old);
 				sc.Instance->Call("OnStart");
 			});
 	}

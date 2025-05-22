@@ -746,9 +746,9 @@ void RegisterECS() {
 		asMETHOD(Entity, GetName), asCALL_THISCALL);
 	engine->RegisterObjectMethod("Entity", "void set_Name(const string &in) property",
 		asMETHOD(Entity, SetName), asCALL_THISCALL);
-	engine->RegisterObjectMethod("Entity", "bool IsAlive() const",
+	engine->RegisterObjectMethod("Entity", "bool get_IsAlive() const property",
 		asMETHOD(Entity, IsAlive), asCALL_THISCALL);
-	engine->RegisterObjectMethod("Entity", "bool IsValid() const",
+	engine->RegisterObjectMethod("Entity", "bool get_IsValid() const property",
 		asMETHOD(Entity, IsValid), asCALL_THISCALL);
 	engine->RegisterObjectMethod("Entity", "void Kill()",
 		asMETHOD(Entity, Kill), asCALL_THISCALL);

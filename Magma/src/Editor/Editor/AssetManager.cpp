@@ -179,9 +179,11 @@ void FileWatcher::ReloadScript(const std::string& path) {
 	auto name = fs::path(path).filename().stem().string();
 	Ref<ScriptModule> mod = CreateRef<ScriptModule>(name);
 	mod->Load(path);
-	if(mod->HasErrors())
-		return;
-	m_AssetManager->m_ScriptAssets[id] = mod;
+
+	if(!mod->HasErrors())
+		m_AssetManager->m_ScriptAssets[id] = mod;
+	else
+		VOLCANICORE_LOG_INFO("Error occured when reloading script");
 }
 
 static efsw::FileWatcher* s_FileWatcher;

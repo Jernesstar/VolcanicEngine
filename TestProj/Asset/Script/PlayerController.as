@@ -42,7 +42,7 @@ class PlayerController : IEntityController
         print("Coins: " + game.State.Coins);
 
         print("Name: " + Handle.Name);
-        print("Alive: " + Handle.IsAlive());
+        print("Alive: " + Handle.IsAlive);
         const TagComponent@ tag = Handle.GetTagComponent();
         print(tag.Tag);
 
