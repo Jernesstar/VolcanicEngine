@@ -84,8 +84,6 @@ private:
 	List<Func<void, Asset, bool>> m_Callbacks;
 };
 
-static bool s_Flip = false;
-
 FileWatcher::FileWatcher(EditorAssetManager* assetManager)
 	: m_AssetManager(assetManager) { }
 
@@ -103,35 +101,26 @@ void FileWatcher::handleFileAction(
 	else if(action == efsw::Actions::Delete)
 		Remove(type, fullPath);
 	else if(action == efsw::Actions::Modified) {
-		// Two modified events are emitted for each change
-		// So ignore the first and use only the second
-		if(!s_Flip) {
-			s_Flip = true;
-			return;
-		}
-		else {
-			s_Flip = false;
-			for(auto callback : m_Callbacks)
-				callback(asset, 0);
+		for(auto callback : m_Callbacks)
+			callback(asset, 0);
 
-			switch(type) {
-				case AssetType::Mesh:
-					ReloadMesh(fullPath);
-					break;
-				case AssetType::Texture:
-					ReloadTexture(fullPath);
-					break;
-				case AssetType::Audio:
-					ReloadAudio(fullPath);
-					break;
-				case AssetType::Script:
-					ReloadScript(fullPath);
-					break;
-			}
-
-			for(auto callback : m_Callbacks)
-				callback(asset, 1);
+		switch(type) {
+			case AssetType::Mesh:
+				ReloadMesh(fullPath);
+				break;
+			case AssetType::Texture:
+				ReloadTexture(fullPath);
+				break;
+			case AssetType::Audio:
+				ReloadAudio(fullPath);
+				break;
+			case AssetType::Script:
+				ReloadScript(fullPath);
+				break;
 		}
+
+		for(auto callback : m_Callbacks)
+			callback(asset, 1);
 	}
 	else if(action == efsw::Actions::Moved) {
 		std::cout << "DIR (" << dir << ") FILE (" << file << ") has event Moved from (" << oldFilename << ")" << "\n";
@@ -369,10 +358,10 @@ void EditorAssetManager::Load(const std::string& path) {
 		(rootPath / "Shader")
 	};
 
-	uint32_t i = 0;
+	uint32_t i = 1;
 	for(auto& folder : paths) {
 		for(auto path : FileUtils::GetFiles(folder.string())) {
-			if(i == 0)
+			if(i == 1)
 				path = FileUtils::GetFiles(path, { ".obj" })[0];
 			if(!GetFromPath(path))
 				Add(path, (AssetType)i);

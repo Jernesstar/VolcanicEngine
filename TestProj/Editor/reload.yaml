@@ -1,6 +1,7 @@
 Objects:
   - Entity:
       ID: 1110
+      Class: PlayerController
       Fields:
         - Field:
             Name: soundAsset

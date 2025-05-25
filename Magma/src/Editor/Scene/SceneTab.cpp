@@ -133,10 +133,7 @@ void SceneTab::Setup() {
 						continue;
 					}
 
-					auto mod = assetManager.Get<ScriptModule>(asset);
-					std::string name =
-						sc.Instance->GetHandle()->GetObjectType()->GetName();
-					sc.Instance = LoadScript(entity, asset, name, node);
+					sc.Instance = LoadScript(entity, asset, node);
 				};
 			}
 

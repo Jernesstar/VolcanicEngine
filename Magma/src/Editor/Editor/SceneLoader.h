@@ -10,7 +10,7 @@ namespace Magma {
 extern void SaveScript(YAMLSerializer& serializer,
 	Ref<Script::ScriptObject> obj);
 extern Ref<Script::ScriptObject> LoadScript(Entity entity, Asset asset,
-	const std::string& className, YAML::Node& scriptComponentNode);
+	YAML::Node& scriptComponentNode);
 
 class SceneLoader {
 public:

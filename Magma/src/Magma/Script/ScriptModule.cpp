@@ -60,6 +60,7 @@ void ScriptModule::Load(const std::string& path) {
 
 	if(!fs::exists(path)) {
 		VOLCANICORE_LOG_WARNING("File '%s' does not exist", path.c_str());
+		m_HasErrors = true;
 		return;
 	}
 

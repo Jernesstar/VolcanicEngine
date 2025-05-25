@@ -103,6 +103,7 @@ void SceneLoader::EditorSave(const Scene& scene, const std::string& path) {
 }
 
 void SaveScript(YAMLSerializer& serializer, Ref<ScriptObject> obj) {
+	serializer.WriteKey("Class").Write(obj->GetClass()->Name);
 	serializer.WriteKey("Fields").BeginSequence();
 
 	auto* handle = obj->GetHandle();
@@ -296,12 +297,10 @@ void SerializeEntity(YAMLSerializer& serializer, const Entity& entity) {
 	if(entity.Has<ScriptComponent>()) {
 		const auto& comp = entity.Get<ScriptComponent>();
 		auto obj = comp.Instance;
-		std::string name = obj ? obj->GetClass()->Name : std::string("");
 
 		serializer.WriteKey("ScriptComponent")
 		.BeginMapping()
-			.WriteKey("ModuleID").Write((uint64_t)comp.ModuleAsset.ID)
-			.WriteKey("Class").Write(name);
+			.WriteKey("ModuleID").Write((uint64_t)comp.ModuleAsset.ID);
 
 		if(obj)
 			SaveScript(serializer, obj);
@@ -415,7 +414,7 @@ void SerializeEntity(YAMLSerializer& serializer, const Entity& entity) {
 }
 
 Ref<ScriptObject> LoadScript(Entity entity, Asset asset,
-	const std::string& className, YAML::Node& scriptComponentNode)
+	YAML::Node& scriptComponentNode)
 {
 	auto& assetManager =
 		Application::As<EditorApp>()->GetEditor().GetAssetManager();
@@ -429,6 +428,10 @@ Ref<ScriptObject> LoadScript(Entity entity, Asset asset,
 		return nullptr;
 	}
 
+	if(!scriptComponentNode["Class"])
+		return nullptr;
+
+	auto className = scriptComponentNode["Class"].as<std::string>();
 	auto _class = mod->GetClass(className);
 	if(!_class) {
 		VOLCANICORE_LOG_INFO(
@@ -469,17 +472,17 @@ Ref<ScriptObject> LoadScript(Entity entity, Asset asset,
 			*(float*)address = value.as<float>();
 		else if(type == "double")
 			*(double*)address = value.as<float>();
+		else if(type == "array") {
+			auto data = value.as<List<uint32_t>>();
+			for(uint32_t i = 0; i < data.Count(); i++)
+				((CScriptArray*)address)->InsertLast(data.At(i));
+		}
 		else if(type == "Vec3")
 			*(Vec3*)address = value.as<Vec3>();
 		else if(type == "Asset") {
 			((Asset*)address)->ID = value["ID"].as<uint64_t>();
 			((Asset*)address)->Type =
 				AssetTypeFromString(value["Type"].as<std::string>());
-		}
-		else if(type == "array") {
-			auto data = value.as<List<uint32_t>>();
-			for(uint32_t i = 0; i < data.Count(); i++)
-				((CScriptArray*)address)->InsertLast(data.At(i));
 		}
 	}
 
@@ -566,16 +569,13 @@ void DeserializeEntity(YAML::Node entityNode, Scene& scene) {
 	auto scriptComponentNode = components["ScriptComponent"];
 	if(scriptComponentNode) {
 		auto id = scriptComponentNode["ModuleID"].as<uint64_t>();
-		auto className = scriptComponentNode["Class"].as<std::string>();
 		Asset asset = { id, AssetType::Script };
 
 		if(!id || !assetManager.IsValid(asset))
 			entity.Add<ScriptComponent>();
-		else if(className == "")
-			entity.Add<ScriptComponent>(asset, nullptr);
 		else {
 			auto obj =
-				LoadScript(entity, asset, className, scriptComponentNode);
+				LoadScript(entity, asset, scriptComponentNode);
 			entity.Add<ScriptComponent>(asset, obj);
 		}
 	}
