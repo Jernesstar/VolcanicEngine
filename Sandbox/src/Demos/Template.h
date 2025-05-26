@@ -33,11 +33,6 @@ Template::Template() {
 
 	VOLCANICORE_LOG_INFO("Template Project Started");
 
-	RendererAPI::Get()->NewDrawCommand(nullptr)->Clear = true;
-	RendererAPI::Get()->NewDrawCommand(nullptr)->Clear = true;
-	RendererAPI::Get()->NewDrawCommand(nullptr)->Clear = true;
-	RendererAPI::Get()->NewDrawCommand(nullptr)->Clear = true;
-
 	VOLCANICORE_LOG_INFO("Success");
 }
 

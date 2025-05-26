@@ -23,6 +23,8 @@ public:
 	Ref<ScriptClass> GetClass(const std::string& name) const;
 	const auto& GetClasses() const { return m_Classes; }
 
+	asIScriptModule* GetHandle() const { return m_Handle; }
+
 private:
 	asIScriptModule* m_Handle;
 	bool m_HasErrors = false;

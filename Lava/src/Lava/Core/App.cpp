@@ -346,10 +346,6 @@ void App::ScreenPop() {
 }
 
 RuntimeSceneRenderer::RuntimeSceneRenderer() {
-	auto camera = CreateRef<StereographicCamera>(75.0f);
-	m_Controller.SetCamera(camera);
-	m_Controller.TranslationSpeed = 10.0f;
-
 	auto window = Application::GetWindow();
 	m_Output = Framebuffer::Create(window->GetWidth(), window->GetHeight());
 

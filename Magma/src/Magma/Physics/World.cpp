@@ -16,7 +16,7 @@ PxFilterFlags FilterShader(
 	pairFlags = PxPairFlag::eSOLVE_CONTACT
 		| PxPairFlag::eDETECT_DISCRETE_CONTACT
 		| PxPairFlag::eNOTIFY_TOUCH_FOUND
-		| PxPairFlag::eNOTIFY_TOUCH_PERSISTS
+		// | PxPairFlag::eNOTIFY_TOUCH_PERSISTS
 		// | PxPairFlag::eNOTIFY_CONTACT_POINTS
 		;
 	return PxFilterFlag::eDEFAULT;

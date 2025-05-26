@@ -44,18 +44,8 @@ void ShaderProgram::Compile() {
 	int result;
 	glGetProgramiv(m_ProgramID, GL_LINK_STATUS, &result);
 
-	if(result == GL_FALSE) {
-		GLint length;
-		glGetProgramiv(m_ProgramID, GL_INFO_LOG_LENGTH, &length);
-
-		char* message = (char*)alloca(length * sizeof(char));
-		glGetProgramInfoLog(m_ProgramID, length, &length, message);
-
+	if(result == GL_FALSE)
 		glDeleteProgram(m_ProgramID);
-
-		VOLCANICORE_ASSERT_ARGS(false, "A linking error has occured: \n%s",
-								message);
-	}
 
 	for(auto& shaderID : m_ShaderIDs) {
 		glDetachShader(m_ProgramID, shaderID);

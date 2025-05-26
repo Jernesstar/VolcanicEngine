@@ -30,10 +30,12 @@ public:
 	void SubmitMesh(const Entity& entity) override;
 	void Render() override;
 
+	CameraController& GetCameraController() { return m_Controller; }
 	void Select(Entity entity) { Selected = entity; }
 	void IsHovered(bool hovered) { Hovered = hovered; }
 
 private:
+	CameraController m_Controller;
 	SceneVisualizerPanel* RootPanel;
 
 	Entity Selected;

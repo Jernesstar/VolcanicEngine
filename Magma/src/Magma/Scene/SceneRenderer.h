@@ -31,11 +31,9 @@ public:
 	virtual void Render() = 0;
 
 	Ref<Framebuffer> GetOutput() const { return m_Output; }
-	CameraController& GetCameraController() { return m_Controller; }
 
 protected:
 	Ref<Framebuffer> m_Output;
-	CameraController m_Controller;
 };
 
 }

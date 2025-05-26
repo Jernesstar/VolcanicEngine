@@ -50,6 +50,7 @@ using namespace Magma::Physics;
 #include "Demos/Shadows.h"
 #include "Demos/Bloom.h"
 #include "Demos/Deferred.h"
+#include "Demos/Particles.h"
 #include "Demos/UI.h"
 #include "Demos/Text.h"
 #include "Demos/ECS.h"
@@ -76,6 +77,8 @@ Application* CreateApplication(const CommandLineArgs& args) {
 	else if(project == "Shadows") return new Demo::Shadows();
 	// Bloom
 	else if(project == "Bloom") return new Demo::Bloom();
+	// Particle system
+	else if(project == "Particles") return new Demo::Particles();
 	// Deferred
 	else if(project == "Deferred") return new Demo::Deferred();
 	// Text rendering

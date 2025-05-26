@@ -149,6 +149,12 @@ struct UniformSlot {
 	uint32_t Binding = 0;
 };
 
+struct StorageSlot {
+	// Ref<StorageBuffer> Buffer = nullptr;
+	std::string Name = "";
+	uint32_t Binding = 0;
+};
+
 struct DrawUniforms {
 	Map<std::string, int32_t> IntUniforms;
 	Map<std::string, float> FloatUniforms;

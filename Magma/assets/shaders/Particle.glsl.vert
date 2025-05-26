@@ -1,7 +1,7 @@
 #version 450 core
 
 struct Particle {
-    vec4 Position;
+    vec3 Position;
     vec3 Velocity;
     float Life;
 };
@@ -11,8 +11,8 @@ uniform mat4 u_ViewProj;
 uniform float u_BillboardWidth;
 uniform float u_BillboardHeight;
 
-layout(std430, binding = 0) readonly restrict buffer Particles {
-    Particle Buffer[];
+layout(std430, binding = 0) readonly restrict buffer SSBO_1  {
+    Particle Particles[];
 };
 
 const vec2 Vertices[4] =
@@ -38,7 +38,7 @@ void main()
 
     Particle particle = Particles[gl_InstanceID];
     if(particle.Life <= 0)
-        discard;
+        return;
 
     v_Position =
         a_BillboardCenter

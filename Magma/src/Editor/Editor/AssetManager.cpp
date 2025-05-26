@@ -166,11 +166,13 @@ void FileWatcher::ReloadScript(const std::string& path) {
 	VOLCANICORE_LOG_INFO("Reloading Script at path '%s'", path.c_str());
 	auto id = m_AssetManager->GetFromPath(path);
 	auto name = fs::path(path).filename().stem().string();
-	Ref<ScriptModule> mod = CreateRef<ScriptModule>(name);
+	Ref<ScriptModule> mod = CreateRef<ScriptModule>("TestBuild");
 	mod->Load(path);
 
-	if(!mod->HasErrors())
+	if(!mod->HasErrors()) {
+		mod->GetHandle()->SetName(name.c_str());
 		m_AssetManager->m_ScriptAssets[id] = mod;
+	}
 	else
 		VOLCANICORE_LOG_INFO("Error occured when reloading script");
 }
