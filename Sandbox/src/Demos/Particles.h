@@ -60,6 +60,7 @@ Particles::Particles() {
 
 	shader = ShaderPipeline::Create("Magma/assets/shaders", "Particle");
 	DrawPass = RenderPass::Create("Particle-Draw", shader);
+	DrawPass->SetData(Renderer3D::GetMeshBuffer());
 
 	auto texture = AssetImporter::GetTexture("Sandbox/assets/images/wood.png");
 	BufferLayout particleLayout =
@@ -70,7 +71,6 @@ Particles::Particles() {
 	};
 	BufferLayout freeListLayout =
 	{
-		{ "Count", BufferDataType::Int },
 		{ "Indices", BufferDataType::Int },
 	};
 
@@ -80,10 +80,10 @@ Particles::Particles() {
 			.Material = texture,
 			.MaxParticleCount = 100,
 			.ParticleLifetime = 1000.0f,
-			.SpawnInterval = 1000.0f,
+			.SpawnInterval = 10.0f,
 			.Timer = 0,
-			.ParticleBuffer = StorageBuffer::Create(particleLayout),
-			.FreeListBuffer = StorageBuffer::Create(freeListLayout)
+			.ParticleBuffer = StorageBuffer::Create(particleLayout, 100),
+			.FreeListBuffer = StorageBuffer::Create(freeListLayout, 100)
 		}
 	);
 
@@ -92,22 +92,30 @@ Particles::Particles() {
 
 void Particles::OnUpdate(TimeStep ts) {
 	controller.OnUpdate(ts);
-	int workGroupSize = 128;
 
 	Renderer::StartPass(EmitterPass);
 	{
+		int workGroupSize = 64;
 		auto* command = Renderer::GetCommand();
 
 		for(auto& emitter : Emitters) {
 			command = Renderer::NewCommand();
+			command->UniformData
+			.SetInput("u_ParticlesToSpawn", 10);
+			command->UniformData
+			.SetInput("u_Emitter.Position", emitter.Position);
+			command->UniformData
+			.SetInput("u_Emitter.ParticleLifetime", emitter.ParticleLifetime);
+
 			emitter.Timer += (float)ts;
-			uint32_t particlesToSpawn = emitter.Timer / emitter.SpawnInterval;
+			uint32_t particlesToSpawn =
+				uint32_t(emitter.Timer / emitter.SpawnInterval);
 			emitter.Timer = fmodf(emitter.Timer, emitter.SpawnInterval);
 			if(particlesToSpawn <= 0)
 				continue;
 
 			int numWorkGroups =
-				(emitter.MaxParticleCount + workGroupSize - 1) / workGroupSize;
+				(particlesToSpawn + workGroupSize - 1) / workGroupSize;
 			command->UniformData
 			.SetInput(StorageSlot{ emitter.ParticleBuffer, "", 0 });
 			command->UniformData
@@ -119,12 +127,14 @@ void Particles::OnUpdate(TimeStep ts) {
 
 	Renderer::StartPass(UpdatePass);
 	{
+		int workGroupSize = 128;
 		auto* command = Renderer::GetCommand();
 		command->UniformData
 		.SetInput("u_TimeStep", (float)ts);
 
 		for(auto& emitter : Emitters) {
 			command = Renderer::NewCommand();
+
 			int numWorkGroups =
 				(emitter.MaxParticleCount + workGroupSize - 1) / workGroupSize;
 			command->UniformData

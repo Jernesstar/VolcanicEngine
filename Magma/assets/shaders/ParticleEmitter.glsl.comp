@@ -1,14 +1,9 @@
-#version 460 core
+#version 450 core
 
 struct Particle {
     vec3 Position;
     vec3 Velocity;
     float Life;
-};
-
-struct EmitterSettings {
-    vec3 Position;
-    float ParticleLifetime;
 };
 
 layout(std430, binding = 0) buffer SSBO_0 {
@@ -20,14 +15,19 @@ layout(std430, binding = 1) buffer SSBO_1 {
     int Indices[];
 } FreeList;
 
+struct EmitterSettings {
+    vec3 Position;
+    float ParticleLifetime;
+};
+
 layout(location = 0) uniform int u_ParticlesToSpawn;
 layout(location = 1) uniform EmitterSettings u_Emitter;
 
 // Make a particle with random attributes
 void MakeParticle(out Particle particle) {
     particle.Life = u_Emitter.ParticleLifetime;
-    particle.Velocity = vec3(1.0f);
-    particle.Position = u_Emitter.Position + vec3(1.0f);
+    particle.Velocity = vec3(0.0001f);
+    particle.Position = u_Emitter.Position;
 }
 
 layout(local_size_x = 64, local_size_y = 1, local_size_z = 1) in;

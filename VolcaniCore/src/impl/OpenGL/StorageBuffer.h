@@ -20,18 +20,19 @@ public:
 		: VolcaniCore::StorageBuffer(layout, count), Size(layout.Stride)
 	{
 		glCreateBuffers(1, &m_BufferID);
-		glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_BufferID);
+		glNamedBufferStorage(m_BufferID, count * Size, nullptr,
+			GL_DYNAMIC_STORAGE_BIT);
 	}
 
 	template<typename T>
 	StorageBuffer(const BufferLayout& layout, const Buffer<T>& buffer)
-		: VolcaniCore::StorageBuffer(layout), Size(layout.Stride)
+		: VolcaniCore::StorageBuffer(layout, buffer.GetCount()),
+			Size(layout.Stride)
 	{
 		VOLCANICORE_ASSERT(layout.Stride == sizeof(T));
-
 		glCreateBuffers(1, &m_BufferID);
-		glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_BufferID);
-		glBufferData(GL_SHADER_STORAGE_BUFFER, Size, buffer.Get(), GL_DYNAMIC_COPY);
+		glNamedBufferStorage(m_BufferID, Size * buffer.GetCount(), buffer.Get(),
+			GL_DYNAMIC_STORAGE_BIT);
 	}
 
 	~StorageBuffer() {
@@ -41,10 +42,7 @@ public:
 	void SetData(const void* data, uint64_t count = 1,
 				 uint64_t offset = 0) override
 	{
-		glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_BufferID);
-		GLvoid* p = glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_WRITE_ONLY);
-		memcpy(p + offset * Size, data, count * Size);
-		glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+		glNamedBufferSubData(m_BufferID, offset * Size, Size * count, data);
 	}
 
 	void Bind(uint32_t binding) {

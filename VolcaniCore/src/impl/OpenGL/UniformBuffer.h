@@ -17,21 +17,22 @@ public:
 	public:
 	UniformBuffer(const BufferLayout& layout, uint64_t count = 1,
 		const void* data = nullptr)
-													// TODO(Fix): This is bad!!
-		: VolcaniCore::UniformBuffer(layout, count), Size(layout.Stride * count)
+		: VolcaniCore::UniformBuffer(layout, count), Size(layout.Stride)
 	{
 		glCreateBuffers(1, &m_BufferID);
-		glNamedBufferData(m_BufferID, Size, data, GL_DYNAMIC_DRAW);
+		glNamedBufferData(m_BufferID, Size * count, data, GL_DYNAMIC_DRAW);
 	}
 
 	template<typename T>
 	UniformBuffer(const BufferLayout& layout, const Buffer<T>& buffer)
-		: VolcaniCore::UniformBuffer(layout), Size(layout.Stride)
+		: VolcaniCore::UniformBuffer(layout, buffer.GetCount()),
+			Size(layout.Stride)
 	{
 		VOLCANICORE_ASSERT(layout.Stride == sizeof(T));
 
 		glCreateBuffers(1, &m_BufferID);
-		glNamedBufferData(m_BufferID, Size, buffer.Get(), GL_DYNAMIC_DRAW);
+		glNamedBufferData(m_BufferID, Size * buffer.GetCount(), buffer.Get(),
+			GL_DYNAMIC_DRAW);
 	}
 
 	~UniformBuffer() {
@@ -41,8 +42,7 @@ public:
 	void SetData(const void* data, uint64_t count = 1,
 				 uint64_t offset = 0) override
 	{
-		glNamedBufferSubData(m_BufferID, offset * Layout.Stride,
-							 count == 0 ? Size : count * Layout.Stride, data);
+		glNamedBufferSubData(m_BufferID, offset * Size, count * Size, data);
 	}
 
 	void Bind(uint32_t binding) {

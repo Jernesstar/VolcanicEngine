@@ -17,8 +17,7 @@ const int Indices[6] = int[6](0, 2, 1, 2, 0, 3);
 
 layout(location = 0) in vec3 a_BillboardCenter;
 
-layout(location = 0) out vec3 v_Position;
-layout(location = 1) out vec2 v_TexCoords;
+layout(location = 0) out vec2 v_TexCoords;
 
 void main()
 {
@@ -26,11 +25,11 @@ void main()
     vec3 cameraUp = vec3(u_View[0][1], u_View[1][1], u_View[2][1]);
     vec2 vertex = Vertices[Indices[gl_VertexID]];
 
-    v_Position =
+    vec3 position =
         a_BillboardCenter
         + cameraRight * vertex.x * u_BillboardWidth
         + cameraUp * vertex.y * u_BillboardHeight;
     v_TexCoords = vertex + 0.5;
 
-    gl_Position = u_ViewProj * vec4(v_Position, 1.0);
+    gl_Position = u_ViewProj * vec4(position, 1.0);
 }

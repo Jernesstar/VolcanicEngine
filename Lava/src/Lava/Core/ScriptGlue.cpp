@@ -28,6 +28,10 @@
 #include <Magma/Script/ScriptClass.h>
 #include <Magma/Script/ScriptObject.h>
 
+#include "Types/GridSet.h"
+#include "Types/GridSet3D.h"
+#include "Types/Timer.h"
+
 #include "App.h"
 
 using namespace Magma;
@@ -86,6 +90,10 @@ void ScriptGlue::RegisterInterface() {
 
 	RegisterScene();
 	RegisterUI();
+
+	GridSet::RegisterInterface();
+	GridSet3D::RegisterInterface();
+	Timer::RegisterInterface();
 }
 
 static void print(const std::string& str) {
