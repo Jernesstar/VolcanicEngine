@@ -32,7 +32,8 @@ public:
 	void SetMat3(const std::string& name, const glm::mat3& mat) override;
 	void SetMat4(const std::string& name, const glm::mat4& mat) override;
 
-	void SetBuffer(const std::string& name, uint32_t binding) override;
+	void SetUniformBuffer(const std::string& name, uint32_t binding) override;
+	void SetStorageBuffer(const std::string& name, uint32_t binding) override;
 
 	void Bind() const;
 	void Unbind() const;

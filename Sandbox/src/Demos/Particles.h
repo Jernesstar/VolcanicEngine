@@ -9,6 +9,9 @@ struct Emitter {
 	float ParticleLifetime; // In milliseconds
 	float SpawnInterval; // In milliseconds
 	float Timer;
+
+	Ref<StorageBuffer> ParticleBuffer;
+	Ref<StorageBuffer> FreeListBuffer;
 };
 
 class Particles : public Application {
@@ -58,6 +61,32 @@ Particles::Particles() {
 	shader = ShaderPipeline::Create("Magma/assets/shaders", "Particle");
 	DrawPass = RenderPass::Create("Particle-Draw", shader);
 
+	auto texture = AssetImporter::GetTexture("Sandbox/assets/images/wood.png");
+	BufferLayout particleLayout =
+	{
+		{ "Position", BufferDataType::Vec3 },
+		{ "Velocity", BufferDataType::Vec3 },
+		{ "Life", BufferDataType::Float },
+	};
+	BufferLayout freeListLayout =
+	{
+		{ "Count", BufferDataType::Int },
+		{ "Indices", BufferDataType::Int },
+	};
+
+	Emitters.Add(
+		{
+			.Position = Vec3(0.0f),
+			.Material = texture,
+			.MaxParticleCount = 100,
+			.ParticleLifetime = 1000.0f,
+			.SpawnInterval = 1000.0f,
+			.Timer = 0,
+			.ParticleBuffer = StorageBuffer::Create(particleLayout),
+			.FreeListBuffer = StorageBuffer::Create(freeListLayout)
+		}
+	);
+
 	VOLCANICORE_LOG_INFO("Success");
 }
 
@@ -79,10 +108,10 @@ void Particles::OnUpdate(TimeStep ts) {
 
 			int numWorkGroups =
 				(emitter.MaxParticleCount + workGroupSize - 1) / workGroupSize;
-			// command->UniformData
-			// .SetInput(StorageSlot{ emitter.ParticleBuffer, "", 0 });
-			// command->UniformData
-			// .SetInput(StorageSlot{ emitter.FreeListBuffer, "", 1 });
+			command->UniformData
+			.SetInput(StorageSlot{ emitter.ParticleBuffer, "", 0 });
+			command->UniformData
+			.SetInput(StorageSlot{ emitter.FreeListBuffer, "", 1 });
 			command->ComputeX = numWorkGroups;
 		}
 	}
@@ -93,14 +122,15 @@ void Particles::OnUpdate(TimeStep ts) {
 		auto* command = Renderer::GetCommand();
 		command->UniformData
 		.SetInput("u_TimeStep", (float)ts);
+
 		for(auto& emitter : Emitters) {
 			command = Renderer::NewCommand();
 			int numWorkGroups =
 				(emitter.MaxParticleCount + workGroupSize - 1) / workGroupSize;
-			// command->UniformData
-			// .SetInput(StorageSlot{ ParticleBuffer, "", 0 });
-			// command->UniformData
-			// .SetInput(StorageSlot{ FreeListBuffer, "", 1 });
+			command->UniformData
+			.SetInput(StorageSlot{ emitter.ParticleBuffer, "", 0 });
+			command->UniformData
+			.SetInput(StorageSlot{ emitter.FreeListBuffer, "", 1 });
 			command->ComputeX = numWorkGroups;
 		}
 	}
@@ -121,7 +151,7 @@ void Particles::OnUpdate(TimeStep ts) {
 
 			auto& call = command->NewDrawCall();
 			call.VertexCount = 6;
-			call.InstanceCount = 100; // MaxParticleCount
+			call.InstanceCount = emitter.MaxParticleCount;
 			call.Primitive = PrimitiveType::Triangle;
 			call.Partition = PartitionType::Instanced;
 		}

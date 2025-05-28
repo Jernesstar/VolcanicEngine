@@ -11,7 +11,7 @@ uniform mat4 u_ViewProj;
 uniform float u_BillboardWidth;
 uniform float u_BillboardHeight;
 
-layout(std430, binding = 0) readonly restrict buffer SSBO_1  {
+layout(std430, binding = 0) readonly restrict buffer SSBO_0  {
     Particle Particles[];
 };
 

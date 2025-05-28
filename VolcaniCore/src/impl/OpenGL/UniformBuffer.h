@@ -14,9 +14,10 @@ class UniformBuffer : public VolcaniCore::UniformBuffer {
 public:
 	const uint64_t Size;
 
-public:
+	public:
 	UniformBuffer(const BufferLayout& layout, uint64_t count = 1,
-				  const void* data = nullptr)
+		const void* data = nullptr)
+													// TODO(Fix): This is bad!!
 		: VolcaniCore::UniformBuffer(layout, count), Size(layout.Stride * count)
 	{
 		glCreateBuffers(1, &m_BufferID);

@@ -19,7 +19,7 @@ uniform float u_TimeStep;
 
 void UpdateParticle(inout Particle particle, int index) {
     if(particle.Life > 0) {
-        // particle.velocity += particle.accel * u_TimeStep;
+        // particle.Velocity += particle.Acceleration * u_TimeStep;
         particle.Position += particle.Velocity * u_TimeStep;
         particle.Life -= u_TimeStep;
 
@@ -33,7 +33,6 @@ layout(local_size_x = 128, local_size_y = 1, local_size_z = 1) in;
 
 void main() {
     uint index = gl_GlobalInvocationID.x;
-
     if(index >= Particles.length())
         return;
 

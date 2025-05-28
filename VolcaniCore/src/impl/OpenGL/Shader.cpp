@@ -93,9 +93,16 @@ void ShaderProgram::SetMat4(const std::string& name, const glm::mat4& mat) {
 	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(mat));
 }
 
-void ShaderProgram::SetBuffer(const std::string& name, uint32_t binding) {
+void ShaderProgram::SetUniformBuffer(const std::string& name, uint32_t binding) {
 	GLint location = glGetUniformBlockIndex(m_ProgramID, name.c_str());
 	glUniformBlockBinding(m_ProgramID, location, binding);
+}
+
+void ShaderProgram::SetStorageBuffer(const std::string& name, uint32_t binding) {
+	GLint location =
+		glGetProgramResourceIndex(m_ProgramID,
+			GL_SHADER_STORAGE_BLOCK, name.c_str());
+	glShaderStorageBlockBinding(m_ProgramID, location, binding);
 }
 
 void ShaderProgram::Lock() {

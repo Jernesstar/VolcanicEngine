@@ -23,7 +23,7 @@ layout(std430, binding = 1) buffer SSBO_1 {
 layout(location = 0) uniform int u_ParticlesToSpawn;
 layout(location = 1) uniform EmitterSettings u_Emitter;
 
-// make a particle with random attributes
+// Make a particle with random attributes
 void MakeParticle(out Particle particle) {
     particle.Life = u_Emitter.ParticleLifetime;
     particle.Velocity = vec3(1.0f);
@@ -36,7 +36,7 @@ void main() {
     if(index >= u_ParticlesToSpawn)
         return;
 
-    // undo decrement and return if nothing in freelist
+    // Undo decrement and return if nothing in freelist
     int freeListIndex = atomicAdd(FreeList.Count, -1) - 1;
     if(freeListIndex < 0) {
         atomicAdd(FreeList.Count, 1);

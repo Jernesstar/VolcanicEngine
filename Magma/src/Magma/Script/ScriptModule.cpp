@@ -59,7 +59,7 @@ void ScriptModule::Load(const std::string& path) {
 	auto* engine = ScriptEngine::Get();
 
 	if(!fs::exists(path)) {
-		VOLCANICORE_LOG_WARNING("File '%s' does not exist", path.c_str());
+		VOLCANICORE_LOG_ERROR("File '%s' does not exist", path.c_str());
 		m_HasErrors = true;
 		return;
 	}
@@ -67,11 +67,23 @@ void ScriptModule::Load(const std::string& path) {
 	CScriptBuilder builder;
 	bool loadMetadata = true;
 	if(fs::path(path).extension() == ".as") {
-		builder.StartNewModule(engine, Name.c_str());
-		builder.DefineWord("EDITOR");
-		builder.AddSectionFromFile(path.c_str());
-		int r = builder.BuildModule();
+		int r;
+		r = builder.StartNewModule(engine, Name.c_str());
 		if(r < 0) {
+			VOLCANICORE_LOG_ERROR("StartNewModule failed'%s'", Name.c_str());
+			m_HasErrors = true;
+			return;
+		}
+		builder.DefineWord("EDITOR");
+		r = builder.AddSectionFromFile(path.c_str());
+		if(r < 0) {
+			VOLCANICORE_LOG_ERROR("AddSectionFromFile failed");
+			m_HasErrors = true;
+			return;
+		}
+		r = builder.BuildModule();
+		if(r < 0) {
+			VOLCANICORE_LOG_ERROR("BuildModule failed");
 			m_HasErrors = true;
 			return;
 		}

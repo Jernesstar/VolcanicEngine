@@ -1,15 +1,13 @@
 #pragma once
 
-#include "Core/Buffer.h"
 #include "Core/List.h"
 
 #include "Graphics/Shader.h"
 #include "Graphics/Texture.h"
 #include "Graphics/Cubemap.h"
-#include "Graphics/UniformBuffer.h"
 #include "Graphics/Framebuffer.h"
-
-#include "BufferLayout.h"
+#include "Graphics/UniformBuffer.h"
+#include "Graphics/StorageBuffer.h"
 
 namespace VolcaniCore {
 
@@ -150,7 +148,7 @@ struct UniformSlot {
 };
 
 struct StorageSlot {
-	// Ref<StorageBuffer> Buffer = nullptr;
+	Ref<StorageBuffer> Buffer = nullptr;
 	std::string Name = "";
 	uint32_t Binding = 0;
 };
@@ -170,9 +168,11 @@ struct DrawUniforms {
 	Map<std::string, glm::mat4> Mat4Uniforms;
 
 	List<UniformSlot> UniformBuffers;
+	List<StorageSlot> StorageBuffers;
 
 	operator bool () const {
-		return UniformBuffers || IntUniforms.size() || FloatUniforms.size()
+		return UniformBuffers || StorageBuffers
+		|| IntUniforms.size() || FloatUniforms.size()
 		|| TextureUniforms.size() || CubemapUniforms.size()
 		|| Vec2Uniforms.size() || Vec3Uniforms.size() || Vec4Uniforms.size()
 		|| Mat2Uniforms.size() || Mat3Uniforms.size() || Mat4Uniforms.size();
@@ -210,6 +210,9 @@ struct DrawUniforms {
 	}
 	void SetInput(const UniformSlot& data) {
 		UniformBuffers.Add(data);
+	}
+	void SetInput(const StorageSlot& data) {
+		StorageBuffers.Add(data);
 	}
 };
 

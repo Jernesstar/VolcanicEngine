@@ -18,6 +18,7 @@
 #include "Texture2D.h"
 #include "Framebuffer.h"
 #include "UniformBuffer.h"
+#include "StorageBuffer.h"
 
 #include "VertexArray.h"
 
@@ -347,8 +348,14 @@ void SetUniforms(DrawCommand& command) {
 
 	for(auto& [buffer, name, binding] : uniforms.UniformBuffers) {
 		if(name != "")
-			shader->SetBuffer(name, binding);
+			shader->SetUniformBuffer(name, binding);
 		buffer->As<OpenGL::UniformBuffer>()->Bind(binding);
+	}
+
+	for(auto& [buffer, name, binding] : uniforms.StorageBuffers) {
+		if(name != "")
+			shader->SetStorageBuffer(name, binding);
+		buffer->As<OpenGL::StorageBuffer>()->Bind(binding);
 	}
 }
 

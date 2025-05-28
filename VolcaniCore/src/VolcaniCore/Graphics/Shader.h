@@ -47,7 +47,8 @@ public:
 	virtual void SetMat3(const std::string& name, const glm::mat3& mat) = 0;
 	virtual void SetMat4(const std::string& name, const glm::mat4& mat) = 0;
 
-	virtual void SetBuffer(const std::string& name, uint32_t binding) = 0;
+	virtual void SetUniformBuffer(const std::string& name, uint32_t binding) = 0;
+	virtual void SetStorageBuffer(const std::string& name, uint32_t binding) = 0;
 };
 
 }
