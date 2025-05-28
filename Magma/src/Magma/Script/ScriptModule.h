@@ -26,7 +26,7 @@ public:
 	asIScriptModule* GetHandle() const { return m_Handle; }
 
 private:
-	asIScriptModule* m_Handle;
+	asIScriptModule* m_Handle = nullptr;
 	bool m_HasErrors = false;
 
 	Map<std::string, Ref<ScriptClass>> m_Classes;

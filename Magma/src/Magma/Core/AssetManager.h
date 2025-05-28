@@ -79,7 +79,7 @@ public:
 		m_NamedAssets.erase(asset);
 	}
 
-	std::string GetAssetName(Asset asset) {
+	std::string GetAssetName(Asset asset) const {
 		if(!m_NamedAssets.count(asset))
 			return "";
 		return m_NamedAssets.at(asset);

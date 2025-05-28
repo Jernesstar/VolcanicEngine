@@ -66,7 +66,7 @@ void SceneTab::Setup() {
 	auto& assetManager = editor.GetAssetManager();
 	assetManager
 	.AddReloadCallback(
-		[&](Asset asset, bool stage)
+		[this](Asset asset, bool stage)
 		{
 			auto& editor = Application::As<EditorApp>()->GetEditor();
 			auto& proj = editor.GetProject();

@@ -67,6 +67,11 @@ void ScriptModule::Load(const std::string& path) {
 	CScriptBuilder builder;
 	bool loadMetadata = true;
 	if(fs::path(path).extension() == ".as") {
+		if(m_Handle) {
+			m_Classes.clear();
+			m_Handle->Discard();
+		}
+
 		int r;
 		r = builder.StartNewModule(engine, Name.c_str());
 		if(r < 0) {
@@ -104,6 +109,7 @@ void ScriptModule::Load(const std::string& path) {
 		scriptClass->m_Module = this;
 		m_Classes[name] = scriptClass;
 	}
+	m_HasErrors = false;
 
 	if(!loadMetadata)
 		return;

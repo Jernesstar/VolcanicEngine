@@ -358,16 +358,16 @@ void RegisterEvents() {
 		.AddMethod("string GetID() const");
 }
 
-static uint64_t GetAssetID(Asset* asset) {
-	return (uint64_t)asset->ID;
-}
-
 static void AssetDefaultCtor(Asset* ptr) {
 	new (ptr) Asset{ };
 }
 
 static void AssetInitCtor(uint64_t id, AssetType type, Asset* ptr) {
 	new (ptr) Asset{ id, type };
+}
+
+static uint64_t GetAssetID(Asset* asset) {
+	return (uint64_t)asset->ID;
 }
 
 static bool AssetIsValid(Asset* asset) {
@@ -394,11 +394,6 @@ static void PlaySound(Sound* sound) {
 void RegisterAssetManager() {
 	auto* engine = ScriptEngine::Get();
 
-	engine->RegisterObjectType("Asset", sizeof(Asset),
-		asOBJ_VALUE | asOBJ_POD | asGetTypeTraits<Asset>());
-	engine->RegisterObjectMethod("Asset", "uint64 get_ID() const property",
-		asFUNCTION(GetAssetID), asCALL_CDECL_OBJLAST);
-
 	engine->RegisterEnum("AssetType");
 	engine->RegisterEnumValue("AssetType", "Mesh",	  0);
 	engine->RegisterEnumValue("AssetType", "Texture", 1);
@@ -409,15 +404,20 @@ void RegisterAssetManager() {
 	engine->RegisterEnumValue("AssetType", "Shader",  6);
 	engine->RegisterEnumValue("AssetType", "None",	  7);
 
+	engine->RegisterObjectType("Asset", sizeof(Asset),
+		asOBJ_VALUE | asOBJ_POD | asGetTypeTraits<Asset>());
+	engine->RegisterObjectBehaviour("Asset", asBEHAVE_CONSTRUCT,
+		"void f()", asFUNCTION(AssetDefaultCtor), asCALL_CDECL_OBJLAST);
+	engine->RegisterObjectBehaviour("Asset", asBEHAVE_CONSTRUCT,
+		"void f(uint64, AssetType)", asFUNCTION(AssetInitCtor),
+		asCALL_CDECL_OBJLAST);
+
 	engine->RegisterObjectProperty("Asset", "const AssetType Type",
 		asOFFSET(Asset, Type));
 	engine->RegisterObjectProperty("Asset", "const bool Primary",
 		asOFFSET(Asset, Primary));
-
-	engine->RegisterObjectBehaviour("Asset", asBEHAVE_CONSTRUCT,
-		"void f()", asFUNCTION(AssetDefaultCtor), asCALL_CDECL_OBJLAST);
-	engine->RegisterObjectBehaviour("Asset", asBEHAVE_CONSTRUCT,
-		"void f(uint64, AssetType)", asFUNCTION(AssetInitCtor), asCALL_CDECL_OBJLAST);
+	engine->RegisterObjectMethod("Asset", "uint64 get_ID() const property",
+		asFUNCTION(GetAssetID), asCALL_CDECL_OBJLAST);
 	engine->RegisterObjectMethod("Asset", "bool get_IsValid() const property",
 		asFUNCTION(AssetIsValid), asCALL_CDECL_OBJLAST);
 	engine->RegisterObjectMethod("Asset", "bool get_IsLoaded() const property",
@@ -727,11 +727,23 @@ void RegisterECS() {
 	engine->RegisterObjectMethod("RigidBody", "void ApplyForce(const Vec3 &in)",
 		asFUNCTION(RigidBodyApplyForce), asCALL_CDECL_OBJLAST);
 
-	engine->RegisterObjectMethod("RigidBodyComponent", "RigidBody@ get_Body()",
-		asFUNCTION(GetRigidBody), asCALL_CDECL_OBJLAST);
+	engine->RegisterObjectMethod("RigidBodyComponent",
+		"RigidBody@ get_Body() property", asFUNCTION(GetRigidBody),
+		asCALL_CDECL_OBJLAST);
 
 	engine->RegisterObjectType("DirectionalLightComponent", 0,
 		asOBJ_REF | asOBJ_NOCOUNT);
+	engine->RegisterObjectProperty("DirectionalLightComponent", "Vec3 Ambient",
+		asOFFSET(DirectionalLightComponent, Ambient));
+	engine->RegisterObjectProperty("DirectionalLightComponent", "Vec3 Diffuse",
+		asOFFSET(DirectionalLightComponent, Diffuse));
+	engine->RegisterObjectProperty("DirectionalLightComponent", "Vec3 Specular",
+		asOFFSET(DirectionalLightComponent, Specular));
+	engine->RegisterObjectProperty("DirectionalLightComponent", "Vec3 Position",
+		asOFFSET(DirectionalLightComponent, Position));
+	engine->RegisterObjectProperty("DirectionalLightComponent", "Vec3 Direction",
+		asOFFSET(DirectionalLightComponent, Direction));
+
 	engine->RegisterObjectType("PointLightComponent", 0,
 		asOBJ_REF | asOBJ_NOCOUNT);
 	engine->RegisterObjectType("SpotlightComponent", 0,

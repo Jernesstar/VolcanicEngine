@@ -77,7 +77,8 @@ public:
 	void ReloadAudio(const std::string& path);
 	void ReloadScript(const std::string& path);
 
-	void AddCallback(const Func<void, Asset, bool>& callback);
+	uint32_t AddCallback(const Func<void, Asset, bool>& callback);
+	void RemoveCallback(uint32_t id);
 
 private:
 	EditorAssetManager* m_AssetManager;
@@ -140,8 +141,13 @@ void FileWatcher::Remove(AssetType type, const std::string& path) {
 
 }
 
-void FileWatcher::AddCallback(const Func<void, Asset, bool>& callback) {
+uint32_t FileWatcher::AddCallback(const Func<void, Asset, bool>& callback) {
 	m_Callbacks.Add(callback);
+	return m_Callbacks.Count() - 1;
+}
+
+void FileWatcher::RemoveCallback(uint32_t id) {
+	m_Callbacks.Pop(id);
 }
 
 void FileWatcher::ReloadMesh(const std::string& path) {
@@ -169,10 +175,8 @@ void FileWatcher::ReloadScript(const std::string& path) {
 	Ref<ScriptModule> mod = CreateRef<ScriptModule>("TestBuild");
 	mod->Load(path);
 
-	if(!mod->HasErrors()) {
-		mod->GetHandle()->SetName(name.c_str());
-		m_AssetManager->m_ScriptAssets[id] = mod;
-	}
+	if(!mod->HasErrors())
+		m_AssetManager->m_ScriptAssets[id]->Load(path);
 	else
 		VOLCANICORE_LOG_INFO("Error occured when reloading script");
 }
@@ -236,10 +240,14 @@ void EditorAssetManager::Unload(Asset asset) {
 		m_ScriptAssets.erase(asset.ID);
 }
 
-void EditorAssetManager::AddReloadCallback(
-		const Func<void, Asset, bool>& callback)
+uint32_t EditorAssetManager::AddReloadCallback(
+	const Func<void, Asset, bool>& callback)
 {
-	s_Listener->AddCallback(callback);
+	return s_Listener->AddCallback(callback);
+}
+
+void EditorAssetManager::RemoveReloadCallback(uint32_t id) {
+	return s_Listener->RemoveCallback(id);
 }
 
 Asset EditorAssetManager::Add(const std::string& path, AssetType type) {
@@ -250,7 +258,16 @@ Asset EditorAssetManager::Add(const std::string& path, AssetType type) {
 	return newAsset;
 }
 
-UUID EditorAssetManager::GetFromPath(const std::string& path) {
+void EditorAssetManager::Remove(Asset asset) {
+	Unload(asset);
+
+	m_AssetRegistry.erase(asset);
+	m_NamedAssets.erase(asset);
+	m_References.erase(asset.ID);
+	m_Paths.erase(asset.ID);
+}
+
+UUID EditorAssetManager::GetFromPath(const std::string& path) const {
 	for(auto& [id, assetPath] : m_Paths)
 		if(fs::path(path) == fs::path(assetPath))
 			return id;
@@ -258,11 +275,10 @@ UUID EditorAssetManager::GetFromPath(const std::string& path) {
 	return 0;
 }
 
-std::string EditorAssetManager::GetPath(UUID id) {
+std::string EditorAssetManager::GetPath(UUID id) const {
 	if(!m_Paths.count(id))
 		return "";
-
-	return m_Paths[id];
+	return m_Paths.at(id);
 }
 
 void EditorAssetManager::Load(const std::string& path) {
@@ -294,15 +310,21 @@ void EditorAssetManager::Load(const std::string& path) {
 	for(auto assetNode : assetPackNode["Assets"]) {
 		auto node = assetNode["Asset"];
 		UUID id = node["ID"].as<uint64_t>();
+		if(node["Path"]) {
+			auto path =
+				(rootPath / node["Path"].as<std::string>()).generic_string();
+			if(!fs::exists(path))
+				continue;
+
+			m_Paths[id] = path;
+		}
+
 		AssetType type = AssetTypeFromString(node["Type"].as<std::string>());
 		Asset asset = { id, type };
 		m_AssetRegistry[asset] = false;
 		if(node["Name"])
 			NameAsset(asset, node["Name"].as<std::string>());
 
-		if(node["Path"])
-			m_Paths[id] =
-				(rootPath / node["Path"].as<std::string>()).generic_string();
 		if(asset.Type == AssetType::Mesh) {
 			if(node["Path"]) {
 				List<SubMesh> meshes;
