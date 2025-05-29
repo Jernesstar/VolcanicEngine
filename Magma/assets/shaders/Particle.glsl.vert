@@ -29,16 +29,17 @@ layout(location = 0) out vec2 v_TexCoords;
 
 void main()
 {
+    Particle particle = Particles[gl_InstanceID];
+    vec2 vertex = Vertices[Indices[gl_VertexID]];
     vec3 cameraRight = vec3(u_View[0][0], u_View[1][0], u_View[2][0]);
     vec3 cameraUp = vec3(u_View[0][1], u_View[1][1], u_View[2][1]);
-    vec2 vertex = Vertices[Indices[gl_VertexID]];
-    Particle particle = Particles[gl_InstanceID];
 
     vec3 position =
         particle.Position
         + cameraRight * vertex.x * u_BillboardWidth
         + cameraUp * vertex.y * u_BillboardHeight;
-    v_TexCoords = vertex + 0.5;
 
     gl_Position = u_ViewProj * vec4(position, 1.0);
+
+    v_TexCoords = vertex + 0.5;
 }

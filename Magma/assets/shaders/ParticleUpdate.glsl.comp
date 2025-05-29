@@ -23,9 +23,8 @@ void UpdateParticle(inout Particle particle, int index) {
         particle.Position += particle.Velocity * u_TimeStep;
         particle.Life -= u_TimeStep;
 
-        if(particle.Life <= 0.0) {
+        if(particle.Life <= 0.0)
             FreeList.Indices[atomicAdd(FreeList.Count, 1)] = index;
-        }
     }
 }
 

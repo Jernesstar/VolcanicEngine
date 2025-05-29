@@ -48,7 +48,7 @@ Shadows::Shadows()
 	auto depth = ShaderPipeline::Create("Sandbox/assets/shaders", "Depth");
 	auto shadow = ShaderPipeline::Create("Magma/assets/shaders", "Shadow");
 
-	auto depthTexture = Texture::Create(2048, 2048, Texture::Format::Depth);
+	auto depthTexture = Texture::Create(4096, 4096, Texture::Format::Depth);
 	depthMap = Framebuffer::Create(
 		{
 			{ AttachmentTarget::Depth, { { depthTexture } } }
@@ -110,8 +110,6 @@ void Shadows::OnUpdate(TimeStep ts) {
 		Renderer::PopCommand();
 
 		RenderScene(depthCamera);
-
-		Renderer::PopOptions();
 	}
 	Renderer::EndPass();
 

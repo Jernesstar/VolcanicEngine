@@ -19,13 +19,37 @@ struct EmitterSettings {
     vec3 Position;
     float ParticleLifetime;
 };
+// Used as initial seed to the PRNG.
+uint pcg_hash(uint seed)
+{
+    uint state = seed * 747796405u + 2891336453u;
+    uint word = ((state >> ((state >> 28u) + 4u)) ^ state) * 277803737u;
+    return (word >> 22u) ^ word;
+}
 
-layout(location = 0) uniform int u_ParticlesToSpawn;
-layout(location = 1) uniform EmitterSettings u_Emitter;
+// Used to advance the PCG state.
+uint rand_pcg(inout uint rng_state)
+{
+    uint state = rng_state;
+    rng_state = rng_state * 747796405u + 2891336453u;
+    uint word = ((state >> ((state >> 28u) + 4u)) ^ state) * 277803737u;
+    return (word >> 22u) ^ word;
+}
+
+// Advances the prng state and returns the corresponding random float.
+float rand(inout uint state)
+{
+    uint x = rand_pcg(state);
+    state = x;
+    return float(x) * uintBitsToFloat(0x2f800000u);
+}
+
+uniform int u_ParticlesToSpawn;
+uniform EmitterSettings u_Emitter;
 
 void MakeParticle(out Particle particle) {
     particle.Life = u_Emitter.ParticleLifetime;
-    particle.Velocity = vec3(0.0001f);
+    particle.Velocity = vec3(0.001f);
     particle.Position = u_Emitter.Position;
 }
 

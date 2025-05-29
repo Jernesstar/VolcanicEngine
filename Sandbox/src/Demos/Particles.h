@@ -52,7 +52,9 @@ Particles::Particles() {
 		});
 
 	camera = CreateRef<StereographicCamera>(75.0f);
+	camera->Resize(800, 600);
 	camera->SetPosition({ 0.0f, 0.0f, 3.0f });
+	camera->SetProjection(0.001f, 10'000.0f);
 	controller = CameraController{ camera };
 
 	VOLCANICORE_LOG_INFO("Particles Project Started");
@@ -80,6 +82,10 @@ Particles::Particles() {
 		{ "Indices", BufferDataType::Int },
 	};
 
+	Buffer<ParticleData> data(1000);
+	for(int i = 0; i < 1000; i++)
+		data.Set(i, ParticleData{ });
+
 	Buffer<int> freelist(1001);
 	freelist.Set(0, 1000);
 	for(int i = 1; i <= 1000; i++)
@@ -93,7 +99,7 @@ Particles::Particles() {
 			.ParticleLifetime = 3000.0f,
 			.SpawnInterval = 10.0f,
 			.Timer = 0,
-			.ParticleBuffer = StorageBuffer::Create(particleLayout, 1000),
+			.ParticleBuffer = StorageBuffer::Create(particleLayout, data),
 			.FreeListBuffer = StorageBuffer::Create(freeListLayout, freelist)
 		}
 	);
@@ -111,9 +117,9 @@ void Particles::OnUpdate(TimeStep ts) {
 
 		for(auto& emitter : Emitters) {
 			emitter.Timer += (float)ts;
-			uint32_t particlesToSpawn =
-				uint32_t(emitter.Timer / emitter.SpawnInterval);
+			uint32_t particlesToSpawn = emitter.Timer / emitter.SpawnInterval;
 			emitter.Timer = glm::mod(emitter.Timer, emitter.SpawnInterval);
+
 			if(particlesToSpawn <= 0)
 				continue;
 
@@ -158,13 +164,21 @@ void Particles::OnUpdate(TimeStep ts) {
 	Renderer::StartPass(DrawPass);
 	{
 		auto* command = Renderer::GetCommand();
+		command->Clear = true;
 		command->UniformData
 		.SetInput("u_View", camera->GetView());
 		command->UniformData
 		.SetInput("u_ViewProj", camera->GetViewProjection());
+		command->UniformData
+		.SetInput("u_BillboardWidth", 0.5f);
+		command->UniformData
+		.SetInput("u_BillboardHeight", 0.5f);
 
 		for(auto& emitter : Emitters) {
 			command = Renderer::NewCommand();
+			command->DepthTest = DepthTestingMode::Off;
+			command->Culling = CullingMode::Off;
+			command->Blending = BlendingMode::Greatest;
 			command->UniformData
 			.SetInput("u_Texture", TextureSlot{ emitter.Material, 0 });
 

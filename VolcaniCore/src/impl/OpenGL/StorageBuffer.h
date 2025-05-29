@@ -34,6 +34,7 @@ public:
 	}
 
 	void Bind(uint32_t binding) {
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_BufferID);
 		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, binding, m_BufferID);
 	}
 

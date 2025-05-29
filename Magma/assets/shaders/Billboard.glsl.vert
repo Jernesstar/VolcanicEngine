@@ -29,7 +29,8 @@ void main()
         a_BillboardCenter
         + cameraRight * vertex.x * u_BillboardWidth
         + cameraUp * vertex.y * u_BillboardHeight;
-    v_TexCoords = vertex + 0.5;
 
     gl_Position = u_ViewProj * vec4(position, 1.0);
+
+    v_TexCoords = vertex + 0.5;
 }

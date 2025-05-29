@@ -224,9 +224,7 @@ void FlushCommand(DrawCommand& command) {
 		Clear();
 
 	if(command.Pass && command.ComputeX && command.ComputeY && command.ComputeZ)
-	{
 		command.Pass->Pipeline->As<OpenGL::ShaderProgram>()->Lock();
-	}
 
 	if(command.Pass && command.Pass->Pipeline) {
 		command.Pass->Pipeline->As<OpenGL::ShaderProgram>()->Bind();
@@ -253,10 +251,8 @@ void FlushCommand(DrawCommand& command) {
 		s_Info.DrawCallCount++;
 	}
 	if(command.Pass && command.ComputeX && command.ComputeY && command.ComputeZ)
-	{
 		command.Pass->Pipeline->As<OpenGL::ShaderProgram>()
 			->Compute(command.ComputeX, command.ComputeY, command.ComputeZ);
-	}
 
 	if(command.Pass && command.Pass->BufferData)
 		array->Unbind();
