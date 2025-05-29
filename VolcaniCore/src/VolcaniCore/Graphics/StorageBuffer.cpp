@@ -7,13 +7,13 @@
 namespace VolcaniCore {
 
 Ref<StorageBuffer> StorageBuffer::Create(const BufferLayout& layout,
-										 uint64_t count)
+										 uint64_t count, void* data)
 {
 	RendererAPI::Backend backend = RendererAPI::Get()->GetBackend();
 
 	switch(backend) {
 		case RendererAPI::Backend::OpenGL:
-			return CreateRef<OpenGL::StorageBuffer>(layout, count);
+			return CreateRef<OpenGL::StorageBuffer>(layout, count, data);
 			break;
 	}
 

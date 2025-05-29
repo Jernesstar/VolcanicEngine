@@ -11,7 +11,14 @@ namespace VolcaniCore {
 class StorageBuffer : public Derivable<StorageBuffer> {
 public:
 	static Ref<StorageBuffer> Create(const BufferLayout& layout,
-									 uint64_t count = 1);
+									 uint64_t count = 1, void* data = nullptr);
+
+	template<typename T>
+	static Ref<StorageBuffer> Create(const BufferLayout& layout,
+									 const Buffer<T>& data)
+	{
+		return Create(layout, data.GetCount(), data.Get());
+	}
 
 public:
 	const BufferLayout Layout;

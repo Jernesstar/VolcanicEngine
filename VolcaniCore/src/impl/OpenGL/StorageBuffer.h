@@ -15,23 +15,11 @@ public:
 	const uint64_t Size;
 
 public:
-	StorageBuffer(const BufferLayout& layout, uint64_t count = 1,
-				  const void* data = nullptr)
+	StorageBuffer(const BufferLayout& layout, uint64_t count, const void* data)
 		: VolcaniCore::StorageBuffer(layout, count), Size(layout.Stride)
 	{
 		glCreateBuffers(1, &m_BufferID);
-		glNamedBufferStorage(m_BufferID, count * Size, nullptr,
-			GL_DYNAMIC_STORAGE_BIT);
-	}
-
-	template<typename T>
-	StorageBuffer(const BufferLayout& layout, const Buffer<T>& buffer)
-		: VolcaniCore::StorageBuffer(layout, buffer.GetCount()),
-			Size(layout.Stride)
-	{
-		VOLCANICORE_ASSERT(layout.Stride == sizeof(T));
-		glCreateBuffers(1, &m_BufferID);
-		glNamedBufferStorage(m_BufferID, Size * buffer.GetCount(), buffer.Get(),
+		glNamedBufferStorage(m_BufferID, count * Size, data,
 			GL_DYNAMIC_STORAGE_BIT);
 	}
 

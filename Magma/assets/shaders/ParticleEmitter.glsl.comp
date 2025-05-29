@@ -6,11 +6,11 @@ struct Particle {
     float Life;
 };
 
-layout(std430, binding = 0) buffer SSBO_0 {
+layout(std430, binding = 0) writeonly restrict buffer SSBO_0 {
     Particle Particles[];
 };
 
-layout(std430, binding = 1) buffer SSBO_1 {
+layout(std430, binding = 1) coherent restrict buffer SSBO_1 {
     coherent int Count;
     int Indices[];
 } FreeList;
@@ -23,7 +23,6 @@ struct EmitterSettings {
 layout(location = 0) uniform int u_ParticlesToSpawn;
 layout(location = 1) uniform EmitterSettings u_Emitter;
 
-// Make a particle with random attributes
 void MakeParticle(out Particle particle) {
     particle.Life = u_Emitter.ParticleLifetime;
     particle.Velocity = vec3(0.0001f);

@@ -15,24 +15,11 @@ public:
 	const uint64_t Size;
 
 	public:
-	UniformBuffer(const BufferLayout& layout, uint64_t count = 1,
-		const void* data = nullptr)
+	UniformBuffer(const BufferLayout& layout, uint64_t count, const void* data)
 		: VolcaniCore::UniformBuffer(layout, count), Size(layout.Stride)
 	{
 		glCreateBuffers(1, &m_BufferID);
 		glNamedBufferData(m_BufferID, Size * count, data, GL_DYNAMIC_DRAW);
-	}
-
-	template<typename T>
-	UniformBuffer(const BufferLayout& layout, const Buffer<T>& buffer)
-		: VolcaniCore::UniformBuffer(layout, buffer.GetCount()),
-			Size(layout.Stride)
-	{
-		VOLCANICORE_ASSERT(layout.Stride == sizeof(T));
-
-		glCreateBuffers(1, &m_BufferID);
-		glNamedBufferData(m_BufferID, Size * buffer.GetCount(), buffer.Get(),
-			GL_DYNAMIC_DRAW);
 	}
 
 	~UniformBuffer() {

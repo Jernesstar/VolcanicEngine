@@ -91,8 +91,13 @@ public:
 	void Add(const Buffer& buffer) {
 		Set(buffer.Get(), buffer.GetCount(), m_Count);
 	}
+
 	void Add(const void* data, uint64_t count) {
 		Set(data, count, m_Count);
+	}
+
+	void Set(uint64_t idx, const T& data) {
+		Set(&data, 1, idx);
 	}
 
 	void Set(const void* data, uint64_t count, uint64_t offset = 0) {

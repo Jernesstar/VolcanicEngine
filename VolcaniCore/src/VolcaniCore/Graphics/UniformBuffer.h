@@ -11,7 +11,7 @@ namespace VolcaniCore {
 class UniformBuffer : public Derivable<UniformBuffer> {
 public:
 	static Ref<UniformBuffer> Create(const BufferLayout& layout,
-									 uint64_t count = 1);
+									 uint64_t count = 1, void* data = nullptr);
 
 public:
 	const BufferLayout Layout;

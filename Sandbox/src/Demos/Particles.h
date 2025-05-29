@@ -14,6 +14,12 @@ struct Emitter {
 	Ref<StorageBuffer> FreeListBuffer;
 };
 
+struct ParticleData {
+	Vec3 Position;
+	Vec3 Velocity;
+	float Life;
+};
+
 class Particles : public Application {
 public:
 	Particles();
@@ -74,16 +80,21 @@ Particles::Particles() {
 		{ "Indices", BufferDataType::Int },
 	};
 
+	Buffer<int> freelist(1001);
+	freelist.Set(0, 1000);
+	for(int i = 1; i <= 1000; i++)
+		freelist.Set(i, i - 1);
+
 	Emitters.Add(
 		{
 			.Position = Vec3(0.0f),
 			.Material = texture,
-			.MaxParticleCount = 100,
-			.ParticleLifetime = 1000.0f,
+			.MaxParticleCount = 1000,
+			.ParticleLifetime = 3000.0f,
 			.SpawnInterval = 10.0f,
 			.Timer = 0,
-			.ParticleBuffer = StorageBuffer::Create(particleLayout, 100),
-			.FreeListBuffer = StorageBuffer::Create(freeListLayout, 100)
+			.ParticleBuffer = StorageBuffer::Create(particleLayout, 1000),
+			.FreeListBuffer = StorageBuffer::Create(freeListLayout, freelist)
 		}
 	);
 
@@ -99,28 +110,27 @@ void Particles::OnUpdate(TimeStep ts) {
 		auto* command = Renderer::GetCommand();
 
 		for(auto& emitter : Emitters) {
+			emitter.Timer += (float)ts;
+			uint32_t particlesToSpawn =
+				uint32_t(emitter.Timer / emitter.SpawnInterval);
+			emitter.Timer = glm::mod(emitter.Timer, emitter.SpawnInterval);
+			if(particlesToSpawn <= 0)
+				continue;
+
 			command = Renderer::NewCommand();
+			uint32_t numWorkGroups =
+				(particlesToSpawn + workGroupSize - 1) / workGroupSize;
+			command->ComputeX = numWorkGroups;
 			command->UniformData
-			.SetInput("u_ParticlesToSpawn", 10);
+			.SetInput("u_ParticlesToSpawn", (int)particlesToSpawn);
 			command->UniformData
 			.SetInput("u_Emitter.Position", emitter.Position);
 			command->UniformData
 			.SetInput("u_Emitter.ParticleLifetime", emitter.ParticleLifetime);
-
-			emitter.Timer += (float)ts;
-			uint32_t particlesToSpawn =
-				uint32_t(emitter.Timer / emitter.SpawnInterval);
-			emitter.Timer = fmodf(emitter.Timer, emitter.SpawnInterval);
-			if(particlesToSpawn <= 0)
-				continue;
-
-			int numWorkGroups =
-				(particlesToSpawn + workGroupSize - 1) / workGroupSize;
 			command->UniformData
 			.SetInput(StorageSlot{ emitter.ParticleBuffer, "", 0 });
 			command->UniformData
 			.SetInput(StorageSlot{ emitter.FreeListBuffer, "", 1 });
-			command->ComputeX = numWorkGroups;
 		}
 	}
 	Renderer::EndPass();
@@ -134,14 +144,13 @@ void Particles::OnUpdate(TimeStep ts) {
 
 		for(auto& emitter : Emitters) {
 			command = Renderer::NewCommand();
-
-			int numWorkGroups =
+			uint32_t numWorkGroups =
 				(emitter.MaxParticleCount + workGroupSize - 1) / workGroupSize;
+			command->ComputeX = numWorkGroups;
 			command->UniformData
 			.SetInput(StorageSlot{ emitter.ParticleBuffer, "", 0 });
 			command->UniformData
 			.SetInput(StorageSlot{ emitter.FreeListBuffer, "", 1 });
-			command->ComputeX = numWorkGroups;
 		}
 	}
 	Renderer::EndPass();
