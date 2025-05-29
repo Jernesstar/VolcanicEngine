@@ -176,7 +176,7 @@ void Particles::OnUpdate(TimeStep ts) {
 
 		for(auto& emitter : Emitters) {
 			command = Renderer::NewCommand();
-			command->DepthTest = DepthTestingMode::Off;
+			command->DepthTest = DepthTestingMode::On;
 			command->Culling = CullingMode::Off;
 			command->Blending = BlendingMode::Greatest;
 			command->UniformData

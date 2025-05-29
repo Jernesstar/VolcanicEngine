@@ -19,29 +19,58 @@ struct EmitterSettings {
     vec3 Position;
     float ParticleLifetime;
 };
-// Used as initial seed to the PRNG.
-uint pcg_hash(uint seed)
+
+// // Used as initial seed to the PRNG.
+// uint pcg_hash(uint seed)
+// {
+//     uint state = seed * 747796405u + 2891336453u;
+//     uint word = ((state >> ((state >> 28u) + 4u)) ^ state) * 277803737u;
+//     return (word >> 22u) ^ word;
+// }
+
+// // Used to advance the PCG state.
+// uint rand_pcg(inout uint rng_state)
+// {
+//     uint state = rng_state;
+//     rng_state = rng_state * 747796405u + 2891336453u;
+//     uint word = ((state >> ((state >> 28u) + 4u)) ^ state) * 277803737u;
+//     return (word >> 22u) ^ word;
+// }
+
+// // Advances the prng state and returns the corresponding random float.
+// float rand(inout uint state)
+// {
+//     uint x = rand_pcg(state);
+//     state = x;
+//     return float(x) * uintBitsToFloat(0x2f800000u);
+// }
+
+// classic noise
+float rand(vec2 co)
 {
-    uint state = seed * 747796405u + 2891336453u;
-    uint word = ((state >> ((state >> 28u) + 4u)) ^ state) * 277803737u;
-    return (word >> 22u) ^ word;
+    return fract(sin(dot(co, vec2(12.9898, 78.233))) * 43758.5453);
 }
 
-// Used to advance the PCG state.
-uint rand_pcg(inout uint rng_state)
+float umap(float val, float rs, float re) // [0, 1] -> [rs, re]
 {
-    uint state = rng_state;
-    rng_state = rng_state * 747796405u + 2891336453u;
-    uint word = ((state >> ((state >> 28u) + 4u)) ^ state) * 277803737u;
-    return (word >> 22u) ^ word;
+    return val * (re - rs) + rs;
 }
 
-// Advances the prng state and returns the corresponding random float.
-float rand(inout uint state)
+float rng(float low, float high)
 {
-    uint x = rand_pcg(state);
-    state = x;
-    return float(x) * uintBitsToFloat(0x2f800000u);
+    // tseed += 1.61803399;
+    // return umap(rand(gl_GlobalInvocationID.xy * u_seed.xy + u_seed.z * tseed * seed), low, high);
+    return umap(rand(gl_GlobalInvocationID.xy), low, high);
+}
+
+vec2 rng(vec2 low, vec2 high)
+{
+    return vec2(rng(low.x, high.x), rng(low.y, high.y));
+}
+
+vec3 rng(vec3 low, vec3 high)
+{
+    return vec3(rng(low.x, high.x), rng(low.y, high.y), rng(low.z, high.z));
 }
 
 uniform int u_ParticlesToSpawn;
@@ -49,8 +78,8 @@ uniform EmitterSettings u_Emitter;
 
 void MakeParticle(out Particle particle) {
     particle.Life = u_Emitter.ParticleLifetime;
-    particle.Velocity = vec3(0.001f);
-    particle.Position = u_Emitter.Position;
+    particle.Velocity = vec3(0.001f, rng(-0.01, 0.01), 0.0f);
+    particle.Position = u_Emitter.Position + rng(vec3(-1.0), vec3(1.0));
 }
 
 layout(local_size_x = 64, local_size_y = 1, local_size_z = 1) in;
