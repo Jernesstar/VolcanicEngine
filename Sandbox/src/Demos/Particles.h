@@ -83,13 +83,13 @@ Particles::Particles() {
 	};
 
 	Buffer<ParticleData> data(1000);
-	for(int i = 0; i < 1000; i++)
+	for(uint32_t i = 0; i < 1000; i++)
 		data.Set(i, ParticleData{ });
 
 	Buffer<int> freelist(1001);
 	freelist.Set(0, 1000);
-	for(int i = 1; i <= 1000; i++)
-		freelist.Set(i, i - 1);
+	for(uint32_t i = 1; i <= 1000; i++)
+		freelist.Set(i, int(i) - 1);
 
 	Emitters.Add(
 		{
@@ -127,6 +127,8 @@ void Particles::OnUpdate(TimeStep ts) {
 			uint32_t numWorkGroups =
 				(particlesToSpawn + workGroupSize - 1) / workGroupSize;
 			command->ComputeX = numWorkGroups;
+			command->UniformData
+			.SetInput("u_TimeStep", (float)ts);
 			command->UniformData
 			.SetInput("u_ParticlesToSpawn", (int)particlesToSpawn);
 			command->UniformData
@@ -170,9 +172,9 @@ void Particles::OnUpdate(TimeStep ts) {
 		command->UniformData
 		.SetInput("u_ViewProj", camera->GetViewProjection());
 		command->UniformData
-		.SetInput("u_BillboardWidth", 0.5f);
+		.SetInput("u_BillboardWidth", 0.1f);
 		command->UniformData
-		.SetInput("u_BillboardHeight", 0.5f);
+		.SetInput("u_BillboardHeight", 0.1f);
 
 		for(auto& emitter : Emitters) {
 			command = Renderer::NewCommand();

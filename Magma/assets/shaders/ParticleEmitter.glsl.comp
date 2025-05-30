@@ -20,30 +20,19 @@ struct EmitterSettings {
     float ParticleLifetime;
 };
 
-// // Used as initial seed to the PRNG.
-// uint pcg_hash(uint seed)
-// {
-//     uint state = seed * 747796405u + 2891336453u;
-//     uint word = ((state >> ((state >> 28u) + 4u)) ^ state) * 277803737u;
-//     return (word >> 22u) ^ word;
-// }
+uniform float u_TimeStep;
+uniform int u_ParticlesToSpawn;
+uniform EmitterSettings u_Emitter;
 
-// // Used to advance the PCG state.
-// uint rand_pcg(inout uint rng_state)
-// {
-//     uint state = rng_state;
-//     rng_state = rng_state * 747796405u + 2891336453u;
-//     uint word = ((state >> ((state >> 28u) + 4u)) ^ state) * 277803737u;
-//     return (word >> 22u) ^ word;
-// }
+float umap(float val, float rs, float re) // [0, 1] -> [rs, re]
+{
+    return val * (re - rs) + rs;
+}
 
-// // Advances the prng state and returns the corresponding random float.
-// float rand(inout uint state)
-// {
-//     uint x = rand_pcg(state);
-//     state = x;
-//     return float(x) * uintBitsToFloat(0x2f800000u);
-// }
+float map(float val, float r1s, float r1e, float r2s, float r2e)
+{
+    return (val - r1s) / (r1e - r1s) * (r2e - r2s) + r2s;
+}
 
 // classic noise
 float rand(vec2 co)
@@ -51,34 +40,25 @@ float rand(vec2 co)
     return fract(sin(dot(co, vec2(12.9898, 78.233))) * 43758.5453);
 }
 
-float umap(float val, float rs, float re) // [0, 1] -> [rs, re]
+float rng(float low, float high, float seed)
 {
-    return val * (re - rs) + rs;
-}
-
-float rng(float low, float high)
-{
-    // tseed += 1.61803399;
-    // return umap(rand(gl_GlobalInvocationID.xy * u_seed.xy + u_seed.z * tseed * seed), low, high);
-    return umap(rand(gl_GlobalInvocationID.xy), low, high);
-}
-
-vec2 rng(vec2 low, vec2 high)
-{
-    return vec2(rng(low.x, high.x), rng(low.y, high.y));
+    seed += 1.61803399;
+    vec3 seedVec = vec3(fract(u_TimeStep), sin(u_TimeStep), cos(u_TimeStep));
+    return umap(rand(tan(gl_GlobalInvocationID.xy) * seedVec.xy + seedVec.z * seed * seed), low, high);
 }
 
 vec3 rng(vec3 low, vec3 high)
 {
-    return vec3(rng(low.x, high.x), rng(low.y, high.y), rng(low.z, high.z));
+    return vec3(
+        rng(low.x, high.x, 23.98901),
+        rng(low.y, high.y, 80.23353),
+        rng(low.z, high.z, 54.71941)
+    );
 }
-
-uniform int u_ParticlesToSpawn;
-uniform EmitterSettings u_Emitter;
 
 void MakeParticle(out Particle particle) {
     particle.Life = u_Emitter.ParticleLifetime;
-    particle.Velocity = vec3(0.001f, rng(-0.01, 0.01), 0.0f);
+    particle.Velocity = vec3(0.0f, 0.0001, 0.0);
     particle.Position = u_Emitter.Position + rng(vec3(-1.0), vec3(1.0));
 }
 

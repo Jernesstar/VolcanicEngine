@@ -30,6 +30,9 @@ layout(location = 0) out vec2 v_TexCoords;
 void main()
 {
     Particle particle = Particles[gl_InstanceID];
+    if(particle.Life <= 0)
+        return;
+
     vec2 vertex = Vertices[Indices[gl_VertexID]];
     vec3 cameraRight = vec3(u_View[0][0], u_View[1][0], u_View[2][0]);
     vec3 cameraUp = vec3(u_View[0][1], u_View[1][1], u_View[2][1]);
