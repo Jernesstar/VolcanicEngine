@@ -33,6 +33,10 @@ GridSet& GridSet::operator =(const GridSet& other) {
 	return *this;
 }
 
+uint8_t* GridSet::Get() const {
+	return m_Data;
+}
+
 uint8_t* GridSet::At(uint32_t x, uint32_t y) const {
 	VOLCANICORE_ASSERT(m_Data);
 	VOLCANICORE_ASSERT(m_Width && m_Height);

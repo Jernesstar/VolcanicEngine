@@ -58,16 +58,17 @@ struct RuntimeScreen {
 
 		UI.Clear();
 		World.reset();
+		App::Get()->GetRenderer().OnSceneClose();
 	}
 };
 
 static RuntimeScreen* s_Screen = nullptr;
 
-static Scene& GetScene() {
+static Scene& ScriptGetScene() {
 	return *s_Screen->World;
 }
 
-static UIPage& GetUI() {
+static UIPage& ScriptGetUI() {
 	return s_Screen->UI;
 }
 
@@ -86,6 +87,7 @@ static void ScriptLoadScene(const std::string& name, App* app) {
 	s_Screen->World = CreateRef<Scene>(name);
 	s_Screen->World->RegisterSystems();
 	app->SceneLoad(*s_Screen->World);
+	app->GetRenderer().OnSceneLoad();
 
 	List<Entity> list;
 	s_Screen->World->EntityWorld
@@ -137,9 +139,11 @@ App::App(const Project& project)
 		asFUNCTION(ScriptLoadUI), asCALL_CDECL_OBJLAST);
 
 	ScriptEngine::Get()->RegisterGlobalFunction(
-		"SceneClass& get_Scene() property", asFUNCTION(GetScene), asCALL_CDECL);
+		"SceneClass& get_Scene() property",
+		asFUNCTION(ScriptGetScene), asCALL_CDECL);
 	ScriptEngine::Get()->RegisterGlobalFunction(
-		"UIPageClass& get_UIPage() property", asFUNCTION(GetUI), asCALL_CDECL);
+		"UIPageClass& get_UIPage() property",
+		asFUNCTION(ScriptGetUI), asCALL_CDECL);
 
 	ScriptEngine::Get()->RegisterGlobalFunction(
 		"IApp@ get_ScriptApp() property",
@@ -240,6 +244,16 @@ void App::LoadUI(UIPage* ui) {
 	s_ShouldLoadUI = ui;
 }
 
+Scene* App::GetScene() {
+	VOLCANICORE_ASSERT(s_Screen);
+	return s_Screen->World.get();
+}
+
+UIPage* App::GetUI() {
+	VOLCANICORE_ASSERT(s_Screen);
+	return &s_Screen->UI;
+}
+
 void App::SwitchScreen(const std::string& name) {
 	if (!ChangeScreen) {
 		Running = false;
@@ -300,6 +314,7 @@ void App::ScreenSet(const std::string& name) {
 		*s_Screen->World = *s_ShouldLoadScene;
 		s_ShouldLoadScene = nullptr;
 		s_Screen->World->RegisterSystems();
+		m_SceneRenderer.OnSceneLoad();
 
 		List<Entity> list;
 		s_Screen->World->EntityWorld

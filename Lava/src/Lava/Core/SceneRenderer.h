@@ -25,6 +25,9 @@ public:
 	void SubmitMesh(const Entity& entity) override;
 	void Render() override;
 
+	void OnSceneLoad();
+	void OnSceneClose();
+
 private:
 	// Lighting and shadows
 	Ref<RenderPass> DepthPass;

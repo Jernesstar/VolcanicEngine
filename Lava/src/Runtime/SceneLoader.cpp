@@ -19,6 +19,9 @@
 #include <Magma/Scene/Component.h>
 
 #include <Lava/Core/App.h>
+#include <Lava/Types/GridSet.h>
+#include <Lava/Types/GridSet3D.h>
+#include <Lava/Types/Timer.h>
 
 #undef near
 #undef far
@@ -170,10 +173,6 @@ BinaryReader& BinaryReader::ReadObject(ScriptComponent& comp) {
 			Read(*field.As<float>());
 		else if(field.TypeID == asTYPEID_DOUBLE)
 			Read(*field.As<double>());
-		else if(typeName == "Asset")
-			Read(*field.As<Asset>());
-		else if(typeName == "Vec3")
-			Read(*field.As<glm::vec3>());
 		else if(typeName == "string")
 			Read(*field.As<std::string>());
 		else if(typeName == "array") {
@@ -194,6 +193,20 @@ BinaryReader& BinaryReader::ReadObject(ScriptComponent& comp) {
 			array->Reserve(count);
 			for(uint32_t i = 0; i < count; i++)
 				array->InsertLast((char*)data.Get() + size * i);
+		}
+		else if(typeName == "Asset")
+			Read(*field.As<Asset>());
+		else if(typeName == "Vec3")
+			Read(*field.As<glm::vec3>());
+		else if(typeName == "GridSet") {
+			auto* grid = field.As<GridSet>();
+			uint32_t width;
+			uint32_t height;
+			Read(width);
+			Read(height);
+			grid->Resize(width, height);
+			if(width && height)
+				ReadData(grid->Get(), grid->GetCount());
 		}
 	}
 

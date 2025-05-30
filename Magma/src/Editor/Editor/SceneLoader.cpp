@@ -822,10 +822,6 @@ BinaryWriter& BinaryWriter::WriteObject(const ScriptComponent& comp) {
 			Write(*field.As<float>());
 		else if(field.TypeID == asTYPEID_DOUBLE)
 			Write(*field.As<double>());
-		else if(typeName == "Asset")
-			Write(*field.As<Asset>());
-		else if(typeName == "Vec3")
-			Write(*field.As<glm::vec3>());
 		else if(typeName == "string")
 			Write(*field.As<std::string>());
 		else if(typeName == "array") {
@@ -842,6 +838,17 @@ BinaryWriter& BinaryWriter::WriteObject(const ScriptComponent& comp) {
 			Write((uint32_t)count);
 			// Works for primitive and POD types
 			WriteData(array->GetBuffer(), size * count);
+		}
+		else if(typeName == "Asset")
+			Write(*field.As<Asset>());
+		else if(typeName == "Vec3")
+			Write(*field.As<glm::vec3>());
+		else if(typeName == "GridSet") {
+			auto* grid = field.As<GridSet>();
+			Write(grid->GetWidth());
+			Write(grid->GetHeight());
+			if(*grid)
+				WriteData(grid->Get(), grid->GetCount());
 		}
 	}
 

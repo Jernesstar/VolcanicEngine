@@ -50,8 +50,14 @@ Runtime::Runtime(const CommandLineArgs& args)
 		"Lighting", ShaderPipeline::Create("Asset/Shader", "Lighting"));
 	ShaderLibrary::Add(
 		"Mesh", ShaderPipeline::Create("Asset/Shader", "Mesh"));
-	// ShaderLibrary::Add(
-	// 	"Bloom", ShaderPipeline::Create("Asset/Shader", "Bloom"));
+	// ShaderLibrary::Add("Particle-Emit",
+	// 	ShaderPipeline::Create("Asset/Shader", "ParticleEmitter"));
+	// ShaderLibrary::Add("Particle-Update",
+	// 	ShaderPipeline::Create("Asset/Shader", "ParticleUpdate"));
+	// ShaderLibrary::Add("Particle-Draw",
+	// 	ShaderPipeline::Create("Asset/Shader", "Particle"));
+	// ShaderLibrary::Add("Bloom",
+	// 	ShaderPipeline::Create("Asset/Shader", "Bloom"));
 
 	Physics::Init();
 	AudioEngine::Init();

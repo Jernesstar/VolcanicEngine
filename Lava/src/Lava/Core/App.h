@@ -42,6 +42,8 @@ public:
 
 	void LoadScene(Scene* scene);
 	void LoadUI(UIPage* ui);
+	Scene* GetScene();
+	UIPage* GetUI();
 
 	void SwitchScreen(const std::string& name);
 	void PushScreen(const std::string& name);

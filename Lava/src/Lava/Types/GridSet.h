@@ -20,6 +20,7 @@ public:
 	void ResizeY(uint32_t height);
 	void Clear();
 
+	uint8_t* Get() const;
 	uint8_t* At(uint32_t x, uint32_t y) const;
 	uint32_t GetWidth() const;
 	uint32_t GetHeight() const;
