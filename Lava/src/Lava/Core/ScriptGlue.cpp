@@ -96,6 +96,46 @@ void ScriptGlue::RegisterInterface() {
 	Timer::RegisterInterface();
 }
 
+void ScriptGlue::Copy(Ref<ScriptObject> src, Ref<ScriptObject> dst) {
+	if(src->GetClass()->Name != dst->GetClass()->Name)
+		return;
+
+	for(uint32_t i = 0; i < src->GetHandle()->GetPropertyCount(); i++) {
+		ScriptField ours = dst->GetProperty(i);
+		ScriptField field = src->GetProperty(i);
+		if(!field.Data)
+			continue;
+		if(!field.HasMetadata("EditorField"))
+			continue;
+
+		std::string fieldType;
+		if(field.Type)
+			fieldType = field.Type->GetName();
+
+		size_t size = 0;
+		if(field.TypeID > 0 && field.TypeID <= 11) // (Void, Double]
+			size = ScriptEngine::Get()->GetSizeOfPrimitiveType(field.TypeID);
+		else if(fieldType == "Asset")
+			size = sizeof(Vec3);
+		else if(fieldType == "Vec3")
+			size = sizeof(Asset);
+
+		if(size) {
+			void* us = dst->GetHandle()->GetAddressOfProperty(i);
+			void* them = src->GetHandle()->GetAddressOfProperty(i);
+			memcpy(us, them, size);
+			continue;
+		}
+
+		if(fieldType == "string")
+			*ours.As<std::string>() = *field.As<std::string>();
+		else if(fieldType == "array")
+			*ours.As<CScriptArray>() = *field.As<CScriptArray>();
+		else if(fieldType == "GridSet")
+			*ours.As<Lava::GridSet>() = *field.As<Lava::GridSet>();
+	}
+}
+
 static void print(const std::string& str) {
 	std::cout << str << "\n";
 }

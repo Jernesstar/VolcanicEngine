@@ -764,7 +764,7 @@ void EditorSceneRenderer::SubmitCamera(const Entity& entity) {
 
 void EditorSceneRenderer::SubmitSkybox(const Entity& entity) {
 	auto& sc = entity.Get<SkyboxComponent>();
-	auto* assetManager = App::Get()->GetAssetManager();
+	auto* assetManager = AssetManager::Get();
 	assetManager->Load(sc.CubemapAsset);
 	auto cubemap = assetManager->Get<Cubemap>(sc.CubemapAsset);
 
@@ -859,7 +859,7 @@ void EditorSceneRenderer::SubmitParticles(const Entity& entity) {
 }
 
 void EditorSceneRenderer::SubmitMesh(const Entity& entity) {
-	auto* assetManager = App::Get()->GetAssetManager();
+	auto* assetManager = AssetManager::Get();
 	auto& tc = entity.Get<TransformComponent>();
 	auto& mc = entity.Get<MeshComponent>();
 
@@ -896,7 +896,7 @@ void EditorSceneRenderer::Render() {
 	if(Selected
 	&& Selected.Has<TransformComponent>() && Selected.Has<MeshComponent>())
 	{
-		auto* assetManager = App::Get()->GetAssetManager();
+		auto* assetManager = AssetManager::Get();
 		auto& tc = Selected.Get<TransformComponent>();
 		auto& mc = Selected.Get<MeshComponent>();
 		assetManager->Load(mc.MeshAsset);

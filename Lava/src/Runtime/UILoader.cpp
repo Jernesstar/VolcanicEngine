@@ -60,7 +60,7 @@ static void ReadUI(BinaryReader* reader, UIElement* element) {
 	if(element->Class == "")
 		return;
 
-	auto* assetManager = App::Get()->GetAssetManager();
+	auto* assetManager = AssetManager::Get();
 	Asset asset = { element->ModuleID, AssetType::Script };
 	assetManager->Load(asset);
 
@@ -176,7 +176,7 @@ BinaryReader& BinaryReader::ReadObject(UI::Image& image) {
 	uint64_t id;
 	Read(id);
 	Asset asset = { id, AssetType::Texture };
-	auto* assetManager = App::Get()->GetAssetManager();
+	auto* assetManager = AssetManager::Get();
 	image.Content = assetManager->Get<Texture>(asset);
 
 	return *this;

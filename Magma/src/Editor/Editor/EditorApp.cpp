@@ -41,6 +41,12 @@ EditorApp::EditorApp(const CommandLineArgs& args)
 		ShaderPipeline::Create("Magma/assets/shaders/", "Lighting"));
 	ShaderLibrary::Add("Mesh",
 		ShaderPipeline::Create("Magma/assets/shaders/", "Mesh"));
+	ShaderLibrary::Add("Particle-Emit",
+		ShaderPipeline::Create("Magma/assets/shaders/", "ParticleEmitter"));
+	ShaderLibrary::Add("Particle-Update",
+		ShaderPipeline::Create("Magma/assets/shaders/", "ParticleUpdate"));
+	ShaderLibrary::Add("Particle-DefaultDraw",
+		ShaderPipeline::Create("Magma/assets/shaders/", "Particle"));
 	// ShaderLibrary::Add("Bloom",
 	// 	ShaderPipeline::Create("Magma/assets/shaders/", "Bloom"));
 

@@ -17,6 +17,10 @@
 #include <Editor/AssetManager.h>
 #include <Editor/AssetImporter.h>
 
+#include <Lava/Types/GridSet.h>
+#include <Lava/Types/GridSet3D.h>
+#include <Lava/Types/Timer.h>
+
 #undef near
 #undef far
 
@@ -358,65 +362,63 @@ std::string SelectScriptClass(Ref<ScriptModule> mod) {
 	return "";
 }
 
-static bool s_TilemapEdit = false;
+static bool s_GridSetEdit = false;
 
-static void TilemapEditorPopup(Ref<ScriptObject> obj, const std::string& name) {
-	auto* width = obj->GetProperty("Width").As<uint32_t>();
-	auto* height = obj->GetProperty("Height").As<uint32_t>();
-	auto* data = obj->GetProperty(name).As<CScriptArray>();
+static void ListEditorPopup(Ref<ScriptObject> obj, const std::string& name) {
 
-	if(!width || !height || !data)
+}
+
+static void GridSetEditorPopup(Ref<ScriptObject> obj, const std::string& name) {
+	auto* data = obj->GetProperty(name).As<Lava::GridSet>();
+	if(!data)
 		return;
 
-	uint32_t size = (*width) * (*height);
-	if(!data->GetSize() || size != data->GetSize()) {
-		asITypeInfo* type =
-			ScriptEngine::Get()->GetTypeInfoByDecl("array<uint32>");
-		auto* array = CScriptArray::Create(type, size);
-		*data = *array;
-		array->Release();
-	}
-
-	ImGui::OpenPopup("Tilemap Editor");
-	if(ImGui::BeginPopupModal("Tilemap Editor")) {
+	ImGui::OpenPopup("GridSet Editor");
+	if(ImGui::BeginPopupModal("GridSet Editor")) {
 		if(ImGui::Button("Close")) {
-			s_TilemapEdit = false;
+			s_GridSetEdit = false;
 			ImGui::CloseCurrentPopup();
 		}
+		ImGui::SameLine();
+		if(ImGui::Button("Clear"))
+			data->Clear();
 
-		bool w = ImGui::InputScalar("Width", ImGuiDataType_U32, width);
-		bool h = ImGui::InputScalar("Height", ImGuiDataType_U32, height);
+		uint32_t width = data->GetWidth();
+		uint32_t height = data->GetHeight();
+		ImGui::SetNextItemWidth(50);
+		bool w = ImGui::InputScalar("Width", ImGuiDataType_U32, &width);
+		ImGui::SameLine();
+		ImGui::SetNextItemWidth(50);
+		bool h = ImGui::InputScalar("Height", ImGuiDataType_U32, &height);
 
 		if(w || h)
-			data->Resize((*width) * (*height));
+			data->Resize(width, height);
 
 		UI::Button button;
 		button.Display = CreateRef<UI::Text>();
 		// button.Color = { };
 		button.SetSize(18.0f, 18.0f);
 
-		for(uint32_t y = 0; y < *height; y++) {
-			for(uint32_t x = 0; x < *width; x++) {
-				uint32_t i = y * (*width) + x;
-				uint32_t val = *(uint32_t*)data->At(i);
+		if(*data)
+			for(uint32_t y = 0; y < height; y++) {
+				for(uint32_t x = 0; x < width; x++) {
+					uint8_t& val = *data->At(x, y);
 
-				button.Display->As<UI::Text>()->Content = std::to_string(val);
-				button.x = 12 + x * 23.0f;
-				button.y = 120 + y * 23.0f;
-				button.Render();
+					button.Display->As<UI::Text>()->Content =
+						std::to_string(val);
+					button.x = 12 + x * 23.0f;
+					button.y = 120 + y * 23.0f;
+					button.Render();
 
-				if(ImGui::IsMouseClicked(0) && ImGui::IsItemHovered()) {
-					val++;
-					data->SetValue(i, &val);
-				}
-				else if(ImGui::IsMouseClicked(1) && ImGui::IsItemHovered()
-				&& val > 0)
-				{
-					val--;
-					data->SetValue(i, &val);
+					if(ImGui::IsMouseClicked(0) && ImGui::IsItemHovered())
+						val++;
+					else if(ImGui::IsMouseClicked(1)
+						&& ImGui::IsItemHovered() && val > 0)
+					{
+						val--;
+					}
 				}
 			}
-		}
 
 		ImGui::EndPopup();
 	}
@@ -479,21 +481,17 @@ void DrawComponent<ScriptComponent>(Entity& entity) {
 			ImGui::Text(typeName.c_str()); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(180.0f);
 
-			if(typeName == "Vec3")
-				ImGui::DragFloat3("##Vec3", &field.As<Vec3>()->r);
-			if(typeName == "string")
+			if(typeName == "string") {
+				ImGui::SetNextItemWidth(150);
 				ImGui::InputText("##String", field.As<std::string>());
+			}
 			else if(typeName == "array") {
-				if(field.HasMetadata("Tilemap")
-				&& ImGui::Button("Edit Tilemap"))
-					s_TilemapEdit = true;
-				if(s_TilemapEdit)
-					TilemapEditorPopup(component.Instance, field.Name);
+				
 			}
 			else if(typeName == "Asset") {
 				Asset asset = *field.As<Asset>();
 				ImGui::Text("Type: %s", AssetTypeToString(asset.Type).c_str());
-				ImGui::SameLine(280.0f);
+				ImGui::SameLine(280.0f, 0.0f);
 				ImGui::Text("ID: %llu", (uint64_t)asset.ID);
 
 				if(ImGui::Button(("Edit##" + field.Name).c_str()))
@@ -504,10 +502,23 @@ void DrawComponent<ScriptComponent>(Entity& entity) {
 					s_ForScript = 0;
 				}
 			}
+			if(typeName == "Vec3") {
+				ImGui::SetNextItemWidth(150);
+				ImGui::DragFloat3("##Vec3", &field.As<Vec3>()->r);
+			}
+			else if(typeName == "GridSet") {
+				if(ImGui::Button("Edit GridSet"))
+					s_GridSetEdit = true;
+				if(s_GridSetEdit)
+					GridSetEditorPopup(component.Instance, field.Name);
+			}
 			else
 				ImGui::NewLine();
+
+			continue;
 		}
-		else if(field.TypeID == asTYPEID_BOOL) {
+
+		if(field.TypeID == asTYPEID_BOOL) {
 			ImGui::Text("bool"); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(180.0f);
 			ImGui::Checkbox(std::string("##Bool##" + field.Name).c_str(),
@@ -516,60 +527,70 @@ void DrawComponent<ScriptComponent>(Entity& entity) {
 		else if(field.TypeID == asTYPEID_INT8) {
 			ImGui::Text("int8"); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(180.0f);
+			ImGui::SetNextItemWidth(50);
 			ImGui::DragScalar(std::string("##S8##" + field.Name).c_str(),
 				ImGuiDataType_S8, field.Data);
 		}
 		else if(field.TypeID == asTYPEID_INT16) {
 			ImGui::Text("int16"); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(180.0f);
+			ImGui::SetNextItemWidth(50);
 			ImGui::DragScalar(std::string("##S16##" + field.Name).c_str(),
 								ImGuiDataType_S16, field.Data);
 		}
 		else if(field.TypeID == asTYPEID_INT32) {
 			ImGui::Text("int32"); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(180.0f);
+			ImGui::SetNextItemWidth(50);
 			ImGui::DragScalar(std::string("##S32##" + field.Name).c_str(),
 								ImGuiDataType_S32, field.Data);
 		}
 		else if(field.TypeID == asTYPEID_INT64) {
 			ImGui::Text("int64"); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(180.0f);
+			ImGui::SetNextItemWidth(50);
 			ImGui::DragScalar(std::string("##S64##" + field.Name).c_str(),
 								ImGuiDataType_S64, field.Data);
 		}
 		else if(field.TypeID == asTYPEID_UINT8) {
 			ImGui::Text("uint8"); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(180.0f);
+			ImGui::SetNextItemWidth(50);
 			ImGui::DragScalar(std::string("##U8##" + field.Name).c_str(),
 								ImGuiDataType_U8, field.Data);
 		}
 		else if(field.TypeID == asTYPEID_UINT16) {
 			ImGui::Text("uint16"); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(180.0f);
+			ImGui::SetNextItemWidth(50);
 			ImGui::DragScalar(std::string("##U16##" + field.Name).c_str(),
 								ImGuiDataType_U16, field.Data);
 		}
 		else if(field.TypeID == asTYPEID_UINT32) {
 			ImGui::Text("uint32"); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(180.0f);
+			ImGui::SetNextItemWidth(50);
 			ImGui::DragScalar(std::string("##U32##" + field.Name).c_str(),
 								ImGuiDataType_U32, field.Data);
 		}
 		else if(field.TypeID == asTYPEID_UINT64) {
 			ImGui::Text("uint64"); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(180.0f);
+			ImGui::SetNextItemWidth(50);
 			ImGui::DragScalar(std::string("##U64##" + field.Name).c_str(),
 								ImGuiDataType_U64, field.Data);
 		}
 		else if(field.TypeID == asTYPEID_FLOAT) {
 			ImGui::Text("float"); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(180.0f);
+			ImGui::SetNextItemWidth(50);
 			ImGui::DragFloat(std::string("##Float##" + field.Name).c_str(),
 							 field.As<float>(), 0.1f, 0.0f, 0.0f, "%.3f");
 		}
 		else if(field.TypeID == asTYPEID_DOUBLE) {
 			ImGui::Text("double"); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(180.0f);
+			ImGui::SetNextItemWidth(50);
 			ImGui::DragScalar(std::string("##Double##" + field.Name).c_str(),
 							  ImGuiDataType_Double, field.As<double>());
 		}

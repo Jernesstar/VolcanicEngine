@@ -18,6 +18,9 @@
 #include <Magma/Scene/Component.h>
 
 #include <Lava/Core/App.h>
+#include <Lava/Types/GridSet.h>
+#include <Lava/Types/GridSet3D.h>
+#include <Lava/Types/Timer.h>
 
 #include "EditorApp.h"
 
@@ -172,15 +175,10 @@ void SaveScript(YAMLSerializer& serializer, Ref<ScriptObject> obj) {
 				.WriteKey("Type").Write(std::string("double"))
 				.WriteKey("Value").Write(*(float*)field.As<double>());
 		}
-		else if(std::string(field.Type->GetName()) == "Vec3") {
+		else if(std::string(field.Type->GetName()) == "string") {
 			serializer
-				.WriteKey("Type").Write(std::string("Vec3"))
-				.WriteKey("Value").Write(*field.As<Vec3>());
-		}
-		else if(std::string(field.Type->GetName()) == "Asset") {
-			serializer
-				.WriteKey("Type").Write(std::string("Asset"))
-				.WriteKey("Value").Write(*field.As<Asset>());
+				.WriteKey("Type").Write(std::string("array"))
+				.WriteKey("Value").Write(*field.As<std::string>());
 		}
 		else if(std::string(field.Type->GetName()) == "array") {
 			serializer
@@ -197,6 +195,38 @@ void SaveScript(YAMLSerializer& serializer, Ref<ScriptObject> obj) {
 
 			serializer
 				.EndSequence();
+		}
+		else if(std::string(field.Type->GetName()) == "Asset") {
+			serializer
+				.WriteKey("Type").Write(std::string("Asset"))
+				.WriteKey("Value").Write(*field.As<Asset>());
+		}
+		else if(std::string(field.Type->GetName()) == "Vec3") {
+			serializer
+				.WriteKey("Type").Write(std::string("Vec3"))
+				.WriteKey("Value").Write(*field.As<Vec3>());
+		}
+		else if(std::string(field.Type->GetName()) == "GridSet") {
+			serializer
+				.WriteKey("Type").Write(std::string("GridSet"))
+				.WriteKey("Value").BeginMapping();
+
+			auto* grid = field.As<GridSet>();
+			serializer.WriteKey("Width").Write(grid->GetWidth());
+			serializer.WriteKey("Height").Write(grid->GetHeight());
+
+			serializer.WriteKey("Data")
+				.BeginSequence();
+			for(uint32_t y = 0; y < grid->GetHeight(); y++) {
+				serializer.SetOptions(Serializer::Options::ArrayOneLine);
+				serializer.BeginSequence();
+				for(uint32_t x = 0; x < grid->GetWidth(); x++)
+					serializer.Write(*grid->At(x, y));
+				serializer.EndSequence();
+			}
+			serializer.EndSequence();
+
+			serializer.EndMapping();
 		}
 		// Script Type
 		else if(field.Is(ScriptQualifier::ScriptObject)) {
@@ -404,6 +434,7 @@ void SerializeEntity(YAMLSerializer& serializer, const Entity& entity) {
 			.WriteKey("Position").Write(system.Position)
 			.WriteKey("MaxParticleCount").Write(system.MaxParticleCount)
 			.WriteKey("ParticleLifetime").Write(system.ParticleLifetime)
+			.WriteKey("SpawnInterval").Write(system.SpawnInterval)
 			.WriteKey("AssetID").Write((uint64_t)system.MaterialAsset.ID)
 		.EndMapping(); // ParticleEmitterComponent
 	}
@@ -472,17 +503,33 @@ Ref<ScriptObject> LoadScript(Entity entity, Asset asset,
 			*(float*)address = value.as<float>();
 		else if(type == "double")
 			*(double*)address = value.as<float>();
+		else if(type == "string")
+			*(std::string*)address = value.as<std::string>();
 		else if(type == "array") {
 			auto data = value.as<List<uint32_t>>();
 			for(uint32_t i = 0; i < data.Count(); i++)
 				((CScriptArray*)address)->InsertLast(data.At(i));
 		}
-		else if(type == "Vec3")
-			*(Vec3*)address = value.as<Vec3>();
 		else if(type == "Asset") {
 			((Asset*)address)->ID = value["ID"].as<uint64_t>();
 			((Asset*)address)->Type =
 				AssetTypeFromString(value["Type"].as<std::string>());
+		}
+		else if(type == "Vec3")
+			*(Vec3*)address = value.as<Vec3>();
+		else if(type == "GridSet") {
+			auto* grid = (GridSet*)address;
+			auto width = value["Width"].as<uint32_t>();
+			auto height = value["Height"].as<uint32_t>();
+			grid->Resize(width, height);
+
+			uint32_t x = 0, y = 0;
+			for(auto row : value["Data"]) {
+				for(auto val : row)
+					*grid->At(x++, y) = (uint8_t)val.as<uint32_t>();
+				x = 0;
+				y++;
+			}
 		}
 	}
 
@@ -654,6 +701,7 @@ void DeserializeEntity(YAML::Node entityNode, Scene& scene) {
 			particleEmitterComponentNode["Position"].as<glm::vec3>(),
 			particleEmitterComponentNode["MaxParticleCount"].as<uint64_t>(),
 			particleEmitterComponentNode["ParticleLifetime"].as<float>(),
+			particleEmitterComponentNode["SpawnInterval"].as<float>(),
 			Asset{ particleEmitterComponentNode["AssetID"].as<uint64_t>(),
 					AssetType::Texture });
 	}
@@ -852,6 +900,7 @@ BinaryWriter& BinaryWriter::WriteObject(const ParticleEmitterComponent& comp) {
 	Write(comp.Position);
 	Write(comp.MaxParticleCount);
 	Write(comp.ParticleLifetime);
+	Write(comp.SpawnInterval);
 	Write((uint64_t)comp.MaterialAsset.ID);
 
 	return *this;

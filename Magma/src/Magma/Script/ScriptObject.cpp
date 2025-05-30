@@ -61,44 +61,6 @@ void ScriptObject::DestroyAndRelease() {
 	Release();
 }
 
-void ScriptObject::Copy(Ref<ScriptObject> other) {
-	if(other->GetClass()->Name != GetClass()->Name)
-		return;
-
-	for(uint32_t i = 0; i < m_Handle->GetPropertyCount(); i++) {
-		ScriptField ours = GetProperty(i);
-		ScriptField field = other->GetProperty(i);
-		if(!field.Data)
-			continue;
-		if(!field.HasMetadata("EditorField"))
-			continue;
-
-		std::string fieldType;
-		if(field.Type)
-			fieldType = field.Type->GetName();
-
-		size_t size = 0;
-		if(field.TypeID > 0 && field.TypeID <= 11) // (Void, Double]
-			size = ScriptEngine::Get()->GetSizeOfPrimitiveType(field.TypeID);
-		else if(fieldType == "Asset")
-			size = sizeof(Vec3);
-		else if(fieldType == "Vec3")
-			size = sizeof(Asset);
-
-		if(size) {
-			void* us = m_Handle->GetAddressOfProperty(i);
-			void* them = other->m_Handle->GetAddressOfProperty(i);
-			memcpy(us, them, size);
-			continue;
-		}
-
-		if(fieldType == "string")
-			*ours.As<std::string>() = *field.As<std::string>();
-		else if(fieldType == "array")
-			*ours.As<CScriptArray>() = *field.As<CScriptArray>();
-	}
-}
-
 ScriptField ScriptObject::GetProperty(const std::string& name) {
 	if(!m_Class->m_FieldMap.count(name))
 		return { };

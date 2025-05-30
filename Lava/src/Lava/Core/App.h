@@ -1,20 +1,14 @@
 #pragma once
 
-#ifdef _MSC_VER
-#define NOMINMAX
-#endif
-
 #include <VolcaniCore/Core/Defines.h>
 
 #include <Magma/Core/Project.h>
 #include <Magma/Core/AssetManager.h>
-
 #include <Magma/Scene/Scene.h>
-#include <Magma/Scene/SceneRenderer.h>
-
 #include <Magma/UI/UIPage.h>
-
 #include <Magma/Script/ScriptModule.h>
+
+#include "SceneRenderer.h"
 
 using namespace VolcaniCore;
 using namespace Magma;
@@ -22,43 +16,6 @@ using namespace Magma::UI;
 using namespace Magma::Script;
 
 namespace Lava {
-
-class RuntimeSceneRenderer : public SceneRenderer {
-	public:
-		RuntimeSceneRenderer();
-		~RuntimeSceneRenderer() = default;
-	
-		void Update(TimeStep ts) override;
-	
-		void Begin() override;
-		void SubmitCamera(const Entity& entity) override;
-		void SubmitSkybox(const Entity& entity) override;
-		void SubmitLight(const Entity& entity) override;
-		void SubmitParticles(const Entity& entity) override;
-		void SubmitMesh(const Entity& entity) override;
-		void Render() override;
-	
-	private:
-		// Lighting and shadows
-		Ref<RenderPass> DepthPass;
-		Ref<RenderPass> LightingPass;
-		Ref<UniformBuffer> DirectionalLightBuffer;
-		Ref<UniformBuffer> PointLightBuffer;
-		Ref<UniformBuffer> SpotlightBuffer;
-		DrawCommand* LightingCommand;
-		bool HasDirectionalLight = false;
-		uint32_t PointLightCount = 0;
-		uint32_t SpotlightCount = 0;
-
-		// Bloom
-		Ref<Framebuffer> Mips;
-		Ref<RenderPass> DownsamplePass;
-		Ref<RenderPass> UpsamplePass;
-		Ref<RenderPass> BloomPass;
-
-		// Particles
-
-	};
 
 class App {
 public:
@@ -95,13 +52,10 @@ public:
 	void ScreenPop();
 
 	auto& GetProject() { return m_Project; }
-	void SetAssetManager(AssetManager* manager) { m_AssetManager = manager; }
-	AssetManager* GetAssetManager() { return m_AssetManager; }
 	RuntimeSceneRenderer& GetRenderer() { return m_SceneRenderer; }
 
 private:
 	Project m_Project;
-	AssetManager* m_AssetManager;
 	RuntimeSceneRenderer m_SceneRenderer;
 
 private:

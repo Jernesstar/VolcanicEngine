@@ -22,10 +22,8 @@ class PlayerController : IEntityController
     [EditorField] uint32 Unsigned32;
     [EditorField] float Float;
 
-    [Tilemap]
-    [EditorField] array<uint32> Tilemap;
-    [EditorField] uint32 Width;
-    [EditorField] uint32 Height;
+    [EditorField] array<uint32> List;
+    [EditorField] GridSet Grid;
     [EditorField] Vec3 SomeVec3;
 
     PlayerController(Entity entity)
@@ -55,10 +53,9 @@ class PlayerController : IEntityController
 
         AssetManager.Load(meshAsset);
 
-        for(uint32 y = 0; y < Height; y++) {
-            for(uint32 x = 0; x < Width; x++) {
-                uint32 i = (y * Width) + x;
-                uint32 data = Tilemap[i];
+        for(uint32 y = 0; y < Grid.Height; y++) {
+            for(uint32 x = 0; x < Grid.Width; x++) {
+                uint8 data = Grid.At(x, y);
                 if(data == 0)
                     continue;
 

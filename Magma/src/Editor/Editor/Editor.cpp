@@ -426,7 +426,6 @@ void Editor::NewProject(const std::string& volcPath) {
 	m_App->RenderScene = false;
 	m_App->RenderUI = false;
 	m_App->Running = false;
-	m_App->SetAssetManager(&m_AssetManager);
 
 	auto themePath = rootPath / "Visual" / "UI" / "theme.magma.ui.json";
 	if(fs::exists(themePath))

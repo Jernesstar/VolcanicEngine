@@ -13,6 +13,9 @@ public:
 	GridSet(uint32_t width, uint32_t height);
 	~GridSet();
 
+	GridSet& operator =(const GridSet& other);
+
+	void Resize(uint32_t width, uint32_t height);
 	void ResizeX(uint32_t width);
 	void ResizeY(uint32_t height);
 	void Clear();
@@ -22,9 +25,14 @@ public:
 	uint32_t GetHeight() const;
 	uint32_t GetCount() const;
 
+	operator bool() const { return m_Data != nullptr; }
+
 private:
 	uint8_t* m_Data = nullptr;
 	uint32_t m_Width = 0, m_Height = 0;
+
+private:
+	void Reallocate();
 };
 
 }

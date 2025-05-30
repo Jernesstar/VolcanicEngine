@@ -7,6 +7,7 @@ AssetPack:
     - Asset:
         ID: 4186775327602265389
         Type: Mesh
+        Name: WoodBall
         Path: Mesh/sphere/wooden_sphere.obj
     - Asset:
         ID: 9099402520052546251
@@ -15,6 +16,7 @@ AssetPack:
     - Asset:
         ID: 10036008063945961451
         Type: Mesh
+        Name: BlueCube
         MeshType: 1
         Material:
           DiffuseColor: [0, 0, 1, 1]
@@ -23,6 +25,7 @@ AssetPack:
     - Asset:
         ID: 15277418182178081176
         Type: Mesh
+        Name: Player
         Path: Mesh/player/Knight_Golden_Male.obj
     - Asset:
         ID: 16624656892553940704

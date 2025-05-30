@@ -129,7 +129,7 @@ BinaryReader& BinaryReader::ReadObject(ScriptComponent& comp) {
 	std::string className;
 	Read(className);
 
-	auto* assetManager = App::Get()->GetAssetManager();
+	auto* assetManager = AssetManager::Get();
 	assetManager->Load(asset);
 
 	auto mod = assetManager->Get<ScriptModule>(asset);
