@@ -32,27 +32,6 @@ void ShaderProgram::Unbind() const {
 	glUseProgram(0);
 }
 
-void ShaderProgram::AddShader(const ShaderFile& shader) {
-	uint32_t shaderID = CreateShader(shader);
-	glAttachShader(m_ProgramID, shaderID);
-	m_ShaderIDs.Add(shaderID);
-}
-
-void ShaderProgram::Compile() {
-	glLinkProgram(m_ProgramID);
-
-	int result;
-	glGetProgramiv(m_ProgramID, GL_LINK_STATUS, &result);
-
-	if(result == GL_FALSE)
-		glDeleteProgram(m_ProgramID);
-
-	for(auto& shaderID : m_ShaderIDs) {
-		glDetachShader(m_ProgramID, shaderID);
-		glDeleteShader(shaderID);
-	}
-}
-
 void ShaderProgram::SetInt(const std::string& name, int32_t _int) {
 	GLint location = glGetUniformLocation(m_ProgramID, name.c_str());
 	glUniform1i(location, _int);
@@ -122,6 +101,27 @@ uint32_t GetShaderType(ShaderType type) {
 	}
 
 	return 0;
+}
+
+void ShaderProgram::AddShader(const ShaderFile& shader) {
+	uint32_t shaderID = CreateShader(shader);
+	glAttachShader(m_ProgramID, shaderID);
+	m_ShaderIDs.Add(shaderID);
+}
+
+void ShaderProgram::Compile() {
+	glLinkProgram(m_ProgramID);
+
+	int result;
+	glGetProgramiv(m_ProgramID, GL_LINK_STATUS, &result);
+
+	if(result == GL_FALSE)
+		glDeleteProgram(m_ProgramID);
+
+	for(auto& shaderID : m_ShaderIDs) {
+		glDetachShader(m_ProgramID, shaderID);
+		glDeleteShader(shaderID);
+	}
 }
 
 uint32_t CreateShader(const ShaderFile& shader) {
