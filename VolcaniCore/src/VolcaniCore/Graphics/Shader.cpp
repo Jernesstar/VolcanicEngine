@@ -10,13 +10,11 @@
 namespace VolcaniCore {
 
 static ShaderFile TryGetShader(const std::string& path);
-static std::vector<ShaderFile> GetShaders(const std::vector<std::string>& paths);
-static std::vector<ShaderFile> GetShaders(const std::string& shaderFolder,
+static List<ShaderFile> GetShaders(const List<std::string>& paths);
+static List<ShaderFile> GetShaders(const std::string& shaderFolder,
 										  const std::string& name);
 
-Ref<ShaderPipeline> ShaderPipeline::Create(
-						const std::vector<ShaderFile>& shaders)
-{
+Ref<ShaderPipeline> ShaderPipeline::Create(const List<ShaderFile>& shaders) {
 	RendererAPI::Backend backend = RendererAPI::Get()->GetBackend();
 
 	switch(backend) {
@@ -27,9 +25,7 @@ Ref<ShaderPipeline> ShaderPipeline::Create(
 	return nullptr;
 }
 
-Ref<ShaderPipeline> ShaderPipeline::Create(
-						const std::vector<std::string>& paths)
-{
+Ref<ShaderPipeline> ShaderPipeline::Create(const List<std::string>& paths) {
 	RendererAPI::Backend backend = RendererAPI::Get()->GetBackend();
 
 	auto shaders = GetShaders(paths);
@@ -57,12 +53,10 @@ Ref<ShaderPipeline> ShaderPipeline::Create(const std::string& folderPath,
 	return nullptr;
 }
 
-std::vector<ShaderFile> GetShaders(const std::vector<std::string>& paths) {
-	std::vector<ShaderFile> shaders;
-	shaders.reserve(paths.size());
-
+List<ShaderFile> GetShaders(const List<std::string>& paths) {
+	List<ShaderFile> shaders(paths.Count());
 	for(const auto& path : paths)
-		shaders.push_back(TryGetShader(path));
+		shaders.Add(TryGetShader(path));
 
 	return shaders;
 }
@@ -71,17 +65,17 @@ bool StringContains(const std::string& str, const std::string& subStr) {
 	return str.find(subStr) != std::string::npos;
 }
 
-std::vector<ShaderFile> GetShaders(const std::string& shaderFolder,
+List<ShaderFile> GetShaders(const std::string& shaderFolder,
 									const std::string& name)
 {
 	namespace fs = std::filesystem;
 
-	std::vector<std::string> paths;
+	List<std::string> paths;
 	for(auto path : FileUtils::GetFiles(shaderFolder,
 					{ ".vert", ".frag", ".geom", ".comp" }))
 	{
 		if(fs::path(path).stem().stem().string() == name)
-			paths.push_back(path);
+			paths.Add(path);
 	}
 	
 	return GetShaders(paths);

@@ -12,13 +12,26 @@
 namespace VolcaniCore::OpenGL {
 
 uint32_t CreateShader(const ShaderFile& shader);
+uint32_t AddShader(uint32_t programID, const ShaderFile& shader);
 
-ShaderProgram::ShaderProgram(const std::vector<ShaderFile>& shaders) {
+ShaderProgram::ShaderProgram(const List<ShaderFile>& shaders) {
 	m_ProgramID = glCreateProgram();
+	List<uint32_t> ids(shaders.Count());
 
 	for(const auto& shader : shaders)
-		AddShader(shader);
-	Compile();
+		ids.Add(AddShader(m_ProgramID, shader));
+
+	glLinkProgram(m_ProgramID);
+	int result;
+	glGetProgramiv(m_ProgramID, GL_LINK_STATUS, &result);
+
+	if(result == GL_FALSE)
+		glDeleteProgram(m_ProgramID);
+
+	for(auto& shaderID : ids) {
+		glDetachShader(m_ProgramID, shaderID);
+		glDeleteShader(shaderID);
+	}
 }
 
 ShaderProgram::~ShaderProgram() {
@@ -103,25 +116,10 @@ uint32_t GetShaderType(ShaderType type) {
 	return 0;
 }
 
-void ShaderProgram::AddShader(const ShaderFile& shader) {
+uint32_t AddShader(uint32_t programID, const ShaderFile& shader) {
 	uint32_t shaderID = CreateShader(shader);
-	glAttachShader(m_ProgramID, shaderID);
-	m_ShaderIDs.Add(shaderID);
-}
-
-void ShaderProgram::Compile() {
-	glLinkProgram(m_ProgramID);
-
-	int result;
-	glGetProgramiv(m_ProgramID, GL_LINK_STATUS, &result);
-
-	if(result == GL_FALSE)
-		glDeleteProgram(m_ProgramID);
-
-	for(auto& shaderID : m_ShaderIDs) {
-		glDetachShader(m_ProgramID, shaderID);
-		glDeleteShader(shaderID);
-	}
+	glAttachShader(programID, shaderID);
+	return shaderID;
 }
 
 uint32_t CreateShader(const ShaderFile& shader) {

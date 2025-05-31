@@ -8,6 +8,7 @@
 #include <VolcaniCore/Graphics/Texture.h>
 #include <VolcaniCore/Graphics/Cubemap.h>
 #include <VolcaniCore/Graphics/Mesh.h>
+#include <VolcaniCore/Graphics/Shader.h>
 
 #include <Magma/Audio/Sound.h>
 
@@ -24,10 +25,10 @@ enum class AssetType {
 	Mesh,
 	Texture,
 	Cubemap,
+	Shader,
 	Font,
 	Audio,
 	Script,
-	Shader,
 };
 
 struct Asset {
@@ -69,15 +70,22 @@ public:
 	virtual void Unload(Asset asset) = 0;
 
 	template<typename T>
-	Ref<T> Get(Asset asset);
+	Ref<T> Get(Asset asset) const;
+	
+	bool IsValid(Asset asset) const {
+		return asset.ID && asset.Type != AssetType::None
+			&& m_AssetRegistry.count(asset);
+	}
+
+	bool IsLoaded(Asset asset) const { return m_AssetRegistry.at(asset); }
+
+	bool HasRefs(Asset asset) const { return m_References.count(asset.ID); }
 
 	void NameAsset(Asset asset, const std::string& name) {
 		m_NamedAssets[asset] = name;
 	}
 
-	void RemoveName(Asset asset) {
-		m_NamedAssets.erase(asset);
-	}
+	void RemoveName(Asset asset) { m_NamedAssets.erase(asset); }
 
 	std::string GetAssetName(Asset asset) const {
 		if(!m_NamedAssets.count(asset))
@@ -94,19 +102,6 @@ public:
 		return { };
 	}
 
-	bool IsLoaded(Asset asset) const {
-		return m_AssetRegistry.at(asset);
-	}
-
-	bool HasRefs(Asset asset) const {
-		return m_References.count(asset.ID);
-	}
-
-	bool IsValid(Asset asset) const {
-		return asset.ID && asset.Type != AssetType::None
-			&& m_AssetRegistry.count(asset);
-	}
-
 	void Clear() {
 		m_AssetRegistry.clear();
 		m_References.clear();
@@ -114,6 +109,7 @@ public:
 		m_MeshAssets.clear();
 		m_TextureAssets.clear();
 		m_CubemapAssets.clear();
+		m_ShaderAssets.clear();
 		m_AudioAssets.clear();
 		m_ScriptAssets.clear();
 	}
@@ -126,68 +122,61 @@ protected:
 	Map<VolcaniCore::UUID, Ref<VolcaniCore::Mesh>> m_MeshAssets;
 	Map<VolcaniCore::UUID, Ref<VolcaniCore::Texture>> m_TextureAssets;
 	Map<VolcaniCore::UUID, Ref<VolcaniCore::Cubemap>> m_CubemapAssets;
+	Map<VolcaniCore::UUID, Ref<VolcaniCore::ShaderPipeline>> m_ShaderAssets;
+	// Map<VolcaniCore::UUID, Ref<VolcaniCore::Font>> m_FontAssets;
 	Map<VolcaniCore::UUID, Ref<Sound>> m_AudioAssets;
 	Map<VolcaniCore::UUID, Ref<ScriptModule>> m_ScriptAssets;
 
 private:
 	inline static AssetManager* s_Instance;
-
-private:
-	Ref<VolcaniCore::Mesh> GetMesh(Asset asset) {
-		if(!m_MeshAssets.count(asset.ID))
-			return nullptr;
-		return m_MeshAssets[asset.ID];
-	}
-	Ref<VolcaniCore::Texture> GetTexture(Asset asset) {
-		if(!m_TextureAssets.count(asset.ID))
-			return nullptr;
-		return m_TextureAssets[asset.ID];
-	}
-	Ref<VolcaniCore::Cubemap> GetCubemap(Asset asset) {
-		if(!m_CubemapAssets.count(asset.ID))
-			return nullptr;
-		return m_CubemapAssets[asset.ID];
-	}
-	Ref<Sound> GetSound(Asset asset) {
-		if(!m_AudioAssets.count(asset.ID))
-			return nullptr;
-		return m_AudioAssets[asset.ID];
-	}
-	Ref<ScriptModule> GetScript(Asset asset) {
-		if(!m_ScriptAssets.count(asset.ID))
-			return nullptr;
-		return m_ScriptAssets[asset.ID];
-	}
 };
 
 template<> inline
-Ref<VolcaniCore::Mesh> AssetManager::Get(Asset asset) {
+Ref<VolcaniCore::Mesh> AssetManager::Get(Asset asset) const {
 	VOLCANICORE_ASSERT(asset.Type == AssetType::Mesh);
-	return GetMesh(asset);
+	if(!m_MeshAssets.count(asset.ID))
+		return nullptr;
+	return m_MeshAssets.at(asset.ID);
 }
 
 template<> inline
-Ref<VolcaniCore::Texture> AssetManager::Get(Asset asset) {
+Ref<VolcaniCore::Texture> AssetManager::Get(Asset asset) const {
 	VOLCANICORE_ASSERT(asset.Type == AssetType::Texture);
-	return GetTexture(asset);
+	if(!m_TextureAssets.count(asset.ID))
+		return nullptr;
+	return m_TextureAssets.at(asset.ID);
 }
 
 template<> inline
-Ref<VolcaniCore::Cubemap> AssetManager::Get(Asset asset) {
+Ref<VolcaniCore::Cubemap> AssetManager::Get(Asset asset) const {
 	VOLCANICORE_ASSERT(asset.Type == AssetType::Cubemap);
-	return GetCubemap(asset);
+	if(!m_CubemapAssets.count(asset.ID))
+		return nullptr;
+	return m_CubemapAssets.at(asset.ID);
 }
 
 template<> inline
-Ref<Sound> AssetManager::Get(Asset asset) {
+Ref<VolcaniCore::ShaderPipeline> AssetManager::Get(Asset asset) const {
+	VOLCANICORE_ASSERT(asset.Type == AssetType::Shader);
+	if(!m_ShaderAssets.count(asset.ID))
+		return nullptr;
+	return m_ShaderAssets.at(asset.ID);
+}
+
+template<> inline
+Ref<Sound> AssetManager::Get(Asset asset) const {
 	VOLCANICORE_ASSERT(asset.Type == AssetType::Audio);
-	return GetSound(asset);
+	if(!m_AudioAssets.count(asset.ID))
+		return nullptr;
+	return m_AudioAssets.at(asset.ID);
 }
 
 template<> inline
-Ref<ScriptModule> AssetManager::Get(Asset asset) {
+Ref<ScriptModule> AssetManager::Get(Asset asset) const {
 	VOLCANICORE_ASSERT(asset.Type == AssetType::Script);
-	return GetScript(asset);
+	if(!m_ScriptAssets.count(asset.ID))
+		return nullptr;
+	return m_ScriptAssets.at(asset.ID);
 }
 
 }

@@ -42,6 +42,9 @@ project "Magma"
     links {
         "VolcaniCore",
 
+        "shaderc",
+        "SPIRV-Cross",
+
         "yaml-cpp",
 
         "imgui",
@@ -138,6 +141,9 @@ project "Editor"
         "glfw",
         "glad",
 
+        "shaderc",
+        "SPIRV-Cross",
+
         "assimp",
         "freetype",
         "stb_image",
@@ -194,3 +200,5 @@ include "Magma/.builddeps/assimp"
 include "Magma/.builddeps/freetype"
 include "Magma/.builddeps/stb_image"
 include "Magma/.builddeps/efsw"
+include "Magma/.builddeps/shaderc"
+include "Magma/.builddeps/SPIRV-Cross"

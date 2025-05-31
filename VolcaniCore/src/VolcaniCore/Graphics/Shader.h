@@ -27,8 +27,8 @@ struct ShaderFile {
 
 class ShaderPipeline : public Derivable<ShaderPipeline> {
 public:
-	static Ref<ShaderPipeline> Create(const std::vector<ShaderFile>& shaders);
-	static Ref<ShaderPipeline> Create(const std::vector<std::string>& paths);
+	static Ref<ShaderPipeline> Create(const List<ShaderFile>& shaders);
+	static Ref<ShaderPipeline> Create(const List<std::string>& paths);
 	static Ref<ShaderPipeline> Create(const std::string& folderPath,
 									  const std::string& name);
 

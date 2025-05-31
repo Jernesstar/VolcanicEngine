@@ -172,7 +172,7 @@ void ProjectTab::RenderButtons() {
 	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.f, 0.f, 0.f, 0.f));
 
 	float x = Application::GetWindow()->GetWidth() - 90.0f;
-	float y = 24.0f;
+	float y = 23.0f;
 	float size = 17.5f;
 
 	UI::Button* button = &m_PlayButton;

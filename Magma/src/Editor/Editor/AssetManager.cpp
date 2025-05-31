@@ -29,14 +29,14 @@ std::string AssetTypeToString(AssetType type) {
 			return "Texture";
 		case AssetType::Cubemap:
 			return "Cubemap";
+		case AssetType::Shader:
+			return "Shader";
 		case AssetType::Font:
 			return "Font";
 		case AssetType::Audio:
 			return "Audio";
 		case AssetType::Script:
 			return "Script";
-		case AssetType::Shader:
-			return "Shader";
 	}
 
 	return "None";
@@ -69,16 +69,17 @@ public:
 	void handleFileAction(efsw::WatchID id, const std::string& dir,
 		const std::string& file, efsw::Action action, std::string old) override;
 
+	uint32_t AddCallback(const Func<void, Asset, bool>& callback);
+	void RemoveCallback(uint32_t id);
+
 	void Add(AssetType type, const std::string& path);
 	void Remove(AssetType type, const std::string& path);
 
 	void ReloadMesh(const std::string& path);
 	void ReloadTexture(const std::string& path);
+	void ReloadShader(const std::string& path);
 	void ReloadAudio(const std::string& path);
 	void ReloadScript(const std::string& path);
-
-	uint32_t AddCallback(const Func<void, Asset, bool>& callback);
-	void RemoveCallback(uint32_t id);
 
 private:
 	EditorAssetManager* m_AssetManager;
@@ -112,6 +113,9 @@ void FileWatcher::handleFileAction(
 			case AssetType::Texture:
 				ReloadTexture(fullPath);
 				break;
+			case AssetType::Shader:
+				ReloadShader(fullPath);
+				break;
 			case AssetType::Audio:
 				ReloadAudio(fullPath);
 				break;
@@ -124,21 +128,13 @@ void FileWatcher::handleFileAction(
 			callback(asset, 1);
 	}
 	else if(action == efsw::Actions::Moved) {
-		std::cout << "DIR (" << dir << ") FILE (" << file << ") has event Moved from (" << oldFilename << ")" << "\n";
+		VOLCANICORE_LOG_INFO("%s has moved from %s",
+			file.c_str(), oldFilename.c_str());
+		// m_AssetManager->Change(fullPath, asset);
 	}
 	else {
-		std::cout << "Should never happen!" << "\n";
+		VOLCANICORE_LOG_ERROR("Unexpected filewatch error!");
 	}
-}
-
-void FileWatcher::Add(AssetType type, const std::string& path) {
-	VOLCANICORE_LOG_INFO("New AssetType::%s added at path '%s'",
-		AssetTypeToString(type).c_str(), path.c_str());
-	m_AssetManager->Add(path, type);
-}
-
-void FileWatcher::Remove(AssetType type, const std::string& path) {
-
 }
 
 uint32_t FileWatcher::AddCallback(const Func<void, Asset, bool>& callback) {
@@ -150,33 +146,52 @@ void FileWatcher::RemoveCallback(uint32_t id) {
 	m_Callbacks.Pop(id);
 }
 
+void FileWatcher::Add(AssetType type, const std::string& path) {
+	VOLCANICORE_LOG_INFO("Adding AssetType::%s at path '%s'",
+		AssetTypeToString(type).c_str(), path.c_str());
+	m_AssetManager->Add(path, type);
+}
+
+void FileWatcher::Remove(AssetType type, const std::string& path) {
+	VOLCANICORE_LOG_INFO("Removing AssetType::%s at path '%s'",
+		AssetTypeToString(type).c_str(), path.c_str());
+	UUID id = m_AssetManager->GetFromPath(path);
+	m_AssetManager->Remove({ id, type });
+}
+
 void FileWatcher::ReloadMesh(const std::string& path) {
 	VOLCANICORE_LOG_INFO("Reloading Mesh at path '%s'", path.c_str());
-	auto id = m_AssetManager->GetFromPath(path);
-	m_AssetManager->m_MeshAssets[id] = AssetImporter::GetMesh(path);
+	UUID id = m_AssetManager->GetFromPath(path);
+	m_AssetManager->Load({ id, AssetType::Mesh });
 }
 
 void FileWatcher::ReloadTexture(const std::string& path) {
 	VOLCANICORE_LOG_INFO("Reloading Texture at path '%s'", path.c_str());
-	auto id = m_AssetManager->GetFromPath(path);
-	m_AssetManager->m_TextureAssets[id] = AssetImporter::GetTexture(path);
+	UUID id = m_AssetManager->GetFromPath(path);
+	m_AssetManager->Load({ id, AssetType::Texture });
+}
+
+void FileWatcher::ReloadShader(const std::string& path) {
+	VOLCANICORE_LOG_INFO("Reloading Shader at path '%s'", path.c_str());
+	UUID id = m_AssetManager->GetFromPath(path);
+	m_AssetManager->Load({ id, AssetType::Shader });
 }
 
 void FileWatcher::ReloadAudio(const std::string& path) {
 	VOLCANICORE_LOG_INFO("Reloading Audio at path '%s'", path.c_str());
-	auto id = m_AssetManager->GetFromPath(path);
-	m_AssetManager->m_AudioAssets[id] = AssetImporter::GetAudio(path);
+	UUID id = m_AssetManager->GetFromPath(path);
+	m_AssetManager->Load({ id, AssetType::Audio });
 }
 
 void FileWatcher::ReloadScript(const std::string& path) {
 	VOLCANICORE_LOG_INFO("Reloading Script at path '%s'", path.c_str());
-	auto id = m_AssetManager->GetFromPath(path);
+	UUID id = m_AssetManager->GetFromPath(path);
 	auto name = fs::path(path).filename().stem().string();
 	Ref<ScriptModule> mod = CreateRef<ScriptModule>("TestBuild");
 	mod->Load(path);
 
 	if(!mod->HasErrors())
-		m_AssetManager->m_ScriptAssets[id]->Load(path);
+		m_AssetManager->Load({ id, AssetType::Script });
 	else
 		VOLCANICORE_LOG_INFO("Error occured when reloading script");
 }
@@ -212,6 +227,11 @@ void EditorAssetManager::Load(Asset asset) {
 		m_TextureAssets[asset.ID] = AssetImporter::GetTexture(path);
 	else if(asset.Type == AssetType::Cubemap)
 		m_CubemapAssets[asset.ID] = AssetImporter::GetCubemap(path);
+	else if(asset.Type == AssetType::Shader) {
+		auto folder = fs::path(path).parent_path().string();
+		auto name = fs::path(path).filename().string();
+		m_ShaderAssets[asset.ID] = ShaderPipeline::Create(folder, name);
+	}
 	else if(asset.Type == AssetType::Audio)
 		m_AudioAssets[asset.ID] = AssetImporter::GetAudio(path);
 	else if(asset.Type == AssetType::Script) {
@@ -234,6 +254,8 @@ void EditorAssetManager::Unload(Asset asset) {
 		m_TextureAssets.erase(asset.ID);
 	else if(asset.Type == AssetType::Cubemap)
 		m_CubemapAssets.erase(asset.ID);
+	else if(asset.Type == AssetType::Shader)
+		m_ShaderAssets.erase(asset.ID);
 	else if(asset.Type == AssetType::Audio)
 		m_AudioAssets.erase(asset.ID);
 	else if(asset.Type == AssetType::Script)
@@ -247,7 +269,7 @@ uint32_t EditorAssetManager::AddReloadCallback(
 }
 
 void EditorAssetManager::RemoveReloadCallback(uint32_t id) {
-	return s_Listener->RemoveCallback(id);
+	s_Listener->RemoveCallback(id);
 }
 
 Asset EditorAssetManager::Add(const std::string& path, AssetType type) {
@@ -293,13 +315,21 @@ void EditorAssetManager::Load(const std::string& path) {
 		VOLCANICORE_ASSERT_ARGS(false, "Could not load file %s: %s",
 								m_Path.c_str(), e.what());
 	}
-	auto meshPath = rootPath / "Mesh";
-	auto scriptPath = rootPath / "Script";
 
 	s_WatcherIDs.Add(
-		s_FileWatcher->addWatch(meshPath.string(), s_Listener));
+		s_FileWatcher->addWatch((rootPath / "Mesh").string(), s_Listener));
 	s_WatcherIDs.Add(
-		s_FileWatcher->addWatch(scriptPath.string(), s_Listener));
+		s_FileWatcher->addWatch((rootPath / "Image").string(), s_Listener));
+	s_WatcherIDs.Add(
+		s_FileWatcher->addWatch((rootPath / "Cubemap").string(), s_Listener));
+	s_WatcherIDs.Add(
+		s_FileWatcher->addWatch((rootPath / "Font").string(), s_Listener));
+	s_WatcherIDs.Add(
+		s_FileWatcher->addWatch((rootPath / "Audio").string(), s_Listener));
+	s_WatcherIDs.Add(
+		s_FileWatcher->addWatch((rootPath / "Script").string(), s_Listener));
+	s_WatcherIDs.Add(
+		s_FileWatcher->addWatch((rootPath / "Shader").string(), s_Listener));
 
 	s_FileWatcher->watch();
 

@@ -32,8 +32,6 @@ public:
 public:
 	std::string m_Path;
 	Map<VolcaniCore::UUID, std::string> m_Paths;
-
-	friend class FileWatcher;
 };
 
 }
