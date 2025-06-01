@@ -23,6 +23,10 @@ project "angelscript"
         "%{VendorPaths.angelscript}/add_on/**.cpp",
     }
 
+    removefiles {
+        "%{VendorPaths.angelscript}/add_on/autowrapper/**.cpp",
+    }
+
     includedirs {
         "%{Includes.angelscript}",
         "%{VendorPaths.angelscript}",

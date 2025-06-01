@@ -35,6 +35,9 @@ project "Sandbox"
         "%{Includes.glfw}",
         "%{Includes.glad}",
         "%{Includes.glm}",
+
+        "%{Includes.glm}",
+
         "%{Includes.freetype}",
         "%{Includes.assimp}",
         "%{Includes.stb_image}",
@@ -62,6 +65,9 @@ project "Sandbox"
         "assimp",
         "freetype",
         "stb_image",
+
+        "glslang",
+        "SPIRV-Cross",
 
         "imgui",
         "yaml-cpp",

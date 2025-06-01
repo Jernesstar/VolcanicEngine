@@ -11,8 +11,6 @@ namespace VolcaniCore {
 
 static ShaderFile TryGetShader(const std::string& path);
 static List<ShaderFile> GetShaders(const List<std::string>& paths);
-static List<ShaderFile> GetShaders(const std::string& shaderFolder,
-										  const std::string& name);
 
 Ref<ShaderPipeline> ShaderPipeline::Create(const List<ShaderFile>& shaders) {
 	RendererAPI::Backend backend = RendererAPI::Get()->GetBackend();
@@ -26,10 +24,9 @@ Ref<ShaderPipeline> ShaderPipeline::Create(const List<ShaderFile>& shaders) {
 }
 
 Ref<ShaderPipeline> ShaderPipeline::Create(const List<std::string>& paths) {
-	RendererAPI::Backend backend = RendererAPI::Get()->GetBackend();
-
 	auto shaders = GetShaders(paths);
 
+	RendererAPI::Backend backend = RendererAPI::Get()->GetBackend();
 	switch(backend) {
 		case RendererAPI::Backend::OpenGL:
 			return CreateRef<OpenGL::ShaderProgram>(shaders);
@@ -41,10 +38,9 @@ Ref<ShaderPipeline> ShaderPipeline::Create(const List<std::string>& paths) {
 Ref<ShaderPipeline> ShaderPipeline::Create(const std::string& folderPath,
 										   const std::string& name)
 {
-	RendererAPI::Backend backend = RendererAPI::Get()->GetBackend();
-
 	auto shaders = GetShaders(folderPath, name);
 
+	RendererAPI::Backend backend = RendererAPI::Get()->GetBackend();
 	switch(backend) {
 		case RendererAPI::Backend::OpenGL:
 			return CreateRef<OpenGL::ShaderProgram>(shaders);
@@ -56,7 +52,7 @@ Ref<ShaderPipeline> ShaderPipeline::Create(const std::string& folderPath,
 List<ShaderFile> GetShaders(const List<std::string>& paths) {
 	List<ShaderFile> shaders(paths.Count());
 	for(const auto& path : paths)
-		shaders.Add(TryGetShader(path));
+		shaders.AddMove(TryGetShader(path));
 
 	return shaders;
 }
@@ -66,7 +62,7 @@ bool StringContains(const std::string& str, const std::string& subStr) {
 }
 
 List<ShaderFile> GetShaders(const std::string& shaderFolder,
-									const std::string& name)
+							const std::string& name)
 {
 	namespace fs = std::filesystem;
 
@@ -99,7 +95,7 @@ ShaderFile TryGetShader(const std::string& path) {
 		return ShaderFile{ path, ShaderType::Compute };
 
 	VOLCANICORE_ASSERT_ARGS(false, "File %s is of unknown shader type",
-									path.c_str());
+							path.c_str());
 	return ShaderFile{ "", ShaderType::Unknown };
 }
 

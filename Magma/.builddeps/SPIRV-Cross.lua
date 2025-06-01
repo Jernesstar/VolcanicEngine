@@ -7,12 +7,18 @@ project "SPIRV-Cross"
     targetdir ("%{RootPath}/build/%{_ACTION}/Magma/lib")
 
     files {
-        "%{VendorPaths.SPIRV_Cross}/"
+        "%{VendorPaths.SPIRV_Cross}/*.cpp",
+    }
+
+    removefiles {
+        "%{VendorPaths.SPIRV_Cross}/main.cpp"
     }
 
     includedirs {
-        "%{Includes.SPIRV_Cross}"
+        "%{Includes.SPIRV_Cross}",
+        -- "%{Includes.glslang}"
     }
 
-    buildoptions  {
+    buildoptions {
+        
     }

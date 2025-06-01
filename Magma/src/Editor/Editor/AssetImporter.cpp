@@ -6,6 +6,8 @@
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 
+#include <ShaderLang.h>
+
 #include <soloud.h>
 #include <soloud_wav.h>
 
@@ -196,6 +198,10 @@ void AssetImporter::GetMeshData(const std::string& path,
 
 		materialPaths.Emplace(diffusePath, specularPath, emissivePath);
 	}
+}
+
+Buffer<uint32_t> AssetImporter::GetShaderData(const std::string& name) {
+
 }
 
 Buffer<float> AssetImporter::GetAudioData(const std::string& path) {

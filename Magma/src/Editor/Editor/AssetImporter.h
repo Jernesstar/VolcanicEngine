@@ -31,6 +31,8 @@ public:
 		bool flip = true);
 	static Ref<VolcaniCore::Cubemap> GetCubemap(const std::string& path);
 
+	static VolcaniCore::Buffer<uint32_t> GetShaderData(const std::string& name);
+
 	static VolcaniCore::Buffer<float> GetAudioData(const std::string& path);
 	static Ref<Sound> GetAudio(const std::string& path);
 };

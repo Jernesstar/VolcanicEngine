@@ -21,14 +21,17 @@ namespace VolcaniCore {
 enum class ShaderType { Vertex, Fragment, Geometry, Compute, Unknown };
 
 struct ShaderFile {
-	const std::string Path;
 	const ShaderType Type;
+	Buffer<void> Data;
 };
 
+extern List<ShaderFile> GetShaders(const std::string& shaderFolder,
+									const std::string& name);
 class ShaderPipeline : public Derivable<ShaderPipeline> {
 public:
 	static Ref<ShaderPipeline> Create(const List<ShaderFile>& shaders);
-	static Ref<ShaderPipeline> Create(const List<std::string>& paths);
+	static Ref<ShaderPipeline> Create(const std::string& folderPath,
+									  const std::string& name);
 	static Ref<ShaderPipeline> Create(const std::string& folderPath,
 									  const std::string& name);
 

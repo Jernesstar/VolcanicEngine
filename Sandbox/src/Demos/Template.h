@@ -1,5 +1,7 @@
 #pragma once
 
+#include <SPIRV-Cross/spirv_glsl.hpp>
+
 namespace Demo {
 
 class Template : public Application {
@@ -32,6 +34,9 @@ Template::Template() {
 	controller = CameraController{ camera };
 
 	VOLCANICORE_LOG_INFO("Template Project Started");
+
+	uint32_t* data;
+	spirv_cross::CompilerGLSL c{ data, 0 };
 
 	VOLCANICORE_LOG_INFO("Success");
 }

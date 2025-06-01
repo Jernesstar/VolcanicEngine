@@ -50,9 +50,9 @@
 [submodule "Magma/vendor/ImGuiColorTextEdit"]
 	path = Magma/vendor/ImGuiColorTextEdit
 	url = https://github.com/BalazsJako/ImGuiColorTextEdit.git
-[submodule "Magma/vendor/shaderc"]
-	path = Magma/vendor/shaderc
-	url = https://github.com/google/shaderc.git
 [submodule "Magma/vendor/SPIRV-Cross"]
 	path = Magma/vendor/SPIRV-Cross
 	url = https://github.com/KhronosGroup/SPIRV-Cross.git
+[submodule "Magma/vendor/glslang"]
+	path = Magma/vendor/glslang
+	url = https://github.com/KhronosGroup/glslang.git

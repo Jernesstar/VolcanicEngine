@@ -126,10 +126,17 @@ uint32_t CreateShader(const ShaderFile& shader) {
 	uint32_t type = GetShaderType(shader.Type);
 	uint32_t shaderID = glCreateShader(type);
 
-	std::string source = FileUtils::ReadFile(shader.Path);
-	const char* address = source.c_str();
-	glShaderSource(shaderID, 1, &address, nullptr);
-	glCompileShader(shaderID);
+	if(shader.Binary) {
+		glShaderBinary(1, &shaderID, GL_SHADER_BINARY_FORMAT_SPIR_V_ARB,
+			shader.BinaryData.Get(), shader.BinaryData.GetCount());
+		glSpecializeShader(shaderID, "main", 0, 0, 0);
+	}
+	else {
+		std::string source = FileUtils::ReadFile(shader.Path);
+		const char* address = source.c_str();
+		glShaderSource(shaderID, 1, &address, nullptr);
+		glCompileShader(shaderID);
+	}
 
 	int result;
 	glGetShaderiv(shaderID, GL_COMPILE_STATUS, &result);
