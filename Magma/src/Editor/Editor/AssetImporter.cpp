@@ -203,30 +203,6 @@ void AssetImporter::GetMeshData(const std::string& path,
 	}
 }
 
-List<ShaderFile> GetShaders(const List<std::string>& paths) {
-	List<ShaderFile> shaders(paths.Count());
-	for(const auto& path : paths)
-		shaders.AddMove(TryGetShader(path));
-
-	return shaders;
-}
-
-List<ShaderFile> GetShaders(const std::string& shaderFolder,
-							const std::string& name)
-{
-	namespace fs = std::filesystem;
-
-	List<std::string> paths;
-	for(auto path : FileUtils::GetFiles(shaderFolder,
-					{ ".vert", ".frag", ".geom", ".comp" }))
-	{
-		if(fs::path(path).stem().stem().string() == name)
-			paths.Add(path);
-	}
-	
-	return GetShaders(paths);
-}
-
 bool StringContains(const std::string& str, const std::string& subStr) {
 	return str.find(subStr) != std::string::npos;
 }
@@ -253,13 +229,49 @@ ShaderFile TryGetShader(const std::string& path) {
 	return ShaderFile{ "", ShaderType::Unknown };
 }
 
+List<ShaderFile> GetShaders(const List<std::string>& paths) {
+	List<ShaderFile> shaders(paths.Count());
+	for(const auto& path : paths)
+		shaders.Add(TryGetShader(path));
+
+	return shaders;
+}
+
+List<ShaderFile> GetShaders(const std::string& shaderFolder,
+							const std::string& name)
+{
+	namespace fs = std::filesystem;
+
+	List<std::string> paths;
+	for(auto path : FileUtils::GetFiles(shaderFolder,
+					{ ".vert", ".frag", ".geom", ".comp" }))
+	{
+		if(fs::path(path).stem().stem().string() == name)
+			paths.Add(path);
+	}
+	
+	return GetShaders(paths);
+}
+
+Ref<ShaderPipeline> AssetImporter::GetShader(const List<std::string>& paths) {
+	List<Shader> list;
+	for(auto path : paths) {
+		auto file = TryGetShader(path);
+		auto str = FileUtils::ReadFile(file.Path);
+		Buffer<void> data(sizeof(char), str.size());
+		data.Set(str.c_str(), str.size());
+		list.Add({ file.Type, data });
+	}
+
+	return ShaderPipeline::Create(list);
+}
+
 Buffer<uint32_t> AssetImporter::GetShaderData(const std::string& path) {
 	glslang::TShader shader(EShLangVertex);
 	std::string buffer = FileUtils::ReadFile(path);
 	const char* sources[1] = { buffer.data() };
 	shader.setStrings(sources, 1);
 
-	// Use appropriate Vulkan version
 	glslang::EShTargetClientVersion targetApiVersion = glslang::EShTargetOpenGL_450;
 	shader.setEnvClient(glslang::EShClientOpenGL, targetApiVersion);
 	glslang::EShTargetLanguageVersion spirvVersion = glslang::EShTargetSpv_1_3;

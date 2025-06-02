@@ -560,7 +560,10 @@ EditorSceneRenderer::EditorSceneRenderer(SceneVisualizerPanel* panel)
 
 	GridPass =
 		RenderPass::Create("Grid",
-			ShaderPipeline::Create("Magma/assets/shaders", "Grid"), m_Output);
+			AssetImporter::GetShader({
+				"Magma/assets/shaders/Grid.glsl.vert",
+				"Magma/assets/shaders/Grid.glsl.frag"
+			}), m_Output);
 	GridPass->SetData(Renderer2D::GetScreenBuffer());
 
 	BufferLayout instanceLayout =
@@ -584,8 +587,10 @@ EditorSceneRenderer::EditorSceneRenderer(SceneVisualizerPanel* panel)
 	
 	BillboardPass =
 		RenderPass::Create("Billboard",
-			ShaderPipeline::Create("Magma/assets/shaders", "Billboard"),
-			m_Output);
+			AssetImporter::GetShader({
+				"Magma/assets/shaders/Billboard.glsl.vert",
+				"Magma/assets/shaders/Billboard.glsl.frag"
+			}), m_Output);
 	BillboardPass->SetData(BillboardBuffer);
 
 	DirectionalLightIcon =
@@ -599,24 +604,34 @@ EditorSceneRenderer::EditorSceneRenderer(SceneVisualizerPanel* panel)
 
 	LightingPass =
 		RenderPass::Create("Lighting",
-			ShaderPipeline::Create("Magma/assets/shaders", "Lighting"),
-			m_Output);
+			AssetImporter::GetShader({
+				"Magma/assets/shaders/Lighting.glsl.vert",
+				"Magma/assets/shaders/Lighting.glsl.frag"
+			}), m_Output);
 	LightingPass->SetData(Renderer3D::GetMeshBuffer());
 
 	MaskPass =
 		RenderPass::Create("Mask",
-			ShaderPipeline::Create("Magma/assets/shaders", "Mask"),
-			Framebuffer::Create(window->GetWidth(), window->GetHeight()));
+			AssetImporter::GetShader({
+				"Magma/assets/shaders/Mask.glsl.vert",
+				"Magma/assets/shaders/Mask.glsl.frag"
+			}), Framebuffer::Create(window->GetWidth(), window->GetHeight()));
 	MaskPass->SetData(Renderer3D::GetMeshBuffer());
 
 	OutlinePass =
 		RenderPass::Create("Outline",
-			ShaderPipeline::Create("Magma/assets/shaders", "Outline"), m_Output);
+			AssetImporter::GetShader({
+				"Magma/assets/shaders/Outline.glsl.vert",
+				"Magma/assets/shaders/Outline.glsl.frag"
+			}), m_Output);
 	OutlinePass->SetData(Renderer2D::GetScreenBuffer());
 
 	LinePass =
 		RenderPass::Create("Line",
-			ShaderPipeline::Create("Magma/assets/shaders", "Line"), m_Output);
+			AssetImporter::GetShader({
+				"Magma/assets/shaders/Line.glsl.vert",
+				"Magma/assets/shaders/Line.glsl.frag"
+			}), m_Output);
 	LinePass->SetData(Renderer3D::GetLineBuffer());
 
 	DirectionalLightBuffer =

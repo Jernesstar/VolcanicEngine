@@ -13,8 +13,9 @@
 #include <VolcaniCore/Graphics/ShaderLibrary.h>
 
 #include <Magma/UI/UI.h>
-
 #include <Magma/Physics/Physics.h>
+
+#include <Editor/Editor/AssetImporter.h>
 
 using namespace Magma::UI;
 using namespace Magma::Physics;
@@ -36,19 +37,33 @@ EditorApp::EditorApp(const CommandLineArgs& args)
 	Application::PushDir();
 
 	ShaderLibrary::Add("Framebuffer",
-		ShaderPipeline::Create("Magma/assets/shaders/", "Framebuffer"));
+		AssetImporter::GetShader({
+			"Magma/assets/shaders/Framebuffer.glsl.vert",
+			"Magma/assets/shaders/Framebuffer.glsl.frag"
+		}));
 	ShaderLibrary::Add("Lighting",
-		ShaderPipeline::Create("Magma/assets/shaders/", "Lighting"));
+		AssetImporter::GetShader({
+			"Magma/assets/shaders/Lighting.glsl.vert",
+			"Magma/assets/shaders/Lighting.glsl.frag"
+		}));
 	ShaderLibrary::Add("Mesh",
-		ShaderPipeline::Create("Magma/assets/shaders/", "Mesh"));
+		AssetImporter::GetShader({
+			"Magma/assets/shaders/Mesh.glsl.vert",
+			"Magma/assets/shaders/Mesh.glsl.frag"
+		}));
 	ShaderLibrary::Add("Particle-Emit",
-		ShaderPipeline::Create("Magma/assets/shaders/", "ParticleEmitter"));
+		AssetImporter::GetShader({
+			"Magma/assets/shaders/ParticleEmitter.glsl.comp",
+		}));
 	ShaderLibrary::Add("Particle-Update",
-		ShaderPipeline::Create("Magma/assets/shaders/", "ParticleUpdate"));
+		AssetImporter::GetShader({
+			"Magma/assets/shaders/ParticleUpdate.glsl.comp",
+		}));
 	ShaderLibrary::Add("Particle-DefaultDraw",
-		ShaderPipeline::Create("Magma/assets/shaders/", "Particle"));
-	// ShaderLibrary::Add("Bloom",
-	// 	ShaderPipeline::Create("Magma/assets/shaders/", "Bloom"));
+		AssetImporter::GetShader({
+			"Magma/assets/shaders/Particle.glsl.vert",
+			"Magma/assets/shaders/Particle.glsl.frag"
+		}));
 
 	float fontSize = 15.0f;
 	ImGuiIO& io = ImGui::GetIO();

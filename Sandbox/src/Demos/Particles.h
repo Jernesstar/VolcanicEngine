@@ -62,15 +62,13 @@ Particles::Particles() {
 	Ref<ShaderPipeline> shader;
 	shader = AssetImporter::GetShader(
 		{
-			{ "Magma/assets/shaders/ParticleEmitter.glsl.vert", ShaderType::Vertex },
-			{ "Magma/assets/shaders/ParticleEmitter.glsl.frag", ShaderType::Fragment }
+			{ "Magma/assets/shaders/ParticleEmitter.glsl.comp", ShaderType::Compute },
 		});
 	EmitterPass = RenderPass::Create("Particle-Emit", shader);
 
 	shader = AssetImporter::GetShader(
 		{
-			{ "Magma/assets/shaders/ParticleUpdate.glsl.vert", ShaderType::Vertex },
-			{ "Magma/assets/shaders/ParticleUpdate.glsl.frag", ShaderType::Fragment }
+			{ "Magma/assets/shaders/ParticleUpdate.glsl.comp", ShaderType::Compute },
 		});
 	UpdatePass = RenderPass::Create("Particle-Update", shader);
 

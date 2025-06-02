@@ -66,7 +66,10 @@ Application* CreateApplication(const CommandLineArgs& args) {
 
 	Application::PushDir();
 	ShaderLibrary::Add("Framebuffer",
-		ShaderPipeline::Create("Magma/assets/shaders/", "Framebuffer"));
+		Demo::AssetImporter::GetShader({
+			{ "Magma/assets/shaders/Framebuffer.glsl.vert", ShaderType::Vertex },
+			{ "Magma/assets/shaders/Framebuffer.glsl.frag", ShaderType::Fragment }
+		}));
 	Application::PopDir();
 
 	// Isometric Camera, smooth scroll pixels, instancing

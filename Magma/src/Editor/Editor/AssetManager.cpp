@@ -230,7 +230,10 @@ void EditorAssetManager::Load(Asset asset) {
 	else if(asset.Type == AssetType::Shader) {
 		auto folder = fs::path(path).parent_path().string();
 		auto name = fs::path(path).filename().string();
-		m_ShaderAssets[asset.ID] = ShaderPipeline::Create(folder, name);
+		List<std::string> shaders;
+		for(auto ref : m_References[asset.ID])
+			shaders.Add(GetPath(ref.ID));
+		m_ShaderAssets[asset.ID] = AssetImporter::GetShader(shaders);
 	}
 	else if(asset.Type == AssetType::Audio)
 		m_AudioAssets[asset.ID] = AssetImporter::GetAudio(path);

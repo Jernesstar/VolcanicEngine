@@ -60,7 +60,7 @@ Lighting::Lighting() {
 				Application::Close();
 		});
 
-	shader = AssetImporter::GetShader(
+	auto shader = AssetImporter::GetShader(
 		{
 			{ "Magma/assets/shaders/Lighting.glsl.vert", ShaderType::Vertex },
 			{ "Magma/assets/shaders/Lighting.glsl.frag", ShaderType::Fragment }

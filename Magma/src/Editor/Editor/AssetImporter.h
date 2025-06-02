@@ -7,6 +7,8 @@
 
 #include <Magma/Audio/Sound.h>
 
+using namespace VolcaniCore;
+
 using namespace Magma::Audio;
 
 namespace Magma {
@@ -38,6 +40,8 @@ public:
 	static Ref<VolcaniCore::Cubemap> GetCubemap(const std::string& path);
 
 	static VolcaniCore::Buffer<uint32_t> GetShaderData(const std::string& path);
+	static Ref<VolcaniCore::ShaderPipeline> GetShader(
+		const List<std::string>& path);
 
 	static VolcaniCore::Buffer<float> GetAudioData(const std::string& path);
 	static Ref<Sound> GetAudio(const std::string& path);

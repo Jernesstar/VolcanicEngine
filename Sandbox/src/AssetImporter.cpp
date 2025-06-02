@@ -163,7 +163,7 @@ Ref<ShaderPipeline> AssetImporter::GetShader(const List<ShaderFile>& files) {
 		auto str = FileUtils::ReadFile(file.Path);
 		Buffer<void> data(sizeof(char), str.size());
 		data.Set(str.c_str(), str.size());
-		list.Add({ file.Type, data });
+		list.AddMove({ file.Type, data });
 	}
 
 	return ShaderPipeline::Create(list);

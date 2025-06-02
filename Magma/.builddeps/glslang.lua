@@ -11,7 +11,8 @@ project "glslang"
         "%{VendorPaths.glslang}/glslang/GenericCodeGen/*.cpp",
         "%{VendorPaths.glslang}/glslang/CInterface/*.cpp",
         "%{VendorPaths.glslang}/glslang/MachineIndependent/**.cpp",
-        "%{VendorPaths.glslang}/glslang/ResourceLimits/**.cpp",
+        "%{VendorPaths.glslang}/glslang/ResourceLimits/*.cpp",
+        "%{VendorPaths.glslang}/SPIRV/*.cpp",
     }
 
     includedirs {
