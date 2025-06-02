@@ -258,8 +258,8 @@ Ref<ShaderPipeline> AssetImporter::GetShader(const List<std::string>& paths) {
 	for(auto path : paths) {
 		auto file = TryGetShader(path);
 		auto str = FileUtils::ReadFile(file.Path);
-		Buffer<void> data(sizeof(char), str.size());
-		data.Set(str.c_str(), str.size());
+		Buffer<void> data(sizeof(char), str.size() + 1);
+		data.Set(str.c_str(), str.size() + 1);
 		list.Add({ file.Type, data });
 	}
 

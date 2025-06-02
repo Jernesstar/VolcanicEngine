@@ -1,6 +1,7 @@
 project "glslang"
     kind "StaticLib"
     language "C++"
+    cppdialect "C++17"
     staticruntime "Off"
 
     objdir ("%{RootPath}/build/%{_ACTION}/Magma/obj")

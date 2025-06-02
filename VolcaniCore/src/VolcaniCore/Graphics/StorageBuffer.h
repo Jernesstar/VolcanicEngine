@@ -17,7 +17,7 @@ public:
 	static Ref<StorageBuffer> Create(const BufferLayout& layout,
 									 const Buffer<T>& data)
 	{
-		return Create(layout, data.GetCount(), data.Get());
+		return Create(layout, data.GetCount(), (void*)data.Get());
 	}
 
 public:
