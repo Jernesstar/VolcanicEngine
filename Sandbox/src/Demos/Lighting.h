@@ -60,7 +60,11 @@ Lighting::Lighting() {
 				Application::Close();
 		});
 
-	auto shader = ShaderPipeline::Create("Magma/assets/shaders", "Lighting");
+	shader = AssetImporter::GetShader(
+		{
+			{ "Magma/assets/shaders/Lighting.glsl.vert", ShaderType::Vertex },
+			{ "Magma/assets/shaders/Lighting.glsl.frag", ShaderType::Fragment }
+		});
 	lightingPass = RenderPass::Create("Lighting", shader);
 	lightingPass->SetData(Renderer3D::GetMeshBuffer());
 

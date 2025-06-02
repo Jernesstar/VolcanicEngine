@@ -37,7 +37,7 @@ Shadows::Shadows()
 				Application::Close();
 		});
 
-	auto depthViewShader = ShaderPipeline::Create(
+	auto depthViewShader = AssetImporter::GetShader(
 		{
 			{ "Magma/assets/shaders/Framebuffer.glsl.vert", ShaderType::Vertex },
 			{ "Sandbox/assets/shaders/DepthView.glsl.frag", ShaderType::Fragment }
@@ -45,8 +45,16 @@ Shadows::Shadows()
 	depthViewPass = RenderPass::Create("DepthView", depthViewShader);
 	depthViewPass->SetData(Renderer2D::GetScreenBuffer());
 
-	auto depth = ShaderPipeline::Create("Sandbox/assets/shaders", "Depth");
-	auto shadow = ShaderPipeline::Create("Magma/assets/shaders", "Shadow");
+	auto depth = AssetImporter::GetShader(
+		{
+			{ "Sandbox/assets/shaders/Depth.glsl.vert", ShaderType::Vertex },
+			{ "Sandbox/assets/shaders/Depth.glsl.frag", ShaderType::Fragment }
+		});
+	auto shadow = AssetImporter::GetShader(
+		{
+			{ "Magma/assets/shaders/Shadow.glsl.vert", ShaderType::Vertex },
+			{ "Magma/assets/shaders/Shadow.glsl.frag", ShaderType::Fragment }
+		});
 
 	auto depthTexture = Texture::Create(4096, 4096, Texture::Format::Depth);
 	depthMap = Framebuffer::Create(

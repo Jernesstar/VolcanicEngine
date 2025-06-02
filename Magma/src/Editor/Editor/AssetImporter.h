@@ -3,6 +3,7 @@
 #include <VolcaniCore/Graphics/Mesh.h>
 #include <VolcaniCore/Graphics/Texture.h>
 #include <VolcaniCore/Graphics/Cubemap.h>
+#include <VolcaniCore/Graphics/Shader.h>
 
 #include <Magma/Audio/Sound.h>
 
@@ -15,6 +16,11 @@ struct MaterialPaths {
 	std::string Emissive;
 
 	std::string operator[](uint32_t i) { return *(&Diffuse + i); }
+};
+
+struct ShaderFile {
+	const std::string Path;
+	const VolcaniCore::ShaderType Type;
 };
 
 class AssetImporter {
@@ -31,7 +37,7 @@ public:
 		bool flip = true);
 	static Ref<VolcaniCore::Cubemap> GetCubemap(const std::string& path);
 
-	static VolcaniCore::Buffer<uint32_t> GetShaderData(const std::string& name);
+	static VolcaniCore::Buffer<uint32_t> GetShaderData(const std::string& path);
 
 	static VolcaniCore::Buffer<float> GetAudioData(const std::string& path);
 	static Ref<Sound> GetAudio(const std::string& path);

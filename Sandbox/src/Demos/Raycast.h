@@ -73,9 +73,21 @@ Raycast::Raycast() {
 				VOLCANICORE_LOG_INFO("No hit");
 		});
 
-	auto draw = ShaderPipeline::Create("Magma/assets/shaders", "Mesh");
-	auto mask = ShaderPipeline::Create("Magma/assets/shaders", "Mask");
-	auto outline = ShaderPipeline::Create("Magma/assets/shaders", "Outline");
+	auto draw = AssetImporter::GetShader(
+		{
+			{ "Magma/assets/shaders/Mesh.glsl.vert", ShaderType::Vertex },
+			{ "Magma/assets/shaders/Mesh.glsl.frag", ShaderType::Fragment }
+		});
+	auto mask = AssetImporter::GetShader(
+		{
+			{ "Magma/assets/shaders/Mask.glsl.vert", ShaderType::Vertex },
+			{ "Magma/assets/shaders/Mask.glsl.frag", ShaderType::Fragment }
+		});
+	auto outline = AssetImporter::GetShader(
+		{
+			{ "Magma/assets/shaders/Outline.glsl.vert", ShaderType::Vertex },
+			{ "Magma/assets/shaders/Outline.glsl.frag", ShaderType::Fragment }
+		});
 
 	drawPass = RenderPass::Create("Draw", draw);
 	drawPass->SetData(Renderer3D::GetMeshBuffer());

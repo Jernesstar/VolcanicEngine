@@ -18,7 +18,7 @@ namespace VolcaniCore::OpenGL {
 
 class ShaderProgram : public VolcaniCore::ShaderPipeline {
 public:
-	ShaderProgram(const VolcaniCore::List<ShaderFile>& shaders);
+	ShaderProgram(const VolcaniCore::List<Shader>& shaders);
 	~ShaderProgram();
 
 	void SetInt(const std::string& name, int32_t _int) override;

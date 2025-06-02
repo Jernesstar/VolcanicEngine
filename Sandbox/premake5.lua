@@ -36,7 +36,9 @@ project "Sandbox"
         "%{Includes.glad}",
         "%{Includes.glm}",
 
-        "%{Includes.glm}",
+        "%{VendorPaths.glslang}",
+        "%{Includes.glslang}",
+        "%{Includes.SPIRV_Cross}",
 
         "%{Includes.freetype}",
         "%{Includes.assimp}",

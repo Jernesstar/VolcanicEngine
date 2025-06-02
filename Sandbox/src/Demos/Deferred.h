@@ -27,8 +27,16 @@ Deferred::Deferred() {
 
 	Ref<ShaderPipeline> geom;
 	Ref<ShaderPipeline> deferred;
-	geom = ShaderPipeline::Create("Sandbox/assets/shaders", "Geometry");
-	deferred = ShaderPipeline::Create("Sandbox/assets/shaders", "Deferred");
+	geom = AssetImporter::GetShader(
+	{
+		{ "Sandbox/assets/shaders/Geometry.glsl.vert", ShaderType::Vertex },
+		{ "Sandbox/assets/shaders/Geometry.glsl.frag", ShaderType::Fragment }
+	});
+	deferred = AssetImporter::GetShader(
+	{
+		{ "Sandbox/assets/shaders/Deferred.glsl.vert", ShaderType::Vertex },
+		{ "Sandbox/assets/shaders/Deferred.glsl.frag", ShaderType::Fragment }
+	});
 
 	Ref<Texture> position = Texture::Create(1920, 1080, Texture::Format::Float);
 	Ref<Texture> normal = Texture::Create(1920, 1080, Texture::Format::Float);

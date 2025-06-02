@@ -56,7 +56,7 @@ Bloom::Bloom()
 	InitMips();
 
 	Ref<ShaderPipeline> shader;
-	shader = ShaderPipeline::Create(
+	shader = AssetImporter::GetShader(
 		{
 			{ "Magma/assets/shaders/Framebuffer.glsl.vert", ShaderType::Vertex },
 			{ "Magma/assets/shaders/Downsample.glsl.frag", ShaderType::Fragment }
@@ -64,7 +64,7 @@ Bloom::Bloom()
 	downsamplePass = RenderPass::Create("Downsample", shader, mips);
 	downsamplePass->SetData(Renderer2D::GetScreenBuffer());
 
-	shader = ShaderPipeline::Create(
+	shader = AssetImporter::GetShader(
 		{
 			{ "Magma/assets/shaders/Framebuffer.glsl.vert", ShaderType::Vertex },
 			{ "Magma/assets/shaders/Upsample.glsl.frag", ShaderType::Fragment }
@@ -72,7 +72,7 @@ Bloom::Bloom()
 	upsamplePass = RenderPass::Create("Upsample", shader, mips);
 	upsamplePass->SetData(Renderer2D::GetScreenBuffer());
 
-	shader = ShaderPipeline::Create(
+	shader = AssetImporter::GetShader(
 		{
 			{ "Magma/assets/shaders/Framebuffer.glsl.vert", ShaderType::Vertex },
 			{ "Magma/assets/shaders/Bloom.glsl.frag", ShaderType::Fragment }
@@ -80,7 +80,11 @@ Bloom::Bloom()
 	bloomPass = RenderPass::Create("Bloom", shader);
 	bloomPass->SetData(Renderer2D::GetScreenBuffer());
 
-	shader = ShaderPipeline::Create("Magma/assets/shaders", "Mesh");
+	shader = AssetImporter::GetShader(
+		{
+			{ "Magma/assets/shaders/Mesh.glsl.vert", ShaderType::Vertex },
+			{ "Magma/assets/shaders/Mesh.glsl.frag", ShaderType::Fragment }
+		});
 	drawPass = RenderPass::Create("Draw", shader, src);
 	drawPass->SetData(Renderer3D::GetMeshBuffer());
 

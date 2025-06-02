@@ -108,6 +108,7 @@ project "Editor"
         "%{Includes.glad}",
         "%{Includes.glfw}",
 
+        "%{VendorPaths.glslang}",
         "%{Includes.glslang}",
         "%{Includes.SPIRV_Cross}",
 

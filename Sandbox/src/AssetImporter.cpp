@@ -157,6 +157,18 @@ Ref<Mesh> AssetImporter::GetMesh(const std::string& path) {
 	return mesh;
 }
 
+Ref<ShaderPipeline> AssetImporter::GetShader(const List<ShaderFile>& files) {
+	List<Shader> list;
+	for(auto file : files) {
+		auto str = FileUtils::ReadFile(file.Path);
+		Buffer<void> data(sizeof(char), str.size());
+		data.Set(str.c_str(), str.size());
+		list.Add({ file.Type, data });
+	}
+
+	return ShaderPipeline::Create(list);
+}
+
 Ref<Sound> AssetImporter::GetAudio(const std::string& path) {
 	auto sound = CreateRef<Sound>();
 	VOLCANICORE_ASSERT(sound->GetInternal().load(path.c_str()) == 0);

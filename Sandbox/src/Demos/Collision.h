@@ -28,7 +28,11 @@ Collision::Collision() {
 		});
 
 	Ref<ShaderPipeline> shader;
-	shader = ShaderPipeline::Create("Magma/assets/shaders", "Mesh");
+	shader = AssetImporter::GetShader(
+		{
+			{ "Magma/assets/shaders/Mesh.glsl.vert", ShaderType::Vertex },
+			{ "Magma/assets/shaders/Mesh.glsl.frag", ShaderType::Fragment }
+		});
 	drawPass = RenderPass::Create("Draw", shader);
 	drawPass->SetData(Renderer3D::GetMeshBuffer());
 

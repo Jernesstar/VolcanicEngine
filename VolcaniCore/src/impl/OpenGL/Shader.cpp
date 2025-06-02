@@ -11,10 +11,10 @@
 
 namespace VolcaniCore::OpenGL {
 
-uint32_t CreateShader(const ShaderFile& shader);
-uint32_t AddShader(uint32_t programID, const ShaderFile& shader);
+uint32_t CreateShader(const Shader& shader);
+uint32_t AddShader(uint32_t programID, const Shader& shader);
 
-ShaderProgram::ShaderProgram(const List<ShaderFile>& shaders) {
+ShaderProgram::ShaderProgram(const List<Shader>& shaders) {
 	m_ProgramID = glCreateProgram();
 	List<uint32_t> ids(shaders.Count());
 
@@ -116,24 +116,23 @@ uint32_t GetShaderType(ShaderType type) {
 	return 0;
 }
 
-uint32_t AddShader(uint32_t programID, const ShaderFile& shader) {
+uint32_t AddShader(uint32_t programID, const Shader& shader) {
 	uint32_t shaderID = CreateShader(shader);
 	glAttachShader(programID, shaderID);
 	return shaderID;
 }
 
-uint32_t CreateShader(const ShaderFile& shader) {
+uint32_t CreateShader(const Shader& shader) {
 	uint32_t type = GetShaderType(shader.Type);
 	uint32_t shaderID = glCreateShader(type);
 
-	if(shader.Binary) {
-		glShaderBinary(1, &shaderID, GL_SHADER_BINARY_FORMAT_SPIR_V_ARB,
-			shader.BinaryData.Get(), shader.BinaryData.GetCount());
-		glSpecializeShader(shaderID, "main", 0, 0, 0);
+	if(shader.Data.GetSizeT() == sizeof(uint32_t)) { // SPIR-V
+		// glShaderBinary(1, &shaderID, GL_SHADER_BINARY_FORMAT_SPIR_V_ARB,
+		// 	shader.Data.Get(), shader.BinaryData.GetCount());
+		// glSpecializeShader(shaderID, "main", 0, 0, 0);
 	}
 	else {
-		std::string source = FileUtils::ReadFile(shader.Path);
-		const char* address = source.c_str();
+		const char* address = (const char*)shader.Data.Get();
 		glShaderSource(shaderID, 1, &address, nullptr);
 		glCompileShader(shaderID);
 	}
@@ -146,10 +145,7 @@ uint32_t CreateShader(const ShaderFile& shader) {
 		glGetShaderiv(shaderID, GL_INFO_LOG_LENGTH, &length);
 		char* message = (char*)alloca(length * sizeof(char));
 		glGetShaderInfoLog(shaderID, length, &length, message);
-
-		VOLCANICORE_ASSERT_ARGS(false,
-			"A compile error was detected for shader file at %s:\n%s",
-			shader.Path.c_str(), message);
+		VOLCANICORE_LOG_ERROR("A compile error was detected \n%s", message);
 	}
 
 	return shaderID;

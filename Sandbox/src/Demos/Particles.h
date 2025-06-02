@@ -60,13 +60,25 @@ Particles::Particles() {
 	VOLCANICORE_LOG_INFO("Particles Project Started");
 
 	Ref<ShaderPipeline> shader;
-	shader = ShaderPipeline::Create("Magma/assets/shaders", "ParticleEmitter");
+	shader = AssetImporter::GetShader(
+		{
+			{ "Magma/assets/shaders/ParticleEmitter.glsl.vert", ShaderType::Vertex },
+			{ "Magma/assets/shaders/ParticleEmitter.glsl.frag", ShaderType::Fragment }
+		});
 	EmitterPass = RenderPass::Create("Particle-Emit", shader);
 
-	shader = ShaderPipeline::Create("Magma/assets/shaders", "ParticleUpdate");
+	shader = AssetImporter::GetShader(
+		{
+			{ "Magma/assets/shaders/ParticleUpdate.glsl.vert", ShaderType::Vertex },
+			{ "Magma/assets/shaders/ParticleUpdate.glsl.frag", ShaderType::Fragment }
+		});
 	UpdatePass = RenderPass::Create("Particle-Update", shader);
 
-	shader = ShaderPipeline::Create("Magma/assets/shaders", "Particle");
+	shader = AssetImporter::GetShader(
+		{
+			{ "Magma/assets/shaders/Particle.glsl.vert", ShaderType::Vertex },
+			{ "Magma/assets/shaders/Particle.glsl.frag", ShaderType::Fragment }
+		});
 	DrawPass = RenderPass::Create("Particle-Draw", shader);
 	DrawPass->SetData(Renderer3D::GetMeshBuffer());
 
