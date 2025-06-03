@@ -415,11 +415,16 @@ void EditorAssetManager::Load(const std::string& path) {
 		(rootPath / "Shader")
 	};
 
+	Map<std::string, List<std::string>> shaders;
+
 	uint32_t i = 1;
 	for(auto& folder : paths) {
 		for(auto path : FileUtils::GetFiles(folder.string())) {
 			if(i == 1)
 				path = FileUtils::GetFiles(path, { ".obj" })[0];
+			if(i == 6) {
+				auto name = fs::path(path).filename();
+			}
 			if(!GetFromPath(path))
 				Add(path, (AssetType)i);
 		}
@@ -622,7 +627,11 @@ void EditorAssetManager::RuntimeSave(const std::string& exportPath) {
 			scriptFile.Write(mod->Name);
 		}
 		else if(asset.Type == AssetType::Shader) {
-
+			auto name = fs::path(path).filename();
+			auto outputPath = (assetPath / "Shader" / name).string();
+			BinaryWriter writer(path);
+			Buffer<uint32_t> data = AssetImporter::GetShaderData(outputPath);
+			writer.Write(data);
 		}
 
 		if(!HasRefs(asset))
@@ -645,18 +654,24 @@ void EditorAssetManager::RuntimeSave(const std::string& exportPath) {
 		auto source2 = sourceRoot.string() + ".glsl.frag";
 
 		auto targetRoot = fs::path(exportPath) / "Asset" / "Shader" / name;
-		auto target1 = targetRoot.string() + ".glsl.vert";
-		auto target2 = targetRoot.string() + ".glsl.frag";
+		auto target1 = targetRoot.string() + ".bin.vert";
+		auto target2 = targetRoot.string() + ".bin.frag";
 
 		if(FileUtils::FileExists(target1))
 			fs::remove(target1);
-		if(FileUtils::FileExists(source1))
-			fs::copy_file(source1, target1);
+		if(FileUtils::FileExists(source1)) {
+			BinaryWriter writer(target1);
+			Buffer<uint32_t> data = AssetImporter::GetShaderData(source1);
+			writer.Write(data);
+		}
 
 		if(FileUtils::FileExists(target2))
 			fs::remove(target2);
-		if(FileUtils::FileExists(source2))
-			fs::copy_file(source2, target2);
+		if(FileUtils::FileExists(source2)) {
+			BinaryWriter writer(target2);
+			Buffer<uint32_t> data = AssetImporter::GetShaderData(source2);
+			writer.Write(data);
+		}
 	}
 
 	Application::PopDir();
