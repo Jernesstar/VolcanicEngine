@@ -29,6 +29,7 @@ enum class AssetType {
 	Font,
 	Audio,
 	Script,
+	Material,
 };
 
 struct Asset {
@@ -81,6 +82,10 @@ public:
 
 	bool HasRefs(Asset asset) const { return m_References.count(asset.ID); }
 
+	VolcaniCore::List<Asset> GetRefs(Asset asset) const {
+		return m_References.at(asset.ID);
+	}
+
 	void NameAsset(Asset asset, const std::string& name) {
 		m_NamedAssets[asset] = name;
 	}
@@ -123,9 +128,9 @@ protected:
 	Map<VolcaniCore::UUID, Ref<VolcaniCore::Texture>> m_TextureAssets;
 	Map<VolcaniCore::UUID, Ref<VolcaniCore::Cubemap>> m_CubemapAssets;
 	Map<VolcaniCore::UUID, Ref<VolcaniCore::ShaderPipeline>> m_ShaderAssets;
-	// Map<VolcaniCore::UUID, Ref<VolcaniCore::Font>> m_FontAssets;
 	Map<VolcaniCore::UUID, Ref<Sound>> m_AudioAssets;
 	Map<VolcaniCore::UUID, Ref<ScriptModule>> m_ScriptAssets;
+	// Map<VolcaniCore::UUID, Ref<Material>> m_MaterialAssets;
 
 private:
 	inline static AssetManager* s_Instance;

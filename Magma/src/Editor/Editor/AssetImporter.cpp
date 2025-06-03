@@ -280,9 +280,11 @@ Buffer<uint32_t> AssetImporter::GetShaderData(const std::string& path) {
 		lang = EShLangGeometry;
 
 	glslang::TShader shader(lang);
-	std::string buffer = FileUtils::ReadFile(path);
-	const char* sources[1] = { buffer.c_str() };
-	shader.setStrings(sources, 1);
+	std::string str = FileUtils::ReadFile(path);
+	const char* sources[1] = { str.c_str() };
+	int length = str.size();
+	auto name = fs::path(path).filename().string().c_str();
+	shader.setStringsWithLengthsAndNames(sources, &length, &name, 1);
 
 	shader.setEnvClient(glslang::EShClientOpenGL, glslang::EShTargetOpenGL_450);
 	shader.setEnvTarget(glslang::EShTargetSpv, glslang::EShTargetSpv_1_6);

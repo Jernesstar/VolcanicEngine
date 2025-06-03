@@ -37,6 +37,8 @@ std::string AssetTypeToString(AssetType type) {
 			return "Audio";
 		case AssetType::Script:
 			return "Script";
+		case AssetType::Material:
+			return "Material";
 	}
 
 	return "None";
@@ -409,22 +411,17 @@ void EditorAssetManager::Load(const std::string& path) {
 		(rootPath / "Mesh"),
 		(rootPath / "Image"),
 		(rootPath / "Cubemap"),
+		(rootPath / "Shader"),
 		(rootPath / "Font"),
 		(rootPath / "Audio"),
 		(rootPath / "Script"),
-		(rootPath / "Shader")
 	};
-
-	Map<std::string, List<std::string>> shaders;
 
 	uint32_t i = 1;
 	for(auto& folder : paths) {
 		for(auto path : FileUtils::GetFiles(folder.string())) {
 			if(i == 1)
 				path = FileUtils::GetFiles(path, { ".obj" })[0];
-			if(i == 6) {
-				auto name = fs::path(path).filename();
-			}
 			if(!GetFromPath(path))
 				Add(path, (AssetType)i);
 		}
@@ -548,6 +545,7 @@ void EditorAssetManager::RuntimeSave(const std::string& exportPath) {
 
 	BinaryWriter meshFile((assetPath / "Mesh" / "mesh.bin").string());
 	BinaryWriter textureFile((assetPath / "Texture" / "image.bin").string());
+	BinaryWriter shaderFile((assetPath / "Shader" / "shader.bin").string());
 	BinaryWriter soundFile((assetPath / "Audio" / "sound.bin").string());
 	BinaryWriter scriptFile((assetPath / "Script" / "script.bin").string());
 
@@ -617,6 +615,18 @@ void EditorAssetManager::RuntimeSave(const std::string& exportPath) {
 			Buffer<float> soundData = AssetImporter::GetAudioData(path);
 			soundFile.Write(soundData);
 		}
+		else if(asset.Type == AssetType::Shader) {
+			pack.Write(shaderFile.GetPosition());
+
+			auto name = fs::path(path).filename().stem().stem();
+			auto outputPath =
+				(assetPath / "Shader" / name).string() + "bin.frag";
+			BinaryWriter writer(outputPath);
+			Buffer<uint32_t> data = AssetImporter::GetShaderData(path);
+			writer.Write(data);
+
+			shaderFile.Write(name);
+		}
 		else if(asset.Type == AssetType::Script) {
 			pack.Write(scriptFile.GetPosition());
 
@@ -624,14 +634,8 @@ void EditorAssetManager::RuntimeSave(const std::string& exportPath) {
 			auto mod = Get<ScriptModule>(asset);
 			auto outputPath = assetPath / "Script" / mod->Name;
 			mod->Save(outputPath.string() + ".class");
+
 			scriptFile.Write(mod->Name);
-		}
-		else if(asset.Type == AssetType::Shader) {
-			auto name = fs::path(path).filename();
-			auto outputPath = (assetPath / "Shader" / name).string();
-			BinaryWriter writer(path);
-			Buffer<uint32_t> data = AssetImporter::GetShaderData(outputPath);
-			writer.Write(data);
 		}
 
 		if(!HasRefs(asset))

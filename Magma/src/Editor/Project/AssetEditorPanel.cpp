@@ -1,15 +1,18 @@
 #include "AssetEditorPanel.h"
 
-#include <VolcaniCore/Core/List.h>
-#include <VolcaniCore/Core/FileUtils.h>
+#include <SPIRV-Cross/spirv_glsl.hpp>
 
 #include <imgui/imgui.h>
 #include <imgui/imgui_internal.h>
 #include <imgui/misc/cpp/imgui_stdlib.h>
 
+#include <VolcaniCore/Core/List.h>
+#include <VolcaniCore/Core/FileUtils.h>
+
 #include <glm/gtc/type_ptr.hpp>
 
 #include "Editor/EditorApp.h"
+#include "Editor/AssetImporter.h"
 
 #include "Project/ScriptEditorPanel.h"
 
@@ -38,29 +41,10 @@ static void EditAsset(Asset asset) {
 	ImGui::SeparatorText("Asset");
 	ImGui::Indent(22.0f);
 
-	std::string type;
-	switch(asset.Type) {
-		case AssetType::Mesh:
-			type = "Mesh";
-			break;
-		case AssetType::Texture:
-			type = "Texture";
-			break;
-		case AssetType::Cubemap:
-			type = "Cubemap";
-			break;
-		case AssetType::Script:
-			type = "Script";
-			break;
-		case AssetType::Audio:
-			type = "Audio";
-			break;
-	}
-
 	auto& editor = Application::As<EditorApp>()->GetEditor();
 	auto* assets = AssetManager::Get()->As<EditorAssetManager>();
 
-	ImGui::Text("Type: %s", type.c_str());
+	ImGui::Text("Type: %s", AssetTypeToString(asset.Type).c_str());
 	ImGui::Text("ID: %llu", (uint64_t)asset.ID);
 	auto path = assets->GetPath(asset.ID);
 	if(path != "") {
@@ -84,6 +68,24 @@ static void EditAsset(Asset asset) {
 			auto panel = tab->GetPanel("ScriptEditor")->As<ScriptEditorPanel>();
 			panel->Open = true;
 			panel->EditFile(asset);
+		}
+	}
+	else if(asset.Type == AssetType::Shader) {
+		if(ImGui::Button("Create New Material")) {
+			
+		}
+	}
+	else if(asset.Type == AssetType::Material) {
+		Asset shader = assets->GetRefs(asset)[0];
+		auto path = assets->GetPath(shader.ID);
+		Buffer<uint32_t> data = AssetImporter::GetShaderData(path);
+
+		spirv_cross::Compiler compiler(data.Get(), data.GetCount());
+		spirv_cross::ShaderResources resources =
+			compiler.get_shader_resources();
+		for(const auto& resource : resources.gl_plain_uniforms) {
+			ImGui::Text(resource.name.c_str());
+			
 		}
 	}
 }
