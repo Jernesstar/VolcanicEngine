@@ -170,24 +170,28 @@ void FileWatcher::Remove(AssetType type, const std::string& path) {
 void FileWatcher::ReloadMesh(const std::string& path) {
 	VOLCANICORE_LOG_INFO("Reloading Mesh at path '%s'", path.c_str());
 	UUID id = m_AssetManager->GetFromPath(path);
+	m_AssetManager->Unload({ id, AssetType::Mesh });
 	m_AssetManager->Load({ id, AssetType::Mesh });
 }
 
 void FileWatcher::ReloadTexture(const std::string& path) {
 	VOLCANICORE_LOG_INFO("Reloading Texture at path '%s'", path.c_str());
 	UUID id = m_AssetManager->GetFromPath(path);
+	m_AssetManager->Unload({ id, AssetType::Texture });
 	m_AssetManager->Load({ id, AssetType::Texture });
 }
 
 void FileWatcher::ReloadShader(const std::string& path) {
 	VOLCANICORE_LOG_INFO("Reloading Shader at path '%s'", path.c_str());
 	UUID id = m_AssetManager->GetFromPath(path);
+	m_AssetManager->Unload({ id, AssetType::Shader });
 	m_AssetManager->Load({ id, AssetType::Shader });
 }
 
 void FileWatcher::ReloadAudio(const std::string& path) {
 	VOLCANICORE_LOG_INFO("Reloading Audio at path '%s'", path.c_str());
 	UUID id = m_AssetManager->GetFromPath(path);
+	m_AssetManager->Unload({ id, AssetType::Audio });
 	m_AssetManager->Load({ id, AssetType::Audio });
 }
 
@@ -198,8 +202,10 @@ void FileWatcher::ReloadScript(const std::string& path) {
 	Ref<ScriptModule> mod = CreateRef<ScriptModule>("TestBuild");
 	mod->Load(path);
 
-	if(!mod->HasErrors())
+	if(!mod->HasErrors()) {
+		m_AssetManager->Unload({ id, AssetType::Script });
 		m_AssetManager->Load({ id, AssetType::Script });
+	}
 	else
 		VOLCANICORE_LOG_INFO("Error occured when reloading script");
 }
@@ -336,11 +342,11 @@ void EditorAssetManager::Load(const std::string& path) {
 	s_WatcherIDs.Add(
 		s_FileWatcher->addWatch((rootPath / "Font").string(), s_Listener));
 	s_WatcherIDs.Add(
+		s_FileWatcher->addWatch((rootPath / "Shader").string(), s_Listener));
+	s_WatcherIDs.Add(
 		s_FileWatcher->addWatch((rootPath / "Audio").string(), s_Listener));
 	s_WatcherIDs.Add(
 		s_FileWatcher->addWatch((rootPath / "Script").string(), s_Listener));
-	s_WatcherIDs.Add(
-		s_FileWatcher->addWatch((rootPath / "Shader").string(), s_Listener));
 
 	s_FileWatcher->watch();
 
