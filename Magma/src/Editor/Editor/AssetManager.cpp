@@ -115,9 +115,15 @@ void FileWatcher::handleFileAction(
 			case AssetType::Texture:
 				ReloadTexture(fullPath);
 				break;
+			// case AssetType::Cubemap:
+			// 	ReloadCubemap(fullPath);
+			// 	break;
 			case AssetType::Shader:
 				ReloadShader(fullPath);
 				break;
+			// case AssetType::Font:
+			// 	ReloadFont(fullPath);
+			// 	break;
 			case AssetType::Audio:
 				ReloadAudio(fullPath);
 				break;
@@ -620,12 +626,12 @@ void EditorAssetManager::RuntimeSave(const std::string& exportPath) {
 
 			auto name = fs::path(path).filename().stem().stem();
 			auto outputPath =
-				(assetPath / "Shader" / name).string() + "bin.frag";
+				(assetPath / "Shader" / name).string() + ".bin.frag";
 			BinaryWriter writer(outputPath);
 			Buffer<uint32_t> data = AssetImporter::GetShaderData(path);
 			writer.Write(data);
 
-			shaderFile.Write(name);
+			shaderFile.Write(name.string());
 		}
 		else if(asset.Type == AssetType::Script) {
 			pack.Write(scriptFile.GetPosition());

@@ -49,6 +49,9 @@ SceneTab::~SceneTab() {
 	if(m_ScenePath == "")
 		m_ScenePath = "Magma/assets/scenes/" + m_Scene.Name + ".magma.scene";
 	SceneLoader::EditorSave(m_Scene, m_ScenePath);
+
+	AssetManager::Get()->As<EditorAssetManager>()
+		->RemoveReloadCallback(m_CallbackID);
 }
 
 void SceneTab::Setup() {
@@ -64,7 +67,7 @@ void SceneTab::Setup() {
 
 	auto& editor = Application::As<EditorApp>()->GetEditor();
 	auto& assetManager = editor.GetAssetManager();
-	assetManager
+	m_CallbackID = assetManager
 	.AddReloadCallback(
 		[this](Asset asset, bool stage)
 		{

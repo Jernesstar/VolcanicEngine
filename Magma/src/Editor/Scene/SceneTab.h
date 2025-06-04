@@ -34,6 +34,7 @@ public:
 private:
 	Scene m_Scene;
 	std::string m_ScenePath;
+	uint32_t m_CallbackID;
 
 private:
 	void Setup();
