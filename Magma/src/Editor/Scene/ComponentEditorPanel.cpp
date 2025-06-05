@@ -200,9 +200,11 @@ void DrawComponent<CameraComponent>(Entity& entity) {
 		return;
 	}
 
+	ImGui::SetNextItemWidth(150);
 	auto pos = camera->GetPosition();
 	if(ImGui::DragFloat3("Position", &pos.x, 1.0f, -FLT_MAX/2.0f, +FLT_MAX/2.0f))
 		camera->SetPosition(pos);
+	ImGui::SetNextItemWidth(150);
 	auto dir = camera->GetDirection();
 	if(ImGui::DragFloat3("Direction", &dir.x, 1.0f, -FLT_MAX/2.0f, +FLT_MAX/2.0f))
 		camera->SetDirection(dir);
@@ -210,10 +212,12 @@ void DrawComponent<CameraComponent>(Entity& entity) {
 	uint32_t max = 3000;
 	uint32_t min = 0;
 	uint32_t vW = camera->GetViewportWidth();
+	ImGui::SetNextItemWidth(50);
 	bool w =
 		ImGui::DragScalar("Viewport Width", ImGuiDataType_U32,
 			&vW, 1.0f, &min, &max);
 	uint32_t vH = camera->GetViewportHeight();
+	ImGui::SetNextItemWidth(50);
 	bool h =
 		ImGui::DragScalar("Viewport Height", ImGuiDataType_U32,
 			&vH, 1.0f, &min, &max);
@@ -222,8 +226,10 @@ void DrawComponent<CameraComponent>(Entity& entity) {
 
 	float near = camera->GetNear();
 	float far = camera->GetFar();
+	ImGui::SetNextItemWidth(50);
 	bool newNear =
 		ImGui::DragFloat("Near", &near, 1.0f, 0.001f, 1000.0f, "%.4f");
+	ImGui::SetNextItemWidth(50);
 	bool newFar =
 		ImGui::DragFloat("Far", &far, 1.0f, 0.001f, 1000.0f, "%.4f");
 	if(newNear || newFar)
@@ -232,6 +238,7 @@ void DrawComponent<CameraComponent>(Entity& entity) {
 	if(camera->GetType() == Camera::Type::Stereo) {
 		auto cam = camera->As<StereographicCamera>();
 		float fov = cam->GetVerticalFOV();
+		ImGui::SetNextItemWidth(50);
 		if(ImGui::DragFloat("FOV", &fov, 1.0f, 0.001f, 180.0f, "%.4f"))
 			cam->SetVerticalFOV(fov);
 	}
@@ -260,10 +267,13 @@ void DrawComponent<TransformComponent>(Entity& entity) {
 	auto ro = glm::value_ptr(roD);
 	auto sc = glm::value_ptr(component.Scale);
 	ImGui::Text("Translation"); ImGui::SameLine(120.0f);
+	ImGui::SetNextItemWidth(150);
 	ImGui::DragFloat3("##Translation", tr, 0.5f, -FLT_MAX, +FLT_MAX, "%.2f");
 	ImGui::Text("Rotation"); ImGui::SameLine(120.0f);
+	ImGui::SetNextItemWidth(150);
 	ImGui::DragFloat3("##Rotation", ro, 0.5f, 0.0001f, 360.0f, "%.2f");
 	ImGui::Text("Scale"); ImGui::SameLine(120.0f);
+	ImGui::SetNextItemWidth(150);
 	ImGui::DragFloat3("##Scale", sc, 0.5f, 0.0001f, +FLT_MAX, "%.2f");
 
 	component.Rotation = glm::radians(roD);
@@ -660,10 +670,13 @@ void DrawComponent<RigidBodyComponent>(Entity& entity) {
 	}
 
 	auto tr = body->GetTransform();
+	ImGui::SetNextItemWidth(150);
 	ImGui::DragFloat3("##Translation", &tr.Translation.x, 0.1f,
 		-FLT_MAX, +FLT_MAX, "%.4f");
+	ImGui::SetNextItemWidth(150);
 	ImGui::DragFloat3("##Rotation", &tr.Rotation.x, 0.1f,
 		0.0001f, 360.0f, "%.4f");
+	ImGui::SetNextItemWidth(150);
 	ImGui::DragFloat3("##Scale", &tr.Scale.x, 0.5f, 0.0001f, +FLT_MAX, "%.4f");
 }
 
@@ -675,8 +688,10 @@ void DrawComponent<DirectionalLightComponent>(Entity& entity) {
 	auto& component = entity.Set<DirectionalLightComponent>();
 	ImGui::SeparatorText("DirectionalLightComponent");
 
+	ImGui::SetNextItemWidth(150);
 	ImGui::DragFloat3("Position", &component.Position.x, 0.1f,
 		-FLT_MAX, +FLT_MAX, "%.4f");
+	ImGui::SetNextItemWidth(150);
 	ImGui::DragFloat3("Direction", &component.Direction.x, 0.1f,
 		-FLT_MAX, +FLT_MAX, "%.4f");
 	ImGui::ColorEdit3("Ambient", &component.Ambient.x);
@@ -692,13 +707,17 @@ void DrawComponent<PointLightComponent>(Entity& entity) {
 	auto& component = entity.Set<PointLightComponent>();
 	ImGui::SeparatorText("PointLightComponent");
 
+	ImGui::SetNextItemWidth(150);
 	ImGui::DragFloat3("Position", &component.Position.x, 0.1f,
 		-FLT_MAX, +FLT_MAX, "%.4f");
 	ImGui::ColorEdit3("Ambient", &component.Ambient.x);
 	ImGui::ColorEdit3("Diffuse", &component.Diffuse.x);
 	ImGui::ColorEdit3("Specular", &component.Specular.x);
+	ImGui::SetNextItemWidth(50);
 	ImGui::DragFloat("Constant", &component.Constant);
+	ImGui::SetNextItemWidth(50);
 	ImGui::DragFloat("Linear", &component.Linear);
+	ImGui::SetNextItemWidth(50);
 	ImGui::DragFloat("Quadratic", &component.Quadratic);
 }
 
@@ -710,15 +729,19 @@ void DrawComponent<SpotlightComponent>(Entity& entity) {
 	auto& component = entity.Set<SpotlightComponent>();
 	ImGui::SeparatorText("SpotlightComponent");
 
+	ImGui::SetNextItemWidth(150);
 	ImGui::DragFloat3("Position", &component.Position.x, 0.1f,
 		-FLT_MAX / 2.0f, +FLT_MAX / 2.0f, "%.4f");
+	ImGui::SetNextItemWidth(150);
 	ImGui::DragFloat3("Direction", &component.Direction.x, 0.1f,
 		-FLT_MAX / 2.0f, +FLT_MAX / 2.0f, "%.4f");
 	ImGui::ColorEdit3("Ambient", &component.Ambient.x);
 	ImGui::ColorEdit3("Diffuse", &component.Diffuse.x);
 	ImGui::ColorEdit3("Specular", &component.Specular.x);
+	ImGui::SetNextItemWidth(50);
 	ImGui::DragFloat("Cutoff Angle", &component.CutoffAngle, 1.0f, 0.1f,
 		component.OuterCutoffAngle);
+	ImGui::SetNextItemWidth(50);
 	ImGui::DragFloat("Outer Cutoff Angle", &component.OuterCutoffAngle, 1.0f,
 		component.CutoffAngle, 2*PI);
 }
@@ -732,21 +755,24 @@ void DrawComponent<ParticleEmitterComponent>(Entity& entity) {
 	ImGui::SeparatorText("ParticleEmitterComponent");
 
 	ImGui::Text("Position"); ImGui::SameLine(120.0f);
+	ImGui::SetNextItemWidth(150);
 	ImGui::DragFloat3("##Position", &component.Position.x, 0.1f,
 		-FLT_MAX, +FLT_MAX, "%.4f");
 
 	uint64_t min = 3, max = 1000;
 	ImGui::Text("Particle Max Count"); ImGui::SameLine(200.0f);
+	ImGui::SetNextItemWidth(50);
 	ImGui::SliderScalar("##MaxCount", ImGuiDataType_U64,
 		&component.MaxParticleCount, &min, &max);
-	ImGui::Text("Particle Life Time"); ImGui::SameLine(200.0f);
+	ImGui::Text("Particle Life Time (ms)"); ImGui::SameLine(200.0f);
+	ImGui::SetNextItemWidth(50);
 	ImGui::DragFloat("##LifeTime", &component.ParticleLifetime,
-		1.0f, 1.0f, 10000.0f);
-	ImGui::Text("Image Asset: %li", (uint64_t)component.MaterialAsset.ID);
+		1.0f, 1.0f, 99000.0f, "%.0f");
+	ImGui::Text("Material: %li", (uint64_t)component.MaterialAsset.ID);
 
 	auto text = component.MaterialAsset.ID ? "Change Asset" : "Set Asset";
 	if(ImGui::Button(text))
-		s_Selecting = AssetType::Texture;
+		s_Selecting = AssetType::Material;
 
 	if(s_Asset.Type != AssetType::None && !s_ForScript) {
 		component.MaterialAsset = s_Asset;

@@ -166,3 +166,13 @@ Scene:
                   Name: SomeVec3
                   Type: Vec3
                   Value: [29, 0, 0]
+    - Entity:
+        Name: Fireflies
+        ID: 1111
+        Components:
+          ParticleEmitterComponent:
+            Position: [0, 0, 0]
+            MaxParticleCount: 384
+            ParticleLifetime: 1
+            SpawnInterval: 0
+            MaterialID: 0

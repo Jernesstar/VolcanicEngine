@@ -18,6 +18,8 @@ public:
 	void Update(VolcaniCore::TimeStep ts) override;
 	void Draw() override;
 
+	void RenderAssetTable(bool hovering = false);
+
 private:
 	fs::path m_Path;
 	Ref<UI::Image> m_FileIcon;

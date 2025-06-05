@@ -101,75 +101,100 @@ void ContentBrowserPanel::Draw() {
 			}
 			ImGui::PopClipRect();
 
-			static float padding = 24.0f;
-			static float thumbnailSize = 100.0f;
-			static float cellSize = thumbnailSize + padding;
-
-			float panelWidth = ImGui::GetContentRegionAvail().x;
-			int32_t columnCount = (int32_t)(panelWidth / cellSize);
-			columnCount = columnCount ? columnCount : 1;
-
-			auto& assetManager =
-				Application::As<EditorApp>()->GetEditor().GetAssetManager();
-
-			if(ImGui::BeginTable("AssetsTable", columnCount))
-			{
-				static Asset s_Asset;
-
-				for(auto& [asset, _] : assetManager.GetRegistry()) {
-					if(!asset.Primary)
-						continue;
-
-					ImGui::TableNextColumn();
-
-					std::string path = assetManager.GetPath(asset.ID);
-					if(path != "")
-						path = fs::path(path).filename().string();
-
-					UI::Button button;
-					button.Width = thumbnailSize;
-					button.Height = thumbnailSize;
-					button.Display = m_FileIcon;
-					button.UsePosition = false;
-
-					if(UI::UIRenderer::DrawButton(button).Clicked) {
-						s_Asset = asset;
-						auto panel =
-							m_Tab->GetPanel("AssetEditor")
-							->As<AssetEditorPanel>();
-						panel->Select(asset);
-					}
-
-					if(ImGui::BeginDragDropSource())
-					{
-						ImGui::SetDragDropPayload("ASSET",
-							&s_Asset, sizeof(Asset));
-
-						UI::Image image;
-						image.Content = m_FileIcon->Content;
-						image.Width = thumbnailSize;
-						image.Height = thumbnailSize;
-						image.UsePosition = false;
-
-						UI::UIRenderer::DrawImage(image);
-
-						ImGui::EndDragDropSource();
-					}
-					auto name = assetManager.GetAssetName(asset);
-					if(name != "")
-						ImGui::Text(name.c_str());
-					else if(path != "")
-						ImGui::TextWrapped(path.c_str());
-					else
-						ImGui::Text("%llu", (uint64_t)asset.ID);
-				}
-
-				ImGui::EndTable();
-			}
+			RenderAssetTable();
 		}
 		ImGui::EndChild();
 	}
 	ImGui::End();
+}
+
+void ContentBrowserPanel::RenderAssetTable(bool hovering) {
+	static float padding = 24.0f;
+	static float thumbnailSize = 100.0f;
+	static float cellSize = thumbnailSize + padding;
+
+	float panelWidth = ImGui::GetContentRegionAvail().x;
+	int32_t columnCount = (int32_t)(panelWidth / cellSize);
+	columnCount = columnCount ? columnCount : 1;
+
+	auto& assetManager =
+		Application::As<EditorApp>()->GetEditor().GetAssetManager();
+
+	if(hovering) {
+		ImGui::OpenPopup("Select Asset");
+		if(!ImGui::BeginPopupModal("Select Asset")) {
+			ImGui::EndPopup();
+			return;
+		}
+	}
+
+	if(ImGui::BeginTable("AssetsTable", columnCount))
+	{
+		static Asset s_Asset;
+
+		for(auto& [asset, _] : assetManager.GetRegistry()) {
+			if(!asset.Primary)
+				continue;
+
+			ImGui::TableNextColumn();
+
+			std::string path = assetManager.GetPath(asset.ID);
+			if(path != "")
+				path = fs::path(path).filename().string();
+
+			UI::Button button;
+			button.Width = thumbnailSize;
+			button.Height = thumbnailSize;
+			button.Display = m_FileIcon;
+			button.UsePosition = false;
+
+			if(UI::UIRenderer::DrawButton(button).Clicked) {
+				s_Asset = asset;
+				if(!hovering) {
+					auto panel =
+						m_Tab->GetPanel("AssetEditor")->As<AssetEditorPanel>();
+					panel->Select(asset);
+				}
+			}
+
+			if(!hovering)
+				if(ImGui::BeginDragDropSource())
+				{
+					ImGui::SetDragDropPayload("ASSET", &s_Asset, sizeof(Asset));
+
+					UI::Image image;
+					image.Content = m_FileIcon->Content;
+					image.Width = thumbnailSize;
+					image.Height = thumbnailSize;
+					image.UsePosition = false;
+
+					UI::UIRenderer::DrawImage(image);
+
+					ImGui::EndDragDropSource();
+				}
+
+			auto name = assetManager.GetAssetName(asset);
+			if(name != "")
+				ImGui::Text(name.c_str());
+			else if(path != "")
+				ImGui::TextWrapped(path.c_str());
+			else
+				ImGui::Text("%llu", (uint64_t)asset.ID);
+		}
+
+		if(hovering) {
+			if(ImGui::Button("Close")) {
+				ImGui::CloseCurrentPopup();
+				// s_Selecting = AssetType::None;
+				// s_ForScript = 0;
+			}
+		}
+
+		ImGui::EndTable();
+	}
+
+	if(hovering)
+		ImGui::EndPopup();
 }
 
 ImRect Traverse(fs::path path) {

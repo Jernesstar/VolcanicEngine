@@ -83,8 +83,12 @@ public:
 
 	bool HasRefs(Asset asset) const { return m_References.count(asset.ID); }
 
-	VolcaniCore::List<Asset> GetRefs(Asset asset) const {
+	const VolcaniCore::List<Asset>& GetRefs(Asset asset) const {
 		return m_References.at(asset.ID);
+	}
+
+	void AddRef(Asset base, Asset ref) {
+		m_References[base.ID].Add(ref);
 	}
 
 	void NameAsset(Asset asset, const std::string& name) {

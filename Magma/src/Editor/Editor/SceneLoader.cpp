@@ -435,7 +435,7 @@ void SerializeEntity(YAMLSerializer& serializer, const Entity& entity) {
 			.WriteKey("MaxParticleCount").Write(system.MaxParticleCount)
 			.WriteKey("ParticleLifetime").Write(system.ParticleLifetime)
 			.WriteKey("SpawnInterval").Write(system.SpawnInterval)
-			.WriteKey("AssetID").Write((uint64_t)system.MaterialAsset.ID)
+			.WriteKey("MaterialID").Write((uint64_t)system.MaterialAsset.ID)
 		.EndMapping(); // ParticleEmitterComponent
 	}
 
@@ -702,8 +702,8 @@ void DeserializeEntity(YAML::Node entityNode, Scene& scene) {
 			particleEmitterComponentNode["MaxParticleCount"].as<uint64_t>(),
 			particleEmitterComponentNode["ParticleLifetime"].as<float>(),
 			particleEmitterComponentNode["SpawnInterval"].as<float>(),
-			Asset{ particleEmitterComponentNode["AssetID"].as<uint64_t>(),
-					AssetType::Texture });
+			Asset{ particleEmitterComponentNode["MaterialID"].as<uint64_t>(),
+					AssetType::Material });
 	}
 }
 

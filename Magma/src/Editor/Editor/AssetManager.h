@@ -17,7 +17,8 @@ public:
 	uint32_t AddReloadCallback(const Func<void, Asset, bool>& callback);
 	void RemoveReloadCallback(uint32_t id);
 
-	Asset Add(const std::string& path, AssetType type);
+	Asset Add(AssetType type, VolcaniCore::UUID id = 0, bool primary = true,
+		const std::string& path = "");
 	void Remove(Asset asset);
 
 	std::string GetPath(VolcaniCore::UUID id) const;

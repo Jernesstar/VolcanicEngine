@@ -23,10 +23,6 @@ AssetPack:
         Type: Mesh
         Name: BlueCube
         MeshType: 1
-        Material:
-          DiffuseColor: [0, 0, 1, 1]
-          SpecularColor: [0, 0, 0, 0]
-          EmissiveColor: [0, 0, 0, 0]
     - Asset:
         ID: 15277418182178081176
         Type: Mesh

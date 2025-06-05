@@ -42,24 +42,24 @@ static void EditAsset(Asset asset) {
 	ImGui::Indent(22.0f);
 
 	auto& editor = Application::As<EditorApp>()->GetEditor();
-	auto* assets = AssetManager::Get()->As<EditorAssetManager>();
+	auto* assetManager = AssetManager::Get()->As<EditorAssetManager>();
 
 	ImGui::Text("Type: %s", AssetTypeToString(asset.Type).c_str());
 	ImGui::Text("ID: %llu", (uint64_t)asset.ID);
-	auto path = assets->GetPath(asset.ID);
+	auto path = assetManager->GetPath(asset.ID);
 	if(path != "") {
 		auto rootPath = fs::path(editor.GetProject().Path) / "Asset";
 		auto display = fs::relative(path, rootPath).generic_string();
 		ImGui::Text("Path: %s", display.c_str());
 	}
 
-	std::string name = assets->GetAssetName(asset);
+	std::string name = assetManager->GetAssetName(asset);
 	ImGui::Text("Name: "); ImGui::SameLine();
 	bool active = ImGui::InputTextWithHint("##AssetName", "Unnamed asset", &name);
 
 	if(active && ImGui::IsKeyPressed(ImGuiKey_Enter, false)) {
-		assets->RemoveName(asset);
-		assets->NameAsset(asset, name);
+		assetManager->RemoveName(asset);
+		assetManager->NameAsset(asset, name);
 	}
 
 	if(asset.Type == AssetType::Script) {
@@ -72,18 +72,23 @@ static void EditAsset(Asset asset) {
 	}
 	else if(asset.Type == AssetType::Shader) {
 		if(ImGui::Button("Create New Material")) {
+			Asset newMaterial = assetManager->Add(AssetType::Material);
 			
 		}
 	}
 	else if(asset.Type == AssetType::Material) {
-		Asset shader = assets->GetRefs(asset)[0];
-		auto path = assets->GetPath(shader.ID);
+		Asset shader = assetManager->GetRefs(asset)[0];
+		auto path = assetManager->GetPath(shader.ID);
 		Buffer<uint32_t> data = AssetImporter::GetShaderData(path);
 
 		spirv_cross::Compiler compiler(data.Get(), data.GetCount());
 		spirv_cross::ShaderResources resources =
 			compiler.get_shader_resources();
 		for(const auto& resource : resources.gl_plain_uniforms) {
+			ImGui::Text(resource.name.c_str());
+			
+		}
+		for(const auto& resource : resources.separate_samplers) {
 			ImGui::Text(resource.name.c_str());
 			
 		}

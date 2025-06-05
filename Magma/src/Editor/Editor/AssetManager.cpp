@@ -157,7 +157,7 @@ void FileWatcher::RemoveCallback(uint32_t id) {
 void FileWatcher::Add(AssetType type, const std::string& path) {
 	VOLCANICORE_LOG_INFO("Adding AssetType::%s at path '%s'",
 		AssetTypeToString(type).c_str(), path.c_str());
-	m_AssetManager->Add(path, type);
+	m_AssetManager->Add(type, path);
 }
 
 void FileWatcher::Remove(AssetType type, const std::string& path) {
@@ -232,11 +232,11 @@ void EditorAssetManager::Load(Asset asset) {
 
 	m_AssetRegistry[asset] = true;
 	std::string path = GetPath(asset.ID);
-	if(path == "")
-		return;
 
-	if(asset.Type == AssetType::Mesh)
-		m_MeshAssets[asset.ID] = AssetImporter::GetMesh(path);
+	if(asset.Type == AssetType::Mesh) {
+		if(path != "")
+			m_MeshAssets[asset.ID] = AssetImporter::GetMesh(path);
+	}
 	else if(asset.Type == AssetType::Texture)
 		m_TextureAssets[asset.ID] = AssetImporter::GetTexture(path);
 	else if(asset.Type == AssetType::Cubemap)
@@ -256,6 +256,9 @@ void EditorAssetManager::Load(Asset asset) {
 		Ref<ScriptModule> mod = CreateRef<ScriptModule>(name);
 		mod->Load(path);
 		m_ScriptAssets[asset.ID] = mod;
+	}
+	else if(asset.Type == AssetType::Material) {
+
 	}
 }
 
@@ -277,6 +280,8 @@ void EditorAssetManager::Unload(Asset asset) {
 		m_AudioAssets.erase(asset.ID);
 	else if(asset.Type == AssetType::Script)
 		m_ScriptAssets.erase(asset.ID);
+	else if(asset.Type == AssetType::Material)
+		m_MaterialAssets.erase(asset.ID);
 }
 
 uint32_t EditorAssetManager::AddReloadCallback(
@@ -289,10 +294,40 @@ void EditorAssetManager::RemoveReloadCallback(uint32_t id) {
 	s_Listener->RemoveCallback(id);
 }
 
-Asset EditorAssetManager::Add(const std::string& path, AssetType type) {
-	Asset newAsset{ UUID(), type };
+Asset EditorAssetManager::Add(AssetType type, UUID id, bool primary,
+							  const std::string& path)
+{
+	Asset newAsset{ id ? id : UUID(), type, primary };
 	m_AssetRegistry[newAsset] = false;
-	m_Paths[newAsset.ID] = path;
+	if(path != "")
+		m_Paths[newAsset.ID] = path;
+
+	if(type == AssetType::Mesh) {
+		if(path != "") {
+			List<SubMesh> meshes;
+			List<MaterialPaths> materials;
+			AssetImporter::GetMeshData(path, meshes, materials);
+
+			for(auto matPaths : materials) {
+				Asset material = Add(AssetType::Material, 0, false);
+				for(uint32_t i = 0; i < 3; i++) {
+					auto path = matPaths[i];
+					if(path == "")
+						continue;
+
+					AddRef(material,
+						Add(AssetType::Texture, 0, false, path));
+				}
+
+				AddRef(newAsset, material);
+			}
+		}
+		else {
+
+		}
+	}
+	if(type == AssetType::Material)
+		m_MaterialAssets[newAsset.ID] = CreateRef<DrawUniforms>();
 
 	return newAsset;
 }
@@ -340,9 +375,9 @@ void EditorAssetManager::Load(const std::string& path) {
 	s_WatcherIDs.Add(
 		s_FileWatcher->addWatch((rootPath / "Cubemap").string(), s_Listener));
 	s_WatcherIDs.Add(
-		s_FileWatcher->addWatch((rootPath / "Font").string(), s_Listener));
-	s_WatcherIDs.Add(
 		s_FileWatcher->addWatch((rootPath / "Shader").string(), s_Listener));
+	s_WatcherIDs.Add(
+		s_FileWatcher->addWatch((rootPath / "Font").string(), s_Listener));
 	s_WatcherIDs.Add(
 		s_FileWatcher->addWatch((rootPath / "Audio").string(), s_Listener));
 	s_WatcherIDs.Add(
@@ -356,66 +391,53 @@ void EditorAssetManager::Load(const std::string& path) {
 
 	for(auto assetNode : assetPackNode["Assets"]) {
 		auto node = assetNode["Asset"];
+		AssetType type = AssetTypeFromString(node["Type"].as<std::string>());
 		UUID id = node["ID"].as<uint64_t>();
+		std::string path;
+		Asset asset;
 		if(node["Path"]) {
 			auto path =
 				(rootPath / node["Path"].as<std::string>()).generic_string();
 			if(!fs::exists(path))
 				continue;
-
-			m_Paths[id] = path;
 		}
 
-		AssetType type = AssetTypeFromString(node["Type"].as<std::string>());
-		Asset asset = { id, type };
-		m_AssetRegistry[asset] = false;
-		if(node["Name"])
-			NameAsset(asset, node["Name"].as<std::string>());
+		if(type == AssetType::Mesh) {
+			if(node["Path"])
+				Add(type, id, true, path);
+			else {
+				auto type = (MeshType)node["MeshType"].as<uint32_t>();
+				auto materialID = node["MaterialID"].as<uint64_t>();
+				m_MeshAssets[id] = Mesh::Create(type);
 
-		if(asset.Type == AssetType::Mesh) {
-			if(node["Path"]) {
-				List<SubMesh> meshes;
-				List<MaterialPaths> materials;
-				AssetImporter::GetMeshData(m_Paths[id], meshes, materials);
-				for(auto matPaths : materials) {
-					for(uint32_t i = 0; i < 3; i++) {
-						auto path = matPaths[i];
-						if(path == "")
-							continue;
-						auto& secondary =
-							m_References[asset.ID].Emplace(
-								UUID(), AssetType::Texture, false);
-						m_AssetRegistry[secondary] = false;
-						m_Paths[secondary.ID] = path;
-					}
-				}
-
-				continue;
+				AddRef(asset, { materialID, AssetType::Material, false });
 			}
 
-			auto type = (MeshType)node["MeshType"].as<uint32_t>();
-			auto materialNode = node["Material"];
-
-			Material mat;
-			if(materialNode["Diffuse"])
-				mat.Diffuse =
-					AssetImporter::GetTexture(
-						materialNode["Diffuse"]["Path"].as<std::string>());
-			if(materialNode["Specular"])
-				mat.Specular =
-					AssetImporter::GetTexture(
-						materialNode["Specular"]["Path"].as<std::string>());
-			if(materialNode["Emissive"])
-				mat.Emissive =
-					AssetImporter::GetTexture(
-						materialNode["Emissive"]["Path"].as<std::string>());
-
-			mat.DiffuseColor = materialNode["DiffuseColor"].as<glm::vec4>();
-			mat.SpecularColor = materialNode["SpecularColor"].as<glm::vec4>();
-			mat.EmissiveColor = materialNode["EmissiveColor"].as<glm::vec4>();
-
-			m_MeshAssets[id] = Mesh::Create(type, mat);
 		}
+		if(type == AssetType::Material) {
+			// if(materialNode["Diffuse"])
+			// 	mat.Diffuse =
+			// 		AssetImporter::GetTexture(
+			// 			materialNode["Diffuse"]["Path"].as<std::string>());
+			// if(materialNode["Specular"])
+			// 	mat.Specular =
+			// 		AssetImporter::GetTexture(
+			// 			materialNode["Specular"]["Path"].as<std::string>());
+			// if(materialNode["Emissive"])
+			// 	mat.Emissive =
+			// 		AssetImporter::GetTexture(
+			// 			materialNode["Emissive"]["Path"].as<std::string>());
+
+			// mat.DiffuseColor = materialNode["DiffuseColor"].as<glm::vec4>();
+			// mat.SpecularColor = materialNode["SpecularColor"].as<glm::vec4>();
+			// mat.EmissiveColor = materialNode["EmissiveColor"].as<glm::vec4>();
+
+		}
+		else
+			asset = Add(type, id, true, path);
+
+		if(node["Name"])
+			NameAsset(asset, node["Name"].as<std::string>());
 	}
 
 	List<fs::path> paths
@@ -435,7 +457,7 @@ void EditorAssetManager::Load(const std::string& path) {
 			if(i == 1)
 				path = FileUtils::GetFiles(path, { ".obj" })[0];
 			if(!GetFromPath(path))
-				Add(path, (AssetType)i);
+				Add((AssetType)i, 0, true, path);
 		}
 		i++;
 	}
@@ -471,42 +493,45 @@ void EditorAssetManager::Save() {
 			serializer.WriteKey("Path")
 				.Write(fs::relative(path, rootPath).generic_string());
 		else {
-			Ref<Mesh> mesh = m_MeshAssets[asset.ID];
-			List<Asset>& refs = m_References[asset.ID];
-			const SubMesh& subMesh = mesh->SubMeshes[0];
-			serializer.WriteKey("MeshType").Write((uint32_t)mesh->Type);
+			if(asset.Type == AssetType::Mesh) {
+				Ref<Mesh> mesh = m_MeshAssets[asset.ID];
+				const SubMesh& subMesh = mesh->SubMeshes[0];
+				serializer.WriteKey("MeshType").Write((uint32_t)mesh->Type);
 
-			serializer.WriteKey("Material")
-			.BeginMapping();
+				const List<Asset>& refs = GetRefs(asset);
+				serializer.WriteKey("MaterialID").Write(refs[0].ID);
+			}
+			else if(asset.Type == AssetType::Material) {
+				// for(auto floatUniform : )
 
-			auto& mat = mesh->Materials[subMesh.MaterialIndex];
-			if(mat.Diffuse)
-				serializer.WriteKey("Diffuse")
-				.BeginMapping()
-					.WriteKey("Path").Write(m_Paths[refs[0].ID])
-				.EndMapping();
+				// auto& mat = mesh->Materials[subMesh.MaterialIndex];
+				// if(mat.Diffuse)
+				// 	serializer.WriteKey("Diffuse")
+				// 	.BeginMapping()
+				// 		.WriteKey("Path").Write(m_Paths[refs[0].ID])
+				// 	.EndMapping();
 
-			if(mat.Specular)
-				serializer.WriteKey("Specular")
-				.BeginMapping()
-					.WriteKey("Path").Write(m_Paths[refs[1].ID])
-				.EndMapping();
+				// if(mat.Specular)
+				// 	serializer.WriteKey("Specular")
+				// 	.BeginMapping()
+				// 		.WriteKey("Path").Write(m_Paths[refs[1].ID])
+				// 	.EndMapping();
 
-			if(mat.Emissive)
-				serializer.WriteKey("Emissive")
-				.BeginMapping()
-					.WriteKey("Path").Write(m_Paths[refs[2].ID])
-				.EndMapping();
+				// if(mat.Emissive)
+				// 	serializer.WriteKey("Emissive")
+				// 	.BeginMapping()
+				// 		.WriteKey("Path").Write(m_Paths[refs[2].ID])
+				// 	.EndMapping();
 
-			serializer
-				.WriteKey("DiffuseColor").Write(mat.DiffuseColor);
-			serializer
-				.WriteKey("SpecularColor").Write(mat.SpecularColor);
-			serializer
-				.WriteKey("EmissiveColor").Write(mat.EmissiveColor);
+				// serializer
+				// 	.WriteKey("DiffuseColor").Write(mat.DiffuseColor);
+				// serializer
+				// 	.WriteKey("SpecularColor").Write(mat.SpecularColor);
+				// serializer
+				// 	.WriteKey("EmissiveColor").Write(mat.EmissiveColor);
 
-			serializer
-			.EndMapping(); // Material
+				// serializer.EndMapping();
+			}
 		}
 
 		serializer.EndMapping(); // Asset
