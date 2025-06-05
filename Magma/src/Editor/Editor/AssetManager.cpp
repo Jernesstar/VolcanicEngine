@@ -157,7 +157,7 @@ void FileWatcher::RemoveCallback(uint32_t id) {
 void FileWatcher::Add(AssetType type, const std::string& path) {
 	VOLCANICORE_LOG_INFO("Adding AssetType::%s at path '%s'",
 		AssetTypeToString(type).c_str(), path.c_str());
-	m_AssetManager->Add(type, path);
+	m_AssetManager->Add(type, 0, true, path);
 }
 
 void FileWatcher::Remove(AssetType type, const std::string& path) {
@@ -302,31 +302,24 @@ Asset EditorAssetManager::Add(AssetType type, UUID id, bool primary,
 	if(path != "")
 		m_Paths[newAsset.ID] = path;
 
-	if(type == AssetType::Mesh) {
-		if(path != "") {
-			List<SubMesh> meshes;
-			List<MaterialPaths> materials;
-			AssetImporter::GetMeshData(path, meshes, materials);
+	if(type == AssetType::Mesh && path != "") {
+		List<SubMesh> meshes;
+		List<MaterialPaths> materials;
+		AssetImporter::GetMeshData(m_Paths[id], meshes, materials);
+		for(auto matPaths : materials) {
+			Asset material = Add(AssetType::Material, 0, false);
+			for(uint32_t i = 0; i < 3; i++) {
+				auto path = matPaths[i];
+				if(path == "")
+					continue;
 
-			for(auto matPaths : materials) {
-				Asset material = Add(AssetType::Material, 0, false);
-				for(uint32_t i = 0; i < 3; i++) {
-					auto path = matPaths[i];
-					if(path == "")
-						continue;
-
-					AddRef(material,
-						Add(AssetType::Texture, 0, false, path));
-				}
-
-				AddRef(newAsset, material);
+				AddRef(material, Add(AssetType::Texture, 0, false, path));
 			}
-		}
-		else {
 
+			AddRef(newAsset, material);
 		}
 	}
-	if(type == AssetType::Material)
+	else if(type == AssetType::Material)
 		m_MaterialAssets[newAsset.ID] = CreateRef<DrawUniforms>();
 
 	return newAsset;
@@ -393,8 +386,7 @@ void EditorAssetManager::Load(const std::string& path) {
 		auto node = assetNode["Asset"];
 		AssetType type = AssetTypeFromString(node["Type"].as<std::string>());
 		UUID id = node["ID"].as<uint64_t>();
-		std::string path;
-		Asset asset;
+		std::string path = "";
 		if(node["Path"]) {
 			auto path =
 				(rootPath / node["Path"].as<std::string>()).generic_string();
@@ -402,19 +394,16 @@ void EditorAssetManager::Load(const std::string& path) {
 				continue;
 		}
 
-		if(type == AssetType::Mesh) {
-			if(node["Path"])
-				Add(type, id, true, path);
-			else {
-				auto type = (MeshType)node["MeshType"].as<uint32_t>();
-				auto materialID = node["MaterialID"].as<uint64_t>();
-				m_MeshAssets[id] = Mesh::Create(type);
+		Asset asset = Add(type, id, true, path);
 
-				AddRef(asset, { materialID, AssetType::Material, false });
-			}
+		if(type == AssetType::Mesh && !node["Path"]) {
+			auto type = (MeshType)node["MeshType"].as<uint32_t>();
+			auto materialID = node["MaterialID"].as<uint64_t>();
+			m_MeshAssets[id] = Mesh::Create(type);
 
+			AddRef(asset, { materialID, AssetType::Material, false });
 		}
-		if(type == AssetType::Material) {
+		else if(type == AssetType::Material) {
 			// if(materialNode["Diffuse"])
 			// 	mat.Diffuse =
 			// 		AssetImporter::GetTexture(
@@ -433,8 +422,6 @@ void EditorAssetManager::Load(const std::string& path) {
 			// mat.EmissiveColor = materialNode["EmissiveColor"].as<glm::vec4>();
 
 		}
-		else
-			asset = Add(type, id, true, path);
 
 		if(node["Name"])
 			NameAsset(asset, node["Name"].as<std::string>());
@@ -499,7 +486,7 @@ void EditorAssetManager::Save() {
 				serializer.WriteKey("MeshType").Write((uint32_t)mesh->Type);
 
 				const List<Asset>& refs = GetRefs(asset);
-				serializer.WriteKey("MaterialID").Write(refs[0].ID);
+				serializer.WriteKey("MaterialID").Write((uint64_t)refs[0].ID);
 			}
 			else if(asset.Type == AssetType::Material) {
 				// for(auto floatUniform : )
@@ -550,6 +537,20 @@ void EditorAssetManager::Save() {
 namespace Magma {
 
 template<>
+BinaryWriter& BinaryWriter::WriteObject(const Asset& asset) {
+	Write((uint64_t)asset.ID);
+	Write((uint8_t)asset.Type);
+	Write(asset.Primary);
+
+	Write(AssetManager::Get()->GetAssetName(asset));
+
+	if(AssetManager::Get()->HasRefs(asset))
+		Write(AssetManager::Get()->GetRefs(asset));
+
+	return *this;
+}
+
+template<>
 BinaryWriter& BinaryWriter::WriteObject(const SubMesh& mesh) {
 	Write(mesh.Vertices);
 	Write(mesh.Indices);
@@ -572,34 +573,60 @@ namespace Magma {
 void EditorAssetManager::RuntimeSave(const std::string& exportPath) {
 	namespace fs = std::filesystem;
 
-	auto assetPath = fs::path(exportPath) / "Asset";
-	fs::create_directories(assetPath);
-	fs::create_directories(assetPath / "Mesh");
-	fs::create_directories(assetPath / "Texture");
-	fs::create_directories(assetPath / "Audio");
-	fs::create_directories(assetPath / "Script");
-	fs::create_directories(assetPath / "Shader");
-
-	BinaryWriter meshFile((assetPath / "Mesh" / "mesh.bin").string());
-	BinaryWriter textureFile((assetPath / "Texture" / "image.bin").string());
-	BinaryWriter shaderFile((assetPath / "Shader" / "shader.bin").string());
-	BinaryWriter soundFile((assetPath / "Audio" / "sound.bin").string());
-	BinaryWriter scriptFile((assetPath / "Script" / "script.bin").string());
-
 	BinaryWriter pack((fs::path(exportPath) / ".volc.assetpk").string());
 	pack.Write(std::string("VOLC_PACK"));
+
 	pack.Write(m_AssetRegistry.size());
 
+	uint64_t assetIdx = 0;
 	for(auto [asset, _] : m_AssetRegistry) {
-		pack.Write((uint64_t)asset.ID);
-		pack.Write((uint32_t)asset.Type);
-		auto name = GetAssetName(asset);
-		if(name != "") {
-			pack.Write(true);
-			pack.Write(name);
+		// ID, Type, Primary
+		assetIdx += sizeof(uint64_t) + sizeof(uint8_t) + sizeof(bool);
+		// AssetIndex
+		assetIdx += sizeof(uint64_t);
+		// Name
+		assetIdx += sizeof(uint64_t) + sizeof(char) * GetAssetName(asset).size();
+		// RefCount
+		assetIdx += sizeof(uint64_t);
+		if(HasRefs(asset))
+			assetIdx += sizeof(Asset) * GetRefs(asset).Count();
+	}
+
+	for(auto [asset, _] : m_AssetRegistry) {
+		pack.Write(asset);
+		auto path = GetPath(asset.ID);
+
+		auto registryPos = pack.GetPosition();
+		pack.SetPosition(assetIdx);
+
+		if(asset.Type == AssetType::Mesh) {
+			
 		}
-		else
-			pack.Write(false);
+		else if(asset.Type == AssetType::Texture) {
+			ImageData image = AssetImporter::GetImageData(path, false);
+			pack.Write(image.Width);
+			pack.Write(image.Height);
+			pack.Write(image.Data);
+		}
+		else if(asset.Type == AssetType::Cubemap) {
+			
+		}
+		else if(asset.Type == AssetType::Shader) {
+			
+		}
+		else if(asset.Type == AssetType::Audio) {
+			
+		}
+		else if(asset.Type == AssetType::Script) {
+			
+		}
+
+		assetIdx = pack.GetPosition();
+		pack.SetPosition(registryPos);
+	}
+
+	for(auto [asset, _] : m_AssetRegistry) {
+
 		auto path = m_Paths[asset.ID];
 
 		if(asset.Type == AssetType::Mesh) {
@@ -637,10 +664,7 @@ void EditorAssetManager::RuntimeSave(const std::string& exportPath) {
 		else if(asset.Type == AssetType::Texture) {
 			pack.Write(textureFile.GetPosition());
 
-			ImageData image = AssetImporter::GetImageData(path, false);
-			textureFile.Write(image.Width);
-			textureFile.Write(image.Height);
-			textureFile.Write(image.Data);
+
 		}
 		else if(asset.Type == AssetType::Cubemap) {
 			// pack.Write(textureFile.GetPosition());

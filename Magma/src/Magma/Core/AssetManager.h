@@ -21,7 +21,7 @@ using namespace Magma::Script;
 
 namespace Magma {
 
-enum class AssetType {
+enum class AssetType : uint8_t {
 	None,
 	Mesh,
 	Texture,
