@@ -103,7 +103,6 @@ Cube::Cube()
 	drawPass->SetOutput(framebuffer);
 
 	cube = Mesh::Create(MeshType::Cube,
-		Material
 		{
 			.Diffuse = AssetImporter::GetTexture("Sandbox/assets/images/wood.png"),
 		});

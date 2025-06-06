@@ -11,24 +11,19 @@ namespace Magma::Script {
 
 class ScriptModule {
 public:
-	const std::string Name;
-
-public:
-	ScriptModule(const std::string& name);
+	ScriptModule(asIScriptModule* mod = nullptr);
 	~ScriptModule();
 
-	void Load(const std::string& path);
-	void Save(const std::string& path);
-	bool HasErrors() const { return m_HasErrors; }
+	void ReloadClasses();
+
 	Ref<ScriptClass> GetClass(const std::string& name) const;
+	asIScriptModule* GetHandle() const { return m_Handle; }
 	const auto& GetClasses() const { return m_Classes; }
 
-	asIScriptModule* GetHandle() const { return m_Handle; }
+	std::string GetName() const { return m_Handle->GetName(); }
 
 private:
 	asIScriptModule* m_Handle = nullptr;
-	bool m_HasErrors = false;
-
 	Map<std::string, Ref<ScriptClass>> m_Classes;
 };
 

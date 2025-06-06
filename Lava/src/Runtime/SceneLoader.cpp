@@ -110,19 +110,6 @@ BinaryReader& BinaryReader::ReadObject(SkyboxComponent& comp) {
 static Entity s_CurrentEntity;
 
 template<>
-BinaryReader& BinaryReader::ReadObject(Asset& asset) {
-	uint64_t id;
-	Read(id);
-	asset.ID = id;
-	uint32_t type;
-	Read(type);
-	asset.Type = (AssetType)type;
-	Read(asset.Primary);
-
-	return *this;
-}
-
-template<>
 BinaryReader& BinaryReader::ReadObject(ScriptComponent& comp) {
 	uint64_t id;
 	Read(id);
@@ -194,8 +181,15 @@ BinaryReader& BinaryReader::ReadObject(ScriptComponent& comp) {
 			for(uint32_t i = 0; i < count; i++)
 				array->InsertLast((char*)data.Get() + size * i);
 		}
-		else if(typeName == "Asset")
-			Read(*field.As<Asset>());
+		else if(typeName == "Asset") {
+			uint64_t id;
+			Read(id);
+			asset.ID = id;
+			uint32_t type;
+			Read(type);
+			asset.Type = (AssetType)type;
+			Read(asset.Primary);
+		}
 		else if(typeName == "Vec3")
 			Read(*field.As<glm::vec3>());
 		else if(typeName == "GridSet") {

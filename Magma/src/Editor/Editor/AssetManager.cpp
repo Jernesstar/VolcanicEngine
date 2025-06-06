@@ -198,11 +198,10 @@ void FileWatcher::ReloadAudio(const std::string& path) {
 void FileWatcher::ReloadScript(const std::string& path) {
 	VOLCANICORE_LOG_INFO("Reloading Script at path '%s'", path.c_str());
 	UUID id = m_AssetManager->GetFromPath(path);
-	auto name = fs::path(path).filename().stem().string();
-	Ref<ScriptModule> mod = CreateRef<ScriptModule>("TestBuild");
-	mod->Load(path);
+	bool error;
+	auto mod = AssetImporter::GetScriptData(path, &error, "TestBuild");
 
-	if(!mod->HasErrors()) {
+	if(!error) {
 		m_AssetManager->Unload({ id, AssetType::Script });
 		m_AssetManager->Load({ id, AssetType::Script });
 	}
@@ -251,14 +250,10 @@ void EditorAssetManager::Load(Asset asset) {
 	}
 	else if(asset.Type == AssetType::Audio)
 		m_AudioAssets[asset.ID] = AssetImporter::GetAudio(path);
-	else if(asset.Type == AssetType::Script) {
-		auto name = fs::path(path).filename().stem().string();
-		Ref<ScriptModule> mod = CreateRef<ScriptModule>(name);
-		mod->Load(path);
-		m_ScriptAssets[asset.ID] = mod;
-	}
+	else if(asset.Type == AssetType::Script)
+		m_ScriptAssets[asset.ID] = AssetImporter::GetScript(path);
 	else if(asset.Type == AssetType::Material) {
-
+		// Nothing, materials are always loaded
 	}
 }
 
@@ -305,7 +300,7 @@ Asset EditorAssetManager::Add(AssetType type, UUID id, bool primary,
 	if(type == AssetType::Mesh && path != "") {
 		List<SubMesh> meshes;
 		List<MaterialPaths> materials;
-		AssetImporter::GetMeshData(m_Paths[id], meshes, materials);
+		AssetImporter::GetMeshData(path, meshes, materials);
 		for(auto matPaths : materials) {
 			Asset material = Add(AssetType::Material, 0, false);
 			for(uint32_t i = 0; i < 3; i++) {
@@ -320,7 +315,7 @@ Asset EditorAssetManager::Add(AssetType type, UUID id, bool primary,
 		}
 	}
 	else if(type == AssetType::Material)
-		m_MaterialAssets[newAsset.ID] = CreateRef<DrawUniforms>();
+		m_MaterialAssets[newAsset.ID] = CreateRef<Material>();
 
 	return newAsset;
 }
@@ -361,20 +356,35 @@ void EditorAssetManager::Load(const std::string& path) {
 								m_Path.c_str(), e.what());
 	}
 
-	s_WatcherIDs.Add(
-		s_FileWatcher->addWatch((rootPath / "Mesh").string(), s_Listener));
-	s_WatcherIDs.Add(
-		s_FileWatcher->addWatch((rootPath / "Image").string(), s_Listener));
-	s_WatcherIDs.Add(
-		s_FileWatcher->addWatch((rootPath / "Cubemap").string(), s_Listener));
-	s_WatcherIDs.Add(
-		s_FileWatcher->addWatch((rootPath / "Shader").string(), s_Listener));
-	s_WatcherIDs.Add(
-		s_FileWatcher->addWatch((rootPath / "Font").string(), s_Listener));
-	s_WatcherIDs.Add(
-		s_FileWatcher->addWatch((rootPath / "Audio").string(), s_Listener));
-	s_WatcherIDs.Add(
-		s_FileWatcher->addWatch((rootPath / "Script").string(), s_Listener));
+	fs::path assetDir;
+	assetDir = rootPath / "Mesh";
+	if(fs::exists(assetDir))
+		s_WatcherIDs.Add(
+			s_FileWatcher->addWatch(assetDir.string(), s_Listener));
+	assetDir = rootPath / "Image";
+	if(fs::exists(assetDir))
+		s_WatcherIDs.Add(
+			s_FileWatcher->addWatch(assetDir.string(), s_Listener));
+	assetDir = rootPath / "Cubemap";
+	if(fs::exists(assetDir))
+		s_WatcherIDs.Add(
+			s_FileWatcher->addWatch(assetDir.string(), s_Listener));
+	assetDir = rootPath / "Shader";
+	if(fs::exists(assetDir))
+		s_WatcherIDs.Add(
+			s_FileWatcher->addWatch(assetDir.string(), s_Listener));
+	assetDir = rootPath / "Font";
+	if(fs::exists(assetDir))
+		s_WatcherIDs.Add(
+			s_FileWatcher->addWatch(assetDir.string(), s_Listener));
+	assetDir = rootPath / "Audio";
+	if(fs::exists(assetDir))
+		s_WatcherIDs.Add(
+			s_FileWatcher->addWatch(assetDir.string(), s_Listener));
+	assetDir = rootPath / "Script";
+	if(fs::exists(assetDir))
+		s_WatcherIDs.Add(
+			s_FileWatcher->addWatch(assetDir.string(), s_Listener));
 
 	s_FileWatcher->watch();
 
@@ -388,8 +398,7 @@ void EditorAssetManager::Load(const std::string& path) {
 		UUID id = node["ID"].as<uint64_t>();
 		std::string path = "";
 		if(node["Path"]) {
-			auto path =
-				(rootPath / node["Path"].as<std::string>()).generic_string();
+			path = (rootPath / node["Path"].as<std::string>()).generic_string();
 			if(!fs::exists(path))
 				continue;
 		}
@@ -570,145 +579,90 @@ BinaryWriter& BinaryWriter::WriteObject(const Vec4& vec) {
 
 namespace Magma {
 
+class ByteCodeWriter : public asIBinaryStream {
+public:
+	ByteCodeWriter(BinaryWriter* writer)
+		: m_Writer(writer) { }
+	~ByteCodeWriter() = default;
+
+	int Read(void* data, uint32_t size) override {
+		return 0;
+	}
+
+	int Write(const void* data, uint32_t size) override {
+		m_Writer->WriteData(data, (uint64_t)size);
+		return 0;
+	}
+
+private:
+	BinaryWriter* m_Writer = nullptr;
+};
+
 void EditorAssetManager::RuntimeSave(const std::string& exportPath) {
 	namespace fs = std::filesystem;
 
 	BinaryWriter pack((fs::path(exportPath) / ".volc.assetpk").string());
 	pack.Write(std::string("VOLC_PACK"));
-
 	pack.Write(m_AssetRegistry.size());
 
-	uint64_t assetIdx = 0;
+	uint64_t assetIdx = pack.GetPosition();
 	for(auto [asset, _] : m_AssetRegistry) {
-		// ID, Type, Primary
-		assetIdx += sizeof(uint64_t) + sizeof(uint8_t) + sizeof(bool);
-		// AssetIndex
-		assetIdx += sizeof(uint64_t);
-		// Name
-		assetIdx += sizeof(uint64_t) + sizeof(char) * GetAssetName(asset).size();
-		// RefCount
-		assetIdx += sizeof(uint64_t);
-		if(HasRefs(asset))
-			assetIdx += sizeof(Asset) * GetRefs(asset).Count();
+		assetIdx += sizeof(uint64_t) + sizeof(uint8_t) + sizeof(bool); // ID, Type, Primary
+		assetIdx += sizeof(uint64_t); // Object Index
+	}
+	for(auto [_, refs] : m_References) {
+		assetIdx += sizeof(uint64_t); // RefCount
+		assetIdx += 10 * refs.Count(); // (ID + Type + Primary) * RefCount
+	}
+	for(auto [_, name] : m_NamedAssets) {
+		assetIdx += sizeof(uint64_t); // Name length
+		assetIdx += sizeof(char) * name.size(); // Name
 	}
 
 	for(auto [asset, _] : m_AssetRegistry) {
-		pack.Write(asset);
+		pack.Write(asset); // Asset data (type, id, name, refs (recursive))
+		pack.Write(assetIdx); // Where the Asset points to, the actual object
+
+		auto registryPos = pack.GetPosition(); // Record current position
+		pack.SetPosition(assetIdx); // Jump to object position
+
 		auto path = GetPath(asset.ID);
-
-		auto registryPos = pack.GetPosition();
-		pack.SetPosition(assetIdx);
-
 		if(asset.Type == AssetType::Mesh) {
-			
+			Load(asset);
+			auto mesh = Get<Mesh>(asset);
+
+			pack.Write(mesh->SubMeshes);
 		}
 		else if(asset.Type == AssetType::Texture) {
 			ImageData image = AssetImporter::GetImageData(path, false);
 			pack.Write(image.Width);
 			pack.Write(image.Height);
-			pack.Write(image.Data);
+			pack.WriteData(image.Data.Get(), image.Data.GetCount());
 		}
 		else if(asset.Type == AssetType::Cubemap) {
-			
+			// Nothing, virtual asset that simply references other images
 		}
 		else if(asset.Type == AssetType::Shader) {
-			
-		}
-		else if(asset.Type == AssetType::Audio) {
-			
-		}
-		else if(asset.Type == AssetType::Script) {
-			
-		}
-
-		assetIdx = pack.GetPosition();
-		pack.SetPosition(registryPos);
-	}
-
-	for(auto [asset, _] : m_AssetRegistry) {
-
-		auto path = m_Paths[asset.ID];
-
-		if(asset.Type == AssetType::Mesh) {
-			pack.Write(meshFile.GetPosition());
-			Load(asset);
-			auto mesh = Get<Mesh>(asset);
-
-			if(path != "") {
-				List<MaterialPaths> materials;
-				List<SubMesh> meshes;
-				AssetImporter::GetMeshData(path, meshes, materials);
-				meshFile.Write(meshes);
-				meshFile.Write(materials.Count());
-				for(auto& mat : materials) {
-					std::bitset<3> flags;
-					flags |= (mat.Diffuse != "") << 0;
-					flags |= (mat.Specular != "") << 1;
-					flags |= (mat.Emissive != "") << 2;
-					meshFile.Write((uint8_t)flags.to_ulong());
-				}
-				for(uint64_t i = 0; i < materials.Count(); i++) {
-					meshFile.Write(mesh->Materials[i].DiffuseColor);
-					meshFile.Write(mesh->Materials[i].SpecularColor);
-					meshFile.Write(mesh->Materials[i].EmissiveColor);
-				}
-			}
-			else {
-				meshFile.Write(mesh->SubMeshes);
-				meshFile.Write((uint64_t)0);
-				meshFile.Write(mesh->Materials[0].DiffuseColor);
-				meshFile.Write(mesh->Materials[0].SpecularColor);
-				meshFile.Write(mesh->Materials[0].EmissiveColor);
-			}
-		}
-		else if(asset.Type == AssetType::Texture) {
-			pack.Write(textureFile.GetPosition());
-
-
-		}
-		else if(asset.Type == AssetType::Cubemap) {
-			// pack.Write(textureFile.GetPosition());
-
-		}
-		else if(asset.Type == AssetType::Audio) {
-			pack.Write(soundFile.GetPosition());
-
-			Buffer<float> soundData = AssetImporter::GetAudioData(path);
-			soundFile.Write(soundData);
-		}
-		else if(asset.Type == AssetType::Shader) {
-			pack.Write(shaderFile.GetPosition());
-
-			auto name = fs::path(path).filename().stem().stem();
-			auto outputPath =
-				(assetPath / "Shader" / name).string() + ".bin.frag";
-			BinaryWriter writer(outputPath);
 			Buffer<uint32_t> data = AssetImporter::GetShaderData(path);
-			writer.Write(data);
-
-			shaderFile.Write(name.string());
+			pack.Write(data);
+		}
+		else if(asset.Type == AssetType::Audio) {
+			Buffer<float> soundData = AssetImporter::GetAudioData(path);
+			pack.Write(soundData);
 		}
 		else if(asset.Type == AssetType::Script) {
-			pack.Write(scriptFile.GetPosition());
+			asIScriptModule* mod = AssetImporter::GetScriptData(path);
+			pack.Write(std::string(mod->GetName()));
 
-			Load(asset);
-			auto mod = Get<ScriptModule>(asset);
-			auto outputPath = assetPath / "Script" / mod->Name;
-			mod->Save(outputPath.string() + ".class");
-
-			scriptFile.Write(mod->Name);
+			ByteCodeWriter stream(&pack);
+			mod->SaveByteCode(&stream, true);
+		}
+		else if(asset.Type == AssetType::Material) {
+			// TODO
 		}
 
-		if(!HasRefs(asset))
-			pack.Write((uint64_t)0);
-		else {
-			auto& refs = m_References[asset.ID];
-			pack.Write(refs.Count());
-			for(auto& ref : refs) {
-				pack.Write((uint64_t)ref.ID);
-				pack.Write((uint32_t)ref.Type);
-			}
-		}
+		assetIdx = pack.GetPosition(); // Object position for next asset
+		pack.SetPosition(registryPos); // Return to registry position
 	}
 
 	Application::PushDir();

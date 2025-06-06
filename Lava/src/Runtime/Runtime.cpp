@@ -69,13 +69,13 @@ Runtime::Runtime(const CommandLineArgs& args)
 	m_App->AppLoad =
 		[](Ref<ScriptModule> script)
 		{
-			script->Load("./.volc.class");
+			// script->Load("./.volc.class");
 		};
 	m_App->ScreenLoad =
 		[](Ref<ScriptModule> script)
 		{
-			auto scriptPath = fs::path("Class") / script->Name;
-			script->Load(scriptPath.string() + ".class");
+			// auto scriptPath = fs::path("Class") / script->Name;
+			// script->Load(scriptPath.string() + ".class");
 		};
 	m_App->SceneLoad =
 		[](Scene& scene)

@@ -16,14 +16,9 @@ struct ScriptField {
 	const std::string Name = "";
 	int TypeID = 0;
 	asITypeInfo* Type = nullptr;
-	VolcaniCore::List<std::string> Metadata;
 
 	template<typename T>
 	T* As() const { return static_cast<T*>(Data); }
-
-	bool HasMetadata(const std::string& metadata) {
-		return Metadata.Find([&](auto& val) { return val == metadata; }).Found;
-	}
 
 	bool Is(ScriptQualifier q);
 };

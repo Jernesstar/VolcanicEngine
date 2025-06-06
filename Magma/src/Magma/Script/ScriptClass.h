@@ -46,9 +46,8 @@ public:
 	}
 
 	asIScriptFunction* GetFunction(const std::string& name) const;
+	asITypeInfo* GetType() const { return m_Type; }
 	const auto& GetFunctions() const { return m_Functions; }
-
-	ScriptModule* GetModule() const { return m_Module; }
 
 private:
 	ScriptFunc GetFunc() const;
@@ -56,15 +55,9 @@ private:
 private:
 	asITypeInfo* m_Type;
 	asIScriptFunction* m_Factory;
-	VolcaniCore::List<std::string> m_Metadata;
 	Map<std::string, uint32_t> m_FieldMap;
-	Map<std::string, VolcaniCore::List<std::string>> m_FieldMetadata;
-
 	Map<std::string, asIScriptFunction*> m_Functions;
 
-	ScriptModule* m_Module;
-
-	friend class ScriptModule;
 	friend class ScriptObject;
 };
 

@@ -22,6 +22,7 @@
 #include <Editor/EditorApp.h>
 #include <Editor/AssetManager.h>
 #include <Editor/AssetImporter.h>
+#include <Editor/ScriptManager.h>
 
 static Ref<UI::Image> s_FileIcon;
 
@@ -356,7 +357,10 @@ void EditElement<UIElement>(UIElement* element) {
 	auto* handle = obj->GetHandle();
 	for(uint32_t i = 0; i < handle->GetPropertyCount(); i++) {
 		ScriptField field = obj->GetProperty(i);
-		if(!field.HasMetadata("EditorField"))
+		bool editorField =
+			ScriptManager::FieldHasMetadata(
+				obj->GetClass()->Name, field.Name, "EditorField");
+		if(!editorField)
 			continue;
 
 		if(field.Type) {

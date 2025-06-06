@@ -48,7 +48,7 @@ struct RuntimeScreen {
 	RuntimeScreen(const Screen& screen)
 		: World(CreateRef<Scene>(screen.Scene)), UI(screen.UI)
 	{
-		Script = CreateRef<ScriptModule>(screen.Name);
+		Script = CreateRef<ScriptModule>();
 	}
 
 	~RuntimeScreen() {
@@ -158,7 +158,7 @@ App::~App() {
 }
 
 void App::OnLoad() {
-	s_AppModule = CreateRef<ScriptModule>(m_Project.App);
+	s_AppModule = CreateRef<ScriptModule>();
 	AppLoad(s_AppModule);
 
 	s_AppObject = s_AppModule->GetClass(m_Project.App)->Instantiate();

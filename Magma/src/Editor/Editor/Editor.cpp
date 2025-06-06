@@ -96,7 +96,7 @@ void Editor::Load(const CommandLineArgs& args) {
 		NewProject(args["--project"]);
 
 		if(args["--export"]) {
-			auto path = fs::canonical(args["--export"].Args[0]).string();
+			auto path = (args["--export"].Args[0]);
 			ExportProject(path);
 			Application::Close();
 			return;
@@ -399,14 +399,14 @@ void Editor::NewProject(const std::string& volcPath) {
 	m_App->AppLoad =
 		[rootPath](Ref<ScriptModule> script)
 		{
-			auto scriptPath = rootPath / "Project" / "App" / script->Name;
-			script->Load(scriptPath.string() + ".as");
+			// auto scriptPath = rootPath / "Project" / "App" / script->Name;
+			// script->Load(scriptPath.string() + ".as");
 		};
 	m_App->ScreenLoad =
 		[rootPath](Ref<ScriptModule> script)
 		{
-			auto scriptPath = rootPath / "Project" / "Screen" / script->Name;
-			script->Load(scriptPath.string() + ".as");
+			// auto scriptPath = rootPath / "Project" / "Screen" / script->Name;
+			// script->Load(scriptPath.string() + ".as");
 		};
 	m_App->SceneLoad =
 		[rootPath](Scene& scene)
@@ -494,9 +494,11 @@ void Editor::ExportProject() {
 
 void Editor::ExportProject(const std::string& exportPath) {
 	menu.project.exportProject = false;
+	fs::path test(".build");
+	VOLCANICORE_LOG_INFO(test.extension().string().c_str());
 
-	if(!fs::is_directory(exportPath) || !fs::exists(exportPath)) {
-		VOLCANICORE_LOG_INFO("'%s' is not a valid directory");
+	if(fs::is_regular_file(exportPath)) {
+		VOLCANICORE_LOG_INFO("'%s' is not a valid directory path");
 		return;
 	}
 
@@ -509,12 +511,12 @@ void Editor::ExportProject(const std::string& exportPath) {
 	m_Project.Save((fs::path(exportPath) / ".volc.proj").string());
 
 	for(auto& screen : m_Project.Screens) {
-		auto mod = CreateRef<ScriptModule>(screen.Name);
-		mod->Load(
-			(fs::path(m_Project.Path) / "Project" / "Screen" / screen.Name
-			).string() + ".as");
-		mod->Save(
-			(fs::path(exportPath) / "Class" / screen.Name).string() + ".class");
+		auto mod = CreateRef<ScriptModule>();
+		// mod->Load(
+		// 	(fs::path(m_Project.Path) / "Project" / "Screen" / screen.Name
+		// 	).string() + ".as");
+		// mod->Save(
+		// 	(fs::path(exportPath) / "Class" / screen.Name).string() + ".class");
 	}
 
 	fs::path sceneFolder = fs::path(m_Project.Path) / "Visual" / "Scene";
@@ -533,11 +535,11 @@ void Editor::ExportProject(const std::string& exportPath) {
 		UILoader::RuntimeSave(uiPage, m_Project.Path, exportPath);
 	}
 
-	auto mod = CreateRef<ScriptModule>(m_Project.App);
-	mod->Load(
-		(fs::path(m_Project.Path) / "Project" / "App" / m_Project.App
-		).string() + ".as");
-	mod->Save((fs::path(exportPath) / ".volc.class").string());
+	// auto mod = CreateRef<ScriptModule>(m_Project.App);
+	// mod->Load(
+	// 	(fs::path(m_Project.Path) / "Project" / "App" / m_Project.App
+	// 	).string() + ".as");
+	// mod->Save((fs::path(exportPath) / ".volc.class").string());
 
 	m_AssetManager.RuntimeSave(exportPath);
 

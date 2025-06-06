@@ -41,6 +41,21 @@ struct Asset {
 	operator uint64_t() const { return ID; }
 };
 
+struct Material {
+	Map<std::string, int32_t> IntUniforms;
+	Map<std::string, float> FloatUniforms;
+	Map<std::string, VolcaniCore::UUID> TextureUniforms;
+	Map<std::string, VolcaniCore::UUID> CubemapUniforms;
+
+	Map<std::string, glm::vec2> Vec2Uniforms;
+	Map<std::string, glm::vec3> Vec3Uniforms;
+	Map<std::string, glm::vec4> Vec4Uniforms;
+
+	Map<std::string, glm::mat2> Mat2Uniforms;
+	Map<std::string, glm::mat3> Mat3Uniforms;
+	Map<std::string, glm::mat4> Mat4Uniforms;
+};
+
 }
 
 
@@ -135,7 +150,7 @@ protected:
 	Map<VolcaniCore::UUID, Ref<VolcaniCore::ShaderPipeline>> m_ShaderAssets;
 	Map<VolcaniCore::UUID, Ref<Sound>> m_AudioAssets;
 	Map<VolcaniCore::UUID, Ref<ScriptModule>> m_ScriptAssets;
-	Map<VolcaniCore::UUID, Ref<VolcaniCore::DrawUniforms>> m_MaterialAssets;
+	Map<VolcaniCore::UUID, Ref<Material>> m_MaterialAssets;
 
 private:
 	inline static AssetManager* s_Instance;
@@ -190,7 +205,7 @@ inline Ref<ScriptModule> AssetManager::Get(Asset asset) const {
 }
 
 template<>
-inline Ref<VolcaniCore::DrawUniforms> AssetManager::Get(Asset asset) const {
+inline Ref<Material> AssetManager::Get(Asset asset) const {
 	VOLCANICORE_ASSERT(asset.Type == AssetType::Material);
 	if(!m_MaterialAssets.count(asset.ID))
 		return nullptr;

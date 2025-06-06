@@ -105,7 +105,7 @@ void ScriptGlue::Copy(Ref<ScriptObject> src, Ref<ScriptObject> dst) {
 		ScriptField field = src->GetProperty(i);
 		if(!field.Data)
 			continue;
-		if(!field.HasMetadata("EditorField"))
+		if(field.Is(ScriptQualifier::ScriptObject))
 			continue;
 
 		std::string fieldType;

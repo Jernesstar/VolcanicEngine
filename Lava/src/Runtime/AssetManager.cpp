@@ -4,8 +4,6 @@
 
 #include <Magma/Core/BinaryReader.h>
 
-#include <VolcaniCore/Core/Math.h>
-
 namespace Lava {
 
 RuntimeAssetManager::RuntimeAssetManager() {
@@ -21,6 +19,32 @@ RuntimeAssetManager::~RuntimeAssetManager() {
 namespace Magma {
 
 template<>
+BinaryReader& BinaryReader::ReadObject(Asset& asset) {
+	uint64_t id;
+	uint8_t typeInt;
+	bool primary;
+	std::string name;
+	Read(id);
+	Read(typeInt);
+	Read(primary);
+	asset = { id, (AssetType)typeInt, primary };
+	Read(name);
+	if(name != "")
+		AssetManager::Get()->NameAsset(asset, name);
+
+	uint64_t refCount;
+	Read(refCount);
+
+	for(uint64_t i = 0; i < refCount; i++) {
+		Asset ref;
+		Read(ref);
+		AssetManager::Get()->AddRef(asset, ref);
+	}
+
+	return *this;
+}
+
+template<>
 BinaryReader& BinaryReader::ReadObject(SubMesh& mesh) {
 	Read(mesh.Vertices);
 	Read(mesh.Indices);
@@ -28,89 +52,84 @@ BinaryReader& BinaryReader::ReadObject(SubMesh& mesh) {
 
 	return *this;
 }
-	
+
 }
 
 namespace Lava {
+
+class ByteCodeReader : public asIBinaryStream {
+public:
+	ByteCodeReader(BinaryReader* writer)
+		: m_Reader(writer)
+	{
+	}
+	~ByteCodeReader() = default;
+
+	int Read(void* data, uint32_t size) override {
+		m_Reader->ReadData(data, (uint64_t)size);
+		return 0;
+	}
+
+	int Write(const void* data, uint32_t size) override {
+		return 0;
+	}
+
+private:
+	BinaryReader* m_Reader = nullptr;
+};
 
 void RuntimeAssetManager::Load(Asset asset) {
 	if(!IsValid(asset) || IsLoaded(asset))
 		return;
 
+	BinaryReader pack("./.volc.assetpk");
+
 	m_AssetRegistry[asset] = true;
 	uint64_t offset = m_AssetOffsets[asset.ID];
 
 	if(asset.Type == AssetType::Mesh) {
+		pack.SetPosition(offset);
+
 		Ref<Mesh> mesh = CreateRef<Mesh>(MeshType::Model);
-		BinaryReader reader("Asset/Mesh/mesh.bin");
+		pack.Read(mesh->SubMeshes);
+
+		for(auto ref : GetRefs(asset)) {
+			auto& mat = mesh->Materials.Emplace();
+			Load(ref);
+			auto material = Get<Magma::Material>(asset);
+			// TODO
+		}
+
 		m_MeshAssets[asset.ID] = mesh;
-		
-		reader.SetPosition(offset);
-		reader.Read(mesh->SubMeshes);
-		uint64_t materialCount;
-		reader.Read(materialCount);
-
-		if(!materialCount) {
-			mesh->Materials.Emplace();
-			reader.Read(mesh->Materials[0].DiffuseColor);
-			reader.Read(mesh->Materials[0].SpecularColor);
-			reader.Read(mesh->Materials[0].EmissiveColor);
-			return;
-		}
-
-		reader.SetPosition(reader.GetPosition() - sizeof(uint64_t));
-		List<uint8_t> materialFlags;
-		reader.Read(materialFlags);
-
-		uint64_t refIdx = 0;
-		List<Asset> refs;
-		if(HasRefs(asset))
-			refs = m_References[asset.ID];
-
-		for(uint64_t i = 0; i < materialFlags.Count(); i++) {
-			std::bitset<3> flags(materialFlags[i]);
-			mesh->Materials.Emplace();
-			reader.Read(mesh->Materials[i].DiffuseColor);
-			reader.Read(mesh->Materials[i].SpecularColor);
-			reader.Read(mesh->Materials[i].EmissiveColor);
-
-			if(flags.test(0)) {
-				Load(refs[refIdx]);
-				mesh->Materials[i].Diffuse = Get<Texture>(refs[refIdx++]);
-			}
-			if(flags.test(1)) {
-				Load(refs[refIdx]);
-				mesh->Materials[i].Specular = Get<Texture>(refs[refIdx++]);
-			}
-			if(flags.test(2)) {
-				Load(refs[refIdx]);
-				mesh->Materials[i].Emissive = Get<Texture>(refs[refIdx++]);
-			}
-		}
 	}
 	else if(asset.Type == AssetType::Texture) {
-		BinaryReader reader("Asset/Texture/image.bin");
-		reader.SetPosition(offset);
+		pack.SetPosition(offset);
 
 		uint32_t width, height;
-		Buffer<uint8_t> data;
-		reader.Read(width);
-		reader.Read(height);
-		reader.Read(data);
+		Buffer<uint8_t> data(width * height);
+		pack.Read(width);
+		pack.Read(height);
+		pack.ReadData(data.Get(), data.GetMaxCount());
 
 		Ref<Texture> texture = Texture::Create(width, height);
 		texture->SetData(data);
-
 		m_TextureAssets[asset.ID] = texture;
 	}
 	else if(asset.Type == AssetType::Cubemap) {
+		// TODO
+	}
+	else if(asset.Type == AssetType::Shader) {
+		pack.SetPosition(offset);
+		Buffer<uint32_t> bytecode;
+		pack.Read(bytecode);
 
+		// m_ShaderAssets[asset.ID] = ShaderPipeline::Create(bytecode);
 	}
 	else if(asset.Type == AssetType::Audio) {
-		BinaryReader reader("Asset/Audio/sound.bin");
-		reader.SetPosition(offset);
+		pack.SetPosition(offset);
+
 		Buffer<float> data;
-		reader.Read(data);
+		pack.Read(data);
 
 		Ref<Sound> sound = CreateRef<Sound>();
 		bool success =
@@ -121,16 +140,45 @@ void RuntimeAssetManager::Load(Asset asset) {
 		m_AudioAssets[asset.ID] = sound;
 	}
 	else if(asset.Type == AssetType::Script) {
-		BinaryReader reader("Asset/Script/script.bin");
+		pack.SetPosition(offset);
+
 		std::string name;
-		reader.SetPosition(offset);
-		reader.Read(name);
+		pack.Read(name);
 
-		auto path = "Asset/Script/" + name + ".class";
-		Ref<ScriptModule> mod = CreateRef<ScriptModule>(name);
-		mod->Load(path);
+		auto handle =
+			ScriptEngine::Get()->GetModule(name.c_str(), asGM_ALWAYS_CREATE);
+		ByteCodeReader stream(&pack);
+		handle->LoadByteCode(&stream);
+		m_ScriptAssets[asset.ID] = CreateRef<ScriptModule>(handle);
+	}
+	else if(asset.Type == AssetType::Material) {
+		List<uint8_t> materialFlags;
+		pack.Read(materialFlags);
 
-		m_ScriptAssets[asset.ID] = mod;
+		// uint64_t refIdx = 0;
+		// List<Asset> refs;
+		// if(HasRefs(asset))
+		// 	refs = m_References[asset.ID];
+
+		// for(uint64_t i = 0; i < materialFlags.Count(); i++) {
+		// 	std::bitset<3> flags(materialFlags[i]);
+		// 	pack.Read(mesh->Materials[i].DiffuseColor);
+		// 	pack.Read(mesh->Materials[i].SpecularColor);
+		// 	pack.Read(mesh->Materials[i].EmissiveColor);
+
+		// 	if(flags.test(0)) {
+		// 		Load(refs[refIdx]);
+		// 		mesh->Materials[i].Diffuse = Get<Texture>(refs[refIdx++]);
+		// 	}
+		// 	if(flags.test(1)) {
+		// 		Load(refs[refIdx]);
+		// 		mesh->Materials[i].Specular = Get<Texture>(refs[refIdx++]);
+		// 	}
+		// 	if(flags.test(2)) {
+		// 		Load(refs[refIdx]);
+		// 		mesh->Materials[i].Emissive = Get<Texture>(refs[refIdx++]);
+		// 	}
+		// }
 	}
 }
 
@@ -146,6 +194,8 @@ void RuntimeAssetManager::Unload(Asset asset) {
 		m_TextureAssets.erase(asset.ID);
 	else if(asset.Type == AssetType::Cubemap)
 		m_CubemapAssets.erase(asset.ID);
+	else if(asset.Type == AssetType::Shader)
+		m_ShaderAssets.erase(asset.ID);
 	else if(asset.Type == AssetType::Audio)
 		m_AudioAssets.erase(asset.ID);
 	else if(asset.Type == AssetType::Script)
@@ -153,45 +203,22 @@ void RuntimeAssetManager::Unload(Asset asset) {
 }
 
 void RuntimeAssetManager::Load() {
-	BinaryReader reader("./.volc.assetpk");
+	BinaryReader pack("./.volc.assetpk");
 
 	std::string header;
-	reader.Read(header);
+	pack.Read(header);
 	VOLCANICORE_ASSERT(header == "VOLC_PACK");
 
 	uint64_t count;
-	reader.Read(count);
+	pack.Read(count);
 	for(uint64_t i = 0; i < count; i++) {
-		uint64_t id;
-		uint32_t typeInt;
-		bool named;
-		reader.Read(id);
-		reader.Read(typeInt);
-		reader.Read(named);
-		Asset asset{ id, (AssetType)typeInt };
-		if(named) {
-			std::string name;
-			reader.Read(name);
-			NameAsset(asset, name);
-		}
+		Asset asset;
+		pack.Read(asset);
+
 		uint64_t offset;
-		reader.Read(offset);
+		pack.Read(offset);
 		m_AssetRegistry[asset] = false;
 		m_AssetOffsets[asset.ID] = offset;
-
-		uint64_t refCount;
-		reader.Read(refCount);
-		if(!refCount)
-			continue;
-
-		m_References[asset.ID].Allocate(refCount);
-		for(uint64_t i = 0; i < refCount; i++) {
-			uint64_t refID;
-			uint32_t refType;
-			reader.Read(refID);
-			reader.Read(refType);
-			m_References[asset.ID].Emplace(refID, (AssetType)refType, false);
-		}
 	}
 }
 

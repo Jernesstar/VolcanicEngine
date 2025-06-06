@@ -17,6 +17,7 @@
 
 #include "EditorApp.h"
 #include "AssetManager.h"
+#include "ScriptManager.h"
 
 namespace fs = std::filesystem;
 
@@ -213,7 +214,11 @@ void Serialize(const UIElement* ui, JSONSerializer& serializer) {
 		auto* handle = ui->ScriptInstance->GetHandle();
 		for(uint32_t i = 0; i < handle->GetPropertyCount(); i++) {
 			ScriptField field = ui->ScriptInstance->GetProperty(i);
-			if(!field.HasMetadata("EditorField"))
+			bool editorField =
+				ScriptManager::FieldHasMetadata(
+					ui->ScriptInstance->GetClass()->Name, field.Name,
+					"EditorField");
+			if(!editorField)
 				continue;
 
 			serializer.BeginMapping();
@@ -306,7 +311,7 @@ void Serialize(const UIElement* ui, JSONSerializer& serializer) {
 			else if(field.Is(ScriptQualifier::ScriptObject)) {
 				auto* type = field.Type;
 				for(uint32_t i = 0; i < type->GetPropertyCount(); i++) {
-					uint64_t offset;
+					// uint64_t offset;
 					// type->GetProperty()
 				}
 			}
@@ -453,7 +458,10 @@ static void WriteUI(BinaryWriter* writer, const UIElement* element) {
 	auto handle = element->ScriptInstance->GetHandle();
 	for(uint32_t i = 0; i < handle->GetPropertyCount(); i++) {
 		ScriptField field = element->ScriptInstance->GetProperty(i);
-		if(!field.HasMetadata("EditorField")) {
+		bool editorField =
+			ScriptManager::FieldHasMetadata(
+				element->ScriptInstance->GetClass()->Name, field.Name, "EditorField");
+		if(!editorField) {
 			writer->Write((int)-1);
 			continue;
 		}

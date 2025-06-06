@@ -16,6 +16,7 @@
 #include <Editor/EditorApp.h>
 #include <Editor/AssetManager.h>
 #include <Editor/AssetImporter.h>
+#include <Editor/ScriptManager.h>
 
 #include <Lava/Types/GridSet.h>
 #include <Lava/Types/GridSet3D.h>
@@ -483,7 +484,10 @@ void DrawComponent<ScriptComponent>(Entity& entity) {
 	auto* handle = component.Instance->GetHandle();
 	for(uint32_t i = 0; i < handle->GetPropertyCount(); i++) {
 		ScriptField field = component.Instance->GetProperty(i);
-		if(!field.HasMetadata("EditorField"))
+		bool editorField =
+			ScriptManager::FieldHasMetadata(
+				component.Instance->GetClass()->Name, field.Name, "EditorField");
+		if(!editorField)
 			continue;
 
 		if(field.Type) {

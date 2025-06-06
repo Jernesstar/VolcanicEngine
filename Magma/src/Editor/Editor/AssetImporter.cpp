@@ -13,11 +13,19 @@
 #include <soloud.h>
 #include <soloud_wav.h>
 
+#include <angelscript.h>
+#include <angelscript/add_on/scriptbuilder/scriptbuilder.h>
+
+#include <VolcaniCore/Core/FileUtils.h>
+
+#include <Magma/Core/BinaryWriter.h>
+
 #include "Core/Log.h"
 #include "Core/Assert.h"
 #include "Core/FileUtils.h"
 
 using namespace VolcaniCore;
+using namespace Magma::Script;
 
 namespace fs = std::filesystem;
 
@@ -325,6 +333,74 @@ Ref<Sound> AssetImporter::GetAudio(const std::string& path) {
 	auto output = CreateRef<Sound>();
 	VOLCANICORE_ASSERT(output->GetInternal().load(path.c_str()) == 0);
 	return output;
+}
+
+asIScriptModule* AssetImporter::GetScriptData(const std::string& path,
+	bool* error, std::string name)
+{
+	auto* engine = ScriptEngine::Get();
+
+	if(!fs::exists(path)) {
+		VOLCANICORE_LOG_ERROR(
+			"GetScriptData: File '%s' does not exist", path.c_str());
+		if(error) *error = true;
+		return nullptr;
+	}
+
+	if(name == "")
+		name = fs::path(path).filename().stem().string();
+	CScriptBuilder builder;
+	int r;
+	r = builder.StartNewModule(engine, name.c_str());
+	if(r < 0) {
+		VOLCANICORE_LOG_ERROR("StartNewModule failed'%s'", name.c_str());
+		if(error) *error = true;
+		return nullptr;
+	}
+	builder.DefineWord("EDITOR");
+	r = builder.AddSectionFromFile(path.c_str());
+	if(r < 0) {
+		VOLCANICORE_LOG_ERROR("AddSectionFromFile failed");
+		if(error) *error = true;
+		return nullptr;
+	}
+	r = builder.BuildModule();
+	if(r < 0) {
+		VOLCANICORE_LOG_ERROR("BuildModule failed");
+		if(error) *error = true;
+		return nullptr;
+	}
+	asIScriptModule* handle = builder.GetModule();
+
+	if(error) *error = false;
+	return handle;
+}
+
+Ref<ScriptModule> AssetImporter::GetScript(const std::string& path) {
+	bool error;
+	asIScriptModule* handle = GetScriptData(path, &error);
+	if(error)
+		return nullptr;
+
+	Ref<ScriptModule> mod = CreateRef<ScriptModule>(handle);
+
+	for(auto [_, _class] : mod->GetClasses()) {
+		auto type = _class->GetType();
+		auto id = type->GetTypeId();
+
+		// auto& list = ScriptManager::GetClassMetadata(id);
+		// for(auto str : builder.GetMetadataForType(id))
+		// 	_class->m_Metadata.Add(str);
+
+		// for(uint32_t i = 0; i < type->GetPropertyCount(); i++)
+		// 	for(auto str : builder.GetMetadataForTypeProperty(id, i)) {
+		// 		const char* name;
+		// 		type->GetProperty(i, &name);
+		// 		_class->m_FieldMetadata[name].Add(str);
+		// 	}
+	}
+
+	return mod;
 }
 
 }

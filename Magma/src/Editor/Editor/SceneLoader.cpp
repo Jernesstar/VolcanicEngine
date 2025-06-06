@@ -16,6 +16,7 @@
 #include <Magma/Core/BinaryReader.h>
 #include <Magma/Script/ScriptClass.h>
 #include <Magma/Scene/Component.h>
+#include <Magma/Scene/Component.h>
 
 #include <Lava/Core/App.h>
 #include <Lava/Types/GridSet.h>
@@ -23,6 +24,7 @@
 #include <Lava/Types/Timer.h>
 
 #include "EditorApp.h"
+#include "ScriptManager.h"
 
 #undef near
 #undef far
@@ -112,7 +114,10 @@ void SaveScript(YAMLSerializer& serializer, Ref<ScriptObject> obj) {
 	auto* handle = obj->GetHandle();
 	for(uint32_t i = 0; i < handle->GetPropertyCount(); i++) {
 		ScriptField field = obj->GetProperty(i);
-		if(!field.HasMetadata("EditorField"))
+		bool editorField =
+			ScriptManager::FieldHasMetadata(
+				obj->GetClass()->Name, field.Name, "EditorField");
+		if(!editorField)
 			continue;
 
 		serializer.BeginMapping()
@@ -773,14 +778,6 @@ BinaryWriter& BinaryWriter::WriteObject(const SkyboxComponent& comp) {
 }
 
 template<>
-BinaryWriter& BinaryWriter::WriteObject(const Asset& asset) {
-	Write((uint64_t)asset.ID);
-	Write((uint32_t)asset.Type);
-	Write((bool)asset.Primary);
-	return *this;
-}
-
-template<>
 BinaryWriter& BinaryWriter::WriteObject(const ScriptComponent& comp) {
 	auto obj = comp.Instance;
 	auto* handle = obj->GetHandle();
@@ -790,7 +787,10 @@ BinaryWriter& BinaryWriter::WriteObject(const ScriptComponent& comp) {
 
 	for(uint32_t i = 0; i < handle->GetPropertyCount(); i++) {
 		ScriptField field = obj->GetProperty(i);
-		if(!field.HasMetadata("EditorField")) {
+		bool editorField =
+			ScriptManager::FieldHasMetadata(
+				comp.Instance->GetClass()->Name, field.Name, "EditorField");
+		if(!editorField) {
 			Write((int)-1);
 			continue;
 		}
@@ -839,8 +839,12 @@ BinaryWriter& BinaryWriter::WriteObject(const ScriptComponent& comp) {
 			// Works for primitive and POD types
 			WriteData(array->GetBuffer(), size * count);
 		}
-		else if(typeName == "Asset")
-			Write(*field.As<Asset>());
+		else if(typeName == "Asset") {
+			auto asset = *field.As<Asset>();
+			Write((uint64_t)asset.ID);
+			Write((uint32_t)asset.Type);
+			Write((bool)asset.Primary);
+		}
 		else if(typeName == "Vec3")
 			Write(*field.As<glm::vec3>());
 		else if(typeName == "GridSet") {

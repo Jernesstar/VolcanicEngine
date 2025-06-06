@@ -64,8 +64,8 @@ Script::Script() {
 		.AddMethod("void OnMouseUp()")
 		.AddMethod("void OnMouseDown()");
 
-	mod = CreateRef<ScriptModule>("TestScript");
-	mod->Load("Sandbox/assets/scripts/script.as");
+	// mod = CreateRef<ScriptModule>("TestScript");
+	// mod->Load("Sandbox/assets/scripts/script.as");
 
 	scriptClass = mod->GetClass("Button");
 

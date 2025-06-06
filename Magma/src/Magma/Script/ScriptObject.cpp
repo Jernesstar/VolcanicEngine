@@ -75,11 +75,8 @@ ScriptField ScriptObject::GetProperty(uint32_t idx) {
 	std::string name = m_Handle->GetPropertyName(idx);
 	auto id = m_Handle->GetPropertyTypeId(idx);
 	auto type = ScriptEngine::Get()->GetTypeInfoById(id);
-	List<std::string> metadata;
-	if(m_Class->m_FieldMetadata.count(name))
-		metadata = m_Class->m_FieldMetadata.at(name);
 
-	return { address, name, id, type, metadata };
+	return { address, name, id, type };
 }
 
 ScriptFunc ScriptObject::GetFunc(const std::string& name) const {
