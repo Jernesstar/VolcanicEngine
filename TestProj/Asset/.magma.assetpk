@@ -1,11 +1,6 @@
 AssetPack:
   Assets:
     - Asset:
-        ID: 436686443103530623
-        Type: Shader
-        Name: Particle
-        Path: Shader/Particle.glsl.frag
-    - Asset:
         ID: 2691709289590626850
         Type: Script
         Path: Script/PlayerController.as

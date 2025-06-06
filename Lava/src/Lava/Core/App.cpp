@@ -48,7 +48,6 @@ struct RuntimeScreen {
 	RuntimeScreen(const Screen& screen)
 		: World(CreateRef<Scene>(screen.Scene)), UI(screen.UI)
 	{
-		Script = CreateRef<ScriptModule>();
 	}
 
 	~RuntimeScreen() {
@@ -306,7 +305,7 @@ void App::ScreenSet(const std::string& name) {
 	delete s_Screen;
 	s_Screen = new RuntimeScreen(screen);
 
-	ScreenLoad(s_Screen->Script);
+	ScreenLoad(s_Screen->Script, screen.Name);
 	auto scriptClass = s_Screen->Script->GetClass(name);
 	s_Screen->ScriptObj = scriptClass->Instantiate();
 

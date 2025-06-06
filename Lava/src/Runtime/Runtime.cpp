@@ -5,12 +5,10 @@
 #include <VolcaniCore/Graphics/Renderer.h>
 #include <VolcaniCore/Graphics/ShaderLibrary.h>
 
+#include <Magma/Core/BinaryReader.h>
 #include <Magma/Script/ScriptEngine.h>
-
 #include <Magma/Audio/AudioEngine.h>
-
 #include <Magma/Physics/Physics.h>
-
 #include <Magma/UI/UIRenderer.h>
 
 #include <Lava/Core/ScriptGlue.h>
@@ -67,15 +65,26 @@ Runtime::Runtime(const CommandLineArgs& args)
 
 	m_App = CreateRef<App>(project);
 	m_App->AppLoad =
-		[](Ref<ScriptModule> script)
+		[=](Ref<ScriptModule>& script)
 		{
-			// script->Load("./.volc.class");
+			auto handle =
+				ScriptEngine::Get()->GetModule(
+					project.App.c_str(), asGM_ALWAYS_CREATE);
+			BinaryReader reader("./.volc.class");
+			ByteCodeReader stream(&reader);
+			handle->LoadByteCode(&stream);
+			script = CreateRef<ScriptModule>(handle);
 		};
 	m_App->ScreenLoad =
-		[](Ref<ScriptModule> script)
+		[](Ref<ScriptModule>& script, const std::string& name)
 		{
-			// auto scriptPath = fs::path("Class") / script->Name;
-			// script->Load(scriptPath.string() + ".class");
+			auto handle =
+				ScriptEngine::Get()->GetModule(name.c_str(),
+					asGM_ALWAYS_CREATE);
+			BinaryReader reader((fs::path("Class") / name).string() + ".class");
+			ByteCodeReader stream(&reader);
+			handle->LoadByteCode(&stream);
+			script = CreateRef<ScriptModule>(handle);
 		};
 	m_App->SceneLoad =
 		[](Scene& scene)

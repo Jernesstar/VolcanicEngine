@@ -185,7 +185,7 @@ BinaryReader& BinaryReader::ReadObject(ScriptComponent& comp) {
 			uint64_t id;
 			Read(id);
 			asset.ID = id;
-			uint32_t type;
+			uint8_t type;
 			Read(type);
 			asset.Type = (AssetType)type;
 			Read(asset.Primary);

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Magma/Core/BinaryWriter.h>
 #include <Magma/Script/ScriptObject.h>
 
 using namespace VolcaniCore;
@@ -7,11 +8,15 @@ using namespace Magma::Script;
 
 namespace Magma {
 
-// Linting, metadata
+// Loading, linting, metadata
 class ScriptManager {
 public:
 	ScriptManager() = default;
 	~ScriptManager() = default;
+
+	static asIScriptModule* LoadScript(const std::string& path,
+		bool metadata = true, bool* error = nullptr, std::string name = "");
+	static void SaveScript(asIScriptModule* mod, BinaryWriter& writer);
 
 	static bool FunctionHasMetadata(const std::string& name,
 									const std::string& str)

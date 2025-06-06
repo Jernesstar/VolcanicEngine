@@ -24,6 +24,7 @@
 #include "Project/ProjectTab.h"
 
 #include "AssetImporter.h"
+#include "ScriptManager.h"
 #include "SceneLoader.h"
 #include "UILoader.h"
 
@@ -397,16 +398,16 @@ void Editor::NewProject(const std::string& volcPath) {
 	auto rootPath = fs::path(volcPath).parent_path();
 	m_App = CreateRef<Lava::App>(m_Project);
 	m_App->AppLoad =
-		[rootPath](Ref<ScriptModule> script)
+		[this, rootPath](Ref<ScriptModule>& script)
 		{
-			// auto scriptPath = rootPath / "Project" / "App" / script->Name;
-			// script->Load(scriptPath.string() + ".as");
+			auto scriptPath = rootPath / "Project" / "App" / m_Project.App;
+			script = AssetImporter::GetScript(scriptPath.string() + ".as");
 		};
 	m_App->ScreenLoad =
-		[rootPath](Ref<ScriptModule> script)
+		[rootPath](Ref<ScriptModule>& script, const std::string& name)
 		{
-			// auto scriptPath = rootPath / "Project" / "Screen" / script->Name;
-			// script->Load(scriptPath.string() + ".as");
+			auto scriptPath = rootPath / "Project" / "Screen" / name;
+			script = AssetImporter::GetScript(scriptPath.string() + ".as");
 		};
 	m_App->SceneLoad =
 		[rootPath](Scene& scene)
@@ -494,8 +495,6 @@ void Editor::ExportProject() {
 
 void Editor::ExportProject(const std::string& exportPath) {
 	menu.project.exportProject = false;
-	fs::path test(".build");
-	VOLCANICORE_LOG_INFO(test.extension().string().c_str());
 
 	if(fs::is_regular_file(exportPath)) {
 		VOLCANICORE_LOG_INFO("'%s' is not a valid directory path");
@@ -511,12 +510,12 @@ void Editor::ExportProject(const std::string& exportPath) {
 	m_Project.Save((fs::path(exportPath) / ".volc.proj").string());
 
 	for(auto& screen : m_Project.Screens) {
-		auto mod = CreateRef<ScriptModule>();
-		// mod->Load(
-		// 	(fs::path(m_Project.Path) / "Project" / "Screen" / screen.Name
-		// 	).string() + ".as");
-		// mod->Save(
-		// 	(fs::path(exportPath) / "Class" / screen.Name).string() + ".class");
+		auto* mod = ScriptManager::LoadScript(
+			(fs::path(m_Project.Path) / "Project" / "Screen" / screen.Name
+			).string() + ".as", false);
+		BinaryWriter writer(
+			(fs::path(exportPath) / "Class" / screen.Name).string() + ".class");
+		ScriptManager::SaveScript(mod, writer);
 	}
 
 	fs::path sceneFolder = fs::path(m_Project.Path) / "Visual" / "Scene";
@@ -535,11 +534,11 @@ void Editor::ExportProject(const std::string& exportPath) {
 		UILoader::RuntimeSave(uiPage, m_Project.Path, exportPath);
 	}
 
-	// auto mod = CreateRef<ScriptModule>(m_Project.App);
-	// mod->Load(
-	// 	(fs::path(m_Project.Path) / "Project" / "App" / m_Project.App
-	// 	).string() + ".as");
-	// mod->Save((fs::path(exportPath) / ".volc.class").string());
+	auto* mod = ScriptManager::LoadScript(
+		(fs::path(m_Project.Path) / "Project" / "App" / m_Project.App
+		).string() + ".as", false);
+	BinaryWriter writer((fs::path(exportPath) / ".volc.class").string());
+	ScriptManager::SaveScript(mod, writer);
 
 	m_AssetManager.RuntimeSave(exportPath);
 

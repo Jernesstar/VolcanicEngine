@@ -36,8 +36,11 @@ BinaryReader& BinaryReader::ReadObject(Asset& asset) {
 	Read(refCount);
 
 	for(uint64_t i = 0; i < refCount; i++) {
-		Asset ref;
-		Read(ref);
+		uint64_t id;
+		uint8_t type;
+		Read(id);
+		Read(type);
+		Asset ref{ id, (AssetType)type, false };
 		AssetManager::Get()->AddRef(asset, ref);
 	}
 
@@ -57,54 +60,28 @@ BinaryReader& BinaryReader::ReadObject(SubMesh& mesh) {
 
 namespace Lava {
 
-class ByteCodeReader : public asIBinaryStream {
-public:
-	ByteCodeReader(BinaryReader* writer)
-		: m_Reader(writer)
-	{
-	}
-	~ByteCodeReader() = default;
-
-	int Read(void* data, uint32_t size) override {
-		m_Reader->ReadData(data, (uint64_t)size);
-		return 0;
-	}
-
-	int Write(const void* data, uint32_t size) override {
-		return 0;
-	}
-
-private:
-	BinaryReader* m_Reader = nullptr;
-};
-
 void RuntimeAssetManager::Load(Asset asset) {
 	if(!IsValid(asset) || IsLoaded(asset))
 		return;
 
-	BinaryReader pack("./.volc.assetpk");
-
 	m_AssetRegistry[asset] = true;
-	uint64_t offset = m_AssetOffsets[asset.ID];
+	BinaryReader pack("./.volc.assetpk");
+	pack.SetPosition(m_AssetOffsets[asset.ID]);
 
 	if(asset.Type == AssetType::Mesh) {
-		pack.SetPosition(offset);
-
 		Ref<Mesh> mesh = CreateRef<Mesh>(MeshType::Model);
 		pack.Read(mesh->SubMeshes);
 
-		for(auto ref : GetRefs(asset)) {
-			auto& mat = mesh->Materials.Emplace();
-			Load(ref);
-			auto material = Get<Magma::Material>(asset);
-			// TODO
-		}
+		//for(auto ref : GetRefs(asset)) {
+		//	auto& mat = mesh->Materials.Emplace();
+		//	Load(ref);
+		//	auto material = Get<Magma::Material>(asset);
+		//	// TODO
+		//}
 
 		m_MeshAssets[asset.ID] = mesh;
 	}
 	else if(asset.Type == AssetType::Texture) {
-		pack.SetPosition(offset);
-
 		uint32_t width, height;
 		Buffer<uint8_t> data(width * height);
 		pack.Read(width);
@@ -116,18 +93,18 @@ void RuntimeAssetManager::Load(Asset asset) {
 		m_TextureAssets[asset.ID] = texture;
 	}
 	else if(asset.Type == AssetType::Cubemap) {
-		// TODO
+		uint32_t test;
+		pack.Read(test);
+		VOLCANICORE_ASSERT(test == 4);
+
 	}
 	else if(asset.Type == AssetType::Shader) {
-		pack.SetPosition(offset);
 		Buffer<uint32_t> bytecode;
 		pack.Read(bytecode);
 
 		// m_ShaderAssets[asset.ID] = ShaderPipeline::Create(bytecode);
 	}
 	else if(asset.Type == AssetType::Audio) {
-		pack.SetPosition(offset);
-
 		Buffer<float> data;
 		pack.Read(data);
 
@@ -140,8 +117,6 @@ void RuntimeAssetManager::Load(Asset asset) {
 		m_AudioAssets[asset.ID] = sound;
 	}
 	else if(asset.Type == AssetType::Script) {
-		pack.SetPosition(offset);
-
 		std::string name;
 		pack.Read(name);
 
@@ -152,8 +127,12 @@ void RuntimeAssetManager::Load(Asset asset) {
 		m_ScriptAssets[asset.ID] = CreateRef<ScriptModule>(handle);
 	}
 	else if(asset.Type == AssetType::Material) {
-		List<uint8_t> materialFlags;
-		pack.Read(materialFlags);
+		uint32_t test;
+		pack.Read(test);
+		VOLCANICORE_ASSERT(test == 5);
+		m_MaterialAssets[asset.ID] = CreateRef<Magma::Material>();
+		// List<uint8_t> materialFlags;
+		// pack.Read(materialFlags);
 
 		// uint64_t refIdx = 0;
 		// List<Asset> refs;

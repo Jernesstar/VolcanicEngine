@@ -16,6 +16,7 @@
 #include <Lava/Core/App.h>
 
 #include "AssetImporter.h"
+#include "ScriptManager.h"
 
 namespace fs = std::filesystem;
 
@@ -51,14 +52,14 @@ AssetType AssetTypeFromString(const std::string& str) {
 		return AssetType::Texture;
 	else if(str == "Cubemap")
 		return AssetType::Cubemap;
+	else if(str == "Shader")
+		return AssetType::Shader;
 	else if(str == "Font")
 		return AssetType::Font;
 	else if(str == "Audio")
 		return AssetType::Audio;
 	else if(str == "Script")
 		return AssetType::Script;
-	else if(str == "Shader")
-		return AssetType::Shader;
 
 	return AssetType::None;
 }
@@ -553,8 +554,16 @@ BinaryWriter& BinaryWriter::WriteObject(const Asset& asset) {
 
 	Write(AssetManager::Get()->GetAssetName(asset));
 
-	if(AssetManager::Get()->HasRefs(asset))
-		Write(AssetManager::Get()->GetRefs(asset));
+	if(AssetManager::Get()->HasRefs(asset)) {
+		const auto& refs = AssetManager::Get()->GetRefs(asset);
+		Write(refs.Count());
+		for(auto ref : refs) {
+			Write((uint64_t)ref.ID);
+			Write((uint8_t)ref.Type);
+		}
+	}
+	else
+		Write((uint64_t)0);
 
 	return *this;
 }
@@ -579,52 +588,33 @@ BinaryWriter& BinaryWriter::WriteObject(const Vec4& vec) {
 
 namespace Magma {
 
-class ByteCodeWriter : public asIBinaryStream {
-public:
-	ByteCodeWriter(BinaryWriter* writer)
-		: m_Writer(writer) { }
-	~ByteCodeWriter() = default;
-
-	int Read(void* data, uint32_t size) override {
-		return 0;
-	}
-
-	int Write(const void* data, uint32_t size) override {
-		m_Writer->WriteData(data, (uint64_t)size);
-		return 0;
-	}
-
-private:
-	BinaryWriter* m_Writer = nullptr;
-};
-
 void EditorAssetManager::RuntimeSave(const std::string& exportPath) {
 	namespace fs = std::filesystem;
 
 	BinaryWriter pack((fs::path(exportPath) / ".volc.assetpk").string());
 	pack.Write(std::string("VOLC_PACK"));
-	pack.Write(m_AssetRegistry.size());
+	pack.Write((uint64_t)m_AssetRegistry.size());
 
-	uint64_t assetIdx = pack.GetPosition();
+	uint64_t objectIdx = pack.GetPosition();
 	for(auto [asset, _] : m_AssetRegistry) {
-		assetIdx += sizeof(uint64_t) + sizeof(uint8_t) + sizeof(bool); // ID, Type, Primary
-		assetIdx += sizeof(uint64_t); // Object Index
+		objectIdx += sizeof(uint64_t) + sizeof(uint8_t) + sizeof(bool); // ID, Type, Primary
+		objectIdx += sizeof(uint64_t); // Object Index
 	}
 	for(auto [_, refs] : m_References) {
-		assetIdx += sizeof(uint64_t); // RefCount
-		assetIdx += 10 * refs.Count(); // (ID + Type + Primary) * RefCount
+		objectIdx += sizeof(uint64_t); // RefCount
+		objectIdx += (sizeof(uint64_t) + sizeof(uint8_t)) * refs.Count(); // (ID + Type) * RefCount
 	}
 	for(auto [_, name] : m_NamedAssets) {
-		assetIdx += sizeof(uint64_t); // Name length
-		assetIdx += sizeof(char) * name.size(); // Name
+		objectIdx += sizeof(uint64_t); // Name length
+		objectIdx += sizeof(char) * name.size(); // Name
 	}
 
 	for(auto [asset, _] : m_AssetRegistry) {
-		pack.Write(asset); // Asset data (type, id, name, refs (recursive))
-		pack.Write(assetIdx); // Where the Asset points to, the actual object
+		pack.Write(asset); // Asset data (type, id, primary, name, refs)
+		pack.Write(objectIdx); // Where the Asset points to, the actual object
 
 		auto registryPos = pack.GetPosition(); // Record current position
-		pack.SetPosition(assetIdx); // Jump to object position
+		pack.SetPosition(objectIdx); // Jump to object position
 
 		auto path = GetPath(asset.ID);
 		if(asset.Type == AssetType::Mesh) {
@@ -641,6 +631,7 @@ void EditorAssetManager::RuntimeSave(const std::string& exportPath) {
 		}
 		else if(asset.Type == AssetType::Cubemap) {
 			// Nothing, virtual asset that simply references other images
+			pack.Write((uint32_t)4);
 		}
 		else if(asset.Type == AssetType::Shader) {
 			Buffer<uint32_t> data = AssetImporter::GetShaderData(path);
@@ -651,22 +642,22 @@ void EditorAssetManager::RuntimeSave(const std::string& exportPath) {
 			pack.Write(soundData);
 		}
 		else if(asset.Type == AssetType::Script) {
-			asIScriptModule* mod = AssetImporter::GetScriptData(path);
+			auto* mod = ScriptManager::LoadScript(path, false);
 			pack.Write(std::string(mod->GetName()));
-
-			ByteCodeWriter stream(&pack);
-			mod->SaveByteCode(&stream, true);
+			ScriptManager::SaveScript(mod, pack);
+			mod->Discard();
 		}
 		else if(asset.Type == AssetType::Material) {
-			// TODO
+			pack.Write((uint32_t)5);
 		}
 
-		assetIdx = pack.GetPosition(); // Object position for next asset
+		objectIdx = pack.GetPosition(); // Object position for next asset
 		pack.SetPosition(registryPos); // Return to registry position
 	}
 
 	Application::PushDir();
 
+	fs::create_directories(fs::path(exportPath) / "Asset" / "Shader");
 	for(auto name : { "Framebuffer", "Lighting", "Bloom", "Mesh" }) {
 		auto sourceRoot = fs::path("Magma") / "assets" / "shaders" / name;
 		auto source1 = sourceRoot.string() + ".glsl.vert";

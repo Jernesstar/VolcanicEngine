@@ -27,8 +27,8 @@ public:
 	bool RenderUI;
 	bool Running;
 
-	Func<void, Ref<ScriptModule>> AppLoad;
-	Func<void, Ref<ScriptModule>> ScreenLoad;
+	Func<void, Ref<ScriptModule>&> AppLoad;
+	Func<void, Ref<ScriptModule>&, const std::string&> ScreenLoad;
 	Func<void, Scene&> SceneLoad;
 	Func<void, UIPage&> UILoad;
 

@@ -62,7 +62,7 @@ Scene:
               Diffuse: [1, 1, 1]
               Specular: [1, 1, 1]
               Position: [-1.45145547, 1.17734766, 9.42599583]
-              Direction: [0, 00, -1]
+              Direction: [0, 0, -1]
               CutoffAngle: 0.200000003
               OuterCutoffAngle: 0.300000012
     - Entity:
