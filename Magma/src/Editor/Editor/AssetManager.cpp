@@ -627,7 +627,7 @@ void EditorAssetManager::RuntimeSave(const std::string& exportPath) {
 			ImageData image = AssetImporter::GetImageData(path, false);
 			pack.Write(image.Width);
 			pack.Write(image.Height);
-			pack.WriteData(image.Data.Get(), image.Data.GetCount());
+			pack.WriteData(image.Data.Get(), image.Data.GetSize());
 		}
 		else if(asset.Type == AssetType::Cubemap) {
 			// Nothing, virtual asset that simply references other images

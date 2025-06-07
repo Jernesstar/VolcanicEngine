@@ -1,4 +1,4 @@
-#version 450 core
+#version 460 core
 
 uniform vec3 u_CameraPosition;
 uniform mat4 u_ViewProj = mat4(1.0);

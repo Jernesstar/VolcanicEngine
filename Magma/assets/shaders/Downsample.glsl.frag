@@ -1,4 +1,4 @@
-#version 450 core
+#version 460 core
 
 // This shader performs downsampling on a texture,
 // as taken from Call Of Duty method, presented at ACM Siggraph 2014.
@@ -9,12 +9,13 @@
 // Remember to use a floating-point texture format (for HDR)!
 // Remember to use edge clamping for this texture!
 
-uniform vec2 u_SrcResolution;
-layout(binding = 0) uniform sampler2D u_SrcTexture;
+layout(location = 1) uniform vec2 u_SrcResolution;
+
+layout(location = 2, binding = 0) uniform sampler2D u_SrcTexture;
 
 layout(location = 0) in vec2 v_TexCoords;
 
-out vec4 FragColor;
+layout(location = 0) out vec4 FragColor;
 
 void main()
 {

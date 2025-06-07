@@ -1,6 +1,6 @@
 #include "Events.h"
 
-#include <glad/gl.h>
+#include <glad/glad.h>
 
 #include "Core/Application.h"
 #include "Core/Assert.h"

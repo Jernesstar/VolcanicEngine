@@ -1,12 +1,14 @@
-#version 450 core
+#version 460 core
 
-uniform float u_Exposure;
-uniform float u_BloomStrength;
+layout(location = 1) uniform float u_Exposure;
+layout(location = 2) uniform float u_BloomStrength;
 
-layout(binding = 0) uniform sampler2D u_BloomTexture;
-layout(binding = 1) uniform sampler2D u_SceneTexture;
+layout(location = 3, binding = 0) uniform sampler2D u_BloomTexture;
+layout(location = 4, binding = 1) uniform sampler2D u_SceneTexture;
 
 layout(location = 0) in vec2 v_TexCoords;
+
+layout(location = 0) out vec4 FragColor;
 
 vec3 bloom()
 {
@@ -14,8 +16,6 @@ vec3 bloom()
     vec3 hdrColor = texture(u_SceneTexture, v_TexCoords).rgb;
     return mix(hdrColor, bloomColor, u_BloomStrength); // linear interpolation
 }
-
-out vec4 FragColor;
 
 void main()
 {

@@ -1,6 +1,6 @@
 #include "Shader.h"
 
-#include <glad/gl.h>
+#include <glad/glad.h>
 
 #include <glm/gtc/type_ptr.hpp>
 
@@ -127,9 +127,10 @@ uint32_t CreateShader(const Shader& shader) {
 	uint32_t shaderID = glCreateShader(type);
 
 	if(shader.Data.GetSizeT() == sizeof(uint32_t)) { // SPIR-V
-		// glShaderBinary(1, &shaderID, GL_SHADER_BINARY_FORMAT_SPIR_V_ARB,
-		// 	shader.Data.Get(), shader.BinaryData.GetCount());
-		// glSpecializeShader(shaderID, "main", 0, 0, 0);
+		// Really expecting uint8_t, so get we use GetMaxSize = GetMaxCount * 4
+		glShaderBinary(1, &shaderID, GL_SHADER_BINARY_FORMAT_SPIR_V,
+			shader.Data.Get(), shader.Data.GetMaxSize());
+		glSpecializeShader(shaderID, "main", 0, nullptr, nullptr);
 	}
 	else {
 		const char* address = (const char*)shader.Data.Get();

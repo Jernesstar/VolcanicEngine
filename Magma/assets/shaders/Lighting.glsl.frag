@@ -1,4 +1,4 @@
-#version 450 core
+#version 460 core
 
 #define MAX_POINT_LIGHTS 50
 #define MAX_SPOT_LIGHTS 50
@@ -57,20 +57,20 @@ layout(std140, binding = 2) uniform Spotlights
     Spotlight Buffer[MAX_SPOT_LIGHTS];
 } u_Spotlights;
 
-uniform int u_DirectionalLight;
-uniform int u_PointLightCount;
-uniform int u_SpotlightCount;
-uniform int u_SceneVisualizer;
+layout(location = 1) uniform int u_DirectionalLight;
+layout(location = 2) uniform int u_PointLightCount;
+layout(location = 3) uniform int u_SpotlightCount;
+layout(location = 4) uniform int u_SceneVisualizer;
 
-uniform vec3 u_CameraPosition;
+layout(location = 5) uniform vec3 u_CameraPosition;
 
-uniform Material u_Material;
+layout(location = 6) uniform Material u_Material;
 
 layout(location = 0) in vec3 v_Position;
 layout(location = 1) in vec3 v_Normal;
 layout(location = 2) in vec2 v_TexCoords;
 
-out vec4 FragColor;
+layout(location = 0) out vec4 FragColor;
 
 vec3 CalcDirLight(DirectionalLight light, vec3 normal, vec3 viewDir);
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 viewDir);

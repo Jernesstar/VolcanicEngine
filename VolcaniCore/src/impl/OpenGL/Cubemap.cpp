@@ -4,7 +4,7 @@
 #include <vector>
 #include <unordered_map>
 
-#include <glad/gl.h>
+#include <glad/glad.h>
 
 #include "Core/FileUtils.h"
 #include "Core/Log.h"

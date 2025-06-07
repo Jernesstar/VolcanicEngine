@@ -1,4 +1,4 @@
-#version 450 core
+#version 460 core
 
 struct Material {
     sampler2D Diffuse;
@@ -9,13 +9,13 @@ struct Material {
     int IsTextured;
 };
 
-uniform Material u_Material;
+layout(location = 1) uniform Material u_Material;
 
 layout(location = 0) in vec3 v_Position;
 layout(location = 1) in vec3 v_Normal;
 layout(location = 2) in vec2 v_TexCoords;
 
-out vec4 FragColor;
+layout(location = 0) out vec4 FragColor;
 
 void main()
 {

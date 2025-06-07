@@ -7,7 +7,7 @@ project "glad"
     targetdir ("%{RootPath}/build/%{_ACTION}/VolcaniCore/lib")
 
     files {
-        "%{VendorPaths.glad}/src/gl.c"
+        "%{VendorPaths.glad}/src/glad.c"
     }
 
     includedirs {

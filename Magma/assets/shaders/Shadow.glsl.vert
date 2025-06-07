@@ -1,4 +1,4 @@
-#version 450 core
+#version 460 core
 
 uniform mat4 u_ViewProj;
 uniform mat4 u_LightSpaceMatrix;

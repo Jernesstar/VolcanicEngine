@@ -3,7 +3,7 @@
 #include <iostream>
 #include <cstring>
 
-#include <glad/gl.h>
+#include <glad/glad.h>
 
 #include "Core/Assert.h"
 

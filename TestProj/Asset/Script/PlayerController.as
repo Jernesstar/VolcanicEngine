@@ -53,8 +53,10 @@ class PlayerController : IEntityController
 
         AssetManager.Load(meshAsset);
 
-        for(uint32 y = 0; y < Grid.Height; y++) {
-            for(uint32 x = 0; x < Grid.Width; x++) {
+        for(uint32 y = 0; y < Grid.Height; y++)
+        {
+            for(uint32 x = 0; x < Grid.Width; x++)
+            {
                 uint8 data = Grid.At(x, y);
                 if(data == 0)
                     continue;
@@ -89,7 +91,8 @@ class PlayerController : IEntityController
 
     void OnKeyEvent(KeyEvent@ event)
     {
-        if(event.Type == EventType::KeyCharacter) {
+        if(event.Type == EventType::KeyCharacter)
+        {
             KeyCharacterEvent@ e = cast<KeyCharacterEvent>(event);
             print("Inputted character: '" + e.Char + "'");
         }
@@ -124,12 +127,14 @@ class PlayerController : IEntityController
 
     void OnPhysicsEvent(PhysicsEvent@ event)
     {
-        // if(event.Type == PhysicsEventType::MousePress) {
+        // if(event.Type == PhysicsEventType::MousePress)
+        // {
         //     print("Pressed");
         //     return;
         // }
 
-        // if(event.EntityHandle.GetTagComponent().Tag == "Lava") {
+        // if(event.EntityHandle.GetTagComponent().Tag == "Lava")
+        // {
         //     ScriptSystem@ sys = Scene.GetScriptSystem();
         //     sys.BroadcastEvent(Handle, "PlayerDied");
         // }

@@ -1,6 +1,6 @@
 #include "Renderer.h"
 
-#include <glad/gl.h>
+#include <glad/glad.h>
 
 #include <glm/gtc/type_ptr.hpp>
 
@@ -55,10 +55,10 @@ static DebugInfo s_Info;
 Renderer::Renderer()
 	: RendererAPI(RendererAPI::Backend::OpenGL)
 {
-	int version = gladLoadGL(glfwGetProcAddress);
-	VOLCANICORE_ASSERT(version, "Glad could not load OpenGL");
-	VOLCANICORE_LOG_INFO("Successfully loaded OpenGL version %d.%d",
-		GLAD_VERSION_MAJOR(version), GLAD_VERSION_MINOR(version));
+	int success = gladLoadGL();
+	VOLCANICORE_ASSERT(success, "Glad could not load OpenGL");
+	VOLCANICORE_LOG_INFO("Successfully loaded OpenGL version %s",
+		glGetString(GL_VERSION));
 }
 
 void Renderer::Init() {

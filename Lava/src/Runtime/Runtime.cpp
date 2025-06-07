@@ -3,6 +3,7 @@
 #include <VolcaniCore/Event/Events.h>
 
 #include <VolcaniCore/Graphics/Renderer.h>
+#include <VolcaniCore/Graphics/Shader.h>
 #include <VolcaniCore/Graphics/ShaderLibrary.h>
 
 #include <Magma/Core/BinaryReader.h>
@@ -42,14 +43,32 @@ Runtime::Runtime(const CommandLineArgs& args)
 
 	Application::PushDir(rootPath);
 
-	// ShaderLibrary::Add(
-	// 	"Framebuffer", ShaderPipeline::Create("Asset/Shader", "Framebuffer"));
-	// ShaderLibrary::Add(
-	// 	"Lighting", ShaderPipeline::Create("Asset/Shader", "Lighting"));
-	// ShaderLibrary::Add(
-	// 	"Mesh", ShaderPipeline::Create("Asset/Shader", "Mesh"));
+	for(std::string name : { "Framebuffer", "Lighting", "Mesh" }) {
+		BinaryReader vertFile("Asset/Shader/" + name + ".bin.vert");
+		uint64_t count1;
+		vertFile.Read(count1);
+		Shader shader1
+		{
+			ShaderType::Vertex,
+			Buffer<void>(sizeof(uint32_t), count1)
+		};
+		vertFile.ReadData(shader1.Data.Get(), shader1.Data.GetMaxSize());
+
+		BinaryReader fragFile("Asset/Shader/" + name + ".bin.frag");
+		uint64_t count2;
+		fragFile.Read(count2);
+		Shader shader2
+		{
+			ShaderType::Fragment,
+			Buffer<void>(sizeof(uint32_t), count2)
+		};
+		fragFile.ReadData(shader2.Data.Get(), shader2.Data.GetMaxSize());
+
+		ShaderLibrary::Add(name, ShaderPipeline::Create({ shader1, shader2 }));
+	}
 
 	Physics::Init();
+	
 	AudioEngine::Init();
 	ScriptEngine::Init();
 	ScriptGlue::RegisterInterface();

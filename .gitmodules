@@ -44,9 +44,6 @@
 [submodule "Magma/vendor/efsw"]
 	path = Magma/vendor/efsw
 	url = https://github.com/SpartanJ/efsw.git
-[submodule "VolcaniCore/vendor/glad"]
-	path = VolcaniCore/vendor/glad
-	url = https://github.com/Jernesstar/glad.git
 [submodule "Magma/vendor/ImGuiColorTextEdit"]
 	path = Magma/vendor/ImGuiColorTextEdit
 	url = https://github.com/BalazsJako/ImGuiColorTextEdit.git
@@ -56,3 +53,6 @@
 [submodule "Magma/vendor/glslang"]
 	path = Magma/vendor/glslang
 	url = https://github.com/Jernesstar/glslang.git
+[submodule "VolcaniCore/vendor/glad"]
+	path = VolcaniCore/vendor/glad
+	url = https://github.com/Jernesstar/glad.git

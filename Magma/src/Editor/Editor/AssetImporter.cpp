@@ -6,9 +6,10 @@
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 
-#include <ShaderLang.h>
-#include <glslang/SPIRV/GlslangToSpv.h>
+#include <glslang/Public/ShaderLang.h>
+#include <glslang/Public/ResourceLimits.h>
 #include <glslang/SPIRV/Logger.h>
+#include <glslang/SPIRV/GlslangToSpv.h>
 
 #include <soloud.h>
 #include <soloud_wav.h>
@@ -66,11 +67,11 @@ Ref<Cubemap> AssetImporter::GetCubemap(const std::string& folder) {
 		{ "front", 4 }, { "back",	5 }
 	};
 	List<ImageData> output(6);
-	// for(uint32_t i = 0; i < 6; i++)
-	// 	output.Emplace();
+	for(uint32_t i = 0; i < 6; i++)
+		output.Emplace();
 
-	// for(auto& path : paths)
-	// 	output.Insert(map[path.filename().string()], GetImageData(path.string()));
+	for(auto& path : paths)
+		output[map[path.filename().string()]] = GetImageData(path.string());
 
 	return Cubemap::Create(output);
 }
@@ -276,28 +277,42 @@ Buffer<uint32_t> AssetImporter::GetShaderData(const std::string& path) {
 	EShLanguage lang;
 	if(file.Type == ShaderType::Vertex)
 		lang = EShLangVertex;
-	if(file.Type == ShaderType::Fragment)
+	else if(file.Type == ShaderType::Fragment)
 		lang = EShLangFragment;
-	if(file.Type == ShaderType::Compute)
+	else if(file.Type == ShaderType::Compute)
 		lang = EShLangCompute;
-	if(file.Type == ShaderType::Geometry)
+	else if(file.Type == ShaderType::Geometry)
 		lang = EShLangGeometry;
 
 	glslang::TShader shader(lang);
 	std::string str = FileUtils::ReadFile(path);
 	const char* sources[1] = { str.c_str() };
-	int length = str.size();
-	auto name = fs::path(path).filename().string().c_str();
-	shader.setStringsWithLengthsAndNames(sources, &length, &name, 1);
+	shader.setStrings(sources, 1);
 
 	shader.setEnvClient(glslang::EShClientOpenGL, glslang::EShTargetOpenGL_450);
 	shader.setEnvTarget(glslang::EShTargetSpv, glslang::EShTargetSpv_1_6);
 	shader.setEntryPoint("main"); // We can specify a different entry point
 
+	// The resource is an entire discussion in and by itself, here just use default.
+	const TBuiltInResource* resources = GetDefaultResources();
+	// use 100 for ES environment, overridden by #version in shader
+	const int defaultVersion = 460;
+	const bool forwardCompatible = false;
+	const EShMessages messageFlags =
+		(EShMessages)(EShMsgSpvRules | EShMsgDebugInfo);
+	EProfile defaultProfile = ECoreProfile;
+	bool parsed = shader.parse(resources, defaultVersion, defaultProfile, false,
+		forwardCompatible, messageFlags);
+	if(!parsed) {
+		VOLCANICORE_LOG_ERROR("Failed to parse shader '%s': %s",
+			path.c_str(), shader.getInfoLog());
+		return { };
+	}
+
 	glslang::TProgram program;
 	program.addShader(&shader);
-	auto messageConfig = EShMsgDefault | EShMsgAST;
-	if(!program.link(EShMessages(messageConfig))) {
+	bool linked = program.link(EShMessages(messageFlags));
+	if(!linked) {
 		VOLCANICORE_LOG_ERROR("Failed to link shader: %s", program.getInfoLog());
 		return { };
 	}
@@ -310,7 +325,10 @@ Buffer<uint32_t> AssetImporter::GetShaderData(const std::string& path) {
 
 	spv::SpvBuildLogger logger;
 	glslang::GlslangToSpv(intermediateRef, spirv, &logger, &options);
-	VOLCANICORE_LOG_INFO("SPIRV Log: %s", logger.getAllMessages().c_str());
+	if (!spirv.size()) {
+		VOLCANICORE_LOG_INFO("SPIRV Log: %s", logger.getAllMessages().c_str());
+		return { };
+	}
 
 	Buffer<uint32_t> data(spirv.size());
 	data.Set(spirv.data(), spirv.size());

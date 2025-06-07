@@ -1,4 +1,4 @@
-#version 450 core
+#version 460 core
 
 uniform mat4 u_View;
 uniform mat4 u_Proj;

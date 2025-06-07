@@ -9,7 +9,7 @@ static Map<std::string, Ref<ShaderPipeline>> s_Shaders;
 
 void ShaderLibrary::Add(const std::string& name, Ref<ShaderPipeline> shader) {
 	if(!shader) {
-		VOLCANICORE_LOG_WARNING("Failed to add null shader '%s'", name.c_str());
+		VOLCANICORE_LOG_WARNING("Failed to add shader '%s'", name.c_str());
 		return;
 	}
 
