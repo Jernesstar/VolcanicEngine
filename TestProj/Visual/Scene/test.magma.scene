@@ -119,13 +119,3 @@ Scene:
             Class: PlayerController
             Fields:
               []
-    - Entity:
-        Name: Fireflies
-        ID: 1111
-        Components:
-          ParticleEmitterComponent:
-            Position: [0, 0, 0]
-            MaxParticleCount: 384
-            ParticleLifetime: 1
-            SpawnInterval: 0
-            MaterialID: 0

@@ -83,9 +83,9 @@ void RuntimeAssetManager::Load(Asset asset) {
 	}
 	else if(asset.Type == AssetType::Texture) {
 		uint32_t width, height;
-		Buffer<uint8_t> data(width * height);
 		pack.Read(width);
 		pack.Read(height);
+		Buffer<uint8_t> data(width * height * 4);
 		pack.ReadData(data.Get(), data.GetMaxCount());
 
 		Ref<Texture> texture = Texture::Create(width, height);
