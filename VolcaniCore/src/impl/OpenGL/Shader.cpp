@@ -25,8 +25,15 @@ ShaderProgram::ShaderProgram(const List<Shader>& shaders) {
 	int result;
 	glGetProgramiv(m_ProgramID, GL_LINK_STATUS, &result);
 
-	if(result == GL_FALSE)
+	if(result == GL_FALSE) {
+		GLint length;
+		glGetProgramiv(m_ProgramID, GL_INFO_LOG_LENGTH, &length);
+
+		char* message = new char[length];
+		glGetProgramInfoLog(m_ProgramID, length, &length, message);
+		VOLCANICORE_LOG_ERROR("A linking error was detected \n%s", message);
 		glDeleteProgram(m_ProgramID);
+	}
 
 	for(auto& shaderID : ids) {
 		glDetachShader(m_ProgramID, shaderID);
@@ -127,7 +134,7 @@ uint32_t CreateShader(const Shader& shader) {
 	uint32_t shaderID = glCreateShader(type);
 
 	if(shader.Data.GetSizeT() == sizeof(uint32_t)) { // SPIR-V
-		// Really expecting uint8_t, so get we use GetMaxSize = GetMaxCount * 4
+		// Expects uint8_t, so using GetMaxSize = GetMaxCount * 4
 		glShaderBinary(1, &shaderID, GL_SHADER_BINARY_FORMAT_SPIR_V,
 			shader.Data.Get(), shader.Data.GetMaxSize());
 		glSpecializeShader(shaderID, "main", 0, nullptr, nullptr);
@@ -144,7 +151,7 @@ uint32_t CreateShader(const Shader& shader) {
 	if(result == GL_FALSE) {
 		int length;
 		glGetShaderiv(shaderID, GL_INFO_LOG_LENGTH, &length);
-		char* message = (char*)alloca(length * sizeof(char));
+		char* message = new char[length];
 		glGetShaderInfoLog(shaderID, length, &length, message);
 		VOLCANICORE_LOG_ERROR("A compile error was detected \n%s", message);
 	}

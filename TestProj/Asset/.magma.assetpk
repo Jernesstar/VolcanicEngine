@@ -18,7 +18,6 @@ AssetPack:
         Type: Mesh
         Name: BlueCube
         MeshType: 1
-        MaterialID: 0
     - Asset:
         ID: 15277418182178081176
         Type: Mesh

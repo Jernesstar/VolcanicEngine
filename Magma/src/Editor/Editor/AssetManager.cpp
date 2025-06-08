@@ -299,21 +299,19 @@ Asset EditorAssetManager::Add(AssetType type, UUID id, bool primary,
 		m_Paths[newAsset.ID] = path;
 
 	if(type == AssetType::Mesh && path != "") {
-		List<SubMesh> meshes;
-		List<MaterialPaths> materials;
-		AssetImporter::GetMeshData(path, meshes, materials);
-		for(auto matPaths : materials) {
-			Asset material = Add(AssetType::Material, 0, false);
-			for(uint32_t i = 0; i < 3; i++) {
-				auto path = matPaths[i];
-				if(path == "")
-					continue;
+		// List<SubMesh> meshes;
+		// List<MaterialPaths> materials;
+		// AssetImporter::GetMeshData(path, meshes, materials);
+		// for(auto matPaths : materials) {
+		// 	Asset material = Add(AssetType::Material, 0, false);
+		// 	AddRef(newAsset, material);
 
-				AddRef(material, Add(AssetType::Texture, 0, false, path));
-			}
-
-			AddRef(newAsset, material);
-		}
+		// 	for(uint32_t i = 0; i < 3; i++) {
+		// 		std::string image = matPaths[i];
+		// 		if(image != "")
+		// 			AddRef(material, Add(AssetType::Texture, 0, false, image));
+		// 	}
+		// }
 	}
 	else if(type == AssetType::Material)
 		m_MaterialAssets[newAsset.ID] = CreateRef<Material>();
@@ -408,10 +406,10 @@ void EditorAssetManager::Load(const std::string& path) {
 
 		if(type == AssetType::Mesh && !node["Path"]) {
 			auto type = (MeshType)node["MeshType"].as<uint32_t>();
-			auto materialID = node["MaterialID"].as<uint64_t>();
+			// auto materialID = node["MaterialID"].as<uint64_t>();
 			m_MeshAssets[id] = Mesh::Create(type);
 
-			AddRef(asset, { materialID, AssetType::Material, false });
+			// AddRef(asset, { materialID, AssetType::Material, false });
 		}
 		else if(type == AssetType::Material) {
 			// if(materialNode["Diffuse"])
@@ -491,12 +489,12 @@ void EditorAssetManager::Save() {
 				.Write(fs::relative(path, rootPath).generic_string());
 		else {
 			if(asset.Type == AssetType::Mesh) {
-				Ref<Mesh> mesh = m_MeshAssets[asset.ID];
+				Ref<Mesh> mesh = Get<Mesh>(asset);
 				const SubMesh& subMesh = mesh->SubMeshes[0];
 				serializer.WriteKey("MeshType").Write((uint32_t)mesh->Type);
 
-				const List<Asset>& refs = GetRefs(asset);
-				serializer.WriteKey("MaterialID").Write((uint64_t)refs[0].ID);
+				// const List<Asset>& refs = GetRefs(asset);
+				// serializer.WriteKey("MaterialID").Write((uint64_t)refs[0].ID);
 			}
 			else if(asset.Type == AssetType::Material) {
 				// for(auto floatUniform : )
@@ -550,20 +548,20 @@ template<>
 BinaryWriter& BinaryWriter::WriteObject(const Asset& asset) {
 	Write((uint64_t)asset.ID);
 	Write((uint8_t)asset.Type);
-	Write(asset.Primary);
-
-	Write(AssetManager::Get()->GetAssetName(asset));
+	Write((bool)asset.Primary);
 
 	if(AssetManager::Get()->HasRefs(asset)) {
 		const auto& refs = AssetManager::Get()->GetRefs(asset);
 		Write(refs.Count());
-		for(auto ref : refs) {
+		for(const auto& ref : refs) {
 			Write((uint64_t)ref.ID);
 			Write((uint8_t)ref.Type);
 		}
 	}
 	else
 		Write((uint64_t)0);
+
+	Write(AssetManager::Get()->GetAssetName(asset));
 
 	return *this;
 }
@@ -596,24 +594,27 @@ void EditorAssetManager::RuntimeSave(const std::string& exportPath) {
 	pack.Write((uint64_t)m_AssetRegistry.size());
 
 	uint64_t objectIdx = pack.GetPosition();
-	for(auto [asset, _] : m_AssetRegistry) {
+	for(const auto& [asset, _] : m_AssetRegistry) {
 		objectIdx += sizeof(uint64_t) + sizeof(uint8_t) + sizeof(bool); // ID, Type, Primary
 		objectIdx += sizeof(uint64_t); // Object Index
-	}
-	for(auto [_, refs] : m_References) {
+
 		objectIdx += sizeof(uint64_t); // RefCount
-		objectIdx += (sizeof(uint64_t) + sizeof(uint8_t)) * refs.Count(); // (ID + Type) * RefCount
-	}
-	for(auto [_, name] : m_NamedAssets) {
+		if(HasRefs(asset)) {
+			const auto& refs = GetRefs(asset);
+			objectIdx += (sizeof(uint64_t) + sizeof(uint8_t)) * refs.Count(); // (ID + Type) * RefCount
+		}
+
 		objectIdx += sizeof(uint64_t); // Name length
-		objectIdx += sizeof(char) * name.size(); // Name
+		objectIdx += GetAssetName(asset).size(); // Name
 	}
 
-	for(auto [asset, _] : m_AssetRegistry) {
+	uint64_t registryPos = 0;
+	uint64_t registrySize = objectIdx;
+	for(const auto& [asset, _] : m_AssetRegistry) {
 		pack.Write(asset); // Asset data (type, id, primary, name, refs)
 		pack.Write(objectIdx); // Where the Asset points to, the actual object
 
-		auto registryPos = pack.GetPosition(); // Record current position
+		registryPos = pack.GetPosition(); // Record current position
 		pack.SetPosition(objectIdx); // Jump to object position
 
 		auto path = GetPath(asset.ID);
@@ -654,6 +655,7 @@ void EditorAssetManager::RuntimeSave(const std::string& exportPath) {
 		objectIdx = pack.GetPosition(); // Object position for next asset
 		pack.SetPosition(registryPos); // Return to registry position
 	}
+	VOLCANICORE_ASSERT(registrySize == registryPos);
 
 	Application::PushDir();
 

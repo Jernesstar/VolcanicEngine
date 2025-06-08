@@ -1,7 +1,6 @@
 #include "UIElementEditorPanel.h"
 
 #ifdef _MSC_VER
-#define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
 #endif
 

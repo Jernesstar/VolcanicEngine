@@ -10,8 +10,6 @@ BinaryReader& BinaryReader::ReadObject(std::string& str) {
 		str.resize(size);
 		ReadData((void*)str.data(), size);
 	}
-	else
-		str = "";
 
 	return *this;
 }

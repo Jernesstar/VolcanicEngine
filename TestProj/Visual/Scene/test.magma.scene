@@ -118,4 +118,51 @@ Scene:
             ModuleID: 2691709289590626850
             Class: PlayerController
             Fields:
-              []
+              - Field:
+                  Name: soundAsset
+                  Type: Asset
+                  Value:
+                    ID: 16624656892553940704
+                    Type: Audio
+              - Field:
+                  Name: meshAsset
+                  Type: Asset
+                  Value:
+                    ID: 10036008063945961451
+                    Type: Mesh
+              - Field:
+                  Name: SomeBool
+                  Type: bool
+                  Value: false
+              - Field:
+                  Name: Signed8
+                  Type: int8
+                  Value: 0
+              - Field:
+                  Name: Unsigned32
+                  Type: uint32
+                  Value: 0
+              - Field:
+                  Name: Float
+                  Type: float
+                  Value: 0
+              - Field:
+                  Name: List
+                  Type: array
+                  Value: []
+              - Field:
+                  Name: Grid
+                  Type: GridSet
+                  Value:
+                    Width: 5
+                    Height: 5
+                    Data:
+                      - [1, 0, 0, 0, 1]
+                      - [0, 1, 0, 1, 0]
+                      - [0, 0, 1, 0, 0]
+                      - [0, 1, 0, 1, 0]
+                      - [1, 0, 0, 0, 1]
+              - Field:
+                  Name: SomeVec3
+                  Type: Vec3
+                  Value: [0, 0, 0]

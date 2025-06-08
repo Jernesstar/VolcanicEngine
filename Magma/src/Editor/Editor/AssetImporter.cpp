@@ -273,51 +273,59 @@ Ref<ShaderPipeline> AssetImporter::GetShader(const List<std::string>& paths) {
 }
 
 Buffer<uint32_t> AssetImporter::GetShaderData(const std::string& path) {
-	auto file = TryGetShader(path);
-	EShLanguage lang;
-	if(file.Type == ShaderType::Vertex)
-		lang = EShLangVertex;
-	else if(file.Type == ShaderType::Fragment)
-		lang = EShLangFragment;
-	else if(file.Type == ShaderType::Compute)
-		lang = EShLangCompute;
-	else if(file.Type == ShaderType::Geometry)
-		lang = EShLangGeometry;
+	glslang::InitializeProcess();
 
-	glslang::TShader shader(lang);
+	auto file = TryGetShader(path);
+	EShLanguage stage;
+	if(file.Type == ShaderType::Vertex)
+		stage = EShLangVertex;
+	else if(file.Type == ShaderType::Fragment)
+		stage = EShLangFragment;
+	else if(file.Type == ShaderType::Compute)
+		stage = EShLangCompute;
+	else if(file.Type == ShaderType::Geometry)
+		stage = EShLangGeometry;
+
+	glslang::TShader shader(stage);
 	std::string str = FileUtils::ReadFile(path);
 	const char* sources[1] = { str.c_str() };
 	shader.setStrings(sources, 1);
 
 	shader.setEnvClient(glslang::EShClientOpenGL, glslang::EShTargetOpenGL_450);
+	shader.setEnvInput(glslang::EShSource::EShSourceGlsl, stage,
+		glslang::EShClient::EShClientOpenGL, 460);
 	shader.setEnvTarget(glslang::EShTargetSpv, glslang::EShTargetSpv_1_6);
 	shader.setEntryPoint("main"); // We can specify a different entry point
 
 	// The resource is an entire discussion in and by itself, here just use default.
 	const TBuiltInResource* resources = GetDefaultResources();
 	// use 100 for ES environment, overridden by #version in shader
-	const int defaultVersion = 460;
-	const bool forwardCompatible = false;
-	const EShMessages messageFlags =
-		(EShMessages)(EShMsgSpvRules | EShMsgDebugInfo);
+	int defaultVersion = 460;
+	bool forceDefaults = true;
+	bool forwardCompatible = true;
 	EProfile defaultProfile = ECoreProfile;
-	bool parsed = shader.parse(resources, defaultVersion, defaultProfile, false,
-		forwardCompatible, messageFlags);
+	EShMessages messageFlags = (EShMessages)(EShMsgSpvRules);
+	bool parsed =
+		shader.parse(resources, defaultVersion, defaultProfile,
+					 forwardCompatible, forceDefaults, messageFlags);
 	if(!parsed) {
-		VOLCANICORE_LOG_ERROR("Failed to parse shader '%s': %s",
+		VOLCANICORE_LOG_ERROR("Failed to parse '%s': %s",
 			path.c_str(), shader.getInfoLog());
+		glslang::FinalizeProcess();
 		return { };
 	}
 
 	glslang::TProgram program;
 	program.addShader(&shader);
-	bool linked = program.link(EShMessages(messageFlags));
+	bool linked = program.link(messageFlags);
 	if(!linked) {
-		VOLCANICORE_LOG_ERROR("Failed to link shader: %s", program.getInfoLog());
+		VOLCANICORE_LOG_ERROR("Failed to link '%s': %s",
+			path.c_str(), program.getInfoLog());
+		glslang::FinalizeProcess();
 		return { };
 	}
 
-	glslang::TIntermediate& intermediateRef = *program.getIntermediate(lang);
+	glslang::TIntermediate& intermediateRef = *program.getIntermediate(stage);
 	std::vector<uint32_t> spirv;
 	glslang::SpvOptions options{};
 	options.validate = true;
@@ -327,8 +335,11 @@ Buffer<uint32_t> AssetImporter::GetShaderData(const std::string& path) {
 	glslang::GlslangToSpv(intermediateRef, spirv, &logger, &options);
 	if (!spirv.size()) {
 		VOLCANICORE_LOG_INFO("SPIRV Log: %s", logger.getAllMessages().c_str());
+		glslang::FinalizeProcess();
 		return { };
 	}
+
+	glslang::FinalizeProcess();
 
 	Buffer<uint32_t> data(spirv.size());
 	data.Set(spirv.data(), spirv.size());

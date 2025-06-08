@@ -484,11 +484,11 @@ void DrawComponent<ScriptComponent>(Entity& entity) {
 	auto* handle = component.Instance->GetHandle();
 	for(uint32_t i = 0; i < handle->GetPropertyCount(); i++) {
 		ScriptField field = component.Instance->GetProperty(i);
-		// bool editorField =
-		// 	ScriptManager::FieldHasMetadata(
-		// 		component.Instance->GetClass()->Name, field.Name, "EditorField");
-		// if(!editorField)
-		// 	continue;
+		bool editorField =
+			ScriptManager::FieldHasMetadata(
+				component.Instance->GetClass()->Name, field.Name, "EditorField");
+		if(!editorField)
+			continue;
 
 		if(field.Type) {
 			std::string typeName = field.Type->GetName();

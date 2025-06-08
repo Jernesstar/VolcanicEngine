@@ -21,28 +21,26 @@ namespace Magma {
 template<>
 BinaryReader& BinaryReader::ReadObject(Asset& asset) {
 	uint64_t id;
-	uint8_t typeInt;
+	uint8_t type;
 	bool primary;
-	std::string name;
 	Read(id);
-	Read(typeInt);
+	Read(type);
 	Read(primary);
-	asset = { id, (AssetType)typeInt, primary };
-	Read(name);
-	if(name != "")
-		AssetManager::Get()->NameAsset(asset, name);
+	asset = { id, (AssetType)type, primary };
 
 	uint64_t refCount;
 	Read(refCount);
-
 	for(uint64_t i = 0; i < refCount; i++) {
-		uint64_t id;
-		uint8_t type;
 		Read(id);
 		Read(type);
-		Asset ref{ id, (AssetType)type, false };
+		Asset ref = { id, (AssetType)type, false };
 		AssetManager::Get()->AddRef(asset, ref);
 	}
+
+	std::string name;
+	Read(name);
+	if(name != "")
+		AssetManager::Get()->NameAsset(asset, name);
 
 	return *this;
 }
@@ -72,7 +70,7 @@ void RuntimeAssetManager::Load(Asset asset) {
 		Ref<Mesh> mesh = CreateRef<Mesh>(MeshType::Model);
 		pack.Read(mesh->SubMeshes);
 
-		//for(auto ref : GetRefs(asset)) {
+		//for(const auto& ref : GetRefs(asset)) {
 		//	auto& mat = mesh->Materials.Emplace();
 		//	Load(ref);
 		//	auto material = Get<Magma::Material>(asset);

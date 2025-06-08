@@ -47,19 +47,38 @@ asIScriptModule* ScriptManager::LoadScript(const std::string& path,
 
 	if(error) *error = false;
 
+	if(!metadata)
+		return handle;
+
+	for(uint32_t i = 0; i < handle->GetFunctionCount(); i++) {
+		asIScriptFunction* func = handle->GetFunctionByIndex(i);
+
+	}
+
 	for(uint32_t i = 0; i < handle->GetObjectTypeCount(); i++) {
 		asITypeInfo* type = handle->GetObjectTypeByIndex(i);
+		int id = type->GetTypeId();
+		std::string className = type->GetName();
 
-		// auto& list = ScriptManager::GetClassMetadata(id);
-		// for(auto str : builder.GetMetadataForType(id))
-		// 	_class->m_Metadata.Add(str);
+		auto& list = s_ClassMetadata[className];
+		for(auto str : builder.GetMetadataForType(id))
+			list.Add(str);
 
-		// for(uint32_t i = 0; i < type->GetPropertyCount(); i++)
-		// 	for(auto str : builder.GetMetadataForTypeProperty(id, i)) {
-		// 		const char* name;
-		// 		type->GetProperty(i, &name);
-		// 		_class->m_FieldMetadata[name].Add(str);
-		// 	}
+		for(uint32_t i = 0; i < type->GetPropertyCount(); i++) {
+			for(auto str : builder.GetMetadataForTypeProperty(id, i)) {
+				const char* name;
+				type->GetProperty(i, &name);
+				s_FieldMetadata[className + "::" + name].Add(str);
+			}
+		}
+
+		for(uint32_t i = 0; i < type->GetMethodCount(); i++) {
+			asIScriptFunction* method = type->GetMethodByIndex(i);
+			for(auto str : builder.GetMetadataForTypeMethod(id, method)) {
+				std::string name = method->GetName();
+				s_MethodMetadata[className + "::" + name].Add(str);
+			}
+		}
 	}
 
 	return handle;

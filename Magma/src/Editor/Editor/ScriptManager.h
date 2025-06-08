@@ -22,28 +22,28 @@ public:
 									const std::string& str)
 	{
 		return
-			m_FunctionMetadata[name].Find(
-				[&](auto& val) { return val == str; }).Found;
+			s_FunctionMetadata[name]
+			.Find([&](auto& val) { return val == str; });
 	}
 	static bool ClassHasMetadata(const std::string& name,
 								 const std::string& str)
 	{
 		return
-			m_ClassMetadata[name].Find(
-				[&](auto& val) { return val == str; }).Found;
+			s_ClassMetadata[name].Find([&](auto& val) { return val == str; });
 	}
 	static bool FieldHasMetadata(const std::string& _class,
 		const std::string& field, const std::string& str)
 	{
 		return
-			m_FieldMetadata[_class + "::" + field].Find(
-				[&](auto& val) { return val == str; }).Found;
+			s_FieldMetadata[_class + "::" + field]
+			.Find([&](auto& val) { return val == str; });
 	}
 
 private:
-	inline static Map<std::string, List<std::string>> m_FunctionMetadata;
-	inline static Map<std::string, List<std::string>> m_ClassMetadata;
-	inline static Map<std::string, List<std::string>> m_FieldMetadata;
+	inline static Map<std::string, List<std::string>> s_FunctionMetadata;
+	inline static Map<std::string, List<std::string>> s_ClassMetadata;
+	inline static Map<std::string, List<std::string>> s_FieldMetadata;
+	inline static Map<std::string, List<std::string>> s_MethodMetadata;
 };
 
 }
