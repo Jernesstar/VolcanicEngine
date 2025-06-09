@@ -29,9 +29,12 @@ ShaderProgram::ShaderProgram(const List<Shader>& shaders) {
 		GLint length;
 		glGetProgramiv(m_ProgramID, GL_INFO_LOG_LENGTH, &length);
 
-		char* message = new char[length];
-		glGetProgramInfoLog(m_ProgramID, length, &length, message);
-		VOLCANICORE_LOG_ERROR("A linking error was detected \n%s", message);
+		if(length) {
+			char* message = new char[length];
+			glGetProgramInfoLog(m_ProgramID, length, &length, message);
+			VOLCANICORE_LOG_ERROR("A linking error was detected \n%s", message);
+		}
+
 		glDeleteProgram(m_ProgramID);
 	}
 
@@ -151,9 +154,11 @@ uint32_t CreateShader(const Shader& shader) {
 	if(result == GL_FALSE) {
 		int length;
 		glGetShaderiv(shaderID, GL_INFO_LOG_LENGTH, &length);
-		char* message = new char[length];
-		glGetShaderInfoLog(shaderID, length, &length, message);
-		VOLCANICORE_LOG_ERROR("A compile error was detected \n%s", message);
+		if(length) {
+			char* message = new char[length];
+			glGetShaderInfoLog(shaderID, length, &length, message);
+			VOLCANICORE_LOG_ERROR("A compile error was detected \n%s", message);
+		}
 	}
 
 	return shaderID;

@@ -68,7 +68,7 @@ Runtime::Runtime(const CommandLineArgs& args)
 	}
 
 	Physics::Init();
-	
+
 	AudioEngine::Init();
 	ScriptEngine::Init();
 	ScriptGlue::RegisterInterface();
@@ -84,11 +84,10 @@ Runtime::Runtime(const CommandLineArgs& args)
 
 	m_App = CreateRef<App>(project);
 	m_App->AppLoad =
-		[=](Ref<ScriptModule>& script)
+		[app = project.App](Ref<ScriptModule>& script)
 		{
 			auto handle =
-				ScriptEngine::Get()->GetModule(
-					project.App.c_str(), asGM_ALWAYS_CREATE);
+				ScriptEngine::Get()->GetModule(app.c_str(), asGM_ALWAYS_CREATE);
 			BinaryReader reader("./.volc.class");
 			ByteCodeReader stream(&reader);
 			handle->LoadByteCode(&stream);
@@ -98,8 +97,7 @@ Runtime::Runtime(const CommandLineArgs& args)
 		[](Ref<ScriptModule>& script, const std::string& name)
 		{
 			auto handle =
-				ScriptEngine::Get()->GetModule(name.c_str(),
-					asGM_ALWAYS_CREATE);
+				ScriptEngine::Get()->GetModule(name.c_str(), asGM_ALWAYS_CREATE);
 			BinaryReader reader((fs::path("Class") / name).string() + ".class");
 			ByteCodeReader stream(&reader);
 			handle->LoadByteCode(&stream);

@@ -292,22 +292,18 @@ Buffer<uint32_t> AssetImporter::GetShaderData(const std::string& path) {
 	shader.setStrings(sources, 1);
 
 	shader.setEnvClient(glslang::EShClientOpenGL, glslang::EShTargetOpenGL_450);
-	shader.setEnvInput(glslang::EShSource::EShSourceGlsl, stage,
-		glslang::EShClient::EShClientOpenGL, 460);
-	shader.setEnvTarget(glslang::EShTargetSpv, glslang::EShTargetSpv_1_6);
-	shader.setEntryPoint("main"); // We can specify a different entry point
+	shader.setEnvTarget(glslang::EShTargetSpv, glslang::EShTargetSpv_1_3);
+	shader.setEntryPoint("main");
 
-	// The resource is an entire discussion in and by itself, here just use default.
 	const TBuiltInResource* resources = GetDefaultResources();
-	// use 100 for ES environment, overridden by #version in shader
-	int defaultVersion = 460;
 	bool forceDefaults = true;
-	bool forwardCompatible = true;
+	bool forwardCompatible = true; // Warn deprecated features
+	int defaultVersion = 450;
 	EProfile defaultProfile = ECoreProfile;
 	EShMessages messageFlags = (EShMessages)(EShMsgSpvRules);
 	bool parsed =
 		shader.parse(resources, defaultVersion, defaultProfile,
-					 forwardCompatible, forceDefaults, messageFlags);
+					 forceDefaults, forwardCompatible, messageFlags);
 	if(!parsed) {
 		VOLCANICORE_LOG_ERROR("Failed to parse '%s': %s",
 			path.c_str(), shader.getInfoLog());
@@ -329,11 +325,16 @@ Buffer<uint32_t> AssetImporter::GetShaderData(const std::string& path) {
 	std::vector<uint32_t> spirv;
 	glslang::SpvOptions options{};
 	options.validate = true;
+	options.generateDebugInfo = true;
+	// options.disableOptimizer = true;
+	// options.optimizeSize = false;
+	// options.emitNonSemanticShaderDebugInfo = true;
+	// options.emitNonSemanticShaderDebugSource = true;
 	// options.compileOnly = true;
 
 	spv::SpvBuildLogger logger;
 	glslang::GlslangToSpv(intermediateRef, spirv, &logger, &options);
-	if (!spirv.size()) {
+	if(!spirv.size()) {
 		VOLCANICORE_LOG_INFO("SPIRV Log: %s", logger.getAllMessages().c_str());
 		glslang::FinalizeProcess();
 		return { };

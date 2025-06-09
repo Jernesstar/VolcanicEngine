@@ -660,7 +660,7 @@ void EditorAssetManager::RuntimeSave(const std::string& exportPath) {
 	Application::PushDir();
 
 	fs::create_directories(fs::path(exportPath) / "Asset" / "Shader");
-	for(auto name : { "Framebuffer", "Lighting", "Bloom", "Mesh" }) {
+	for(auto name : { "Framebuffer", "Lighting", "Mesh" }) {
 		auto sourceRoot = fs::path("Magma") / "assets" / "shaders" / name;
 		auto source1 = sourceRoot.string() + ".glsl.vert";
 		auto source2 = sourceRoot.string() + ".glsl.frag";
