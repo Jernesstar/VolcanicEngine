@@ -56,3 +56,6 @@
 [submodule "VolcaniCore/vendor/glad"]
 	path = VolcaniCore/vendor/glad
 	url = https://github.com/Jernesstar/glad.git
+[submodule "Magma/vendor/IconFontCppHeaders"]
+	path = Magma/vendor/IconFontCppHeaders
+	url = https://github.com/juliettef/IconFontCppHeaders.git

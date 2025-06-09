@@ -116,7 +116,11 @@ project "Editor"
         "%{Includes.stb_image}",
         "%{Includes.freetype}",
 
+        "%{Includes.imgui}",
         "%{Includes.imgui}/imgui",
+        "%{Includes.ImGuiFileDialog}",
+        "%{Includes.IconFontCppHeaders}",
+
         "%{Includes.yaml_cpp}",
         "%{Includes.rapidjson}",
 
@@ -126,9 +130,6 @@ project "Editor"
         "%{Includes.rapidjson}",
         "%{Includes.PhysX}",
 
-        "%{Includes.ImGuiFileDialog}",
-
-        "%{Includes.imgui}",
         "%{Includes.angelscript}",
         "%{VendorPaths.angelscript}",
         "%{Includes.soloud}",
