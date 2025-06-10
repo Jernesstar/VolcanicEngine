@@ -53,7 +53,7 @@ private:
 	// Particles
 	Ref<RenderPass> EmitterPass;
 	Ref<RenderPass> UpdatePass;
-	Ref<RenderPass> DrawPass;
+	Ref<RenderPass> ParticlePass;
 
 private:
 	void InitMips();

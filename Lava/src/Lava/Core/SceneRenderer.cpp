@@ -89,16 +89,16 @@ struct ParticleEmitter {
 
 static List<BloomMip> s_MipChain;
 static uint32_t s_MipChainLength = 11; // TODO(Change): These are material settings
-static float s_FilterRadius	= 0.005f;
-static float s_Exposure		= 1.0f;
+static float s_FilterRadius = 0.005f;
+static float s_Exposure = 1.0f;
 static float s_BloomStrength = 0.04f;
 
 static Map<uint64_t, ParticleEmitter> s_ParticleEmitters;
 
 RuntimeSceneRenderer::RuntimeSceneRenderer() {
 	auto window = Application::GetWindow();
-	m_Output = Framebuffer::Create(window->GetWidth(), window->GetHeight());
 	m_BaseLayer = Framebuffer::Create(window->GetWidth(), window->GetHeight());
+	m_Output = Framebuffer::Create(window->GetWidth(), window->GetHeight());
 
 	DirectionalLightBuffer =
 		UniformBuffer::Create(
@@ -141,7 +141,7 @@ RuntimeSceneRenderer::RuntimeSceneRenderer() {
 
 	LightingPass =
 		RenderPass::Create("Lighting",
-			ShaderLibrary::Get("Lighting"), m_BaseLayer);
+			ShaderLibrary::Get("Lighting"), m_Output);
 	LightingPass->SetData(Renderer3D::GetMeshBuffer());
 
 	DownsamplePass =
@@ -163,10 +163,10 @@ RuntimeSceneRenderer::RuntimeSceneRenderer() {
 	UpdatePass =
 		RenderPass::Create("Particle-Update",
 			ShaderLibrary::Get("Particle-Update"));
-	DrawPass =
+	ParticlePass =
 		RenderPass::Create("Particle-Draw",
 			ShaderLibrary::Get("Particle-DefaultDraw"));
-	DrawPass->SetData(Renderer3D::GetMeshBuffer());
+	ParticlePass->SetData(Renderer3D::GetMeshBuffer());
 }
 
 void RuntimeSceneRenderer::OnSceneLoad() {
@@ -179,38 +179,38 @@ void RuntimeSceneRenderer::OnSceneLoad() {
 	.each(
 		[](flecs::entity e)
 		{
-			Entity entity{ e };
-			BufferLayout particleLayout =
-			{
-				{ "Position", BufferDataType::Vec3 },
-				{ "Velocity", BufferDataType::Vec3 },
-				{ "Life", BufferDataType::Float },
-			};
-			BufferLayout freeListLayout =
-			{
-				{ "Indices", BufferDataType::Int },
-			};
+			// Entity entity{ e };
+			// BufferLayout particleLayout =
+			// {
+			// 	{ "Position", BufferDataType::Vec3 },
+			// 	{ "Velocity", BufferDataType::Vec3 },
+			// 	{ "Life", BufferDataType::Float },
+			// };
+			// BufferLayout freeListLayout =
+			// {
+			// 	{ "Indices", BufferDataType::Int },
+			// };
 
-			auto& component = entity.Get<ParticleEmitterComponent>();
-			auto& emitter = s_ParticleEmitters[entity.GetHandle()];
+			// auto& component = entity.Get<ParticleEmitterComponent>();
+			// auto& emitter = s_ParticleEmitters[entity.GetHandle()];
 
-			emitter.Position = component.Position;
-			emitter.MaxParticleCount = component.MaxParticleCount;
-			emitter.SpawnInterval = component.SpawnInterval;
+			// emitter.Position = component.Position;
+			// emitter.MaxParticleCount = component.MaxParticleCount;
+			// emitter.SpawnInterval = component.SpawnInterval;
 
-			Buffer<ParticleData> data(emitter.MaxParticleCount);
-			for(uint32_t i = 0; i < emitter.MaxParticleCount; i++)
-				data.Set(i, ParticleData{ });
+			// Buffer<ParticleData> data(emitter.MaxParticleCount);
+			// for(uint32_t i = 0; i < emitter.MaxParticleCount; i++)
+			// 	data.Set(i, ParticleData{ });
 
-			Buffer<int> freelist(emitter.MaxParticleCount + 1);
-			freelist.Set(0, emitter.MaxParticleCount);
-			for(uint32_t i = 1; i <= emitter.MaxParticleCount; i++)
-				freelist.Set(i, int(i) - 1);
+			// Buffer<int> freelist(emitter.MaxParticleCount + 1);
+			// freelist.Set(0, emitter.MaxParticleCount);
+			// for(uint32_t i = 1; i <= emitter.MaxParticleCount; i++)
+			// 	freelist.Set(i, int(i) - 1);
 
-			emitter.ParticleBuffer =
-				StorageBuffer::Create(particleLayout, data);
-			emitter.FreeListBuffer =
-				StorageBuffer::Create(freeListLayout, freelist);
+			// emitter.ParticleBuffer =
+			// 	StorageBuffer::Create(particleLayout, data);
+			// emitter.FreeListBuffer =
+			// 	StorageBuffer::Create(freeListLayout, freelist);
 		});
 }
 
@@ -317,9 +317,12 @@ void RuntimeSceneRenderer::SubmitLight(const Entity& entity) {
 }
 
 void RuntimeSceneRenderer::SubmitParticles(const Entity& entity) {
+	if(!s_ParticleEmitters.count(entity.GetHandle()))
+		return;
+
 	auto& emitter = s_ParticleEmitters[entity.GetHandle()];
 
-	Renderer::StartPass(DrawPass);
+	Renderer::StartPass(ParticlePass);
 	{
 		auto* command = Renderer::GetCommand();
 		command->UniformData

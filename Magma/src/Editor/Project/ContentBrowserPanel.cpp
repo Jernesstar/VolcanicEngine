@@ -189,6 +189,11 @@ void ContentBrowserPanel::Select(AssetType type, uint32_t id) {
 	s_SelectType = type;
 	s_SelectionID = id;
 	s_Position = ImGui::GetCursorScreenPos();
+
+	if(s_Position.y + 170.0f > ImGui::GetIO().DisplaySize.y)
+		s_Position.y -= 171.0f;
+	if(s_Position.x + 130.0f > ImGui::GetIO().DisplaySize.x)
+		s_Position.x -= 131.0f;
 }
 
 void ContentBrowserPanel::CancelSelect() {
@@ -219,17 +224,27 @@ void DrawAssetSelectWindow() {
 			   | ImGuiWindowFlags_NoSavedSettings;
 
 	ImGui::SetNextWindowPos(s_Position);
-	ImGui::SetNextWindowSizeConstraints({ 130.0f, 150.0f }, { 130.0f, 150.0f });
+	ImGui::SetNextWindowSizeConstraints({ 130.0f, 170.0f }, { 130.0f, 170.0f });
 	ImGui::Begin("Select Asset", nullptr, flags);
 	{
 		if(s_Selection.ID) {
 			UI::Image image;
 			image.x = 5.0f;
 			image.Width = 120;
-			image.Height = 100;
+			image.Height = 120;
 			image.Content = s_FileIcon->Content;
 			// image.Content = s_Thumbnails[s_Selection.ID];
 			image.Render();
+
+			auto assetManager = AssetManager::Get()->As<EditorAssetManager>();
+			auto name = assetManager->GetAssetName(s_Selection);
+			auto path = assetManager->GetPath(s_Selection.ID);
+			if(name != "")
+				ImGui::Text(name.c_str());
+			else if(path != "")
+				ImGui::Text(fs::path(path).filename().string().c_str());
+			else
+				ImGui::Text("%llu", (uint64_t)s_Selection.ID);
 		}
 		else {
 			ImGui::Text("No Asset Selected");
