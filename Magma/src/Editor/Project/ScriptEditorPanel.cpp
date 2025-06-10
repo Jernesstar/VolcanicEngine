@@ -59,7 +59,6 @@ void ScriptEditorPanel::Draw() {
 	auto* assetManager = AssetManager::Get()->As<EditorAssetManager>();
 	auto path = assetManager->GetPath(m_CurrentAsset.ID);
 
-	// ImGui::SetWindowSize(ImVec2(800, 600), ImGuiCond_FirstUseEver);
 	ImGui::Begin("Script Editor", &Open,
 		ImGuiWindowFlags_HorizontalScrollbar | ImGuiWindowFlags_MenuBar);
 	if(ImGui::BeginMenuBar())

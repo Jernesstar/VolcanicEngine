@@ -305,6 +305,8 @@ void RuntimeSceneRenderer::SubmitLight(const Entity& entity) {
 		DirectionalLight light = entity.Get<DirectionalLightComponent>();
 		DirectionalLightBuffer->SetData(&light);
 		HasDirectionalLight = true;
+
+		
 	}
 	else if(entity.Has<PointLightComponent>()) {
 		PointLight light = entity.Get<PointLightComponent>();

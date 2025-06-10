@@ -21,6 +21,7 @@
 #include "ContentBrowserPanel.h"
 #include "AssetEditorPanel.h"
 #include "ScriptEditorPanel.h"
+#include "LogPanel.h"
 
 using namespace Lava;
 
@@ -46,6 +47,7 @@ ProjectTab::ProjectTab(const std::string& path)
 	AddPanel<AssetEditorPanel>()->SetTab(this);
 	AddPanel<ContentBrowserPanel>(path)->SetTab(this);
 	AddPanel<ScriptEditorPanel>()->SetTab(this);
+	AddPanel<LogPanel>()->SetTab(this);
 	GetPanel("AssetEditor")->As<AssetEditorPanel>()->Open = true;
 	GetPanel("ContentBrowser")->As<ContentBrowserPanel>()->Open = true;
 

@@ -100,6 +100,64 @@ void ContentBrowserPanel::Draw() {
 			}
 			ImGui::PopClipRect();
 
+			if(ImGui::IsMouseDown(1) && ImGui::IsWindowHovered())
+				ImGui::OpenPopup("Options");
+
+			if(ImGui::BeginPopup("Options")) {
+				if(ImGui::MenuItem("New Material"));
+					ImGui::OpenPopup("New Material");
+				if(ImGui::MenuItem("New Script"))
+					ImGui::OpenPopup("New Script");
+
+				ImGui::EndPopup();
+			}
+
+			if(ImGui::BeginPopupModal("New Material")) {
+				VOLCANICORE_LOG_INFO("Here");
+				static std::string name;
+				ImGui::InputTextWithHint("##", "Enter material name", &name);
+
+				if(ImGui::Button("Create")) {
+
+					ImGui::CloseCurrentPopup();
+				}
+				if(ImGui::Button("Cancel"))
+					ImGui::CloseCurrentPopup();
+
+				ImGui::EndPopup();
+			}
+
+			if(ImGui::BeginPopupModal("New Script")) {
+				static std::string name;
+				ImGui::InputTextWithHint("##", "Enter file name", &name);
+
+				static const char* type;
+				static uint32_t currentItem;
+				List<std::string> types =
+					{ "IEntityController", "IUIController" };
+				if(ImGui::BeginCombo("##Combo", type)) {
+					for(uint32_t i = 0; i < types.Count(); i++) {
+						auto item = types[i];
+						bool isSelected = currentItem == i;
+						if(ImGui::Selectable(item.c_str(), isSelected))
+							currentItem = i;
+						if(isSelected)
+							ImGui::SetItemDefaultFocus();
+					}
+
+					ImGui::EndCombo();
+				}
+
+				if(ImGui::Button("Create")) {
+
+					ImGui::CloseCurrentPopup();
+				}
+				if(ImGui::Button("Cancel"))
+					ImGui::CloseCurrentPopup();
+
+				ImGui::EndPopup();
+			}
+
 			RenderAssetTable();
 		}
 		ImGui::EndChild();
@@ -154,6 +212,15 @@ void ContentBrowserPanel::RenderAssetTable() {
 				}
 				else
 					s_Selection = s_Asset;
+			}
+			if(ImGui::IsItemClicked(ImGuiMouseButton_Right))
+				ImGui::OpenPopup("Asset Options##");
+
+			if(ImGui::BeginPopup("Asset Options")) {
+				if(ImGui::MenuItem("Delete"))
+					;
+
+				ImGui::EndPopup();
 			}
 
 			if(!s_Selecting)
