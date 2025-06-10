@@ -156,9 +156,12 @@ static void ButtonText(Ref<UIElement> element, ImVec2 dim) {
 }
 
 static void ButtonImage(Ref<UIElement> element, ImVec2 dim) {
+	if(!element->As<Image>()->Content)
+		return;
+
 	auto tex = element->As<Image>()->Content->As<OpenGL::Texture2D>();
 	auto id = (ImTextureID)(intptr_t)tex->GetID();
-	ImGui::ImageButton(id, dim);
+	ImGui::ImageButton(id, dim, ImVec2(0, 1), ImVec2(1, 0));
 }
 
 UIState UIRenderer::DrawButton(UI::Button& button) {

@@ -13,14 +13,16 @@
 #include <Magma/UI/UIRenderer.h>
 #include <Magma/Scene/Component.h>
 
-#include <Editor/EditorApp.h>
-#include <Editor/AssetManager.h>
-#include <Editor/AssetImporter.h>
-#include <Editor/ScriptManager.h>
-
 #include <Lava/Types/GridSet.h>
 #include <Lava/Types/GridSet3D.h>
 #include <Lava/Types/Timer.h>
+
+#include "Editor/EditorApp.h"
+#include "Editor/AssetManager.h"
+#include "Editor/AssetImporter.h"
+#include "Editor/ScriptManager.h"
+
+#include "Editor/Project/ContentBrowserPanel.h"
 
 #undef near
 #undef far
@@ -40,25 +42,18 @@ using namespace Magma::Physics;
 
 namespace Magma {
 
-static uint32_t s_ForScript = 0;
-static Asset s_Asset = { };
-static AssetType s_Selecting = AssetType::None;
-static Ref<UI::Image> s_FileIcon;
-
 ComponentEditorPanel::ComponentEditorPanel()
 	: Panel("ComponentEditor")
 {
-	Application::PushDir();
-	s_FileIcon =
-		CreateRef<UI::Image>(
-			AssetImporter::GetTexture("Magma/assets/icons/FileIcon.png", false));
-	Application::PopDir();
+
 }
 
 void ComponentEditorPanel::SetContext(Entity& entity) {
 	m_Context = entity;
-	s_Asset = { };
-	s_Selecting = AssetType::None;
+	auto panel =
+		Editor::GetProjectTab()->
+				GetPanel("ContentBrowser")->As<ContentBrowserPanel>();
+	panel->CancelSelect();
 }
 
 void ComponentEditorPanel::Update(TimeStep ts) {
@@ -109,66 +104,6 @@ FOCUS_COMPONENT(DirectionalLight)
 FOCUS_COMPONENT(PointLight)
 FOCUS_COMPONENT(Spotlight)
 FOCUS_COMPONENT(ParticleEmitter)
-
-static void AssetSelect() {
-	namespace fs = std::filesystem;
-	if(!s_ForScript && s_Selecting == AssetType::None)
-		return;
-
-	ImGui::OpenPopup("Select Asset");
-	if(ImGui::BeginPopupModal("Select Asset")) {
-		static float padding = 18.0f;
-		static float thumbnailSize = 100.0f;
-		static float cellSize = thumbnailSize + padding;
-
-		float panelWidth = ImGui::GetContentRegionAvail().x;
-		int32_t columnCount = (int32_t)(panelWidth / cellSize);
-		columnCount = columnCount ? columnCount : 1;
-
-		Editor& editor = Application::As<EditorApp>()->GetEditor();
-		EditorAssetManager& assetManager = editor.GetAssetManager();
-		if(ImGui::BeginTable("AssetsTable", columnCount))
-		{
-			for(auto& [asset, _] : assetManager.GetRegistry()) {
-				if(!asset.Primary)
-					continue;
-				if(!s_ForScript && asset.Type != s_Selecting)
-					continue;
-
-				ImGui::TableNextColumn();
-
-				std::string display = assetManager.GetPath(asset.ID);
-				if(display != "")
-					display = fs::path(display).filename().string();
-
-				UI::Button button;
-				button.Width = thumbnailSize;
-				button.Height = thumbnailSize;
-				button.Display = s_FileIcon;
-				button.UsePosition = false;
-
-				if(UI::UIRenderer::DrawButton(button).Clicked) {
-					s_Asset = asset;
-					s_Selecting = AssetType::None;
-				}
-
-				if(display != "")
-					ImGui::TextWrapped(display.c_str());
-				ImGui::Text("Asset %llu", (uint64_t)asset.ID);
-			}
-
-			ImGui::EndTable();
-		}
-
-		if(ImGui::Button("Close")) {
-			ImGui::CloseCurrentPopup();
-			s_Selecting = AssetType::None;
-			s_ForScript = 0;
-		}
-
-		ImGui::EndPopup();
-	}
-}
 
 template<typename TComponent>
 static void DrawComponent(Entity& entity);
@@ -290,13 +225,15 @@ void DrawComponent<AudioComponent>(Entity& entity) {
 
 	ImGui::Text("Asset ID: %lu", (uint64_t)component.AudioAsset.ID);
 	auto text = component.AudioAsset.ID ? "Change Asset" : "Set Asset";
-	if(ImGui::Button(text))
-		s_Selecting = AssetType::Audio;
 
-	if(s_Asset.Type != AssetType::None && !s_ForScript) {
-		component.AudioAsset = s_Asset;
-		s_Asset = { };
-	}
+	auto panel =
+		Editor::GetProjectTab()->
+				GetPanel("ContentBrowser")->As<ContentBrowserPanel>();
+
+	if(ImGui::Button(text))
+		panel->Select(AssetType::Audio);
+	if(panel->HasSelection())
+		component.AudioAsset = panel->GetSelected();
 }
 
 template<>
@@ -309,13 +246,15 @@ void DrawComponent<MeshComponent>(Entity& entity) {
 
 	ImGui::Text("Asset ID: %llu", (uint64_t)component.MeshAsset.ID);
 	auto text = component.MeshAsset.ID ? "Change Asset" : "Set Asset";
-	if(ImGui::Button(text))
-		s_Selecting = AssetType::Mesh;
 
-	if(s_Asset.Type != AssetType::None && !s_ForScript) {
-		component.MeshAsset = s_Asset;
-		s_Asset = { };
-	}
+	auto panel =
+		Editor::GetProjectTab()->
+				GetPanel("ContentBrowser")->As<ContentBrowserPanel>();
+
+	if(ImGui::Button(text))
+		panel->Select(AssetType::Mesh);
+	if(panel->HasSelection())
+		component.MeshAsset = panel->GetSelected();
 }
 
 template<>
@@ -328,13 +267,15 @@ void DrawComponent<SkyboxComponent>(Entity& entity) {
 
 	ImGui::Text("Asset ID: %lu", (uint64_t)component.CubemapAsset.ID);
 	auto text = component.CubemapAsset.ID ? "Change Asset" : "Set Asset";
-	if(ImGui::Button(text))
-		s_Selecting = AssetType::Cubemap;
 
-	if(s_Asset.Type != AssetType::None && !s_ForScript) {
-		component.CubemapAsset = s_Asset;
-		s_Asset = { };
-	}
+	auto panel =
+		Editor::GetProjectTab()->
+				GetPanel("ContentBrowser")->As<ContentBrowserPanel>();
+
+	if(ImGui::Button(text))
+		panel->Select(AssetType::Cubemap);
+	if(panel->HasSelection())
+		component.CubemapAsset = panel->GetSelected();
 }
 
 static bool s_SelectingClass = false;
@@ -445,14 +386,15 @@ void DrawComponent<ScriptComponent>(Entity& entity) {
 
 	ImGui::Text("Asset ID: %llu", (uint64_t)component.ModuleAsset.ID);
 	auto text = component.ModuleAsset.ID ? "Change Module" : "Set Module";
-	if(ImGui::Button(text))
-		s_Selecting = AssetType::Script;
 
-	if(s_Asset.Type != AssetType::None && !s_ForScript) {
-		component.ModuleAsset = s_Asset;
-		component.Instance.reset();
-		s_Asset = { };
-	}
+	auto panel =
+		Editor::GetProjectTab()->
+				GetPanel("ContentBrowser")->As<ContentBrowserPanel>();
+
+	if(ImGui::Button(text))
+		panel->Select(AssetType::Script);
+	if(panel->HasSelection())
+		component.ModuleAsset = panel->GetSelected();
 
 	if(!component.ModuleAsset)
 		return;
@@ -509,12 +451,9 @@ void DrawComponent<ScriptComponent>(Entity& entity) {
 				ImGui::Text("ID: %llu", (uint64_t)asset.ID);
 
 				if(ImGui::Button(("Edit##" + field.Name).c_str()))
-					s_ForScript = i + 1;
-				if(s_Asset.Type != AssetType::None && i + 1 == s_ForScript) {
-					*field.As<Asset>() = s_Asset;
-					s_Asset = { };
-					s_ForScript = 0;
-				}
+					panel->Select(AssetType::None, i + 1);
+				if(panel->HasSelection(i + 1))
+					*field.As<Asset>() = panel->GetSelected();
 			}
 			if(typeName == "Vec3") {
 				ImGui::SetNextItemWidth(150);
@@ -775,19 +714,18 @@ void DrawComponent<ParticleEmitterComponent>(Entity& entity) {
 	ImGui::Text("Material: %li", (uint64_t)component.MaterialAsset.ID);
 
 	auto text = component.MaterialAsset.ID ? "Change Asset" : "Set Asset";
-	if(ImGui::Button(text))
-		s_Selecting = AssetType::Material;
 
-	if(s_Asset.Type != AssetType::None && !s_ForScript) {
-		component.MaterialAsset = s_Asset;
-		s_Asset = { };
-	}
+	auto panel =
+		Editor::GetProjectTab()->
+				GetPanel("ContentBrowser")->As<ContentBrowserPanel>();
+
+	if(ImGui::Button(text))
+		panel->Select(AssetType::Material);
+	if(panel->HasSelection())
+		component.MaterialAsset = panel->GetSelected();
 }
 
 void ComponentEditorPanel::Draw() {
-	if(s_ForScript || s_Selecting != AssetType::None)
-		AssetSelect();
-
 	ImGui::Begin("Component Editor", &Open);
 	{
 		if(m_Context) {

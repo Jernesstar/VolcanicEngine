@@ -12,7 +12,7 @@ GridSet::GridSet(uint32_t width, uint32_t height)
 	: m_Width(width), m_Height(height)
 {
 	if(width && height)
-		m_Data = new uint8_t[width * height];
+		m_Data = new uint8_t[GetCount()];
 }
 
 GridSet::~GridSet() {
@@ -45,19 +45,15 @@ uint8_t* GridSet::At(uint32_t x, uint32_t y) const {
 }
 
 void GridSet::Resize(uint32_t width, uint32_t height) {
-	m_Width = width;
-	m_Height = height;
-	Reallocate();
+	Reallocate(width, height);
 }
 
 void GridSet::ResizeX(uint32_t width) {
-	m_Width = width;
-	Reallocate();
+	Reallocate(width, m_Height);
 }
 
 void GridSet::ResizeY(uint32_t height) {
-	m_Height = height;
-	Reallocate();
+	Reallocate(m_Width, height);
 }
 
 void GridSet::Clear() {
@@ -77,18 +73,22 @@ uint32_t GridSet::GetCount() const {
 	return m_Width * m_Height;
 }
 
-void GridSet::Reallocate() {
-	if(!GetCount())
+void GridSet::Reallocate(uint32_t width, uint32_t height) {
+	if(!(width * height))
 		return;
 
-	uint8_t* newData = new uint8_t[GetCount()];
-	if(m_Data)
-		memcpy(newData, m_Data, GetCount());
-	else
-		memset(newData, 0, GetCount());
+	uint32_t newDim = width * height;
+	uint8_t* newData = new uint8_t[newDim];
+	// memset(newData, 0, newDim);
 
-	delete[] m_Data;
+	if(m_Data) {
+		memcpy(newData, m_Data, GetCount());
+		delete[] m_Data;
+	}
+
 	m_Data = newData;
+	m_Width = width;
+	m_Height = height;
 }
 
 static void GridSetDefaultCtor(GridSet* ptr) {

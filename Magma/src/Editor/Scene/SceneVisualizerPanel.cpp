@@ -402,7 +402,7 @@ void SceneVisualizerPanel::Draw() {
 		else if(options.add.asset.Type == AssetType::Audio)
 			open = ImGui::BeginPopupModal("Create Entity with AudioComponent");
 		else if(options.add.asset.Type == AssetType::Script)
-			open = ImGui::BeginPopupModal("Create Entity with ScriptComponent", nullptr);
+			open = ImGui::BeginPopupModal("Create Entity with ScriptComponent");
 
 		if(open) {
 			static std::string str;
@@ -416,8 +416,10 @@ void SceneVisualizerPanel::Draw() {
 			auto& world = m_Context->EntityWorld;
 			auto& assetManager = editor.GetAssetManager();
 
-			if(ImGui::Button("Cancel"))
+			if(ImGui::Button("Cancel")) {
+				options.add.asset = { };
 				ImGui::CloseCurrentPopup();
+			}
 			ImGui::SameLine();
 			if(ImGui::Button("Create")
 			|| ImGui::IsKeyPressed(ImGuiKey_Enter, false))
@@ -634,43 +636,6 @@ EditorSceneRenderer::EditorSceneRenderer(SceneVisualizerPanel* panel)
 			}), m_Output);
 	LinePass->SetData(Renderer3D::GetLineBuffer());
 
-	DirectionalLightBuffer =
-		UniformBuffer::Create(
-			BufferLayout
-			{
-				{ "Position",  BufferDataType::Vec4 },
-				{ "Ambient",   BufferDataType::Vec4 },
-				{ "Diffuse",   BufferDataType::Vec4 },
-				{ "Specular",  BufferDataType::Vec4 },
-				{ "Direction", BufferDataType::Vec4 },
-			}, 1);
-	
-	PointLightBuffer =
-		UniformBuffer::Create(
-			BufferLayout
-			{
-				{ "Position",  BufferDataType::Vec4 },
-				{ "Ambient",   BufferDataType::Vec4 },
-				{ "Diffuse",   BufferDataType::Vec4 },
-				{ "Specular",  BufferDataType::Vec4 },
-				{ "Constant",  BufferDataType::Float },
-				{ "Linear",	   BufferDataType::Float },
-				{ "Quadratic", BufferDataType::Float },
-			}, 50);
-
-	SpotlightBuffer =
-		UniformBuffer::Create(
-			BufferLayout
-			{
-				{ "Position",  BufferDataType::Vec4 },
-				{ "Ambient",   BufferDataType::Vec4 },
-				{ "Diffuse",   BufferDataType::Vec4 },
-				{ "Specular",  BufferDataType::Vec4 },
-				{ "Direction", BufferDataType::Vec4 },
-				{ "CutoffAngle",	  BufferDataType::Float },
-				{ "OuterCutoffAngle", BufferDataType::Float },
-			}, 50);
-
 	Application::PopDir();
 }
 
@@ -787,79 +752,22 @@ void EditorSceneRenderer::SubmitSkybox(const Entity& entity) {
 	.SetInput("u_Skybox", CubemapSlot{ cubemap });
 }
 
-struct DirectionalLight {
-	glm::vec4 Position;
-	glm::vec4 Ambient;
-	glm::vec4 Diffuse;
-	glm::vec4 Specular;
-	glm::vec4 Direction;
-
-	DirectionalLight(const DirectionalLightComponent& dc)
-		: Position(dc.Position, 0.0f), Ambient(dc.Ambient, 0.0f),
-		Diffuse(dc.Diffuse, 0.0f), Specular(dc.Specular, 0.0f),
-		Direction(dc.Direction, 0.0f) { }
-};
-
-struct PointLight {
-	glm::vec4 Position;
-	glm::vec4 Ambient;
-	glm::vec4 Diffuse;
-	glm::vec4 Specular;
-
-	float Constant;
-	float Linear;
-	float Quadratic;
-	// float _padding;
-
-	PointLight(const PointLightComponent& pc)
-		: Position(pc.Position, 0.0f), Ambient(pc.Ambient, 0.0f),
-		Diffuse(pc.Diffuse, 0.0f), Specular(pc.Specular, 0.0f),
-		Constant(pc.Constant), Linear(pc.Linear), Quadratic(pc.Quadratic) { }
-};
-
-struct Spotlight {
-	glm::vec4 Position;
-	glm::vec4 Ambient;
-	glm::vec4 Diffuse;
-	glm::vec4 Specular;
-	glm::vec4 Direction;
-
-	float CutoffAngle;
-	float OuterCutoffAngle;
-	// float _padding[2];
-
-	Spotlight(const SpotlightComponent& sc)
-		: Position(sc.Position, 0.0f), Ambient(sc.Ambient, 0.0f),
-		Diffuse(sc.Diffuse, 0.0f), Specular(sc.Specular, 0.0f),
-		Direction(sc.Direction, 0.0f),
-		CutoffAngle(sc.CutoffAngle), OuterCutoffAngle(sc.OuterCutoffAngle) { }
-};
-
 void EditorSceneRenderer::SubmitLight(const Entity& entity) {
 	glm::vec3 position;
 	uint64_t start = 0;
 	uint64_t count = 0;
 
 	if(entity.Has<DirectionalLightComponent>()) {
-		DirectionalLight light = entity.Get<DirectionalLightComponent>();
-		DirectionalLightBuffer->SetData(&light);
+		position = entity.Get<DirectionalLightComponent>().Position;
 		HasDirectionalLight = true;
-
-		position = light.Position;
 	}
 	else if(entity.Has<PointLightComponent>()) {
-		PointLight light = entity.Get<PointLightComponent>();
-		PointLightBuffer->SetData(&light, 1, PointLightCount);
-
-		position = light.Position;
+		position = entity.Get<PointLightComponent>().Position;
 		start = 1;
 		count = PointLightCount++;
 	}
 	else if(entity.Has<SpotlightComponent>()) {
-		Spotlight light = entity.Get<SpotlightComponent>();
-		SpotlightBuffer->SetData(&light, 1, SpotlightCount);
-
-		position = light.Position;
+		position = entity.Get<SpotlightComponent>().Position;
 		start = 51;
 		count = SpotlightCount++;
 	}
@@ -893,18 +801,11 @@ void EditorSceneRenderer::SubmitMesh(const Entity& entity) {
 
 void EditorSceneRenderer::Render() {
 	LightingCommand->UniformData
-	.SetInput("u_DirectionalLightCount", (int32_t)HasDirectionalLight);
+	.SetInput("u_DirectionalLightCount", 0);
 	LightingCommand->UniformData
-	.SetInput("u_PointLightCount", (int32_t)PointLightCount);
+	.SetInput("u_PointLightCount", 0);
 	LightingCommand->UniformData
-	.SetInput("u_SpotlightCount", (int32_t)SpotlightCount);
-
-	LightingCommand->UniformData
-	.SetInput(UniformSlot{ DirectionalLightBuffer, "", 0 });
-	LightingCommand->UniformData
-	.SetInput(UniformSlot{ PointLightBuffer, "", 1 });
-	LightingCommand->UniformData
-	.SetInput(UniformSlot{ SpotlightBuffer, "", 2 });
+	.SetInput("u_SpotlightCount", 0);
 
 	Renderer3D::End();
 

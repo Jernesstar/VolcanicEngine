@@ -61,6 +61,12 @@ struct Spotlight {
 		CutoffAngle(sc.CutoffAngle), OuterCutoffAngle(sc.OuterCutoffAngle) { }
 };
 
+struct BloomMip {
+	glm::vec2 Size;
+	glm::ivec2 IntSize;
+	Ref<Texture> Sampler;
+};
+
 struct ParticleData {
 	Vec3 Position;
 	Vec3 Velocity;
@@ -81,24 +87,18 @@ struct ParticleEmitter {
 	Ref<RenderPass> DrawPass;
 };
 
+static List<BloomMip> s_MipChain;
+static uint32_t s_MipChainLength = 11; // TODO(Change): These are material settings
+static float s_FilterRadius	= 0.005f;
+static float s_Exposure		= 1.0f;
+static float s_BloomStrength = 0.04f;
+
 static Map<uint64_t, ParticleEmitter> s_ParticleEmitters;
 
 RuntimeSceneRenderer::RuntimeSceneRenderer() {
 	auto window = Application::GetWindow();
 	m_Output = Framebuffer::Create(window->GetWidth(), window->GetHeight());
-
-	Ref<ShaderPipeline> shader;
-	Ref<Framebuffer> buffer;
-
-	shader = ShaderLibrary::Get("Lighting");
-	// buffer = Framebuffer::Create(window->GetWidth(), window->GetHeight());
-	LightingPass = RenderPass::Create("Lighting", shader, m_Output);
-	LightingPass->SetData(Renderer3D::GetMeshBuffer());
-
-	// shader = ShaderLibrary::Get("Bloom");
-	// buffer = Framebuffer::Create(window->GetWidth(), window->GetHeight());
-	// BloomPass = RenderPass::Create("Bloom", shader, buffer);
-	// BloomPass->SetData(Renderer3D::GetMeshBuffer());
+	m_BaseLayer = Framebuffer::Create(window->GetWidth(), window->GetHeight());
 
 	DirectionalLightBuffer =
 		UniformBuffer::Create(
@@ -137,40 +137,67 @@ RuntimeSceneRenderer::RuntimeSceneRenderer() {
 				{ "OuterCutoffAngle", BufferDataType::Float },
 			}, 50);
 
-	shader = ShaderLibrary::Get("Particle-Emit");
-	EmitterPass = RenderPass::Create("Particle-Emit", shader);
+	InitMips();
 
-	shader = ShaderLibrary::Get("Particle-Update");
-	UpdatePass = RenderPass::Create("Particle-Update", shader);
+	LightingPass =
+		RenderPass::Create("Lighting",
+			ShaderLibrary::Get("Lighting"), m_BaseLayer);
+	LightingPass->SetData(Renderer3D::GetMeshBuffer());
 
-	shader = ShaderLibrary::Get("Particle-DefaultDraw");
-	DrawPass = RenderPass::Create("Particle-Draw", shader);
+	DownsamplePass =
+		RenderPass::Create("BloomDownsample",
+			ShaderLibrary::Get("BloomDownsample"), Mips);
+	UpsamplePass =
+		RenderPass::Create("BloomUpsample",
+			ShaderLibrary::Get("BloomDownsample"), Mips);
+	BloomPass =
+		RenderPass::Create("Bloom",
+			ShaderLibrary::Get("Bloom"), Mips);
+	DownsamplePass->SetData(Renderer2D::GetScreenBuffer());
+	UpsamplePass->SetData(Renderer2D::GetScreenBuffer());
+	BloomPass->SetData(Renderer2D::GetScreenBuffer());
+
+	EmitterPass =
+		RenderPass::Create("Particle-Emit",
+			ShaderLibrary::Get("Particle-Emit"));
+	UpdatePass =
+		RenderPass::Create("Particle-Update",
+			ShaderLibrary::Get("Particle-Update"));
+	DrawPass =
+		RenderPass::Create("Particle-Draw",
+			ShaderLibrary::Get("Particle-DefaultDraw"));
 	DrawPass->SetData(Renderer3D::GetMeshBuffer());
 }
 
 void RuntimeSceneRenderer::OnSceneLoad() {
 	auto* scene = App::Get()->GetScene();
 
-	BufferLayout particleLayout =
-	{
-		{ "Position", BufferDataType::Vec3 },
-		{ "Velocity", BufferDataType::Vec3 },
-		{ "Life", BufferDataType::Float },
-	};
-	BufferLayout freeListLayout =
-	{
-		{ "Indices", BufferDataType::Int },
-	};
-	scene->EntityWorld.ForEach<ParticleEmitterComponent>(
-		[&](Entity& entity)
+	scene->EntityWorld.GetNative()
+	.observer()
+	.with<ParticleEmitterComponent>()
+	.event(flecs::OnSet)
+	.each(
+		[](flecs::entity e)
 		{
+			Entity entity{ e };
+			BufferLayout particleLayout =
+			{
+				{ "Position", BufferDataType::Vec3 },
+				{ "Velocity", BufferDataType::Vec3 },
+				{ "Life", BufferDataType::Float },
+			};
+			BufferLayout freeListLayout =
+			{
+				{ "Indices", BufferDataType::Int },
+			};
+
 			auto& component = entity.Get<ParticleEmitterComponent>();
 			auto& emitter = s_ParticleEmitters[entity.GetHandle()];
 
 			emitter.Position = component.Position;
 			emitter.MaxParticleCount = component.MaxParticleCount;
 			emitter.SpawnInterval = component.SpawnInterval;
-	
+
 			Buffer<ParticleData> data(emitter.MaxParticleCount);
 			for(uint32_t i = 0; i < emitter.MaxParticleCount; i++)
 				data.Set(i, ParticleData{ });
@@ -188,7 +215,7 @@ void RuntimeSceneRenderer::OnSceneLoad() {
 }
 
 void RuntimeSceneRenderer::OnSceneClose() {
-
+	s_ParticleEmitters.clear();
 }
 
 void RuntimeSceneRenderer::Update(TimeStep ts) {
@@ -362,6 +389,119 @@ void RuntimeSceneRenderer::Render() {
 	HasDirectionalLight = false;
 	PointLightCount = 0;
 	SpotlightCount = 0;
+}
+
+void RuntimeSceneRenderer::InitMips() {
+	auto window = Application::GetWindow();
+
+	glm::vec2 mipSize((float)window->GetWidth(), (float)window->GetHeight());
+	glm::ivec2 mipIntSize(window->GetWidth(), window->GetHeight());
+	List<Ref<Texture>> textures;
+	for(uint32_t i = 0; i < s_MipChainLength; i++) {
+		BloomMip mip;
+
+		mipSize *= 0.5f;
+		mipIntSize /= 2;
+		mip.Size = mipSize;
+		mip.IntSize = mipIntSize;
+
+		mip.Sampler =
+			Texture::Create(mipIntSize.x, mipIntSize.y, Texture::Format::Float);
+
+		s_MipChain.Add(mip);
+		textures.Add(mip.Sampler);
+	}
+
+	Mips = Framebuffer::Create(
+		{
+			{ AttachmentTarget::Color, textures }
+		});
+}
+
+void RuntimeSceneRenderer::Downsample() {
+	auto* command = Renderer::NewCommand();
+	command->Clear = true;
+	command->UniformData
+	.SetInput("u_SrcResolution",
+		glm::vec2{ m_BaseLayer->GetWidth(), m_BaseLayer->GetHeight() });
+	command->UniformData
+	.SetInput("u_SrcTexture",
+		TextureSlot{ m_BaseLayer->Get(AttachmentTarget::Color), 0 });
+
+	uint32_t i = 0;
+	for(const auto& mip : s_MipChain) {
+		command->ViewportWidth = mip.IntSize.x;
+		command->ViewportHeight = mip.IntSize.y;
+		command->DepthTest = DepthTestingMode::Off;
+		command->Blending = BlendingMode::Off;
+		command->Culling = CullingMode::Off;
+		command->Outputs = { { AttachmentTarget::Color, i++ } };
+
+		auto& call = command->NewDrawCall();
+		call.VertexCount = 6;
+		call.Primitive = PrimitiveType::Triangle;
+		call.Partition = PartitionType::Single;
+
+		command = Renderer::NewCommand();
+		command->UniformData
+		.SetInput("u_SrcResolution", mip.Size);
+		command->UniformData
+		.SetInput("u_SrcTexture", TextureSlot{ mip.Sampler, 0 });
+	}
+}
+
+void RuntimeSceneRenderer::Upsample() {
+	auto* command = Renderer::NewCommand();
+	command->UniformData
+	.SetInput("u_FilterRadius", s_FilterRadius);
+
+	for(uint32_t i = s_MipChainLength - 1; i > 0; i--) {
+		const BloomMip& mip = s_MipChain[i];
+		const BloomMip& nextMip = s_MipChain[i - 1];
+
+		command->ViewportWidth = nextMip.IntSize.x;
+		command->ViewportHeight = nextMip.IntSize.y;
+		command->DepthTest = DepthTestingMode::Off;
+		command->Blending = BlendingMode::Additive;
+		command->Culling = CullingMode::Off;
+		command->Outputs = { { AttachmentTarget::Color, i - 1 } };
+		command->UniformData
+		.SetInput("u_SrcTexture", TextureSlot{ mip.Sampler, 0 });
+		command->UniformData
+		.SetInput("u_SrcResolution", mip.Size);
+
+		auto& call = command->NewDrawCall();
+		call.VertexCount = 6;
+		call.Primitive = PrimitiveType::Triangle;
+		call.Partition = PartitionType::Single;
+
+		command = Renderer::NewCommand();
+	}
+}
+
+void RuntimeSceneRenderer::Composite() {
+	auto* command = Renderer::NewCommand();
+	command->ViewportWidth = Application::GetWindow()->GetWidth();
+	command->ViewportHeight = Application::GetWindow()->GetHeight();
+	command->DepthTest = DepthTestingMode::Off;
+	command->Blending = BlendingMode::Greatest;
+	command->Culling = CullingMode::Off;
+
+	command->UniformData
+	.SetInput("u_Exposure", s_Exposure);
+	command->UniformData
+	.SetInput("u_BloomStrength", s_BloomStrength);
+	command->UniformData
+	.SetInput("u_BloomTexture",
+		TextureSlot{ Mips->Get(AttachmentTarget::Color), 0 });
+	command->UniformData
+	.SetInput("u_SceneTexture",
+		TextureSlot{ m_BaseLayer->Get(AttachmentTarget::Color), 1 });
+
+	auto& call = command->NewDrawCall();
+	call.VertexCount = 6;
+	call.Primitive = PrimitiveType::Triangle;
+	call.Partition = PartitionType::Single;
 }
 
 }

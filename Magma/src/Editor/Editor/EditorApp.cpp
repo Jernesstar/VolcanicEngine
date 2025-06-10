@@ -32,6 +32,8 @@ EditorApp::EditorApp(const CommandLineArgs& args)
 				Application::Close();
 		});
 
+	GetWindow()->Maximize();
+
 	UIRenderer::Init();
 
 	Application::PushDir();

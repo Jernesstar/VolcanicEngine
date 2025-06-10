@@ -29,6 +29,9 @@ public:
 	void OnSceneClose();
 
 private:
+	// Base
+	Ref<Framebuffer> m_BaseLayer;
+
 	// Lighting and shadows
 	Ref<RenderPass> DepthPass;
 	Ref<RenderPass> LightingPass;
@@ -51,6 +54,12 @@ private:
 	Ref<RenderPass> EmitterPass;
 	Ref<RenderPass> UpdatePass;
 	Ref<RenderPass> DrawPass;
+
+private:
+	void InitMips();
+	void Downsample();
+	void Upsample();
+	void Composite();
 };
 
 }

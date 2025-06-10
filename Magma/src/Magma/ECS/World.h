@@ -63,28 +63,6 @@ public:
 		m_World.defer_end();
 	}
 
-	// template<typename TEvent>
-	// void Register() {
-	// 	m_EventHandler.observe<TEvent>(
-	// 		[this](TEvent& event) {
-	// 			auto& list =
-	// 				m_Events[TypeIDGenerator<Event>::GetID<TEvent>()];
-	// 			for(auto& callback : list)
-	// 				((Func<void, const TEvent&>)callback)(event);
-	// 		});
-	// }
-
-	// template<typename TEvent>
-	// void Subscribe(const Func<void, const TEvent&>& callback) {
-	// 	m_Events[TypeIDGenerator<Event>::GetID<TEvent>()]
-	// 		.push_back((Func<void, const Event&>)callback);
-	// }
-
-	// template<typename TEvent, typename ...Args>
-	// void Emit(Args&&... args) {
-	// 	m_EventHandler.emit<TEvent>(TEvent{ std::forward<Args>(args)... });
-	// }
-
 	template<class TSystem>
 	void Add() {
  		uint64_t id = TypeIDGenerator<System<>>::GetID<TSystem>();

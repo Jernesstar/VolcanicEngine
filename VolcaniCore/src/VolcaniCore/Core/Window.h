@@ -17,6 +17,7 @@ public:
 	void Update() { glfwSwapBuffers(m_NativeWindow); }
 
 	void Resize(uint32_t width, uint32_t height);
+	void Maximize();
 	void SetIcon(const ImageData& imageData);
 	void SetTitle(const std::string& title);
 

@@ -41,6 +41,10 @@ void Window::Resize(uint32_t width, uint32_t height) {
 	glfwSetWindowSize(m_NativeWindow, width, height);
 }
 
+void Window::Maximize() {
+	glfwMaximizeWindow(m_NativeWindow);
+}
+
 void Window::SetIcon(const ImageData& imageData) {
 	if(!imageData.Data) {
 		glfwSetWindowIcon(m_NativeWindow, 0, nullptr);

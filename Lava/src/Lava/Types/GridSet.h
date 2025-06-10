@@ -33,7 +33,7 @@ private:
 	uint32_t m_Width = 0, m_Height = 0;
 
 private:
-	void Reallocate();
+	void Reallocate(uint32_t width, uint32_t height);
 };
 
 }

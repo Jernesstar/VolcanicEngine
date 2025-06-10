@@ -60,24 +60,14 @@ private:
 	Ref<Texture> SpotlightIcon;
 	Ref<Texture> CameraIcon;
 
-	// Lighting and shadows
-	Ref<RenderPass> DepthPass;
+	// Lighting (and shadows?)
 	Ref<RenderPass> LightingPass;
-	Ref<UniformBuffer> DirectionalLightBuffer;
-	Ref<UniformBuffer> PointLightBuffer;
-	Ref<UniformBuffer> SpotlightBuffer;
 	DrawCommand* LightingCommand;
 
 	bool HasCamera = false;
 	bool HasDirectionalLight = false;
 	uint32_t PointLightCount = 0;
 	uint32_t SpotlightCount = 0;
-
-	// Bloom
-	Ref<Framebuffer> Mips;
-	Ref<RenderPass> DownsamplePass;
-	Ref<RenderPass> UpsamplePass;
-	Ref<RenderPass> BloomPass;
 };
 
 class SceneVisualizerPanel : public Panel {

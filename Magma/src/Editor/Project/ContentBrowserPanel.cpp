@@ -17,16 +17,25 @@
 
 namespace Magma {
 
+Ref<UI::Image> s_FileIcon;
+Ref<UI::Image> s_FolderIcon;
+
+static bool s_Selecting = false;
+static uint32_t s_SelectionID = 0;
+static AssetType s_SelectType = AssetType::None;
+static Asset s_Selection = { };
+static ImVec2 s_Position;
+
 ContentBrowserPanel::ContentBrowserPanel(const std::string& path)
 	: Panel("ContentBrowser"), m_Path(path)
 {
 	Application::PushDir();
-	m_FileIcon =
+	s_FileIcon =
 		CreateRef<UI::Image>(
-			AssetImporter::GetTexture("Magma/assets/icons/FileIcon.png", false));
-	m_FolderIcon =
+			AssetImporter::GetTexture("Magma/assets/icons/FileIcon.png"));
+	s_FolderIcon =
 		CreateRef<UI::Image>(
-			AssetImporter::GetTexture("Magma/assets/icons/FolderIcon.png", false));
+			AssetImporter::GetTexture("Magma/assets/icons/FolderIcon.png"));
 	Application::PopDir();
 }
 
@@ -38,18 +47,8 @@ void ContentBrowserPanel::Update(VolcaniCore::TimeStep ts) {
 
 }
 
-static bool HasExtension(fs::path path,
-	const VolcaniCore::List<std::string>& extensions)
-{
-	if(path.string() != "")
-		for(const auto& ext : extensions)
-			if(path.extension() == ext)
-				return true;
-
-	return false;
-}
-
 static ImRect Traverse(fs::path folder);
+static void DrawAssetSelectWindow();
 
 void ContentBrowserPanel::Draw() {
 	ImGui::Begin("Content Browser", &Open);
@@ -104,11 +103,14 @@ void ContentBrowserPanel::Draw() {
 			RenderAssetTable();
 		}
 		ImGui::EndChild();
+
+		if(s_Selecting)
+			DrawAssetSelectWindow();
 	}
 	ImGui::End();
 }
 
-void ContentBrowserPanel::RenderAssetTable(bool hovering) {
+void ContentBrowserPanel::RenderAssetTable() {
 	static float padding = 24.0f;
 	static float thumbnailSize = 100.0f;
 	static float cellSize = thumbnailSize + padding;
@@ -120,20 +122,15 @@ void ContentBrowserPanel::RenderAssetTable(bool hovering) {
 	auto& assetManager =
 		Application::As<EditorApp>()->GetEditor().GetAssetManager();
 
-	if(hovering) {
-		ImGui::OpenPopup("Select Asset");
-		if(!ImGui::BeginPopupModal("Select Asset")) {
-			ImGui::EndPopup();
-			return;
-		}
-	}
-
 	if(ImGui::BeginTable("AssetsTable", columnCount))
 	{
 		static Asset s_Asset;
 
 		for(auto& [asset, _] : assetManager.GetRegistry()) {
 			if(!asset.Primary)
+				continue;
+			if(s_Selecting && s_SelectType != AssetType::None
+			&& asset.Type != s_SelectType)
 				continue;
 
 			ImGui::TableNextColumn();
@@ -145,25 +142,26 @@ void ContentBrowserPanel::RenderAssetTable(bool hovering) {
 			UI::Button button;
 			button.Width = thumbnailSize;
 			button.Height = thumbnailSize;
-			button.Display = m_FileIcon;
+			button.Display = s_FileIcon;
 			button.UsePosition = false;
 
 			if(UI::UIRenderer::DrawButton(button).Clicked) {
 				s_Asset = asset;
-				if(!hovering) {
+				if(!s_Selecting) {
 					auto panel =
 						m_Tab->GetPanel("AssetEditor")->As<AssetEditorPanel>();
 					panel->Select(asset);
 				}
+				else
+					s_Selection = s_Asset;
 			}
 
-			if(!hovering)
-				if(ImGui::BeginDragDropSource())
-				{
+			if(!s_Selecting)
+				if(ImGui::BeginDragDropSource()) {
 					ImGui::SetDragDropPayload("ASSET", &s_Asset, sizeof(Asset));
 
 					UI::Image image;
-					image.Content = m_FileIcon->Content;
+					image.Content = s_FileIcon->Content;
 					image.Width = thumbnailSize;
 					image.Height = thumbnailSize;
 					image.UsePosition = false;
@@ -182,19 +180,73 @@ void ContentBrowserPanel::RenderAssetTable(bool hovering) {
 				ImGui::Text("%llu", (uint64_t)asset.ID);
 		}
 
-		if(hovering) {
-			if(ImGui::Button("Close")) {
-				ImGui::CloseCurrentPopup();
-				// s_Selecting = AssetType::None;
-				// s_ForScript = 0;
-			}
-		}
-
 		ImGui::EndTable();
 	}
+}
 
-	if(hovering)
-		ImGui::EndPopup();
+void ContentBrowserPanel::Select(AssetType type, uint32_t id) {
+	s_Selecting = true;
+	s_SelectType = type;
+	s_SelectionID = id;
+	s_Position = ImGui::GetCursorScreenPos();
+}
+
+void ContentBrowserPanel::CancelSelect() {
+	s_Selecting = false;
+	s_SelectionID = 0;
+	s_SelectType = AssetType::None;
+	s_Selection = { };
+}
+
+bool ContentBrowserPanel::HasSelection(uint32_t id) {
+	return !s_Selecting && s_Selection.ID && s_SelectionID == id;
+}
+
+Asset ContentBrowserPanel::GetSelected() {
+	Asset asset = s_Selection;
+	s_Selection = { };
+	s_SelectionID = 0;
+	s_SelectType = AssetType::None;
+	return asset;
+}
+
+void DrawAssetSelectWindow() {
+	auto flags = ImGuiWindowFlags_NoTitleBar
+			   | ImGuiWindowFlags_NoResize
+			   | ImGuiWindowFlags_NoMove
+			   | ImGuiWindowFlags_NoScrollbar
+			   | ImGuiWindowFlags_NoScrollWithMouse
+			   | ImGuiWindowFlags_NoSavedSettings;
+
+	ImGui::SetNextWindowPos(s_Position);
+	ImGui::SetNextWindowSizeConstraints({ 130.0f, 150.0f }, { 130.0f, 150.0f });
+	ImGui::Begin("Select Asset", nullptr, flags);
+	{
+		if(s_Selection.ID) {
+			UI::Image image;
+			image.x = 5.0f;
+			image.Width = 120;
+			image.Height = 100;
+			image.Content = s_FileIcon->Content;
+			// image.Content = s_Thumbnails[s_Selection.ID];
+			image.Render();
+		}
+		else {
+			ImGui::Text("No Asset Selected");
+			// TODO(Art): Little indent with barred circle or something
+		}
+
+		bool closeWindow = false;
+		closeWindow |= ImGui::Button("Confirm");
+		ImGui::SameLine();
+		closeWindow |= ImGui::Button("Cancel");
+
+		if(closeWindow) {
+			s_SelectType = AssetType::None;
+			s_Selecting = false;
+		}
+	}
+	ImGui::End();
 }
 
 ImRect Traverse(fs::path path) {
