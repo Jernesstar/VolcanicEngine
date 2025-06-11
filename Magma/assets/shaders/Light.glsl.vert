@@ -33,7 +33,7 @@ const vec2 Vertices[4] =
 const int Indices[6] = int[6](0, 2, 1, 2, 0, 3);
 
 layout(location = 0) out vec3 v_Center;
-layout(location = 1) out vec2 v_TexCoords;
+layout(location = 1) out vec3 v_Color;
 
 void main()
 {
@@ -48,7 +48,7 @@ void main()
         + cameraUp * vertex.y * u_Radius;
 
     v_Center = light.Position.xyz;
-    v_TexCoords = vertex + 0.5;
+    v_Color = light.Diffuse.xyz;
 
     gl_Position = u_ViewProj * vec4(position, 1.0);
 }

@@ -97,7 +97,6 @@ static Map<uint64_t, ParticleEmitter> s_ParticleEmitters;
 
 RuntimeSceneRenderer::RuntimeSceneRenderer() {
 	auto window = Application::GetWindow();
-	m_BaseLayer = Framebuffer::Create(window->GetWidth(), window->GetHeight());
 	m_Output = Framebuffer::Create(window->GetWidth(), window->GetHeight());
 
 	DirectionalLightBuffer =
@@ -137,30 +136,33 @@ RuntimeSceneRenderer::RuntimeSceneRenderer() {
 				{ "OuterCutoffAngle", BufferDataType::Float },
 			}, 50);
 
-	InitMips();
-
-	FinalCompositePass =
-		RenderPass::Create("FinalComposite",
-			ShaderLibrary::Get("Framebuffer"), m_Output);
-	FinalCompositePass->SetData(Renderer2D::GetScreenBuffer());
+	// FinalCompositePass =
+	// 	RenderPass::Create("FinalComposite",
+	// 		ShaderLibrary::Get("Framebuffer"), m_Output);
+	// FinalCompositePass->SetData(Renderer2D::GetScreenBuffer());
 
 	LightingPass =
 		RenderPass::Create("Lighting",
-			ShaderLibrary::Get("Lighting"), m_BaseLayer);
+			ShaderLibrary::Get("Lighting"), m_Output);
 	LightingPass->SetData(Renderer3D::GetMeshBuffer());
+
+	BaseLayer = Framebuffer::Create(window->GetWidth(), window->GetHeight());
 
 	LightPass =
 		RenderPass::Create("Light",
-			ShaderLibrary::Get("Light"), m_BaseLayer);
-	LightPass->SetData(Renderer3D::GetMeshBuffer());
+			ShaderLibrary::Get("Light"), BaseLayer);
+	LightPass->SetData(Renderer2D::GetScreenBuffer());
 
+	InitMips();
 	DownsamplePass =
 		RenderPass::Create("Bloom-Downsample",
 			ShaderLibrary::Get("Bloom-Downsample"), Mips);
 	UpsamplePass =
 		RenderPass::Create("Bloom-Upsample",
 			ShaderLibrary::Get("Bloom-Upsample"), Mips);
-	BloomPass = RenderPass::Create("Bloom", ShaderLibrary::Get("Bloom"), Mips);
+	BloomPass =
+		RenderPass::Create("Bloom",
+			ShaderLibrary::Get("Bloom"), m_Output);
 
 	DownsamplePass->SetData(Renderer2D::GetScreenBuffer());
 	UpsamplePass->SetData(Renderer2D::GetScreenBuffer());
@@ -174,7 +176,7 @@ RuntimeSceneRenderer::RuntimeSceneRenderer() {
 			ShaderLibrary::Get("Particle-Update"));
 	ParticlePass =
 		RenderPass::Create("Particle-Draw",
-			ShaderLibrary::Get("Particle-DefaultDraw"), m_BaseLayer);
+			ShaderLibrary::Get("Particle-DefaultDraw"), m_Output);
 	ParticlePass->SetData(Renderer3D::GetMeshBuffer());
 }
 
@@ -282,8 +284,29 @@ void RuntimeSceneRenderer::Update(TimeStep ts) {
 }
 
 void RuntimeSceneRenderer::Begin() {
+	LightCommand = RendererAPI::Get()->NewDrawCommand(LightPass->Get());
+	LightCommand->Clear = true;
+	LightCommand->DepthTest = DepthTestingMode::On;
+	LightCommand->Blending = BlendingMode::Greatest;
+	LightCommand->Culling = CullingMode::Off;
+
+	Renderer::StartPass(DownsamplePass, false);
+	{
+		Downsample();
+	}
+
+	Renderer::StartPass(UpsamplePass, false);
+	{
+		Upsample();
+	}
+	Renderer::EndPass();
+
+	Renderer::StartPass(BloomPass, false);
+	{
+		Composite();
+	}
+
 	LightingCommand = RendererAPI::Get()->NewDrawCommand(LightingPass->Get());
-	LightingCommand->Clear = true;
 }
 
 void RuntimeSceneRenderer::SubmitCamera(const Entity& entity) {
@@ -397,11 +420,6 @@ void RuntimeSceneRenderer::Render() {
 	LightingCommand->UniformData
 	.SetInput(UniformSlot{ SpotlightBuffer, "", 2 });
 
-	LightCommand = RendererAPI::Get()->NewDrawCommand(LightPass->Get());
-	LightCommand->DepthTest = DepthTestingMode::On;
-	LightCommand->Blending = BlendingMode::Greatest;
-	LightCommand->Culling = CullingMode::Off;
-
 	LightCommand->UniformData
 	.SetInput("u_View",
 		LightingCommand->UniformData.Mat4Uniforms["u_View"]);
@@ -414,36 +432,18 @@ void RuntimeSceneRenderer::Render() {
 	.SetInput("u_CameraPosition",
 		LightingCommand->UniformData.Vec3Uniforms["u_CameraPosition"]);
 	LightCommand->UniformData
+	.SetInput("u_ViewportWidth", (float)Application::GetWindow()->GetWidth());
+	LightCommand->UniformData
+	.SetInput("u_ViewportHeight", (float)Application::GetWindow()->GetHeight());
+	LightCommand->UniformData
 	.SetInput(UniformSlot{ PointLightBuffer, "", 1 });
 
 	auto& call = LightCommand->NewDrawCall();
 	call.VertexCount = 6;
+	call.InstanceStart = 0;
 	call.InstanceCount = PointLightCount;
 	call.Primitive = PrimitiveType::Triangle;
 	call.Partition = PartitionType::Instanced;
-
-	// // Bloom
-	// Renderer::StartPass(DownsamplePass, false);
-	// {
-	// 	Downsample();
-	// }
-
-	// Renderer::StartPass(UpsamplePass, false);
-	// {
-	// 	Upsample();
-	// }
-	// Renderer::EndPass();
-
-	// Renderer::StartPass(BloomPass, false);
-	// {
-	// 	Composite();
-	// }
-
-	Renderer::StartPass(FinalCompositePass);
-	{
-		Renderer2D::DrawFullscreenQuad(m_BaseLayer, AttachmentTarget::Color);
-	}
-	Renderer::EndPass();
 
 	Renderer::Flush();
 
@@ -484,10 +484,10 @@ void RuntimeSceneRenderer::Downsample() {
 	command->Clear = true;
 	command->UniformData
 	.SetInput("u_SrcResolution",
-		glm::vec2{ m_BaseLayer->GetWidth(), m_BaseLayer->GetHeight() });
+		glm::vec2{ BaseLayer->GetWidth(), BaseLayer->GetHeight() });
 	command->UniformData
 	.SetInput("u_SrcTexture",
-		TextureSlot{ m_BaseLayer->Get(AttachmentTarget::Color), 0 });
+		TextureSlot{ BaseLayer->Get(AttachmentTarget::Color), 0 });
 
 	uint32_t i = 0;
 	for(const auto& mip : s_MipChain) {
@@ -542,6 +542,7 @@ void RuntimeSceneRenderer::Upsample() {
 
 void RuntimeSceneRenderer::Composite() {
 	auto* command = Renderer::NewCommand();
+	command->Clear = true;
 	command->ViewportWidth = Application::GetWindow()->GetWidth();
 	command->ViewportHeight = Application::GetWindow()->GetHeight();
 	command->DepthTest = DepthTestingMode::Off;
@@ -557,7 +558,7 @@ void RuntimeSceneRenderer::Composite() {
 		TextureSlot{ Mips->Get(AttachmentTarget::Color), 0 });
 	command->UniformData
 	.SetInput("u_SceneTexture",
-		TextureSlot{ m_BaseLayer->Get(AttachmentTarget::Color), 1 });
+		TextureSlot{ BaseLayer->Get(AttachmentTarget::Color), 1 });
 
 	auto& call = command->NewDrawCall();
 	call.VertexCount = 6;

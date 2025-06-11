@@ -29,9 +29,6 @@ public:
 	void OnSceneClose();
 
 private:
-	// Base
-	Ref<Framebuffer> m_BaseLayer;
-
 	// End
 	Ref<RenderPass> FinalCompositePass;
 
@@ -52,6 +49,7 @@ private:
 	uint32_t SpotlightCount = 0;
 
 	// Bloom
+	Ref<Framebuffer> BaseLayer;
 	Ref<Framebuffer> Mips;
 	Ref<RenderPass> DownsamplePass;
 	Ref<RenderPass> UpsamplePass;

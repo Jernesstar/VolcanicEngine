@@ -29,6 +29,7 @@ private:
 	Ref<RenderPass> upsamplePass;
 	Ref<RenderPass> bloomPass;
 	Ref<RenderPass> drawPass;
+	Ref<RenderPass> drawPass2;
 
 	Ref<Framebuffer> src;
 	Ref<Framebuffer> mips;
@@ -88,6 +89,9 @@ Bloom::Bloom()
 	drawPass = RenderPass::Create("Draw", shader, src);
 	drawPass->SetData(Renderer3D::GetMeshBuffer());
 
+	drawPass2 = RenderPass::Create("Draw", shader);
+	drawPass2->SetData(Renderer3D::GetMeshBuffer());
+
 	cube = Mesh::Create(MeshType::Cube, { 0.98f, 0.92f, 0.0f, 1.0f });
 
 	camera = CreateRef<StereographicCamera>(75.0f);
@@ -107,6 +111,7 @@ Bloom::~Bloom() {
 
 void Bloom::OnUpdate(TimeStep ts) {
 	UIRenderer::BeginFrame();
+	Renderer::Clear();
 
 	controller.OnUpdate(ts);
 
@@ -128,11 +133,6 @@ void Bloom::OnUpdate(TimeStep ts) {
 		Renderer3D::DrawMesh(cube, { .Translation = {  2.0f,  0.0f,  0.0f } });
 		Renderer3D::DrawMesh(cube, { .Translation = {  0.0f,  0.0f, -2.0f } });
 		Renderer3D::DrawMesh(cube, { .Translation = {  0.0f,  0.0f,  2.0f } });
-		for(int i = -20; i < 20; i++) {
-			Renderer3D::DrawMesh(cube, { .Translation = { i, i, 0.0f } });
-			Renderer3D::DrawMesh(cube, { .Translation = { 0.0f, i, i } });
-			Renderer3D::DrawMesh(cube, { .Translation = { i, 0.0f, i } });
-		}
 
 		Renderer3D::End();
 	}
@@ -181,7 +181,19 @@ void Bloom::OnUpdate(TimeStep ts) {
 	}
 	Renderer::EndPass();
 
+	Renderer::StartPass(drawPass2);
+	{
+		Renderer3D::Begin(camera);
+
+		for(int i = -20; i < 20; i++)
+			Renderer3D::DrawMesh(cube, { .Translation = { i, -1.0, 0.0f } });
+
+		Renderer3D::End();
+	}
+	Renderer::EndPass();
+
 	Renderer::Flush();
+
 	UIRenderer::EndFrame();
 }
 

@@ -598,14 +598,14 @@ EditorSceneRenderer::EditorSceneRenderer(SceneVisualizerPanel* panel)
 			}), m_Output);
 	BillboardPass->SetData(BillboardBuffer);
 
+	CameraIcon =
+		AssetImporter::GetTexture("Magma/assets/icons/CameraIcon.png");
 	DirectionalLightIcon =
 		AssetImporter::GetTexture("Magma/assets/icons/DirectionalLightIcon.png");
 	PointLightIcon =
 		AssetImporter::GetTexture("Magma/assets/icons/PointLightIcon.png");
 	SpotlightIcon =
 		AssetImporter::GetTexture("Magma/assets/icons/SpotlightIcon.png");
-	CameraIcon =
-		AssetImporter::GetTexture("Magma/assets/icons/CameraIcon.png");
 	ParticlesIcon =
 		AssetImporter::GetTexture("Magma/assets/icons/ParticlesIcon.png");
 
