@@ -3,8 +3,8 @@
 layout(location = 1) uniform float u_Exposure;
 layout(location = 2) uniform float u_BloomStrength;
 
-layout(location = 3, binding = 0) uniform sampler2D u_BloomTexture;
-layout(location = 4, binding = 1) uniform sampler2D u_SceneTexture;
+layout(binding = 0) uniform sampler2D u_BloomTexture;
+layout(binding = 1) uniform sampler2D u_SceneTexture;
 
 layout(location = 0) in vec2 v_TexCoords;
 

@@ -152,7 +152,7 @@ void Bloom::OnUpdate(TimeStep ts) {
 	}
 	Renderer::EndPass();
 
-	// // Renderer2D::DrawFullscreenQuad(mips, AttachmentTarget::Color);
+	// Renderer2D::DrawFullscreenQuad(mips, AttachmentTarget::Color);
 
 	Renderer::StartPass(bloomPass, false);
 	{

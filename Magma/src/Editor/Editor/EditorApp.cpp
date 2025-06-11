@@ -53,6 +53,29 @@ EditorApp::EditorApp(const CommandLineArgs& args)
 			"Magma/assets/shaders/Mesh.glsl.vert",
 			"Magma/assets/shaders/Mesh.glsl.frag"
 		}));
+
+	ShaderLibrary::Add("Light",
+		AssetImporter::GetShader({
+			"Magma/assets/shaders/Light.glsl.vert",
+			"Magma/assets/shaders/Light.glsl.frag"
+		}));
+
+	ShaderLibrary::Add("Bloom-Downsample",
+		AssetImporter::GetShader({
+			"Magma/assets/shaders/Framebuffer.glsl.vert",
+			"Magma/assets/shaders/Downsample.glsl.frag"
+		}));
+	ShaderLibrary::Add("Bloom-Upsample",
+		AssetImporter::GetShader({
+			"Magma/assets/shaders/Framebuffer.glsl.vert",
+			"Magma/assets/shaders/Upsample.glsl.frag"
+		}));
+	ShaderLibrary::Add("Bloom",
+		AssetImporter::GetShader({
+			"Magma/assets/shaders/Framebuffer.glsl.vert",
+			"Magma/assets/shaders/Bloom.glsl.frag"
+		}));
+
 	ShaderLibrary::Add("Particle-Emit",
 		AssetImporter::GetShader({
 			"Magma/assets/shaders/ParticleEmitter.glsl.comp",

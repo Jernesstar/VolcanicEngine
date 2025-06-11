@@ -189,8 +189,8 @@ void Particles::OnUpdate(TimeStep ts) {
 		for(auto& emitter : Emitters) {
 			command = Renderer::NewCommand();
 			command->DepthTest = DepthTestingMode::On;
-			command->Culling = CullingMode::Off;
 			command->Blending = BlendingMode::Greatest;
+			command->Culling = CullingMode::Off;
 			command->UniformData
 			.SetInput("u_Texture", TextureSlot{ emitter.Material, 0 });
 

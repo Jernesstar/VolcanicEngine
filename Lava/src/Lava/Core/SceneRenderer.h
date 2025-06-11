@@ -32,10 +32,17 @@ private:
 	// Base
 	Ref<Framebuffer> m_BaseLayer;
 
+	// End
+	Ref<RenderPass> FinalCompositePass;
+
 	// Lighting and shadows
 	Ref<RenderPass> DepthPass;
 	Ref<RenderPass> LightingPass;
 	DrawCommand* LightingCommand;
+
+	// Lights
+	Ref<RenderPass> LightPass;
+	DrawCommand* LightCommand;
 
 	Ref<UniformBuffer> DirectionalLightBuffer;
 	Ref<UniformBuffer> PointLightBuffer;

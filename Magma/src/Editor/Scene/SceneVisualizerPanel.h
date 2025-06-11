@@ -59,6 +59,7 @@ private:
 	Ref<Texture> PointLightIcon;
 	Ref<Texture> SpotlightIcon;
 	Ref<Texture> CameraIcon;
+	Ref<Texture> ParticlesIcon;
 
 	// Lighting (and shadows?)
 	Ref<RenderPass> LightingPass;
@@ -68,6 +69,11 @@ private:
 	bool HasDirectionalLight = false;
 	uint32_t PointLightCount = 0;
 	uint32_t SpotlightCount = 0;
+	uint32_t ParticleEmitterCount = 0;
+	List<std::pair<glm::vec3, uint32_t>> Billboards;
+
+private:
+	void AddBillboard(const glm::vec3& position, uint32_t type);
 };
 
 class SceneVisualizerPanel : public Panel {

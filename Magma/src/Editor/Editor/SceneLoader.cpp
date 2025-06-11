@@ -411,6 +411,7 @@ void SerializeEntity(YAMLSerializer& serializer, const Entity& entity) {
 				.WriteKey("Constant").Write(light.Constant)
 				.WriteKey("Linear").Write(light.Linear)
 				.WriteKey("Quadratic").Write(light.Quadratic)
+				.WriteKey("Bloom").Write(light.Bloom)
 			.EndMapping()
 		.EndMapping(); // PointLightComponent
 	}
@@ -684,7 +685,8 @@ void DeserializeEntity(YAML::Node entityNode, Scene& scene) {
 			lightNode["Position"].as<glm::vec3>(),
 			lightNode["Constant"].as<float>(),
 			lightNode["Linear"].as<float>(),
-			lightNode["Quadratic"].as<float>());
+			lightNode["Quadratic"].as<float>(),
+			lightNode["Bloom"].as<bool>());
 	}
 
 	auto spotlightComponentNode = components["SpotlightComponent"];
@@ -702,13 +704,17 @@ void DeserializeEntity(YAML::Node entityNode, Scene& scene) {
 
 	auto particleEmitterComponentNode = components["ParticleEmitterComponent"];
 	if(particleEmitterComponentNode) {
+		Asset asset
+		{
+			particleEmitterComponentNode["MaterialID"].as<uint64_t>(),
+			AssetType::Material
+		};
 		entity.Add<ParticleEmitterComponent>(
 			particleEmitterComponentNode["Position"].as<glm::vec3>(),
 			particleEmitterComponentNode["MaxParticleCount"].as<uint64_t>(),
 			particleEmitterComponentNode["ParticleLifetime"].as<float>(),
 			particleEmitterComponentNode["SpawnInterval"].as<float>(),
-			Asset{ particleEmitterComponentNode["MaterialID"].as<uint64_t>(),
-					AssetType::Material });
+			asset);
 	}
 }
 
@@ -889,6 +895,7 @@ BinaryWriter& BinaryWriter::WriteObject(const PointLightComponent& comp) {
 	Write(comp.Constant);
 	Write(comp.Linear);
 	Write(comp.Quadratic);
+	Write(comp.Bloom);
 
 	return *this;
 }

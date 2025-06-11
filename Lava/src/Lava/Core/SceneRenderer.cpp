@@ -139,20 +139,29 @@ RuntimeSceneRenderer::RuntimeSceneRenderer() {
 
 	InitMips();
 
+	FinalCompositePass =
+		RenderPass::Create("FinalComposite",
+			ShaderLibrary::Get("Framebuffer"), m_Output);
+	FinalCompositePass->SetData(Renderer2D::GetScreenBuffer());
+
 	LightingPass =
 		RenderPass::Create("Lighting",
-			ShaderLibrary::Get("Lighting"), m_Output);
+			ShaderLibrary::Get("Lighting"), m_BaseLayer);
 	LightingPass->SetData(Renderer3D::GetMeshBuffer());
 
+	LightPass =
+		RenderPass::Create("Light",
+			ShaderLibrary::Get("Light"), m_BaseLayer);
+	LightPass->SetData(Renderer3D::GetMeshBuffer());
+
 	DownsamplePass =
-		RenderPass::Create("BloomDownsample",
-			ShaderLibrary::Get("BloomDownsample"), Mips);
+		RenderPass::Create("Bloom-Downsample",
+			ShaderLibrary::Get("Bloom-Downsample"), Mips);
 	UpsamplePass =
-		RenderPass::Create("BloomUpsample",
-			ShaderLibrary::Get("BloomDownsample"), Mips);
-	BloomPass =
-		RenderPass::Create("Bloom",
-			ShaderLibrary::Get("Bloom"), Mips);
+		RenderPass::Create("Bloom-Upsample",
+			ShaderLibrary::Get("Bloom-Upsample"), Mips);
+	BloomPass = RenderPass::Create("Bloom", ShaderLibrary::Get("Bloom"), Mips);
+
 	DownsamplePass->SetData(Renderer2D::GetScreenBuffer());
 	UpsamplePass->SetData(Renderer2D::GetScreenBuffer());
 	BloomPass->SetData(Renderer2D::GetScreenBuffer());
@@ -165,7 +174,7 @@ RuntimeSceneRenderer::RuntimeSceneRenderer() {
 			ShaderLibrary::Get("Particle-Update"));
 	ParticlePass =
 		RenderPass::Create("Particle-Draw",
-			ShaderLibrary::Get("Particle-DefaultDraw"));
+			ShaderLibrary::Get("Particle-DefaultDraw"), m_BaseLayer);
 	ParticlePass->SetData(Renderer3D::GetMeshBuffer());
 }
 
@@ -305,8 +314,6 @@ void RuntimeSceneRenderer::SubmitLight(const Entity& entity) {
 		DirectionalLight light = entity.Get<DirectionalLightComponent>();
 		DirectionalLightBuffer->SetData(&light);
 		HasDirectionalLight = true;
-
-		
 	}
 	else if(entity.Has<PointLightComponent>()) {
 		PointLight light = entity.Get<PointLightComponent>();
@@ -372,6 +379,8 @@ void RuntimeSceneRenderer::SubmitMesh(const Entity& entity) {
 }
 
 void RuntimeSceneRenderer::Render() {
+	Renderer3D::End();
+
 	LightingCommand->UniformData
 	.SetInput("u_DirectionalLightCount", (int32_t)HasDirectionalLight);
 	LightingCommand->UniformData
@@ -388,7 +397,54 @@ void RuntimeSceneRenderer::Render() {
 	LightingCommand->UniformData
 	.SetInput(UniformSlot{ SpotlightBuffer, "", 2 });
 
-	Renderer3D::End();
+	LightCommand = RendererAPI::Get()->NewDrawCommand(LightPass->Get());
+	LightCommand->DepthTest = DepthTestingMode::On;
+	LightCommand->Blending = BlendingMode::Greatest;
+	LightCommand->Culling = CullingMode::Off;
+
+	LightCommand->UniformData
+	.SetInput("u_View",
+		LightingCommand->UniformData.Mat4Uniforms["u_View"]);
+	LightCommand->UniformData
+	.SetInput("u_ViewProj",
+		LightingCommand->UniformData.Mat4Uniforms["u_ViewProj"]);
+	LightCommand->UniformData
+	.SetInput("u_Radius", 4.0f);
+	LightCommand->UniformData
+	.SetInput("u_CameraPosition",
+		LightingCommand->UniformData.Vec3Uniforms["u_CameraPosition"]);
+	LightCommand->UniformData
+	.SetInput(UniformSlot{ PointLightBuffer, "", 1 });
+
+	auto& call = LightCommand->NewDrawCall();
+	call.VertexCount = 6;
+	call.InstanceCount = PointLightCount;
+	call.Primitive = PrimitiveType::Triangle;
+	call.Partition = PartitionType::Instanced;
+
+	// // Bloom
+	// Renderer::StartPass(DownsamplePass, false);
+	// {
+	// 	Downsample();
+	// }
+
+	// Renderer::StartPass(UpsamplePass, false);
+	// {
+	// 	Upsample();
+	// }
+	// Renderer::EndPass();
+
+	// Renderer::StartPass(BloomPass, false);
+	// {
+	// 	Composite();
+	// }
+
+	Renderer::StartPass(FinalCompositePass);
+	{
+		Renderer2D::DrawFullscreenQuad(m_BaseLayer, AttachmentTarget::Color);
+	}
+	Renderer::EndPass();
+
 	Renderer::Flush();
 
 	HasDirectionalLight = false;

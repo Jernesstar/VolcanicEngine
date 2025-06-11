@@ -151,15 +151,15 @@ uint32_t CreateShader(const Shader& shader) {
 	int result;
 	glGetShaderiv(shaderID, GL_COMPILE_STATUS, &result);
 
-	if(result == GL_FALSE) {
-		int length;
-		glGetShaderiv(shaderID, GL_INFO_LOG_LENGTH, &length);
-		if(length) {
-			char* message = new char[length];
-			glGetShaderInfoLog(shaderID, length, &length, message);
-			VOLCANICORE_LOG_ERROR("A compile error was detected \n%s", message);
-		}
-	}
+	// if(result == GL_FALSE) {
+	// 	int length;
+	// 	glGetShaderiv(shaderID, GL_INFO_LOG_LENGTH, &length);
+	// 	if(length) {
+	// 		char* message = new char[length];
+	// 		glGetShaderInfoLog(shaderID, length, &length, message);
+	// 		VOLCANICORE_LOG_ERROR("A compile error was detected \n%s", message);
+	// 	}
+	// }
 
 	return shaderID;
 }

@@ -126,12 +126,13 @@ struct PointLightComponent : public Component {
 	float Constant;
 	float Linear;
 	float Quadratic;
+	bool Bloom;
 
 	PointLightComponent() = default;
 	PointLightComponent(const Vec3& a, const Vec3& d, const Vec3& s,
-						const Vec3& pos, float c, float l, float q)
+						const Vec3& pos, float c, float l, float q, bool b)
 		: Ambient(a), Diffuse(d), Specular(s), Position(pos),
-			Constant(c), Linear(l), Quadratic(q) { }
+		Constant(c), Linear(l), Quadratic(q), Bloom(b) { }
 	PointLightComponent(const PointLightComponent& other) = default;
 };
 
@@ -149,7 +150,7 @@ struct SpotlightComponent : public Component {
 						const Vec3& pos, const Vec3& dir,
 						float inner, float outer)
 		: Ambient(a), Diffuse(d), Specular(s), Position(pos), Direction(dir),
-			CutoffAngle(inner), OuterCutoffAngle(outer) { }
+		CutoffAngle(inner), OuterCutoffAngle(outer) { }
 	SpotlightComponent(const SpotlightComponent& other) = default;
 };
 

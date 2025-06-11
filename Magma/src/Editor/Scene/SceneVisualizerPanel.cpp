@@ -1,5 +1,8 @@
 #include "SceneVisualizerPanel.h"
 
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/intersect.hpp>
+
 #include <imgui/imgui.h>
 #include <imgui/imgui_internal.h>
 #include <imgui/misc/cpp/imgui_stdlib.h>
@@ -583,7 +586,7 @@ EditorSceneRenderer::EditorSceneRenderer(SceneVisualizerPanel* panel)
 		.InstanceLayout = instanceLayout,
 		.MaxIndexCount = 0,
 		.MaxVertexCount = 0,
-		.MaxInstanceCount = 102
+		.MaxInstanceCount = 152
 	};
 	BillboardBuffer = RendererAPI::Get()->NewDrawBuffer(specs);
 	
@@ -603,6 +606,8 @@ EditorSceneRenderer::EditorSceneRenderer(SceneVisualizerPanel* panel)
 		AssetImporter::GetTexture("Magma/assets/icons/SpotlightIcon.png");
 	CameraIcon =
 		AssetImporter::GetTexture("Magma/assets/icons/CameraIcon.png");
+	ParticlesIcon =
+		AssetImporter::GetTexture("Magma/assets/icons/ParticlesIcon.png");
 
 	LightingPass =
 		RenderPass::Create("Lighting",
@@ -648,6 +653,24 @@ void EditorSceneRenderer::Update(TimeStep ts) {
 		m_Controller.OnUpdate(ts);
 }
 
+void EditorSceneRenderer::AddBillboard(const glm::vec3& pos, uint32_t type) {
+	glm::vec3 cameraPos = m_Controller.GetCamera()->GetPosition();
+	float distance = glm::distance(cameraPos, pos);
+
+	// Put them in the list farthest to closest
+	auto [found, i] =
+		Billboards.Find( // The first pair farthest to camera
+			[=](const std::pair<glm::vec3, uint32_t>& pair) -> bool
+			{
+				return distance < glm::distance(pair.first, cameraPos);
+			});
+
+	if(!found) // Farthest thing
+		Billboards.Insert(0, { pos, type });
+	else
+		Billboards.Insert(i, { pos, type });
+}
+
 void EditorSceneRenderer::Begin() {
 	auto camera = m_Controller.GetCamera();
 
@@ -664,11 +687,20 @@ void EditorSceneRenderer::Begin() {
 	}
 
 	BillboardBuffer->Clear(DrawBufferIndex::Instances);
+	Billboards.Clear();
+
+	glm::vec3 pos = camera->GetPosition();
+	glm::vec3 dir = camera->GetDirection();
+	glm::vec3 planePos = glm::vec3(0.0f);
+	glm::vec3 planeNormal = glm::vec3(0.0f, 1.0f, 0.0f);
+	float t;
+	if(glm::intersectRayPlane(pos, dir, planePos, planeNormal, t))
+		AddBillboard(pos + t * dir, 0);
 
 	LineCommand = RendererAPI::Get()->NewDrawCommand(LinePass->Get());
 	LineCommand->DepthTest = DepthTestingMode::On;
-	LineCommand->Culling = CullingMode::Off;
 	LineCommand->Blending = BlendingMode::Greatest;
+	LineCommand->Culling = CullingMode::Off;
 	LineCommand->UniformData
 	.SetInput("u_ViewProj", m_Controller.GetCamera()->GetViewProjection());
 }
@@ -679,9 +711,7 @@ void EditorSceneRenderer::SubmitCamera(const Entity& entity) {
 		return;
 
 	HasCamera = true;
-	RendererAPI::Get()
-	->SetBufferData(BillboardBuffer, DrawBufferIndex::Instances,
-					glm::value_ptr(camera->GetPosition()), 1, 101);
+	AddBillboard(camera->GetPosition(), 1);
 
 	if(Selected != entity)
 		return;
@@ -754,31 +784,27 @@ void EditorSceneRenderer::SubmitSkybox(const Entity& entity) {
 
 void EditorSceneRenderer::SubmitLight(const Entity& entity) {
 	glm::vec3 position;
-	uint64_t start = 0;
-	uint64_t count = 0;
 
 	if(entity.Has<DirectionalLightComponent>()) {
 		position = entity.Get<DirectionalLightComponent>().Position;
 		HasDirectionalLight = true;
+		AddBillboard(position, 2);
 	}
 	else if(entity.Has<PointLightComponent>()) {
 		position = entity.Get<PointLightComponent>().Position;
-		start = 1;
-		count = PointLightCount++;
+		PointLightCount++;
+		AddBillboard(position, 3);
 	}
 	else if(entity.Has<SpotlightComponent>()) {
 		position = entity.Get<SpotlightComponent>().Position;
-		start = 51;
-		count = SpotlightCount++;
+		SpotlightCount++;
+		AddBillboard(position, 4);
 	}
-
-	RendererAPI::Get()
-	->SetBufferData(BillboardBuffer, DrawBufferIndex::Instances,
-					glm::value_ptr(position), 1, start + count);
 }
 
 void EditorSceneRenderer::SubmitParticles(const Entity& entity) {
-
+	glm::vec3 position = entity.Get<ParticleEmitterComponent>().Position;
+	AddBillboard(position, 5);
 }
 
 void EditorSceneRenderer::SubmitMesh(const Entity& entity) {
@@ -850,121 +876,53 @@ void EditorSceneRenderer::Render() {
 	Renderer3D::End();
 
 	auto camera = m_Controller.GetCamera();
+	for(auto [pos, type] : Billboards) {
+		DrawCommand* command;
+		if(type == 0) {
+			command = RendererAPI::Get()->NewDrawCommand(GridPass->Get());
+			command->UniformData
+			.SetInput("u_CameraPosition", camera->GetPosition());
+		}
+		else {
+			command = RendererAPI::Get()->NewDrawCommand(BillboardPass->Get());
+			command->UniformData
+			.SetInput("u_View", camera->GetView());
+			command->UniformData
+			.SetInput("u_BillboardWidth", 1.0f);
+			command->UniformData
+			.SetInput("u_BillboardHeight", 1.0f);
+			Ref<Texture> icon;
+			if(type == 1)
+				icon = CameraIcon;
+			else if(type == 2)
+				icon = DirectionalLightIcon;
+			else if(type == 3)
+				icon = PointLightIcon;
+			else if(type == 4)
+				icon = SpotlightIcon;
+			else if(type == 5)
+				icon = ParticlesIcon;
 
-	{
-		auto* command = RendererAPI::Get()->NewDrawCommand(GridPass->Get());
+			command->UniformData
+			.SetInput("u_Texture", TextureSlot{ icon, 0 });
+		}
+
 		command->DepthTest = DepthTestingMode::On;
-		command->Culling = CullingMode::Off;
 		command->Blending = BlendingMode::Greatest;
+		command->Culling = CullingMode::Off;
 		command->UniformData
 		.SetInput("u_ViewProj", camera->GetViewProjection());
-		command->UniformData
-		.SetInput("u_CameraPosition", camera->GetPosition());
 
 		auto& call = command->NewDrawCall();
 		call.VertexCount = 6;
 		call.Primitive = PrimitiveType::Triangle;
 		call.Partition = PartitionType::Single;
-	}
-
-	{
-		auto* command =
-			RendererAPI::Get()->NewDrawCommand(BillboardPass->Get());
-		command->DepthTest = DepthTestingMode::On;
-		command->Culling = CullingMode::Off;
-		command->Blending = BlendingMode::Greatest;
-		command->UniformData
-		.SetInput("u_View", camera->GetView());
-		command->UniformData
-		.SetInput("u_ViewProj", camera->GetViewProjection());
-		command->UniformData
-		.SetInput("u_BillboardWidth", 1.0f);
-		command->UniformData
-		.SetInput("u_BillboardHeight", 1.0f);
-		command->UniformData
-		.SetInput("u_Texture", TextureSlot{ DirectionalLightIcon, 0 });
-
-		auto& call = command->NewDrawCall();
-		call.VertexCount = 6;
-		call.InstanceStart = 0;
-		call.InstanceCount = (uint64_t)HasDirectionalLight;
-		call.Primitive = PrimitiveType::Triangle;
-		call.Partition = PartitionType::Instanced;
-	}
-
-	{
-		auto* command =
-			RendererAPI::Get()->NewDrawCommand(BillboardPass->Get());
-		command->DepthTest = DepthTestingMode::On;
-		command->Culling = CullingMode::Off;
-		command->Blending = BlendingMode::Greatest;
-		command->UniformData
-		.SetInput("u_View", camera->GetView());
-		command->UniformData
-		.SetInput("u_ViewProj", camera->GetViewProjection());
-		command->UniformData
-		.SetInput("u_BillboardWidth", 1.0f);
-		command->UniformData
-		.SetInput("u_BillboardHeight", 1.0f);
-		command->UniformData
-		.SetInput("u_Texture", TextureSlot{ PointLightIcon, 0 });
-
-		auto& call = command->NewDrawCall();
-		call.VertexCount = 6;
-		call.InstanceStart = 1;
-		call.InstanceCount = PointLightCount;
-		call.Primitive = PrimitiveType::Triangle;
-		call.Partition = PartitionType::Instanced;
-	}
-
-	{
-		auto* command =
-			RendererAPI::Get()->NewDrawCommand(BillboardPass->Get());
-		command->DepthTest = DepthTestingMode::On;
-		command->Culling = CullingMode::Off;
-		command->Blending = BlendingMode::Greatest;
-		command->UniformData
-		.SetInput("u_View", camera->GetView());
-		command->UniformData
-		.SetInput("u_ViewProj", camera->GetViewProjection());
-		command->UniformData
-		.SetInput("u_BillboardWidth", 1.0f);
-		command->UniformData
-		.SetInput("u_BillboardHeight", 1.0f);
-		command->UniformData
-		.SetInput("u_Texture", TextureSlot{ SpotlightIcon, 0 });
-
-		auto& call = command->NewDrawCall();
-		call.VertexCount = 6;
-		call.InstanceStart = 51;
-		call.InstanceCount = SpotlightCount;
-		call.Primitive = PrimitiveType::Triangle;
-		call.Partition = PartitionType::Instanced;
-	}
-
-	{
-		auto* command =
-			RendererAPI::Get()->NewDrawCommand(BillboardPass->Get());
-		command->DepthTest = DepthTestingMode::On;
-		command->Culling = CullingMode::Off;
-		command->Blending = BlendingMode::Greatest;
-		command->UniformData
-		.SetInput("u_View", camera->GetView());
-		command->UniformData
-		.SetInput("u_ViewProj", camera->GetViewProjection());
-		command->UniformData
-		.SetInput("u_BillboardWidth", 1.0f);
-		command->UniformData
-		.SetInput("u_BillboardHeight", 1.0f);
-		command->UniformData
-		.SetInput("u_Texture", TextureSlot{ CameraIcon, 0 });
-
-		auto& call = command->NewDrawCall();
-		call.VertexCount = 6;
-		call.InstanceStart = 101;
-		call.InstanceCount = (uint32_t)HasCamera;
-		call.Primitive = PrimitiveType::Triangle;
-		call.Partition = PartitionType::Instanced;
+		if(type != 0) {
+			command->AddInstance(glm::value_ptr(pos));
+			call.Partition = PartitionType::Instanced;
+			call.InstanceStart = BillboardBuffer->InstancesCount - 1;
+			call.InstanceCount = 1;
+		}
 	}
 
 #ifdef MAGMA_PHYSICS

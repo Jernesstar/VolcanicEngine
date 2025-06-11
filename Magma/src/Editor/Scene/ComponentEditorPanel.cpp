@@ -700,7 +700,7 @@ void DrawComponent<ParticleEmitterComponent>(Entity& entity) {
 	ImGui::Text("Position"); ImGui::SameLine(120.0f);
 	ImGui::SetNextItemWidth(150);
 	ImGui::DragFloat3("##Position", &component.Position.x, 0.1f,
-		-FLT_MAX, +FLT_MAX, "%.4f");
+		-FLT_MAX, +FLT_MAX, "%.1f");
 
 	uint64_t min = 3, max = 1000;
 	ImGui::Text("Particle Max Count"); ImGui::SameLine(200.0f);

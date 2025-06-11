@@ -75,60 +75,28 @@ layout(location = 0) out vec4 FragColor;
 vec3 CalcDirLight(DirectionalLight light, vec3 normal, vec3 viewDir);
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 viewDir);
 vec3 CalcSpotlight(Spotlight light, vec3 normal, vec3 viewDir);
-vec3 SphereIntersect();
 
 void main()
 {
     vec3 result = vec3(0.0, 0.0, 0.0);
-    // vec3 normal = normalize(v_Normal);
-    // vec3 viewDir = normalize(u_CameraPosition - v_Position);
+    vec3 normal = normalize(v_Normal);
+    vec3 viewDir = normalize(u_CameraPosition - v_Position);
 
-    // for(int i = 0; i < u_PointLightCount; i++)
-    //     result += CalcPointLight(u_PointLights.Buffer[i], normal, viewDir);
-    // for(int i = 0; i < u_SpotlightCount; i++)
-    //     result += CalcSpotlight(u_Spotlights.Buffer[i], normal, viewDir);
+    for(int i = 0; i < u_PointLightCount; i++)
+        result += CalcPointLight(u_PointLights.Buffer[i], normal, viewDir);
+    for(int i = 0; i < u_SpotlightCount; i++)
+        result += CalcSpotlight(u_Spotlights.Buffer[i], normal, viewDir);
 
-    // vec3 color;
-    // if(u_Material.IsTextured == 1)
-    //     color = texture(u_Material.Diffuse, v_TexCoords.xy).rgb;
-    // else
-    //     color = u_Material.DiffuseColor.rgb;
+    vec3 color;
+    if(u_Material.IsTextured == 1)
+        color = texture(u_Material.Diffuse, v_TexCoords.xy).rgb;
+    else
+        color = u_Material.DiffuseColor.rgb;
 
-    // if(u_SceneVisualizer == 1)
-    //     result += color;
+    if(u_SceneVisualizer == 1)
+        result += color;
 
-    vec3 sp = SphereIntersect();
-    if(sp == vec3(0.0))
-        discard;
-
-    // FragColor = vec4(result, 1.0);
-    FragColor = vec4(1.0);
-}
-
-vec3 SphereIntersect()
-{
-    vec3 c = v_Position;
-    vec3 ro = u_CameraPosition;
-
-    vec3 rd = vec3(normalize(-ro));
-    vec3 u = vec3(ro - c);
-
-    float a = dot(rd, rd);
-    float b = 2.0 * dot(u, rd);
-    float cc = dot(u, u) - 1.0;
-
-    float discriminant = b * b - 4 * a * cc;
-
-    // no intersection
-    if (discriminant < 0.0)
-        return vec3(0.0);
-
-    float t1 = (-b + sqrt(discriminant)) / (2.0 * a);
-    float t2 = (-b - sqrt(discriminant)) / (2.0 * a);
-    float t = min(t1, t2);
-    vec3 intersection = ro + vec3(t * rd);
-
-    return intersection;
+    FragColor = vec4(result, 1.0);
 }
 
 vec3 CalcDirLight(DirectionalLight light, vec3 normal, vec3 viewDir)

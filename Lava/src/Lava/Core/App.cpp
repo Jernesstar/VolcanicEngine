@@ -290,10 +290,7 @@ void App::ScreenSet(const std::string& name) {
 
 	auto [found, idx] =
 		m_Project.Screens.Find(
-			[name](const Screen& screen) -> bool
-			{
-				return screen.Name == name;
-			});
+			[name](const Screen& screen) { return screen.Name == name; });
 	if(!found) {
 		VOLCANICORE_LOG_INFO("Screen '%s' was not found", name.c_str());
 		return;
@@ -310,9 +307,9 @@ void App::ScreenSet(const std::string& name) {
 	s_Screen->ScriptObj = scriptClass->Instantiate();
 
 	if(s_ShouldLoadScene) {
+		s_Screen->World->RegisterSystems();
 		*s_Screen->World = *s_ShouldLoadScene;
 		s_ShouldLoadScene = nullptr;
-		s_Screen->World->RegisterSystems();
 		m_SceneRenderer.OnSceneLoad();
 
 		List<Entity> list;

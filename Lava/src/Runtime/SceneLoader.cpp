@@ -242,6 +242,7 @@ BinaryReader& BinaryReader::ReadObject(PointLightComponent& comp) {
 	Read(comp.Constant);
 	Read(comp.Linear);
 	Read(comp.Quadratic);
+	Read(comp.Bloom);
 
 	return *this;
 }

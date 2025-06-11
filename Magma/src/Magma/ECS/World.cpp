@@ -66,8 +66,10 @@ World& World::operator =(const World& other) {
 				newEntity.Add<PointLightComponent>(entity.Get<PointLightComponent>());
 			if(entity.Has<SpotlightComponent>())
 				newEntity.Add<SpotlightComponent>(entity.Get<SpotlightComponent>());
-			if(entity.Has<ParticleEmitterComponent>())
+			if(entity.Has<ParticleEmitterComponent>()) {
 				newEntity.Add<ParticleEmitterComponent>(entity.Get<ParticleEmitterComponent>());
+				newEntity.GetHandle().modified<ParticleEmitterComponent>();
+			}
 		});
 
 	return *this;

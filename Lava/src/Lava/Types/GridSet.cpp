@@ -79,7 +79,7 @@ void GridSet::Reallocate(uint32_t width, uint32_t height) {
 
 	uint32_t newDim = width * height;
 	uint8_t* newData = new uint8_t[newDim];
-	// memset(newData, 0, newDim);
+	memset(newData, 0, newDim);
 
 	if(m_Data) {
 		memcpy(newData, m_Data, GetCount());

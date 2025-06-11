@@ -220,6 +220,42 @@ public:
 	const_iterator begin()	const { return cbegin(); }
 	const_iterator end()	const { return cend(); }
 
+	template<typename TIteratorType>
+	class reverse_iterator {
+	public:
+		reverse_iterator(TIteratorType* data, uint64_t front, uint64_t back)
+			: m_Data(data), m_Front(front), m_Back(back) { }
+
+		TIteratorType* begin() { return m_Data + m_Back; }
+		TIteratorType* end() { return m_Data + m_Front; }
+		const TIteratorType* cbegin() const { return m_Data + m_Back; }
+		const TIteratorType* cend()	const { return m_Data + m_Front; }
+		const TIteratorType* begin() const { return cbegin(); }
+		const TIteratorType* end() const { return cend(); }
+
+        TIteratorType& operator*() { return *m_Data; }
+
+        reverse_iterator& operator++() {
+            m_Data--;
+            return *this;
+        }
+
+        bool operator==(const reverse_iterator& rhs) {
+            return m_Data == rhs.m_Data;
+        }
+        bool operator!=(const reverse_iterator& rhs) {
+            return m_Data != rhs.m_Data;
+        }
+
+	private:
+		TIteratorType* m_Data;
+		uint64_t m_Front, m_Back;
+	};
+
+	reverse_iterator<T> Reverse() {
+		return reverse_iterator(m_Buffer.Get(), m_Front, m_Back);
+	}
+
 private:
 	Buffer<T> m_Buffer;
 	uint64_t m_Front = 0, m_Back = 0;

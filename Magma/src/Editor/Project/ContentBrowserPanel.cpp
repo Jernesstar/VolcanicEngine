@@ -17,6 +17,13 @@
 
 namespace Magma {
 
+struct {
+	struct {
+		bool material = false;
+		bool script = false;
+	} add;
+} static options;
+
 Ref<UI::Image> s_FileIcon;
 Ref<UI::Image> s_FolderIcon;
 
@@ -105,29 +112,53 @@ void ContentBrowserPanel::Draw() {
 
 			if(ImGui::BeginPopup("Options")) {
 				if(ImGui::MenuItem("New Material"));
-					ImGui::OpenPopup("New Material");
+					options.add.material = true;
 				if(ImGui::MenuItem("New Script"))
-					ImGui::OpenPopup("New Script");
+					options.add.script = true;
 
 				ImGui::EndPopup();
 			}
 
-			if(ImGui::BeginPopupModal("New Material")) {
-				VOLCANICORE_LOG_INFO("Here");
+			auto* assets = AssetManager::Get()->As<EditorAssetManager>();
+
+			if(options.add.material)
+				ImGui::OpenPopup("New Material");
+			if(options.add.script)
+				ImGui::OpenPopup("New Script");
+
+			if(options.add.material && ImGui::BeginPopupModal("New Material")) {
 				static std::string name;
 				ImGui::InputTextWithHint("##", "Enter material name", &name);
 
-				if(ImGui::Button("Create")) {
+				uint32_t close = 0;
+				close = ImGui::Button("Create") ? 1 : 0;
+				ImGui::SameLine();
+				if(!close)
+				close = ImGui::Button("Cancel") ? 2 : 0;
 
-					ImGui::CloseCurrentPopup();
+				if(close) {
+					if(close == 2) {
+						if(name == ""
+						|| name.find_first_not_of(' ') == std::string::npos)
+							close = 0;
+						else if(auto asset = assets->GetNamedAsset(name); asset)
+							close = 0;
+						else {
+							Asset newAsset = assets->Add(AssetType::Material);
+							assets->NameAsset(newAsset, name);
+						}
+					}
+
+					if(close) {
+						options.add.material = false;
+						ImGui::CloseCurrentPopup();
+					}
 				}
-				if(ImGui::Button("Cancel"))
-					ImGui::CloseCurrentPopup();
 
 				ImGui::EndPopup();
 			}
 
-			if(ImGui::BeginPopupModal("New Script")) {
+			if(options.add.script && ImGui::BeginPopupModal("New Script")) {
 				static std::string name;
 				ImGui::InputTextWithHint("##", "Enter file name", &name);
 
@@ -148,12 +179,14 @@ void ContentBrowserPanel::Draw() {
 					ImGui::EndCombo();
 				}
 
-				if(ImGui::Button("Create")) {
-
+				bool close = false;
+				close |= ImGui::Button("Create");
+				ImGui::SameLine();
+				close |= ImGui::Button("Cancel");
+				if(close) {
+					options.add.script = false;
 					ImGui::CloseCurrentPopup();
 				}
-				if(ImGui::Button("Cancel"))
-					ImGui::CloseCurrentPopup();
 
 				ImGui::EndPopup();
 			}

@@ -6,7 +6,7 @@ struct Particle {
     float Life;
 };
 
-layout(std430, binding = 0) readonly restrict buffer SSBO_0  {
+layout(std430, binding = 0) readonly restrict buffer SSBO_0 {
     Particle Particles[];
 };
 
