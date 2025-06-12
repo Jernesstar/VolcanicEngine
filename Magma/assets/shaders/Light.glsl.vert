@@ -32,8 +32,9 @@ const vec2 Vertices[4] =
 
 const int Indices[6] = int[6](0, 2, 1, 2, 0, 3);
 
-layout(location = 0) out vec3 v_Center;
-layout(location = 1) out vec3 v_Color;
+layout(location = 0) out vec3 v_Position;
+layout(location = 1) out vec3 v_Center;
+layout(location = 2) out vec3 v_Color;
 
 void main()
 {
@@ -42,7 +43,7 @@ void main()
     vec3 cameraUp = vec3(u_View[0][1], u_View[1][1], u_View[2][1]);
     vec2 vertex = Vertices[Indices[gl_VertexID]];
 
-    vec3 position =
+    v_Position =
         light.Position.xyz
         + cameraRight * vertex.x * u_Radius
         + cameraUp * vertex.y * u_Radius;
@@ -50,5 +51,5 @@ void main()
     v_Center = light.Position.xyz;
     v_Color = light.Diffuse.xyz;
 
-    gl_Position = u_ViewProj * vec4(position, 1.0);
+    gl_Position = u_ViewProj * vec4(v_Position, 1.0);
 }

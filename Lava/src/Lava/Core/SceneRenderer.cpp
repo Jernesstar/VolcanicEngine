@@ -88,7 +88,7 @@ struct ParticleEmitter {
 };
 
 static List<BloomMip> s_MipChain;
-static uint32_t s_MipChainLength = 11; // TODO(Change): These are material settings
+static uint32_t s_MipChainLength = 8; // TODO(Change): These are material settings
 static float s_FilterRadius = 0.005f;
 static float s_Exposure = 1.0f;
 static float s_BloomStrength = 0.04f;
