@@ -711,7 +711,7 @@ void EditorSceneRenderer::SubmitCamera(const Entity& entity) {
 		return;
 
 	HasCamera = true;
-	AddBillboard(camera->GetPosition(), 1);
+	// AddBillboard(camera->GetPosition(), 1);
 
 	if(Selected != entity)
 		return;
@@ -788,23 +788,23 @@ void EditorSceneRenderer::SubmitLight(const Entity& entity) {
 	if(entity.Has<DirectionalLightComponent>()) {
 		position = entity.Get<DirectionalLightComponent>().Position;
 		HasDirectionalLight = true;
-		AddBillboard(position, 2);
+		// AddBillboard(position, 2);
 	}
 	else if(entity.Has<PointLightComponent>()) {
 		position = entity.Get<PointLightComponent>().Position;
 		PointLightCount++;
-		AddBillboard(position, 3);
+		// AddBillboard(position, 3);
 	}
 	else if(entity.Has<SpotlightComponent>()) {
 		position = entity.Get<SpotlightComponent>().Position;
 		SpotlightCount++;
-		AddBillboard(position, 4);
+		// AddBillboard(position, 4);
 	}
 }
 
 void EditorSceneRenderer::SubmitParticles(const Entity& entity) {
 	glm::vec3 position = entity.Get<ParticleEmitterComponent>().Position;
-	AddBillboard(position, 5);
+	// AddBillboard(position, 5);
 }
 
 void EditorSceneRenderer::SubmitMesh(const Entity& entity) {

@@ -184,44 +184,42 @@ void RuntimeSceneRenderer::OnSceneLoad() {
 	auto* scene = App::Get()->GetScene();
 
 	scene->EntityWorld.GetNative()
-	.observer()
-	.with<ParticleEmitterComponent>()
+	.observer<ParticleEmitterComponent>()
 	.event(flecs::OnSet)
 	.each(
-		[](flecs::entity e)
+		[](flecs::entity e, ParticleEmitterComponent& component)
 		{
-			// Entity entity{ e };
-			// BufferLayout particleLayout =
-			// {
-			// 	{ "Position", BufferDataType::Vec3 },
-			// 	{ "Velocity", BufferDataType::Vec3 },
-			// 	{ "Life", BufferDataType::Float },
-			// };
-			// BufferLayout freeListLayout =
-			// {
-			// 	{ "Indices", BufferDataType::Int },
-			// };
+			Entity entity{ e };
+			BufferLayout particleLayout =
+			{
+				{ "Position", BufferDataType::Vec3 },
+				{ "Velocity", BufferDataType::Vec3 },
+				{ "Life", BufferDataType::Float },
+			};
+			BufferLayout freeListLayout =
+			{
+				{ "Indices", BufferDataType::Int },
+			};
 
-			// auto& component = entity.Get<ParticleEmitterComponent>();
-			// auto& emitter = s_ParticleEmitters[entity.GetHandle()];
+			auto& emitter = s_ParticleEmitters[entity.GetHandle()];
 
-			// emitter.Position = component.Position;
-			// emitter.MaxParticleCount = component.MaxParticleCount;
-			// emitter.SpawnInterval = component.SpawnInterval;
+			emitter.Position = component.Position;
+			emitter.MaxParticleCount = component.MaxParticleCount;
+			emitter.SpawnInterval = component.SpawnInterval;
 
-			// Buffer<ParticleData> data(emitter.MaxParticleCount);
-			// for(uint32_t i = 0; i < emitter.MaxParticleCount; i++)
-			// 	data.Set(i, ParticleData{ });
+			Buffer<ParticleData> data(emitter.MaxParticleCount);
+			for(uint32_t i = 0; i < emitter.MaxParticleCount; i++)
+				data.Set(i, ParticleData{ });
 
-			// Buffer<int> freelist(emitter.MaxParticleCount + 1);
-			// freelist.Set(0, emitter.MaxParticleCount);
-			// for(uint32_t i = 1; i <= emitter.MaxParticleCount; i++)
-			// 	freelist.Set(i, int(i) - 1);
+			Buffer<int> freelist(emitter.MaxParticleCount + 1);
+			freelist.Set(0, (int)emitter.MaxParticleCount);
+			for(uint32_t i = 1; i <= emitter.MaxParticleCount; i++)
+				freelist.Set(i, int(i) - 1);
 
-			// emitter.ParticleBuffer =
-			// 	StorageBuffer::Create(particleLayout, data);
-			// emitter.FreeListBuffer =
-			// 	StorageBuffer::Create(freeListLayout, freelist);
+			emitter.ParticleBuffer =
+				StorageBuffer::Create(particleLayout, data);
+			emitter.FreeListBuffer =
+				StorageBuffer::Create(freeListLayout, freelist);
 		});
 }
 
@@ -349,8 +347,8 @@ void RuntimeSceneRenderer::SubmitLight(const Entity& entity) {
 }
 
 void RuntimeSceneRenderer::SubmitParticles(const Entity& entity) {
-	if(!s_ParticleEmitters.count(entity.GetHandle()))
-		return;
+	// if(!s_ParticleEmitters.count(entity.GetHandle()))
+	// 	return;
 
 	auto& emitter = s_ParticleEmitters[entity.GetHandle()];
 

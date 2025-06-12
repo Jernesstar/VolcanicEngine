@@ -85,8 +85,8 @@ static void ScriptLoadScene(const std::string& name, App* app) {
 	s_Screen->World.reset();
 	s_Screen->World = CreateRef<Scene>(name);
 	s_Screen->World->RegisterSystems();
-	app->SceneLoad(*s_Screen->World);
 	app->GetRenderer().OnSceneLoad();
+	app->SceneLoad(*s_Screen->World);
 
 	List<Entity> list;
 	s_Screen->World->EntityWorld
@@ -308,9 +308,9 @@ void App::ScreenSet(const std::string& name) {
 
 	if(s_ShouldLoadScene) {
 		s_Screen->World->RegisterSystems();
+		m_SceneRenderer.OnSceneLoad();
 		*s_Screen->World = *s_ShouldLoadScene;
 		s_ShouldLoadScene = nullptr;
-		m_SceneRenderer.OnSceneLoad();
 
 		List<Entity> list;
 		s_Screen->World->EntityWorld

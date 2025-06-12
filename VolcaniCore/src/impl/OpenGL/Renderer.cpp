@@ -350,12 +350,16 @@ void SetUniforms(DrawCommand& command) {
 		shader->SetMat4(name, data);
 
 	for(auto& [buffer, name, binding] : uniforms.UniformBuffers) {
+		if(!buffer)
+			continue;
 		if(name != "")
 			shader->SetUniformBuffer(name, binding);
 		buffer->As<OpenGL::UniformBuffer>()->Bind(binding);
 	}
 
 	for(auto& [buffer, name, binding] : uniforms.StorageBuffers) {
+		if(!buffer)
+			continue;
 		if(name != "")
 			shader->SetStorageBuffer(name, binding);
 		buffer->As<OpenGL::StorageBuffer>()->Bind(binding);

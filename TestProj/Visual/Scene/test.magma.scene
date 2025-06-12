@@ -172,8 +172,8 @@ Scene:
         ID: 1111
         Components:
           ParticleEmitterComponent:
-            Position: [1.39999998, 0, 0]
-            MaxParticleCount: 150
+            Position: [0, 0, 0]
+            MaxParticleCount: 355
             ParticleLifetime: 127
             SpawnInterval: 0
             MaterialID: 0

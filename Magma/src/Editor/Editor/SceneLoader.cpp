@@ -715,6 +715,8 @@ void DeserializeEntity(YAML::Node entityNode, Scene& scene) {
 			particleEmitterComponentNode["ParticleLifetime"].as<float>(),
 			particleEmitterComponentNode["SpawnInterval"].as<float>(),
 			asset);
+
+		entity.GetHandle().modified<ParticleEmitterComponent>();
 	}
 }
 
