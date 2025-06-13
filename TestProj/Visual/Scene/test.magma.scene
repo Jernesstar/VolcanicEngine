@@ -110,8 +110,8 @@ Scene:
             Tag: MainCharacter
           TransformComponent:
             Transform:
-              Translation: [0.789677322, 1, 8.51014519]
-              Rotation: [0, 0, 0]
+              Translation: [1, 1, 10]
+              Rotation: [1.7453292e-06, 1.7453292e-06, 6.28318548]
               Scale: [1, 1, 1]
           MeshComponent:
             AssetID: 15277418182178081176
@@ -172,8 +172,8 @@ Scene:
         ID: 1111
         Components:
           ParticleEmitterComponent:
-            Position: [0, 0, 0]
-            MaxParticleCount: 355
-            ParticleLifetime: 127
-            SpawnInterval: 0
+            Position: [1.29999995, 2.29999995, 14.3000002]
+            MaxParticleCount: 1000
+            ParticleLifetime: 5001
+            SpawnInterval: 12
             MaterialID: 0

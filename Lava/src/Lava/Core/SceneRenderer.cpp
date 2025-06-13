@@ -183,29 +183,30 @@ RuntimeSceneRenderer::RuntimeSceneRenderer() {
 void RuntimeSceneRenderer::OnSceneLoad() {
 	auto* scene = App::Get()->GetScene();
 
+	BufferLayout particleLayout =
+	{
+		{ "Position", BufferDataType::Vec3 },
+		{ "Velocity", BufferDataType::Vec3 },
+		{ "Life", BufferDataType::Float },
+	};
+	BufferLayout freeListLayout =
+	{
+		{ "Indices", BufferDataType::Int },
+	};
+
 	scene->EntityWorld.GetNative()
 	.observer<ParticleEmitterComponent>()
 	.event(flecs::OnSet)
 	.each(
-		[](flecs::entity e, ParticleEmitterComponent& component)
+		[=](flecs::entity e, ParticleEmitterComponent& component)
 		{
-			Entity entity{ e };
-			BufferLayout particleLayout =
-			{
-				{ "Position", BufferDataType::Vec3 },
-				{ "Velocity", BufferDataType::Vec3 },
-				{ "Life", BufferDataType::Float },
-			};
-			BufferLayout freeListLayout =
-			{
-				{ "Indices", BufferDataType::Int },
-			};
-
-			auto& emitter = s_ParticleEmitters[entity.GetHandle()];
+			auto& emitter = s_ParticleEmitters[e];
 
 			emitter.Position = component.Position;
 			emitter.MaxParticleCount = component.MaxParticleCount;
+			emitter.ParticleLifetime = component.ParticleLifetime;
 			emitter.SpawnInterval = component.SpawnInterval;
+			emitter.Timer = 0.0f;
 
 			Buffer<ParticleData> data(emitter.MaxParticleCount);
 			for(uint32_t i = 0; i < emitter.MaxParticleCount; i++)
@@ -230,6 +231,7 @@ void RuntimeSceneRenderer::OnSceneClose() {
 void RuntimeSceneRenderer::Update(TimeStep ts) {
 	Renderer::StartPass(EmitterPass);
 	{
+		int workGroupSize = 64;
 		auto* command = Renderer::GetCommand();
 		command->UniformData
 		.SetInput("u_TimeStep", (float)ts);
@@ -238,10 +240,10 @@ void RuntimeSceneRenderer::Update(TimeStep ts) {
 			emitter.Timer += (float)ts;
 			uint32_t particlesToSpawn = emitter.Timer / emitter.SpawnInterval;
 			emitter.Timer = glm::mod(emitter.Timer, emitter.SpawnInterval);
+
 			if(particlesToSpawn <= 0)
 				continue;
 
-			int workGroupSize = 64;
 			uint32_t numWorkGroups =
 				(particlesToSpawn + workGroupSize - 1) / workGroupSize;
 
@@ -263,15 +265,16 @@ void RuntimeSceneRenderer::Update(TimeStep ts) {
 
 	Renderer::StartPass(UpdatePass);
 	{
+		int workGroupSize = 128;
+		auto* command = Renderer::GetCommand();
+		command->UniformData
+		.SetInput("u_TimeStep", (float)ts);
 		for(auto& [_, emitter] : s_ParticleEmitters) {
-			int workGroupSize = 128;
 			uint32_t numWorkGroups =
 				(emitter.MaxParticleCount + workGroupSize - 1) / workGroupSize;
 
-			auto* command = Renderer::NewCommand();
+			command = Renderer::NewCommand();
 			command->ComputeX = numWorkGroups;
-			command->UniformData
-			.SetInput("u_TimeStep", (float)ts);
 			command->UniformData
 			.SetInput(StorageSlot{ emitter.ParticleBuffer, "", 0 });
 			command->UniformData

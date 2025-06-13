@@ -78,7 +78,7 @@ Particles::Particles() {
 			{ "Magma/assets/shaders/Particle.glsl.frag", ShaderType::Fragment }
 		});
 	DrawPass = RenderPass::Create("Particle-Draw", shader);
-	DrawPass->SetData(Renderer3D::GetMeshBuffer());
+	DrawPass->SetData(Renderer2D::GetScreenBuffer());
 
 	auto texture = AssetImporter::GetTexture("Sandbox/assets/images/wood.png");
 	BufferLayout particleLayout =

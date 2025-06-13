@@ -51,19 +51,16 @@ SceneVisualizerPanel::SceneVisualizerPanel(Scene* context)
 	Application::PushDir();
 	m_Cursor.Display =
 		CreateRef<UI::Image>(
-			AssetImporter::GetTexture("Magma/assets/icons/Cursor.png", false));
+			AssetImporter::GetTexture("Magma/assets/icons/Cursor.png"));
 	m_GizmoTranslate.Display =
 		CreateRef<UI::Image>(
-			AssetImporter::GetTexture("Magma/assets/icons/GizmoTranslate.png",
-			false));
+			AssetImporter::GetTexture("Magma/assets/icons/GizmoTranslate.png"));
 	m_GizmoRotate.Display =
 		CreateRef<UI::Image>(
-			AssetImporter::GetTexture("Magma/assets/icons/GizmoRotate.png",
-			false));
+			AssetImporter::GetTexture("Magma/assets/icons/GizmoRotate.png"));
 	m_GizmoScale.Display =
 		CreateRef<UI::Image>(
-			AssetImporter::GetTexture("Magma/assets/icons/GizmoScale.png",
-			false));
+			AssetImporter::GetTexture("Magma/assets/icons/GizmoScale.png"));
 	Application::PopDir();
 
 	m_Cursor.SetSize(35, 35);
@@ -669,6 +666,7 @@ void EditorSceneRenderer::AddBillboard(const glm::vec3& pos, uint32_t type) {
 		Billboards.Insert(0, { pos, type });
 	else
 		Billboards.Insert(i, { pos, type });
+	// Billboards.Add({ pos, type });
 }
 
 void EditorSceneRenderer::Begin() {
@@ -711,7 +709,7 @@ void EditorSceneRenderer::SubmitCamera(const Entity& entity) {
 		return;
 
 	HasCamera = true;
-	// AddBillboard(camera->GetPosition(), 1);
+	AddBillboard(camera->GetPosition(), 1);
 
 	if(Selected != entity)
 		return;
@@ -788,23 +786,23 @@ void EditorSceneRenderer::SubmitLight(const Entity& entity) {
 	if(entity.Has<DirectionalLightComponent>()) {
 		position = entity.Get<DirectionalLightComponent>().Position;
 		HasDirectionalLight = true;
-		// AddBillboard(position, 2);
+		AddBillboard(position, 2);
 	}
 	else if(entity.Has<PointLightComponent>()) {
 		position = entity.Get<PointLightComponent>().Position;
 		PointLightCount++;
-		// AddBillboard(position, 3);
+		AddBillboard(position, 3);
 	}
 	else if(entity.Has<SpotlightComponent>()) {
 		position = entity.Get<SpotlightComponent>().Position;
 		SpotlightCount++;
-		// AddBillboard(position, 4);
+		AddBillboard(position, 4);
 	}
 }
 
 void EditorSceneRenderer::SubmitParticles(const Entity& entity) {
 	glm::vec3 position = entity.Get<ParticleEmitterComponent>().Position;
-	// AddBillboard(position, 5);
+	AddBillboard(position, 5);
 }
 
 void EditorSceneRenderer::SubmitMesh(const Entity& entity) {
@@ -879,9 +877,10 @@ void EditorSceneRenderer::Render() {
 	for(auto [pos, type] : Billboards) {
 		DrawCommand* command;
 		if(type == 0) {
-			command = RendererAPI::Get()->NewDrawCommand(GridPass->Get());
-			command->UniformData
-			.SetInput("u_CameraPosition", camera->GetPosition());
+			continue;
+			// command = RendererAPI::Get()->NewDrawCommand(GridPass->Get());
+			// command->UniformData
+			// .SetInput("u_CameraPosition", camera->GetPosition());
 		}
 		else {
 			command = RendererAPI::Get()->NewDrawCommand(BillboardPass->Get());
@@ -917,11 +916,12 @@ void EditorSceneRenderer::Render() {
 		call.VertexCount = 6;
 		call.Primitive = PrimitiveType::Triangle;
 		call.Partition = PartitionType::Single;
+
 		if(type != 0) {
-			command->AddInstance(glm::value_ptr(pos));
 			call.Partition = PartitionType::Instanced;
-			call.InstanceStart = BillboardBuffer->InstancesCount - 1;
+			call.InstanceStart = BillboardBuffer->InstancesCount;
 			call.InstanceCount = 1;
+			BillboardBuffer->AddInstance(glm::value_ptr(pos));
 		}
 	}
 

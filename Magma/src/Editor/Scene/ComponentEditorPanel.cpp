@@ -707,10 +707,17 @@ void DrawComponent<ParticleEmitterComponent>(Entity& entity) {
 	ImGui::SetNextItemWidth(50);
 	ImGui::SliderScalar("##MaxCount", ImGuiDataType_U64,
 		&component.MaxParticleCount, &min, &max);
+
 	ImGui::Text("Particle Life Time (ms)"); ImGui::SameLine(200.0f);
 	ImGui::SetNextItemWidth(50);
 	ImGui::DragFloat("##LifeTime", &component.ParticleLifetime,
 		1.0f, 1.0f, 99000.0f, "%.0f");
+
+	ImGui::Text("Particle Spawn Interval (ms)"); ImGui::SameLine(200.0f);
+	ImGui::SetNextItemWidth(50);
+	ImGui::DragFloat("##SpawnInterval", &component.SpawnInterval,
+		1.0f, 1.0f, 99000.0f, "%.0f");
+
 	ImGui::Text("Material: %li", (uint64_t)component.MaterialAsset.ID);
 
 	auto text = component.MaterialAsset.ID ? "Change Asset" : "Set Asset";

@@ -369,7 +369,7 @@ void SetUniforms(DrawCommand& command) {
 void SetOptions(DrawCommand& command) {
 	if(command.DepthTest == DepthTestingMode::On)
 		glEnable(GL_DEPTH_TEST);
-	if(command.DepthTest == DepthTestingMode::Off)
+	else if(command.DepthTest == DepthTestingMode::Off)
 		glDisable(GL_DEPTH_TEST);
 
 	if(command.Blending == BlendingMode::Off)

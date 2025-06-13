@@ -123,10 +123,10 @@ void ContentBrowserPanel::Draw() {
 
 			if(options.add.material)
 				ImGui::OpenPopup("New Material");
-			if(options.add.script)
+			else if(options.add.script)
 				ImGui::OpenPopup("New Script");
 
-			if(options.add.material && ImGui::BeginPopupModal("New Material")) {
+			if(ImGui::BeginPopupModal("New Material")) {
 				static std::string name;
 				ImGui::InputTextWithHint("##", "Enter material name", &name);
 
@@ -158,7 +158,7 @@ void ContentBrowserPanel::Draw() {
 				ImGui::EndPopup();
 			}
 
-			if(options.add.script && ImGui::BeginPopupModal("New Script")) {
+			if(ImGui::BeginPopupModal("New Script")) {
 				static std::string name;
 				ImGui::InputTextWithHint("##", "Enter file name", &name);
 
