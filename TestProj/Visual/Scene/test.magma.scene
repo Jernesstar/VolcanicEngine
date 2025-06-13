@@ -175,5 +175,5 @@ Scene:
             Position: [1.29999995, 2.29999995, 14.3000002]
             MaxParticleCount: 1000
             ParticleLifetime: 5001
-            SpawnInterval: 12
+            SpawnInterval: 10
             MaterialID: 0

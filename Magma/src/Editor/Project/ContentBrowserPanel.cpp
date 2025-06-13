@@ -111,7 +111,7 @@ void ContentBrowserPanel::Draw() {
 				ImGui::OpenPopup("Options");
 
 			if(ImGui::BeginPopup("Options")) {
-				if(ImGui::MenuItem("New Material"));
+				if(ImGui::MenuItem("New Material"))
 					options.add.material = true;
 				if(ImGui::MenuItem("New Script"))
 					options.add.script = true;
@@ -123,7 +123,7 @@ void ContentBrowserPanel::Draw() {
 
 			if(options.add.material)
 				ImGui::OpenPopup("New Material");
-			else if(options.add.script)
+			if(options.add.script)
 				ImGui::OpenPopup("New Script");
 
 			if(ImGui::BeginPopupModal("New Material")) {
@@ -131,13 +131,13 @@ void ContentBrowserPanel::Draw() {
 				ImGui::InputTextWithHint("##", "Enter material name", &name);
 
 				uint32_t close = 0;
-				close = ImGui::Button("Create") ? 1 : 0;
+				close = (uint32_t)ImGui::Button("Create");
 				ImGui::SameLine();
 				if(!close)
-				close = ImGui::Button("Cancel") ? 2 : 0;
+					close = 2 * (uint32_t)ImGui::Button("Cancel");
 
 				if(close) {
-					if(close == 2) {
+					if(close == 1) {
 						if(name == ""
 						|| name.find_first_not_of(' ') == std::string::npos)
 							close = 0;
@@ -162,11 +162,11 @@ void ContentBrowserPanel::Draw() {
 				static std::string name;
 				ImGui::InputTextWithHint("##", "Enter file name", &name);
 
-				static const char* type;
-				static uint32_t currentItem;
-				List<std::string> types =
+				static uint32_t currentItem = 0;
+				static List<std::string> types =
 					{ "IEntityController", "IUIController" };
-				if(ImGui::BeginCombo("##Combo", type)) {
+				if(ImGui::BeginCombo("##Combo", types[currentItem].c_str()))
+				{
 					for(uint32_t i = 0; i < types.Count(); i++) {
 						auto item = types[i];
 						bool isSelected = currentItem == i;
@@ -179,13 +179,21 @@ void ContentBrowserPanel::Draw() {
 					ImGui::EndCombo();
 				}
 
-				bool close = false;
-				close |= ImGui::Button("Create");
+				uint32_t close = 0;
+				close = (uint32_t)ImGui::Button("Create");
 				ImGui::SameLine();
-				close |= ImGui::Button("Cancel");
+				if(!close)
+					close = 2 * (uint32_t)ImGui::Button("Cancel");
+
 				if(close) {
-					options.add.script = false;
-					ImGui::CloseCurrentPopup();
+					if(close == 1) {
+						
+					}
+
+					if(close) {
+						options.add.script = false;
+						ImGui::CloseCurrentPopup();
+					}
 				}
 
 				ImGui::EndPopup();

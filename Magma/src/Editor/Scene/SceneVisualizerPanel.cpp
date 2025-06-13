@@ -659,13 +659,13 @@ void EditorSceneRenderer::AddBillboard(const glm::vec3& pos, uint32_t type) {
 		Billboards.Find( // The first pair farthest to camera
 			[=](const std::pair<glm::vec3, uint32_t>& pair) -> bool
 			{
-				return distance < glm::distance(pair.first, cameraPos);
+				return distance > glm::distance(pair.first, cameraPos);
 			});
 
 	if(!found) // Farthest thing
 		Billboards.Insert(0, { pos, type });
 	else
-		Billboards.Insert(i, { pos, type });
+		Billboards.Insert(i + 1, { pos, type });
 	// Billboards.Add({ pos, type });
 }
 
