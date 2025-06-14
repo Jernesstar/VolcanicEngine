@@ -111,7 +111,7 @@ Scene:
           TransformComponent:
             Transform:
               Translation: [1, 1, 10]
-              Rotation: [1.7453292e-06, 1.7453292e-06, 6.28318548]
+              Rotation: [0, 0, 0]
               Scale: [1, 1, 1]
           MeshComponent:
             AssetID: 15277418182178081176

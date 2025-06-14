@@ -93,6 +93,8 @@ Editor::~Editor() {
 }
 
 void Editor::Load(const CommandLineArgs& args) {
+	m_App = CreateRef<Lava::App>();
+
 	if(args["--project"]) {
 		NewProject(args["--project"]);
 
@@ -396,7 +398,8 @@ void Editor::NewProject(const std::string& volcPath) {
 	m_AssetManager.Load(m_Project.Path);
 
 	auto rootPath = fs::path(volcPath).parent_path();
-	m_App = CreateRef<Lava::App>(m_Project);
+
+	m_App->SetProject(m_Project);
 	m_App->AppLoad =
 		[this, rootPath](Ref<ScriptModule>& script)
 		{

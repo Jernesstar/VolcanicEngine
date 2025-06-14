@@ -33,8 +33,10 @@ public:
 	Func<void, UIPage&> UILoad;
 
 public:
-	App(const Project& project);
-	~App();
+	App();
+	~App() = default;
+
+	void SetProject(const Project& project);
 
 	void OnLoad();
 	void OnClose();

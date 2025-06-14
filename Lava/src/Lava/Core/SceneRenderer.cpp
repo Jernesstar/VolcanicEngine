@@ -206,7 +206,7 @@ void RuntimeSceneRenderer::OnSceneLoad() {
 			emitter.MaxParticleCount = component.MaxParticleCount;
 			emitter.ParticleLifetime = component.ParticleLifetime;
 			emitter.SpawnInterval = component.SpawnInterval;
-			emitter.Timer = 0.0f;
+			emitter.Timer = component.SpawnInterval; // To start immediately
 
 			Buffer<ParticleData> data(emitter.MaxParticleCount);
 			for(uint32_t i = 0; i < emitter.MaxParticleCount; i++)
@@ -350,9 +350,6 @@ void RuntimeSceneRenderer::SubmitLight(const Entity& entity) {
 }
 
 void RuntimeSceneRenderer::SubmitParticles(const Entity& entity) {
-	// if(!s_ParticleEmitters.count(entity.GetHandle()))
-	// 	return;
-
 	auto& emitter = s_ParticleEmitters[entity.GetHandle()];
 
 	Renderer::StartPass(ParticlePass);

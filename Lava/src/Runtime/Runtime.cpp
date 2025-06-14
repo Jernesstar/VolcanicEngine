@@ -82,7 +82,8 @@ Runtime::Runtime(const CommandLineArgs& args)
 	m_AssetManager.Load();
 	// Application::GetWindow()->SetIcon();
 
-	m_App = CreateRef<App>(project);
+	m_App = CreateRef<App>();
+	m_App->SetProject(project);
 	m_App->AppLoad =
 		[app = project.App](Ref<ScriptModule>& script)
 		{

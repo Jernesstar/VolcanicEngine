@@ -117,9 +117,7 @@ static void ScriptLoadUI(const std::string& name, App* app) {
 	app->UILoad(s_Screen->UI);
 }
 
-App::App(const Project& project)
-	: m_Project(project)
-{
+App::App() {
 	s_Instance = this;
 
 	ScriptEngine::RegisterSingleton("AppClass", "App", this);
@@ -152,8 +150,8 @@ App::App(const Project& project)
 		asFUNCTION(GetAssetManagerInstance), asCALL_CDECL);
 }
 
-App::~App() {
-
+void App::SetProject(const Project& project) {
+	m_Project = project;
 }
 
 void App::OnLoad() {

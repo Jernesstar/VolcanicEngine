@@ -22,6 +22,7 @@ GridSet::~GridSet() {
 GridSet& GridSet::operator =(const GridSet& other) {
 	m_Width = other.m_Width;
 	m_Height = other.m_Height;
+
 	if(!m_Data && other.m_Data)
 		m_Data = new uint8_t[GetCount()];
 	if(m_Data && !other.m_Data) {
@@ -30,6 +31,7 @@ GridSet& GridSet::operator =(const GridSet& other) {
 	}
 	if(m_Data && other.m_Data)
 		memcpy(m_Data, other.m_Data, GetCount());
+
 	return *this;
 }
 
@@ -74,15 +76,19 @@ uint32_t GridSet::GetCount() const {
 }
 
 void GridSet::Reallocate(uint32_t width, uint32_t height) {
-	if(!(width * height))
+	uint32_t newDim = width * height;
+	if(!newDim)
 		return;
 
-	uint32_t newDim = width * height;
 	uint8_t* newData = new uint8_t[newDim];
 	memset(newData, 0, newDim);
 
 	if(m_Data) {
-		memcpy(newData, m_Data, GetCount());
+		auto minWidth = std::min(m_Width, width);
+		auto minHeight = std::min(m_Height, height);
+		for(uint32_t i = 0; i < minHeight; i++)
+			memcpy(newData + i*width, m_Data + i*m_Width, minWidth);
+
 		delete[] m_Data;
 	}
 

@@ -209,10 +209,10 @@ BinaryReader& BinaryReader::ReadObject(ScriptComponent& comp) {
 
 template<>
 BinaryReader& BinaryReader::ReadObject(RigidBodyComponent& comp) {
-	uint32_t typeInt;
+	uint8_t typeInt;
 	Read(typeInt);
 	RigidBody::Type type = (RigidBody::Type)typeInt;
-	uint32_t shapeTypeInt;
+	uint8_t shapeTypeInt;
 	Read(shapeTypeInt);
 	Shape::Type shapeType = (Shape::Type)shapeTypeInt;
 
@@ -265,10 +265,11 @@ BinaryReader& BinaryReader::ReadObject(ParticleEmitterComponent& comp) {
 	Read(comp.Position);
 	Read(comp.MaxParticleCount);
 	Read(comp.ParticleLifetime);
+	Read(comp.SpawnInterval);
 
 	uint64_t id;
 	Read(id);
-	comp.MaterialAsset = { id, AssetType::Texture };
+	comp.MaterialAsset = { id, AssetType::Material };
 
 	return *this;
 }

@@ -850,7 +850,7 @@ BinaryWriter& BinaryWriter::WriteObject(const ScriptComponent& comp) {
 		else if(typeName == "Asset") {
 			auto asset = *field.As<Asset>();
 			Write((uint64_t)asset.ID);
-			Write((uint32_t)asset.Type);
+			Write((uint8_t)asset.Type);
 			Write((bool)asset.Primary);
 		}
 		else if(typeName == "Vec3")
@@ -871,8 +871,8 @@ template<>
 BinaryWriter& BinaryWriter::WriteObject(const RigidBodyComponent& comp) {
 	auto body = comp.Body;
 
-	Write(body->GetType());
-	Write(body->GetShape()->GetType());
+	Write((uint8_t)body->GetType());
+	Write((uint8_t)body->GetShape()->GetType());
 
 	return *this;
 }
