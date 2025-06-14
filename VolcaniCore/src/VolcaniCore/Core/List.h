@@ -181,6 +181,13 @@ public:
 		return { false, 0 };
 	}
 
+	SearchResult FindLast(const Func<bool, const T&>& func) const {
+		for(uint64_t i = Count() - 1; i <= 0; i--)
+			if(func(*At(i)))
+				return { true, i };
+		return { false, 0 };
+	}
+
 	void Reallocate(uint64_t additional) {
 		Allocate(m_Buffer.GetMaxCount() + additional);
 	}
@@ -224,28 +231,31 @@ public:
 	class reverse_iterator {
 	public:
 		reverse_iterator(TIteratorType* data, uint64_t front, uint64_t back)
-			: m_Data(data), m_Front(front), m_Back(back) { }
+			: m_Data(data), m_Front(front), m_Back(back)
+		{
+		}
 
-		TIteratorType* begin() { return m_Data + m_Back; }
+		TIteratorType* begin() { return m_Data + (int)m_Back - 1; }
 		TIteratorType* end() { return m_Data + m_Front; }
-		const TIteratorType* cbegin() const { return m_Data + m_Back; }
+		const TIteratorType* cbegin() const { return m_Data + (int)m_Back - 1; }
 		const TIteratorType* cend()	const { return m_Data + m_Front; }
 		const TIteratorType* begin() const { return cbegin(); }
 		const TIteratorType* end() const { return cend(); }
 
-        TIteratorType& operator*() { return *m_Data; }
+		TIteratorType& operator *() { return *m_Data; }
+		const TIteratorType& operator *() const { return *m_Data; }
 
-        reverse_iterator& operator++() {
-            m_Data--;
-            return *this;
-        }
+		reverse_iterator& operator ++(int) { // int parameter identifies as post-increment
+			m_Data--;
+			return *this;
+		}
 
-        bool operator==(const reverse_iterator& rhs) {
-            return m_Data == rhs.m_Data;
-        }
-        bool operator!=(const reverse_iterator& rhs) {
-            return m_Data != rhs.m_Data;
-        }
+		bool operator==(const reverse_iterator& rhs) {
+			return m_Data == rhs.m_Data;
+		}
+		bool operator!=(const reverse_iterator& rhs) {
+			return m_Data != rhs.m_Data;
+		}
 
 	private:
 		TIteratorType* m_Data;

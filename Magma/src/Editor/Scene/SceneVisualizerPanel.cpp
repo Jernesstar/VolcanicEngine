@@ -656,17 +656,16 @@ void EditorSceneRenderer::AddBillboard(const glm::vec3& pos, uint32_t type) {
 
 	// Put them in the list farthest to closest
 	auto [found, i] =
-		Billboards.Find( // The first pair farthest to camera
+		Billboards.FindLast( // The minimal distance pair with greater distance
 			[=](const std::pair<glm::vec3, uint32_t>& pair) -> bool
 			{
-				return distance > glm::distance(pair.first, cameraPos);
+				return distance < glm::distance(pair.first, cameraPos);
 			});
 
 	if(!found) // Farthest thing
 		Billboards.Insert(0, { pos, type });
 	else
 		Billboards.Insert(i + 1, { pos, type });
-	// Billboards.Add({ pos, type });
 }
 
 void EditorSceneRenderer::Begin() {
@@ -692,8 +691,8 @@ void EditorSceneRenderer::Begin() {
 	glm::vec3 planePos = glm::vec3(0.0f);
 	glm::vec3 planeNormal = glm::vec3(0.0f, 1.0f, 0.0f);
 	float t;
-	if(glm::intersectRayPlane(pos, dir, planePos, planeNormal, t))
-		AddBillboard(pos + t * dir, 0);
+	// if(glm::intersectRayPlane(pos, dir, planePos, planeNormal, t))
+	// 	AddBillboard(pos + t * dir, 0);
 
 	LineCommand = RendererAPI::Get()->NewDrawCommand(LinePass->Get());
 	LineCommand->DepthTest = DepthTestingMode::On;
@@ -877,10 +876,9 @@ void EditorSceneRenderer::Render() {
 	for(auto [pos, type] : Billboards) {
 		DrawCommand* command;
 		if(type == 0) {
-			continue;
-			// command = RendererAPI::Get()->NewDrawCommand(GridPass->Get());
-			// command->UniformData
-			// .SetInput("u_CameraPosition", camera->GetPosition());
+			command = RendererAPI::Get()->NewDrawCommand(GridPass->Get());
+			command->UniformData
+			.SetInput("u_CameraPosition", camera->GetPosition());
 		}
 		else {
 			command = RendererAPI::Get()->NewDrawCommand(BillboardPass->Get());
