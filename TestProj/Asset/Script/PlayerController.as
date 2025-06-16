@@ -16,7 +16,7 @@ class PlayerController : IEntityController
     SomeScriptClass Class;
     [EditorField] Asset soundAsset;
     [EditorField] Asset meshAsset;
- 
+
     [EditorField] bool SomeBool;
     [EditorField] int8 Signed8;
     [EditorField] uint32 Unsigned32;
@@ -149,3 +149,7 @@ class PlayerController : IEntityController
         }
     }
 }
+
+
+
+

@@ -45,24 +45,17 @@ Runtime::Runtime(const CommandLineArgs& args)
 
 	for(std::string name : { "Framebuffer", "Lighting", "Mesh" }) {
 		BinaryReader vertFile("Asset/Shader/" + name + ".bin.vert");
-		uint64_t count1;
-		vertFile.Read(count1);
-		Shader shader1
-		{
-			ShaderType::Vertex,
-			Buffer<void>(sizeof(uint32_t), count1)
-		};
-		vertFile.ReadData(shader1.Data.Get(), shader1.Data.GetMaxSize());
-
 		BinaryReader fragFile("Asset/Shader/" + name + ".bin.frag");
+		uint64_t count1;
 		uint64_t count2;
+		vertFile.Read(count1);
 		fragFile.Read(count2);
-		Shader shader2
-		{
-			ShaderType::Fragment,
-			Buffer<void>(sizeof(uint32_t), count2)
-		};
-		fragFile.ReadData(shader2.Data.Get(), shader2.Data.GetMaxSize());
+		Buffer<void> vertBuf(sizeof(uint32_t), count1);
+		Buffer<void> fragBuf(sizeof(uint32_t), count2);
+		vertFile.ReadData(vertBuf.Get(), vertBuf.GetMaxSize());
+		fragFile.ReadData(fragBuf.Get(), fragBuf.GetMaxSize());
+		Shader shader1{ ShaderType::Vertex, vertBuf };
+		Shader shader2{ ShaderType::Fragment, fragBuf };
 
 		ShaderLibrary::Add(name, ShaderPipeline::Create({ shader1, shader2 }));
 	}

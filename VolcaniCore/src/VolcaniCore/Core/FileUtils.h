@@ -5,6 +5,8 @@
 #include <filesystem>
 #include <fstream>
 
+#include "List.h"
+
 namespace VolcaniCore {
 
 class File {
@@ -34,9 +36,9 @@ public:
 
 	static void WriteToFile(const std::string& path, const std::string& info);
 
-	static std::vector<std::string> GetFiles(const std::string& dir);
-	static std::vector<std::string> GetFiles(
-		const std::string& dir, const std::vector<std::string>& ext);
+	static List<std::string> GetFiles(const std::string& dir);
+	static List<std::string> GetFiles(
+		const std::string& dir, const List<std::string>& ext);
 };
 
 }

@@ -5,15 +5,16 @@
 
 namespace Magma {
 
-class LogPanel : public Panel {
+class ConsolePanel : public Panel {
 public:
-	LogPanel();
-	~LogPanel() = default;
+	ConsolePanel();
+	~ConsolePanel() = default;
 
 	void Update(VolcaniCore::TimeStep ts) override;
 	void Draw() override;
 
 private:
+
 };
 
 }

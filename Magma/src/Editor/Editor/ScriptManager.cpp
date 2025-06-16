@@ -108,4 +108,43 @@ void ScriptManager::SaveScript(asIScriptModule* mod, BinaryWriter& writer) {
 	mod->SaveByteCode(&stream, true);
 }
 
+
+
+static void DebugLineCallback(asIScriptContext* ctx) {
+	if(ctx->GetState() != asEXECUTION_ACTIVE)
+		return;
+
+	
+}
+
+static void DebugExceptionCallback(asIScriptContext* ctx) {
+
+}
+
+void ScriptManager::BeginDebug() {
+	auto ctx = ScriptEngine::GetContext();
+	ctx->SetLineCallback(asFUNCTION(DebugLineCallback), nullptr, asCALL_CDECL);
+}
+
+void ScriptManager::EndDebug() {
+	auto ctx = ScriptEngine::GetContext();
+	ctx->ClearLineCallback();
+}
+
+void ScriptManager::StepOver() {
+
+}
+
+void ScriptManager::StepInto() {
+
+}
+
+void ScriptManager::StepOut() {
+
+}
+
+void ScriptManager::Continue() {
+
+}
+
 }

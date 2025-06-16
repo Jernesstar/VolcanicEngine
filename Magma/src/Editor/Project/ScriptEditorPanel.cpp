@@ -1,17 +1,20 @@
 #include "ScriptEditorPanel.h"
 
-#include <VolcaniCore/Core/List.h>
-#include <VolcaniCore/Core/FileUtils.h>
-
 #include <imgui/imgui.h>
 #include <imgui/imgui_internal.h>
 #include <imgui/misc/cpp/imgui_stdlib.h>
 
 #include <glm/gtc/type_ptr.hpp>
 
+#include <VolcaniCore/Core/List.h>
+#include <VolcaniCore/Core/FileUtils.h>
+
+#include <Magma/UI/UIRenderer.h>
+
 namespace fs = std::filesystem;
 
 using namespace VolcaniCore;
+using namespace Magma::UI;
 
 namespace Magma {
 
@@ -23,11 +26,12 @@ ScriptEditorPanel::ScriptEditorPanel()
 	Map<std::string, std::string> identifiers =
 	{
 		{ "array", "class array" },
-		{ "Vec3", "class Vec3" },
-		{ "Vec4", "class Vec4" },
-		{ "Asset", "class Asset" },
-		{ "Entity", "class Entity" },
+		{ "Vec3", "struct Vec3" },
+		{ "Vec4", "struct Vec4" },
+		{ "Asset", "struct Asset" },
+		{ "Entity", "struct Entity" },
 		{ "TransformComponent", "class Components::TransformComponent" },
+		{ "EditorField", "EditorField: This field will be editable in the editor" },
 	};
 	for(auto [decl, def] : identifiers) {
 		TextEditor::Identifier id;
@@ -40,15 +44,38 @@ ScriptEditorPanel::ScriptEditorPanel()
 	auto palette = TextEditor::GetDarkPalette();
 
 	m_Editor.SetPalette(palette);
+	m_Editor.SetImGuiChildIgnored(true);
 }
 
-void ScriptEditorPanel::EditFile(const Asset& asset) {
-	m_CurrentAsset = asset;
-	auto* assetManager = AssetManager::Get()->As<EditorAssetManager>();
-	std::string path = assetManager->GetPath(asset.ID);
-	std::string text = FileUtils::ReadFile(path);
+void ScriptEditorPanel::EditFile(uint32_t i) {
+	m_OpenFile = true;
+	m_CurrentFile = i;
+	const auto& file = m_Files[i];
+	m_Editor.SetText(FileUtils::ReadFile(file.Path));
+	m_Editor.SetBreakpoints(file.Breakpoints);
+}
 
-	m_Editor.SetText(text);
+void ScriptEditorPanel::OpenFile(const std::string& path) {
+	if(!m_Files.Find([path](auto& file) { return file.Path == path; })) {
+		m_Files.Add({ path });
+		EditFile(m_Files.Count() - 1);
+	}
+}
+
+void ScriptEditorPanel::CloseFile(const std::string& path) {
+	auto [found, i] =
+		m_Files.Find([path](auto& file) { return file.Path == path; });
+	if(!found)
+		return;
+
+	m_Files.Pop(i);
+	if(!m_Files) {
+		m_CurrentFile = 0;
+		m_OpenFile = false;
+		m_Editor.SetText("");
+	}
+	else
+		EditFile(i == m_Files.Count() ? i - 1 : i);
 }
 
 void ScriptEditorPanel::Update(TimeStep ts) {
@@ -56,24 +83,28 @@ void ScriptEditorPanel::Update(TimeStep ts) {
 }
 
 void ScriptEditorPanel::Draw() {
-	auto* assetManager = AssetManager::Get()->As<EditorAssetManager>();
-	auto path = assetManager->GetPath(m_CurrentAsset.ID);
+	auto windowFlags = ImGuiWindowFlags_MenuBar
+					 | ImGuiWindowFlags_NoNav;
+	ImGui::Begin("Script Editor", &Open, windowFlags);
 
-	ImGui::Begin("Script Editor", &Open,
-		ImGuiWindowFlags_HorizontalScrollbar | ImGuiWindowFlags_MenuBar);
+	auto* assetManager = AssetManager::Get()->As<EditorAssetManager>();
+
 	if(ImGui::BeginMenuBar())
 	{
 		if(ImGui::BeginMenu("File"))
 		{
-			if(ImGui::MenuItem("Save")) {
-				std::string textToSave = m_Editor.GetText();
-				FileUtils::WriteToFile(path, textToSave);
+			if(ImGui::MenuItem("Open")) {
+			
 			}
-			if(ImGui::MenuItem("Quit", "Alt-F4"))
-				Open = false;
+
+			if(m_OpenFile && ImGui::MenuItem("Save")) {
+				std::string textToSave = m_Editor.GetText();
+				FileUtils::WriteToFile(m_Files[m_CurrentFile].Path, textToSave);
+			}
+
 			ImGui::EndMenu();
 		}
-		if(ImGui::BeginMenu("Edit"))
+		if(m_OpenFile && ImGui::BeginMenu("Edit"))
 		{
 			bool ro = m_Editor.IsReadOnly();
 			if(ImGui::MenuItem("Read-only mode", nullptr, &ro))
@@ -81,26 +112,20 @@ void ScriptEditorPanel::Draw() {
 			ImGui::Separator();
 
 			if(ImGui::MenuItem("Undo", "ALT-Backspace", nullptr,
-				!ro && m_Editor.CanUndo()))
-				m_Editor.Undo();
+				!ro && m_Editor.CanUndo())) m_Editor.Undo();
 			if(ImGui::MenuItem("Redo", "Ctrl-Y", nullptr,
-				!ro && m_Editor.CanRedo()))
-				m_Editor.Redo();
+				!ro && m_Editor.CanRedo())) m_Editor.Redo();
 
 			ImGui::Separator();
 
-			if(ImGui::MenuItem("Copy", "Ctrl-C", nullptr,
-				m_Editor.HasSelection()))
-				m_Editor.Copy();
-			if(ImGui::MenuItem("Cut", "Ctrl-X", nullptr,
-				!ro && m_Editor.HasSelection()))
-				m_Editor.Cut();
 			if(ImGui::MenuItem("Delete", "Del", nullptr,
-				!ro && m_Editor.HasSelection()))
-				m_Editor.Delete();
+				!ro && m_Editor.HasSelection())) m_Editor.Delete();
+			if(ImGui::MenuItem("Copy", "Ctrl-C", nullptr,
+				m_Editor.HasSelection())) m_Editor.Copy();
+			if(ImGui::MenuItem("Cut", "Ctrl-X", nullptr,
+				!ro && m_Editor.HasSelection())) m_Editor.Cut();
 			if(ImGui::MenuItem("Paste", "Ctrl-V", nullptr,
-				!ro && ImGui::GetClipboardText() != nullptr))
-				m_Editor.Paste();
+				!ro && ImGui::GetClipboardText() != nullptr)) m_Editor.Paste();
 
 			ImGui::Separator();
 
@@ -124,14 +149,64 @@ void ScriptEditorPanel::Draw() {
 		ImGui::EndMenuBar();
 	}
 
-	auto cpos = m_Editor.GetCursorPosition();
-	ImGui::Text("%3d/%-3d %3d lines | %s | %s | %s | %s",
-		cpos.mLine + 1, cpos.mColumn + 1, m_Editor.GetTotalLines(),
-		m_Editor.IsOverwrite() ? "Ovr" : "Ins",
-		m_Editor.CanUndo() ? "*" : " ",
-		m_Editor.GetLanguageDefinition().mName.c_str(), path.c_str());
+	auto tabBarFlags = ImGuiTabBarFlags_Reorderable
+					 | ImGuiTabBarFlags_TabListPopupButton;
+	ImGui::BeginTabBar("ScriptFiles", tabBarFlags);
+	{
+		auto leadingFlags = ImGuiTabItemFlags_Trailing
+							| ImGuiTabItemFlags_NoReorder;
+		if(ImGui::TabItemButton("+", leadingFlags)) {
+
+		}
+
+		uint32_t fileToClose = 0;
+		uint32_t i = 0;
+		for(auto file : m_Files) {
+			i++;
+			auto name = fs::path(file.Path).filename().string();
+			TabState state = UIRenderer::DrawTab(name);
+			if(state.Closed)
+				fileToClose = i;
+			else if(state.Clicked)
+				EditFile(i - 1);
+		}
+
+		if(fileToClose)
+			CloseFile(m_Files[fileToClose - 1].Path);
+	}
+	ImGui::EndTabBar();
+
+	if(!m_OpenFile) {
+		ImGui::End();
+		return;
+	}
 
 	m_Editor.Render("ScriptEditor");
+
+	ImGui::Text("%3d lines", m_Editor.GetTotalLines());
+
+	if(ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_S)) {
+		std::string textToSave = m_Editor.GetText();
+		FileUtils::WriteToFile(m_Files[m_CurrentFile].Path, textToSave);
+	}
+	if(ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_Backspace)) {
+		
+	}
+	if(ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_K)) {
+		auto pos = m_Editor.GetCursorPosition();
+		TextEditor::Coordinates start = { pos.mLine, 0 };
+		TextEditor::Coordinates end = { pos.mLine, 0 };
+		m_Editor.SetSelection(start, end, TextEditor::SelectionMode::Line);
+		m_Editor.Delete();
+		m_Editor.Delete();
+		m_Editor.MoveLeft();
+	}
+	if(ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiMod_Shift | ImGuiKey_K)) {
+		// Delete to the left
+	}
+	if(ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiMod_Alt | ImGuiKey_K)) {
+		// Delete to the right
+	}
 
 	ImGui::End();
 }

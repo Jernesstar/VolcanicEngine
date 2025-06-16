@@ -39,6 +39,13 @@ public:
 			.Find([&](auto& val) { return val == str; });
 	}
 
+	static void BeginDebug();
+	static void EndDebug();
+	static void StepOver();
+	static void StepInto();
+	static void StepOut();
+	static void Continue();
+
 private:
 	inline static Map<std::string, List<std::string>> s_FunctionMetadata;
 	inline static Map<std::string, List<std::string>> s_ClassMetadata;

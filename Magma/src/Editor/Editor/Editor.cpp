@@ -12,11 +12,8 @@
 #include <VolcaniCore/Graphics/RendererAPI.h>
 
 #include <Magma/Script/ScriptEngine.h>
-
 #include <Magma/Audio/AudioEngine.h>
-
 #include <Magma/Physics/Physics.h>
-
 #include <Magma/UI/UIRenderer.h>
 
 #include <Lava/Core/ScriptGlue.h>
@@ -382,7 +379,7 @@ void Editor::CloseTab(Ref<Tab> tabToDelete) {
 	m_ClosedTabs.Add(m_Tabs.Pop(idx));
 
 	if(idx == m_CurrentTab)
-		SetTab(idx > 0 ? m_Tabs[idx - 1] : nullptr);
+		SetTab(m_Tabs[idx - 1]);
 }
 
 void Editor::NewProject() {

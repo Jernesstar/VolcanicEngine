@@ -1,4 +1,4 @@
-#include "LogPanel.h"
+#include "ConsolePanel.h"
 
 #include <VolcaniCore/Core/List.h>
 #include <VolcaniCore/Core/FileUtils.h>
@@ -15,20 +15,20 @@ using namespace VolcaniCore;
 
 namespace Magma {
 
-LogPanel::LogPanel()
-	: Panel("Log")
+ConsolePanel::ConsolePanel()
+	: Panel("Console")
 {
 
 }
 
-void LogPanel::Update(TimeStep ts) {
+void ConsolePanel::Update(TimeStep ts) {
 
 }
 
-void LogPanel::Draw() {
-	ImGui::Begin("Log", &Open);
+void ConsolePanel::Draw() {
+	ImGui::Begin("Console", &Open);
 
-	
+
 	ImGui::End();
 }
 

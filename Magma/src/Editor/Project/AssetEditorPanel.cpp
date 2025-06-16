@@ -55,7 +55,7 @@ static void EditAsset(Asset asset) {
 
 	std::string name = assetManager->GetAssetName(asset);
 	ImGui::Text("Name: "); ImGui::SameLine();
-	bool active = ImGui::InputTextWithHint("##AssetName", "Unnamed asset", &name);
+	bool active = ImGui::InputTextWithHint("##Name", "Unnamed asset", &name);
 
 	if(active && ImGui::IsKeyPressed(ImGuiKey_Enter, false)) {
 		assetManager->RemoveName(asset);
@@ -67,7 +67,7 @@ static void EditAsset(Asset asset) {
 			auto tab = editor.GetProjectTab();
 			auto panel = tab->GetPanel("ScriptEditor")->As<ScriptEditorPanel>();
 			panel->Open = true;
-			panel->EditFile(asset);
+			panel->OpenFile(path);
 		}
 	}
 	else if(asset.Type == AssetType::Shader) {

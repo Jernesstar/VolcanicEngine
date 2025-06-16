@@ -136,10 +136,10 @@ uint32_t CreateShader(const Shader& shader) {
 	uint32_t type = GetShaderType(shader.Type);
 	uint32_t shaderID = glCreateShader(type);
 
-	if(shader.Data.GetSizeT() == sizeof(uint32_t)) { // SPIR-V
+	if(shader.Data.GetSizeT() == sizeof(uint32_t)) {
 		// Expects uint8_t, so using GetMaxSize = GetMaxCount * 4
 		glShaderBinary(1, &shaderID, GL_SHADER_BINARY_FORMAT_SPIR_V,
-			shader.Data.Get(), shader.Data.GetMaxSize());
+			shader.Data.Get(), (GLsizei)shader.Data.GetMaxSize());
 		glSpecializeShader(shaderID, "main", 0, nullptr, nullptr);
 	}
 	else {
@@ -151,15 +151,15 @@ uint32_t CreateShader(const Shader& shader) {
 	int result;
 	glGetShaderiv(shaderID, GL_COMPILE_STATUS, &result);
 
-	// if(result == GL_FALSE) {
-	// 	int length;
-	// 	glGetShaderiv(shaderID, GL_INFO_LOG_LENGTH, &length);
-	// 	if(length) {
-	// 		char* message = new char[length];
-	// 		glGetShaderInfoLog(shaderID, length, &length, message);
-	// 		VOLCANICORE_LOG_ERROR("A compile error was detected \n%s", message);
-	// 	}
-	// }
+	if(result == GL_FALSE) {
+		int length;
+		glGetShaderiv(shaderID, GL_INFO_LOG_LENGTH, &length);
+		if(length) {
+			char* message = new char[length];
+			glGetShaderInfoLog(shaderID, length, &length, message);
+			VOLCANICORE_LOG_ERROR("A compile error was detected \n%s", message);
+		}
+	}
 
 	return shaderID;
 }

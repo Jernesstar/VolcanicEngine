@@ -40,16 +40,9 @@ std::string FileUtils::ReadFile(const std::string& filePath) {
 	std::ifstream in(filePath, std::ios::in);
 	VOLCANICORE_ASSERT_ARGS(in, "Could not open file: %s", filePath.c_str());
 
-	in.seekg(0, std::ios::end);
-	size_t size = in.tellg();
-	VOLCANICORE_ASSERT_ARGS(size,
-		"Could not read from file '%s'", filePath.c_str());
-
-	std::string str;
-	str.resize(size);
-	in.seekg(0, std::ios::beg);
-	in.read(str.data(), size);
-	return str;
+	std::stringstream buffer;
+	buffer << in.rdbuf();
+	return buffer.str();
 }
 
 void FileUtils::WriteToFile(const std::string& path, const std::string& info) {
@@ -57,25 +50,25 @@ void FileUtils::WriteToFile(const std::string& path, const std::string& info) {
 	fout << info.c_str();
 }
 
-std::vector<std::string> FileUtils::GetFiles(const std::string& dir) {
-	std::vector<std::string> files;
+List<std::string> FileUtils::GetFiles(const std::string& dir) {
+	List<std::string> files;
 
 	if(fs::is_directory(dir))
 		for(auto p : fs::directory_iterator(dir))
-			files.push_back(p.path().string());
+			files.Add(p.path().string());
 
 	return files;
 }
 
-std::vector<std::string> FileUtils::GetFiles(
-	const std::string& dir, const std::vector<std::string>& extensions)
+List<std::string> FileUtils::GetFiles(
+	const std::string& dir, const List<std::string>& extensions)
 {
-	std::vector<std::string> files;
+	List<std::string> files;
 	if(fs::is_directory(dir))
 		for(auto p : fs::directory_iterator(dir))
 			for(auto& ext : extensions)
 				if(p.path().extension().string() == ext)
-					files.push_back(p.path().string());
+					files.Add(p.path().string());
 
 	return files;
 }

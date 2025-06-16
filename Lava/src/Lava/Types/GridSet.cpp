@@ -141,7 +141,7 @@ void GridSet::RegisterInterface() {
 		asMETHOD(GridSet, ResizeX), asCALL_THISCALL);
 	engine->RegisterObjectMethod("GridSet", "void set_Height(uint32) property",
 		asMETHOD(GridSet, ResizeY), asCALL_THISCALL);
-	engine->RegisterObjectMethod("GridSet", "uint8 At(uint32, uint32)",
+	engine->RegisterObjectMethod("GridSet", "uint8 At(uint32, uint32) const",
 		asFUNCTION(GetData), asCALL_CDECL_OBJLAST);
 	engine->RegisterObjectMethod("GridSet", "void Set(uint32, uint32, uint8)",
 		asFUNCTION(SetData), asCALL_CDECL_OBJLAST);

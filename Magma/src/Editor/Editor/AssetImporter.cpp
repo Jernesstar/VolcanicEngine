@@ -275,7 +275,7 @@ Ref<ShaderPipeline> AssetImporter::GetShader(const List<std::string>& paths) {
 Buffer<uint32_t> AssetImporter::GetShaderData(const std::string& path) {
 	glslang::InitializeProcess();
 
-	auto file = TryGetShader(path);
+	ShaderFile file = TryGetShader(path);
 	EShLanguage stage;
 	if(file.Type == ShaderType::Vertex)
 		stage = EShLangVertex;
@@ -291,16 +291,17 @@ Buffer<uint32_t> AssetImporter::GetShaderData(const std::string& path) {
 	const char* sources[1] = { str.c_str() };
 	shader.setStrings(sources, 1);
 
+	shader.setEnvInput(glslang::EShSourceGlsl, stage, glslang::EShClientOpenGL, 100);
 	shader.setEnvClient(glslang::EShClientOpenGL, glslang::EShTargetOpenGL_450);
-	shader.setEnvTarget(glslang::EShTargetSpv, glslang::EShTargetSpv_1_3);
+	shader.setEnvTarget(glslang::EShTargetSpv, glslang::EShTargetSpv_1_6);
 	shader.setEntryPoint("main");
 
 	const TBuiltInResource* resources = GetDefaultResources();
-	bool forceDefaults = true;
+	bool forceDefaults = false;
 	bool forwardCompatible = true; // Warn deprecated features
-	int defaultVersion = 450;
-	EProfile defaultProfile = ECoreProfile;
-	EShMessages messageFlags = (EShMessages)(EShMsgSpvRules);
+	int defaultVersion = 100;
+	EProfile defaultProfile = ENoProfile;
+	EShMessages messageFlags = (EShMessages)(EShMsgDefault | EShMsgSpvRules);
 	bool parsed =
 		shader.parse(resources, defaultVersion, defaultProfile,
 					 forceDefaults, forwardCompatible, messageFlags);
@@ -325,9 +326,10 @@ Buffer<uint32_t> AssetImporter::GetShaderData(const std::string& path) {
 	std::vector<uint32_t> spirv;
 	glslang::SpvOptions options{};
 	options.validate = true;
-	options.generateDebugInfo = true;
-	// options.disableOptimizer = true;
-	// options.optimizeSize = false;
+	options.stripDebugInfo = true;
+	options.generateDebugInfo = false;
+	options.optimizeSize = true;
+	options.disableOptimizer = false;
 	// options.emitNonSemanticShaderDebugInfo = true;
 	// options.emitNonSemanticShaderDebugSource = true;
 	// options.compileOnly = true;
