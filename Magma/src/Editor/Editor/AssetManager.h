@@ -24,6 +24,8 @@ public:
 	std::string GetPath(VolcaniCore::UUID id) const;
 	VolcaniCore::UUID GetFromPath(const std::string& path) const;
 
+	bool IsMagmaAsset(Asset asset);
+
 	const auto& GetRegistry() const { return m_AssetRegistry; }
 
 	void Load(const std::string& path);

@@ -4,6 +4,9 @@
 
 #include <VolcaniCore/Core/FileUtils.h>
 
+#include "Editor/Editor.h"
+#include "Project/ScriptEditorPanel.h"
+
 namespace fs = std::filesystem;
 
 namespace Magma {
@@ -108,31 +111,64 @@ void ScriptManager::SaveScript(asIScriptModule* mod, BinaryWriter& writer) {
 	mod->SaveByteCode(&stream, true);
 }
 
+static asIScriptContext* s_Context = nullptr;
+static asIScriptFunction* s_LastFunction = nullptr;
+static asIScriptModule* s_LastModule = nullptr;
+static int s_StackLevel = 0;
 
+static bool CheckBreakpoint(asIScriptContext* ctx) {
+	const char *path = 0;
+	int lineNbr = ctx->GetLineNumber(s_StackLevel, 0, &path);
+	asIScriptFunction* func = ctx->GetFunction();
+
+	VOLCANICORE_LOG_INFO("File: %s, Function: %s, Line: %d",
+		path, func->GetName(), lineNbr);
+
+	auto panel =
+		Editor::GetProjectTab()->
+			GetPanel("ScriptEditor")->As<ScriptEditorPanel>();
+	panel->OpenFile(path);
+
+	const ScriptFile& file = panel->GetFile(path);
+	return file.Breakpoints.contains(lineNbr);
+}
 
 static void DebugLineCallback(asIScriptContext* ctx) {
 	if(ctx->GetState() != asEXECUTION_ACTIVE)
 		return;
 
-	
+	if(!CheckBreakpoint(ctx))
+		return;
+
+	// ctx->Suspend();
+
+	const char *path = 0;
+	int lineNbr = ctx->GetLineNumber(s_StackLevel, 0, &path);
+	asIScriptFunction* func = ctx->GetFunction();
+
+	VOLCANICORE_LOG_INFO("File: %s, Function: %s, Line: %d",
+		path, func->GetName(), lineNbr);
 }
 
 static void DebugExceptionCallback(asIScriptContext* ctx) {
 
 }
 
-void ScriptManager::BeginDebug() {
-	auto ctx = ScriptEngine::GetContext();
-	ctx->SetLineCallback(asFUNCTION(DebugLineCallback), nullptr, asCALL_CDECL);
+void ScriptManager::StartDebug() {
+	s_Context = ScriptEngine::GetContext();
+	s_Context->SetLineCallback(
+		asFUNCTION(DebugLineCallback), nullptr, asCALL_CDECL);
 }
 
 void ScriptManager::EndDebug() {
-	auto ctx = ScriptEngine::GetContext();
-	ctx->ClearLineCallback();
+	s_Context->ClearLineCallback();
+	s_Context = nullptr;
+	s_LastModule = nullptr;
+	s_LastFunction = nullptr;
 }
 
 void ScriptManager::StepOver() {
-
+	// s_Context->
 }
 
 void ScriptManager::StepInto() {

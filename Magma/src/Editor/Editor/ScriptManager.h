@@ -8,7 +8,7 @@ using namespace Magma::Script;
 
 namespace Magma {
 
-// Loading, linting, metadata
+// Loading, metadata, debugger, linting
 class ScriptManager {
 public:
 	ScriptManager() = default;
@@ -39,7 +39,7 @@ public:
 			.Find([&](auto& val) { return val == str; });
 	}
 
-	static void BeginDebug();
+	static void StartDebug();
 	static void EndDebug();
 	static void StepOver();
 	static void StepInto();

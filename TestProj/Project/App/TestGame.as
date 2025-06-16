@@ -1,36 +1,36 @@
 
 shared class GameState
 {
-	uint Level = 1;
-	uint Coins = 50;
+    uint Level = 1;
+    uint Coins = 50;
 }
 
 shared class TestGame : IApp
 {
-	GameState State;
+    GameState State;
 
-	TestGame()
-	{
+    TestGame()
+    {
 
-	}
+    }
 
-	void OnLoad()
-	{
-		print("OnLoad");
-	}
+    void OnLoad()
+    {
+        print("OnLoad");
+    }
 
-	void OnClose()
-	{
-		print("OnClose");
-	}
+    void OnClose()
+    {
+        print("OnClose");
+    }
 
-	void OnUpdate(float ts)
-	{
-		// print("OnUpdate: " + ts);
-	}
+    void OnUpdate(float ts)
+    {
+        // print("OnUpdate: " + ts);
+    }
 
-	void NewMethod()
-	{
-		print("New Method");
-	}
+    void NewMethod()
+    {
+        print("New Method");
+    }
 }

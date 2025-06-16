@@ -28,8 +28,10 @@ ScriptEditorPanel::ScriptEditorPanel()
 		{ "array", "class array" },
 		{ "Vec3", "struct Vec3" },
 		{ "Vec4", "struct Vec4" },
+		{ "GridSet", "struct GridSet" },
 		{ "Asset", "struct Asset" },
 		{ "Entity", "struct Entity" },
+		{ "CameraComponent", "class Components::CameraComponent" },
 		{ "TransformComponent", "class Components::TransformComponent" },
 		{ "EditorField", "EditorField: This field will be editable in the editor" },
 	};
@@ -44,22 +46,28 @@ ScriptEditorPanel::ScriptEditorPanel()
 	auto palette = TextEditor::GetDarkPalette();
 
 	m_Editor.SetPalette(palette);
-	m_Editor.SetImGuiChildIgnored(true);
 }
 
 void ScriptEditorPanel::EditFile(uint32_t i) {
-	m_OpenFile = true;
-	m_CurrentFile = i;
+	m_CurrentFile = i + 1;
 	const auto& file = m_Files[i];
 	m_Editor.SetText(FileUtils::ReadFile(file.Path));
 	m_Editor.SetBreakpoints(file.Breakpoints);
 }
 
 void ScriptEditorPanel::OpenFile(const std::string& path) {
-	if(!m_Files.Find([path](auto& file) { return file.Path == path; })) {
+	auto [found, i] =
+		m_Files.Find([path](auto& file) { return file.Path == path; });
+
+	if(found && m_CurrentFile == i + 1)
+		return;
+
+	if(!found) {
 		m_Files.Add({ path });
 		EditFile(m_Files.Count() - 1);
 	}
+	else
+		EditFile(i);
 }
 
 void ScriptEditorPanel::CloseFile(const std::string& path) {
@@ -71,11 +79,22 @@ void ScriptEditorPanel::CloseFile(const std::string& path) {
 	m_Files.Pop(i);
 	if(!m_Files) {
 		m_CurrentFile = 0;
-		m_OpenFile = false;
 		m_Editor.SetText("");
 	}
 	else
 		EditFile(i == m_Files.Count() ? i - 1 : i);
+}
+
+ScriptFile& ScriptEditorPanel::GetFile(const std::string& path) {
+	auto [_, i] =
+		m_Files.Find([path](auto& file) { return file.Path == path; });
+	// if(!found)
+		// PANIC!!
+	return m_Files[i];
+}
+
+ScriptFile& ScriptEditorPanel::Get() {
+	return m_Files[m_CurrentFile - 1];
 }
 
 void ScriptEditorPanel::Update(TimeStep ts) {
@@ -97,14 +116,14 @@ void ScriptEditorPanel::Draw() {
 			
 			}
 
-			if(m_OpenFile && ImGui::MenuItem("Save")) {
+			if(m_CurrentFile && ImGui::MenuItem("Save")) {
 				std::string textToSave = m_Editor.GetText();
-				FileUtils::WriteToFile(m_Files[m_CurrentFile].Path, textToSave);
+				FileUtils::WriteToFile(Get().Path, textToSave);
 			}
 
 			ImGui::EndMenu();
 		}
-		if(m_OpenFile && ImGui::BeginMenu("Edit"))
+		if(m_CurrentFile && ImGui::BeginMenu("Edit"))
 		{
 			bool ro = m_Editor.IsReadOnly();
 			if(ImGui::MenuItem("Read-only mode", nullptr, &ro))
@@ -176,24 +195,27 @@ void ScriptEditorPanel::Draw() {
 	}
 	ImGui::EndTabBar();
 
-	if(!m_OpenFile) {
+	if(!m_CurrentFile) {
 		ImGui::End();
 		return;
 	}
 
-	m_Editor.Render("ScriptEditor");
+	auto& file = Get();
+	m_Editor.SetBreakpoints(file.Breakpoints);
 
-	ImGui::Text("%3d lines", m_Editor.GetTotalLines());
+	ImGui::Text("%d lines", m_Editor.GetTotalLines());
+	
+	m_Editor.Render("ScriptEditor");
+	auto pos = m_Editor.GetCursorPosition();
 
 	if(ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_S)) {
 		std::string textToSave = m_Editor.GetText();
-		FileUtils::WriteToFile(m_Files[m_CurrentFile].Path, textToSave);
+		FileUtils::WriteToFile(file.Path, textToSave);
 	}
 	if(ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_Backspace)) {
 		
 	}
 	if(ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_K)) {
-		auto pos = m_Editor.GetCursorPosition();
 		TextEditor::Coordinates start = { pos.mLine, 0 };
 		TextEditor::Coordinates end = { pos.mLine, 0 };
 		m_Editor.SetSelection(start, end, TextEditor::SelectionMode::Line);
@@ -206,6 +228,12 @@ void ScriptEditorPanel::Draw() {
 	}
 	if(ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiMod_Alt | ImGuiKey_K)) {
 		// Delete to the right
+	}
+	if(ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_B)) {
+		if(file.Breakpoints.contains(pos.mLine + 1))
+			file.Breakpoints.erase(pos.mLine + 1);
+		else
+			file.Breakpoints.insert(pos.mLine + 1);
 	}
 
 	ImGui::End();

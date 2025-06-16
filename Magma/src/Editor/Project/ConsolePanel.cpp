@@ -21,6 +21,10 @@ ConsolePanel::ConsolePanel()
 
 }
 
+void ConsolePanel::Log(ConsoleLevel level, const std::string& message) {
+	m_Log.Add({ level, message });
+}
+
 void ConsolePanel::Update(TimeStep ts) {
 
 }

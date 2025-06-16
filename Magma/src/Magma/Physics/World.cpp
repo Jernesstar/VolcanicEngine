@@ -85,7 +85,6 @@ HitInfo World::Raycast(const glm::vec3& start, const glm::vec3& direction,
 	if(hasHit) {
 		auto hit = hitInfo.block;
 		RigidBody* actor = static_cast<RigidBody*>(hit.actor->userData);
-
 		return HitInfo(actor, hit.distance);
 	}
 #endif

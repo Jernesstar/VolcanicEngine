@@ -1,5 +1,7 @@
 #include "AssetImporter.h"
 
+#include <glad/glad.h>
+
 #include <stb_image/stb_image.h>
 
 #include <assimp/scene.h>
@@ -266,7 +268,7 @@ Ref<ShaderPipeline> AssetImporter::GetShader(const List<std::string>& paths) {
 		auto str = FileUtils::ReadFile(file.Path);
 		Buffer<void> data(sizeof(char), str.size() + 1);
 		data.Set(str.c_str(), str.size() + 1);
-		list.Add({ file.Type, data });
+		list.AddMove({ file.Type, std::move(data) });
 	}
 
 	return ShaderPipeline::Create(list);
@@ -346,6 +348,7 @@ Buffer<uint32_t> AssetImporter::GetShaderData(const std::string& path) {
 
 	Buffer<uint32_t> data(spirv.size());
 	data.Set(spirv.data(), spirv.size());
+
 	return data;
 }
 

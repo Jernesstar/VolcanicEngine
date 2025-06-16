@@ -54,10 +54,11 @@ Runtime::Runtime(const CommandLineArgs& args)
 		Buffer<void> fragBuf(sizeof(uint32_t), count2);
 		vertFile.ReadData(vertBuf.Get(), vertBuf.GetMaxSize());
 		fragFile.ReadData(fragBuf.Get(), fragBuf.GetMaxSize());
-		Shader shader1{ ShaderType::Vertex, vertBuf };
-		Shader shader2{ ShaderType::Fragment, fragBuf };
+		List<Shader> shaders;
+		shaders.AddMove({ ShaderType::Vertex, std::move(vertBuf) });
+		shaders.AddMove({ ShaderType::Fragment, std::move(fragBuf) });
 
-		ShaderLibrary::Add(name, ShaderPipeline::Create({ shader1, shader2 }));
+		ShaderLibrary::Add(name, ShaderPipeline::Create(shaders));
 	}
 
 	Physics::Init();

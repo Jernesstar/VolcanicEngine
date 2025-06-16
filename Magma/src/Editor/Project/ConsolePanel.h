@@ -5,6 +5,8 @@
 
 namespace Magma {
 
+enum class ConsoleLevel { Info, Warn, Error };
+
 class ConsolePanel : public Panel {
 public:
 	ConsolePanel();
@@ -13,8 +15,10 @@ public:
 	void Update(VolcaniCore::TimeStep ts) override;
 	void Draw() override;
 
-private:
+	void Log(ConsoleLevel level, const std::string& message);
 
+private:
+	VolcaniCore::List<std::pair<ConsoleLevel, std::string>> m_Log;
 };
 
 }

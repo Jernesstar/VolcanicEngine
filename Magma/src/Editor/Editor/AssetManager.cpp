@@ -342,6 +342,12 @@ std::string EditorAssetManager::GetPath(UUID id) const {
 	return m_Paths.at(id);
 }
 
+bool EditorAssetManager::IsMagmaAsset(Asset asset) {
+	return false;
+
+	return (asset.ID << 1) & 0b1 == 0;
+}
+
 void EditorAssetManager::Load(const std::string& path) {
 	auto rootPath = fs::path(path) / "Asset";
 	m_Path = (rootPath / ".magma.assetpk").string();
@@ -473,6 +479,8 @@ void EditorAssetManager::Save() {
 	serializer.WriteKey("Assets").BeginSequence();
 	for(auto& [asset, _] : m_AssetRegistry) {
 		if(!asset.Primary)
+			continue;
+		if(IsMagmaAsset(asset))
 			continue;
 
 		serializer.BeginMapping();
@@ -656,37 +664,6 @@ void EditorAssetManager::RuntimeSave(const std::string& exportPath) {
 		pack.SetPosition(registryPos); // Return to registry position
 	}
 	VOLCANICORE_ASSERT(registrySize == registryPos);
-
-	Application::PushDir();
-
-	fs::create_directories(fs::path(exportPath) / "Asset" / "Shader");
-	for(auto name : { "Framebuffer", "Lighting", "Mesh" }) {
-		auto sourceRoot = fs::path("Magma") / "assets" / "shaders" / name;
-		auto source1 = sourceRoot.string() + ".glsl.vert";
-		auto source2 = sourceRoot.string() + ".glsl.frag";
-
-		auto targetRoot = fs::path(exportPath) / "Asset" / "Shader" / name;
-		auto target1 = targetRoot.string() + ".bin.vert";
-		auto target2 = targetRoot.string() + ".bin.frag";
-
-		if(FileUtils::FileExists(target1))
-			fs::remove(target1);
-		if(FileUtils::FileExists(source1)) {
-			BinaryWriter writer(target1);
-			Buffer<uint32_t> data = AssetImporter::GetShaderData(source1);
-			writer.Write(data);
-		}
-
-		if(FileUtils::FileExists(target2))
-			fs::remove(target2);
-		if(FileUtils::FileExists(source2)) {
-			BinaryWriter writer(target2);
-			Buffer<uint32_t> data = AssetImporter::GetShaderData(source2);
-			writer.Write(data);
-		}
-	}
-
-	Application::PopDir();
 }
 
 }

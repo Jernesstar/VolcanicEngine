@@ -13,6 +13,7 @@
 #include "Editor/Tab.h"
 #include "Editor/AssetImporter.h"
 #include "Editor/SceneLoader.h"
+#include "Editor/ScriptManager.h"
 
 #include "Scene/SceneHierarchyPanel.h"
 #include "Scene/SceneVisualizerPanel.h"
@@ -242,6 +243,8 @@ void ProjectTab::OnPlay() {
 		else
 			VOLCANICORE_LOG_WARNING("Cound not find screen for scene '%s'",
 				scene->Name.c_str());
+
+		ScriptManager::StartDebug();
 	}
 
 }
