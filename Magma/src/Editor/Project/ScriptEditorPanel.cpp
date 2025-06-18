@@ -6,10 +6,16 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
+#include <VolcaniCore/Core/Application.h>
 #include <VolcaniCore/Core/List.h>
 #include <VolcaniCore/Core/FileUtils.h>
 
+#include <Magma/Core/YAMLSerializer.h>
 #include <Magma/UI/UIRenderer.h>
+
+#include "Editor/Editor.h"
+#include "Editor/AssetImporter.h"
+#include "Editor/ScriptManager.h"
 
 namespace fs = std::filesystem;
 
@@ -21,8 +27,65 @@ namespace Magma {
 ScriptEditorPanel::ScriptEditorPanel()
 	: Panel("ScriptEditor")
 {
-	auto lang = TextEditor::LanguageDefinition::AngelScript();
+	Application::PushDir();
+	m_Debug.Display =
+		CreateRef<UI::Image>(
+			AssetImporter::GetTexture("Magma/assets/icons/Debug.png"));
+	m_StepOver.Display =
+		CreateRef<UI::Image>(
+			AssetImporter::GetTexture("Magma/assets/icons/StepOver.png"));
+	m_StepInto.Display =
+		CreateRef<UI::Image>(
+			AssetImporter::GetTexture("Magma/assets/icons/StepInto.png"));
+	m_StepOut.Display =
+		CreateRef<UI::Image>(
+			AssetImporter::GetTexture("Magma/assets/icons/StepOut.png"));
+	m_Continue.Display =
+		CreateRef<UI::Image>(
+			AssetImporter::GetTexture("Magma/assets/icons/Continue.png"));
 
+	m_Debug.UsePosition = false;
+	m_Debug.SetSize(17, 17);
+	m_StepOver.UsePosition = false;
+	m_StepOver.SetSize(17, 17);
+	m_StepInto.UsePosition = false;
+	m_StepInto.SetSize(17, 17);
+	m_StepOut.UsePosition = false;
+	m_StepOut.SetSize(17, 17);
+	m_Continue.UsePosition = false;
+	m_Continue.SetSize(17, 17);
+
+	Application::PopDir();
+
+	auto path = Editor::GetProject().Path;
+	path = (fs::path(path) / "Editor" / "Scripts.yaml").string();
+	if(!FileUtils::FileExists(path))
+		return;
+
+	YAML::Node rootNode;
+	try {
+		rootNode = YAML::LoadFile(path);
+	}
+	catch(YAML::ParserException e) {
+		VOLCANICORE_ASSERT_ARGS(false, "Could not load file %s: %s",
+								path.c_str(), e.what());
+	}
+
+	for(auto node : rootNode["Scripts"]) {
+		auto file = node["Script"];
+		auto path = file["Path"].as<std::string>();
+		auto list = file["Breakpoints"].as<std::vector<int>>();
+		TextEditor::Breakpoints bps(list.begin(), list.end());
+		auto open = file["Open"].as<bool>();
+		m_Files.Add({ .Path = path, .Breakpoints = bps, .Open = open });
+		m_OpenCount += open;
+	}
+	if(m_OpenCount) {
+		Open = true;
+		EditFile(0);
+	}
+
+	auto lang = TextEditor::LanguageDefinition::AngelScript();
 	Map<std::string, std::string> identifiers =
 	{
 		{ "array", "class array" },
@@ -33,7 +96,7 @@ ScriptEditorPanel::ScriptEditorPanel()
 		{ "Entity", "struct Entity" },
 		{ "CameraComponent", "class Components::CameraComponent" },
 		{ "TransformComponent", "class Components::TransformComponent" },
-		{ "EditorField", "EditorField: This field will be editable in the editor" },
+		{ "EditorField", "This field will be editable in the editor" },
 	};
 	for(auto [decl, def] : identifiers) {
 		TextEditor::Identifier id;
@@ -42,31 +105,68 @@ ScriptEditorPanel::ScriptEditorPanel()
 	}
 
 	m_Editor.SetLanguageDefinition(lang);
-
 	auto palette = TextEditor::GetDarkPalette();
-
 	m_Editor.SetPalette(palette);
+
+	m_Debugging = false;
+}
+
+ScriptEditorPanel::~ScriptEditorPanel() {
+	YAMLSerializer serializer;
+	serializer.BeginMapping(); // File
+	serializer.WriteKey("Scripts").BeginSequence();
+	for(auto& file : m_Files) {
+		serializer.BeginMapping()
+			.WriteKey("Script").BeginMapping();
+		serializer.WriteKey("Path").Write(file.Path);
+
+		serializer.WriteKey("Breakpoints")
+			.SetOptions(Serializer::Options::ArrayOneLine)
+			.BeginSequence();
+		for(int bp : file.Breakpoints)
+			serializer.Write(bp);
+		serializer
+			.EndSequence();
+
+		serializer.WriteKey("Open").Write(file.Open);
+
+		serializer.EndMapping()
+			.EndMapping();
+	}
+	serializer.EndSequence();
+	serializer.EndMapping();
+
+	auto path = Editor::GetProject().Path;
+	path = (fs::path(path) / "Editor" / "Scripts.yaml").string();
+	serializer.Finalize(path);
+
+	if(m_Debugging)
+		Editor::GetProjectTab()->OnStop();
 }
 
 void ScriptEditorPanel::EditFile(uint32_t i) {
-	m_CurrentFile = i + 1;
-	const auto& file = m_Files[i];
+	m_CurrentFile = i;
+	auto& file = m_Files[i];
+	file.Open = true;
 	m_Editor.SetText(FileUtils::ReadFile(file.Path));
-	m_Editor.SetBreakpoints(file.Breakpoints);
 }
 
-void ScriptEditorPanel::OpenFile(const std::string& path) {
+void ScriptEditorPanel::OpenFile(const std::string& path, bool open) {
 	auto [found, i] =
 		m_Files.Find([path](auto& file) { return file.Path == path; });
 
-	if(found && m_CurrentFile == i + 1)
+	if(found && m_OpenCount && m_CurrentFile == i)
 		return;
 
+	if(open)
+		m_OpenCount++;
+
 	if(!found) {
-		m_Files.Add({ path });
-		EditFile(m_Files.Count() - 1);
+		m_Files.Add({ .Path = path, .Open = open });
+		if(open)
+			EditFile(m_Files.Count() - 1);
 	}
-	else
+	else if(open)
 		EditFile(i);
 }
 
@@ -76,25 +176,36 @@ void ScriptEditorPanel::CloseFile(const std::string& path) {
 	if(!found)
 		return;
 
-	m_Files.Pop(i);
-	if(!m_Files) {
+	GetFile()->Open = false;
+	if(m_OpenCount)
+		m_OpenCount--;
+
+	if(!m_OpenCount) {
 		m_CurrentFile = 0;
 		m_Editor.SetText("");
+		return;
 	}
-	else
-		EditFile(i == m_Files.Count() ? i - 1 : i);
+
+	auto [_,idx] =
+		m_Files.Find([](auto& file) { return file.Open; });
+	EditFile(idx);
 }
 
-ScriptFile& ScriptEditorPanel::GetFile(const std::string& path) {
-	auto [_, i] =
+ScriptFile* ScriptEditorPanel::GetFile(const std::string& path) {
+	auto [found, i] =
 		m_Files.Find([path](auto& file) { return file.Path == path; });
-	// if(!found)
-		// PANIC!!
-	return m_Files[i];
+	if(!found)
+		return nullptr;
+	return m_Files.At(i);
 }
 
-ScriptFile& ScriptEditorPanel::Get() {
-	return m_Files[m_CurrentFile - 1];
+ScriptFile* ScriptEditorPanel::GetFile() {
+	return m_Files.At(m_CurrentFile);
+}
+
+void ScriptEditorPanel::EndDebug() {
+	m_Debugging = false;
+	ScriptManager::EndDebug();
 }
 
 void ScriptEditorPanel::Update(TimeStep ts) {
@@ -116,14 +227,14 @@ void ScriptEditorPanel::Draw() {
 			
 			}
 
-			if(m_CurrentFile && ImGui::MenuItem("Save")) {
+			if(m_OpenCount && ImGui::MenuItem("Save")) {
 				std::string textToSave = m_Editor.GetText();
-				FileUtils::WriteToFile(Get().Path, textToSave);
+				FileUtils::WriteToFile(GetFile()->Path, textToSave);
 			}
 
 			ImGui::EndMenu();
 		}
-		if(m_CurrentFile && ImGui::BeginMenu("Edit"))
+		if(m_OpenCount && ImGui::BeginMenu("Edit"))
 		{
 			bool ro = m_Editor.IsReadOnly();
 			if(ImGui::MenuItem("Read-only mode", nullptr, &ro))
@@ -182,6 +293,9 @@ void ScriptEditorPanel::Draw() {
 		uint32_t i = 0;
 		for(auto file : m_Files) {
 			i++;
+			if(!file.Open)
+				continue;
+
 			auto name = fs::path(file.Path).filename().string();
 			TabState state = UIRenderer::DrawTab(name);
 			if(state.Closed)
@@ -195,22 +309,57 @@ void ScriptEditorPanel::Draw() {
 	}
 	ImGui::EndTabBar();
 
-	if(!m_CurrentFile) {
+	if(!m_OpenCount) {
+		// Open new file prompt
+
 		ImGui::End();
 		return;
 	}
 
-	auto& file = Get();
-	m_Editor.SetBreakpoints(file.Breakpoints);
+	auto* file = GetFile();
+	m_Editor.SetBreakpoints(file->Breakpoints);
+	m_Editor.SetErrorMarkers(file->Errors);
 
 	ImGui::Text("%d lines", m_Editor.GetTotalLines());
-	
+	ImGui::SameLine(0.0f, m_Debugging ? 75.0f : 100.0f);
+	m_Debug.Render();
+
+	if(m_Debug.GetState().Clicked) {
+		if(!m_Debugging) {
+			ScriptManager::StartDebug();
+			Editor::GetProjectTab()->OnPlay();
+			m_Debugging = true;
+		}
+		else {
+			Editor::GetProjectTab()->OnStop();
+			m_Debugging = false;
+		}
+	}
+
+	if(m_Debugging) {
+		ImGui::SameLine();
+		m_Continue.Render(); ImGui::SameLine();
+		m_StepOver.Render(); ImGui::SameLine();
+		m_StepInto.Render(); ImGui::SameLine();
+		m_StepOut.Render();
+
+		if(m_Continue.GetState().Clicked)
+			ScriptManager::Continue();
+		if(m_StepOver.GetState().Clicked)
+			ScriptManager::StepOver();
+		if(m_StepInto.GetState().Clicked)
+			ScriptManager::StepInto();
+		if(m_StepOut.GetState().Clicked)
+			ScriptManager::StepOut();
+	}
+
 	m_Editor.Render("ScriptEditor");
+
 	auto pos = m_Editor.GetCursorPosition();
 
 	if(ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_S)) {
 		std::string textToSave = m_Editor.GetText();
-		FileUtils::WriteToFile(file.Path, textToSave);
+		FileUtils::WriteToFile(file->Path, textToSave);
 	}
 	if(ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_Backspace)) {
 		
@@ -230,10 +379,10 @@ void ScriptEditorPanel::Draw() {
 		// Delete to the right
 	}
 	if(ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_B)) {
-		if(file.Breakpoints.contains(pos.mLine + 1))
-			file.Breakpoints.erase(pos.mLine + 1);
+		if(file->Breakpoints.contains(pos.mLine + 1))
+			file->Breakpoints.erase(pos.mLine + 1);
 		else
-			file.Breakpoints.insert(pos.mLine + 1);
+			file->Breakpoints.insert(pos.mLine + 1);
 	}
 
 	ImGui::End();

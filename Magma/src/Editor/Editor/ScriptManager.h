@@ -39,6 +39,8 @@ public:
 			.Find([&](auto& val) { return val == str; });
 	}
 
+	static void RunCodeAnalysis();
+
 	static void StartDebug();
 	static void EndDebug();
 	static void StepOver();

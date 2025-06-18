@@ -2,15 +2,15 @@
 
 precision highp float;
 
-uniform sampler2D u_ScreenTexture;
+layout(location = 0) uniform sampler2D u_ScreenTexture;
 
-uniform vec2 u_PixelSize;
-uniform vec3 u_Color;
+layout(location = 1) uniform vec2 u_PixelSize;
+layout(location = 2) uniform vec3 u_Color;
 // uniform flat int u_Width;
 
 layout(location = 0) in vec2 v_TexCoords;
 
-out vec4 FragColor;
+layout(location = 0) out vec4 FragColor;
 
 void main()
 {

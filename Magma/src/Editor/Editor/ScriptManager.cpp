@@ -111,43 +111,47 @@ void ScriptManager::SaveScript(asIScriptModule* mod, BinaryWriter& writer) {
 	mod->SaveByteCode(&stream, true);
 }
 
+void ScriptManager::RunCodeAnalysis() {
+	auto panel =
+		Editor::GetProjectTab()->
+			GetPanel("ScriptEditor")->As<ScriptEditorPanel>();
+}
+
 static asIScriptContext* s_Context = nullptr;
 static asIScriptFunction* s_LastFunction = nullptr;
 static asIScriptModule* s_LastModule = nullptr;
 static int s_StackLevel = 0;
-
-static bool CheckBreakpoint(asIScriptContext* ctx) {
-	const char *path = 0;
-	int lineNbr = ctx->GetLineNumber(s_StackLevel, 0, &path);
-	asIScriptFunction* func = ctx->GetFunction();
-
-	VOLCANICORE_LOG_INFO("File: %s, Function: %s, Line: %d",
-		path, func->GetName(), lineNbr);
-
-	auto panel =
-		Editor::GetProjectTab()->
-			GetPanel("ScriptEditor")->As<ScriptEditorPanel>();
-	panel->OpenFile(path);
-
-	const ScriptFile& file = panel->GetFile(path);
-	return file.Breakpoints.contains(lineNbr);
-}
+static bool s_Suspended = false;
 
 static void DebugLineCallback(asIScriptContext* ctx) {
 	if(ctx->GetState() != asEXECUTION_ACTIVE)
 		return;
 
-	if(!CheckBreakpoint(ctx))
+	const char* path = nullptr;
+	int lineNbr = ctx->GetLineNumber(s_StackLevel, 0, &path);
+	if(!path)
 		return;
 
-	// ctx->Suspend();
+	auto panel =
+		Editor::GetProjectTab()->
+			GetPanel("ScriptEditor")->As<ScriptEditorPanel>();
+	panel->OpenFile(path, s_Suspended);
 
-	const char *path = 0;
-	int lineNbr = ctx->GetLineNumber(s_StackLevel, 0, &path);
+	auto* file = panel->GetFile(path);
+	VOLCANICORE_ASSERT(file);
+
+	bool isBreakpoint = file->Breakpoints.contains(lineNbr);
+	if(!isBreakpoint)
+		return;
+
 	asIScriptFunction* func = ctx->GetFunction();
-
 	VOLCANICORE_LOG_INFO("File: %s, Function: %s, Line: %d",
 		path, func->GetName(), lineNbr);
+
+	s_Suspended = true;
+	ctx->Suspend();
+
+	Editor::GetProjectTab()->OnPause();
 }
 
 static void DebugExceptionCallback(asIScriptContext* ctx) {
@@ -161,26 +165,33 @@ void ScriptManager::StartDebug() {
 }
 
 void ScriptManager::EndDebug() {
-	s_Context->ClearLineCallback();
+	if(s_Context)
+		s_Context->ClearLineCallback();
 	s_Context = nullptr;
 	s_LastModule = nullptr;
 	s_LastFunction = nullptr;
+	s_StackLevel = 0;
+	s_Suspended = false;
 }
 
 void ScriptManager::StepOver() {
-	// s_Context->
+	s_Context->Execute();
+	s_Context->Suspend();
 }
 
 void ScriptManager::StepInto() {
-
+	if(s_StackLevel < s_Context->GetCallstackSize())
+		s_StackLevel++;
 }
 
 void ScriptManager::StepOut() {
-
+	if(s_StackLevel)
+		s_StackLevel--;
 }
 
 void ScriptManager::Continue() {
-
+	s_Suspended = false;
+	Editor::GetProjectTab()->OnResume();
 }
 
 }

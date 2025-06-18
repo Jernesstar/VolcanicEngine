@@ -39,6 +39,11 @@ public:
 	void RenderButtons();
 	void RenderEssentialPanels();
 
+	void OnPlay();
+	void OnPause();
+	void OnResume();
+	void OnStop();
+
 	ScreenState GetState() const { return m_ScreenState; }
 
 private:
@@ -48,11 +53,6 @@ private:
 
 private:
 	void Setup();
-
-	void OnPlay();
-	void OnPause();
-	void OnResume();
-	void OnStop();
 };
 
 }

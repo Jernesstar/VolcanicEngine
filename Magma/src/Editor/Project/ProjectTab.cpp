@@ -112,7 +112,7 @@ void ProjectTab::Setup() {
 
 void ProjectTab::Update(TimeStep ts) {
 	App::Get()->OnUpdate(ts);
-	// The scene was stopped but it wasn't because of the stop button
+	// The App was stopped but not because of the stop button
 	// i.e SwitchScreen was called inside the script
 	if(!App::Get()->Running && m_ScreenState == ScreenState::Play)
 		OnStop();
@@ -243,10 +243,7 @@ void ProjectTab::OnPlay() {
 		else
 			VOLCANICORE_LOG_WARNING("Cound not find screen for scene '%s'",
 				scene->Name.c_str());
-
-		ScriptManager::StartDebug();
 	}
-
 }
 
 void ProjectTab::OnPause() {
@@ -263,8 +260,9 @@ void ProjectTab::OnStop() {
 	if(m_ScreenState == ScreenState::Edit)
 		return;
 
-	auto& editor = Application::As<EditorApp>()->GetEditor();
-	Ref<Tab> current = editor.GetCurrentTab();
+	GetPanel("ScriptEditor")->As<ScriptEditorPanel>()->EndDebug();
+
+	Ref<Tab> current = Editor::GetCurrentTab();
 
 	if(current->Type == TabType::Scene) {
 		auto tab = current->As<SceneTab>();

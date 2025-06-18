@@ -209,8 +209,8 @@ void SceneVisualizerPanel::Draw() {
 
 		ImVec2 size = { vMax.x - vMin.x, vMax.y - vMin.y };
 
-		// ImGui::GetForegroundDrawList()
-		// 	->AddRect(vMin, vMax, IM_COL32(255, 255, 0, 255));
+		ImGui::GetForegroundDrawList()
+			->AddRect(vMin, vMax, IM_COL32(255, 255, 0, 255));
 
 		ImVec2 pos = ImGui::GetCursorPos();
 		ImVec2 screenPos = ImGui::GetCursorScreenPos();

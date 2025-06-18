@@ -20,9 +20,9 @@ struct EmitterSettings {
     float ParticleLifetime;
 };
 
-uniform float u_TimeStep;
-uniform int u_ParticlesToSpawn;
-uniform EmitterSettings u_Emitter;
+layout(location = 0) uniform float u_TimeStep;
+layout(location = 1) uniform int u_ParticlesToSpawn;
+layout(location = 2) uniform EmitterSettings u_Emitter;
 
 float umap(float val, float rs, float re) // [0, 1] -> [rs, re]
 {
