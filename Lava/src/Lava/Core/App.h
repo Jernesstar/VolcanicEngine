@@ -47,6 +47,9 @@ public:
 	Scene* GetScene();
 	UIPage* GetUI();
 
+	void SetCurrentEntity(Entity entity);
+	Entity GetCurrentEntity();
+
 	void SwitchScreen(const std::string& name);
 	void PushScreen(const std::string& name);
 	void PopScreen(const std::string& name);

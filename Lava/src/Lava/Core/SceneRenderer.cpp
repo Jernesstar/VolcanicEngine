@@ -203,24 +203,27 @@ void RuntimeSceneRenderer::OnSceneLoad() {
 			auto& emitter = s_ParticleEmitters[e];
 
 			emitter.Position = component.Position;
-			emitter.MaxParticleCount = component.MaxParticleCount;
 			emitter.ParticleLifetime = component.ParticleLifetime;
 			emitter.SpawnInterval = component.SpawnInterval;
-			emitter.Timer = component.SpawnInterval; // To start immediately
+			emitter.Timer = 0.0f;
 
-			Buffer<ParticleData> data(emitter.MaxParticleCount);
-			for(uint32_t i = 0; i < emitter.MaxParticleCount; i++)
-				data.Set(i, ParticleData{ });
+			if(emitter.MaxParticleCount != component.MaxParticleCount) {
+				emitter.MaxParticleCount = component.MaxParticleCount;
 
-			Buffer<int> freelist(emitter.MaxParticleCount + 1);
-			freelist.Set(0, (int)emitter.MaxParticleCount);
-			for(uint32_t i = 1; i <= emitter.MaxParticleCount; i++)
-				freelist.Set(i, int(i) - 1);
+				Buffer<ParticleData> data(emitter.MaxParticleCount);
+				for(uint32_t i = 0; i < emitter.MaxParticleCount; i++)
+					data.Set(i, ParticleData{ });
 
-			emitter.ParticleBuffer =
-				StorageBuffer::Create(particleLayout, data);
-			emitter.FreeListBuffer =
-				StorageBuffer::Create(freeListLayout, freelist);
+				Buffer<int> freelist(emitter.MaxParticleCount + 1);
+				freelist.Set(0, (int)emitter.MaxParticleCount);
+				for(uint32_t i = 1; i <= emitter.MaxParticleCount; i++)
+					freelist.Set(i, int(i) - 1);
+
+				emitter.ParticleBuffer =
+					StorageBuffer::Create(particleLayout, data);
+				emitter.FreeListBuffer =
+					StorageBuffer::Create(freeListLayout, freelist);
+			}
 		});
 }
 

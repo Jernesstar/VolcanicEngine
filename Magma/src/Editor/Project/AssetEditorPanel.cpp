@@ -6,14 +6,13 @@
 #include <imgui/imgui_internal.h>
 #include <imgui/misc/cpp/imgui_stdlib.h>
 
+#include <glm/gtc/type_ptr.hpp>
+
 #include <VolcaniCore/Core/List.h>
 #include <VolcaniCore/Core/FileUtils.h>
 
-#include <glm/gtc/type_ptr.hpp>
-
 #include "Editor/EditorApp.h"
 #include "Editor/AssetImporter.h"
-
 #include "Project/ScriptEditorPanel.h"
 
 namespace fs = std::filesystem;

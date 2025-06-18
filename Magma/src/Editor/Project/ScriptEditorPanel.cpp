@@ -280,12 +280,12 @@ void ScriptEditorPanel::Draw() {
 	}
 
 	auto tabBarFlags = ImGuiTabBarFlags_Reorderable
-					 | ImGuiTabBarFlags_TabListPopupButton;
-	ImGui::BeginTabBar("ScriptFiles", tabBarFlags);
+					 | ImGuiTabBarFlags_AutoSelectNewTabs;
+	if(ImGui::BeginTabBar("ScriptFiles", tabBarFlags))
 	{
-		auto leadingFlags = ImGuiTabItemFlags_Trailing
-							| ImGuiTabItemFlags_NoReorder;
-		if(ImGui::TabItemButton("+", leadingFlags)) {
+		auto plusFlags = ImGuiTabItemFlags_Trailing
+					   | ImGuiTabItemFlags_NoReorder;
+		if(ImGui::TabItemButton("+", plusFlags)) {
 
 		}
 
@@ -306,8 +306,9 @@ void ScriptEditorPanel::Draw() {
 
 		if(fileToClose)
 			CloseFile(m_Files[fileToClose - 1].Path);
+
+		ImGui::EndTabBar();
 	}
-	ImGui::EndTabBar();
 
 	if(!m_OpenCount) {
 		// Open new file prompt
@@ -351,6 +352,7 @@ void ScriptEditorPanel::Draw() {
 			ScriptManager::StepInto();
 		if(m_StepOut.GetState().Clicked)
 			ScriptManager::StepOut();
+
 	}
 
 	m_Editor.Render("ScriptEditor");

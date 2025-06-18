@@ -132,6 +132,10 @@ static void DebugLineCallback(asIScriptContext* ctx) {
 	if(!path)
 		return;
 
+	if(s_Suspended) {
+		ctx->Suspend();
+	}
+
 	auto panel =
 		Editor::GetProjectTab()->
 			GetPanel("ScriptEditor")->As<ScriptEditorPanel>();

@@ -6,6 +6,7 @@
 namespace Magma {
 
 enum class ConsoleLevel { Info, Warn, Error };
+enum class ConsoleType { Log, Debug };
 
 class ConsolePanel : public Panel {
 public:

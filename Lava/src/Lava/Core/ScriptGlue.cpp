@@ -696,6 +696,13 @@ static ParticleEmitterComponent* SetParticleEmitterComponent(Entity* entity) {
 	return &entity->Set<ParticleEmitterComponent>();
 }
 
+static void SetParticleEmitterMaxParticles(uint32_t maxCount,
+	ParticleEmitterComponent* comp)
+{
+	comp->MaxParticleCount = maxCount;
+
+}
+
 void RegisterECS() {
 	auto* engine = ScriptEngine::Get();
 
@@ -798,6 +805,11 @@ void RegisterECS() {
 		asOBJ_REF | asOBJ_NOCOUNT);
 	engine->RegisterObjectType("ParticleEmitterComponent", 0,
 		asOBJ_REF | asOBJ_NOCOUNT);
+	engine->RegisterObjectProperty("ParticleEmitterComponent",
+		"uint32 MaxParticles",
+		asOFFSET(ParticleEmitterComponent, MaxParticleCount), asCALL_THISCALL);
+	engine->RegisterObjectMethod("Entity", "void set_MaxParticles(uint32) property",
+		asFUNCTION(SetParticleEmitterMaxParticles), asCALL_CDECL);
 
 	engine->RegisterObjectType("Entity", sizeof(Entity),
 		asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_ALLINTS |
