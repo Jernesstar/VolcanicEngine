@@ -44,9 +44,6 @@
 [submodule "Magma/vendor/efsw"]
 	path = Magma/vendor/efsw
 	url = https://github.com/SpartanJ/efsw.git
-[submodule "Magma/vendor/ImGuiColorTextEdit"]
-	path = Magma/vendor/ImGuiColorTextEdit
-	url = https://github.com/BalazsJako/ImGuiColorTextEdit.git
 [submodule "Magma/vendor/SPIRV-Cross"]
 	path = Magma/vendor/SPIRV-Cross
 	url = https://github.com/KhronosGroup/SPIRV-Cross.git
@@ -59,3 +56,6 @@
 [submodule "Magma/vendor/IconFontCppHeaders"]
 	path = Magma/vendor/IconFontCppHeaders
 	url = https://github.com/juliettef/IconFontCppHeaders.git
+[submodule "Magma/vendor/ImGuiColorTextEdit"]
+	path = Magma/vendor/ImGuiColorTextEdit
+	url = https://github.com/Jernesstar/ImGuiColorTextEdit.git

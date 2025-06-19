@@ -38,7 +38,6 @@ static std::string s_NewScreenName = "";
 
 static Scene* s_ShouldLoadScene = nullptr;
 static UIPage* s_ShouldLoadUI = nullptr;
-static Entity s_Entity = { };
 
 struct RuntimeScreen {
 	Ref<Scene> World;
@@ -102,7 +101,6 @@ static void ScriptLoadScene(const std::string& name, App* app) {
 	list.ForEach(
 		[](Entity& entity)
 		{
-			s_Entity = entity;
 			auto& sc = entity.Set<ScriptComponent>();
 			auto old = sc.Instance;
 			if(!old->IsInitialized()) { // i.e Editor
@@ -113,7 +111,6 @@ static void ScriptLoadScene(const std::string& name, App* app) {
 			sc.Instance->Call("OnStart");
 		});
 
-	s_Entity = { };
 }
 
 static void ScriptLoadUI(const std::string& name, App* app) {
@@ -255,14 +252,6 @@ UIPage* App::GetUI() {
 	return &s_Screen->UI;
 }
 
-void App::SetCurrentEntity(Entity entity) {
-	s_Entity = entity;
-}
-
-Entity App::GetCurrentEntity() {
-	return s_Entity;
-}
-
 void App::SwitchScreen(const std::string& name) {
 	if (!ChangeScreen) {
 		Running = false;
@@ -335,8 +324,6 @@ void App::ScreenSet(const std::string& name) {
 		list.ForEach(
 			[](Entity& entity)
 			{
-				s_Entity = entity;
-
 				auto& sc = entity.Set<ScriptComponent>();
 				auto old = sc.Instance;
 				sc.Instance = old->GetClass()->Instantiate(entity);
@@ -344,7 +331,6 @@ void App::ScreenSet(const std::string& name) {
 				sc.Instance->Call("OnStart");
 			});
 
-		s_Entity = { };
 	}
 	else if(screen.Scene != "")
 		ScriptLoadScene(screen.Scene, this);

@@ -1,5 +1,7 @@
 #include "ProjectTab.h"
 
+#include <thread>
+
 #include <imgui/imgui.h>
 #include <imgui/imgui_internal.h>
 #include <imgui/misc/cpp/imgui_stdlib.h>
@@ -45,9 +47,9 @@ static std::string s_Path;
 ProjectTab::ProjectTab(const std::string& path)
 	: Tab(TabType::Project)
 {
-	AddPanel<AssetEditorPanel>()->SetTab(this);
 	AddPanel<ContentBrowserPanel>(path)->SetTab(this);
 	AddPanel<ScriptEditorPanel>()->SetTab(this);
+	AddPanel<AssetEditorPanel>()->SetTab(this);
 	AddPanel<ConsolePanel>()->SetTab(this);
 	GetPanel("Console")->As<ConsolePanel>()->Open = true;
 	GetPanel("AssetEditor")->As<AssetEditorPanel>()->Open = true;
@@ -260,8 +262,6 @@ void ProjectTab::OnStop() {
 	if(m_ScreenState == ScreenState::Edit)
 		return;
 
-	GetPanel("ScriptEditor")->As<ScriptEditorPanel>()->EndDebug();
-
 	Ref<Tab> current = Editor::GetCurrentTab();
 
 	if(current->Type == TabType::Scene) {
@@ -275,6 +275,9 @@ void ProjectTab::OnStop() {
 	m_ScreenState = ScreenState::Edit;
 	App::Get()->Running = false;
 	App::Get()->OnClose();
+
+	GetPanel("ScriptEditor")->As<ScriptEditorPanel>()->EndDebug();
+	// asThreadCleanup();
 }
 
 }

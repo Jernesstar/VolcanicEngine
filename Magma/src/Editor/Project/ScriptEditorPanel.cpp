@@ -107,8 +107,21 @@ ScriptEditorPanel::ScriptEditorPanel()
 	m_Editor.SetLanguageDefinition(lang);
 	auto palette = TextEditor::GetDarkPalette();
 	m_Editor.SetPalette(palette);
+	m_Editor.SetVariableHoverCallback(
+		[](const std::string& str, bool validate) -> bool
+		{
+			// 1. Find variable in debugger
+			// auto var = ScriptManager::GetVariable(str);
+			if(validate) {
+				// return var;
+				return true;
+			}
+			// 2. ToString
+			ImGui::Text(str.c_str());
 
-	m_Debugging = false;
+			return true;
+		});
+	SetDebugLine(1);
 }
 
 ScriptEditorPanel::~ScriptEditorPanel() {
@@ -201,6 +214,10 @@ ScriptFile* ScriptEditorPanel::GetFile(const std::string& path) {
 
 ScriptFile* ScriptEditorPanel::GetFile() {
 	return m_Files.At(m_CurrentFile);
+}
+
+void ScriptEditorPanel::SetDebugLine(uint32_t line) {
+	m_Editor.SetDebugLine(line);
 }
 
 void ScriptEditorPanel::EndDebug() {
@@ -352,7 +369,6 @@ void ScriptEditorPanel::Draw() {
 			ScriptManager::StepInto();
 		if(m_StepOut.GetState().Clicked)
 			ScriptManager::StepOut();
-
 	}
 
 	m_Editor.Render("ScriptEditor");

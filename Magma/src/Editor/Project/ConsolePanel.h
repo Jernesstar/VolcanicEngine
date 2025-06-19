@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Magma/UI/Image.h>
+
 #include "Editor/Panel.h"
 #include "Editor/AssetManager.h"
 
@@ -20,6 +22,7 @@ public:
 
 private:
 	VolcaniCore::List<std::pair<ConsoleLevel, std::string>> m_Log;
+	UI::Image m_Info, m_Warn, m_Error;
 };
 
 }

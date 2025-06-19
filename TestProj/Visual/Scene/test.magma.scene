@@ -123,14 +123,14 @@ Scene:
                   Name: soundAsset
                   Type: Asset
                   Value:
-                    ID: 16624656892553940704
-                    Type: Audio
+                    ID: 0
+                    Type: None
               - Field:
                   Name: meshAsset
                   Type: Asset
                   Value:
-                    ID: 10036008063945961451
-                    Type: Mesh
+                    ID: 0
+                    Type: None
               - Field:
                   Name: SomeBool
                   Type: bool
@@ -138,15 +138,15 @@ Scene:
               - Field:
                   Name: Signed8
                   Type: int8
-                  Value: 79
+                  Value: 0
               - Field:
                   Name: Unsigned32
                   Type: uint32
-                  Value: 3038
+                  Value: 0
               - Field:
                   Name: Float
                   Type: float
-                  Value: 41.5999985
+                  Value: 0
               - Field:
                   Name: List
                   Type: array
@@ -155,14 +155,10 @@ Scene:
                   Name: Grid
                   Type: GridSet
                   Value:
-                    Width: 5
-                    Height: 5
+                    Width: 0
+                    Height: 0
                     Data:
-                      - [1, 0, 0, 0, 1]
-                      - [0, 1, 0, 1, 0]
-                      - [0, 0, 1, 0, 0]
-                      - [0, 1, 0, 1, 0]
-                      - [1, 0, 0, 0, 1]
+                      []
               - Field:
                   Name: SomeVec3
                   Type: Vec3

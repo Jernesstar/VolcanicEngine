@@ -115,6 +115,8 @@ void ScriptManager::RunCodeAnalysis() {
 	auto panel =
 		Editor::GetProjectTab()->
 			GetPanel("ScriptEditor")->As<ScriptEditorPanel>();
+
+	auto* file = panel->GetFile();
 }
 
 static asIScriptContext* s_Context = nullptr;
@@ -122,6 +124,7 @@ static asIScriptFunction* s_LastFunction = nullptr;
 static asIScriptModule* s_LastModule = nullptr;
 static int s_StackLevel = 0;
 static bool s_Suspended = false;
+static uint8_t s_Action = 0;
 
 static void DebugLineCallback(asIScriptContext* ctx) {
 	if(ctx->GetState() != asEXECUTION_ACTIVE)
@@ -132,10 +135,6 @@ static void DebugLineCallback(asIScriptContext* ctx) {
 	if(!path)
 		return;
 
-	if(s_Suspended) {
-		ctx->Suspend();
-	}
-
 	auto panel =
 		Editor::GetProjectTab()->
 			GetPanel("ScriptEditor")->As<ScriptEditorPanel>();
@@ -145,8 +144,19 @@ static void DebugLineCallback(asIScriptContext* ctx) {
 	VOLCANICORE_ASSERT(file);
 
 	bool isBreakpoint = file->Breakpoints.contains(lineNbr);
-	if(!isBreakpoint)
-		return;
+	if(!isBreakpoint) {
+		// return == free to continue execution
+		if(s_Action == 4) // Continue
+			return;
+		if(s_Action == 3) // Step out
+			if(s_StackLevel <= ctx->GetCallstackSize())
+				return;
+		if(s_Action == 2) // Step into
+			;
+		if(s_Action == 1) // Step over
+			if(s_StackLevel < ctx->GetCallstackSize())
+				return;
+	}
 
 	asIScriptFunction* func = ctx->GetFunction();
 	VOLCANICORE_LOG_INFO("File: %s, Function: %s, Line: %d",
@@ -154,18 +164,14 @@ static void DebugLineCallback(asIScriptContext* ctx) {
 
 	s_Suspended = true;
 	ctx->Suspend();
-
 	Editor::GetProjectTab()->OnPause();
-}
-
-static void DebugExceptionCallback(asIScriptContext* ctx) {
-
 }
 
 void ScriptManager::StartDebug() {
 	s_Context = ScriptEngine::GetContext();
 	s_Context->SetLineCallback(
 		asFUNCTION(DebugLineCallback), nullptr, asCALL_CDECL);
+	s_Action = 4;
 }
 
 void ScriptManager::EndDebug() {
@@ -179,23 +185,22 @@ void ScriptManager::EndDebug() {
 }
 
 void ScriptManager::StepOver() {
-	s_Context->Execute();
-	s_Context->Suspend();
+	s_Action = 1;
 }
 
 void ScriptManager::StepInto() {
-	if(s_StackLevel < s_Context->GetCallstackSize())
-		s_StackLevel++;
+	s_Action = 2;
+	s_StackLevel = s_Context->GetCallstackSize();
 }
 
 void ScriptManager::StepOut() {
-	if(s_StackLevel)
-		s_StackLevel--;
+	s_Action = 3;
+	s_StackLevel = s_Context->GetCallstackSize();
 }
 
 void ScriptManager::Continue() {
+	s_Action = 4;
 	s_Suspended = false;
-	Editor::GetProjectTab()->OnResume();
 }
 
 }

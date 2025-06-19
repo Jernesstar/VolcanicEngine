@@ -25,6 +25,7 @@ public:
 	void CloseFile(const std::string& path);
 	ScriptFile* GetFile(const std::string& path);
 	ScriptFile* GetFile();
+	void SetDebugLine(uint32_t line);
 
 	void EndDebug();
 
@@ -35,9 +36,9 @@ private:
 	VolcaniCore::List<ScriptFile> m_Files;
 	uint32_t m_OpenCount = 0;
 	uint32_t m_CurrentFile = 0;
-	TextEditor m_Editor;
 	UI::Button m_Debug, m_StepOver, m_StepInto, m_StepOut, m_Continue;
-	bool m_Debugging;
+	bool m_Debugging = false;
+	TextEditor m_Editor;
 
 private:
 	void EditFile(uint32_t i);
