@@ -144,27 +144,38 @@ static void DebugLineCallback(asIScriptContext* ctx) {
 	VOLCANICORE_ASSERT(file);
 
 	bool isBreakpoint = file->Breakpoints.contains(lineNbr);
-	if(!isBreakpoint) {
-		// return == free to continue execution
-		if(s_Action == 4) // Continue
-			return;
-		if(s_Action == 3) // Step out
-			if(s_StackLevel <= ctx->GetCallstackSize())
-				return;
-		if(s_Action == 2) // Step into
-			;
-		if(s_Action == 1) // Step over
-			if(s_StackLevel < ctx->GetCallstackSize())
-				return;
-	}
+	if(!isBreakpoint && !s_Suspended)
+		return;
 
 	asIScriptFunction* func = ctx->GetFunction();
 	VOLCANICORE_LOG_INFO("File: %s, Function: %s, Line: %d",
 		path, func->GetName(), lineNbr);
 
-	s_Suspended = true;
 	ctx->Suspend();
+	s_Suspended = true;
 	Editor::GetProjectTab()->OnPause();
+
+	// Having this run on a separate thread will not block the
+	// editor application from responding to events
+	// i.e pressing on the debug buttons
+	while(s_Suspended) {
+		// return == free to continue execution
+		if(s_Action == 4) { // Continue
+			Editor::GetProjectTab()->OnResume();
+			s_Suspended = false;
+			return;
+		}
+		if(s_Action == 3) // Step out
+			if(s_StackLevel <= ctx->GetCallstackSize())
+				return;
+		if(s_Action == 2) // Step into
+			break;
+		if(s_Action == 1) // Step over
+			if(s_StackLevel < ctx->GetCallstackSize())
+				return;
+	}
+
+	s_Suspended = true; // Step into
 }
 
 void ScriptManager::StartDebug() {
@@ -200,7 +211,6 @@ void ScriptManager::StepOut() {
 
 void ScriptManager::Continue() {
 	s_Action = 4;
-	s_Suspended = false;
 }
 
 }
