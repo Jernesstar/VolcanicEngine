@@ -1,2 +1,5 @@
 Scripts:
-  []
+  - Script:
+      Path: C:/Users/Jercy Mukala/Code/VolcanicEngine/TestProj/Asset/Script/PlayerController.as
+      Breakpoints: []
+      Open: true

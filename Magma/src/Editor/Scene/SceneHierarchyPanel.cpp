@@ -61,86 +61,86 @@ struct {
 
 void SceneHierarchyPanel::Draw() {
 	ImGui::Begin("Scene Hierarchy", &Open);
+
+	if(ImGui::IsMouseDown(0) && ImGui::IsWindowHovered()) {
+		// auto editor =
+		// 	m_Tab->GetPanel("ComponentEditor")->As<ComponentEditorPanel>();
+		// auto visual =
+		// 	m_Tab->GetPanel("SceneVisualizer")->As<SceneVisualizerPanel>();
+		m_Selected = { };
+		// editor->SetContext(m_Selected);
+		// visual->Select(m_Selected);
+	}
+	if(ImGui::IsMouseDown(1) && ImGui::IsWindowHovered())
+		ImGui::OpenPopup("Options");
+
+	if(ImGui::BeginPopup("Options"))
 	{
-		if(ImGui::IsMouseDown(0) && ImGui::IsWindowHovered()) {
-			// auto editor =
-			// 	m_Tab->GetPanel("ComponentEditor")->As<ComponentEditorPanel>();
-			// auto visual =
-			// 	m_Tab->GetPanel("SceneVisualizer")->As<SceneVisualizerPanel>();
-			m_Selected = { };
-			// editor->SetContext(m_Selected);
-			// visual->Select(m_Selected);
+		if(ImGui::BeginMenu("Add")) {
+			if(ImGui::MenuItem("Entity"))
+				options.add.entity = true;
+			if(ImGui::MenuItem("Skybox"))
+				options.add.skybox = true;
+			if(ImGui::MenuItem("DirectionalLight"))
+				options.add.directionalLight = true;
+			if(ImGui::MenuItem("PointLight"))
+				options.add.pointLight = true;
+			if(ImGui::MenuItem("Spotlight"))
+				options.add.spotlight = true;
+
+			ImGui::EndMenu();
 		}
-		if(ImGui::IsMouseDown(1) && ImGui::IsWindowHovered())
-			ImGui::OpenPopup("Options");
+		ImGui::EndPopup();
+	}
 
-		if(ImGui::BeginPopup("Options"))
-		{
-			if(ImGui::BeginMenu("Add")) {
-				if(ImGui::MenuItem("Entity"))
-					options.add.entity = true;
-				if(ImGui::MenuItem("Skybox"))
-					options.add.skybox = true;
-				if(ImGui::MenuItem("DirectionalLight"))
-					options.add.directionalLight = true;
-				if(ImGui::MenuItem("PointLight"))
-					options.add.pointLight = true;
-				if(ImGui::MenuItem("Spotlight"))
-					options.add.spotlight = true;
+	uint32_t i = 0;
+	for(auto type : { "Entity", "Skybox",
+						"DirectionalLight", "PointLight", "Spotlight" })
+	{
+		auto& option = *(bool*)(&options.add.entity + i++);
+		if(!option)
+			continue;
 
-				ImGui::EndMenu();
+		ImGui::OpenPopup(type);
+		if(ImGui::BeginPopup(type)) {
+			static std::string str;
+			ImGui::InputTextWithHint("##Input", "Enter entity name", &str);
+
+			if(ImGui::Button("Cancel"))
+				option = false;
+
+			ImGui::SameLine();
+			if(ImGui::Button("Create")) {
+				Entity newEntity;
+				if(str == "")
+					newEntity = m_Context->EntityWorld.AddEntity();
+				else
+					newEntity = m_Context->EntityWorld.AddEntity(str);
+
+				if(type == "Skybox")
+					newEntity.Add<SkyboxComponent>();
+				if(type == "DirectionalLight")
+					newEntity.Add<DirectionalLightComponent>();
+				if(type == "PointLight")
+					newEntity.Add<PointLightComponent>();
+				if(type == "Spotlight")
+					newEntity.Add<SpotlightComponent>();
+
+				str = "";
+				option = false;
 			}
+
 			ImGui::EndPopup();
 		}
-
-		uint32_t i = 0;
-		for(auto type : { "Entity", "Skybox",
-						  "DirectionalLight", "PointLight", "Spotlight" })
-		{
-			auto& option = *(bool*)(&options.add.entity + i++);
-			if(!option)
-				continue;
-
-			ImGui::OpenPopup(type);
-			if(ImGui::BeginPopup(type)) {
-				static std::string str;
-				ImGui::InputTextWithHint("##Input", "Enter entity name", &str);
-
-				if(ImGui::Button("Cancel"))
-					option = false;
-
-				ImGui::SameLine();
-				if(ImGui::Button("Create")) {
-					Entity newEntity;
-					if(str == "")
-						newEntity = m_Context->EntityWorld.AddEntity();
-					else
-						newEntity = m_Context->EntityWorld.AddEntity(str);
-
-					if(type == "Skybox")
-						newEntity.Add<SkyboxComponent>();
-					if(type == "DirectionalLight")
-						newEntity.Add<DirectionalLightComponent>();
-					if(type == "PointLight")
-						newEntity.Add<PointLightComponent>();
-					if(type == "Spotlight")
-						newEntity.Add<SpotlightComponent>();
-
-					str = "";
-					option = false;
-				}
-
-				ImGui::EndPopup();
-			}
-		}
-
-		m_Context->EntityWorld
-		.ForEach(
-			[&](Entity& entity)
-			{
-				DrawEntityNode(entity);
-			});
 	}
+
+	m_Context->EntityWorld
+	.ForEach(
+		[&](Entity& entity)
+		{
+			DrawEntityNode(entity);
+		});
+
 	ImGui::End();
 }
 

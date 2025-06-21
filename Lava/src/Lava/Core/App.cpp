@@ -57,9 +57,9 @@ struct RuntimeScreen {
 		ScriptObj.reset();
 		Script.reset();
 
+		App::Get()->GetRenderer().OnSceneClose();
 		UI.Clear();
 		World.reset();
-		App::Get()->GetRenderer().OnSceneClose();
 	}
 };
 
@@ -84,9 +84,9 @@ static AssetManager& GetAssetManagerInstance() {
 }
 
 static void ScriptLoadScene(const std::string& name, App* app) {
+	s_Screen->World->UnregisterSystems();
 	s_Screen->World->Name = name;
 	s_Screen->World->EntityWorld.Reset();
-	s_Screen->World->UnregisterSystems();
 	s_Screen->World->RegisterSystems();
 	app->GetRenderer().OnSceneLoad();
 	app->SceneLoad(*s_Screen->World);
@@ -173,9 +173,9 @@ void App::OnLoad() {
 }
 
 void App::OnClose() {
-	if(s_Screen)
-		delete s_Screen;
+	delete s_Screen;
 	s_Screen = nullptr;
+	s_ScreenPrepared = false;
 
 	if(s_AppObject)
 		s_AppObject->Call("OnClose");

@@ -158,8 +158,8 @@ static void DebugLineCallback(asIScriptContext* ctx) {
 	s_Suspended = true;
 	Editor::GetProjectTab()->OnPause();
 
-	// Having this run on a separate thread will not block the
-	// editor application from responding to events
+	// Having this run on a separate thread won't block
+	// the editor application from responding to events
 	// i.e pressing on the debug buttons
 
 	// return == free to continue execution

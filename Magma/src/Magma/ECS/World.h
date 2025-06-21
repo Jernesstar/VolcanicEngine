@@ -23,7 +23,7 @@ public:
 	World();
 	~World() = default;
 
-	void Reset() { m_World.reset(); }
+	void Reset();
 
 	World& operator =(const World& other);
 
