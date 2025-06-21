@@ -38,6 +38,7 @@ public:
 
 	void SetProject(const Project& project);
 
+	void PrepareScreen();
 	void OnLoad();
 	void OnClose();
 	void OnUpdate(TimeStep ts);

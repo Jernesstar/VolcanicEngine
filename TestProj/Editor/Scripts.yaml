@@ -1,13 +1,2 @@
 Scripts:
-  - Script:
-      Path: C:/Users/Jercy Mukala/Code/VolcanicEngine/TestProj/Asset/Script/PlayerController.as
-      Breakpoints: [44, 47, 54]
-      Open: true
-  - Script:
-      Path: C:/Users/Jercy Mukala/Code/VolcanicEngine/TestProj/Project/App/TestGame.as
-      Breakpoints: []
-      Open: false
-  - Script:
-      Path: C:/Users/Jercy Mukala/Code/VolcanicEngine/TestProj/Project/Screen/TestHome.as
-      Breakpoints: []
-      Open: false
+  []

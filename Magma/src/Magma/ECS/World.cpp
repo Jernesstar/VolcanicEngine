@@ -37,6 +37,8 @@ World::World() {
 }
 
 World& World::operator =(const World& other) {
+	Reset();
+
 	other.ForEach(
 		[&](const Entity& entity)
 		{

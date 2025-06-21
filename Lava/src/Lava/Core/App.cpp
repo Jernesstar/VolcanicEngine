@@ -31,6 +31,7 @@ namespace Lava {
 static Ref<ScriptModule> s_AppModule = nullptr;
 static Ref<ScriptObject> s_AppObject = nullptr;
 
+static bool s_ScreenPrepared = false;
 static bool s_ShouldSwitchScreen = false;
 static bool s_ShouldPushScreen = false;
 static bool s_ShouldPopScreen = false;
@@ -45,9 +46,10 @@ struct RuntimeScreen {
 	Ref<ScriptModule> Script;
 	Ref<ScriptObject> ScriptObj;
 
-	RuntimeScreen(const Screen& screen)
-		: World(CreateRef<Scene>(screen.Scene)), UI(screen.UI)
+	RuntimeScreen()
+		: World(CreateRef<Scene>("")), UI("")
 	{
+		World->RegisterSystems();
 	}
 
 	~RuntimeScreen() {
@@ -82,9 +84,9 @@ static AssetManager& GetAssetManagerInstance() {
 }
 
 static void ScriptLoadScene(const std::string& name, App* app) {
-	// TODO(Change?): Do this have to be done?
-	s_Screen->World.reset();
-	s_Screen->World = CreateRef<Scene>(name);
+	s_Screen->World->Name = name;
+	s_Screen->World->EntityWorld.Reset();
+	s_Screen->World->UnregisterSystems();
 	s_Screen->World->RegisterSystems();
 	app->GetRenderer().OnSceneLoad();
 	app->SceneLoad(*s_Screen->World);
@@ -156,6 +158,12 @@ void App::SetProject(const Project& project) {
 	m_Project = project;
 }
 
+void App::PrepareScreen() {
+	s_ScreenPrepared = true;
+	delete s_Screen;
+	s_Screen = new RuntimeScreen();
+}
+
 void App::OnLoad() {
 	s_AppModule = CreateRef<ScriptModule>();
 	AppLoad(s_AppModule);
@@ -165,7 +173,8 @@ void App::OnLoad() {
 }
 
 void App::OnClose() {
-	delete s_Screen;
+	if(s_Screen)
+		delete s_Screen;
 	s_Screen = nullptr;
 
 	if(s_AppObject)
@@ -299,15 +308,18 @@ void App::ScreenSet(const std::string& name) {
 		VOLCANICORE_LOG_INFO("Found screen '%s'", name.c_str());
 
 	auto& screen = m_Project.Screens[idx];
-	delete s_Screen;
-	s_Screen = new RuntimeScreen(screen);
+	if(!s_ScreenPrepared)
+		PrepareScreen();
+	s_ScreenPrepared = false;
+
+	s_Screen->World->Name = screen.Scene;
+	s_Screen->UI.Name = screen.UI;
 
 	ScreenLoad(s_Screen->Script, screen.Name);
 	auto scriptClass = s_Screen->Script->GetClass(name);
 	s_Screen->ScriptObj = scriptClass->Instantiate();
 
 	if(s_ShouldLoadScene) {
-		s_Screen->World->RegisterSystems();
 		m_SceneRenderer.OnSceneLoad();
 		*s_Screen->World = *s_ShouldLoadScene;
 		s_ShouldLoadScene = nullptr;

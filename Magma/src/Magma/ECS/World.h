@@ -23,6 +23,8 @@ public:
 	World();
 	~World() = default;
 
+	void Reset() { m_World.reset(); }
+
 	World& operator =(const World& other);
 
 	void OnUpdate(TimeStep ts);

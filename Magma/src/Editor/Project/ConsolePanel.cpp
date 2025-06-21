@@ -48,7 +48,7 @@ void ConsolePanel::Update(TimeStep ts) {
 void ConsolePanel::Draw() {
 	auto windowFlags = ImGuiWindowFlags_NoScrollbar
 					 | ImGuiWindowFlags_NoScrollWithMouse;
-	ImGui::Begin("Console", &Open, windowFlags);
+	ImGui::Begin("Console", nullptr, windowFlags);
 
 	static ConsoleType s_Type = ConsoleType::Log;
 
@@ -81,10 +81,8 @@ void ConsolePanel::Draw() {
 
 	auto tabBarFlags = ImGuiTabBarFlags_Reorderable
 					 | ImGuiTabBarFlags_AutoSelectNewTabs;
-
 	if(ImGui::BeginTabBar("ConsoleTabs", tabBarFlags))
 	{
-
 		TabState s1 = UIRenderer::DrawTab("Log", false);
 		TabState s2 = UIRenderer::DrawTab("Debug", false);
 		if(s1.Clicked)

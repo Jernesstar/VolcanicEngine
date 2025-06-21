@@ -58,7 +58,7 @@ static ImRect Traverse(fs::path folder);
 static void DrawAssetSelectWindow();
 
 void ContentBrowserPanel::Draw() {
-	ImGui::Begin("Content Browser", &Open);
+	ImGui::Begin("Content Browser");
 	{
 		auto windowFlags = ImGuiWindowFlags_MenuBar;
 		auto childFlags = ImGuiChildFlags_Border;

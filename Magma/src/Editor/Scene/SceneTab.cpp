@@ -151,9 +151,9 @@ void SceneTab::SetScene(const std::string& path) {
 }
 
 void SceneTab::Test(Scene* scene) {
-	auto p1 = GetPanel("SceneHierarchyPanel")->As<SceneHierarchyPanel>();
-	auto p2 = GetPanel("SceneVisualizerPanel")->As<SceneVisualizerPanel>();
-	auto p3 = GetPanel("ComponentEditorPanel")->As<ComponentEditorPanel>();
+	auto p1 = GetPanel("SceneHierarchy")->As<SceneHierarchyPanel>();
+	auto p2 = GetPanel("SceneVisualizer")->As<SceneVisualizerPanel>();
+	auto p3 = GetPanel("ComponentEditor")->As<ComponentEditorPanel>();
 
 	p1->SetContext(scene);
 	p2->SetContext(scene);
@@ -162,9 +162,9 @@ void SceneTab::Test(Scene* scene) {
 }
 
 void SceneTab::Reset() {
-	auto p1 = GetPanel("SceneHierarchyPanel")->As<SceneHierarchyPanel>();
-	auto p2 = GetPanel("SceneVisualizerPanel")->As<SceneVisualizerPanel>();
-	auto p3 = GetPanel("ComponentEditorPanel")->As<ComponentEditorPanel>();
+	auto p1 = GetPanel("SceneHierarchy")->As<SceneHierarchyPanel>();
+	auto p2 = GetPanel("SceneVisualizer")->As<SceneVisualizerPanel>();
+	auto p3 = GetPanel("ComponentEditor")->As<ComponentEditorPanel>();
 
 	p1->SetContext(&m_Scene);
 	p2->SetContext(&m_Scene);

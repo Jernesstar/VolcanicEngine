@@ -122,7 +122,7 @@ void ScriptManager::RunCodeAnalysis() {
 static asIScriptContext* s_Context = nullptr;
 static asIScriptFunction* s_LastFunction = nullptr;
 static asIScriptModule* s_LastModule = nullptr;
-static int s_StackLevel = 0;
+static uint32_t s_StackLevel = 0;
 static bool s_Suspended = false;
 static uint8_t s_Action = 0;
 
