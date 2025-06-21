@@ -21,7 +21,8 @@ public:
 	void Update(TimeStep ts) override;
 	void Render() override;
 
-	void SetScene(const std::string& path);
+	void Test(Scene* scene);
+	void Reset();
 	Scene* GetScene() { return &m_Scene; }
 
 	void NewScene();
@@ -38,6 +39,7 @@ private:
 
 private:
 	void Setup();
+	void SetScene(const std::string& path);
 };
 
 }

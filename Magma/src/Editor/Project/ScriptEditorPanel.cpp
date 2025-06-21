@@ -121,6 +121,7 @@ ScriptEditorPanel::ScriptEditorPanel()
 
 			return true;
 		});
+
 	SetDebugLine(1);
 }
 
@@ -152,9 +153,6 @@ ScriptEditorPanel::~ScriptEditorPanel() {
 	auto path = Editor::GetProject().Path;
 	path = (fs::path(path) / "Editor" / "Scripts.yaml").string();
 	serializer.Finalize(path);
-
-	if(m_Debugging)
-		Editor::GetProjectTab()->OnStop();
 }
 
 void ScriptEditorPanel::EditFile(uint32_t i) {
@@ -218,11 +216,6 @@ ScriptFile* ScriptEditorPanel::GetFile() {
 
 void ScriptEditorPanel::SetDebugLine(uint32_t line) {
 	m_Editor.SetDebugLine(line);
-}
-
-void ScriptEditorPanel::EndDebug() {
-	m_Debugging = false;
-	ScriptManager::EndDebug();
 }
 
 void ScriptEditorPanel::Update(TimeStep ts) {
@@ -338,23 +331,19 @@ void ScriptEditorPanel::Draw() {
 	m_Editor.SetBreakpoints(file->Breakpoints);
 	m_Editor.SetErrorMarkers(file->Errors);
 
+	bool debug = Editor::GetProjectTab()->IsDebugging();
 	ImGui::Text("%d lines", m_Editor.GetTotalLines());
-	ImGui::SameLine(0.0f, m_Debugging ? 75.0f : 100.0f);
+	ImGui::SameLine(0.0f, debug ? 75.0f : 100.0f);
 	m_Debug.Render();
 
 	if(m_Debug.GetState().Clicked) {
-		if(!m_Debugging) {
-			ScriptManager::StartDebug();
-			Editor::GetProjectTab()->OnPlay();
-			m_Debugging = true;
-		}
-		else {
+		if(!debug)
+			Editor::GetProjectTab()->OnPlay(true);
+		else
 			Editor::GetProjectTab()->OnStop();
-			m_Debugging = false;
-		}
 	}
 
-	if(m_Debugging) {
+	if(debug) {
 		ImGui::SameLine();
 		m_Continue.Render(); ImGui::SameLine();
 		m_StepOver.Render(); ImGui::SameLine();

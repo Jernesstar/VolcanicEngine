@@ -27,8 +27,6 @@ public:
 	ScriptFile* GetFile();
 	void SetDebugLine(uint32_t line);
 
-	void EndDebug();
-
 	void Update(VolcaniCore::TimeStep ts) override;
 	void Draw() override;
 
@@ -37,7 +35,6 @@ private:
 	uint32_t m_OpenCount = 0;
 	uint32_t m_CurrentFile = 0;
 	UI::Button m_Debug, m_StepOver, m_StepInto, m_StepOut, m_Continue;
-	bool m_Debugging = false;
 	TextEditor m_Editor;
 
 private:

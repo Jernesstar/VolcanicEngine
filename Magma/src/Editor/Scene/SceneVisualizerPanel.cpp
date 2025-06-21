@@ -111,6 +111,16 @@ void SceneVisualizerPanel::SetContext(Scene* context) {
 		});
 }
 
+void SceneVisualizerPanel::SetImage() {
+	Ref<Framebuffer> display = App::Get()->GetRenderer().GetOutput();
+	m_Image.Content = display->Get(AttachmentTarget::Color);
+}
+
+void SceneVisualizerPanel::ResetImage() {
+	Ref<Framebuffer> display = m_Renderer.GetOutput();
+	m_Image.Content = display->Get(AttachmentTarget::Color);
+}
+
 void SceneVisualizerPanel::Add(ECS::Entity entity) {
 	glm::vec3 position;
 	bool billboard = false;

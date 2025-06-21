@@ -102,7 +102,7 @@ void Editor::Load(const CommandLineArgs& args) {
 			return;
 		}
 
-		NewTab(CreateRef<ProjectTab>(m_Project.Path));
+		NewTab(CreateRef<ProjectTab>());
 	}
 	for(auto& path : args["--scene"])
 		NewTab(CreateRef<SceneTab>(path));
@@ -442,8 +442,9 @@ void Editor::OpenProject() {
 	if(instance->Display("ChooseFile")) {
 		if(instance->IsOk()) {
 			std::string path = instance->GetFilePathName();
+			m_Tabs.Clear();
 			NewProject(path);
-			NewTab(CreateRef<ProjectTab>(m_Project.Path));
+			NewTab(CreateRef<ProjectTab>());
 		}
 
 		instance->Close();

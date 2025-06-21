@@ -82,6 +82,8 @@ public:
 	~SceneVisualizerPanel() = default;
 
 	void SetContext(Scene* scene);
+	void SetImage();
+	void ResetImage();
 
 	void Update(TimeStep ts) override;
 	void Draw() override;

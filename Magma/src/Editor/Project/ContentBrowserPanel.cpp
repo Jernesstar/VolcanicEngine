@@ -33,8 +33,8 @@ static AssetType s_SelectType = AssetType::None;
 static Asset s_Selection = { };
 static ImVec2 s_Position;
 
-ContentBrowserPanel::ContentBrowserPanel(const std::string& path)
-	: Panel("ContentBrowser"), m_Path(path)
+ContentBrowserPanel::ContentBrowserPanel()
+	: Panel("ContentBrowser")
 {
 	Application::PushDir();
 	s_FileIcon =
@@ -83,7 +83,7 @@ void ContentBrowserPanel::Draw() {
 			ImGui::PopClipRect();
 			ImGui::SetCursorPos(windowStart);
 
-			Traverse(m_Path);
+			Traverse(Editor::GetProject().Path);
 		}
 		ImGui::EndChild();
 

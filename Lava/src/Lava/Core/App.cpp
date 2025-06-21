@@ -82,6 +82,7 @@ static AssetManager& GetAssetManagerInstance() {
 }
 
 static void ScriptLoadScene(const std::string& name, App* app) {
+	// TODO(Change?): Do this have to be done?
 	s_Screen->World.reset();
 	s_Screen->World = CreateRef<Scene>(name);
 	s_Screen->World->RegisterSystems();

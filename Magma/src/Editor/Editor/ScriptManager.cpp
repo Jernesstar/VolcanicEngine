@@ -150,39 +150,49 @@ static void DebugLineCallback(asIScriptContext* ctx) {
 	asIScriptFunction* func = ctx->GetFunction();
 	VOLCANICORE_LOG_INFO("File: %s, Function: %s, Line: %d",
 		path, func->GetName(), lineNbr);
+	panel->SetDebugLine(lineNbr);
 
-	ctx->Suspend();
+	if(!s_Suspended)
+		ctx->Suspend();
+
 	s_Suspended = true;
 	Editor::GetProjectTab()->OnPause();
 
 	// Having this run on a separate thread will not block the
 	// editor application from responding to events
 	// i.e pressing on the debug buttons
+
+	// return == free to continue execution
 	while(s_Suspended) {
-		// return == free to continue execution
-		if(s_Action == 4) { // Continue
+		// Continue
+		if(s_Action == 4) {
 			Editor::GetProjectTab()->OnResume();
 			s_Suspended = false;
+			// ctx->Execute();
 			return;
 		}
-		if(s_Action == 3) // Step out
-			if(s_StackLevel <= ctx->GetCallstackSize())
-				return;
-		if(s_Action == 2) // Step into
+		// Step out
+		else if(s_Action == 3 && s_StackLevel <= ctx->GetCallstackSize()) {
+			s_Action = 0;
+			return;
+		}
+		else if(s_Action == 2) { // Step into
+			s_Action = 0;
 			break;
-		if(s_Action == 1) // Step over
-			if(s_StackLevel < ctx->GetCallstackSize())
-				return;
+		}
+		// Step over
+		else if(s_Action == 1 && s_StackLevel < ctx->GetCallstackSize()) {
+			s_Action = 0;
+			return;
+		}
 	}
-
-	s_Suspended = true; // Step into
 }
 
 void ScriptManager::StartDebug() {
 	s_Context = ScriptEngine::GetContext();
 	s_Context->SetLineCallback(
 		asFUNCTION(DebugLineCallback), nullptr, asCALL_CDECL);
-	s_Action = 4;
+	s_Action = 0;
 }
 
 void ScriptManager::EndDebug() {

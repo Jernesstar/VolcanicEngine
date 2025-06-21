@@ -150,6 +150,28 @@ void SceneTab::SetScene(const std::string& path) {
 	m_ScenePath = path;
 }
 
+void SceneTab::Test(Scene* scene) {
+	auto p1 = GetPanel("SceneHierarchyPanel")->As<SceneHierarchyPanel>();
+	auto p2 = GetPanel("SceneVisualizerPanel")->As<SceneVisualizerPanel>();
+	auto p3 = GetPanel("ComponentEditorPanel")->As<ComponentEditorPanel>();
+
+	p1->SetContext(scene);
+	p2->SetContext(scene);
+	p2->SetImage();
+	p3->ClearFocus();
+}
+
+void SceneTab::Reset() {
+	auto p1 = GetPanel("SceneHierarchyPanel")->As<SceneHierarchyPanel>();
+	auto p2 = GetPanel("SceneVisualizerPanel")->As<SceneVisualizerPanel>();
+	auto p3 = GetPanel("ComponentEditorPanel")->As<ComponentEditorPanel>();
+
+	p1->SetContext(&m_Scene);
+	p2->SetContext(&m_Scene);
+	p2->ResetImage();
+	p3->ClearFocus();
+}
+
 void SceneTab::Update(TimeStep ts) {
 	for(auto panel : m_Panels)
 		panel->Update(ts);

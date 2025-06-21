@@ -13,7 +13,7 @@ namespace Magma {
 
 class ContentBrowserPanel : public Panel  {
 public:
-	ContentBrowserPanel(const std::string& path);
+	ContentBrowserPanel();
 	~ContentBrowserPanel();
 
 	void Update(VolcaniCore::TimeStep ts) override;
@@ -23,9 +23,6 @@ public:
 	void CancelSelect();
 	bool HasSelection(uint32_t id = 0);
 	Asset GetSelected();
-
-private:
-	fs::path m_Path;
 
 private:
 	void RenderAssetTable();

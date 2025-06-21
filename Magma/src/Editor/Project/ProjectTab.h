@@ -31,7 +31,7 @@ struct RunConfiguration {
 
 class ProjectTab : public Tab {
 public:
-	ProjectTab(const std::string& path);
+	ProjectTab();
 	~ProjectTab();
 
 	void Update(TimeStep ts) override;
@@ -39,7 +39,8 @@ public:
 	void RenderButtons();
 	void RenderEssentialPanels();
 
-	void OnPlay();
+	bool IsDebugging() const { return m_Debugging; }
+	void OnPlay(bool debug = false);
 	void OnPause();
 	void OnResume();
 	void OnStop();
@@ -47,6 +48,7 @@ public:
 	ScreenState GetState() const { return m_ScreenState; }
 
 private:
+	bool m_Debugging = false;
 	UI::Button m_PlayButton, m_PauseButton, m_ResumeButton, m_StopButton;
 	ScreenState m_ScreenState = ScreenState::Edit;
 	RunConfiguration m_Configs;
