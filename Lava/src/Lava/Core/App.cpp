@@ -321,6 +321,7 @@ void App::ScreenSet(const std::string& name) {
 
 	if(s_ShouldLoadScene) {
 		m_SceneRenderer.OnSceneLoad();
+		s_Screen->World->RegisterSystems();
 		*s_Screen->World = *s_ShouldLoadScene;
 		s_ShouldLoadScene = nullptr;
 
