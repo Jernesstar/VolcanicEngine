@@ -20,8 +20,6 @@ void main()
         FragColor = vec4(0.0);
     else
         FragColor = vec4(v_Color, abs(sp.x));
-
-    
 }
 
 vec2 SphereIntersect()

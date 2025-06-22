@@ -43,31 +43,11 @@ Runtime::Runtime(const CommandLineArgs& args)
 
 	Application::PushDir(rootPath);
 
-	for(std::string name : { "Framebuffer", "Lighting", "Mesh" }) {
-		BinaryReader vertFile("Asset/Shader/" + name + ".bin.vert");
-		BinaryReader fragFile("Asset/Shader/" + name + ".bin.frag");
-		uint64_t count1;
-		uint64_t count2;
-		vertFile.Read(count1);
-		fragFile.Read(count2);
-		Buffer<void> vertBuf(sizeof(uint32_t), count1);
-		Buffer<void> fragBuf(sizeof(uint32_t), count2);
-		vertFile.ReadData(vertBuf.Get(), vertBuf.GetMaxSize());
-		fragFile.ReadData(fragBuf.Get(), fragBuf.GetMaxSize());
-		List<Shader> shaders;
-		shaders.AddMove({ ShaderType::Vertex, std::move(vertBuf) });
-		shaders.AddMove({ ShaderType::Fragment, std::move(fragBuf) });
-
-		ShaderLibrary::Add(name, ShaderPipeline::Create(shaders));
-	}
-
+	UIRenderer::Init();
 	Physics::Init();
-
 	AudioEngine::Init();
 	ScriptEngine::Init();
 	ScriptGlue::RegisterInterface();
-
-	UIRenderer::Init();
 
 	Project project;
 	project.Load("./.volc.proj");
@@ -75,6 +55,71 @@ Runtime::Runtime(const CommandLineArgs& args)
 	Application::GetWindow()->SetTitle(project.Name);
 	m_AssetManager.Load();
 	// Application::GetWindow()->SetIcon();
+
+	for(std::string name : { "Framebuffer", "Lighting", "Mesh", "Light",
+		"Bloom", "Downsample", "Upsample",
+		"Particle", "ParticleEmitter", "ParticleUpdate" })
+	{
+		List<Shader> shaders;
+		for(std::string type : { "vert", "frag", "comp" }) {
+			auto path = "Asset/Shader/" + name + ".bin." + type;
+			if(!FileUtils::FileExists(path))
+				continue;
+
+			ShaderType shaderType;
+			if(type == "vert")
+				shaderType = ShaderType::Vertex;
+			else if(type == "frag")
+				shaderType = ShaderType::Fragment;
+			else if(type == "comp")
+				shaderType = ShaderType::Compute;
+
+			BinaryReader shaderFile(path);
+			uint64_t count;
+			shaderFile.Read(count);
+			Buffer<void> buf(sizeof(uint32_t), count);
+			shaderFile.ReadData(buf.Get(), buf.GetMaxSize());
+			shaders.AddMove({ shaderType, std::move(buf) });
+		}
+
+		if(name == "Downsample") {
+			name = "Bloom-Downsample";
+			std::string framebuffer = "Asset/Shader/Framebuffer.bin.vert";
+			BinaryReader shaderFile(framebuffer);
+			uint64_t count;
+			shaderFile.Read(count);
+			Buffer<void> buf(sizeof(uint32_t), count);
+			shaderFile.ReadData(buf.Get(), buf.GetMaxSize());
+			shaders.AddMove({ ShaderType::Vertex, std::move(buf) });
+		}
+		else if(name == "Upsample") {
+			name = "Bloom-Upsample";
+			std::string framebuffer = "Asset/Shader/Framebuffer.bin.vert";
+			BinaryReader shaderFile(framebuffer);
+			uint64_t count;
+			shaderFile.Read(count);
+			Buffer<void> buf(sizeof(uint32_t), count);
+			shaderFile.ReadData(buf.Get(), buf.GetMaxSize());
+			shaders.AddMove({ ShaderType::Vertex, std::move(buf) });
+		}
+		else if(name == "Bloom") {
+			std::string framebuffer = "Asset/Shader/Framebuffer.bin.vert";
+			BinaryReader shaderFile(framebuffer);
+			uint64_t count;
+			shaderFile.Read(count);
+			Buffer<void> buf(sizeof(uint32_t), count);
+			shaderFile.ReadData(buf.Get(), buf.GetMaxSize());
+			shaders.AddMove({ ShaderType::Vertex, std::move(buf) });
+		}
+		else if(name == "Particle")
+			name = "Particle-DefaultDraw";
+		else if(name == "ParticleEmitter")
+			name = "Particle-Emit";
+		else if(name == "ParticleUpdate")
+			name = "Particle-Update";
+
+		ShaderLibrary::Add(name, ShaderPipeline::Create(shaders));
+	}
 
 	m_App = CreateRef<App>();
 	m_App->SetProject(project);
@@ -126,11 +171,10 @@ Runtime::~Runtime() {
 
 	m_AssetManager.Clear();
 
-	UIRenderer::Close();
-
 	ScriptEngine::Shutdown();
 	AudioEngine::Shutdown();
 	Physics::Close();
+	UIRenderer::Close();
 }
 
 void Runtime::OnUpdate(TimeStep ts) {

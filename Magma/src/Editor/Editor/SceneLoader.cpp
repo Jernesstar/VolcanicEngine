@@ -851,7 +851,6 @@ BinaryWriter& BinaryWriter::WriteObject(const ScriptComponent& comp) {
 			auto asset = *field.As<Asset>();
 			Write((uint64_t)asset.ID);
 			Write((uint8_t)asset.Type);
-			Write((bool)asset.Primary);
 		}
 		else if(typeName == "Vec3")
 			Write(*field.As<glm::vec3>());

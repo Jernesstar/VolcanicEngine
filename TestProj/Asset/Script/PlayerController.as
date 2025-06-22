@@ -44,9 +44,9 @@ class PlayerController : IEntityController
         const TagComponent@ tag = Handle.GetTagComponent();
         print(tag.Tag);
 
+        print("Name: " + soundAsset.Name);
         AssetManager.Load(soundAsset);
         print("Loaded: " + soundAsset.IsLoaded);
-        print("Name: " + soundAsset.Name);
 
         ScriptSystem@ sys = Scene.GetScriptSystem();
         sys.ListenForEvent(Handle, "PlayerDied");

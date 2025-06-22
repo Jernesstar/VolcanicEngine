@@ -60,11 +60,8 @@ layout(std140, binding = 2) uniform Spotlights
 layout(location = 1) uniform int u_DirectionalLight;
 layout(location = 2) uniform int u_PointLightCount;
 layout(location = 3) uniform int u_SpotlightCount;
-layout(location = 4) uniform int u_SceneVisualizer;
-
-layout(location = 5) uniform vec3 u_CameraPosition;
-
-layout(location = 6) uniform Material u_Material;
+layout(location = 4) uniform vec3 u_CameraPosition;
+layout(location = 5) uniform Material u_Material;
 
 layout(location = 0) in vec3 v_Position;
 layout(location = 1) in vec3 v_Normal;
@@ -92,9 +89,6 @@ void main()
         color = texture(u_Material.Diffuse, v_TexCoords.xy).rgb;
     else
         color = u_Material.DiffuseColor.rgb;
-
-    if(u_SceneVisualizer == 1)
-        result += color;
 
     FragColor = vec4(result, 1.0);
 }

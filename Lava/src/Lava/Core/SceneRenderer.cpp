@@ -37,6 +37,7 @@ struct PointLight {
 	float Constant;
 	float Linear;
 	float Quadratic;
+	float _padding;
 
 	PointLight(const PointLightComponent& pc)
 		: Position(pc.Position, 0.0f), Ambient(pc.Ambient, 0.0f),
@@ -53,6 +54,8 @@ struct Spotlight {
 
 	float CutoffAngle;
 	float OuterCutoffAngle;
+	float _padding1;
+	float _padding2;
 
 	Spotlight(const SpotlightComponent& sc)
 		: Position(sc.Position, 0.0f), Ambient(sc.Ambient, 0.0f),
@@ -78,7 +81,6 @@ struct ParticleEmitter {
 	uint64_t MaxParticleCount;
 	float ParticleLifetime; // In milliseconds
 	float SpawnInterval; // In milliseconds
-
 	float Timer;
 
 	Ref<Texture> Material;
@@ -109,7 +111,7 @@ RuntimeSceneRenderer::RuntimeSceneRenderer() {
 				{ "Specular",  BufferDataType::Vec4 },
 				{ "Direction", BufferDataType::Vec4 },
 			}, 1);
-	
+
 	PointLightBuffer =
 		UniformBuffer::Create(
 			BufferLayout
@@ -121,6 +123,7 @@ RuntimeSceneRenderer::RuntimeSceneRenderer() {
 				{ "Constant",  BufferDataType::Float },
 				{ "Linear",	   BufferDataType::Float },
 				{ "Quadratic", BufferDataType::Float },
+				{ "_padding", BufferDataType::Float },
 			}, 50);
 
 	SpotlightBuffer =
@@ -134,12 +137,9 @@ RuntimeSceneRenderer::RuntimeSceneRenderer() {
 				{ "Direction", BufferDataType::Vec4 },
 				{ "CutoffAngle",	  BufferDataType::Float },
 				{ "OuterCutoffAngle", BufferDataType::Float },
+				{ "_padding1", BufferDataType::Float },
+				{ "_padding2", BufferDataType::Float },
 			}, 50);
-
-	// FinalCompositePass =
-	// 	RenderPass::Create("FinalComposite",
-	// 		ShaderLibrary::Get("Framebuffer"), m_Output);
-	// FinalCompositePass->SetData(Renderer2D::GetScreenBuffer());
 
 	LightingPass =
 		RenderPass::Create("Lighting",
@@ -395,9 +395,9 @@ void RuntimeSceneRenderer::SubmitMesh(const Entity& entity) {
 	assetManager->Load(mc.MeshAsset);
 	auto mesh = assetManager->Get<Mesh>(mc.MeshAsset);
 
-	Renderer::StartPass(LightingPass, false);
+	Renderer::StartPass(LightingPass);
 	{
-		Renderer3D::DrawMesh(mesh, tc);
+		// Renderer3D::DrawMesh(mesh, tc);
 	}
 	Renderer::EndPass();
 }
@@ -411,8 +411,6 @@ void RuntimeSceneRenderer::Render() {
 	.SetInput("u_PointLightCount", (int32_t)PointLightCount);
 	LightingCommand->UniformData
 	.SetInput("u_SpotlightCount", (int32_t)SpotlightCount);
-	LightingCommand->UniformData
-	.SetInput("u_SceneVisualizer", 0);
 
 	LightingCommand->UniformData
 	.SetInput(UniformSlot{ DirectionalLightBuffer, "", 0 });

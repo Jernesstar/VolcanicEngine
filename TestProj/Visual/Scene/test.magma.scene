@@ -48,7 +48,7 @@ Scene:
               Ambient: [1, 0, 0]
               Diffuse: [1, 1, 1]
               Specular: [1, 1, 1]
-              Position: [-6.4696002, 12.4147997, 2.66100001]
+              Position: [-2.97912478, 12.4147997, 2.66100001]
               Constant: 1
               Linear: 0
               Quadratic: 0
@@ -123,18 +123,18 @@ Scene:
                   Name: soundAsset
                   Type: Asset
                   Value:
-                    ID: 0
-                    Type: None
+                    ID: 16624656892553940704
+                    Type: Audio
               - Field:
                   Name: meshAsset
                   Type: Asset
                   Value:
-                    ID: 0
-                    Type: None
+                    ID: 10036008063945961451
+                    Type: Mesh
               - Field:
                   Name: SomeBool
                   Type: bool
-                  Value: false
+                  Value: true
               - Field:
                   Name: Signed8
                   Type: int8
@@ -155,21 +155,15 @@ Scene:
                   Name: Grid
                   Type: GridSet
                   Value:
-                    Width: 0
-                    Height: 0
+                    Width: 5
+                    Height: 5
                     Data:
-                      []
+                      - [1, 0, 0, 0, 1]
+                      - [0, 1, 0, 1, 0]
+                      - [0, 0, 1, 0, 0]
+                      - [0, 1, 0, 1, 0]
+                      - [1, 0, 0, 0, 1]
               - Field:
                   Name: SomeVec3
                   Type: Vec3
                   Value: [0, 0, 0]
-    - Entity:
-        Name: Fireflies
-        ID: 1111
-        Components:
-          ParticleEmitterComponent:
-            Position: [1.29999995, 2.29999995, 14.3000002]
-            MaxParticleCount: 1000
-            ParticleLifetime: 5001
-            SpawnInterval: 10
-            MaterialID: 0

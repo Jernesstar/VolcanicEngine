@@ -70,12 +70,12 @@ void RuntimeAssetManager::Load(Asset asset) {
 		Ref<Mesh> mesh = CreateRef<Mesh>(MeshType::Model);
 		pack.Read(mesh->SubMeshes);
 
-		//for(const auto& ref : GetRefs(asset)) {
-		//	auto& mat = mesh->Materials.Emplace();
-		//	Load(ref);
-		//	auto material = Get<Magma::Material>(asset);
-		//	// TODO
-		//}
+		for(const auto& ref : GetRefs(asset)) {
+			auto& mat = mesh->Materials.Emplace();
+			Load(ref);
+			auto material = Get<Magma::Material>(asset);
+			// TODO
+		}
 
 		m_MeshAssets[asset.ID] = mesh;
 	}

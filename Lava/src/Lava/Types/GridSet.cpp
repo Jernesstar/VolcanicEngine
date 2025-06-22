@@ -51,10 +51,14 @@ void GridSet::Resize(uint32_t width, uint32_t height) {
 }
 
 void GridSet::ResizeX(uint32_t width) {
+	if(!m_Width)
+		m_Width = width;
 	Reallocate(width, m_Height);
 }
 
 void GridSet::ResizeY(uint32_t height) {
+	if(!m_Height)
+		m_Height = height;
 	Reallocate(m_Width, height);
 }
 

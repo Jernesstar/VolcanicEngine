@@ -616,13 +616,13 @@ EditorSceneRenderer::EditorSceneRenderer(SceneVisualizerPanel* panel)
 	ParticlesIcon =
 		AssetImporter::GetTexture("Magma/assets/icons/ParticlesIcon.png");
 
-	LightingPass =
-		RenderPass::Create("Lighting",
+	MeshPass =
+		RenderPass::Create("Mesh",
 			AssetImporter::GetShader({
-				"Magma/assets/shaders/Lighting.glsl.vert",
-				"Magma/assets/shaders/Lighting.glsl.frag"
+				"Magma/assets/shaders/Mesh.glsl.vert",
+				"Magma/assets/shaders/Mesh.glsl.frag"
 			}), m_Output);
-	LightingPass->SetData(Renderer3D::GetMeshBuffer());
+	MeshPass->SetData(Renderer3D::GetMeshBuffer());
 
 	MaskPass =
 		RenderPass::Create("Mask",
@@ -682,15 +682,13 @@ void EditorSceneRenderer::Begin() {
 	auto camera = m_Controller.GetCamera();
 
 	{
-		LightingCommand =
-			RendererAPI::Get()->NewDrawCommand(LightingPass->Get());
-		LightingCommand->Clear = true;
-		LightingCommand->UniformData
+		MeshCommand =
+			RendererAPI::Get()->NewDrawCommand(MeshPass->Get());
+		MeshCommand->Clear = true;
+		MeshCommand->UniformData
 		.SetInput("u_ViewProj", camera->GetViewProjection());
-		LightingCommand->UniformData
+		MeshCommand->UniformData
 		.SetInput("u_CameraPosition", camera->GetPosition());
-		LightingCommand->UniformData
-		.SetInput("u_SceneVisualizer", 1);
 	}
 
 	BillboardBuffer->Clear(DrawBufferIndex::Instances);
@@ -701,8 +699,8 @@ void EditorSceneRenderer::Begin() {
 	glm::vec3 planePos = glm::vec3(0.0f);
 	glm::vec3 planeNormal = glm::vec3(0.0f, 1.0f, 0.0f);
 	float t;
-	// if(glm::intersectRayPlane(pos, dir, planePos, planeNormal, t))
-	// 	AddBillboard(pos + t * dir, 0);
+	if(glm::intersectRayPlane(pos, dir, planePos, planeNormal, t))
+		AddBillboard(pos + t * dir, 0);
 
 	LineCommand = RendererAPI::Get()->NewDrawCommand(LinePass->Get());
 	LineCommand->DepthTest = DepthTestingMode::On;
@@ -785,7 +783,7 @@ void EditorSceneRenderer::SubmitSkybox(const Entity& entity) {
 	assetManager->Load(sc.CubemapAsset);
 	auto cubemap = assetManager->Get<Cubemap>(sc.CubemapAsset);
 
-	LightingCommand->UniformData
+	MeshCommand->UniformData
 	.SetInput("u_Skybox", CubemapSlot{ cubemap });
 }
 
@@ -825,7 +823,7 @@ void EditorSceneRenderer::SubmitMesh(const Entity& entity) {
 	assetManager->Load(mc.MeshAsset);
 	auto mesh = assetManager->Get<Mesh>(mc.MeshAsset);
 
-	Renderer::StartPass(LightingPass, false);
+	Renderer::StartPass(MeshPass, false);
 	{
 		Renderer3D::DrawMesh(mesh, tc);
 	}
@@ -833,13 +831,6 @@ void EditorSceneRenderer::SubmitMesh(const Entity& entity) {
 }
 
 void EditorSceneRenderer::Render() {
-	LightingCommand->UniformData
-	.SetInput("u_DirectionalLightCount", 0);
-	LightingCommand->UniformData
-	.SetInput("u_PointLightCount", 0);
-	LightingCommand->UniformData
-	.SetInput("u_SpotlightCount", 0);
-
 	Renderer3D::End();
 
 	if(Selected
@@ -856,7 +847,7 @@ void EditorSceneRenderer::Render() {
 			command->Clear = true;
 			command->UniformData
 			.SetInput("u_ViewProj",
-				LightingCommand->UniformData.Mat4Uniforms["u_ViewProj"]);
+				MeshCommand->UniformData.Mat4Uniforms["u_ViewProj"]);
 			command->UniformData
 			.SetInput("u_Color", glm::vec4(1.0f));
 

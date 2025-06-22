@@ -48,12 +48,6 @@ EditorApp::EditorApp(const CommandLineArgs& args)
 			"Magma/assets/shaders/Lighting.glsl.vert",
 			"Magma/assets/shaders/Lighting.glsl.frag"
 		}));
-	ShaderLibrary::Add("Mesh",
-		AssetImporter::GetShader({
-			"Magma/assets/shaders/Mesh.glsl.vert",
-			"Magma/assets/shaders/Mesh.glsl.frag"
-		}));
-
 	ShaderLibrary::Add("Light",
 		AssetImporter::GetShader({
 			"Magma/assets/shaders/Light.glsl.vert",

@@ -627,10 +627,15 @@ void EditorAssetManager::RuntimeSave(const std::string& exportPath) {
 
 		auto path = GetPath(asset.ID);
 		if(asset.Type == AssetType::Mesh) {
-			Load(asset);
-			auto mesh = Get<Mesh>(asset);
-
-			pack.Write(mesh->SubMeshes);
+			if(path == "") {
+				auto mesh = Get<Mesh>(asset);
+				pack.Write(mesh->SubMeshes);
+			}
+			else {
+				// List<SubMesh> meshes;
+				// List<MaterialPaths> materials;
+				// AssetImporter::GetMeshData(path, meshes, materials);
+			}
 		}
 		else if(asset.Type == AssetType::Texture) {
 			ImageData image = AssetImporter::GetImageData(path, false);
@@ -663,7 +668,34 @@ void EditorAssetManager::RuntimeSave(const std::string& exportPath) {
 		objectIdx = pack.GetPosition(); // Object position for next asset
 		pack.SetPosition(registryPos); // Return to registry position
 	}
-	VOLCANICORE_ASSERT(registrySize == registryPos);
+
+	Application::PushDir();
+
+	fs::create_directories(fs::path(exportPath) / "Asset" / "Shader");
+	for(std::string name : { "Framebuffer", "Lighting", "Mesh", "Light",
+		"Bloom", "Downsample", "Upsample",
+		"Particle", "ParticleEmitter", "ParticleUpdate" })
+	{
+		auto sourceRoot = fs::path("Magma") / "assets" / "shaders" / name;
+		auto targetRoot = fs::path(exportPath) / "Asset" / "Shader" / name;
+
+		for(std::string type : { "vert", "frag", "comp" }) {
+			auto source1 = sourceRoot.string() + ".glsl." + type;
+			auto target1 = targetRoot.string() + ".bin." + type;
+
+			if(!FileUtils::FileExists(source1))
+				continue;
+
+			if(FileUtils::FileExists(target1))
+				fs::remove(target1);
+
+			BinaryWriter writer(target1);
+			Buffer<uint32_t> data = AssetImporter::GetShaderData(source1);
+			writer.Write(data);
+		}
+	}
+
+	Application::PopDir();
 }
 
 }

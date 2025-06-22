@@ -116,9 +116,9 @@ void ScriptGlue::Copy(Ref<ScriptObject> src, Ref<ScriptObject> dst) {
 		if(field.TypeID > 0 && field.TypeID <= 11) // (Void, Double]
 			size = ScriptEngine::Get()->GetSizeOfPrimitiveType(field.TypeID);
 		else if(fieldType == "Asset")
-			size = sizeof(Vec3);
-		else if(fieldType == "Vec3")
 			size = sizeof(Asset);
+		else if(fieldType == "Vec3")
+			size = sizeof(Vec3);
 
 		if(size) {
 			void* us = dst->GetHandle()->GetAddressOfProperty(i);

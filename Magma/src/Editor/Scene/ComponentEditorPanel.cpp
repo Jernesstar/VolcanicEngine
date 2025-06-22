@@ -343,8 +343,10 @@ static void GridSetEditorPopup(Ref<ScriptObject> obj, const std::string& name) {
 		ImGui::SetNextItemWidth(50);
 		bool h = ImGui::InputScalar("Height", ImGuiDataType_U32, &height);
 
-		if(w || h)
-			data->Resize(width, height);
+		if(w)
+			data->ResizeX(width);
+		if(h)
+			data->ResizeY(height);
 
 		UI::Button button;
 		button.Display = CreateRef<UI::Text>();

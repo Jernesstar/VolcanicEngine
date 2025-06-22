@@ -12,6 +12,7 @@ AssetPack:
     - Asset:
         ID: 9099402520052546251
         Type: Script
+        Name: LevelButton
         Path: Script/Button1.as
     - Asset:
         ID: 10036008063945961451

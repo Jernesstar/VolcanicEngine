@@ -245,25 +245,25 @@ void ProjectTab::OnPlay(bool debug) {
 		m_ScreenState = ScreenState::Play;
 		tab->SaveScene();
 
+		App::Get()->PrepareScreen();
+		tab->Test(App::Get()->GetScene());
+
 		m_Debugging = debug;
 		if(m_Debugging)
 			ScriptManager::StartDebug();
 
-		App::Get()->PrepareScreen();
-		tab->Test(App::Get()->GetScene());
-
+		s_Updated = false;
 		s_AppThread = CreateRef<std::thread>(
 			[tab, scene, screen, this]()
 			{
 				App::Get()->Running = true;
 				App::Get()->OnLoad();
 				App::Get()->LoadScene(scene);
-
 				App::Get()->ScreenSet(screen);
 
 				while(true) {
 					std::unique_lock<std::mutex> lock(s_Mutex);
-					s_Condition.wait(lock, [&]() { return s_Updated; });
+					s_Condition.wait(lock, []() { return s_Updated; });
 					s_Updated = false;
 
 					if(s_State == ScreenState::Play)
@@ -274,25 +274,18 @@ void ProjectTab::OnPlay(bool debug) {
 						break;
 				}
 
-				App::Get()->Running = false;
 				App::Get()->OnClose();
+				App::Get()->Running = false;
 
 				asThreadCleanup();
 			});
 
 		s_AppThread->detach();
-
-		{
-			std::lock_guard<std::mutex> lock(s_Mutex);
-			s_State = m_ScreenState;
-			s_Updated = true;
-			s_Condition.notify_one();
-		}
 	}
 }
 
 void ProjectTab::OnPause() {
-	m_ScreenState = ScreenState::Edit;
+	m_ScreenState = ScreenState::Pause;
 	{
 		std::lock_guard<std::mutex> lock(s_Mutex);
 		s_State = m_ScreenState;
@@ -323,6 +316,8 @@ void ProjectTab::OnStop() {
 		s_Condition.notify_one();
 	}
 
+	s_AppThread.reset();
+
 	if(m_Debugging)
 		ScriptManager::EndDebug();
 	m_Debugging = false;
@@ -332,10 +327,6 @@ void ProjectTab::OnStop() {
 		auto tab = current->As<SceneTab>();
 		tab->Reset();
 	}
-
-	s_AppThread.reset();
-
-	s_Updated = false;
 }
 
 }

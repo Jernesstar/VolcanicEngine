@@ -113,16 +113,15 @@ template<>
 BinaryReader& BinaryReader::ReadObject(ScriptComponent& comp) {
 	uint64_t id;
 	Read(id);
-	Asset asset = { id, AssetType::Script };
-	comp.ModuleAsset = asset;
+	comp.ModuleAsset = { id, AssetType::Script };
 
 	std::string className;
 	Read(className);
 
 	auto* assetManager = AssetManager::Get();
-	assetManager->Load(asset);
+	assetManager->Load(comp.ModuleAsset);
 
-	auto mod = assetManager->Get<ScriptModule>(asset);
+	auto mod = assetManager->Get<ScriptModule>(comp.ModuleAsset);
 	auto _class = mod->GetClass(className);
 	comp.Instance = _class->Instantiate(s_CurrentEntity);
 
@@ -182,13 +181,14 @@ BinaryReader& BinaryReader::ReadObject(ScriptComponent& comp) {
 				array->InsertLast((char*)data.Get() + size * i);
 		}
 		else if(typeName == "Asset") {
+			auto* asset = field.As<Asset>();
+
 			uint64_t id;
 			Read(id);
-			asset.ID = id;
+			asset->ID = id;
 			uint8_t type;
 			Read(type);
-			asset.Type = (AssetType)type;
-			Read(asset.Primary);
+			asset->Type = (AssetType)type;
 		}
 		else if(typeName == "Vec3")
 			Read(*field.As<glm::vec3>());

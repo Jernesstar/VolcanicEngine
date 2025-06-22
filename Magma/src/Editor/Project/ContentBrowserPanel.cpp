@@ -254,10 +254,12 @@ void ContentBrowserPanel::RenderAssetTable() {
 				else
 					s_Selection = s_Asset;
 			}
-			if(ImGui::IsItemClicked(ImGuiMouseButton_Right))
-				ImGui::OpenPopup("Asset Options##");
+			if(ImGui::IsItemClicked(ImGuiMouseButton_Right)) {
+				s_Asset = asset;
+				ImGui::OpenPopup("Asset Options");
+			}
 
-			if(ImGui::BeginPopup("Asset Options")) {
+			if(asset == s_Asset && ImGui::BeginPopup("Asset Options")) {
 				if(ImGui::MenuItem("Delete"))
 					;
 
@@ -285,7 +287,7 @@ void ContentBrowserPanel::RenderAssetTable() {
 			else if(path != "")
 				ImGui::TextWrapped(path.c_str());
 			else
-				ImGui::Text("%llu", (uint64_t)asset.ID);
+				ImGui::Text("%lu", (uint64_t)asset.ID);
 		}
 
 		ImGui::EndTable();
@@ -352,7 +354,7 @@ void DrawAssetSelectWindow() {
 			else if(path != "")
 				ImGui::Text(fs::path(path).filename().string().c_str());
 			else
-				ImGui::Text("%llu", (uint64_t)s_Selection.ID);
+				ImGui::Text("%lu", (uint64_t)s_Selection.ID);
 		}
 		else {
 			ImGui::Text("No Asset Selected");

@@ -61,9 +61,8 @@ private:
 	Ref<Texture> CameraIcon;
 	Ref<Texture> ParticlesIcon;
 
-	// Lighting (and shadows?)
-	Ref<RenderPass> LightingPass;
-	DrawCommand* LightingCommand;
+	Ref<RenderPass> MeshPass;
+	DrawCommand* MeshCommand;
 
 	bool HasCamera = false;
 	bool HasDirectionalLight = false;
