@@ -157,11 +157,11 @@ void SceneVisualizerPanel::Add(ECS::Entity entity) {
 
 	auto& editor = Application::As<EditorApp>()->GetEditor();
 	auto& assetManager = editor.GetAssetManager();
-	if(!assetManager.IsValid(mc.MeshAsset))
+	if(!assetManager.IsValid(mc.MeshSourceAsset))
 		return;
 
-	assetManager.Load(mc.MeshAsset);
-	auto mesh = assetManager.Get<Mesh>(mc.MeshAsset);
+	assetManager.Load(mc.MeshSourceAsset);
+	auto mesh = assetManager.Get<Mesh>(mc.MeshSourceAsset);
 
 	auto shape = Shape::Create(mesh);
 	auto body = RigidBody::Create(RigidBody::Type::Static, shape);
@@ -218,9 +218,6 @@ void SceneVisualizerPanel::Draw() {
 		vMax.y += ImGui::GetWindowPos().y;
 
 		ImVec2 size = { vMax.x - vMin.x, vMax.y - vMin.y };
-
-		ImGui::GetForegroundDrawList()
-			->AddRect(vMin, vMax, IM_COL32(255, 255, 0, 255));
 
 		ImVec2 pos = ImGui::GetCursorPos();
 		ImVec2 screenPos = ImGui::GetCursorScreenPos();
@@ -469,7 +466,8 @@ void SceneVisualizerPanel::Draw() {
 
 			if(exit) {
 				if(asset.Type == AssetType::Mesh)
-					newEntity.Add<MeshComponent>(asset);
+					newEntity.Add<MeshComponent>(
+						asset, Asset{ 0, AssetType::Material });
 				else if(asset.Type == AssetType::Audio)
 					newEntity.Add<AudioComponent>(asset);
 
@@ -817,11 +815,11 @@ void EditorSceneRenderer::SubmitMesh(const Entity& entity) {
 	auto& tc = entity.Get<TransformComponent>();
 	auto& mc = entity.Get<MeshComponent>();
 
-	if(!assetManager->IsValid(mc.MeshAsset))
+	if(!assetManager->IsValid(mc.MeshSourceAsset))
 		return;
 
-	assetManager->Load(mc.MeshAsset);
-	auto mesh = assetManager->Get<Mesh>(mc.MeshAsset);
+	assetManager->Load(mc.MeshSourceAsset);
+	auto mesh = assetManager->Get<Mesh>(mc.MeshSourceAsset);
 
 	Renderer::StartPass(MeshPass, false);
 	{
@@ -839,8 +837,8 @@ void EditorSceneRenderer::Render() {
 		auto* assetManager = AssetManager::Get();
 		auto& tc = Selected.Get<TransformComponent>();
 		auto& mc = Selected.Get<MeshComponent>();
-		assetManager->Load(mc.MeshAsset);
-		auto mesh = assetManager->Get<Mesh>(mc.MeshAsset);
+		assetManager->Load(mc.MeshSourceAsset);
+		auto mesh = assetManager->Get<Mesh>(mc.MeshSourceAsset);
 
 		{
 			auto* command = RendererAPI::Get()->NewDrawCommand(MaskPass->Get());

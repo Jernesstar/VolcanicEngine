@@ -27,7 +27,8 @@ Scene:
               Rotation: [0, 0, 0]
               Scale: [1, 1, 1]
           MeshComponent:
-            AssetID: 4186775327602265389
+            MeshSourceID: 4186775327602265389
+            MaterialID: 0
     - Entity:
         Name: Cube2
         ID: 956
@@ -38,7 +39,8 @@ Scene:
               Rotation: [0, 0, 0]
               Scale: [22.2000008, 11, 10.5]
           MeshComponent:
-            AssetID: 10036008063945961451
+            MeshSourceID: 10036008063945961451
+            MaterialID: 0
     - Entity:
         Name: ""
         ID: 964
@@ -87,7 +89,8 @@ Scene:
               Rotation: [0, -0, 0.00305269379]
               Scale: [0.999973834, 0.999973834, 1]
           MeshComponent:
-            AssetID: 4186775327602265389
+            MeshSourceID: 4186775327602265389
+            MaterialID: 0
     - Entity:
         Name: ""
         ID: 970
@@ -114,7 +117,8 @@ Scene:
               Rotation: [0, 0.000174532892, 0]
               Scale: [1, 0.999973536, 0.999973536]
           MeshComponent:
-            AssetID: 15277418182178081176
+            MeshSourceID: 15277418182178081176
+            MaterialID: 0
           ScriptComponent:
             ModuleID: 2691709289590626850
             Class: PlayerController
@@ -123,18 +127,18 @@ Scene:
                   Name: soundAsset
                   Type: Asset
                   Value:
-                    ID: 16624656892553940704
-                    Type: Audio
+                    ID: 0
+                    Type: None
               - Field:
                   Name: meshAsset
                   Type: Asset
                   Value:
-                    ID: 10036008063945961451
-                    Type: Mesh
+                    ID: 0
+                    Type: None
               - Field:
                   Name: SomeBool
                   Type: bool
-                  Value: true
+                  Value: false
               - Field:
                   Name: Signed8
                   Type: int8
@@ -155,14 +159,10 @@ Scene:
                   Name: Grid
                   Type: GridSet
                   Value:
-                    Width: 5
-                    Height: 5
+                    Width: 0
+                    Height: 0
                     Data:
-                      - [1, 0, 0, 0, 1]
-                      - [0, 1, 0, 1, 0]
-                      - [0, 0, 1, 0, 0]
-                      - [0, 1, 0, 1, 0]
-                      - [1, 0, 0, 0, 1]
+                      []
               - Field:
                   Name: SomeVec3
                   Type: Vec3

@@ -66,7 +66,7 @@ class PlayerController : IEntityController
                 tc.Translation.x = x;
                 tc.Translation.y = y;
                 MeshComponent@ mc = new.AddMeshComponent();
-                mc.MeshAsset = meshAsset;
+                mc.MeshSourceAsset = meshAsset;
             }
         }
     }

@@ -223,7 +223,7 @@ void DrawComponent<AudioComponent>(Entity& entity) {
 	auto& component = entity.Set<AudioComponent>();
 	ImGui::SeparatorText("AudioComponent");
 
-	ImGui::Text("Asset ID: %lu", (uint64_t)component.AudioAsset.ID);
+	ImGui::Text("Asset ID: %llu", (uint64_t)component.AudioAsset.ID);
 	auto text = component.AudioAsset.ID ? "Change Asset" : "Set Asset";
 
 	auto panel =
@@ -243,18 +243,32 @@ void DrawComponent<MeshComponent>(Entity& entity) {
 
 	auto& component = entity.Set<MeshComponent>();
 	ImGui::SeparatorText("MeshComponent");
-
-	ImGui::Text("Asset ID: %llu", (uint64_t)component.MeshAsset.ID);
-	auto text = component.MeshAsset.ID ? "Change Asset" : "Set Asset";
-
+	
 	auto panel =
 		Editor::GetProjectTab()->
 				GetPanel("ContentBrowser")->As<ContentBrowserPanel>();
 
+	ImGui::Text("Mesh Source: %llu", (uint64_t)component.MeshSourceAsset.ID);
+	auto text = component.MeshSourceAsset.ID ? "Change Asset" : "Set Asset";
+
 	if(ImGui::Button(text))
 		panel->Select(AssetType::Mesh);
 	if(panel->HasSelection())
-		component.MeshAsset = panel->GetSelected();
+		component.MeshSourceAsset = panel->GetSelected();
+
+	auto assets = AssetManager::Get()->As<EditorAssetManager>();
+	if(assets->IsMagmaAsset(component.MeshSourceAsset)) {
+		ImGui::Text("Material: %llu", (uint64_t)component.MaterialAsset.ID);
+		std::string text =
+			component.MaterialAsset.ID ? "Change Asset" : "Set Asset";
+
+		if(ImGui::Button((text + "##2").c_str())) {
+			panel->CancelSelect();
+			panel->Select(AssetType::Material);
+		}
+		if(panel->HasSelection())
+			component.MaterialAsset = panel->GetSelected();
+	}
 }
 
 template<>
@@ -265,7 +279,7 @@ void DrawComponent<SkyboxComponent>(Entity& entity) {
 	auto& component = entity.Set<SkyboxComponent>();
 	ImGui::SeparatorText("SkyboxComponent");
 
-	ImGui::Text("Asset ID: %lu", (uint64_t)component.CubemapAsset.ID);
+	ImGui::Text("Asset ID: %llu", (uint64_t)component.CubemapAsset.ID);
 	auto text = component.CubemapAsset.ID ? "Change Asset" : "Set Asset";
 
 	auto panel =

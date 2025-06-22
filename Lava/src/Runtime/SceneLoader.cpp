@@ -93,7 +93,8 @@ template<>
 BinaryReader& BinaryReader::ReadObject(MeshComponent& comp) {
 	uint64_t id;
 	Read(id);
-	comp.MeshAsset = { id, AssetType::Mesh };
+	comp.MeshSourceAsset = { id, AssetType::Mesh };
+	comp.MaterialAsset = { id, AssetType::Mesh };
 
 	return *this;
 }

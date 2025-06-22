@@ -749,8 +749,10 @@ void RegisterECS() {
 		asOFFSET(AudioComponent, AudioAsset));
 
 	engine->RegisterObjectType("MeshComponent", 0, asOBJ_REF | asOBJ_NOCOUNT);
-	engine->RegisterObjectProperty("MeshComponent", "Asset MeshAsset",
-		asOFFSET(MeshComponent, MeshAsset));
+	engine->RegisterObjectProperty("MeshComponent", "Asset MeshSourceAsset",
+		asOFFSET(MeshComponent, MeshSourceAsset));
+	engine->RegisterObjectProperty("MeshComponent", "Asset MaterialAsset",
+		asOFFSET(MeshComponent, MaterialAsset));
 
 	engine->RegisterObjectType("SkyboxComponent", 0, asOBJ_REF | asOBJ_NOCOUNT);
 	engine->RegisterObjectProperty("SkyboxComponent", "Asset CubemapAsset",

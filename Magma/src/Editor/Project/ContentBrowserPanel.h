@@ -20,6 +20,7 @@ public:
 	void Draw() override;
 
 	void Select(AssetType type, uint32_t id = 0);
+	bool IsSelecting();
 	void CancelSelect();
 	bool HasSelection(uint32_t id = 0);
 	Asset GetSelected();

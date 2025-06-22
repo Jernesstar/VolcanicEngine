@@ -306,6 +306,10 @@ void ContentBrowserPanel::Select(AssetType type, uint32_t id) {
 		s_Position.x -= 131.0f;
 }
 
+bool ContentBrowserPanel::IsSelecting() {
+	return s_Selecting;
+}
+
 void ContentBrowserPanel::CancelSelect() {
 	s_Selecting = false;
 	s_SelectionID = 0;

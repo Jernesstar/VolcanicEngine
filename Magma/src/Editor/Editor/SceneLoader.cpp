@@ -309,21 +309,23 @@ void SerializeEntity(YAMLSerializer& serializer, const Entity& entity) {
 		.EndMapping(); // TransformComponent
 	}
 	if(entity.Has<AudioComponent>()) {
-		auto asset = entity.Get<AudioComponent>().AudioAsset;
+		Asset asset = entity.Get<AudioComponent>().AudioAsset;
 		serializer.WriteKey("AudioComponent")
 		.BeginMapping()
 			.WriteKey("AssetID").Write((uint64_t)asset.ID)
 		.EndMapping();
 	}
 	if(entity.Has<MeshComponent>()) {
-		auto asset = entity.Get<MeshComponent>().MeshAsset;
+		Asset meshSource = entity.Get<MeshComponent>().MeshSourceAsset;
+		Asset material = entity.Get<MeshComponent>().MaterialAsset;
 		serializer.WriteKey("MeshComponent")
 		.BeginMapping()
-			.WriteKey("AssetID").Write((uint64_t)asset.ID)
+			.WriteKey("MeshSourceID").Write((uint64_t)meshSource.ID)
+			.WriteKey("MaterialID").Write((uint64_t)material.ID)
 		.EndMapping();
 	}
 	if(entity.Has<SkyboxComponent>()) {
-		auto asset = entity.Get<SkyboxComponent>().CubemapAsset;
+		Asset asset = entity.Get<SkyboxComponent>().CubemapAsset;
 		serializer.WriteKey("SkyboxComponent")
 		.BeginMapping()
 			.WriteKey("AssetID").Write((uint64_t)asset.ID)
@@ -609,8 +611,11 @@ void DeserializeEntity(YAML::Node entityNode, Scene& scene) {
 
 	auto meshComponentNode = components["MeshComponent"];
 	if(meshComponentNode) {
-		auto id = meshComponentNode["AssetID"].as<uint64_t>();
-		entity.Add<MeshComponent>(Asset{ id, AssetType::Mesh });
+		auto sourceID = meshComponentNode["MeshSourceID"].as<uint64_t>();
+		auto materialID = meshComponentNode["MaterialID"].as<uint64_t>();
+		entity.Add<MeshComponent>(
+			Asset{ sourceID, AssetType::Mesh },
+			Asset{ materialID, AssetType::Material });
 	}
 
 	auto skyboxComponentNode = components["SkyboxComponent"];
@@ -775,7 +780,8 @@ BinaryWriter& BinaryWriter::WriteObject(const AudioComponent& comp) {
 
 template<>
 BinaryWriter& BinaryWriter::WriteObject(const MeshComponent& comp) {
-	Write((uint64_t)comp.MeshAsset.ID);
+	Write((uint64_t)comp.MeshSourceAsset.ID);
+	Write((uint64_t)comp.MaterialAsset.ID);
 	return *this;
 }
 

@@ -389,15 +389,15 @@ void RuntimeSceneRenderer::SubmitMesh(const Entity& entity) {
 	auto& mc = entity.Get<MeshComponent>();
 	auto* assetManager = AssetManager::Get();
 
-	if(!assetManager->IsValid(mc.MeshAsset))
+	if(!assetManager->IsValid(mc.MeshSourceAsset))
 		return;
 
-	assetManager->Load(mc.MeshAsset);
-	auto mesh = assetManager->Get<Mesh>(mc.MeshAsset);
+	assetManager->Load(mc.MeshSourceAsset);
+	auto mesh = assetManager->Get<Mesh>(mc.MeshSourceAsset);
 
 	Renderer::StartPass(LightingPass);
 	{
-		// Renderer3D::DrawMesh(mesh, tc);
+		Renderer3D::DrawMesh(mesh, tc);
 	}
 	Renderer::EndPass();
 }

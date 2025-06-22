@@ -67,11 +67,12 @@ struct AudioComponent : public Component {
 };
 
 struct MeshComponent : public Component {
-	Asset MeshAsset;
+	Asset MeshSourceAsset;
+	Asset MaterialAsset;
 
 	MeshComponent() = default;
-	MeshComponent(const Asset& asset)
-		: MeshAsset(asset) { }
+	MeshComponent(const Asset& source, const Asset& mat)
+		: MeshSourceAsset(source), MaterialAsset(mat) { }
 	MeshComponent(const MeshComponent& other) = default;
 };
 
