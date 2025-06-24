@@ -20,6 +20,14 @@ using Vec2 = Vec2f;
 using Vec3 = Vec3f;
 using Vec4 = Vec4f;
 
+using Mat2f = glm::mat2;
+using Mat3f = glm::mat3;
+using Mat4f = glm::mat4;
+
+using Mat2 = Mat2f;
+using Mat3 = Mat3f;
+using Mat4 = Mat4f;
+
 constexpr float PI = 3.14159265358979328462f;
 constexpr float e  = 2.71828182859f;
 

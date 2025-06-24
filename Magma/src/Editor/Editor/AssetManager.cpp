@@ -3,6 +3,8 @@
 #include <iostream>
 #include <bitset>
 
+#include <glm/gtc/matrix_access.hpp>
+
 #include <efsw/efsw.hpp>
 
 #include <VolcaniCore/Core/Application.h>
@@ -60,6 +62,8 @@ AssetType AssetTypeFromString(const std::string& str) {
 		return AssetType::Audio;
 	else if(str == "Script")
 		return AssetType::Script;
+	else if(str == "Material")
+		return AssetType::Material;
 
 	return AssetType::None;
 }
@@ -299,19 +303,32 @@ Asset EditorAssetManager::Add(AssetType type, UUID id, bool primary,
 		m_Paths[newAsset.ID] = path;
 
 	if(type == AssetType::Mesh && path != "") {
-		// List<SubMesh> meshes;
-		// List<MaterialPaths> materials;
-		// AssetImporter::GetMeshData(path, meshes, materials);
-		// for(auto matPaths : materials) {
-		// 	Asset material = Add(AssetType::Material, 0, false);
-		// 	AddRef(newAsset, material);
+		List<SubMesh> meshes;
+		List<MaterialPaths> materials;
+		AssetImporter::GetMeshData(path, meshes, materials);
+		for(auto matPaths : materials) {
+			Asset materialAsset = Add(AssetType::Material, 0, false);
+			AddRef(newAsset, materialAsset);
+			auto mat = Get<Material>(materialAsset);
 
-		// 	for(uint32_t i = 0; i < 3; i++) {
-		// 		std::string image = matPaths[i];
-		// 		if(image != "")
-		// 			AddRef(material, Add(AssetType::Texture, 0, false, image));
-		// 	}
-		// }
+			List<std::string> names =
+				{ "u_Diffuse", "u_Specular", "u_Emissive" };
+			for(uint32_t i = 0; i < 3; i++) {
+				auto name = names[i];
+				auto refPath = matPaths[i];
+				mat->Vec4Uniforms[name + "Color"] =
+					*(&matPaths.DiffuseColor + i);
+
+				if(refPath == "") {
+					mat->TextureUniforms[name] = 0;
+					continue;
+				}
+
+				Asset textureAsset = Add(AssetType::Texture, 0, false, refPath);
+				AddRef(materialAsset, textureAsset);
+				mat->TextureUniforms[name] = textureAsset.ID;
+			}
+		}
 	}
 	else if(type == AssetType::Material)
 		m_MaterialAssets[newAsset.ID] = CreateRef<Material>();
@@ -343,9 +360,7 @@ std::string EditorAssetManager::GetPath(UUID id) const {
 }
 
 bool EditorAssetManager::IsMagmaAsset(Asset asset) {
-	return false;
-
-	return (asset.ID << 1) & 0b1 == 0;
+	return (uint64_t)asset.ID % 100'000 == 12345;
 }
 
 void EditorAssetManager::Load(const std::string& path) {
@@ -401,7 +416,7 @@ void EditorAssetManager::Load(const std::string& path) {
 		auto node = assetNode["Asset"];
 		AssetType type = AssetTypeFromString(node["Type"].as<std::string>());
 		UUID id = node["ID"].as<uint64_t>();
-		std::string path = "";
+		std::string path;
 		if(node["Path"]) {
 			path = (rootPath / node["Path"].as<std::string>()).generic_string();
 			if(!fs::exists(path))
@@ -409,38 +424,70 @@ void EditorAssetManager::Load(const std::string& path) {
 		}
 
 		Asset asset = Add(type, id, true, path);
-
-		if(type == AssetType::Mesh && !node["Path"]) {
-			auto type = (MeshType)node["MeshType"].as<uint32_t>();
-			// auto materialID = node["MaterialID"].as<uint64_t>();
-			m_MeshAssets[id] = Mesh::Create(type);
-
-			// AddRef(asset, { materialID, AssetType::Material, false });
-		}
-		else if(type == AssetType::Material) {
-			// if(materialNode["Diffuse"])
-			// 	mat.Diffuse =
-			// 		AssetImporter::GetTexture(
-			// 			materialNode["Diffuse"]["Path"].as<std::string>());
-			// if(materialNode["Specular"])
-			// 	mat.Specular =
-			// 		AssetImporter::GetTexture(
-			// 			materialNode["Specular"]["Path"].as<std::string>());
-			// if(materialNode["Emissive"])
-			// 	mat.Emissive =
-			// 		AssetImporter::GetTexture(
-			// 			materialNode["Emissive"]["Path"].as<std::string>());
-
-			// mat.DiffuseColor = materialNode["DiffuseColor"].as<glm::vec4>();
-			// mat.SpecularColor = materialNode["SpecularColor"].as<glm::vec4>();
-			// mat.EmissiveColor = materialNode["EmissiveColor"].as<glm::vec4>();
-
-		}
-
 		if(node["Name"])
 			NameAsset(asset, node["Name"].as<std::string>());
+
+		if(type == AssetType::Material) {
+			auto mat = Get<Material>(asset);
+			auto matNode = node["Material"];
+			for(auto intUniformNode : node["IntUniforms"]) {
+				auto intUniform = intUniformNode["Uniform"];
+				auto name = intUniform["Name"].as<std::string>();
+				auto data = intUniform["Data"].as<int32_t>();
+				mat->IntUniforms[name] = data;
+			}
+			for(auto floatUniformNode : node["FloatUniforms"]) {
+				auto floatUniform = floatUniformNode["Uniform"];
+				auto name = floatUniform["Name"].as<std::string>();
+				auto data = floatUniform["Data"].as<float>();
+				mat->FloatUniforms[name] = data;
+			}
+			for(auto vec2UniformNode : node["Vec2Uniforms"]) {
+				auto vec2Uniform = vec2UniformNode["Uniform"];
+				auto name = vec2Uniform["Name"].as<std::string>();
+				auto data = vec2Uniform["Data"].as<glm::vec2>();
+				mat->Vec2Uniforms[name] = data;
+			}
+			for(auto vec3UniformNode : node["Vec3Uniforms"]) {
+				auto vec3Uniform = vec3UniformNode["Uniform"];
+				auto name = vec3Uniform["Name"].as<std::string>();
+				auto data = vec3Uniform["Data"].as<glm::vec3>();
+				mat->Vec3Uniforms[name] = data;
+			}
+			for(auto vec4UniformNode : node["Vec4Uniforms"]) {
+				auto vec4Uniform = vec4UniformNode["Uniform"];
+				auto name = vec4Uniform["Name"].as<std::string>();
+				auto data = vec4Uniform["Data"].as<glm::vec4>();
+				mat->Vec4Uniforms[name] = data;
+			}
+			for(auto mat2UniformNode : node["Mat2Uniforms"]) {
+				auto mat2Uniform = mat2UniformNode["Uniform"];
+				auto name = mat2Uniform["Name"].as<std::string>();
+				auto data = mat2Uniform["Data"].as<glm::mat2>();
+				mat->Mat2Uniforms[name] = data;
+			}
+			for(auto mat3UniformNode : node["Vec3Uniforms"]) {
+				auto mat3Uniform = mat3UniformNode["Uniform"];
+				auto name = mat3Uniform["Name"].as<std::string>();
+				auto data = mat3Uniform["Data"].as<glm::mat3>();
+				mat->Mat3Uniforms[name] = data;
+			}
+			for(auto mat4UniformNode : node["Mat4Uniforms"]) {
+				auto mat4Uniform = mat4UniformNode["Uniform"];
+				auto name = mat4Uniform["Name"].as<std::string>();
+				auto data = mat4Uniform["Data"].as<glm::mat4>();
+				mat->Mat4Uniforms[name] = data;
+			}
+			for(auto textureUniformNode : node["TextureUniforms"]) {
+				auto textureUniform = textureUniformNode["Uniform"];
+				auto name = textureUniform["Name"].as<std::string>();
+				auto data = textureUniform["Data"].as<uint64_t>();
+				mat->TextureUniforms[name] = data;
+			}
+		}
 	}
 
+	// New assets
 	List<fs::path> paths
 	{
 		(rootPath / "Mesh"),
@@ -451,7 +498,6 @@ void EditorAssetManager::Load(const std::string& path) {
 		(rootPath / "Audio"),
 		(rootPath / "Script"),
 	};
-
 	uint32_t i = 1;
 	for(auto& folder : paths) {
 		for(auto path : FileUtils::GetFiles(folder.string())) {
@@ -462,6 +508,12 @@ void EditorAssetManager::Load(const std::string& path) {
 		}
 		i++;
 	}
+
+	// Magma assets
+	Asset cubeMesh = Add(AssetType::Mesh, 10012345);
+	m_MeshAssets[cubeMesh.ID] = Mesh::Create(MeshType::Cube);
+	Asset quadMesh = Add(AssetType::Mesh, 10112345);
+	m_MeshAssets[cubeMesh.ID] = Mesh::Create(MeshType::Quad);
 }
 
 void EditorAssetManager::Save() {
@@ -478,9 +530,7 @@ void EditorAssetManager::Save() {
 
 	serializer.WriteKey("Assets").BeginSequence();
 	for(auto& [asset, _] : m_AssetRegistry) {
-		if(!asset.Primary)
-			continue;
-		if(IsMagmaAsset(asset))
+		if(!asset.Primary || IsMagmaAsset(asset))
 			continue;
 
 		serializer.BeginMapping();
@@ -495,46 +545,124 @@ void EditorAssetManager::Save() {
 		if(path != "")
 			serializer.WriteKey("Path")
 				.Write(fs::relative(path, rootPath).generic_string());
-		else {
-			if(asset.Type == AssetType::Mesh) {
-				Ref<Mesh> mesh = Get<Mesh>(asset);
-				const SubMesh& subMesh = mesh->SubMeshes[0];
-				serializer.WriteKey("MeshType").Write((uint32_t)mesh->Type);
 
-				// const List<Asset>& refs = GetRefs(asset);
-				// serializer.WriteKey("MaterialID").Write((uint64_t)refs[0].ID);
+		if(asset.Type == AssetType::Material) {
+			serializer.WriteKey("Material").BeginMapping();
+			auto mat = Get<Material>(asset);
+
+			serializer.WriteKey("IntUniforms").BeginSequence();
+			for(auto& [name, data] : mat->IntUniforms) {
+				serializer.BeginMapping()
+				.WriteKey("Uniform").BeginMapping()
+					.WriteKey("Name").Write(name)
+					.WriteKey("Data").Write(data)
+					.EndMapping()
+				.EndMapping();
 			}
-			else if(asset.Type == AssetType::Material) {
-				// for(auto floatUniform : )
+			serializer.EndSequence();
 
-				// auto& mat = mesh->Materials[subMesh.MaterialIndex];
-				// if(mat.Diffuse)
-				// 	serializer.WriteKey("Diffuse")
-				// 	.BeginMapping()
-				// 		.WriteKey("Path").Write(m_Paths[refs[0].ID])
-				// 	.EndMapping();
-
-				// if(mat.Specular)
-				// 	serializer.WriteKey("Specular")
-				// 	.BeginMapping()
-				// 		.WriteKey("Path").Write(m_Paths[refs[1].ID])
-				// 	.EndMapping();
-
-				// if(mat.Emissive)
-				// 	serializer.WriteKey("Emissive")
-				// 	.BeginMapping()
-				// 		.WriteKey("Path").Write(m_Paths[refs[2].ID])
-				// 	.EndMapping();
-
-				// serializer
-				// 	.WriteKey("DiffuseColor").Write(mat.DiffuseColor);
-				// serializer
-				// 	.WriteKey("SpecularColor").Write(mat.SpecularColor);
-				// serializer
-				// 	.WriteKey("EmissiveColor").Write(mat.EmissiveColor);
-
-				// serializer.EndMapping();
+			serializer.WriteKey("FloatUniforms").BeginSequence();
+			for(auto& [name, data] : mat->FloatUniforms) {
+				serializer.BeginMapping()
+				.WriteKey("Uniform").BeginMapping()
+					.WriteKey("Name").Write(name)
+					.WriteKey("Data").Write(data)
+					.EndMapping()
+				.EndMapping();
 			}
+			serializer.EndSequence();
+
+			serializer.WriteKey("Vec2Uniforms").BeginSequence();
+			for(auto& [name, data] : mat->Vec2Uniforms) {
+				serializer.BeginMapping()
+				.WriteKey("Uniform").BeginMapping()
+					.WriteKey("Name").Write(name)
+					.WriteKey("Data").Write(data)
+					.EndMapping()
+				.EndMapping();
+			}
+			serializer.EndSequence();
+
+			serializer.WriteKey("Vec3Uniforms").BeginSequence();
+			for(auto& [name, data] : mat->Vec3Uniforms) {
+				serializer.BeginMapping()
+				.WriteKey("Uniform").BeginMapping()
+					.WriteKey("Name").Write(name)
+					.WriteKey("Data").Write(data)
+					.EndMapping()
+				.EndMapping();
+			}
+			serializer.EndSequence();
+
+			serializer.WriteKey("Vec4Uniforms").BeginSequence();
+			for(auto& [name, data] : mat->Vec4Uniforms) {
+				serializer.BeginMapping()
+				.WriteKey("Uniform").BeginMapping()
+					.WriteKey("Name").Write(name)
+					.WriteKey("Data").Write(data)
+					.EndMapping()
+				.EndMapping();
+			}
+			serializer.EndSequence();
+
+			serializer.WriteKey("Mat2Uniforms").BeginSequence();
+			for(auto& [name, data] : mat->Mat2Uniforms) {
+				serializer.BeginMapping()
+				.WriteKey("Uniform").BeginMapping()
+					.WriteKey("Name").Write(name)
+					.WriteKey("Data")
+						.BeginSequence()
+							.Write(glm::row(data, 0))
+							.Write(glm::row(data, 1))
+						.EndSequence()
+					.EndMapping()
+				.EndMapping();
+			}
+			serializer.EndSequence();
+			serializer.WriteKey("Mat3Uniforms").BeginSequence();
+			for(auto& [name, data] : mat->Mat3Uniforms) {
+				serializer.BeginMapping()
+				.WriteKey("Uniform").BeginMapping()
+					.WriteKey("Name").Write(name)
+					.WriteKey("Data")
+						.BeginSequence()
+							.Write(glm::row(data, 0))
+							.Write(glm::row(data, 1))
+							.Write(glm::row(data, 2))
+						.EndSequence()
+					.EndMapping()
+				.EndMapping();
+			}
+			serializer.EndSequence();
+			serializer.WriteKey("Mat4Uniforms").BeginSequence();
+			for(auto& [name, data] : mat->Mat4Uniforms) {
+				serializer.BeginMapping()
+				.WriteKey("Uniform").BeginMapping()
+					.WriteKey("Name").Write(name)
+					.WriteKey("Data")
+						.BeginSequence()
+							.Write(glm::row(data, 0))
+							.Write(glm::row(data, 1))
+							.Write(glm::row(data, 2))
+							.Write(glm::row(data, 3))
+						.EndSequence()
+					.EndMapping()
+				.EndMapping();
+			}
+			serializer.EndSequence();
+
+			serializer.WriteKey("TextureUniforms").BeginSequence();
+			for(auto& [name, id] : mat->TextureUniforms) {
+				serializer.BeginMapping()
+				.WriteKey("Uniform").BeginMapping()
+					.WriteKey("Name").Write(name)
+					.WriteKey("Data").Write((uint64_t)id)
+					.EndMapping()
+				.EndMapping();
+			}
+			serializer.EndSequence();
+
+			serializer.EndMapping(); // Material
 		}
 
 		serializer.EndMapping(); // Asset
@@ -586,7 +714,30 @@ BinaryWriter& BinaryWriter::WriteObject(const SubMesh& mesh) {
 template<>
 BinaryWriter& BinaryWriter::WriteObject(const Vec4& vec) {
 	WriteData(&vec.x, sizeof(Vec4));
+	return *this;
+}
 
+template<>
+BinaryWriter& BinaryWriter::WriteObject(const Mat2& mat) {
+	WriteData(glm::value_ptr(mat), sizeof(Mat2));
+	return *this;
+}
+
+template<>
+BinaryWriter& BinaryWriter::WriteObject(const Mat3& mat) {
+	WriteData(glm::value_ptr(mat), sizeof(Mat3));
+	return *this;
+}
+
+template<>
+BinaryWriter& BinaryWriter::WriteObject(const Mat4& mat) {
+	WriteData(glm::value_ptr(mat), sizeof(Vec4));
+	return *this;
+}
+
+template<>
+BinaryWriter& BinaryWriter::WriteObject(const UUID& uuid) {
+	Write((uint64_t)uuid);
 	return *this;
 }
 
@@ -603,6 +754,9 @@ void EditorAssetManager::RuntimeSave(const std::string& exportPath) {
 
 	uint64_t objectIdx = pack.GetPosition();
 	for(const auto& [asset, _] : m_AssetRegistry) {
+		if(IsMagmaAsset(asset))
+			continue;
+
 		objectIdx += sizeof(uint64_t) + sizeof(uint8_t) + sizeof(bool); // ID, Type, Primary
 		objectIdx += sizeof(uint64_t); // Object Index
 
@@ -619,6 +773,9 @@ void EditorAssetManager::RuntimeSave(const std::string& exportPath) {
 	uint64_t registryPos = 0;
 	uint64_t registrySize = objectIdx;
 	for(const auto& [asset, _] : m_AssetRegistry) {
+		if(IsMagmaAsset(asset))
+			continue;
+
 		pack.Write(asset); // Asset data (type, id, primary, name, refs)
 		pack.Write(objectIdx); // Where the Asset points to, the actual object
 
@@ -627,15 +784,9 @@ void EditorAssetManager::RuntimeSave(const std::string& exportPath) {
 
 		auto path = GetPath(asset.ID);
 		if(asset.Type == AssetType::Mesh) {
-			if(path == "") {
-				auto mesh = Get<Mesh>(asset);
-				pack.Write(mesh->SubMeshes);
-			}
-			else {
-				// List<SubMesh> meshes;
-				// List<MaterialPaths> materials;
-				// AssetImporter::GetMeshData(path, meshes, materials);
-			}
+			Load(asset);
+			auto mesh = Get<Mesh>(asset);
+			pack.Write(mesh->SubMeshes);
 		}
 		else if(asset.Type == AssetType::Texture) {
 			ImageData image = AssetImporter::GetImageData(path, false);
@@ -662,7 +813,17 @@ void EditorAssetManager::RuntimeSave(const std::string& exportPath) {
 			mod->Discard();
 		}
 		else if(asset.Type == AssetType::Material) {
-			pack.Write((uint32_t)5);
+			auto mat = Get<Material>(asset);
+
+			pack.Write(mat->IntUniforms);
+			pack.Write(mat->FloatUniforms);
+			pack.Write(mat->Vec2Uniforms);
+			pack.Write(mat->Vec3Uniforms);
+			pack.Write(mat->Vec4Uniforms);
+			pack.Write(mat->Mat2Uniforms);
+			pack.Write(mat->Mat3Uniforms);
+			pack.Write(mat->Mat4Uniforms);
+			pack.Write(mat->TextureUniforms);
 		}
 
 		objectIdx = pack.GetPosition(); // Object position for next asset
@@ -697,33 +858,5 @@ void EditorAssetManager::RuntimeSave(const std::string& exportPath) {
 
 	Application::PopDir();
 }
-
-}
-
-namespace YAML {
-
-template<>
-struct convert<glm::vec4> {
-	static Node encode(const glm::vec4& v) {
-		Node node;
-		node.push_back(v.x);
-		node.push_back(v.y);
-		node.push_back(v.z);
-		node.push_back(v.w);
-		node.SetStyle(EmitterStyle::Flow);
-		return node;
-	}
-
-	static bool decode(const Node& node, glm::vec4& v) {
-		if(!node.IsSequence() || node.size() != 4)
-			return false;
-
-		v.x = node[0].as<float>();
-		v.y = node[1].as<float>();
-		v.z = node[2].as<float>();
-		v.w = node[3].as<float>();
-		return true;
-	}
-};
 
 }

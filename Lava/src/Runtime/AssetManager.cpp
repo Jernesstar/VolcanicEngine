@@ -2,6 +2,8 @@
 
 #include <bitset>
 
+#include <VolcaniCore/Core/Math.h>
+
 #include <Magma/Core/BinaryReader.h>
 
 namespace Lava {
@@ -54,6 +56,32 @@ BinaryReader& BinaryReader::ReadObject(SubMesh& mesh) {
 	return *this;
 }
 
+template<>
+BinaryReader& BinaryReader::ReadObject(Mat2& mat) {
+	ReadData(glm::value_ptr(mat), sizeof(Mat2));
+	return *this;
+}
+
+template<>
+BinaryReader& BinaryReader::ReadObject(Mat3& mat) {
+	ReadData(glm::value_ptr(mat), sizeof(Mat3));
+	return *this;
+}
+
+template<>
+BinaryReader& BinaryReader::ReadObject(Mat4& mat) {
+	ReadData(glm::value_ptr(mat), sizeof(Vec4));
+	return *this;
+}
+
+template<>
+BinaryReader& BinaryReader::ReadObject(UUID& uuid) {
+	uint64_t id;
+	Read(id);
+	uuid = id;
+	return *this;
+}
+
 }
 
 namespace Lava {
@@ -70,11 +98,22 @@ void RuntimeAssetManager::Load(Asset asset) {
 		Ref<Mesh> mesh = CreateRef<Mesh>(MeshType::Model);
 		pack.Read(mesh->SubMeshes);
 
-		for(const auto& ref : GetRefs(asset)) {
+		for(auto& ref : GetRefs(asset)) {
 			auto& mat = mesh->Materials.Emplace();
 			Load(ref);
 			auto material = Get<Magma::Material>(asset);
-			// TODO
+
+			mat.DiffuseColor = material->Vec4Uniforms["u_DiffuseColor"];
+			mat.SpecularColor = material->Vec4Uniforms["u_SpecularColor"];
+			mat.EmissiveColor = material->Vec4Uniforms["u_EmissiveColor"];
+
+			UUID id = 0;
+			id = material->TextureUniforms["u_Diffuse"];
+			mat.Diffuse = Get<Texture>(Asset{ id, AssetType::Texture });
+			id = material->TextureUniforms["u_Specular"];
+			mat.Specular = Get<Texture>(Asset{ id, AssetType::Texture });
+			id = material->TextureUniforms["u_Emissive"];
+			mat.Emissive = Get<Texture>(Asset{ id, AssetType::Texture });
 		}
 
 		m_MeshAssets[asset.ID] = mesh;
@@ -125,37 +164,16 @@ void RuntimeAssetManager::Load(Asset asset) {
 		m_ScriptAssets[asset.ID] = CreateRef<ScriptModule>(handle);
 	}
 	else if(asset.Type == AssetType::Material) {
-		uint32_t test;
-		pack.Read(test);
-		VOLCANICORE_ASSERT(test == 5);
-		m_MaterialAssets[asset.ID] = CreateRef<Magma::Material>();
-		// List<uint8_t> materialFlags;
-		// pack.Read(materialFlags);
+		auto mat = m_MaterialAssets[asset.ID] = CreateRef<Magma::Material>();
 
-		// uint64_t refIdx = 0;
-		// List<Asset> refs;
-		// if(HasRefs(asset))
-		// 	refs = m_References[asset.ID];
-
-		// for(uint64_t i = 0; i < materialFlags.Count(); i++) {
-		// 	std::bitset<3> flags(materialFlags[i]);
-		// 	pack.Read(mesh->Materials[i].DiffuseColor);
-		// 	pack.Read(mesh->Materials[i].SpecularColor);
-		// 	pack.Read(mesh->Materials[i].EmissiveColor);
-
-		// 	if(flags.test(0)) {
-		// 		Load(refs[refIdx]);
-		// 		mesh->Materials[i].Diffuse = Get<Texture>(refs[refIdx++]);
-		// 	}
-		// 	if(flags.test(1)) {
-		// 		Load(refs[refIdx]);
-		// 		mesh->Materials[i].Specular = Get<Texture>(refs[refIdx++]);
-		// 	}
-		// 	if(flags.test(2)) {
-		// 		Load(refs[refIdx]);
-		// 		mesh->Materials[i].Emissive = Get<Texture>(refs[refIdx++]);
-		// 	}
-		// }
+		pack.Read(mat->IntUniforms);
+		pack.Read(mat->FloatUniforms);
+		pack.Read(mat->Vec2Uniforms);
+		pack.Read(mat->Vec3Uniforms);
+		pack.Read(mat->Vec4Uniforms);
+		pack.Read(mat->Mat2Uniforms);
+		pack.Read(mat->Mat3Uniforms);
+		pack.Read(mat->Mat4Uniforms);
 	}
 }
 

@@ -39,8 +39,8 @@ Scene:
               Rotation: [0, 0, 0]
               Scale: [22.2000008, 11, 10.5]
           MeshComponent:
-            MeshSourceID: 10036008063945961451
-            MaterialID: 0
+            MeshSourceID: 10012345
+            MaterialID: 11837670142847334937
     - Entity:
         Name: ""
         ID: 964
@@ -64,7 +64,7 @@ Scene:
               Ambient: [1, 1, 1]
               Diffuse: [1, 1, 1]
               Specular: [1, 1, 1]
-              Position: [-1.45145547, 1.17734766, 9.42599583]
+              Position: [-2.35150003, 1.17734766, 9.42599583]
               Direction: [0, 0, -1]
               CutoffAngle: 0.200000003
               OuterCutoffAngle: 0.300000012

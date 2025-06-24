@@ -264,9 +264,9 @@ void DrawComponent<MeshComponent>(Entity& entity) {
 
 		if(ImGui::Button((text + "##2").c_str())) {
 			panel->CancelSelect();
-			panel->Select(AssetType::Material);
+			panel->Select(AssetType::Material, 1);
 		}
-		if(panel->HasSelection())
+		if(panel->HasSelection(1))
 			component.MaterialAsset = panel->GetSelected();
 	}
 }

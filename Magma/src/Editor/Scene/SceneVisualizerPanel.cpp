@@ -660,20 +660,22 @@ void EditorSceneRenderer::Update(TimeStep ts) {
 
 void EditorSceneRenderer::AddBillboard(const glm::vec3& pos, uint32_t type) {
 	glm::vec3 cameraPos = m_Controller.GetCamera()->GetPosition();
-	float distance = glm::distance(cameraPos, pos);
+	Billboards.Add({ pos, type });
 
-	// Put them in the list farthest to closest
-	auto [found, i] =
-		Billboards.FindLast( // The minimal distance pair with greater distance
-			[=](const std::pair<glm::vec3, uint32_t>& pair) -> bool
-			{
-				return distance < glm::distance(pair.first, cameraPos);
-			});
+	// float distance = glm::distance(cameraPos, pos);
 
-	if(!found) // Farthest thing
-		Billboards.Insert(0, { pos, type });
-	else
-		Billboards.Insert(i + 1, { pos, type });
+	// // Put them in the list farthest to closest
+	// auto [found, i] =
+	// 	Billboards.FindLast( // The minimal distance pair with greater distance
+	// 		[=](const std::pair<glm::vec3, uint32_t>& pair) -> bool
+	// 		{
+	// 			return distance < glm::distance(pair.first, cameraPos);
+	// 		});
+
+	// if(!found) // Farthest thing
+	// 	Billboards.Insert(0, { pos, type });
+	// else
+	// 	Billboards.Insert(i + 1, { pos, type });
 }
 
 void EditorSceneRenderer::Begin() {
@@ -696,9 +698,10 @@ void EditorSceneRenderer::Begin() {
 	glm::vec3 dir = camera->GetDirection();
 	glm::vec3 planePos = glm::vec3(0.0f);
 	glm::vec3 planeNormal = glm::vec3(0.0f, 1.0f, 0.0f);
-	float t;
-	if(glm::intersectRayPlane(pos, dir, planePos, planeNormal, t))
-		AddBillboard(pos + t * dir, 0);
+	// float t;
+	// if(glm::intersectRayPlane(pos, dir, planePos, planeNormal, t))
+	// 	AddBillboard(pos + t * dir, 0);
+		AddBillboard(glm::vec3(0.0f), 0);
 
 	LineCommand = RendererAPI::Get()->NewDrawCommand(LinePass->Get());
 	LineCommand->DepthTest = DepthTestingMode::On;

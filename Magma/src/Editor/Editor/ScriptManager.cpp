@@ -223,4 +223,9 @@ void ScriptManager::Continue() {
 	s_Action = 4;
 }
 
+ScriptField ScriptManager::GetVariable(const std::string& name) {
+
+	return { };
+}
+
 }

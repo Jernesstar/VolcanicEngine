@@ -48,6 +48,8 @@ public:
 	static void StepOut();
 	static void Continue();
 
+	static ScriptField GetVariable(const std::string& name);
+
 private:
 	inline static Map<std::string, List<std::string>> s_FunctionMetadata;
 	inline static Map<std::string, List<std::string>> s_ClassMetadata;

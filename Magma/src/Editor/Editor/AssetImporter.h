@@ -17,6 +17,9 @@ struct MaterialPaths {
 	std::string Diffuse;
 	std::string Specular;
 	std::string Emissive;
+	glm::vec4 DiffuseColor;
+	glm::vec4 SpecularColor;
+	glm::vec4 EmissiveColor;
 
 	std::string operator[](uint32_t i) { return *(&Diffuse + i); }
 };

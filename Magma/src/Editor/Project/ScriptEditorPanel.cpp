@@ -108,11 +108,21 @@ ScriptEditorPanel::ScriptEditorPanel()
 	auto palette = TextEditor::GetDarkPalette();
 	m_Editor.SetPalette(palette);
 	m_Editor.SetWordCallback(
-		[](const std::string& str)
+		[](const std::string& name)
 		{
+			if(!Editor::GetProjectTab()->IsDebugging())
+				return;
+			if(name.find_first_not_of(' ') == std::string::npos)
+				return;
+
 			// 1. Find variable in debugger
-			// auto var = ScriptManager::GetVariable(str);
+			ScriptField field = ScriptManager::GetVariable(name);
+
 			// 2. ToString
+			std::string str;
+			if(field.TypeID == asTYPEID_UINT32)
+				str = std::to_string(*field.As<uint32_t>());
+
 			// 3. Display tooltip
 			ImGui::BeginTooltip();
 

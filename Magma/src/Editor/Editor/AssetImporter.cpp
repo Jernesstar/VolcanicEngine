@@ -200,14 +200,22 @@ void AssetImporter::GetMeshData(const std::string& path,
 
 	auto dir = (fs::path(path).parent_path() / "textures").string();
 	for(uint32_t i = 0; i < scene->mNumMaterials; i++) {
-		auto diffusePath =
-			GetMaterialPath(dir, scene->mMaterials[i], aiTextureType_DIFFUSE);
-		auto specularPath =
-			GetMaterialPath(dir, scene->mMaterials[i], aiTextureType_SPECULAR);
-		auto emissivePath =
-			GetMaterialPath(dir, scene->mMaterials[i], aiTextureType_EMISSIVE);
+		auto mat = scene->mMaterials[i];
+		auto diffusePath = GetMaterialPath(dir, mat, aiTextureType_DIFFUSE);
+		auto specularPath = GetMaterialPath(dir, mat, aiTextureType_SPECULAR);
+		auto emissivePath = GetMaterialPath(dir, mat, aiTextureType_EMISSIVE);
 
-		materialPaths.Emplace(diffusePath, specularPath, emissivePath);
+		glm::vec4 diffuse, specular, emissive;
+		aiColor4D color;
+		if(mat->Get(AI_MATKEY_COLOR_DIFFUSE, color) == AI_SUCCESS)
+			diffuse = glm::vec4(color.r, color.g, color.b, color.a);
+		if(mat->Get(AI_MATKEY_COLOR_SPECULAR, color) == AI_SUCCESS)
+			specular = glm::vec4(color.r, color.g, color.b, color.a);
+		if(mat->Get(AI_MATKEY_COLOR_EMISSIVE, color) == AI_SUCCESS)
+			emissive = glm::vec4(color.r, color.g, color.b, color.a);
+
+		materialPaths.Emplace(diffusePath, specularPath, emissivePath,
+			diffuse, specular, emissive);
 	}
 }
 

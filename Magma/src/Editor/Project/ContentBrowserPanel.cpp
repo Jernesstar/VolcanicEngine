@@ -226,8 +226,9 @@ void ContentBrowserPanel::RenderAssetTable() {
 		static Asset s_Asset;
 
 		for(auto& [asset, _] : assetManager.GetRegistry()) {
-			if(!asset.Primary)
+			if(!asset.Primary || assetManager.IsMagmaAsset(asset))
 				continue;
+
 			if(s_Selecting && s_SelectType != AssetType::None
 			&& asset.Type != s_SelectType)
 				continue;

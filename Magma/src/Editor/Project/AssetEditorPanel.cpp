@@ -76,21 +76,23 @@ static void EditAsset(Asset asset) {
 		}
 	}
 	else if(asset.Type == AssetType::Material) {
-		Asset shader = assetManager->GetRefs(asset)[0];
-		auto path = assetManager->GetPath(shader.ID);
-		Buffer<uint32_t> data = AssetImporter::GetShaderData(path);
 
-		spirv_cross::Compiler compiler(data.Get(), data.GetCount());
-		spirv_cross::ShaderResources resources =
-			compiler.get_shader_resources();
-		for(const auto& resource : resources.gl_plain_uniforms) {
-			ImGui::Text(resource.name.c_str());
+		// Asset shader = assetManager->GetRefs(asset)[0];
+		// auto path = assetManager->GetPath(shader.ID);
+
+		// Buffer<uint32_t> data = AssetImporter::GetShaderData(path);
+
+		// spirv_cross::Compiler compiler(data.Get(), data.GetCount());
+		// spirv_cross::ShaderResources resources =
+		// 	compiler.get_shader_resources();
+		// for(const auto& resource : resources.gl_plain_uniforms) {
+		// 	ImGui::Text(resource.name.c_str());
 			
-		}
-		for(const auto& resource : resources.separate_samplers) {
-			ImGui::Text(resource.name.c_str());
+		// }
+		// for(const auto& resource : resources.separate_samplers) {
+		// 	ImGui::Text(resource.name.c_str());
 			
-		}
+		// }
 	}
 }
 
