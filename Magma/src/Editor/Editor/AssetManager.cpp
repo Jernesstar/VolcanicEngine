@@ -430,55 +430,55 @@ void EditorAssetManager::Load(const std::string& path) {
 		if(type == AssetType::Material) {
 			auto mat = Get<Material>(asset);
 			auto matNode = node["Material"];
-			for(auto intUniformNode : node["IntUniforms"]) {
+			for(auto intUniformNode : matNode["IntUniforms"]) {
 				auto intUniform = intUniformNode["Uniform"];
 				auto name = intUniform["Name"].as<std::string>();
 				auto data = intUniform["Data"].as<int32_t>();
 				mat->IntUniforms[name] = data;
 			}
-			for(auto floatUniformNode : node["FloatUniforms"]) {
+			for(auto floatUniformNode : matNode["FloatUniforms"]) {
 				auto floatUniform = floatUniformNode["Uniform"];
 				auto name = floatUniform["Name"].as<std::string>();
 				auto data = floatUniform["Data"].as<float>();
 				mat->FloatUniforms[name] = data;
 			}
-			for(auto vec2UniformNode : node["Vec2Uniforms"]) {
+			for(auto vec2UniformNode : matNode["Vec2Uniforms"]) {
 				auto vec2Uniform = vec2UniformNode["Uniform"];
 				auto name = vec2Uniform["Name"].as<std::string>();
 				auto data = vec2Uniform["Data"].as<glm::vec2>();
 				mat->Vec2Uniforms[name] = data;
 			}
-			for(auto vec3UniformNode : node["Vec3Uniforms"]) {
+			for(auto vec3UniformNode : matNode["Vec3Uniforms"]) {
 				auto vec3Uniform = vec3UniformNode["Uniform"];
 				auto name = vec3Uniform["Name"].as<std::string>();
 				auto data = vec3Uniform["Data"].as<glm::vec3>();
 				mat->Vec3Uniforms[name] = data;
 			}
-			for(auto vec4UniformNode : node["Vec4Uniforms"]) {
+			for(auto vec4UniformNode : matNode["Vec4Uniforms"]) {
 				auto vec4Uniform = vec4UniformNode["Uniform"];
 				auto name = vec4Uniform["Name"].as<std::string>();
 				auto data = vec4Uniform["Data"].as<glm::vec4>();
 				mat->Vec4Uniforms[name] = data;
 			}
-			for(auto mat2UniformNode : node["Mat2Uniforms"]) {
+			for(auto mat2UniformNode : matNode["Mat2Uniforms"]) {
 				auto mat2Uniform = mat2UniformNode["Uniform"];
 				auto name = mat2Uniform["Name"].as<std::string>();
 				auto data = mat2Uniform["Data"].as<glm::mat2>();
 				mat->Mat2Uniforms[name] = data;
 			}
-			for(auto mat3UniformNode : node["Vec3Uniforms"]) {
+			for(auto mat3UniformNode : matNode["Mat3Uniforms"]) {
 				auto mat3Uniform = mat3UniformNode["Uniform"];
 				auto name = mat3Uniform["Name"].as<std::string>();
 				auto data = mat3Uniform["Data"].as<glm::mat3>();
 				mat->Mat3Uniforms[name] = data;
 			}
-			for(auto mat4UniformNode : node["Mat4Uniforms"]) {
+			for(auto mat4UniformNode : matNode["Mat4Uniforms"]) {
 				auto mat4Uniform = mat4UniformNode["Uniform"];
 				auto name = mat4Uniform["Name"].as<std::string>();
 				auto data = mat4Uniform["Data"].as<glm::mat4>();
 				mat->Mat4Uniforms[name] = data;
 			}
-			for(auto textureUniformNode : node["TextureUniforms"]) {
+			for(auto textureUniformNode : matNode["TextureUniforms"]) {
 				auto textureUniform = textureUniformNode["Uniform"];
 				auto name = textureUniform["Name"].as<std::string>();
 				auto data = textureUniform["Data"].as<uint64_t>();
@@ -553,9 +553,10 @@ void EditorAssetManager::Save() {
 			serializer.WriteKey("IntUniforms").BeginSequence();
 			for(auto& [name, data] : mat->IntUniforms) {
 				serializer.BeginMapping()
-				.WriteKey("Uniform").BeginMapping()
-					.WriteKey("Name").Write(name)
-					.WriteKey("Data").Write(data)
+				.WriteKey("Uniform")
+					.BeginMapping()
+						.WriteKey("Name").Write(name)
+						.WriteKey("Data").Write(data)
 					.EndMapping()
 				.EndMapping();
 			}
@@ -564,9 +565,10 @@ void EditorAssetManager::Save() {
 			serializer.WriteKey("FloatUniforms").BeginSequence();
 			for(auto& [name, data] : mat->FloatUniforms) {
 				serializer.BeginMapping()
-				.WriteKey("Uniform").BeginMapping()
-					.WriteKey("Name").Write(name)
-					.WriteKey("Data").Write(data)
+				.WriteKey("Uniform")
+					.BeginMapping()
+						.WriteKey("Name").Write(name)
+						.WriteKey("Data").Write(data)
 					.EndMapping()
 				.EndMapping();
 			}
@@ -575,9 +577,10 @@ void EditorAssetManager::Save() {
 			serializer.WriteKey("Vec2Uniforms").BeginSequence();
 			for(auto& [name, data] : mat->Vec2Uniforms) {
 				serializer.BeginMapping()
-				.WriteKey("Uniform").BeginMapping()
-					.WriteKey("Name").Write(name)
-					.WriteKey("Data").Write(data)
+				.WriteKey("Uniform")
+					.BeginMapping()
+						.WriteKey("Name").Write(name)
+						.WriteKey("Data").Write(data)
 					.EndMapping()
 				.EndMapping();
 			}
@@ -586,9 +589,10 @@ void EditorAssetManager::Save() {
 			serializer.WriteKey("Vec3Uniforms").BeginSequence();
 			for(auto& [name, data] : mat->Vec3Uniforms) {
 				serializer.BeginMapping()
-				.WriteKey("Uniform").BeginMapping()
-					.WriteKey("Name").Write(name)
-					.WriteKey("Data").Write(data)
+				.WriteKey("Uniform")
+					.BeginMapping()
+						.WriteKey("Name").Write(name)
+						.WriteKey("Data").Write(data)
 					.EndMapping()
 				.EndMapping();
 			}
@@ -597,9 +601,10 @@ void EditorAssetManager::Save() {
 			serializer.WriteKey("Vec4Uniforms").BeginSequence();
 			for(auto& [name, data] : mat->Vec4Uniforms) {
 				serializer.BeginMapping()
-				.WriteKey("Uniform").BeginMapping()
-					.WriteKey("Name").Write(name)
-					.WriteKey("Data").Write(data)
+				.WriteKey("Uniform")
+					.BeginMapping()
+						.WriteKey("Name").Write(name)
+						.WriteKey("Data").Write(data)
 					.EndMapping()
 				.EndMapping();
 			}
@@ -608,13 +613,14 @@ void EditorAssetManager::Save() {
 			serializer.WriteKey("Mat2Uniforms").BeginSequence();
 			for(auto& [name, data] : mat->Mat2Uniforms) {
 				serializer.BeginMapping()
-				.WriteKey("Uniform").BeginMapping()
-					.WriteKey("Name").Write(name)
-					.WriteKey("Data")
-						.BeginSequence()
-							.Write(glm::row(data, 0))
-							.Write(glm::row(data, 1))
-						.EndSequence()
+				.WriteKey("Uniform")
+					.BeginMapping()
+						.WriteKey("Name").Write(name)
+						.WriteKey("Data")
+							.BeginSequence()
+								.Write(glm::row(data, 0))
+								.Write(glm::row(data, 1))
+							.EndSequence()
 					.EndMapping()
 				.EndMapping();
 			}
@@ -750,9 +756,9 @@ void EditorAssetManager::RuntimeSave(const std::string& exportPath) {
 
 	BinaryWriter pack((fs::path(exportPath) / ".volc.assetpk").string());
 	pack.Write(std::string("VOLC_PACK"));
-	pack.Write((uint64_t)m_AssetRegistry.size());
 
-	uint64_t objectIdx = pack.GetPosition();
+	uint64_t registryCount;
+	uint64_t objectIdx = pack.GetPosition() + sizeof(uint64_t);
 	for(const auto& [asset, _] : m_AssetRegistry) {
 		if(IsMagmaAsset(asset))
 			continue;
@@ -768,7 +774,10 @@ void EditorAssetManager::RuntimeSave(const std::string& exportPath) {
 
 		objectIdx += sizeof(uint64_t); // Name length
 		objectIdx += GetAssetName(asset).size(); // Name
+		registryCount++;
 	}
+
+	pack.Write(registryCount);
 
 	uint64_t registryPos = 0;
 	uint64_t registrySize = objectIdx;

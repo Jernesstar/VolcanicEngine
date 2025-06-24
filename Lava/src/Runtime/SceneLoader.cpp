@@ -91,10 +91,12 @@ BinaryReader& BinaryReader::ReadObject(AudioComponent& comp) {
 
 template<>
 BinaryReader& BinaryReader::ReadObject(MeshComponent& comp) {
-	uint64_t id;
-	Read(id);
-	comp.MeshSourceAsset = { id, AssetType::Mesh };
-	comp.MaterialAsset = { id, AssetType::Mesh };
+	uint64_t sourceID;
+	Read(sourceID);
+	uint64_t materialID;
+	Read(materialID);
+	comp.MeshSourceAsset = { sourceID, AssetType::Mesh };
+	comp.MaterialAsset = { materialID, AssetType::Material };
 
 	return *this;
 }

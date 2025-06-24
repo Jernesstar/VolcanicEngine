@@ -28,7 +28,9 @@ AssetPack:
           Vec3Uniforms:
             []
           Vec4Uniforms:
-            []
+            - Uniform:
+                Name: u_DiffuseColor
+                Data: [0, 0, 1, 1]
           Mat2Uniforms:
             []
           Mat3Uniforms:
