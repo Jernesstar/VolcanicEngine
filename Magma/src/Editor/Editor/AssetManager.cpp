@@ -757,7 +757,7 @@ void EditorAssetManager::RuntimeSave(const std::string& exportPath) {
 	BinaryWriter pack((fs::path(exportPath) / ".volc.assetpk").string());
 	pack.Write(std::string("VOLC_PACK"));
 
-	uint64_t registryCount;
+	uint64_t registryCount = 0;
 	uint64_t objectIdx = pack.GetPosition() + sizeof(uint64_t);
 	for(const auto& [asset, _] : m_AssetRegistry) {
 		if(IsMagmaAsset(asset))
@@ -780,7 +780,6 @@ void EditorAssetManager::RuntimeSave(const std::string& exportPath) {
 	pack.Write(registryCount);
 
 	uint64_t registryPos = 0;
-	uint64_t registrySize = objectIdx;
 	for(const auto& [asset, _] : m_AssetRegistry) {
 		if(IsMagmaAsset(asset))
 			continue;

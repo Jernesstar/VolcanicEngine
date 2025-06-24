@@ -38,7 +38,15 @@ AssetPack:
           Mat4Uniforms:
             []
           TextureUniforms:
-            []
+            - Uniform:
+                Name: u_Diffuse
+                Data: 6787486968965807575
+            - Uniform:
+                Name: u_Specular
+                Data: 9195479795687490682
+            - Uniform:
+                Name: u_Emissive
+                Data: 1066723617650307664
     - Asset:
         ID: 15277418182178081176
         Type: Mesh

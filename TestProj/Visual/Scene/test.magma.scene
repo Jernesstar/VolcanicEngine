@@ -42,6 +42,18 @@ Scene:
             MeshSourceID: 10012345
             MaterialID: 11837670142847334937
     - Entity:
+        Name: Player2
+        ID: 1111
+        Components:
+          TransformComponent:
+            Transform:
+              Translation: [0, 0.312866569, 0.866874218]
+              Rotation: [0, -0, 0]
+              Scale: [2.70284677, 2.74046397, 5.02205753]
+          MeshComponent:
+            MeshSourceID: 15277418182178081176
+            MaterialID: 0
+    - Entity:
         Name: ""
         ID: 964
         Components:
@@ -50,7 +62,7 @@ Scene:
               Ambient: [1, 0, 0]
               Diffuse: [1, 1, 1]
               Specular: [1, 1, 1]
-              Position: [-2.97912478, 12.4147997, 2.66100001]
+              Position: [-4.11638355, 19.1058464, 5.30045509]
               Constant: 1
               Linear: 0
               Quadratic: 0
@@ -138,15 +150,15 @@ Scene:
               - Field:
                   Name: SomeBool
                   Type: bool
-                  Value: false
+                  Value: true
               - Field:
                   Name: Signed8
                   Type: int8
-                  Value: 0
+                  Value: 127
               - Field:
                   Name: Unsigned32
                   Type: uint32
-                  Value: 0
+                  Value: 218
               - Field:
                   Name: Float
                   Type: float
@@ -159,10 +171,14 @@ Scene:
                   Name: Grid
                   Type: GridSet
                   Value:
-                    Width: 0
-                    Height: 0
+                    Width: 5
+                    Height: 5
                     Data:
-                      []
+                      - [0, 0, 0, 0, 0]
+                      - [0, 0, 0, 0, 0]
+                      - [0, 1, 0, 0, 0]
+                      - [0, 0, 0, 0, 0]
+                      - [0, 0, 0, 1, 0]
               - Field:
                   Name: SomeVec3
                   Type: Vec3

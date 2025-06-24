@@ -395,11 +395,67 @@ void RuntimeSceneRenderer::SubmitMesh(const Entity& entity) {
 	assetManager->Load(mc.MeshSourceAsset);
 	auto mesh = assetManager->Get<Mesh>(mc.MeshSourceAsset);
 
-	Renderer::StartPass(LightingPass);
-	{
-		Renderer3D::DrawMesh(mesh, tc);
+	if(!mc.MaterialAsset.ID) {
+		Renderer::StartPass(LightingPass);
+		{
+			Renderer3D::DrawMesh(mesh, tc);
+		}
+		Renderer::EndPass();
 	}
-	Renderer::EndPass();
+	else {
+		assetManager->Load(mc.MaterialAsset);
+		auto material = assetManager->Get<Magma::Material>(mc.MaterialAsset);
+		VolcaniCore::Material mat;
+		UUID id;
+		Asset textureAsset;
+
+		id = material->TextureUniforms["u_Diffuse"];
+		if(id) {
+			textureAsset = { id, AssetType::Texture };
+			assetManager->Load(textureAsset);
+			mat.Diffuse = assetManager->Get<Texture>(textureAsset);
+		}
+
+		id = material->TextureUniforms["u_Specular"];
+		if(id) {
+			textureAsset = { id, AssetType::Texture };
+			assetManager->Load(textureAsset);
+			mat.Specular = assetManager->Get<Texture>(textureAsset);
+		}
+
+		id = material->TextureUniforms["u_Emissive"];
+		if(id) {
+			textureAsset = { id, AssetType::Texture };
+			assetManager->Load(textureAsset);
+			mat.Emissive = assetManager->Get<Texture>(textureAsset);
+		}
+
+		mat.DiffuseColor = material->Vec4Uniforms["u_DiffuseColor"];
+		mat.SpecularColor = material->Vec4Uniforms["u_SpecularColor"];
+		mat.EmissiveColor = material->Vec4Uniforms["u_EmissiveColor"];
+		Renderer::StartPass(LightingPass);
+		{
+			DrawCommand* command = Renderer::GetCommand();
+			command->UniformData
+			.SetInput("u_Material.IsTextured", (bool)mat.Diffuse);
+			command->UniformData
+			.SetInput("u_Material.Diffuse", TextureSlot{ mat.Diffuse, 0 });
+			command->UniformData
+			.SetInput("u_Material.Specular", TextureSlot{ mat.Specular, 1 });
+			command->UniformData
+			.SetInput("u_Material.Emissive", TextureSlot{ mat.Emissive, 2 });
+
+			command->UniformData
+			.SetInput("u_Material.DiffuseColor", mat.DiffuseColor);
+			command->UniformData
+			.SetInput("u_Material.SpecularColor", mat.SpecularColor);
+			command->UniformData
+			.SetInput("u_Material.EmissiveColor", mat.EmissiveColor);
+
+			Renderer3D::DrawMesh(mesh, tc, command);
+		}
+		Renderer::EndPass();
+	}
 }
 
 void RuntimeSceneRenderer::Render() {

@@ -10,6 +10,11 @@ namespace Lava {
 
 RuntimeAssetManager::RuntimeAssetManager() {
 
+	// Magma assets
+	m_AssetRegistry[Asset{ 10012345, AssetType::Mesh }] = true;
+	m_MeshAssets[10012345] = Mesh::Create(MeshType::Cube);
+	m_AssetRegistry[Asset{ 10112345, AssetType::Mesh }] = true;
+	m_MeshAssets[10112345] = Mesh::Create(MeshType::Quad);
 }
 
 RuntimeAssetManager::~RuntimeAssetManager() {
@@ -97,25 +102,6 @@ void RuntimeAssetManager::Load(Asset asset) {
 	if(asset.Type == AssetType::Mesh) {
 		Ref<Mesh> mesh = CreateRef<Mesh>(MeshType::Model);
 		pack.Read(mesh->SubMeshes);
-
-		for(auto& ref : GetRefs(asset)) {
-			auto& mat = mesh->Materials.Emplace();
-			Load(ref);
-			auto material = Get<Magma::Material>(asset);
-
-			mat.DiffuseColor = material->Vec4Uniforms["u_DiffuseColor"];
-			mat.SpecularColor = material->Vec4Uniforms["u_SpecularColor"];
-			mat.EmissiveColor = material->Vec4Uniforms["u_EmissiveColor"];
-
-			UUID id = 0;
-			id = material->TextureUniforms["u_Diffuse"];
-			mat.Diffuse = Get<Texture>(Asset{ id, AssetType::Texture });
-			id = material->TextureUniforms["u_Specular"];
-			mat.Specular = Get<Texture>(Asset{ id, AssetType::Texture });
-			id = material->TextureUniforms["u_Emissive"];
-			mat.Emissive = Get<Texture>(Asset{ id, AssetType::Texture });
-		}
-
 		m_MeshAssets[asset.ID] = mesh;
 	}
 	else if(asset.Type == AssetType::Texture) {
