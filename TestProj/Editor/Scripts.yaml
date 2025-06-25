@@ -11,3 +11,7 @@ Scripts:
       Path: C:/Users/Jercy Mukala/Code/VolcanicEngine/TestProj/Project/Screen/TestScreen2.as
       Breakpoints: []
       Open: false
+  - Script:
+      Path: C:/Users/Jercy Mukala/Code/VolcanicEngine/TestProj/Asset/Script/Button1.as
+      Breakpoints: []
+      Open: true

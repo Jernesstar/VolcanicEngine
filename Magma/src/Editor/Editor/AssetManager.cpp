@@ -231,7 +231,7 @@ EditorAssetManager::~EditorAssetManager() {
 }
 
 void EditorAssetManager::Load(Asset asset) {
-	if(!IsValid(asset) || IsLoaded(asset))
+	if(!IsValid(asset) || IsLoaded(asset) || IsNativeAsset(asset))
 		return;
 
 	m_AssetRegistry[asset] = true;
@@ -263,7 +263,7 @@ void EditorAssetManager::Load(Asset asset) {
 }
 
 void EditorAssetManager::Unload(Asset asset) {
-	if(!IsValid(asset) || !IsLoaded(asset))
+	if(!IsValid(asset) || !IsLoaded(asset) || IsNativeAsset(asset))
 		return;
 
 	m_AssetRegistry[asset] = false;
@@ -315,10 +315,10 @@ Asset EditorAssetManager::Add(AssetType type, UUID id, bool primary,
 				{ "u_Diffuse", "u_Specular", "u_Emissive" };
 			for(uint32_t i = 0; i < 3; i++) {
 				auto name = names[i];
-				auto refPath = matPaths[i];
 				mat->Vec4Uniforms[name + "Color"] =
 					*(&matPaths.DiffuseColor + i);
 
+				auto refPath = matPaths[i];
 				if(refPath == "") {
 					mat->TextureUniforms[name] = 0;
 					continue;

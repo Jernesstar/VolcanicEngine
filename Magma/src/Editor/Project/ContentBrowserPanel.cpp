@@ -146,6 +146,8 @@ void ContentBrowserPanel::Draw() {
 						else {
 							Asset newAsset = assets->Add(AssetType::Material);
 							assets->NameAsset(newAsset, name);
+							auto panel = m_Tab->GetPanel("AssetEditor");
+							panel->As<AssetEditorPanel>()->Select(newAsset);
 						}
 					}
 

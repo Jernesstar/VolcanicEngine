@@ -816,6 +816,8 @@ void RegisterECS() {
 	engine->RegisterObjectMethod("ParticleEmitterComponent",
 		"void set_MaxParticles(uint32) property",
 		asFUNCTION(SetParticleEmitterMaxParticles), asCALL_CDECL_OBJLAST);
+	engine->RegisterObjectProperty("ParticleEmitterComponent", "Vec3 Position",
+		asOFFSET(ParticleEmitterComponent, Position));
 
 	engine->RegisterObjectType("Entity", sizeof(Entity),
 		asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_ALLINTS |

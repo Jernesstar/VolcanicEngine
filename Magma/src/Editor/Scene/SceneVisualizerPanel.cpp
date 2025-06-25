@@ -824,27 +824,61 @@ void EditorSceneRenderer::SubmitMesh(const Entity& entity) {
 	assetManager->Load(mc.MeshSourceAsset);
 	auto mesh = assetManager->Get<Mesh>(mc.MeshSourceAsset);
 
-	Renderer::StartPass(MeshPass, false);
-	{
-		Renderer3D::DrawMesh(mesh, tc);
+	if(!mc.MaterialAsset.ID) {
+		Renderer::StartPass(MeshPass);
+		{
+			Renderer3D::DrawMesh(mesh, tc);
+		}
+		Renderer::EndPass();
+		return;
 	}
-	Renderer::EndPass();
+
+	if(!assetManager->IsValid(mc.MaterialAsset))
+		return;
+
+	VolcaniCore::Material mat;
+	assetManager->Load(mc.MaterialAsset);
+	auto material = assetManager->Get<Magma::Material>(mc.MaterialAsset);
+
+	if(material->TextureUniforms.count("u_Diffuse")) {
+		UUID id = material->TextureUniforms["u_Diffuse"];
+		Asset textureAsset = { id, AssetType::Texture };
+		assetManager->Load(textureAsset);
+		mat.Diffuse = assetManager->Get<Texture>(textureAsset);
+	}
+	if(material->Vec4Uniforms.count("u_DiffuseColor"))
+		mat.DiffuseColor = material->Vec4Uniforms["u_DiffuseColor"];
+
+	DrawCommand* command =
+		RendererAPI::Get()->NewDrawCommand(MeshPass->Get());
+	command->UniformData
+	.SetInput("u_Material.IsTextured", (bool)mat.Diffuse);
+	command->UniformData
+	.SetInput("u_Material.Diffuse", TextureSlot{ mat.Diffuse, 0 });
+	command->UniformData
+	.SetInput("u_Material.DiffuseColor", mat.DiffuseColor);
+	VOLCANICORE_LOG_INFO("%llu", (uint64_t)mc.MaterialAsset.ID);
+
+	Renderer3D::DrawMesh(mesh, tc, command);
 }
 
 void EditorSceneRenderer::Render() {
 	Renderer3D::End();
 
-	if(Selected
-	&& Selected.Has<TransformComponent>() && Selected.Has<MeshComponent>())
+	auto* assetManager = AssetManager::Get();
+	if(Selected && Selected.Has<TransformComponent>()
+	&& Selected.Has<MeshComponent>()
+	&& assetManager->IsValid(Selected.Get<MeshComponent>().MeshSourceAsset))
 	{
-		auto* assetManager = AssetManager::Get();
 		auto& tc = Selected.Get<TransformComponent>();
 		auto& mc = Selected.Get<MeshComponent>();
+
 		assetManager->Load(mc.MeshSourceAsset);
 		auto mesh = assetManager->Get<Mesh>(mc.MeshSourceAsset);
 
 		{
-			auto* command = RendererAPI::Get()->NewDrawCommand(MaskPass->Get());
+			auto* command =
+				RendererAPI::Get()->NewDrawCommand(MaskPass->Get());
 			command->Clear = true;
 			command->UniformData
 			.SetInput("u_ViewProj",

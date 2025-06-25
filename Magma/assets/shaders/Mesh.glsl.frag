@@ -1,12 +1,9 @@
 #version 460 core
 
 struct Material {
-    sampler2D Diffuse;
-    sampler2D Specular;
-    vec4 DiffuseColor;
-    vec4 SpecularColor;
-
     int IsTextured;
+    sampler2D Diffuse;
+    vec4 DiffuseColor;
 };
 
 layout(location = 1) uniform Material u_Material;

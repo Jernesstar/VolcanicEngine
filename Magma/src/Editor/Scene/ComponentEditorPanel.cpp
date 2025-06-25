@@ -243,7 +243,7 @@ void DrawComponent<MeshComponent>(Entity& entity) {
 
 	auto& component = entity.Set<MeshComponent>();
 	ImGui::SeparatorText("MeshComponent");
-	
+
 	auto panel =
 		Editor::GetProjectTab()->
 				GetPanel("ContentBrowser")->As<ContentBrowserPanel>();
@@ -448,6 +448,8 @@ void DrawComponent<ScriptComponent>(Entity& entity) {
 		if(!editorField)
 			continue;
 
+		ImGui::PushID(i);
+
 		if(field.Type) {
 			std::string typeName = field.Type->GetName();
 			ImGui::Text(typeName.c_str()); ImGui::SameLine(100.0f);
@@ -466,7 +468,7 @@ void DrawComponent<ScriptComponent>(Entity& entity) {
 				ImGui::SameLine(280.0f, 0.0f);
 				ImGui::Text("ID: %llu", (uint64_t)asset.ID);
 
-				if(ImGui::Button(("Edit##" + field.Name).c_str()))
+				if(ImGui::Button("Edit"))
 					panel->Select(AssetType::None, i + 1);
 				if(panel->HasSelection(i + 1))
 					*field.As<Asset>() = panel->GetSelected();
@@ -483,86 +485,76 @@ void DrawComponent<ScriptComponent>(Entity& entity) {
 			}
 			else
 				ImGui::NewLine();
-
-			continue;
 		}
-
-		if(field.TypeID == asTYPEID_BOOL) {
+		else if(field.TypeID == asTYPEID_BOOL) {
 			ImGui::Text("bool"); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(180.0f);
-			ImGui::Checkbox(std::string("##Bool##" + field.Name).c_str(),
-				field.As<bool>());
+			ImGui::Checkbox("##Bool", field.As<bool>());
 		}
 		else if(field.TypeID == asTYPEID_INT8) {
 			ImGui::Text("int8"); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(180.0f);
 			ImGui::SetNextItemWidth(50);
-			ImGui::DragScalar(std::string("##S8##" + field.Name).c_str(),
-				ImGuiDataType_S8, field.Data);
+			ImGui::DragScalar("##S8", ImGuiDataType_S16, field.Data);
 		}
 		else if(field.TypeID == asTYPEID_INT16) {
 			ImGui::Text("int16"); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(180.0f);
 			ImGui::SetNextItemWidth(50);
-			ImGui::DragScalar(std::string("##S16##" + field.Name).c_str(),
-								ImGuiDataType_S16, field.Data);
+			ImGui::DragScalar("##S16", ImGuiDataType_S16, field.Data);
 		}
 		else if(field.TypeID == asTYPEID_INT32) {
 			ImGui::Text("int32"); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(180.0f);
 			ImGui::SetNextItemWidth(50);
-			ImGui::DragScalar(std::string("##S32##" + field.Name).c_str(),
-								ImGuiDataType_S32, field.Data);
+			ImGui::DragScalar("##S32", ImGuiDataType_S32, field.Data);
 		}
 		else if(field.TypeID == asTYPEID_INT64) {
 			ImGui::Text("int64"); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(180.0f);
 			ImGui::SetNextItemWidth(50);
-			ImGui::DragScalar(std::string("##S64##" + field.Name).c_str(),
-								ImGuiDataType_S64, field.Data);
+			ImGui::DragScalar("##S64", ImGuiDataType_S64, field.Data);
 		}
 		else if(field.TypeID == asTYPEID_UINT8) {
 			ImGui::Text("uint8"); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(180.0f);
 			ImGui::SetNextItemWidth(50);
-			ImGui::DragScalar(std::string("##U8##" + field.Name).c_str(),
-								ImGuiDataType_U8, field.Data);
+			ImGui::DragScalar("##U8", ImGuiDataType_U8, field.Data);
 		}
 		else if(field.TypeID == asTYPEID_UINT16) {
 			ImGui::Text("uint16"); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(180.0f);
 			ImGui::SetNextItemWidth(50);
-			ImGui::DragScalar(std::string("##U16##" + field.Name).c_str(),
-								ImGuiDataType_U16, field.Data);
+			ImGui::DragScalar("##U16", ImGuiDataType_U16, field.Data);
 		}
 		else if(field.TypeID == asTYPEID_UINT32) {
 			ImGui::Text("uint32"); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(180.0f);
 			ImGui::SetNextItemWidth(50);
-			ImGui::DragScalar(std::string("##U32##" + field.Name).c_str(),
-								ImGuiDataType_U32, field.Data);
+			ImGui::DragScalar("##U32", ImGuiDataType_U32, field.Data);
 		}
 		else if(field.TypeID == asTYPEID_UINT64) {
 			ImGui::Text("uint64"); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(180.0f);
 			ImGui::SetNextItemWidth(50);
-			ImGui::DragScalar(std::string("##U64##" + field.Name).c_str(),
-								ImGuiDataType_U64, field.Data);
-		}
-		else if(field.TypeID == asTYPEID_FLOAT) {
-			ImGui::Text("float"); ImGui::SameLine(100.0f);
-			ImGui::Text(field.Name.c_str()); ImGui::SameLine(180.0f);
-			ImGui::SetNextItemWidth(50);
-			ImGui::DragFloat(std::string("##Float##" + field.Name).c_str(),
-							 field.As<float>(), 0.1f, 0.0f, 0.0f, "%.3f");
+			ImGui::DragScalar("##U64", ImGuiDataType_U64, field.Data);
 		}
 		else if(field.TypeID == asTYPEID_DOUBLE) {
 			ImGui::Text("double"); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(180.0f);
 			ImGui::SetNextItemWidth(50);
-			ImGui::DragScalar(std::string("##Double##" + field.Name).c_str(),
-							  ImGuiDataType_Double, field.As<double>());
+			ImGui::DragScalar("##Double", ImGuiDataType_Double,
+				field.As<double>());
 		}
+		else if(field.TypeID == asTYPEID_FLOAT) {
+			ImGui::Text("float"); ImGui::SameLine(100.0f);
+			ImGui::Text(field.Name.c_str()); ImGui::SameLine(180.0f);
+			ImGui::SetNextItemWidth(50);
+			ImGui::DragFloat("##Float",
+							 field.As<float>(), 0.1f, 0.0f, 0.0f, "%.3f");
+		}
+
+		ImGui::PopID();
 	}
 }
 
@@ -678,6 +670,8 @@ void DrawComponent<PointLightComponent>(Entity& entity) {
 	ImGui::DragFloat("Linear", &component.Linear);
 	ImGui::SetNextItemWidth(50);
 	ImGui::DragFloat("Quadratic", &component.Quadratic);
+	ImGui::SetNextItemWidth(50);
+	ImGui::Checkbox("Bloom", &component.Bloom);
 }
 
 template<>
@@ -732,6 +726,11 @@ void DrawComponent<ParticleEmitterComponent>(Entity& entity) {
 	ImGui::Text("Particle Spawn Interval (ms)"); ImGui::SameLine(200.0f);
 	ImGui::SetNextItemWidth(50);
 	ImGui::DragFloat("##SpawnInterval", &component.SpawnInterval,
+		1.0f, 1.0f, 99000.0f, "%.0f");
+
+	ImGui::Text("Offset"); ImGui::SameLine(200.0f);
+	ImGui::SetNextItemWidth(50);
+	ImGui::DragFloat("##Offset", &component.Offset,
 		1.0f, 1.0f, 99000.0f, "%.0f");
 
 	ImGui::Text("Material: %li", (uint64_t)component.MaterialAsset.ID);

@@ -60,8 +60,9 @@ vec3 rng(vec3 low, vec3 high)
 void MakeParticle(out Particle particle) {
     particle.Life = u_Emitter.ParticleLifetime;
     particle.Velocity = vec3(0.0f, 0.0001, 0.0);
-    particle.Position = u_Emitter.Position
-        + rng(vec3(-u_Emitter.Displacement), vec3(u_Emitter.Displacement));
+    particle.Position =
+        u_Emitter.Position
+            + rng(vec3(-u_Emitter.Offset), vec3(u_Emitter.Offset));
 }
 
 layout(local_size_x = 64, local_size_y = 1, local_size_z = 1) in;

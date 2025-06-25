@@ -73,6 +73,19 @@ public:
 
 		return *this;
 	}
+
+	template<typename TKey, typename TValue>
+	BinaryReader& Read(OMap<TKey, TValue>& map) {
+		uint64_t size;
+		ReadRaw<uint64_t>(size);
+
+		for(uint64_t i = 0; i < size; i++) {
+			TKey key;
+			Read(key); Read(map[key]);
+		}
+
+		return *this;
+	}
 };
 
 }

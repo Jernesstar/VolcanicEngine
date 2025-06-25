@@ -92,7 +92,7 @@ BinaryReader& BinaryReader::ReadObject(UUID& uuid) {
 namespace Lava {
 
 void RuntimeAssetManager::Load(Asset asset) {
-	if(!IsValid(asset) || IsLoaded(asset))
+	if(!IsValid(asset) || IsLoaded(asset) || IsNativeAsset(asset))
 		return;
 
 	m_AssetRegistry[asset] = true;
@@ -103,6 +103,40 @@ void RuntimeAssetManager::Load(Asset asset) {
 		Ref<Mesh> mesh = CreateRef<Mesh>(MeshType::Model);
 		pack.Read(mesh->SubMeshes);
 		m_MeshAssets[asset.ID] = mesh;
+
+		for(auto& materialRef : GetRefs(asset)) {
+			auto& mat = mesh->Materials.Emplace();
+			Load(materialRef);
+			auto material = Get<Magma::Material>(materialRef);
+
+			if(material->TextureUniforms.count("u_Diffuse")) {
+				auto id = material->TextureUniforms["u_Diffuse"];
+				Asset textureAsset = { id, AssetType::Texture };
+				Load(textureAsset);
+				mat.Diffuse = Get<Texture>(textureAsset);
+			}
+
+			if(material->TextureUniforms.count("u_Specular")) {
+				auto id = material->TextureUniforms["u_Specular"];
+				Asset textureAsset = { id, AssetType::Texture };
+				Load(textureAsset);
+				mat.Specular = Get<Texture>(textureAsset);
+			}
+
+			if(material->TextureUniforms.count("u_Emissive")) {
+				auto id = material->TextureUniforms.count("u_Emissive");
+				Asset textureAsset = { id, AssetType::Texture };
+				Load(textureAsset);
+				mat.Emissive = Get<Texture>(textureAsset);
+			}
+
+			if(material->TextureUniforms.count("u_DiffuseColor"))
+				mat.DiffuseColor = material->Vec4Uniforms["u_DiffuseColor"];
+			if(material->TextureUniforms.count("u_SpecularColor"))
+				mat.SpecularColor = material->Vec4Uniforms["u_SpecularColor"];
+			if(material->TextureUniforms.count("u_EmissiveColor"))
+				mat.EmissiveColor = material->Vec4Uniforms["u_EmissiveColor"];
+		}
 	}
 	else if(asset.Type == AssetType::Texture) {
 		uint32_t width, height;
@@ -150,8 +184,7 @@ void RuntimeAssetManager::Load(Asset asset) {
 		m_ScriptAssets[asset.ID] = CreateRef<ScriptModule>(handle);
 	}
 	else if(asset.Type == AssetType::Material) {
-		auto mat = m_MaterialAssets[asset.ID] = CreateRef<Magma::Material>();
-
+		auto mat = CreateRef<Magma::Material>();
 		pack.Read(mat->IntUniforms);
 		pack.Read(mat->FloatUniforms);
 		pack.Read(mat->Vec2Uniforms);
@@ -160,11 +193,13 @@ void RuntimeAssetManager::Load(Asset asset) {
 		pack.Read(mat->Mat2Uniforms);
 		pack.Read(mat->Mat3Uniforms);
 		pack.Read(mat->Mat4Uniforms);
+
+		m_MaterialAssets[asset.ID] = mat;
 	}
 }
 
 void RuntimeAssetManager::Unload(Asset asset) {
-	if(!IsValid(asset) || !IsLoaded(asset))
+	if(!IsValid(asset) || !IsLoaded(asset) || IsNativeAsset(asset))
 		return;
 
 	m_AssetRegistry[asset] = false;

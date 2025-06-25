@@ -51,8 +51,6 @@ class PlayerController : IEntityController
         ScriptSystem@ sys = Scene.GetScriptSystem();
         sys.ListenForEvent(Handle, "PlayerDied");
 
-        AssetManager.Load(meshAsset);
-
         for(uint32 y = 0; y < Grid.Height; y++)
         {
             for(uint32 x = 0; x < Grid.Width; x++)
@@ -67,6 +65,7 @@ class PlayerController : IEntityController
                 tc.Translation.y = y;
                 MeshComponent@ mc = new.AddMeshComponent();
                 mc.MeshSourceAsset = meshAsset;
+                mc.MaterialAsset = AssetManager.GetNamedAsset("Blue");
             }
         }
     }

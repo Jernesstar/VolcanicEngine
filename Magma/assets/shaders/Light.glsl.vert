@@ -41,7 +41,7 @@ void main()
 {
     PointLight light = u_PointLights.Buffer[gl_InstanceID];
     if(light.BloomStrength == 0)
-        discard;
+        return;
 
     vec3 cameraRight = vec3(u_View[0][0], u_View[1][0], u_View[2][0]);
     vec3 cameraUp = vec3(u_View[0][1], u_View[1][1], u_View[2][1]);

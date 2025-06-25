@@ -160,6 +160,7 @@ struct ParticleEmitterComponent : public Component {
 	uint64_t MaxParticleCount;
 	float ParticleLifetime; // In milliseconds
 	float SpawnInterval; // In milliseconds
+	float Offset;
 	Asset MaterialAsset;
 
 	ParticleEmitterComponent() = default;

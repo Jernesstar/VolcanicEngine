@@ -62,6 +62,16 @@ public:
 
 		return *this;
 	}
+
+	template<typename TKey, typename TValue>
+	BinaryWriter& Write(const OMap<TKey, TValue>& map) {
+		WriteRaw<uint64_t>(map.size());
+		for(auto& [key, val] : map) {
+			Write(key); Write(val);
+		}
+
+		return *this;
+	}
 };
 
 }

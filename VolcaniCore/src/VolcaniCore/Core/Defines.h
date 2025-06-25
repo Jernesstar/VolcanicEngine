@@ -4,6 +4,7 @@
 #include <string>
 #include <memory>
 #include <vector>
+#include <map>
 #include <unordered_map>
 #include <functional>
 
@@ -41,6 +42,9 @@ constexpr Ref<T> CreateRef(Args&&... args) {
 
 template<typename TKey, typename TValue>
 using Map = std::unordered_map<TKey, TValue>;
+
+template<typename TKey, typename TValue>
+using OMap = std::map<TKey, TValue>;
 
 template<typename TValue1, typename TValue2>
 using Pair = std::pair<TValue1, TValue2>;

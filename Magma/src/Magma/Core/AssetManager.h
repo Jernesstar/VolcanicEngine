@@ -42,18 +42,18 @@ struct Asset {
 };
 
 struct Material {
-	Map<std::string, int32_t> IntUniforms;
-	Map<std::string, float> FloatUniforms;
-	Map<std::string, VolcaniCore::UUID> TextureUniforms;
-	Map<std::string, VolcaniCore::UUID> CubemapUniforms;
+	OMap<std::string, int32_t> IntUniforms;
+	OMap<std::string, float> FloatUniforms;
+	OMap<std::string, VolcaniCore::UUID> TextureUniforms;
+	OMap<std::string, VolcaniCore::UUID> CubemapUniforms;
 
-	Map<std::string, glm::vec2> Vec2Uniforms;
-	Map<std::string, glm::vec3> Vec3Uniforms;
-	Map<std::string, glm::vec4> Vec4Uniforms;
+	OMap<std::string, glm::vec2> Vec2Uniforms;
+	OMap<std::string, glm::vec3> Vec3Uniforms;
+	OMap<std::string, glm::vec4> Vec4Uniforms;
 
-	Map<std::string, glm::mat2> Mat2Uniforms;
-	Map<std::string, glm::mat3> Mat3Uniforms;
-	Map<std::string, glm::mat4> Mat4Uniforms;
+	OMap<std::string, glm::mat2> Mat2Uniforms;
+	OMap<std::string, glm::mat3> Mat3Uniforms;
+	OMap<std::string, glm::mat4> Mat4Uniforms;
 };
 
 }
@@ -98,6 +98,8 @@ public:
 			return { 10012345, AssetType::Mesh };
 		if(name == "Quad")
 			return { 10112345, AssetType::Mesh };
+
+		return { };
 	}
 
 	bool IsValid(Asset asset) const {
