@@ -88,7 +88,18 @@ public:
 
 	template<typename T>
 	Ref<T> Get(Asset asset) const;
-	
+
+	bool IsNativeAsset(Asset asset) {
+		return (uint64_t)asset.ID % 100'000 == 12345;
+	}
+
+	Asset GetNativeAsset(const std::string& name) {
+		if(name == "Cube")
+			return { 10012345, AssetType::Mesh };
+		if(name == "Quad")
+			return { 10112345, AssetType::Mesh };
+	}
+
 	bool IsValid(Asset asset) const {
 		return asset.ID && asset.Type != AssetType::None
 			&& m_AssetRegistry.count(asset);

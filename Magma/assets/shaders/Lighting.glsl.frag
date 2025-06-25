@@ -20,6 +20,7 @@ struct PointLight {
     float Constant;
     float Linear;
     float Quadratic;
+    float BloomStrength;
 };
 
 struct Spotlight {

@@ -359,10 +359,6 @@ std::string EditorAssetManager::GetPath(UUID id) const {
 	return m_Paths.at(id);
 }
 
-bool EditorAssetManager::IsMagmaAsset(Asset asset) {
-	return (uint64_t)asset.ID % 100'000 == 12345;
-}
-
 void EditorAssetManager::Load(const std::string& path) {
 	auto rootPath = fs::path(path) / "Asset";
 	m_Path = (rootPath / ".magma.assetpk").string();
@@ -530,7 +526,7 @@ void EditorAssetManager::Save() {
 
 	serializer.WriteKey("Assets").BeginSequence();
 	for(auto& [asset, _] : m_AssetRegistry) {
-		if(!asset.Primary || IsMagmaAsset(asset))
+		if(!asset.Primary || IsNativeAsset(asset))
 			continue;
 
 		serializer.BeginMapping();
@@ -760,7 +756,7 @@ void EditorAssetManager::RuntimeSave(const std::string& exportPath) {
 	uint64_t registryCount = 0;
 	uint64_t objectIdx = pack.GetPosition() + sizeof(uint64_t);
 	for(const auto& [asset, _] : m_AssetRegistry) {
-		if(IsMagmaAsset(asset))
+		if(IsNativeAsset(asset))
 			continue;
 
 		objectIdx += sizeof(uint64_t) + sizeof(uint8_t) + sizeof(bool); // ID, Type, Primary
@@ -781,7 +777,7 @@ void EditorAssetManager::RuntimeSave(const std::string& exportPath) {
 
 	uint64_t registryPos = 0;
 	for(const auto& [asset, _] : m_AssetRegistry) {
-		if(IsMagmaAsset(asset))
+		if(IsNativeAsset(asset))
 			continue;
 
 		pack.Write(asset); // Asset data (type, id, primary, name, refs)

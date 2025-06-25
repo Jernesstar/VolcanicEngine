@@ -257,7 +257,7 @@ void DrawComponent<MeshComponent>(Entity& entity) {
 		component.MeshSourceAsset = panel->GetSelected();
 
 	auto assets = AssetManager::Get()->As<EditorAssetManager>();
-	if(assets->IsMagmaAsset(component.MeshSourceAsset)) {
+	if(assets->IsNativeAsset(component.MeshSourceAsset)) {
 		ImGui::Text("Material: %llu", (uint64_t)component.MaterialAsset.ID);
 		std::string text =
 			component.MaterialAsset.ID ? "Change Asset" : "Set Asset";

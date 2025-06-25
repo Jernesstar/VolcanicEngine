@@ -37,12 +37,13 @@ struct PointLight {
 	float Constant;
 	float Linear;
 	float Quadratic;
-	float _padding;
+	float BloomStrength;
 
 	PointLight(const PointLightComponent& pc)
 		: Position(pc.Position, 0.0f), Ambient(pc.Ambient, 0.0f),
 		Diffuse(pc.Diffuse, 0.0f), Specular(pc.Specular, 0.0f),
-		Constant(pc.Constant), Linear(pc.Linear), Quadratic(pc.Quadratic) { }
+		Constant(pc.Constant), Linear(pc.Linear), Quadratic(pc.Quadratic),
+		BloomStrength(pc.Bloom ? 0.0f, 0.04f) { }
 };
 
 struct Spotlight {
@@ -81,6 +82,7 @@ struct ParticleEmitter {
 	uint64_t MaxParticleCount;
 	float ParticleLifetime; // In milliseconds
 	float SpawnInterval; // In milliseconds
+	float Offset;
 	float Timer;
 
 	Ref<Texture> Material;
@@ -90,8 +92,9 @@ struct ParticleEmitter {
 };
 
 static List<BloomMip> s_MipChain;
-static uint32_t s_MipChainLength = 8; // TODO(Change): These are material settings
+static uint32_t s_MipChainLength = 8;
 static float s_FilterRadius = 0.005f;
+// TODO(Move): These are material settings
 static float s_Exposure = 1.0f;
 static float s_BloomStrength = 0.04f;
 
@@ -123,7 +126,7 @@ RuntimeSceneRenderer::RuntimeSceneRenderer() {
 				{ "Constant",  BufferDataType::Float },
 				{ "Linear",	   BufferDataType::Float },
 				{ "Quadratic", BufferDataType::Float },
-				{ "_padding", BufferDataType::Float },
+				{ "BloomStrength", BufferDataType::Float },
 			}, 50);
 
 	SpotlightBuffer =
@@ -258,6 +261,8 @@ void RuntimeSceneRenderer::Update(TimeStep ts) {
 			.SetInput("u_Emitter.Position", emitter.Position);
 			command->UniformData
 			.SetInput("u_Emitter.ParticleLifetime", emitter.ParticleLifetime);
+			command->UniformData
+			.SetInput("u_Emitter.Offset", emitter.Offset);
 			command->UniformData
 			.SetInput(StorageSlot{ emitter.ParticleBuffer, "", 0 });
 			command->UniformData
@@ -401,61 +406,58 @@ void RuntimeSceneRenderer::SubmitMesh(const Entity& entity) {
 			Renderer3D::DrawMesh(mesh, tc);
 		}
 		Renderer::EndPass();
+		return;
 	}
-	else {
-		assetManager->Load(mc.MaterialAsset);
-		auto material = assetManager->Get<Magma::Material>(mc.MaterialAsset);
-		VolcaniCore::Material mat;
-		UUID id;
-		Asset textureAsset;
 
-		id = material->TextureUniforms["u_Diffuse"];
-		if(id) {
-			textureAsset = { id, AssetType::Texture };
-			assetManager->Load(textureAsset);
-			mat.Diffuse = assetManager->Get<Texture>(textureAsset);
-		}
+	auto material = assetManager->Get<Magma::Material>(mc.MaterialAsset);
+	VolcaniCore::Material mat;
+	UUID id;
+	Asset textureAsset;
 
-		id = material->TextureUniforms["u_Specular"];
-		if(id) {
-			textureAsset = { id, AssetType::Texture };
-			assetManager->Load(textureAsset);
-			mat.Specular = assetManager->Get<Texture>(textureAsset);
-		}
-
-		id = material->TextureUniforms["u_Emissive"];
-		if(id) {
-			textureAsset = { id, AssetType::Texture };
-			assetManager->Load(textureAsset);
-			mat.Emissive = assetManager->Get<Texture>(textureAsset);
-		}
-
-		mat.DiffuseColor = material->Vec4Uniforms["u_DiffuseColor"];
-		mat.SpecularColor = material->Vec4Uniforms["u_SpecularColor"];
-		mat.EmissiveColor = material->Vec4Uniforms["u_EmissiveColor"];
-		Renderer::StartPass(LightingPass);
-		{
-			DrawCommand* command = Renderer::GetCommand();
-			command->UniformData
-			.SetInput("u_Material.IsTextured", (bool)mat.Diffuse);
-			command->UniformData
-			.SetInput("u_Material.Diffuse", TextureSlot{ mat.Diffuse, 0 });
-			command->UniformData
-			.SetInput("u_Material.Specular", TextureSlot{ mat.Specular, 1 });
-			command->UniformData
-			.SetInput("u_Material.Emissive", TextureSlot{ mat.Emissive, 2 });
-
-			command->UniformData
-			.SetInput("u_Material.DiffuseColor", mat.DiffuseColor);
-			command->UniformData
-			.SetInput("u_Material.SpecularColor", mat.SpecularColor);
-			command->UniformData
-			.SetInput("u_Material.EmissiveColor", mat.EmissiveColor);
-
-			Renderer3D::DrawMesh(mesh, tc, command);
-		}
-		Renderer::EndPass();
+	id = material->TextureUniforms["u_Diffuse"];
+	if(id) {
+		textureAsset = { id, AssetType::Texture };
+		assetManager->Load(textureAsset);
+		mat.Diffuse = assetManager->Get<Texture>(textureAsset);
 	}
+
+	id = material->TextureUniforms["u_Specular"];
+	if(id) {
+		textureAsset = { id, AssetType::Texture };
+		assetManager->Load(textureAsset);
+		mat.Specular = assetManager->Get<Texture>(textureAsset);
+	}
+
+	id = material->TextureUniforms["u_Emissive"];
+	if(id) {
+		textureAsset = { id, AssetType::Texture };
+		assetManager->Load(textureAsset);
+		mat.Emissive = assetManager->Get<Texture>(textureAsset);
+	}
+
+	mat.DiffuseColor = material->Vec4Uniforms["u_DiffuseColor"];
+	mat.SpecularColor = material->Vec4Uniforms["u_SpecularColor"];
+	mat.EmissiveColor = material->Vec4Uniforms["u_EmissiveColor"];
+
+	DrawCommand* command =
+		RendererAPI::Get()->NewDrawCommand(LightingPass->Get());
+	command->UniformData
+	.SetInput("u_Material.IsTextured", (bool)mat.Diffuse);
+	command->UniformData
+	.SetInput("u_Material.Diffuse", TextureSlot{ mat.Diffuse, 0 });
+	command->UniformData
+	.SetInput("u_Material.Specular", TextureSlot{ mat.Specular, 1 });
+	command->UniformData
+	.SetInput("u_Material.Emissive", TextureSlot{ mat.Emissive, 2 });
+
+	command->UniformData
+	.SetInput("u_Material.DiffuseColor", mat.DiffuseColor);
+	command->UniformData
+	.SetInput("u_Material.SpecularColor", mat.SpecularColor);
+	command->UniformData
+	.SetInput("u_Material.EmissiveColor", mat.EmissiveColor);
+
+	Renderer3D::DrawMesh(mesh, tc, command);
 }
 
 void RuntimeSceneRenderer::Render() {
@@ -482,7 +484,7 @@ void RuntimeSceneRenderer::Render() {
 	.SetInput("u_ViewProj",
 		LightingCommand->UniformData.Mat4Uniforms["u_ViewProj"]);
 	LightCommand->UniformData
-	.SetInput("u_Radius", 4.0f);
+	.SetInput("u_Radius", 0.5f);
 	LightCommand->UniformData
 	.SetInput("u_CameraPosition",
 		LightingCommand->UniformData.Vec3Uniforms["u_CameraPosition"]);

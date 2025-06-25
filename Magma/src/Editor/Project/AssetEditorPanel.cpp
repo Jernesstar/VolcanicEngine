@@ -76,6 +76,17 @@ static void EditAsset(Asset asset) {
 		}
 	}
 	else if(asset.Type == AssetType::Material) {
+		auto mat = assetManager->Get<Material>(asset);
+
+		ImGui::SeparatorText("Int Uniforms");
+		for(auto& [name, data] : mat->IntUniforms) {
+			ImGui::Text(name.c_str()); ImGui::SameLine();
+			ImGui::DragScalar(std::string("##S32##" + name).c_str(),
+								ImGuiDataType_S32, &data);
+		}
+		if(ImGui::Button("+")) {
+			
+		}
 
 		// Asset shader = assetManager->GetRefs(asset)[0];
 		// auto path = assetManager->GetPath(shader.ID);

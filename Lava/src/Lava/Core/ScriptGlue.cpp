@@ -482,6 +482,9 @@ void RegisterAssetManager() {
 	engine->RegisterObjectMethod("AssetManagerClass",
 		"Asset GetNamedAsset(const string &in)",
 		asMETHOD(AssetManager, GetNamedAsset), asCALL_THISCALL);
+	engine->RegisterObjectMethod("AssetManagerClass",
+		"Asset GetNativeAsset(const string &in)",
+		asMETHOD(AssetManager, GetNativeAsset), asCALL_THISCALL);
 
 	engine->RegisterObjectType("Sound", 0, asOBJ_REF | asOBJ_NOCOUNT);
 	engine->RegisterObjectMethod("Sound", "void Play(float volume)",
