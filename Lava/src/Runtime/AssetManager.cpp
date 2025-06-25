@@ -102,41 +102,42 @@ void RuntimeAssetManager::Load(Asset asset) {
 	if(asset.Type == AssetType::Mesh) {
 		Ref<Mesh> mesh = CreateRef<Mesh>(MeshType::Model);
 		pack.Read(mesh->SubMeshes);
-		m_MeshAssets[asset.ID] = mesh;
 
 		for(auto& materialRef : GetRefs(asset)) {
-			auto& mat = mesh->Materials.Emplace();
 			Load(materialRef);
 			auto material = Get<Magma::Material>(materialRef);
+			VolcaniCore::Material& mat = mesh->Materials.Emplace();
 
 			if(material->TextureUniforms.count("u_Diffuse")) {
-				auto id = material->TextureUniforms["u_Diffuse"];
+				UUID id = material->TextureUniforms["u_Diffuse"];
 				Asset textureAsset = { id, AssetType::Texture };
 				Load(textureAsset);
 				mat.Diffuse = Get<Texture>(textureAsset);
 			}
 
 			if(material->TextureUniforms.count("u_Specular")) {
-				auto id = material->TextureUniforms["u_Specular"];
+				UUID id = material->TextureUniforms["u_Specular"];
 				Asset textureAsset = { id, AssetType::Texture };
 				Load(textureAsset);
 				mat.Specular = Get<Texture>(textureAsset);
 			}
 
 			if(material->TextureUniforms.count("u_Emissive")) {
-				auto id = material->TextureUniforms.count("u_Emissive");
+				UUID id = material->TextureUniforms.count("u_Emissive");
 				Asset textureAsset = { id, AssetType::Texture };
 				Load(textureAsset);
 				mat.Emissive = Get<Texture>(textureAsset);
 			}
 
-			if(material->TextureUniforms.count("u_DiffuseColor"))
+			if(material->Vec4Uniforms.count("u_DiffuseColor"))
 				mat.DiffuseColor = material->Vec4Uniforms["u_DiffuseColor"];
-			if(material->TextureUniforms.count("u_SpecularColor"))
+			if(material->Vec4Uniforms.count("u_SpecularColor"))
 				mat.SpecularColor = material->Vec4Uniforms["u_SpecularColor"];
-			if(material->TextureUniforms.count("u_EmissiveColor"))
+			if(material->Vec4Uniforms.count("u_EmissiveColor"))
 				mat.EmissiveColor = material->Vec4Uniforms["u_EmissiveColor"];
 		}
+
+		m_MeshAssets[asset.ID] = mesh;
 	}
 	else if(asset.Type == AssetType::Texture) {
 		uint32_t width, height;

@@ -410,7 +410,7 @@ void RuntimeSceneRenderer::SubmitMesh(const Entity& entity) {
 		return;
 	}
 
-	if(!assetManager->IsValid(mc.MaterialAsset));
+	if(!assetManager->IsValid(mc.MaterialAsset))
 		return;
 
 	VolcaniCore::Material mat;
@@ -418,14 +418,14 @@ void RuntimeSceneRenderer::SubmitMesh(const Entity& entity) {
 	auto material = assetManager->Get<Magma::Material>(mc.MaterialAsset);
 
 	if(material->TextureUniforms.count("u_Diffuse")) {
-		auto id = material->TextureUniforms["u_Diffuse"];
+		UUID id = material->TextureUniforms["u_Diffuse"];
 		Asset textureAsset = { id, AssetType::Texture };
 		assetManager->Load(textureAsset);
 		mat.Diffuse = assetManager->Get<Texture>(textureAsset);
 	}
 
 	if(material->TextureUniforms.count("u_Specular")) {
-		auto id = material->TextureUniforms["u_Specular"];
+		UUID id = material->TextureUniforms["u_Specular"];
 		Asset textureAsset = { id, AssetType::Texture };
 		assetManager->Load(textureAsset);
 		mat.Specular = assetManager->Get<Texture>(textureAsset);
@@ -438,11 +438,11 @@ void RuntimeSceneRenderer::SubmitMesh(const Entity& entity) {
 		mat.Emissive = assetManager->Get<Texture>(textureAsset);
 	}
 
-	if(material->TextureUniforms.count("u_DiffuseColor"))
+	if(material->Vec4Uniforms.count("u_DiffuseColor"))
 		mat.DiffuseColor = material->Vec4Uniforms["u_DiffuseColor"];
-	if(material->TextureUniforms.count("u_SpecularColor"))
+	if(material->Vec4Uniforms.count("u_SpecularColor"))
 		mat.SpecularColor = material->Vec4Uniforms["u_SpecularColor"];
-	if(material->TextureUniforms.count("u_EmissiveColor"))
+	if(material->Vec4Uniforms.count("u_EmissiveColor"))
 		mat.EmissiveColor = material->Vec4Uniforms["u_EmissiveColor"];
 
 	DrawCommand* command =

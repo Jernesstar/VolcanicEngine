@@ -86,7 +86,7 @@ static void EditAsset(Asset asset) {
 
 	ImGui::SeparatorText("Int Uniforms");
 	for(auto& [name, data] : mat->IntUniforms) {
-		ImGui::PushID(name.c_str());
+		ImGui::PushID((name + "IntUniforms").c_str());
 
 		if(ImGui::Button("Delete"))
 			mat->IntUniforms.erase(name);
@@ -98,7 +98,6 @@ static void EditAsset(Asset asset) {
 		if(active && ImGui::IsKeyPressed(ImGuiKey_Enter, false)) {
 			mat->IntUniforms.erase(name);
 			mat->IntUniforms[str] = data;
-			continue;
 		}
 
 		ImGui::SameLine();
@@ -115,7 +114,7 @@ static void EditAsset(Asset asset) {
 
 	ImGui::SeparatorText("Float Uniforms");
 	for(auto& [name, data] : mat->FloatUniforms) {
-		ImGui::PushID(name.c_str());
+		ImGui::PushID((name + "FloatUniforms").c_str());
 
 		if(ImGui::Button("Delete"))
 			mat->FloatUniforms.erase(name);
@@ -127,12 +126,11 @@ static void EditAsset(Asset asset) {
 		if(active && ImGui::IsKeyPressed(ImGuiKey_Enter, false)) {
 			mat->FloatUniforms.erase(name);
 			mat->FloatUniforms[str] = data;
-			continue;
 		}
 
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(50);
-		ImGui::DragFloat("##Data", &data);
+		ImGui::DragFloat("##Data", &data, 0.01f);
 
 		ImGui::PopID();
 	}
@@ -144,7 +142,7 @@ static void EditAsset(Asset asset) {
 
 	ImGui::SeparatorText("Vec2 Uniforms");
 	for(auto& [name, data] : mat->Vec2Uniforms) {
-		ImGui::PushID(name.c_str());
+		ImGui::PushID((name + "Vec2Uniforms").c_str());
 
 		if(ImGui::Button("Delete"))
 			mat->Vec2Uniforms.erase(name);
@@ -156,12 +154,11 @@ static void EditAsset(Asset asset) {
 		if(active && ImGui::IsKeyPressed(ImGuiKey_Enter, false)) {
 			mat->Vec2Uniforms.erase(name);
 			mat->Vec2Uniforms[str] = data;
-			continue;
 		}
 
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(100);
-		ImGui::DragFloat2("##Data", &data.x);
+		ImGui::DragFloat2("##Data", &data.x, 0.01f);
 
 		ImGui::PopID();
 	}
@@ -173,7 +170,7 @@ static void EditAsset(Asset asset) {
 
 	ImGui::SeparatorText("Vec3 Uniforms");
 	for(auto& [name, data] : mat->Vec3Uniforms) {
-		ImGui::PushID(name.c_str());
+		ImGui::PushID((name + "Vec3Uniforms").c_str());
 
 		if(ImGui::Button("Delete"))
 			mat->Vec3Uniforms.erase(name);
@@ -185,12 +182,11 @@ static void EditAsset(Asset asset) {
 		if(active && ImGui::IsKeyPressed(ImGuiKey_Enter, false)) {
 			mat->Vec3Uniforms.erase(name);
 			mat->Vec3Uniforms[str] = data;
-			continue;
 		}
 
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(100);
-		ImGui::DragFloat3("##Data", &data.x);
+		ImGui::DragFloat3("##Data", &data.x, 0.01f);
 
 		ImGui::PopID();
 	}
@@ -202,7 +198,7 @@ static void EditAsset(Asset asset) {
 
 	ImGui::SeparatorText("Vec4 Uniforms");
 	for(auto& [name, data] : mat->Vec4Uniforms) {
-		ImGui::PushID(name.c_str());
+		ImGui::PushID((name + "Vec4Uniforms").c_str());
 		
 		if(ImGui::Button("Delete"))
 			mat->Vec4Uniforms.erase(name);
@@ -214,12 +210,11 @@ static void EditAsset(Asset asset) {
 		if(active && ImGui::IsKeyPressed(ImGuiKey_Enter, false)) {
 			mat->Vec4Uniforms.erase(name);
 			mat->Vec4Uniforms[str] = data;
-			continue;
 		}
 
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(200);
-		ImGui::DragFloat4("##Data", &data.x);
+		ImGui::DragFloat4("##Data", &data.x, 0.01f);
 
 		ImGui::PopID();
 	}
@@ -232,7 +227,7 @@ static void EditAsset(Asset asset) {
 	ImGui::SeparatorText("Texture Uniforms");
 	uint32_t i = 0;
 	for(auto& [name, data] : mat->TextureUniforms) {
-		ImGui::PushID(name.c_str());
+		ImGui::PushID((name + "TextureUniforms").c_str());
 
 		if(ImGui::Button("Delete"))
 			mat->TextureUniforms.erase(name);
@@ -244,7 +239,6 @@ static void EditAsset(Asset asset) {
 		if(active && ImGui::IsKeyPressed(ImGuiKey_Enter, false)) {
 			mat->TextureUniforms.erase(name);
 			mat->TextureUniforms[str] = data;
-			continue;
 		}
 
 		auto panel =

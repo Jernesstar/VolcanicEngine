@@ -857,7 +857,6 @@ void EditorSceneRenderer::SubmitMesh(const Entity& entity) {
 	.SetInput("u_Material.Diffuse", TextureSlot{ mat.Diffuse, 0 });
 	command->UniformData
 	.SetInput("u_Material.DiffuseColor", mat.DiffuseColor);
-	VOLCANICORE_LOG_INFO("%llu", (uint64_t)mc.MaterialAsset.ID);
 
 	Renderer3D::DrawMesh(mesh, tc, command);
 }

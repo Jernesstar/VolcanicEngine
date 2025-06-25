@@ -44,7 +44,7 @@ float rand(vec2 co)
 float rng(float low, float high, float seed)
 {
     seed += 1.61803399;
-    vec3 seedVec = vec3(fract(u_TimeStep), sin(u_TimeStep), cos(u_TimeStep));
+    vec3 seedVec = vec3(fract(u_TimeStep * u_TimeStep), sin(4 * sqrt(u_TimeStep)), cos(sqrt(u_TimeStep)));
     return umap(rand(tan(gl_GlobalInvocationID.xy) * seedVec.xy + seedVec.z * seed * seed), low, high);
 }
 

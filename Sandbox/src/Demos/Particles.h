@@ -8,6 +8,7 @@ struct Emitter {
 	uint64_t MaxParticleCount;
 	float ParticleLifetime; // In milliseconds
 	float SpawnInterval; // In milliseconds
+	float Offset;
 	float Timer;
 
 	Ref<StorageBuffer> ParticleBuffer;
@@ -108,6 +109,7 @@ Particles::Particles() {
 			.MaxParticleCount = 1000,
 			.ParticleLifetime = 3000.0f,
 			.SpawnInterval = 10.0f,
+			.Offset = 10.0f,
 			.Timer = 0,
 			.ParticleBuffer = StorageBuffer::Create(particleLayout, data),
 			.FreeListBuffer = StorageBuffer::Create(freeListLayout, freelist)
@@ -145,6 +147,8 @@ void Particles::OnUpdate(TimeStep ts) {
 			.SetInput("u_Emitter.Position", emitter.Position);
 			command->UniformData
 			.SetInput("u_Emitter.ParticleLifetime", emitter.ParticleLifetime);
+			command->UniformData
+			.SetInput("u_Emitter.Offset", emitter.Offset);
 			command->UniformData
 			.SetInput(StorageSlot{ emitter.ParticleBuffer, "", 0 });
 			command->UniformData

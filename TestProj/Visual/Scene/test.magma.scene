@@ -35,9 +35,9 @@ Scene:
         Components:
           TransformComponent:
             Transform:
-              Translation: [-15.9685726, -11.9331913, -77.1027679]
-              Rotation: [0, 0, 0]
-              Scale: [22.2000008, 11, 10.5]
+              Translation: [-15.9685726, -11.9331913, -41.0779381]
+              Rotation: [-0.379014879, -0, 0]
+              Scale: [22.2000008, 11.000001, 24.3892193]
           MeshComponent:
             MeshSourceID: 10012345
             MaterialID: 11837670142847334937
@@ -74,7 +74,7 @@ Scene:
           SpotlightComponent:
             Light:
               Ambient: [1, 1, 1]
-              Diffuse: [1, 1, 1]
+              Diffuse: [0.969026566, 0.012863161, 0.012863161]
               Specular: [1, 1, 1]
               Position: [-2.35150003, 1.17734766, 9.42599583]
               Direction: [-0.586527944, -0.711405635, -0.776560009]
@@ -125,7 +125,7 @@ Scene:
             Tag: MainCharacter
           TransformComponent:
             Transform:
-              Translation: [-0.428657055, 1, 10]
+              Translation: [-0.428657055, 1, 10.7950983]
               Rotation: [0, 0.000174532892, 0]
               Scale: [1, 0.999973536, 0.999973536]
           MeshComponent:
@@ -154,7 +154,7 @@ Scene:
               - Field:
                   Name: Signed8
                   Type: int8
-                  Value: 92
+                  Value: 49
               - Field:
                   Name: Unsigned32
                   Type: uint32
@@ -174,11 +174,11 @@ Scene:
                     Width: 5
                     Height: 5
                     Data:
-                      - [0, 0, 0, 0, 0]
-                      - [0, 0, 0, 0, 0]
-                      - [0, 1, 0, 0, 0]
+                      - [1, 0, 0, 0, 1]
+                      - [0, 1, 0, 1, 0]
                       - [0, 0, 1, 0, 0]
-                      - [0, 0, 0, 1, 0]
+                      - [0, 1, 0, 1, 0]
+                      - [1, 0, 0, 0, 1]
               - Field:
                   Name: SomeVec3
                   Type: Vec3

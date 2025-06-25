@@ -314,15 +314,13 @@ Asset EditorAssetManager::Add(AssetType type, UUID id, bool primary,
 			List<std::string> names =
 				{ "u_Diffuse", "u_Specular", "u_Emissive" };
 			for(uint32_t i = 0; i < 3; i++) {
-				auto name = names[i];
+				std::string name = names[i];
 				mat->Vec4Uniforms[name + "Color"] =
 					*(&matPaths.DiffuseColor + i);
 
 				auto refPath = matPaths[i];
-				if(refPath == "") {
-					mat->TextureUniforms[name] = 0;
+				if(refPath == "")
 					continue;
-				}
 
 				Asset textureAsset = Add(AssetType::Texture, 0, false, refPath);
 				AddRef(materialAsset, textureAsset);
@@ -506,10 +504,10 @@ void EditorAssetManager::Load(const std::string& path) {
 	}
 
 	// Magma assets
-	Asset cubeMesh = Add(AssetType::Mesh, 10012345);
-	m_MeshAssets[cubeMesh.ID] = Mesh::Create(MeshType::Cube);
-	Asset quadMesh = Add(AssetType::Mesh, 10112345);
-	m_MeshAssets[cubeMesh.ID] = Mesh::Create(MeshType::Quad);
+	m_AssetRegistry[Asset{ 10012345, AssetType::Mesh }] = true;
+	m_MeshAssets[10012345] = Mesh::Create(MeshType::Cube);
+	m_AssetRegistry[Asset{ 10112345, AssetType::Mesh }] = true;
+	m_MeshAssets[10112345] = Mesh::Create(MeshType::Quad);
 }
 
 void EditorAssetManager::Save() {
@@ -793,7 +791,7 @@ void EditorAssetManager::RuntimeSave(const std::string& exportPath) {
 			pack.Write(mesh->SubMeshes);
 		}
 		else if(asset.Type == AssetType::Texture) {
-			ImageData image = AssetImporter::GetImageData(path, false);
+			ImageData image = AssetImporter::GetImageData(path);
 			pack.Write(image.Width);
 			pack.Write(image.Height);
 			pack.WriteData(image.Data.Get(), image.Data.GetSize());
