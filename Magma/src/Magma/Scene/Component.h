@@ -165,10 +165,9 @@ struct ParticleEmitterComponent : public Component {
 
 	ParticleEmitterComponent() = default;
 	ParticleEmitterComponent(const Vec3& pos, uint64_t max, float lifetime,
-		float spawnInterval, const Asset& asset)
-		: Position(pos), MaxParticleCount(max),
-		SpawnInterval(spawnInterval), ParticleLifetime(lifetime),
-		MaterialAsset(asset) { }
+		float spawnInterval, float offset, const Asset& asset)
+		: Position(pos), MaxParticleCount(max), ParticleLifetime(lifetime),
+		SpawnInterval(spawnInterval), Offset(offset), MaterialAsset(asset) { }
 	ParticleEmitterComponent(const ParticleEmitterComponent& other) = default;
 };
 

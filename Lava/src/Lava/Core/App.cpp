@@ -49,7 +49,6 @@ struct RuntimeScreen {
 	RuntimeScreen()
 		: World(CreateRef<Scene>("")), UI("")
 	{
-		World->RegisterSystems();
 	}
 
 	~RuntimeScreen() {
@@ -84,7 +83,6 @@ static AssetManager& GetAssetManagerInstance() {
 }
 
 static void ScriptLoadScene(const std::string& name, App* app) {
-	s_Screen->World->UnregisterSystems();
 	s_Screen->World->Name = name;
 	s_Screen->World->EntityWorld.Reset();
 	s_Screen->World->RegisterSystems();

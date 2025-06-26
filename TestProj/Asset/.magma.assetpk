@@ -40,6 +40,10 @@ AssetPack:
           TextureUniforms:
             []
     - Asset:
+        ID: 14786163484492344065
+        Type: Mesh
+        Path: Mesh/torch/Torch.obj
+    - Asset:
         ID: 15277418182178081176
         Type: Mesh
         Name: Player

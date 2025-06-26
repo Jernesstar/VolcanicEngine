@@ -191,14 +191,14 @@ static void DrawSubMesh(Ref<Mesh> root, SubMesh& mesh, const glm::mat4& tr,
 	if(s_Meshes.count(&mesh))
 		command = s_Meshes[&mesh];
 	else {
-		if(Renderer::GetPass())
+		if(Renderer::GetPass()) {
 			command = Renderer::NewCommand();
+			s_Meshes[&mesh] = command;
+		}
 		else {
 			command = RendererAPI::Get()->NewDrawCommand(cmd->Pass);
 			command->UniformData = cmd->UniformData;
 		}
-
-		s_Meshes[&mesh] = command;
 	}
 
 	if(!command->VerticesCount) {

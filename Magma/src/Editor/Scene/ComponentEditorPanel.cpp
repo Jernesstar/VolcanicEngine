@@ -731,9 +731,9 @@ void DrawComponent<ParticleEmitterComponent>(Entity& entity) {
 	ImGui::Text("Offset"); ImGui::SameLine(200.0f);
 	ImGui::SetNextItemWidth(50);
 	ImGui::DragFloat("##Offset", &component.Offset,
-		1.0f, 1.0f, 99000.0f, "%.0f");
+		0.01f, 0.0f, 1000.0f, "%.3f");
 
-	ImGui::Text("Material: %li", (uint64_t)component.MaterialAsset.ID);
+	ImGui::Text("Material: %llu", (uint64_t)component.MaterialAsset.ID);
 
 	auto text = component.MaterialAsset.ID ? "Change Asset" : "Set Asset";
 

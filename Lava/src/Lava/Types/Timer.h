@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Magma/Script/ScriptEngine.h>
+
 namespace Lava {
 
 enum class TimerType { Single, Repeat };

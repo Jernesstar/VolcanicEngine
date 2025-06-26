@@ -115,18 +115,41 @@ ScriptEditorPanel::ScriptEditorPanel()
 			if(name.find_first_not_of(' ') == std::string::npos)
 				return;
 
-			// 1. Find variable in debugger
-			ScriptField field = ScriptManager::GetVariable(name);
-
-			// 2. ToString
-			std::string str;
-			if(field.TypeID == asTYPEID_UINT32)
-				str = std::to_string(*field.As<uint32_t>());
-
-			// 3. Display tooltip
 			ImGui::BeginTooltip();
 
-			ImGui::Text(str.c_str());
+			ScriptField field = ScriptManager::GetVariable(name);
+			std::string type;
+			if(field.Type)
+				type = field.Type->GetName();
+
+			std::string str;
+			if(field.TypeID == asTYPEID_UINT32) {
+				str = std::to_string(*field.As<uint32_t>());
+				ImGui::Text(str.c_str());
+			}
+			else if(type == "Asset") {
+				auto* assets = AssetManager::Get()->As<EditorAssetManager>();
+				Asset asset = *field.As<Asset>();
+				assets->Load(asset);
+				Ref<Texture> texture = assets->Get<Texture>(asset);
+
+				UI::Image image;
+				image.x = 5.0f;
+				image.Width = 120;
+				image.Height = 120;
+				image.Content = texture;
+				// image.Content = s_Thumbnails[data];
+				image.Render();
+
+				auto name = assets->GetAssetName(asset);
+				auto path = assets->GetPath(asset.ID);
+				if(name != "")
+					ImGui::Text(name.c_str());
+				else if(path != "")
+					ImGui::Text(fs::path(path).filename().string().c_str());
+				else
+					ImGui::Text("%llu", (uint64_t)asset.ID);
+			}
 
 			ImGui::EndTooltip();
 		});

@@ -5,8 +5,8 @@
             "Type": "Window",
             "Width": 731,
             "Height": 341,
-            "x": 617.0,
-            "y": 331.0,
+            "x": 206.0,
+            "y": 237.0,
             "xAlignment": "Left",
             "yAlignment": "Top",
             "UsePosition": true,
@@ -41,7 +41,7 @@
             "Width": 164,
             "Height": 15,
             "x": 268.0,
-            "y": 96.0,
+            "y": 108.0,
             "xAlignment": "Left",
             "yAlignment": "Top",
             "UsePosition": true,
@@ -57,8 +57,8 @@
             "Parent": "Window1",
             "Width": 278,
             "Height": 92,
-            "x": 231.0,
-            "y": 138.0,
+            "x": 198.0,
+            "y": 156.0,
             "xAlignment": "Left",
             "yAlignment": "Top",
             "UsePosition": true,
@@ -74,6 +74,22 @@
                     "Value": 1
                 }
             ]
-        }
-    ]
+        },
+        {
+            "ID": "777",
+            "Type": "Text",
+            "Parent": "Window1",
+            "Width": 55,
+            "Height": 15,
+            "x": 161.0,
+            "y": 49.0,
+            "xAlignment": "Left",
+            "yAlignment": "Top",
+            "UsePosition": true,
+            "Color": [0.476190447807312, 0.11337867379188538, 0.11337867379188538, 1.0],
+            "ModuleID": 0,
+            "Class": "",
+            "Text": "777 text",
+            "TextColor": [0.476190447807312, 0.11337867379188538, 0.11337867379188538, 1.0]
+        }]
 }

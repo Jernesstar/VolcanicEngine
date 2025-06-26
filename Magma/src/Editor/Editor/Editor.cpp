@@ -434,6 +434,8 @@ void Editor::NewProject(const std::string& volcPath) {
 }
 
 void Editor::OpenProject() {
+	Application::PopDir();
+
 	IGFD::FileDialogConfig config;
 	config.path = m_Project.Path;
 	auto instance = ImGuiFileDialog::Instance();
@@ -450,6 +452,8 @@ void Editor::OpenProject() {
 		instance->Close();
 		menu.project.openProject = false;
 	}
+
+	Application::PushDir();
 }
 
 void Editor::RunProject() {

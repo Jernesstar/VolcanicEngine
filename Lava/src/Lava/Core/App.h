@@ -31,6 +31,7 @@ public:
 	Func<void, Ref<ScriptModule>&, const std::string&> ScreenLoad;
 	Func<void, Scene&> SceneLoad;
 	Func<void, UIPage&> UILoad;
+	Func<void, const std::string&> Log;
 
 public:
 	App();

@@ -269,6 +269,7 @@ BinaryReader& BinaryReader::ReadObject(ParticleEmitterComponent& comp) {
 	Read(comp.MaxParticleCount);
 	Read(comp.ParticleLifetime);
 	Read(comp.SpawnInterval);
+	Read(comp.Offset);
 
 	uint64_t id;
 	Read(id);
@@ -312,8 +313,10 @@ BinaryReader& BinaryReader::ReadObject(Entity& entity) {
 		Read(entity.Set<PointLightComponent>());
 	if(componentBits.test(10))
 		Read(entity.Set<SpotlightComponent>());
-	if(componentBits.test(11))
+	if(componentBits.test(11)) {
 		Read(entity.Set<ParticleEmitterComponent>());
+		entity.GetHandle().modified<ParticleEmitterComponent>();
+	}
 
 	return *this;
 }

@@ -791,7 +791,7 @@ void EditorAssetManager::RuntimeSave(const std::string& exportPath) {
 			pack.Write(mesh->SubMeshes);
 		}
 		else if(asset.Type == AssetType::Texture) {
-			ImageData image = AssetImporter::GetImageData(path);
+			ImageData image = AssetImporter::GetImageData(path, false);
 			pack.Write(image.Width);
 			pack.Write(image.Height);
 			pack.WriteData(image.Data.Get(), image.Data.GetSize());

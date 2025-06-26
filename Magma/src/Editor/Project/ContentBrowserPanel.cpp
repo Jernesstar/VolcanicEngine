@@ -24,8 +24,8 @@ struct {
 	} add;
 } static options;
 
-Ref<UI::Image> s_FileIcon;
-Ref<UI::Image> s_FolderIcon;
+static Ref<UI::Image> s_FileIcon;
+static Ref<UI::Image> s_FolderIcon;
 
 static bool s_Selecting = false;
 static uint32_t s_SelectionID = 0;
@@ -148,6 +148,7 @@ void ContentBrowserPanel::Draw() {
 							assets->NameAsset(newAsset, name);
 							auto panel = m_Tab->GetPanel("AssetEditor");
 							panel->As<AssetEditorPanel>()->Select(newAsset);
+							name = "";
 						}
 					}
 
@@ -290,7 +291,7 @@ void ContentBrowserPanel::RenderAssetTable() {
 			else if(path != "")
 				ImGui::TextWrapped(path.c_str());
 			else
-				ImGui::Text("%lu", (uint64_t)asset.ID);
+				ImGui::Text("%llu", (uint64_t)asset.ID);
 		}
 
 		ImGui::EndTable();
@@ -361,7 +362,7 @@ void DrawAssetSelectWindow() {
 			else if(path != "")
 				ImGui::Text(fs::path(path).filename().string().c_str());
 			else
-				ImGui::Text("%lu", (uint64_t)s_Selection.ID);
+				ImGui::Text("%llu", (uint64_t)s_Selection.ID);
 		}
 		else {
 			ImGui::Text("No Asset Selected");

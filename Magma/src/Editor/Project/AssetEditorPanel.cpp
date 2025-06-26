@@ -24,7 +24,9 @@ using namespace VolcaniCore;
 namespace Magma {
 
 AssetEditorPanel::AssetEditorPanel()
-	: Panel("AssetEditor") { }
+	: Panel("AssetEditor")
+{
+}
 
 void AssetEditorPanel::Update(TimeStep ts) {
 
@@ -236,6 +238,39 @@ static void EditAsset(Asset asset) {
 		std::string str = name;
 		ImGui::SetNextItemWidth(150);
 		bool active = ImGui::InputText("##Name", &str);
+
+		if(ImGui::IsItemHovered()) {
+			ImGui::BeginTooltip();
+
+			if(data) {
+				Asset asset = { data, AssetType::Texture };
+				assetManager->Load(asset);
+				Ref<Texture> texture = assetManager->Get<Texture>(asset);
+
+				UI::Image image;
+				image.x = 5.0f;
+				image.Width = 120;
+				image.Height = 120;
+				image.Content = texture;
+				// image.Content = s_Thumbnails[data];
+				image.Render();
+
+				auto name = assetManager->GetAssetName(asset);
+				auto path = assetManager->GetPath(data);
+				if(name != "")
+					ImGui::Text(name.c_str());
+				else if(path != "")
+					ImGui::Text(fs::path(path).filename().string().c_str());
+				else
+					ImGui::Text("%llu", (uint64_t)data);
+			}
+			else {
+				ImGui::Text("No Asset Selected");
+				// TODO(Art): Little indent with barred circle or something
+			}
+
+			ImGui::EndTooltip();
+		}
 		if(active && ImGui::IsKeyPressed(ImGuiKey_Enter, false)) {
 			mat->TextureUniforms.erase(name);
 			mat->TextureUniforms[str] = data;

@@ -54,6 +54,30 @@ Scene:
             MeshSourceID: 15277418182178081176
             MaterialID: 0
     - Entity:
+        Name: Torch
+        ID: 1112
+        Components:
+          TransformComponent:
+            Transform:
+              Translation: [-6.69999981, 5.68572998, 2.33681917]
+              Rotation: [0, -0, 0]
+              Scale: [2.30330372, 2.53836393, 2.26286674]
+          MeshComponent:
+            MeshSourceID: 14786163484492344065
+            MaterialID: 0
+    - Entity:
+        Name: the torch
+        ID: 1114
+        Components:
+          TransformComponent:
+            Transform:
+              Translation: [-8.02209473, 3.27406311, 4.61811876]
+              Rotation: [7.27948617e-08, 0.399763256, 0.335438699]
+              Scale: [3.83048987, 0.999999523, 0.999999642]
+          MeshComponent:
+            MeshSourceID: 14786163484492344065
+            MaterialID: 0
+    - Entity:
         Name: ""
         ID: 964
         Components:
@@ -125,9 +149,9 @@ Scene:
             Tag: MainCharacter
           TransformComponent:
             Transform:
-              Translation: [-0.428657055, 1, 10.7950983]
-              Rotation: [0, 0.000174532892, 0]
-              Scale: [1, 0.999973536, 0.999973536]
+              Translation: [-0.638636351, 1, 10.7950983]
+              Rotation: [-0.41754818, 0.000159537347, -7.07764411e-05]
+              Scale: [1, 0.999972284, 0.999973238]
           MeshComponent:
             MeshSourceID: 15277418182178081176
             MaterialID: 0
@@ -158,7 +182,7 @@ Scene:
               - Field:
                   Name: Unsigned32
                   Type: uint32
-                  Value: 218
+                  Value: 177
               - Field:
                   Name: Float
                   Type: float
@@ -174,12 +198,44 @@ Scene:
                     Width: 5
                     Height: 5
                     Data:
-                      - [1, 0, 0, 0, 1]
+                      - [1, 0, 1, 0, 1]
                       - [0, 1, 0, 1, 0]
-                      - [0, 0, 1, 0, 0]
+                      - [1, 0, 1, 0, 1]
                       - [0, 1, 0, 1, 0]
-                      - [1, 0, 0, 0, 1]
+                      - [1, 0, 1, 0, 1]
               - Field:
                   Name: SomeVec3
                   Type: Vec3
                   Value: [0, 0, 0]
+    - Entity:
+        Name: Flames
+        ID: 1113
+        Components:
+          ParticleEmitterComponent:
+            Position: [-6.5999999, 7.5, 2.29999995]
+            MaxParticleCount: 1000
+            ParticleLifetime: 2000
+            SpawnInterval: 10
+            Offset: 0.589999974
+            MaterialID: 0
+    - Entity:
+        Name: MyObj01
+        ID: 1115
+        Components:
+          MeshComponent:
+            MeshSourceID: 4186775327602265389
+            MaterialID: 0
+    - Entity:
+        Name: MyObjLight
+        ID: 1116
+        Components:
+          PointLightComponent:
+            Light:
+              Ambient: [0, 0, 0]
+              Diffuse: [0, 0, 0]
+              Specular: [0, 0, 0]
+              Position: [15.4936514, 4.41252518, 11.5849981]
+              Constant: 0
+              Linear: 0
+              Quadratic: 0
+              Bloom: false

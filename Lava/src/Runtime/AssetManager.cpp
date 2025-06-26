@@ -194,6 +194,7 @@ void RuntimeAssetManager::Load(Asset asset) {
 		pack.Read(mat->Mat2Uniforms);
 		pack.Read(mat->Mat3Uniforms);
 		pack.Read(mat->Mat4Uniforms);
+		pack.Read(mat->TextureUniforms);
 
 		m_MaterialAssets[asset.ID] = mat;
 	}
