@@ -212,30 +212,9 @@ Scene:
         ID: 1113
         Components:
           ParticleEmitterComponent:
-            Position: [-6.5999999, 7.5, 2.29999995]
+            Position: [-6.75, 7.5, 2.29999995]
             MaxParticleCount: 1000
             ParticleLifetime: 2000
             SpawnInterval: 10
             Offset: 0.589999974
             MaterialID: 0
-    - Entity:
-        Name: MyObj01
-        ID: 1115
-        Components:
-          MeshComponent:
-            MeshSourceID: 4186775327602265389
-            MaterialID: 0
-    - Entity:
-        Name: MyObjLight
-        ID: 1116
-        Components:
-          PointLightComponent:
-            Light:
-              Ambient: [0, 0, 0]
-              Diffuse: [0, 0, 0]
-              Specular: [0, 0, 0]
-              Position: [15.4936514, 4.41252518, 11.5849981]
-              Constant: 0
-              Linear: 0
-              Quadratic: 0
-              Bloom: false

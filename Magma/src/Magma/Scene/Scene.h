@@ -18,7 +18,7 @@ public:
 
 public:
 	Scene(const std::string& name = "Untitled Scene");
-	~Scene();
+	~Scene() = default;
 
 	void OnUpdate(TimeStep ts);
 	void OnRender(SceneRenderer& renderer);

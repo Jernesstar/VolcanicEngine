@@ -58,6 +58,7 @@ struct RuntimeScreen {
 
 		App::Get()->GetRenderer().OnSceneClose();
 		UI.Clear();
+		World->UnregisterSystems();
 		World.reset();
 	}
 };

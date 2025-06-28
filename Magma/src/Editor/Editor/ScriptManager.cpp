@@ -224,10 +224,11 @@ void ScriptManager::Continue() {
 }
 
 ScriptField ScriptManager::GetVariable(const std::string& name) {
-	for(uint32_t i = 0; i < s_Context->GetVarCount(); i++) {
+	for(int i = 0; i < s_Context->GetVarCount(); i++) {
 		const char* varName;
 		int typeID;
 		s_Context->GetVar(i, 0, &varName, &typeID);
+
 		if(std::string(varName) == name) {
 			auto* varPtr = s_Context->GetAddressOfVar(i, 0);
 			auto typeInfo = ScriptEngine::Get()->GetTypeInfoById(typeID);

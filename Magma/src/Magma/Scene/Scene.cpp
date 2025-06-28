@@ -11,8 +11,72 @@ using namespace Magma::Physics;
 namespace Magma {
 
 Scene::Scene(const std::string& name)
-	: Name(name)
-{
+	: Name(name) { }
+
+void Scene::OnUpdate(TimeStep ts) {
+	EntityWorld.OnUpdate(ts);
+}
+
+void Scene::OnRender(SceneRenderer& renderer) {
+	auto& world = EntityWorld.GetNative();
+
+	renderer.Begin();
+
+	// TODO(Change): Cache queries
+	world.query_builder()
+	.with<CameraComponent>()
+	.build()
+	.each(
+		[&](flecs::entity id)
+		{
+			renderer.SubmitCamera(Entity{ id });
+		});
+
+	world.query_builder()
+	.with<SkyboxComponent>()
+	.build()
+	.each(
+		[&](flecs::entity id)
+		{
+			renderer.SubmitSkybox(Entity{ id });
+		});
+
+	world.query_builder()
+	.with<DirectionalLightComponent>().or_()
+	.with<PointLightComponent>().or_()
+	.with<SpotlightComponent>()
+	.build()
+	.each(
+		[&](flecs::entity id)
+		{
+			renderer.SubmitLight(Entity{ id });
+		});
+
+	world.query_builder()
+	.with<ParticleEmitterComponent>()
+	.build()
+	.each(
+		[&](flecs::entity id)
+		{
+			renderer.SubmitParticles(Entity{ id });
+		});
+
+	world.query_builder()
+	.with<MeshComponent>().and_().with<TransformComponent>()
+	.build()
+	.each(
+		[&](flecs::entity id)
+		{
+			renderer.SubmitMesh(Entity{ id });
+		});
+
+	renderer.Render();
+}
+
+void Scene::RegisterSystems() {
+	EntityWorld.Add<PhysicsSystem>();
+	EntityWorld.Add<ScriptSystem>();
+
 	for(auto phase : { flecs::PreUpdate, flecs::OnUpdate, flecs::PostUpdate }) {
 		Phase ourPhase;
 		if(phase == flecs::PreUpdate)
@@ -132,75 +196,6 @@ Scene::Scene(const std::string& name)
 			else if(it.event() == flecs::OnRemove)
 				sys->OnComponentRemove(entity);
 		});
-}
-
-Scene::~Scene() {
-	UnregisterSystems();
-}
-
-void Scene::OnUpdate(TimeStep ts) {
-	EntityWorld.OnUpdate(ts);
-}
-
-void Scene::OnRender(SceneRenderer& renderer) {
-	auto& world = EntityWorld.GetNative();
-
-	renderer.Begin();
-
-	// TODO(Change): Cache queries
-	world.query_builder()
-	.with<CameraComponent>()
-	.build()
-	.each(
-		[&](flecs::entity id)
-		{
-			renderer.SubmitCamera(Entity{ id });
-		});
-
-	world.query_builder()
-	.with<SkyboxComponent>()
-	.build()
-	.each(
-		[&](flecs::entity id)
-		{
-			renderer.SubmitSkybox(Entity{ id });
-		});
-
-	world.query_builder()
-	.with<DirectionalLightComponent>().or_()
-	.with<PointLightComponent>().or_()
-	.with<SpotlightComponent>()
-	.build()
-	.each(
-		[&](flecs::entity id)
-		{
-			renderer.SubmitLight(Entity{ id });
-		});
-
-	world.query_builder()
-	.with<ParticleEmitterComponent>()
-	.build()
-	.each(
-		[&](flecs::entity id)
-		{
-			renderer.SubmitParticles(Entity{ id });
-		});
-
-	world.query_builder()
-	.with<MeshComponent>().and_().with<TransformComponent>()
-	.build()
-	.each(
-		[&](flecs::entity id)
-		{
-			renderer.SubmitMesh(Entity{ id });
-		});
-
-	renderer.Render();
-}
-
-void Scene::RegisterSystems() {
-	EntityWorld.Add<PhysicsSystem>();
-	EntityWorld.Add<ScriptSystem>();
 }
 
 void Scene::UnregisterSystems() {

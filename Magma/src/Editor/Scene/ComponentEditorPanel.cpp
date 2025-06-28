@@ -195,7 +195,7 @@ void DrawComponent<TransformComponent>(Entity& entity) {
 	if(!entity.Has<TransformComponent>())
 		return;
 
-	auto& component = entity.Set<TransformComponent>();
+	auto component = entity.Get<TransformComponent>();
 	ImGui::SeparatorText("TransformComponent");
 
 	auto tr = glm::value_ptr(component.Translation);
@@ -212,7 +212,8 @@ void DrawComponent<TransformComponent>(Entity& entity) {
 	ImGui::SetNextItemWidth(150);
 	ImGui::DragFloat3("##Scale", sc, 0.5f, 0.0001f, +FLT_MAX, "%.2f");
 
-	component.Rotation = glm::radians(roD);
+	entity.Set<TransformComponent>() =
+		{ component.Translation, glm::radians(roD), component.Scale };
 }
 
 template<>
