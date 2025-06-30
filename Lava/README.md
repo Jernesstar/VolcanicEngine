@@ -5,10 +5,8 @@ The tools necessary to package and run the game, package it, and ship it
 - 
 
 # Codespace Structure
-## Lava
-The core library. Includes:
-* Project
+## The Library
+* class App
 * Game
 
-## Runtime
-A commandline tool. Takes in a project path and run the project
+## The Application

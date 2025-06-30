@@ -100,6 +100,8 @@ static float s_BloomStrength = 0.04f;
 
 static Map<uint64_t, ParticleEmitter> s_ParticleEmitters;
 
+static Map<UUID, DrawCommand*> s_MaterialMeshes;
+
 RuntimeSceneRenderer::RuntimeSceneRenderer() {
 	auto window = Application::GetWindow();
 	m_Output = Framebuffer::Create(window->GetWidth(), window->GetHeight());
@@ -445,23 +447,30 @@ void RuntimeSceneRenderer::SubmitMesh(const Entity& entity) {
 	if(material->Vec4Uniforms.count("u_EmissiveColor"))
 		mat.EmissiveColor = material->Vec4Uniforms["u_EmissiveColor"];
 
-	DrawCommand* command =
-		RendererAPI::Get()->NewDrawCommand(LightingPass->Get());
-	command->UniformData
-	.SetInput("u_Material.IsTextured", (bool)mat.Diffuse);
-	command->UniformData
-	.SetInput("u_Material.Diffuse", TextureSlot{ mat.Diffuse, 0 });
-	command->UniformData
-	.SetInput("u_Material.Specular", TextureSlot{ mat.Specular, 1 });
-	command->UniformData
-	.SetInput("u_Material.Emissive", TextureSlot{ mat.Emissive, 2 });
 
-	command->UniformData
-	.SetInput("u_Material.DiffuseColor", mat.DiffuseColor);
-	command->UniformData
-	.SetInput("u_Material.SpecularColor", mat.SpecularColor);
-	command->UniformData
-	.SetInput("u_Material.EmissiveColor", mat.EmissiveColor);
+	DrawCommand* command;
+	if(!s_MaterialMeshes.count(mc.MaterialAsset.ID)) {
+		command = s_MaterialMeshes[mc.MaterialAsset.ID] =
+			RendererAPI::Get()->NewDrawCommand(LightingPass->Get());
+
+		command->UniformData
+		.SetInput("u_Material.IsTextured", (bool)mat.Diffuse);
+		command->UniformData
+		.SetInput("u_Material.Diffuse", TextureSlot{ mat.Diffuse, 0 });
+		command->UniformData
+		.SetInput("u_Material.Specular", TextureSlot{ mat.Specular, 1 });
+		command->UniformData
+		.SetInput("u_Material.Emissive", TextureSlot{ mat.Emissive, 2 });
+
+		command->UniformData
+		.SetInput("u_Material.DiffuseColor", mat.DiffuseColor);
+		command->UniformData
+		.SetInput("u_Material.SpecularColor", mat.SpecularColor);
+		command->UniformData
+		.SetInput("u_Material.EmissiveColor", mat.EmissiveColor);
+	}
+
+	command = s_MaterialMeshes[mc.MaterialAsset.ID];
 
 	Renderer3D::DrawMesh(mesh, tc, command);
 }
@@ -513,6 +522,8 @@ void RuntimeSceneRenderer::Render() {
 	HasDirectionalLight = false;
 	PointLightCount = 0;
 	SpotlightCount = 0;
+
+	s_MaterialMeshes.clear();
 }
 
 void RuntimeSceneRenderer::InitMips() {

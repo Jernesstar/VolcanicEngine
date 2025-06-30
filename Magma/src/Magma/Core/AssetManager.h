@@ -153,7 +153,7 @@ public:
 	}
 
 protected:
-	std::map<Asset, bool> m_AssetRegistry;
+	OMap<Asset, bool> m_AssetRegistry;
 	Map<VolcaniCore::UUID, VolcaniCore::List<Asset>> m_References;
 	Map<Asset, std::string> m_NamedAssets;
 
