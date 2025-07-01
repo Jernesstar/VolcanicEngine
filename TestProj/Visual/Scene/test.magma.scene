@@ -186,7 +186,7 @@ Scene:
               - Field:
                   Name: Float
                   Type: float
-                  Value: 0
+                  Value: 3.14100003
               - Field:
                   Name: List
                   Type: array
