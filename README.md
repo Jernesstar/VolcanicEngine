@@ -93,5 +93,5 @@ engines, while extending and adding to them in a modular and intuitive way.
 #### Go to [releases](https://github.com/Jernesstar/VolcanicEngine/releases). Download the installer and follow the instructions.
 
 # Want to contribute?
-This project is in need of **your** help. To contribute to this project and the help shape the vision of a world  
-where game dev is less of a souls-like dungeon crawling nightmare, and more link a cozy, enis simple
+Download the source code, build it, and share your experience using the [issues](https://github.com/Jernesstar/VolcanicEngine/issues) tab. [Pull requests](https://github.com/Jernesstar/VolcanicEngine/pulls) are welcome.  
+The VolcanicEngine needs your help to build a world where game dev is enjoyable, not a nightmare.
