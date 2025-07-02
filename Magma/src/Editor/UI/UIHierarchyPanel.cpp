@@ -89,6 +89,7 @@ void UIHierarchyPanel::Draw() {
 			if(s_AddToElement)
 				if(ImGui::MenuItem("Delete")) {
 					m_Context->Delete(s_AddToElement->GetNode());
+					s_AddToElement = nullptr;
 				}
 
 			ImGui::EndPopup();

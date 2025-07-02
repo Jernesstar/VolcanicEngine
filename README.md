@@ -32,10 +32,15 @@ Defines the Scene, and UIPage objects, as well as functions and classes for:
 Where your creativity gets to flow. The intuitive visual tools needed to bring **your** game to life.  
 Some features are:
 - Hot reloading of all assets, including shaders and scripts
-- Built-in script editor with linting and line-by-line debugger
+- Built-in script editor with:
+    - Linting
+    - On-hover descriptions for functions and classes
+    - Line-by-line debugger with variable inspector
 - Fast in-editor testing of scenes and UI
-### The SceneTab and its panels
-![SceneTab](Magma/assets/image/Screenshot.png)
+### The SceneTab
+![SceneTab](Magma/assets/image/SceneTabScreenShot.png)
+### The UITab
+![UITab](Magma/assets/image/UITabScreenshot.png)
 
 ## Lava
 ### [The Library](https://github.com/Jernesstar/VolcanicEngine/wiki/Lava)
@@ -56,27 +61,28 @@ testing the game takes forever.
 Think back further to the **first time** you ever opened up the engine's editor,  
 and were left completely **confused** and overwhelmed as to where to start, quickly falling into **tutorial hell**.
 
-This engine is different.
+Modern engines are bloated.  
+VolcanicEngine is different.
 <!-- TODO(Add): Testimonials -->
 ### Angelscript? What's that? Why use a language no one's heard of before?
 [**Angelscript**](https://www.angelcode.com/angelscript/) is a scripting language syntactically similar to **C#**, **C++**, **Java** and **Python**.  
 It seeks to combine some of the most convenient features from these languages.  
 "*Why not just use the aforementioned languages directly?*", you may ask. Here are a few reasons.  
 
-**C#** is namely used by Unity. However, it is not known for being performant, both at compile and run time.  
-Unreal uses **C++** and **Blueprints**, which provide a speed boost, but can be quite complex to use (it's C++).  
-**Python** is syntactically simpler, but being an interpreted language, it is again, slow.  
-**Lua** is also a popular choice, but unless you're a Roblox programmer, who wants to write Lua code all day?  
+**C#** is namely used by Unity. This implementation, however, lacks memory efficiency and performance both at compile and run time.  
+Unreal uses **C++** and **Blueprints**, which provide a speed boost, but can be quite complex to use (it's C++ after all).  
+**Python** is simpler syntactically, but being an interpreted language, it is again, slow.  
 
 **Angelscript** solves all these problems. Its syntax provides a **familiar feel** to those currently using established engines,  
 a syntax **easy to learn** for anyone picking up game dev for the **first time**, all while approaching **C++ performance**.
 
 As for the question of novelty, **Angelscript** has already made its way into industry-level code.  
 It is actively developed by ***Hazelight*** Studios for use in [UnrealEngine-Angelscript](https://angelscript.hazelight.se/), a fork of UE5 with Angelscript support.  
-***Hazelight*** has already used **Angelscript** to produce the games *Split Fiction* and *It Takes Two*, and it is not the only studio using the language.  
-**Angelscript** has therefore already established itself in the industry as a game-changer.
+***Hazelight*** has already used **Angelscript** to produce the games *Split Fiction* and *It Takes Two*,  
+and it is not the only studio using the language.  
+**Angelscript** has demonstrated its potential as an industry game-changer.
 
-### How does VolcanicEngine compare to other more established names in terms of performance
+### How does VolcanicEngine compare to other more established names in terms of performance ?
 There are a number of performance metrics and categories in which the VolcanicEngine surpasses  
 many household names
 Task                    |  Unity  |  UE5   |  Godot  | Volcanic
@@ -89,9 +95,37 @@ Scene run             |   n/a  |  n/a  |  n/a   |   n/a
 To create a great user experience, we have preserved some well loved features of the numerous  
 engines, while extending and adding to them in a modular and intuitive way.
 
-# Download instructions
-#### Go to [releases](https://github.com/Jernesstar/VolcanicEngine/releases). Download the installer and follow the instructions.
-
 # Want to contribute?
 Download the source code, build it, and share your experience using the [issues](https://github.com/Jernesstar/VolcanicEngine/issues) tab. [Pull requests](https://github.com/Jernesstar/VolcanicEngine/pulls) are welcome.  
 The VolcanicEngine needs your help to build a world where game dev is enjoyable, not a nightmare.
+
+# Download instructions
+For Windows: Go to [releases](https://github.com/Jernesstar/VolcanicEngine/releases). Download the installer and follow the instructions.  
+For Linux:
+```bash
+sudo apt-get update
+sudo apt-get upgrade
+sudo apt-get VolcanicEngine
+```
+# Build instructions
+Clone the repo and pull all submodules
+```bash
+git clone https://github.com/Jernesstar/VolcanicEngine.git
+git submodule update --init
+```
+The build system uses premake5. On Linux, run
+```bash
+scripts/Unix/premake.sh
+```
+and for Windows, run
+```cmd
+scripts/Windows/premake.bat
+```
+This will generate the Makefiles for the project. After this step is complete, run
+```bash
+scripts/Unix/build.sh
+```
+and for Windows, run
+```cmd
+scripts/Windows/build.bat
+```
