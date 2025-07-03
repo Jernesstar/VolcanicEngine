@@ -26,11 +26,14 @@ public:
 	void Update(TimeStep ts);
 	void Render();
 
-	void NewTab(Ref<Tab> tab);
+	static void NewTab(Ref<Tab> tab);
+
 	static Ref<Tab> GetCurrentTab() {
 		return s_Instance->m_Tabs[s_Instance->m_CurrentTab];
 	}
 	static ProjectTab* GetProjectTab() {
+		if(!s_Instance->m_Tabs)
+			return nullptr;
 		return s_Instance->m_Tabs[0]->As<ProjectTab>();
 	}
 

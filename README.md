@@ -38,7 +38,7 @@ Some features are:
     - Line-by-line debugger with variable inspector
 - Fast in-editor testing of scenes and UI
 ### The SceneTab
-![SceneTab](Magma/assets/image/SceneTabScreenShot.png)
+![SceneTab](Magma/assets/image/SceneTabScreenshot.png)
 ### The UITab
 ![UITab](Magma/assets/image/UITabScreenshot.png)
 

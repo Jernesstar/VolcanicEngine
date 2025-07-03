@@ -428,11 +428,10 @@ ImRect Traverse(fs::path path) {
 
 		if(ImGui::BeginPopup("NewTab")) {
 			if(ImGui::Button("Open file as new tab")) {
-				auto& editor = Application::As<EditorApp>()->GetEditor();
 				if(type == "Scene")
-					editor.NewTab(CreateRef<SceneTab>(selected));
+					Editor::NewTab(CreateRef<SceneTab>(selected));
 				if(type == "UI")
-					editor.NewTab(CreateRef<UITab>(selected));
+					Editor::NewTab(CreateRef<UITab>(selected));
 
 				selected = "";
 				type = "";

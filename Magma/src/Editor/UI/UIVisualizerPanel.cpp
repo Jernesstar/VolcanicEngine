@@ -253,6 +253,9 @@ void UIVisualizerPanel::Draw() {
 						return;
 
 					UIElement* other = m_Context->Get(element->GetNode());
+					if(!other)
+						return;
+
 					element->x = other->x;
 					element->y = other->y;
 					element->Width = other->Width;

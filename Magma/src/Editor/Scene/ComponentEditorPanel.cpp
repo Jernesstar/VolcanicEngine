@@ -295,7 +295,7 @@ void DrawComponent<SkyboxComponent>(Entity& entity) {
 
 static bool s_SelectingClass = false;
 
-std::string SelectScriptClass(Ref<ScriptModule> mod) {
+static std::string SelectScriptClass(Ref<ScriptModule> mod) {
 	static std::string select = "";
 
 	ImGui::OpenPopup("Select Script Class");

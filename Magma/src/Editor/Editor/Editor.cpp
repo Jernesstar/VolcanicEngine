@@ -1,4 +1,4 @@
-#include "Editor.h"
+	#include "Editor.h"
 
 #include <imgui/imgui.h>
 #include <imgui/imgui_internal.h>
@@ -167,7 +167,7 @@ void Editor::Render() {
 				ImGui::EndMenu();
 			}
 
-			if(ImGui::BeginMenu("Tab")) {
+			if(GetProjectTab() && ImGui::BeginMenu("Tab")) {
 				if(ImGui::MenuItem("New", "Ctrl+T")
 				|| Input::KeysPressed(Key::Ctrl, Key::T))
 					menu.tab.newTab = true;
@@ -196,8 +196,7 @@ void Editor::Render() {
 
 		auto tabBarFlags = ImGuiTabBarFlags_Reorderable
 						 | ImGuiTabBarFlags_TabListPopupButton;
-		ImGui::BeginTabBar("Tabs", tabBarFlags);
-		{
+		if(m_Tabs && ImGui::BeginTabBar("Tabs", tabBarFlags)) {
 			auto leadingFlags = ImGuiTabItemFlags_Trailing
 							  | ImGuiTabItemFlags_NoReorder;
 			if(ImGui::TabItemButton("+", leadingFlags))
@@ -216,10 +215,11 @@ void Editor::Render() {
 
 			if(tabToDelete != nullptr)
 				CloseTab(tabToDelete);
-		}
-		ImGui::EndTabBar();
-		if(m_Tabs)
+
+			ImGui::EndTabBar();
+
 			GetProjectTab()->RenderButtons();
+		}
 
 		ImGuiID dockspaceID = ImGui::GetID("DockSpace");
 		ImGui::DockSpace(dockspaceID, ImVec2(0.0f, 0.0f), dockspaceFlags);
@@ -297,8 +297,25 @@ void Editor::RenderEmptyTab(Ref<Tab>& tab) {
 }
 
 void Editor::RenderWelcomeScreen() {
-	ImGui::Begin("##Welcome");
+	auto flags = ImGuiWindowFlags_NoDecoration;
+	ImGui::Begin("##Welcome", nullptr, flags);
 	{
+		ImVec2 size = { 300, ImGui::GetContentRegionAvail().y };
+		auto childFlags = ImGuiChildFlags_Border;
+		ImGui::BeginChild("Options", size, childFlags);
+		{
+			if(ImGui::Button("Open Project"))
+				menu.project.openProject = true;
+			if(ImGui::Button("New Project"))
+				menu.project.newProject = true;
+			// for(auto prev : m_PreviousProjects)
+			// 	if(ImGui::Selectable(prev.c_str()))
+			// 		NewProject(prev);
+
+		}
+		ImGui::EndChild();
+		ImGui::SameLine();
+
 		m_WelcomeImage.UsePosition = false;
 		m_WelcomeImage.Width = 800;
 		m_WelcomeImage.Height = 800;
@@ -322,8 +339,8 @@ void Editor::NewTab(Ref<Tab> tab) {
 	menu.tab.newScene = false;
 	menu.tab.newUI = false;
 
-	m_Tabs.Add(tab);
-	SetTab(tab);
+	s_Instance->m_Tabs.Add(tab);
+	s_Instance->SetTab(tab);
 }
 
 void Editor::NewTab() {

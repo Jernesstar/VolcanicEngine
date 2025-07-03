@@ -1,9 +1,5 @@
 #include "UIElementEditorPanel.h"
 
-#ifdef _MSC_VER
-#define WIN32_LEAN_AND_MEAN
-#endif
-
 #include <imgui/imgui.h>
 #include <imgui/imgui_internal.h>
 #include <imgui/misc/cpp/imgui_stdlib.h>
@@ -11,17 +7,18 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include <VolcaniCore/Core/Log.h>
+#include <VolcaniCore/Core/Math.h>
 
 #include <Magma/UI/UI.h>
-
 #include <Magma/Script/ScriptEngine.h>
-
 #include <Magma/Core/AssetManager.h>
 
 #include <Editor/EditorApp.h>
 #include <Editor/AssetManager.h>
 #include <Editor/AssetImporter.h>
 #include <Editor/ScriptManager.h>
+
+#include <Project/ContentBrowserPanel.h>
 
 static Ref<UI::Image> s_FileIcon;
 
@@ -103,82 +100,40 @@ static void EditColor(glm::vec4& color) {
 	ImGui::NewLine();
 }
 
-static Asset s_Asset;
-static bool s_ClassSelect;
-static std::string s_Class;
+static bool s_SelectingClass = false;
 
-static void SelectScript() {
-	namespace fs = std::filesystem;
+static std::string SelectScriptClass(Ref<ScriptModule> mod) {
+	static std::string select = "";
 
-	ImGui::OpenPopup("Select Script");
-	if(ImGui::BeginPopupModal("Select Script")) {
-		static float padding = 18.0f;
-		static float thumbnailSize = 100.0f;
-		static float cellSize = thumbnailSize + padding;
+	ImGui::OpenPopup("Select Script Class");
+	if(ImGui::BeginPopupModal("Select Script Class"))
+	{
+		for(const auto& [name, _class] : mod->GetClasses()) {
+			if(!_class->Implements("IEntityController"))
+				continue;
 
-		float panelWidth = ImGui::GetContentRegionAvail().x;
-		int32_t columnCount = (int32_t)(panelWidth / cellSize);
-		columnCount = columnCount ? columnCount : 1;
-
-		Editor& editor = Application::As<EditorApp>()->GetEditor();
-		EditorAssetManager& assetManager = editor.GetAssetManager();
-		if(ImGui::BeginTable("AssetsTable", columnCount))
-		{
-			for(auto& [asset, _] : assetManager.GetRegistry()) {
-				if(!asset.Primary)
-					continue;
-				if(asset.Type != AssetType::Script)
-					continue;
-
-				ImGui::TableNextColumn();
-
-				std::string display = assetManager.GetPath(asset.ID);
-				if(display != "")
-					display = fs::path(display).filename().string();
-
-				UI::Button button;
-				button.Width = thumbnailSize;
-				button.Height = thumbnailSize;
-				button.Display = s_FileIcon;
-				button.UsePosition = false;
-
-				if(UI::UIRenderer::DrawButton(button).Clicked)
-					s_Asset = asset;
-
-				if(display != "")
-					ImGui::TextWrapped(display.c_str());
-				ImGui::Text("Asset %llu", (uint64_t)asset.ID);
+			bool pressed = ImGui::Button(name.c_str());
+			if(pressed) {
+				select = name;
+				s_SelectingClass = false;
+				ImGui::CloseCurrentPopup();
 			}
-
-			ImGui::EndTable();
 		}
-
 		if(ImGui::Button("Close")) {
-			s_Asset.Type = AssetType::None;
+			s_SelectingClass = false;
 			ImGui::CloseCurrentPopup();
 		}
 
 		ImGui::EndPopup();
 	}
-}
 
-static void SelectClass(Ref<ScriptModule> mod) {
-	ImGui::OpenPopup("Select Script Class");
-	if(ImGui::BeginPopupModal("Select Script Class"))
-	{
-		for(const auto& [name, _class] : mod->GetClasses()) {
-			if(!_class->Implements("IUIController"))
-				continue;
-
-			bool pressed = ImGui::Button(name.c_str());
-			if(pressed) {
-				s_Class = name;
-				ImGui::CloseCurrentPopup();
-			}
-		}
-
-		ImGui::EndPopup();
+	if(select != "") {
+		std::string val = select;
+		select = "";
+		return val;
 	}
+
+	return "";
 }
 
 template<typename TUIElement>
@@ -315,43 +270,44 @@ void EditElement<UIElement>(UIElement* element) {
 	}
 
 	ImGui::Unindent(22.0f);
-	ImGui::SeparatorText("Script Fields");
+	ImGui::SeparatorText("Script");
+	ImGui::Indent(22.0f);
+
+	ImGui::Text("Asset ID: %llu", (uint64_t)element->ModuleID);
+	auto text = element->ModuleID ? "Change Module" : "Set Module";
+
+	auto panel =
+		Editor::GetProjectTab()->
+				GetPanel("ContentBrowser")->As<ContentBrowserPanel>();
+
+	if(ImGui::Button(text))
+		panel->Select(AssetType::Script);
+	if(panel->HasSelection())
+		element->ModuleID = panel->GetSelected().ID;
+
+	if(!element->ModuleID)
+		return;
 
 	auto obj = element->ScriptInstance;
 	if(!obj) {
-		if(ImGui::Button("Create Script Object"))
-			s_Asset.Type = AssetType::Script;
-
-		Editor& editor = Application::As<EditorApp>()->GetEditor();
-		EditorAssetManager& assetManager = editor.GetAssetManager();
+		std::string name;
 		Asset asset = { element->ModuleID, AssetType::Script };
-
-		if(s_Asset.Type != AssetType::None)
-			SelectScript();
-		if(s_Asset.ID) {
-			element->ModuleID = s_Asset.ID;
-			s_ClassSelect = true;
-			s_Asset = { };
-
-			asset = { element->ModuleID, AssetType::Script };
-			assetManager.Load(asset);
+		if(ImGui::Button("Create Instance")) {
+			AssetManager::Get()->Load(asset);
+			s_SelectingClass = true;
 		}
-		if(s_ClassSelect) {
-			SelectClass(assetManager.Get<ScriptModule>(asset));
-		}
-		if(s_Class != "") {
-			element->Class = s_Class;
-
-			auto mod = assetManager.Get<ScriptModule>(asset);
-			auto _class = mod->GetClass(s_Class);
-			element->ScriptInstance = _class->Construct();
-
-			s_ClassSelect = false;
-			s_Class = "";
+		if(s_SelectingClass) {
+			auto mod = AssetManager::Get()->Get<ScriptModule>(asset);
+			name = SelectScriptClass(mod);
+			if(name != "") {
+				auto _class = mod->GetClass(name);
+				obj = _class->Construct();
+			}
 		}
 
 		return;
 	}
+	ImGui::Text("Class: %s", obj->GetClass()->Name.c_str());
 
 	auto* handle = obj->GetHandle();
 	for(uint32_t i = 0; i < handle->GetPropertyCount(); i++) {
@@ -362,80 +318,113 @@ void EditElement<UIElement>(UIElement* element) {
 		if(!editorField)
 			continue;
 
+		ImGui::PushID(i);
+
 		if(field.Type) {
 			std::string typeName = field.Type->GetName();
 			ImGui::Text(typeName.c_str()); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(180.0f);
 
-			// else
+			if(typeName == "string") {
+				ImGui::SetNextItemWidth(150);
+				ImGui::InputText("##String", field.As<std::string>());
+			}
+			else if(typeName == "array") {
+				
+			}
+			else if(typeName == "Asset") {
+				Asset asset = *field.As<Asset>();
+				ImGui::Text("Type: %s", AssetTypeToString(asset.Type).c_str());
+				ImGui::SameLine(280.0f, 0.0f);
+				ImGui::Text("ID: %llu", (uint64_t)asset.ID);
+
+				if(ImGui::Button("Edit"))
+					panel->Select(AssetType::None, i + 1);
+				if(panel->HasSelection(i + 1))
+					*field.As<Asset>() = panel->GetSelected();
+			}
+			if(typeName == "Vec3") {
+				ImGui::SetNextItemWidth(150);
+				ImGui::DragFloat3("##Vec3", &field.As<Vec3>()->r);
+			}
+			// else if(typeName == "GridSet") {
+			// 	if(ImGui::Button("Edit GridSet"))
+			// 		s_GridSetEdit = true;
+			// 	if(s_GridSetEdit)
+			// 		GridSetEditorPopup(obj, field.Name);
+			// }
+			else
 				ImGui::NewLine();
 		}
 		else if(field.TypeID == asTYPEID_BOOL) {
 			ImGui::Text("bool"); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(180.0f);
-			ImGui::Checkbox(std::string("##Bool##" + field.Name).c_str(),
-							field.As<bool>());
+			ImGui::Checkbox("##Bool", field.As<bool>());
 		}
 		else if(field.TypeID == asTYPEID_INT8) {
 			ImGui::Text("int8"); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(180.0f);
-			ImGui::InputScalar(std::string("##S8##" + field.Name).c_str(),
-								ImGuiDataType_S8, field.Data);
+			ImGui::SetNextItemWidth(50);
+			ImGui::DragScalar("##S8", ImGuiDataType_S16, field.Data);
 		}
 		else if(field.TypeID == asTYPEID_INT16) {
 			ImGui::Text("int16"); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(180.0f);
-			ImGui::InputScalar(std::string("##S16##" + field.Name).c_str(),
-								ImGuiDataType_S16, field.Data);
+			ImGui::SetNextItemWidth(50);
+			ImGui::DragScalar("##S16", ImGuiDataType_S16, field.Data);
 		}
 		else if(field.TypeID == asTYPEID_INT32) {
 			ImGui::Text("int32"); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(180.0f);
-			ImGui::InputScalar(std::string("##S32##" + field.Name).c_str(),
-								ImGuiDataType_S32, field.Data);
+			ImGui::SetNextItemWidth(50);
+			ImGui::DragScalar("##S32", ImGuiDataType_S32, field.Data);
 		}
 		else if(field.TypeID == asTYPEID_INT64) {
 			ImGui::Text("int64"); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(180.0f);
-			ImGui::InputScalar(std::string("##S64##" + field.Name).c_str(),
-								ImGuiDataType_S64, field.Data);
+			ImGui::SetNextItemWidth(50);
+			ImGui::DragScalar("##S64", ImGuiDataType_S64, field.Data);
 		}
 		else if(field.TypeID == asTYPEID_UINT8) {
 			ImGui::Text("uint8"); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(180.0f);
-			ImGui::InputScalar(std::string("##U8##" + field.Name).c_str(),
-								ImGuiDataType_U8, field.Data);
+			ImGui::SetNextItemWidth(50);
+			ImGui::DragScalar("##U8", ImGuiDataType_U8, field.Data);
 		}
 		else if(field.TypeID == asTYPEID_UINT16) {
 			ImGui::Text("uint16"); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(180.0f);
-			ImGui::InputScalar(std::string("##U16##" + field.Name).c_str(),
-								ImGuiDataType_U16, field.Data);
+			ImGui::SetNextItemWidth(50);
+			ImGui::DragScalar("##U16", ImGuiDataType_U16, field.Data);
 		}
 		else if(field.TypeID == asTYPEID_UINT32) {
 			ImGui::Text("uint32"); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(180.0f);
-			ImGui::InputScalar(std::string("##U32##" + field.Name).c_str(),
-								ImGuiDataType_U32, field.Data);
+			ImGui::SetNextItemWidth(50);
+			ImGui::DragScalar("##U32", ImGuiDataType_U32, field.Data);
 		}
 		else if(field.TypeID == asTYPEID_UINT64) {
 			ImGui::Text("uint64"); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(180.0f);
-			ImGui::InputScalar(std::string("##U64##" + field.Name).c_str(),
-								ImGuiDataType_U64, field.Data);
-		}
-		else if(field.TypeID == asTYPEID_FLOAT) {
-			ImGui::Text("float"); ImGui::SameLine(100.0f);
-			ImGui::Text(field.Name.c_str()); ImGui::SameLine(180.0f);
-			ImGui::InputFloat(std::string("##Float##" + field.Name).c_str(),
-								field.As<float>(), 0.0f, 0.0f, "%.3f");
+			ImGui::SetNextItemWidth(50);
+			ImGui::DragScalar("##U64", ImGuiDataType_U64, field.Data);
 		}
 		else if(field.TypeID == asTYPEID_DOUBLE) {
 			ImGui::Text("double"); ImGui::SameLine(100.0f);
 			ImGui::Text(field.Name.c_str()); ImGui::SameLine(180.0f);
-			ImGui::InputDouble(std::string("##Double##" + field.Name).c_str(),
-								field.As<double>());
+			ImGui::SetNextItemWidth(50);
+			ImGui::DragScalar("##Double", ImGuiDataType_Double,
+				field.As<double>());
 		}
+		else if(field.TypeID == asTYPEID_FLOAT) {
+			ImGui::Text("float"); ImGui::SameLine(100.0f);
+			ImGui::Text(field.Name.c_str()); ImGui::SameLine(180.0f);
+			ImGui::SetNextItemWidth(50);
+			ImGui::DragFloat("##Float",
+							 field.As<float>(), 0.1f, 0.0f, 0.0f, "%.3f");
+		}
+
+		ImGui::PopID();
 	}
 }
 
