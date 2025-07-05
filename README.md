@@ -1,7 +1,7 @@
-![VolcanicEngine](Magma/assets/image/VolcanicDisplay.png)
+![VolcanicEngine](Magma/assets/images/VolcanicDisplay.png)
 [![Version](https://img.shields.io/github/v/release/Jernesstar/VolcanicEngine?include_prereleases&style=for-the-badge)](https://github.com/Jernesstar/VolcanicEngine/releases)
 [![Licence](https://img.shields.io/badge/license-MIT-blue.svg?style=for-the-badge)](https://github.com/Jernesstar/VolcanicEngine/blob/main/LICENSE)
-[![Documentation](https://img.shields.io/badge/docs-VolcanicEngine-red?style=for-the-badge&color=red)](https://github.com/Jernesstar/VolcanicEngine/wiki)
+[![Documentation](https://img.shields.io/badge/docs-VolcanicEngine-red?style=for-the-badge&color=red)](https://jernesstar.github.io/VolcanicEngine/)
 <!-- [![Discord](https://img.shields.io/discord/633826290415435777.svg?style=for-the-badge&color=%235a64f6)](https://discord.gg/trackmania) -->
 
 # Vision
@@ -38,9 +38,9 @@ Some features are:
     - Line-by-line debugger with variable inspector
 - Fast in-editor testing of scenes and UI
 ### The SceneTab
-![SceneTab](Magma/assets/image/SceneTabScreenshot.png)
+![SceneTab](Magma/assets/images/SceneTabScreenshot.png)
 ### The UITab
-![UITab](Magma/assets/image/UITabScreenshot.png)
+![UITab](Magma/assets/images/UITabScreenshot.png)
 
 ## Lava
 ### [The Library](https://github.com/Jernesstar/VolcanicEngine/wiki/Lava)
@@ -69,7 +69,7 @@ VolcanicEngine is different.
 It seeks to combine some of the most convenient features from these languages.  
 "*Why not just use the aforementioned languages directly?*", you may ask. Here are a few reasons.  
 
-**C#** is namely used by Unity. This implementation, however, lacks memory efficiency and performance both at compile and run time.  
+**C#** is namely used by Unity. This implementation, however, lacks memory efficiency and performance, both at compile and run time.  
 Unreal uses **C++** and **Blueprints**, which provide a speed boost, but can be quite complex to use (it's C++ after all).  
 **Python** is simpler syntactically, but being an interpreted language, it is again, slow.  
 
@@ -78,8 +78,7 @@ a syntax **easy to learn** for anyone picking up game dev for the **first time**
 
 As for the question of novelty, **Angelscript** has already made its way into industry-level code.  
 It is actively developed by ***Hazelight*** Studios for use in [UnrealEngine-Angelscript](https://angelscript.hazelight.se/), a fork of UE5 with Angelscript support.  
-***Hazelight*** has already used **Angelscript** to produce the games *Split Fiction* and *It Takes Two*,  
-and it is not the only studio using the language.  
+***Hazelight*** has already used **Angelscript** to produce the games *Split Fiction* and *It Takes Two*, and it is not the only studio using the language.  
 **Angelscript** has demonstrated its potential as an industry game-changer.
 
 ### How does VolcanicEngine compare to other more established names in terms of performance ?
@@ -100,12 +99,13 @@ Download the source code, build it, and share your experience using the [issues]
 The VolcanicEngine needs your help to build a world where game dev is enjoyable, not a nightmare.
 
 # Download instructions
-For Windows: Go to [releases](https://github.com/Jernesstar/VolcanicEngine/releases). Download the installer and follow the instructions.  
-For Linux:
+For **Windows**: Go to [releases](https://github.com/Jernesstar/VolcanicEngine/releases). Download the installer, run it and follow the instructions.  
+For **Linux**: Go to [releases](https://github.com/Jernesstar/VolcanicEngine/releases).  
+Download the .deb file, navigate to the directory where the .deb file is located and run
 ```bash
 sudo apt-get update
 sudo apt-get upgrade
-sudo apt-get VolcanicEngine
+sudo apt-get install ./VolcanicEngine.deb
 ```
 # Build instructions
 Clone the repo and pull all submodules
@@ -113,7 +113,7 @@ Clone the repo and pull all submodules
 git clone https://github.com/Jernesstar/VolcanicEngine.git
 git submodule update --init
 ```
-The build system uses premake5. On Linux, run
+The build system uses **premake**. On Linux, run
 ```bash
 scripts/Unix/premake.sh
 ```
@@ -121,7 +121,11 @@ and for Windows, run
 ```cmd
 scripts/Windows/premake.bat
 ```
-This will generate the Makefiles for the project. After this step is complete, run
+Run the following instead for MSVC:
+```cmd
+.\vendor\premake\bin\Windows\premake5.exe vs2022
+```
+This will generate the Makefiles/solution and project files for the project. After this step is complete, run
 ```bash
 scripts/Unix/build.sh
 ```
@@ -129,3 +133,4 @@ and for Windows, run
 ```cmd
 scripts/Windows/build.bat
 ```
+For MSVC, simply build the project.

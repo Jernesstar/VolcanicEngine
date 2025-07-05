@@ -36,7 +36,6 @@ struct {
 		bool newProject    = false;
 		bool openProject   = false;
 		bool runProject    = false;
-		bool saveProject   = false;
 		bool exportProject = false;
 		bool exportProjectTo = false;
 
@@ -64,23 +63,14 @@ void Editor::Open() {
 
 	Application::PushDir();
 	m_WelcomeImage.Content =
-		AssetImporter::GetTexture("Magma/assets/image/VolcanicDisplay.png");
+		AssetImporter::GetTexture("Magma/assets/images/VolcanicDisplay.png");
 	Application::PopDir();
 }
 
 void Editor::Close() {
-	m_Tabs.Clear();
-	m_ClosedTabs.Clear();
+	CloseProject();
 
-	if(m_App) {
-		m_App->OnClose();
-		m_App.reset();
-	}
-
-	m_AssetManager.Save();
-	m_AssetManager.Clear();
-
-	m_Project.Save((fs::path(m_Project.Path) / ".magma.proj").string());
+	m_App.reset();
 
 	ScriptEngine::Shutdown();
 	AudioEngine::Shutdown();
@@ -146,21 +136,18 @@ void Editor::Render() {
 					menu.project.newProject = true;
 				if(ImGui::MenuItem("Open", "Ctrl+P"))
 					menu.project.openProject = true;
-				if(ImGui::MenuItem("Save", "Ctrl+S")
-				|| Input::KeysPressed(Key::Ctrl, Key::S))
-					menu.project.saveProject = true;
 				if(ImGui::MenuItem("Run", "Ctrl+R"))
 					menu.project.runProject = true;
-
-				ImGui::Separator();
-				if(ImGui::MenuItem("Add Screen"))
-					menu.project.addScreen = true;
 
 				ImGui::Separator();
 				if(ImGui::MenuItem("Export"))
 					menu.project.exportProject = true;
 				if(ImGui::MenuItem("Export To"))
 					menu.project.exportProjectTo = true;
+
+				ImGui::Separator();
+				if(ImGui::MenuItem("Add Screen"))
+					menu.project.addScreen = true;
 
 				ImGui::EndMenu();
 			}
@@ -242,8 +229,6 @@ void Editor::Render() {
 		OpenProject();
 	if(menu.project.runProject)
 		RunProject();
-	if(menu.project.saveProject)
-		SaveProject();
 	if(menu.project.exportProject)
 		ExportProject(m_Project.ExportPath);
 	if(menu.project.exportProjectTo)
@@ -295,7 +280,8 @@ void Editor::RenderEmptyTab(Ref<Tab>& tab) {
 }
 
 void Editor::RenderWelcomeScreen() {
-	auto flags = ImGuiWindowFlags_NoDecoration;
+	auto flags = ImGuiWindowFlags_NoDecoration
+			   | ImGuiWindowFlags_NoMove;
 	ImGui::Begin("##Welcome", nullptr, flags);
 	{
 		ImVec2 size = { 300, ImGui::GetContentRegionAvail().y };
@@ -399,8 +385,7 @@ void Editor::CloseTab(Ref<Tab> tabToDelete) {
 
 void Editor::NewProject() {
 	menu.project.newProject = false;
-	m_Project = Project();
-	Application::GetWindow()->SetTitle("Magma Editor");
+
 }
 
 void Editor::NewProject(const std::string& volcPath) {
@@ -449,17 +434,15 @@ void Editor::NewProject(const std::string& volcPath) {
 }
 
 void Editor::OpenProject() {
-	Application::PopDir();
-
 	IGFD::FileDialogConfig config;
-	config.path = m_Project.Path;
+	config.path = ".";
 	auto instance = ImGuiFileDialog::Instance();
 	instance->OpenDialog("ChooseFile", "Choose File", ".magma.proj", config);
 
 	if(instance->Display("ChooseFile")) {
 		if(instance->IsOk()) {
 			std::string path = instance->GetFilePathName();
-			m_Tabs.Clear();
+			CloseProject();
 			NewProject(path);
 			NewTab(CreateRef<ProjectTab>());
 		}
@@ -467,8 +450,6 @@ void Editor::OpenProject() {
 		instance->Close();
 		menu.project.openProject = false;
 	}
-
-	Application::PushDir();
 }
 
 void Editor::RunProject() {
@@ -476,20 +457,26 @@ void Editor::RunProject() {
 
 	std::string command;
 #ifdef VOLCANICENGINE_WINDOWS
-	command = ".\\build\\Lava\\bin\\Runtime --project ";
+	command = "Runtime --project ";
 	command += m_Project.ExportPath + "\\.volc.proj";
 #elif VOLCANICENGINE_LINUX
-	command = "./build/Lava/bin/Runtime --project ";
+	command = "Runtime --project ";
 	command += m_Project.ExportPath + "/.volc.proj";
 #endif
 	system(command.c_str());
 }
 
-void Editor::SaveProject() {
-	menu.project.saveProject = false;
+void Editor::CloseProject() {
+	if(!GetProjectTab())
+		return;
 
-	if(m_Project.ExportPath != "")
-		ExportProject(m_Project.ExportPath);
+	m_Tabs.Clear();
+	m_ClosedTabs.Clear();
+
+	m_AssetManager.Save();
+	m_AssetManager.Clear();
+
+	m_Project.Save((fs::path(m_Project.Path) / ".magma.proj").string());
 }
 
 void Editor::ExportProject() {

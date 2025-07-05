@@ -54,9 +54,9 @@ ProjectTab::ProjectTab()
 	: Tab(TabType::Project)
 {
 	AddPanel<ContentBrowserPanel>()->SetTab(this);
+	AddPanel<ConsolePanel>()->SetTab(this);
 	AddPanel<ScriptEditorPanel>()->SetTab(this);
 	AddPanel<AssetEditorPanel>()->SetTab(this);
-	AddPanel<ConsolePanel>()->SetTab(this);
 	GetPanel("Console")->As<ConsolePanel>()->Open = true;
 	GetPanel("AssetEditor")->As<AssetEditorPanel>()->Open = true;
 	GetPanel("ContentBrowser")->As<ContentBrowserPanel>()->Open = true;
@@ -178,15 +178,13 @@ void ProjectTab::Render() {
 	}
 	ImGui::EndMainMenuBar();
 
-	for(auto panel : m_Panels)
-		if(panel->Open)
-			panel->Draw();
+	RenderEssentialPanels();
 }
 
 void ProjectTab::RenderEssentialPanels() {
 	if(GetPanel("ScriptEditor")->Open)
 		GetPanel("ScriptEditor")->Draw();
-	
+
 	GetPanel("ContentBrowser")->Draw();
 	GetPanel("Console")->Draw();
 	GetPanel("AssetEditor")->Draw();

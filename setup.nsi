@@ -21,7 +21,6 @@ RequestExecutionLevel admin
 Section "Install"
   SetOutPath "$INSTDIR"
   File /r "app\*.*"
-  File /r "imgui.ini"
   SetOutPath "$INSTDIR\Magma\assets"
   File /r "assets\"
   CreateShortCut "$DESKTOP\Magma.lnk" "$INSTDIR\${EDITOR_EXE}" "" "$INSTDIR\Magma\assets\icons\favicon.ico" 0 SW_SHOWNORMAL "" "Launch the Magma Editor"

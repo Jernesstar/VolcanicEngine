@@ -199,8 +199,8 @@ void Scene::RegisterSystems() {
 }
 
 void Scene::UnregisterSystems() {
-	EntityWorld.Remove<PhysicsSystem>();
 	EntityWorld.Remove<ScriptSystem>();
+	EntityWorld.Remove<PhysicsSystem>();
 }
 
 }

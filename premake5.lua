@@ -20,7 +20,7 @@ workspace "VolcanicEngine"
         optimize "Full"
 
     filter "action:vs*"
-        startproject "Sandbox"
+        startproject "Editor"
 
 include "VolcaniCore"
 include "Magma"

@@ -70,7 +70,7 @@ private:
 	void NewProject(const std::string& volcPath);
 	void OpenProject();
 	void RunProject();
-	void SaveProject();
+	void CloseProject();
 	void ExportProject();
 	void ExportProject(const std::string& path);
 

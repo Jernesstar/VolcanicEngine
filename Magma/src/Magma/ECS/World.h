@@ -74,7 +74,7 @@ public:
 	template<typename TSystem>
 	TSystem* Get() {
 		uint64_t id = TypeIDGenerator<System<>>::GetID<TSystem>();
-		if (!m_Systems.size() || !m_Systems.count(id))
+		if(!m_Systems.size() || !m_Systems.count(id))
 			return nullptr;
 
 		return (TSystem*)m_Systems[id];
@@ -83,7 +83,7 @@ public:
 	template<class TSystem>
 	void Remove() {
  		uint64_t id = TypeIDGenerator<System<>>::GetID<TSystem>();
-		if (!m_Systems.size() || !m_Systems.count(id))
+		if(!m_Systems.size() || !m_Systems.count(id))
 			return;
 
 		delete (TSystem*)m_Systems[id];

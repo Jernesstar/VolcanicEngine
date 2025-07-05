@@ -86,6 +86,7 @@ static AssetManager& GetAssetManagerInstance() {
 static void ScriptLoadScene(const std::string& name, App* app) {
 	s_Screen->World->Name = name;
 	s_Screen->World->EntityWorld.Reset();
+	s_Screen->World->UnregisterSystems();
 	s_Screen->World->RegisterSystems();
 	app->GetRenderer().OnSceneLoad();
 	app->SceneLoad(*s_Screen->World);
