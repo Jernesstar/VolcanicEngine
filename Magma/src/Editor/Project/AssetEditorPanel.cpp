@@ -44,14 +44,13 @@ static void EditAsset(Asset asset) {
 	ImGui::SeparatorText("Asset");
 	ImGui::Indent(22.0f);
 
-	auto& editor = Application::As<EditorApp>()->GetEditor();
 	auto* assetManager = AssetManager::Get()->As<EditorAssetManager>();
 
 	ImGui::Text("Type: %s", AssetTypeToString(asset.Type).c_str());
 	ImGui::Text("ID: %llu", (uint64_t)asset.ID);
 	auto path = assetManager->GetPath(asset.ID);
 	if(path != "") {
-		auto rootPath = fs::path(editor.GetProject().Path) / "Asset";
+		auto rootPath = fs::path(Editor::GetProject().Path) / "Asset";
 		auto display = fs::relative(path, rootPath).generic_string();
 		ImGui::Text("Path: %s", display.c_str());
 	}
@@ -68,7 +67,7 @@ static void EditAsset(Asset asset) {
 
 	if(asset.Type == AssetType::Script) {
 		if(ImGui::Button("Edit Script")) {
-			auto tab = editor.GetProjectTab();
+			auto tab = Editor::GetProjectTab();
 			auto panel = tab->GetPanel("ScriptEditor")->As<ScriptEditorPanel>();
 			panel->Open = true;
 			panel->OpenFile(path);

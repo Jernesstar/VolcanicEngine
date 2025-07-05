@@ -456,11 +456,8 @@ void SerializeEntity(YAMLSerializer& serializer, const Entity& entity) {
 Ref<ScriptObject> LoadScript(Entity entity, Asset asset,
 	YAML::Node& scriptComponentNode)
 {
-	auto& assetManager =
-		Application::As<EditorApp>()->GetEditor().GetAssetManager();
-
-	assetManager.Load(asset);
-	auto mod = assetManager.Get<ScriptModule>(asset);
+	AssetManager::Get()->Load(asset);
+	auto mod = AssetManager::Get()->Get<ScriptModule>(asset);
 	if(!mod) {
 		VOLCANICORE_LOG_INFO(
 			"Could not load script module %lu, needed for Entity %lu",
@@ -552,8 +549,6 @@ void DeserializeEntity(YAML::Node entityNode, Scene& scene) {
 	if(name != "" && name.find_first_not_of(' ') != std::string::npos)
 		entity.SetName(name);
 
-	auto& assetManager =
-		Application::As<EditorApp>()->GetEditor().GetAssetManager();
 	auto components = entityNode["Components"];
 
 	auto cameraComponentNode = components["CameraComponent"];
@@ -630,7 +625,7 @@ void DeserializeEntity(YAML::Node entityNode, Scene& scene) {
 		auto id = scriptComponentNode["ModuleID"].as<uint64_t>();
 		Asset asset = { id, AssetType::Script };
 
-		if(!id || !assetManager.IsValid(asset))
+		if(!id || !AssetManager::Get()->IsValid(asset))
 			entity.Add<ScriptComponent>();
 		else {
 			auto obj =

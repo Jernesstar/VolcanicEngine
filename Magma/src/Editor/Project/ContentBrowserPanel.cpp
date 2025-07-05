@@ -221,15 +221,14 @@ void ContentBrowserPanel::RenderAssetTable() {
 	int32_t columnCount = (int32_t)(panelWidth / cellSize);
 	columnCount = columnCount ? columnCount : 1;
 
-	auto& assetManager =
-		Application::As<EditorApp>()->GetEditor().GetAssetManager();
+	auto* assetManager = AssetManager::Get()->As<EditorAssetManager>();
 
 	if(ImGui::BeginTable("AssetsTable", columnCount))
 	{
 		static Asset s_Asset;
 
-		for(auto& [asset, _] : assetManager.GetRegistry()) {
-			if(!asset.Primary || assetManager.IsNativeAsset(asset))
+		for(auto& [asset, _] : assetManager->GetRegistry()) {
+			if(!asset.Primary || assetManager->IsNativeAsset(asset))
 				continue;
 
 			if(s_Selecting && s_SelectType != AssetType::None
@@ -238,7 +237,7 @@ void ContentBrowserPanel::RenderAssetTable() {
 
 			ImGui::TableNextColumn();
 
-			std::string path = assetManager.GetPath(asset.ID);
+			std::string path = assetManager->GetPath(asset.ID);
 			if(path != "")
 				path = fs::path(path).filename().string();
 
@@ -285,7 +284,7 @@ void ContentBrowserPanel::RenderAssetTable() {
 					ImGui::EndDragDropSource();
 				}
 
-			auto name = assetManager.GetAssetName(asset);
+			auto name = assetManager->GetAssetName(asset);
 			if(name != "")
 				ImGui::Text(name.c_str());
 			else if(path != "")

@@ -1,4 +1,4 @@
-	#include "Editor.h"
+#include "Editor.h"
 
 #include <imgui/imgui.h>
 #include <imgui/imgui_internal.h>
@@ -55,9 +55,7 @@ struct {
 	} tab;
 } static menu;
 
-Editor::Editor() {
-	s_Instance = this;
-
+void Editor::Open() {
 	Physics::Init();
 	AudioEngine::Init();
 	ScriptEngine::Init();
@@ -70,7 +68,7 @@ Editor::Editor() {
 	Application::PopDir();
 }
 
-Editor::~Editor() {
+void Editor::Close() {
 	m_Tabs.Clear();
 	m_ClosedTabs.Clear();
 

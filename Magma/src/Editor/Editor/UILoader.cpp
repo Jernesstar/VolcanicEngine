@@ -656,13 +656,12 @@ void LoadElement(UIPage& page, const rapidjson::Value& elementNode,
 		auto* button = element->As<Button>();
 
 		if(elementNode.HasMember("Image")) {
-			auto& assetManager =
-				Application::As<EditorApp>()->GetEditor().GetAssetManager();
+			auto* assetManager = AssetManager::Get()->As<EditorAssetManager>();
 			auto id =
-				assetManager.GetFromPath(
+				assetManager->GetFromPath(
 					elementNode["Image"].Get<std::string>());
 			auto asset = Asset{ id, AssetType::Texture };
-			auto image = assetManager.Get<Texture>(asset);
+			auto image = assetManager->Get<Texture>(asset);
 
 			button->Display = CreateRef<Image>(image);
 			button->Display->As<Image>()->ImageID = (uint64_t)id;
@@ -764,15 +763,13 @@ void LoadElement(UIPage& page, const rapidjson::Value& elementNode,
 		element->Class = elementNode["Class"].Get<std::string>();
 
 	if(element->ModuleID && element->Class != "") {
-		Editor& editor = Application::As<EditorApp>()->GetEditor();
-		EditorAssetManager& assetManager = editor.GetAssetManager();
 		Asset asset = { element->ModuleID, AssetType::Script };
 
-		if(!assetManager.IsValid(asset))
+		if(!AssetManager::Get()->IsValid(asset))
 			return;
 
-		assetManager.Load(asset);
-		auto mod = assetManager.Get<ScriptModule>(asset);
+		AssetManager::Get()->Load(asset);
+		auto mod = AssetManager::Get()->Get<ScriptModule>(asset);
 		Ref<ScriptClass> _class = mod->GetClass(element->Class);
 
 		if(!_class)

@@ -26,6 +26,10 @@ project "glfw"
         "%{VendorPaths.glfw}/src"
     }
 
+    defines {
+        "GLFW_USE_HYBRID_HPG"
+    }
+
     filter "system:windows"
         systemversion "latest"
         files {

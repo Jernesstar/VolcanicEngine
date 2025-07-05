@@ -151,10 +151,9 @@ void UITab::OpenUI() {
 	namespace fs = std::filesystem;
 	menu.file.openUI = true;
 
-	auto& editor = Application::As<EditorApp>()->GetEditor();
-	auto& proj = editor.GetProject();
+	auto path = Editor::GetProject().Path;
 	IGFD::FileDialogConfig config;
-	config.path = (fs::path(proj.Path) / "Visual" / "UI").string();
+	config.path = (fs::path(path) / "Visual" / "UI").string();
 	auto instance = ImGuiFileDialog::Instance();
 	instance->OpenDialog("ChooseFile", "Choose File", ".magma.ui.json", config);
 

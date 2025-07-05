@@ -19,8 +19,11 @@ namespace Magma {
 
 class Editor {
 public:
-	Editor();
-	~Editor();
+	Editor() { s_Instance = this; }
+	~Editor() = default;
+
+	void Open();
+	void Close();
 	
 	void Load(const CommandLineArgs& args);
 	void Update(TimeStep ts);

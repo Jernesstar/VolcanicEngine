@@ -42,16 +42,16 @@ Scene:
             MeshSourceID: 10012345
             MaterialID: 11837670142847334937
     - Entity:
-        Name: Player2
-        ID: 1111
+        Name: the torch
+        ID: 1114
         Components:
           TransformComponent:
             Transform:
-              Translation: [0, 0.312866569, 0.866874218]
-              Rotation: [-0.0316777006, -0, 0]
-              Scale: [4.20052099, 4.7583971, 7.88464165]
+              Translation: [-8.02209473, 3.27406311, 4.61811876]
+              Rotation: [7.27948617e-08, 0.399763256, 0.335438699]
+              Scale: [3.83048987, 0.999999523, 0.999999642]
           MeshComponent:
-            MeshSourceID: 15277418182178081176
+            MeshSourceID: 14786163484492344065
             MaterialID: 0
     - Entity:
         Name: Torch
@@ -66,16 +66,16 @@ Scene:
             MeshSourceID: 14786163484492344065
             MaterialID: 0
     - Entity:
-        Name: the torch
-        ID: 1114
+        Name: Player2
+        ID: 1111
         Components:
           TransformComponent:
             Transform:
-              Translation: [-8.02209473, 3.27406311, 4.61811876]
-              Rotation: [7.27948617e-08, 0.399763256, 0.335438699]
-              Scale: [3.83048987, 0.999999523, 0.999999642]
+              Translation: [0, 0.312866569, 0.866874218]
+              Rotation: [-0.0316777006, -0, 0]
+              Scale: [4.20052099, 4.7583971, 7.88464165]
           MeshComponent:
-            MeshSourceID: 14786163484492344065
+            MeshSourceID: 15277418182178081176
             MaterialID: 0
     - Entity:
         Name: ""

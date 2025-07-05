@@ -155,13 +155,12 @@ void SceneVisualizerPanel::Add(ECS::Entity entity) {
 	const auto& tc = entity.Get<TransformComponent>();
 	const auto& mc = entity.Get<MeshComponent>();
 
-	auto& editor = Application::As<EditorApp>()->GetEditor();
-	auto& assetManager = editor.GetAssetManager();
-	if(!assetManager.IsValid(mc.MeshSourceAsset))
+	auto* assetManager = AssetManager::Get();
+	if(!assetManager->IsValid(mc.MeshSourceAsset))
 		return;
 
-	assetManager.Load(mc.MeshSourceAsset);
-	auto mesh = assetManager.Get<Mesh>(mc.MeshSourceAsset);
+	assetManager->Load(mc.MeshSourceAsset);
+	auto mesh = assetManager->Get<Mesh>(mc.MeshSourceAsset);
 
 	auto shape = Shape::Create(mesh);
 	auto body = RigidBody::Create(RigidBody::Type::Static, shape);
@@ -177,8 +176,7 @@ void SceneVisualizerPanel::Remove(ECS::Entity entity) {
 static bool s_Hovered = false;
 
 void SceneVisualizerPanel::Update(TimeStep ts) {
-	auto& editor = Application::As<EditorApp>()->GetEditor();
-	auto* tab = editor.GetProjectTab()->As<ProjectTab>();
+	auto* tab = Editor::GetProjectTab();
 	if(tab->GetState() != ScreenState::Edit)
 		return;
 
@@ -196,8 +194,7 @@ struct {
 static std::string SelectScriptClass(Ref<ScriptModule> mod);
 
 void SceneVisualizerPanel::Draw() {
-	auto& editor = Application::As<EditorApp>()->GetEditor();
-	auto* tab = editor.GetProjectTab()->As<ProjectTab>();
+	auto* tab = Editor::GetProjectTab();
 
 	auto flags = ImGuiWindowFlags_NoScrollbar
 			   | ImGuiWindowFlags_NoScrollWithMouse
@@ -421,7 +418,7 @@ void SceneVisualizerPanel::Draw() {
 
 			auto& asset = options.add.asset;
 			auto& world = m_Context->EntityWorld;
-			auto& assetManager = editor.GetAssetManager();
+			auto* assetManager = AssetManager::Get();
 
 			if(ImGui::Button("Cancel")) {
 				options.add.asset = { };
@@ -446,13 +443,13 @@ void SceneVisualizerPanel::Draw() {
 				if(asset.Type == AssetType::Script)
 					tryExit = true;
 
-				assetManager.Load(asset);
+				assetManager->Load(asset);
 			}
 
 			if(asset.Type == AssetType::Script && tryExit) {
 				exit = false;
 
-				auto mod = assetManager.Get<ScriptModule>(asset);
+				auto mod = assetManager->Get<ScriptModule>(asset);
 				std::string name = SelectScriptClass(mod);
 				if(name != "") {
 					exit = true;

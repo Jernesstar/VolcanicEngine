@@ -65,14 +65,11 @@ void SceneTab::Setup() {
 
 	m_Name = "Scene: " + m_Scene.Name;
 
-	auto& editor = Application::As<EditorApp>()->GetEditor();
-	auto& assetManager = editor.GetAssetManager();
-	m_CallbackID = assetManager.AddReloadCallback(
+	m_CallbackID =
+		AssetManager::Get()->As<EditorAssetManager>()->AddReloadCallback(
 		[this](Asset asset, bool stage)
 		{
-			auto& editor = Application::As<EditorApp>()->GetEditor();
-			auto& proj = editor.GetProject();
-			Application::PushDir(proj.Path);
+			Application::PushDir(Editor::GetProject().Path);
 
 			if(asset.Type == AssetType::Script && stage == 0) {
 				VOLCANICORE_LOG_INFO("Script instance pre-reload");
@@ -238,10 +235,9 @@ void SceneTab::OpenScene() {
 	namespace fs = std::filesystem;
 	menu.file.openScene = true;
 
-	auto& editor = Application::As<EditorApp>()->GetEditor();
-	auto& proj = editor.GetProject();
+	auto path = Editor::GetProject().Path;
 	IGFD::FileDialogConfig config;
-	config.path = (fs::path(proj.Path) / "Visual" / "Scene").string();
+	config.path = (fs::path(path) / "Visual" / "Scene").string();
 	auto instance = ImGuiFileDialog::Instance();
 	instance->OpenDialog("ChooseFile", "Choose File", ".magma.scene", config);
 

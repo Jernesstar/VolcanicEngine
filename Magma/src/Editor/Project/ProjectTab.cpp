@@ -61,12 +61,17 @@ ProjectTab::ProjectTab()
 	GetPanel("AssetEditor")->As<AssetEditorPanel>()->Open = true;
 	GetPanel("ContentBrowser")->As<ContentBrowserPanel>()->Open = true;
 
-	m_Name = Application::As<EditorApp>()->GetEditor().GetProject().Name;
+	m_Name = Editor::GetProject().Name;
 	Setup();
 }
 
 ProjectTab::~ProjectTab() {
 	OnStop();
+
+	auto path = Editor::GetProject().Path;
+	Application::PushDir(path);
+	ImGui::SaveIniSettingsToDisk("Editor/layout.ini");
+	Application::PopDir();
 }
 
 void ProjectTab::Setup() {
@@ -86,35 +91,42 @@ void ProjectTab::Setup() {
 	Application::PopDir();
 
 	auto path = Editor::GetProject().Path;
-	path = (fs::path(path) / "Editor" / "Run.yaml").string();
-	if(!FileUtils::FileExists(path))
-		return;
 
-	YAML::Node file;
-	try {
-		file = YAML::LoadFile(path);
-	}
-	catch(YAML::ParserException e) {
-		VOLCANICORE_ASSERT_ARGS(false, "Could not load file %s: %s",
-								path.c_str(), e.what());
+	auto runPath = (fs::path(path) / "Editor" / "Run.yaml").string();
+	if(FileUtils::FileExists(runPath)) {
+		YAML::Node file;
+		try {
+			file = YAML::LoadFile(runPath);
+		}
+		catch(YAML::ParserException e) {
+			VOLCANICORE_ASSERT_ARGS(false, "Could not load file %s: %s",
+									path.c_str(), e.what());
+		}
+	
+		for(auto sceneIterNode : file["Scenes"]) {
+			auto node = sceneIterNode["Scene"];
+			m_Configs.SceneConfigs.Emplace(
+				node["Name"].as<std::string>(),
+				node["Screen"].as<std::string>(),
+				node["UI"].as<std::string>()
+			);
+		}
+	
+		for(auto uiIterNode : file["UIPages"]) {
+			auto node = uiIterNode["UI"];
+			m_Configs.UIConfigs.Emplace(
+				node["Name"].as<std::string>(),
+				node["Screen"].as<std::string>(),
+				node["UI"].as<std::string>()
+			);
+		}
 	}
 
-	for(auto sceneIterNode : file["Scenes"]) {
-		auto node = sceneIterNode["Scene"];
-		m_Configs.SceneConfigs.Emplace(
-			node["Name"].as<std::string>(),
-			node["Screen"].as<std::string>(),
-			node["UI"].as<std::string>()
-		);
-	}
-
-	for(auto uiIterNode : file["UIPages"]) {
-		auto node = uiIterNode["UI"];
-		m_Configs.UIConfigs.Emplace(
-			node["Name"].as<std::string>(),
-			node["Screen"].as<std::string>(),
-			node["UI"].as<std::string>()
-		);
+	auto layoutPath = (fs::path(path) / "Editor" / "layout.ini").string();
+	if(FileUtils::FileExists(layoutPath)) {
+		Application::PushDir(path);
+		ImGui::LoadIniSettingsFromDisk("Editor/layout.ini");
+		Application::PopDir();
 	}
 }
 

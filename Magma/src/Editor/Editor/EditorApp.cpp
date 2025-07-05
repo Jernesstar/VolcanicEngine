@@ -94,10 +94,13 @@ EditorApp::EditorApp(const CommandLineArgs& args)
 
 	Application::PopDir();
 
+	m_Editor.Open();
 	m_Editor.Load(args);
 }
 
 EditorApp::~EditorApp() {
+	m_Editor.Close();
+
 	UIRenderer::Close();
 }
 

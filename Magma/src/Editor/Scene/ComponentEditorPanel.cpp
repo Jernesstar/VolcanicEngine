@@ -416,17 +416,15 @@ void DrawComponent<ScriptComponent>(Entity& entity) {
 	if(!component.ModuleAsset)
 		return;
 
-	auto& editor = Application::As<EditorApp>()->GetEditor();
-	auto& assetManager = editor.GetAssetManager();
-
+	auto* assetManager = AssetManager::Get()->As<EditorAssetManager>();
 	if(!component.Instance) {
 		std::string name;
 		if(ImGui::Button("Create Instance")) {
-			assetManager.Load(component.ModuleAsset);
+			assetManager->Load(component.ModuleAsset);
 			s_SelectingClass = true;
 		}
 		if(s_SelectingClass) {
-			auto mod = assetManager.Get<ScriptModule>(component.ModuleAsset);
+			auto mod = assetManager->Get<ScriptModule>(component.ModuleAsset);
 			name = SelectScriptClass(mod);
 			if(name != "") {
 				auto _class = mod->GetClass(name);
