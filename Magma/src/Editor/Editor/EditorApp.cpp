@@ -91,6 +91,7 @@ EditorApp::EditorApp(const CommandLineArgs& args)
 	io.FontDefault =
 		io.Fonts->AddFontFromFileTTF(
 			"Magma/assets/fonts/JetBrainsMono-Regular.ttf", fontSize);
+	io.IniFilename = nullptr;
 
 	Application::PopDir();
 

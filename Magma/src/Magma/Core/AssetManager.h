@@ -140,16 +140,19 @@ public:
 		return { };
 	}
 
-	void Clear() {
+	virtual void Clear() {
 		m_AssetRegistry.clear();
 		m_References.clear();
+		m_NamedAssets.clear();
 
 		m_MeshAssets.clear();
 		m_TextureAssets.clear();
 		m_CubemapAssets.clear();
 		m_ShaderAssets.clear();
+		// m_FontAssets.clear();
 		m_AudioAssets.clear();
 		m_ScriptAssets.clear();
+		m_MaterialAssets.clear();
 	}
 
 protected:

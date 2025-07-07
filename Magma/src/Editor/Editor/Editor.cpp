@@ -60,6 +60,7 @@ void Editor::Open() {
 	ScriptEngine::Init();
 
 	Lava::ScriptGlue::RegisterInterface();
+	m_App = CreateRef<Lava::App>();
 
 	Application::PushDir();
 	m_WelcomeImage.Content =
@@ -69,7 +70,6 @@ void Editor::Open() {
 
 void Editor::Close() {
 	CloseProject();
-
 	m_App.reset();
 
 	ScriptEngine::Shutdown();
@@ -78,8 +78,6 @@ void Editor::Close() {
 }
 
 void Editor::Load(const CommandLineArgs& args) {
-	m_App = CreateRef<Lava::App>();
-
 	if(args["--project"]) {
 		NewProject(args["--project"]);
 

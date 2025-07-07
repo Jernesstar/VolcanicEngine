@@ -27,7 +27,7 @@ project "glfw"
     }
 
     defines {
-        "GLFW_USE_HYBRID_HPG"
+        "_GLFW_USE_HYBRID_HPG"
     }
 
     filter "system:windows"

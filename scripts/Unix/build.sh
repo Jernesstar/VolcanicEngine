@@ -1,4 +1,4 @@
 #!/bin/bash
 
 cd build/gmake2/
-make -f Makefile
+mingw32-make.exe -f Makefile

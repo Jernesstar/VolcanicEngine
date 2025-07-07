@@ -224,8 +224,7 @@ EditorAssetManager::EditorAssetManager() {
 }
 
 EditorAssetManager::~EditorAssetManager() {
-	s_WatcherIDs.ForEach([](auto& id) { s_FileWatcher->removeWatch(id); });
-	s_WatcherIDs.Clear();
+	Clear();
 	delete s_Listener;
 	delete s_FileWatcher;
 }
@@ -355,6 +354,15 @@ std::string EditorAssetManager::GetPath(UUID id) const {
 	if(!m_Paths.count(id))
 		return "";
 	return m_Paths.at(id);
+}
+
+void EditorAssetManager::Clear() {
+	AssetManager::Clear();
+	m_Path = "";
+	m_Paths.clear();
+
+	s_WatcherIDs.ForEach([](auto& id) { s_FileWatcher->removeWatch(id); });
+	s_WatcherIDs.Clear();
 }
 
 void EditorAssetManager::Load(const std::string& path) {

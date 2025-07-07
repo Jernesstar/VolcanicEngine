@@ -26,6 +26,7 @@ public:
 
 	const auto& GetRegistry() const { return m_AssetRegistry; }
 
+	void Clear() override;
 	void Load(const std::string& path);
 	void Save();
 	void RuntimeSave(const std::string& exportPath);
