@@ -103,9 +103,7 @@ For **Windows**: Go to [releases](https://github.com/Jernesstar/VolcanicEngine/r
 For **Linux**: Go to [releases](https://github.com/Jernesstar/VolcanicEngine/releases).  
 Download the .deb file, navigate to the directory where the .deb file is located and run
 ```bash
-sudo apt-get update
-sudo apt-get upgrade
-sudo apt-get install ./VolcanicEngine.deb
+sudo dpkg -i ./VolcanicEngine.deb
 ```
 # Build instructions
 Clone the repo and pull all submodules

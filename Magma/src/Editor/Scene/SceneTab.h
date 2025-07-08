@@ -21,6 +21,8 @@ public:
 	void Update(TimeStep ts) override;
 	void Render() override;
 
+	void OnSelect() override;
+
 	void Test(Scene* scene);
 	void Reset();
 	Scene* GetScene() { return &m_Scene; }

@@ -178,6 +178,20 @@ void ProjectTab::Render() {
 	}
 	ImGui::EndMainMenuBar();
 
+	auto flags = ImGuiWindowFlags_NoDecoration
+			//    | ImGuiWindowFlags_NoMove
+			//    | ImGuiWindowFlags_NoDocking
+			;
+	ImGui::Begin("##Project", nullptr, flags);
+	{
+		ImGui::SeparatorText("Project Settings");
+		auto& proj = Editor::GetProject();
+		ImGui::Text(proj.Name.c_str());
+
+		ImGui::InputText("Start Screen", &proj.StartScreen);
+	}
+	ImGui::End();
+
 	RenderEssentialPanels();
 }
 

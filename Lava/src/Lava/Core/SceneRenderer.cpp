@@ -235,6 +235,7 @@ void RuntimeSceneRenderer::OnSceneLoad() {
 
 void RuntimeSceneRenderer::OnSceneClose() {
 	s_ParticleEmitters.clear();
+	s_MaterialMeshes.clear();
 }
 
 void RuntimeSceneRenderer::Update(TimeStep ts) {

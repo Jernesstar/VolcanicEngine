@@ -46,7 +46,7 @@ public:
 public:
 	CameraController(const MovementControls& controls = { });
 	CameraController(Ref<Camera> camera);
-	~CameraController();
+	~CameraController() = default;
 
 	void OnUpdate(TimeStep ts);
 
@@ -62,7 +62,6 @@ private:
 	MovementControls m_Controls;
 
 	glm::vec2 m_LastMousePosition = { 0.0f, 0.0f };
-	UUID m_CallbackID;
 };
 
 }

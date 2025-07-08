@@ -54,6 +54,8 @@ struct {
 	} tab;
 } static menu;
 
+static UI::Image s_WelcomeImage;
+
 void Editor::Open() {
 	Physics::Init();
 	AudioEngine::Init();
@@ -63,7 +65,7 @@ void Editor::Open() {
 	m_App = CreateRef<Lava::App>();
 
 	Application::PushDir();
-	m_WelcomeImage.Content =
+	s_WelcomeImage.Content =
 		AssetImporter::GetTexture("Magma/assets/images/VolcanicDisplay.png");
 	Application::PopDir();
 }
@@ -279,7 +281,8 @@ void Editor::RenderEmptyTab(Ref<Tab>& tab) {
 
 void Editor::RenderWelcomeScreen() {
 	auto flags = ImGuiWindowFlags_NoDecoration
-			   | ImGuiWindowFlags_NoMove;
+			   | ImGuiWindowFlags_NoMove
+			   | ImGuiWindowFlags_NoDocking;
 	ImGui::Begin("##Welcome", nullptr, flags);
 	{
 		ImVec2 size = { 300, ImGui::GetContentRegionAvail().y };
@@ -298,10 +301,10 @@ void Editor::RenderWelcomeScreen() {
 		ImGui::EndChild();
 		ImGui::SameLine();
 
-		m_WelcomeImage.UsePosition = false;
-		m_WelcomeImage.Width = 800;
-		m_WelcomeImage.Height = 800;
-		m_WelcomeImage.Render();
+		s_WelcomeImage.UsePosition = false;
+		s_WelcomeImage.Width = 800;
+		s_WelcomeImage.Height = 800;
+		s_WelcomeImage.Render();
 	}
 	ImGui::End();
 }
@@ -312,6 +315,7 @@ void Editor::SetTab(Ref<Tab> tab) {
 		auto [_, idx] = m_Tabs.Find([&](auto& val) { return val == tab; });
 		m_CurrentTab = idx;
 		title += " - " + tab->GetName();
+		tab->OnSelect();
 	}
 
 	Application::GetWindow()->SetTitle(title);
@@ -389,7 +393,6 @@ void Editor::NewProject() {
 void Editor::NewProject(const std::string& volcPath) {
 	m_Project.Load(volcPath);
 
-	m_AssetManager.Clear();
 	m_AssetManager.Load(m_Project.Path);
 
 	auto rootPath = fs::path(volcPath).parent_path();
@@ -437,11 +440,13 @@ void Editor::OpenProject() {
 	auto instance = ImGuiFileDialog::Instance();
 	instance->OpenDialog("ChooseFile", "Choose File", ".magma.proj", config);
 
-	if(instance->Display("ChooseFile")) {
+	if(instance->Display("ChooseFile", 32, { 500.0f, 600.0f })) {
 		if(instance->IsOk()) {
-			std::string path = instance->GetFilePathName();
+			std::string path = instance->GetCurrentPath();
+			std::string name = instance->GetFilePathName();
+			auto fullPath = fs::path(path) / name;
 			CloseProject();
-			NewProject(path);
+			NewProject(fullPath.string());
 			NewTab(CreateRef<ProjectTab>());
 		}
 
@@ -465,16 +470,15 @@ void Editor::RunProject() {
 }
 
 void Editor::CloseProject() {
-	if(!GetProjectTab())
-		return;
-
 	m_Tabs.Clear();
 	m_ClosedTabs.Clear();
+	m_CurrentTab = 0;
 
 	m_AssetManager.Save();
 	m_AssetManager.Clear();
 
 	m_Project.Save((fs::path(m_Project.Path) / ".magma.proj").string());
+	m_Project = { };
 }
 
 void Editor::ExportProject() {

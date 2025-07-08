@@ -54,6 +54,11 @@ SceneTab::~SceneTab() {
 		->RemoveReloadCallback(m_CallbackID);
 }
 
+void SceneTab::OnSelect() {
+	auto panel = GetPanel("SceneVisualizer")->As<SceneVisualizerPanel>();
+	Editor::GetSceneRenderer().SetContext(panel);
+}
+
 void SceneTab::Setup() {
 	AddPanel<SceneHierarchyPanel>(&m_Scene)->SetTab(this);
 	AddPanel<SceneVisualizerPanel>(&m_Scene)->SetTab(this);

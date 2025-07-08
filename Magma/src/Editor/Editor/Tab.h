@@ -28,6 +28,7 @@ public:
 	virtual void Update(TimeStep ts) { }
 	virtual void Render() { }
 
+	virtual void OnSelect() { }
 	void SetName(const std::string& name) { m_Name = name; }
 	std::string GetName() const { return m_Name; }
 

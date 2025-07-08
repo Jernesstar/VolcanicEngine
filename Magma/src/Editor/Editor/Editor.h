@@ -12,6 +12,7 @@
 #include "UI/UITab.h"
 
 #include "AssetManager.h"
+#include "SceneRenderer.h"
 
 using namespace VolcaniCore;
 
@@ -43,22 +44,24 @@ public:
 	static EditorAssetManager& GetAssetManager() {
 		return s_Instance->m_AssetManager;
 	}
+	static EditorSceneRenderer& GetSceneRenderer() {
+		return s_Instance->m_SceneRenderer;
+	}
 	static Project& GetProject() { return s_Instance->m_Project; }
-	static Ref<Lava::App>& GetApp() { return s_Instance->m_App; }
+	static Ref<Lava::App> GetApp() { return s_Instance->m_App; }
 
 private:
 	inline static Editor* s_Instance;
 
 private:
+	Ref<Lava::App> m_App;
 	Project m_Project;
 	EditorAssetManager m_AssetManager;
-	Ref<Lava::App> m_App;
+	EditorSceneRenderer m_SceneRenderer;
 
-	uint64_t m_CurrentTab;
+	uint64_t m_CurrentTab = 0;
 	List<Ref<Tab>> m_Tabs;
 	List<Ref<Tab>> m_ClosedTabs;
-
-	UI::Image m_WelcomeImage;
 
 	void SetTab(Ref<Tab> tab);
 	void NewTab();
