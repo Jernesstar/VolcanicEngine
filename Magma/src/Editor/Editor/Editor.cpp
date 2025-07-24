@@ -423,6 +423,13 @@ void Editor::NewProject(const std::string& volcPath) {
 			UILoader::EditorLoad(page, uiPath.string() + ".magma.ui.json",
 				UITab::GetTheme());
 		};
+	m_App->Log =
+		[](const std::string& msg)
+		{
+			auto panel =
+				GetProjectTab()->GetPanel("ConsolePanel")->As<ConsolePanel>();
+			panel->Log(ConsoleLevel::Info, msg);
+		};
 
 	m_App->ChangeScreen = false;
 	m_App->RenderScene = false;

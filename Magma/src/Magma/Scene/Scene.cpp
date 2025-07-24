@@ -22,7 +22,6 @@ void Scene::OnRender(SceneRenderer& renderer) {
 
 	renderer.Begin();
 
-	// TODO(Change): Cache queries
 	world.query_builder()
 	.with<CameraComponent>()
 	.build()

@@ -44,6 +44,9 @@ Runtime::Runtime(const CommandLineArgs& args)
 	Application::PushDir(rootPath);
 
 	UIRenderer::Init();
+	ImGuiIO& io = ImGui::GetIO();
+	io.IniFilename = nullptr;
+
 	Physics::Init();
 	AudioEngine::Init();
 	ScriptEngine::Init();
