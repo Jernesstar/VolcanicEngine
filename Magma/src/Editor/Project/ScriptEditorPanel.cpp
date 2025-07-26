@@ -183,6 +183,11 @@ ScriptEditorPanel::~ScriptEditorPanel() {
 	auto path = Editor::GetProject().Path;
 	path = (fs::path(path) / "Editor" / "Scripts.yaml").string();
 	serializer.Finalize(path);
+
+	// if(GetFile()) {
+	// 	std::string textToSave = m_Editor.GetText();
+	// 	FileUtils::WriteToFile(GetFile()->Path, textToSave);
+	// }
 }
 
 void ScriptEditorPanel::EditFile(uint32_t i) {

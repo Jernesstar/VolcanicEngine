@@ -121,6 +121,10 @@ static void ScriptLoadUI(const std::string& name, App* app) {
 	app->UILoad(s_Screen->UI);
 }
 
+static void AppLog(const std::string& msg, App* app) {
+	app->Log(msg);
+}
+
 App::App() {
 	s_Instance = this;
 
@@ -132,6 +136,9 @@ App::App() {
 		"AppClass", "void PushScreen(const string &in)", &App::PushScreen);
 	ScriptEngine::RegisterMethod<App>(
 		"AppClass", "void PopScreen()", &App::PopScreen);
+	ScriptEngine::Get()->RegisterObjectMethod("AppClass",
+		"void Log(const string &in)", asFUNCTION(AppLog), asCALL_CDECL_OBJLAST);
+
 	ScriptEngine::Get()->RegisterObjectMethod(
 		"AppClass", "void LoadScene(const string &in)",
 		asFUNCTION(ScriptLoadScene), asCALL_CDECL_OBJLAST);

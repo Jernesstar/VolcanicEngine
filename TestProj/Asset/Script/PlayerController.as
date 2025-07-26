@@ -37,7 +37,7 @@ class PlayerController : IEntityController
 
         TestGame@ game = cast<TestGame>(ScriptApp);
         game.NewMethod();
-        print("Coins: " + game.State.Coins);
+        App.Log("Coins: " + game.State.Coins);
 
         print("Name: " + Handle.Name);
         print("Alive: " + Handle.IsAlive);
@@ -148,6 +148,10 @@ class PlayerController : IEntityController
         }
     }
 }
+
+
+
+
 
 
 

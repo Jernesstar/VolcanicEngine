@@ -58,7 +58,8 @@ void ScriptSystem::Update(TimeStep ts) {
 
 void ScriptSystem::Run(Entity& entity, TimeStep ts, Phase phase) {
 	auto [sc] = GetRequired(entity);
-	sc.Instance->Call("OnUpdate", (float)ts);
+	if(sc.Instance)
+		sc.Instance->Call("OnUpdate", (float)ts);
 }
 
 void ScriptSystem::Listen(Entity& entity, const std::string& id) {

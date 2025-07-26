@@ -128,7 +128,7 @@ void EditorSceneRenderer::SetContext(SceneVisualizerPanel* panel) {
 	Renderer3D::End();
 	Renderer2D::End();
 	Renderer3D::GetMeshBuffer()->Clear();
-	Renderer3D::GetCubemapBuffer()->Clear();
+	// Renderer3D::GetCubemapBuffer()->Clear();
 	Renderer3D::GetLineBuffer()->Clear();
 }
 
@@ -432,7 +432,8 @@ void EditorSceneRenderer::Render() {
 		}
 	}
 
-#ifdef MAGMA_PHYSICS
+// #ifdef MAGMA_PHYSICS
+#if false
 	auto* scene = RootPanel->GetPhysicsWorld().Get();
 	const PxRenderBuffer& rb = scene->getRenderBuffer();
 	if(rb.getNbLines()) {

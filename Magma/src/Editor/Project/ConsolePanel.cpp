@@ -32,9 +32,13 @@ ConsolePanel::ConsolePanel()
 	m_Info.SetSize(35, 35);
 	m_Warn.SetSize(35, 35);
 	m_Error.SetSize(35, 35);
+	m_Info.UsePosition = false;
+	m_Warn.UsePosition = false;
+	m_Error.UsePosition = false;
 	Application::PopDir();
 
 	Log(ConsoleLevel::Info, "The console works");
+	Log(ConsoleLevel::Info, "I think?");
 }
 
 void ConsolePanel::Log(ConsoleLevel level, const std::string& message) {

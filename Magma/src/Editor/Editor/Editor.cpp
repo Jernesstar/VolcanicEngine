@@ -19,6 +19,7 @@
 #include <Lava/Core/ScriptGlue.h>
 
 #include "Project/ProjectTab.h"
+#include "Project/ConsolePanel.h"
 
 #include "AssetImporter.h"
 #include "ScriptManager.h"
@@ -427,7 +428,7 @@ void Editor::NewProject(const std::string& volcPath) {
 		[](const std::string& msg)
 		{
 			auto panel =
-				GetProjectTab()->GetPanel("ConsolePanel")->As<ConsolePanel>();
+				GetProjectTab()->GetPanel("Console")->As<ConsolePanel>();
 			panel->Log(ConsoleLevel::Info, msg);
 		};
 

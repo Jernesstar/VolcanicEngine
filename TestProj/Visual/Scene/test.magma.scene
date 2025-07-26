@@ -157,24 +157,24 @@ Scene:
                   Name: meshAsset
                   Type: Asset
                   Value:
-                    ID: 10012345
-                    Type: Mesh
+                    ID: 0
+                    Type: None
               - Field:
                   Name: SomeBool
                   Type: bool
-                  Value: true
+                  Value: false
               - Field:
                   Name: Signed8
                   Type: int8
-                  Value: 49
+                  Value: 0
               - Field:
                   Name: Unsigned32
                   Type: uint32
-                  Value: 177
+                  Value: 0
               - Field:
                   Name: Float
                   Type: float
-                  Value: 3.14100003
+                  Value: 0
               - Field:
                   Name: List
                   Type: array
@@ -183,14 +183,10 @@ Scene:
                   Name: Grid
                   Type: GridSet
                   Value:
-                    Width: 5
-                    Height: 5
+                    Width: 0
+                    Height: 0
                     Data:
-                      - [1, 0, 1, 0, 1]
-                      - [0, 1, 0, 1, 0]
-                      - [1, 0, 1, 0, 1]
-                      - [0, 1, 0, 1, 0]
-                      - [1, 0, 1, 0, 1]
+                      []
               - Field:
                   Name: SomeVec3
                   Type: Vec3

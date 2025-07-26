@@ -1,5 +1,7 @@
 #include "Runtime.h"
 
+#include <imgui/imgui.h>
+
 #include <VolcaniCore/Event/Events.h>
 
 #include <VolcaniCore/Graphics/Renderer.h>
@@ -157,6 +159,11 @@ Runtime::Runtime(const CommandLineArgs& args)
 		{
 			auto uiPath = fs::path("UI") / page.Name;
 			UILoader::Load(page, uiPath.string() + ".bin");
+		};
+	m_App->Log =
+		[](const std::string& msg)
+		{
+			// TODO(): Write to some file
 		};
 
 	m_App->ChangeScreen = true;
