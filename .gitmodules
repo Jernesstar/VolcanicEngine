@@ -10,9 +10,6 @@
 [submodule "Magma/vendor/assimp"]
 	path = Magma/vendor/assimp
 	url = https://github.com/Jernesstar/assimp.git
-[submodule "Magma/vendor/freetype"]
-	path = Magma/vendor/freetype
-	url = https://github.com/Jernesstar/freetype.git
 [submodule "Magma/vendor/yaml-cpp"]
 	path = Magma/vendor/yaml-cpp
 	url = https://github.com/jbeder/yaml-cpp.git
