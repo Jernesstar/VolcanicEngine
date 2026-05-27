@@ -1,85 +1,97 @@
 ![VolcanicEngine](Magma/assets/images/VolcanicDisplay.png)
 [![Version](https://img.shields.io/github/v/release/Jernesstar/VolcanicEngine?include_prereleases&style=for-the-badge)](https://github.com/Jernesstar/VolcanicEngine/releases)
-[![Licence](https://img.shields.io/badge/license-MIT-blue.svg?style=for-the-badge)](https://github.com/Jernesstar/VolcanicEngine/blob/main/LICENSE)
-[![Documentation](https://img.shields.io/badge/docs-VolcanicEngine-red?style=for-the-badge&color=red)](https://jernesstar.github.io/VolcanicEngine/)
-<!-- [![Discord](https://img.shields.io/discord/633826290415435777.svg?style=for-the-badge&color=%235a64f6)](https://discord.gg/trackmania) -->
 
-# Vision
-A simple, modular and capable game engine for programmers of all levels of expertise
+### NOTE: A new-and-improved version of the project continues to be developed [here](https://github.com/Jernesstar/Volcanic-Engine)
 
-# Features & Architecture
-- ***Fast*** & **Pure** Entity Component System using [**flecs**](https://github.com/SanderMertens/flecs.git)
-- Physics powered by [**NVIDIA PhysX**](https://github.com/NVIDIA-Omniverse/PhysX.git)
-- Intuitive UI system rendered with [**ImGui**](https://github.com/ocornut/imgui.git)
-- Scripting simplified using [**Angelscript**](https://www.angelcode.com/angelscript/)
-- **Modern** OpenGL utilizing **advanced** optimization techniques
+# VolcanicEngine
+**VolcanicEngine** is a high-performance, modular 3D game engine developed in Modern C++.  
+It features a Vulkan-inspired graphics abstraction layer, a pure ECS architecture, and a fully integrated development environment with real-time debugging capabilities.  
+Inspired by **TheCherno's** *Game Engine* series  
+This is code **100%** AI-free.
 
-and much more!
-# Project Structure
+## 📂 Project Structure
 
-## [VolcaniCore : The Core](https://github.com/Jernesstar/VolcanicEngine/wiki/VolcaniCore)
-Provides the functions and abstractions used throughtout the rest of the project.  
-Defines the rendering architecture and abstractions.
+*   `VolcaniCore/`: Low-level platform & graphics abstraction.
+*   `Magma/`: Core engine library and the Integrated Editor.
+*   `Lava/`: Standalone runtime and scripting bridge.
+*   `Sandbox/`: Technical demos and example projects.
 
-## Magma
-### [The Library](https://github.com/Jernesstar/VolcanicEngine/wiki/Magma)
-Defines the Scene, and UIPage objects, as well as functions and classes for:
-- Audio
-- Scripting
-- Physics
+## 🛠 Core Architecture Deep-Dive
 
-### [The Editor](https://github.com/Jernesstar/VolcanicEngine/wiki/Editor)
-Where your creativity gets to flow. The intuitive visual tools needed to bring **your** game to life.  
-Some features are:
-- Hot reloading of all assets, including shaders and scripts
-- Built-in script editor with:
-    - Linting
-    - On-hover descriptions for functions and classes
-    - Line-by-line debugger with variable inspector
-- Fast in-editor testing of scenes and UI
-### The SceneTab
-![SceneTab](Magma/assets/images/SceneTabScreenshot.png)
-### The UITab
-![UITab](Magma/assets/images/UITabScreenshot.png)
+### 1. VolcaniCore: The Foundational Layer
+VolcaniCore provides the platform-agnostic abstractions and low-level graphics primitives that power the entire ecosystem.
+*   **Platform Abstraction**: Seamless windowing and input handling via GLFW, with a robust event-driven architecture.
+*   **Graphics API Abstraction**: A "Vulkan-style" abstraction over OpenGL. It introduces `RenderPass` and `Framebuffer` objects, enabling explicit control over the rendering pipeline and frame graph management.
+*   **Resource Management**: Low-level wrappers for `Shader`, `Texture`, `UniformBuffer`, and `StorageBuffer` (SSBO) to ensure type safety and efficient GPU memory management.
 
-## Lava
-### [The Library](https://github.com/Jernesstar/VolcanicEngine/wiki/Lava)
-Defines the App class, the bridge between your **angelscript** app and the VolcanicEngine's **C++** application.  
-Also defines the numerous classes, functions and bindings for the scripting language
-### [The Runtime](https://github.com/Jernesstar/VolcanicEngine/wiki/Runtime)
-The application used to run the game as a standalone.
+### 2. Magma Engine: System Integration
+The heart of the engine, Magma integrates high-level systems into a cohesive framework.
+*   **ECS (Powered by Flecs)**: A pure, high-performance Entity Component System. It leverages `flecs` for efficient cache-friendly data layouts and complex system queries.
+*   **Physics (NVIDIA PhysX)**: Full integration of the industry-standard PhysX engine. Supports rigid body dynamics, complex collision shapes (Box, Sphere, Capsule, Mesh), and high-precision raycasting.
+*   **Scripting (AngelScript)**: A deeply integrated C++-like scripting language. Magma features a custom reflection system and metadata support, allowing for seamless communication between C++ systems and script logic.
+*   **Asset Pipeline**: A custom-built UUID-based management system. Assets (Meshes, Textures, Shaders, Scripts) are tracked via unique identifiers, supporting hot-reloading and automatic dependency tracking.
 
-# Download instructions
-For **Windows**: Go to [releases](https://github.com/Jernesstar/VolcanicEngine/releases). Download the installer, run it and follow the instructions.  
-For **Linux**: Go to [releases](https://github.com/Jernesstar/VolcanicEngine/releases).  
-Download the .deb file, navigate to the directory where the .deb file is located and run
+### 3. Magma Editor: The Integrated Development IDE
+A comprehensive toolset built with ImGui, designed to streamline the development workflow.
+*   **Visual Scene Editing**: Intuitive hierarchy and inspector panels for real-time entity manipulation. Includes gizmos for transform manipulation and visual debuggers for physics and cameras.
+*   **Integrated Script IDE**: A built-in code editor with syntax highlighting, linting, and a **Line-by-Line Debugger**. Developers can set breakpoints, step through code, and inspect script variables in real-time.
+*   **Serialization**: Supports dual-mode serialization. **YAML/JSON** is used for project files and scenes to ensure version-control friendliness, while a custom **Binary Serialization** format is used for optimized distribution.
+*   **Asset Importer**: A robust pipeline that processes raw formats (FBX, PNG, GLSL) into engine-optimized assets.
+
+### Editor UI
+|  |  |
+| :--- | :--- |
+| **SceneTab** | ![SceneTab](Magma/assets/images/SceneTabScreenshot.png) <br> Scene Visualizer, Component Editor, Script Editor, Scene Hierarchy, Asset browser, and Asset Editor panels |
+| **UITab** | ![UITab](Magma/assets/images/UITabScreenshot.png) <br> Element hierarchy, Element editor, Canvas Viewer panels |
+| **Scene Testing** | ![Testing](Magma/assets/images/testing.gif) <br> Running scene in debug mode allows for setting breakpoints and inspecting values |
+
+---
+
+### 4. Lava Runtime: Optimized Execution
+Lava is the lightweight, standalone runtime designed for end-user distribution.
+*   **Lava Scene Renderer**: A streamlined, high-performance version of the renderer tailored for final output, stripped of editor-specific overhead.
+*   **Serialized Loading**: Optimized for speed, the runtime loads pre-compiled binary assets and scenes, minimizing boot times and memory footprint.
+*   **Script Glue**: A dedicated binding layer that exposes engine internals to AngelScript, ensuring minimal overhead for gameplay logic.
+
+## 🚀 Demos & Technical Showcases
+Found in Sandbox/Demos
+| Demo | Technical Highlight |
+| :--- | :--- |
+| **Bloom** | ![Bloom](Magma/assets/images/bloom-demo.gif) <br> PBR-correct multi-pass bloom filter using a downsampling/upsampling mip-chain to achieve high-quality light bleeding. |
+| **Particles** | ![Particles](Magma/assets/images/particles-demo.gif) <br> A compute-shader driven particle system. <br> Utilizes `StorageBuffers` for massive parallel updates and rendering of 1M+ particles. |
+| **Raycast** | ![Physics](Magma/assets/images/raycast-demo.gif) <br> An interactive sandbox demonstrating high-precision raycasting using PhysX rigid body bodies for object selection. <br> Object outlining via mask rendering and edge detection. |
+| **Cube** | ![Cube](Magma/assets/images/cube-demo.gif) <br> Showcase of using the isometric camera and a low-resolution frame buffer to create a pixel art affect <br> Object instancing enables 60+ FPS for 20,000 instances. |
+| **Shadows** | ![Shadows](Magma/assets/images/shadows-demo.gif) <br> Shadow casting using a shadowmap |
+
+---
+
+## 🛠 Build & Installation
+
+### Prerequisites
+- **Premake5**
+- **OpenGL 4.5+** compatible drivers
+
+### Clone & Initialize
 ```bash
-sudo dpkg -i ./VolcanicEngine.deb
+git clone --recursive https://github.com/Jernesstar/VolcanicEngine.git
+cd VolcanicEngine
 ```
-# Build instructions
-Clone the repo and pull all submodules
-```bash
-git clone https://github.com/Jernesstar/VolcanicEngine.git
-git submodule update --init
-```
-The build system uses **premake**. On Linux, run
+
+### Linux (Unix)
 ```bash
 scripts/Unix/premake.sh
-```
-and for Windows, run
-```cmd
-scripts/Windows/premake.bat
-```
-Run the following instead for MSVC:
-```cmd
-.\vendor\premake\bin\Windows\premake5.exe vs2022
-```
-This will generate the Makefiles/solution and project files for the project. After this step is complete, run
-```bash
 scripts/Unix/build.sh
 ```
-and for Windows, run
+
+### Windows
 ```cmd
+scripts/Windows/premake.bat
 scripts/Windows/build.bat
 ```
-For MSVC, simply build the project.
+*For Visual Studio users:* Replace *premake.bat* with
+`.\vendor\premake\bin\Windows\premake5.exe vs2022`
+
+---
+
+## 📄 License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

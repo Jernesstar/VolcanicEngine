@@ -1,17 +1,21 @@
 Scripts:
   - Script:
-      Path: C:/Users/Jercy Mukala/Code/VolcanicEngine/TestProj/Asset/Script/PlayerController.as
-      Breakpoints: [36, 42, 47]
-      Open: true
+      Path: home/jernesstar/Code/Personal/VolcanicEngine/TestProj/Asset/Script/PlayerController.as
+      Breakpoints: [47, 42, 36]
+      Open: false
   - Script:
-      Path: C:/Users/Jercy Mukala/Code/VolcanicEngine/TestProj/Project/App/TestGame.as
-      Breakpoints: []
-      Open: true
-  - Script:
-      Path: C:/Users/Jercy Mukala/Code/VolcanicEngine/TestProj/Project/Screen/TestScreen2.as
+      Path: home/jernesstar/Code/Personal/VolcanicEngine/TestProj/Project/App/TestGame.as
       Breakpoints: []
       Open: false
   - Script:
-      Path: C:/Users/Jercy Mukala/Code/VolcanicEngine/TestProj/Asset/Script/Button1.as
+      Path: home/jernesstar/Code/Personal/VolcanicEngine/TestProj/Project/Screen/TestScreen2.as
+      Breakpoints: []
+      Open: false
+  - Script:
+      Path: home/jernesstar/Code/Personal/VolcanicEngine/TestProj/Asset/Script/Button1.as
+      Breakpoints: []
+      Open: false
+  - Script:
+      Path: /home/jernesstar/Code/Personal/VolcanicEngine/TestProj/Asset/Script/PlayerController.as
       Breakpoints: []
       Open: true

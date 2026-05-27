@@ -96,7 +96,7 @@ void Application::SetCurrentDir() {
 	s_Path = fs::current_path().string();
 	s_OldPath = s_Path;
 
-	char* env = getenv("VOLC_PATH");
+	char* env = "/home/jernesstar/Code/Personal/VolcanicEngine";
 	if(!env) {
 		VOLCANICORE_LOG_WARNING("Cound not find VOLC_PATH env variable");
 		return;

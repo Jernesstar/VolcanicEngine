@@ -55,4 +55,4 @@
 	url = https://github.com/juliettef/IconFontCppHeaders.git
 [submodule "Magma/vendor/ImGuiColorTextEdit"]
 	path = Magma/vendor/ImGuiColorTextEdit
-	url = https://github.com/Jernesstar/ImGuiColorTextEdit.git
+	url = https://github.com/BalazsJako/ImGuiColorTextEdit.git

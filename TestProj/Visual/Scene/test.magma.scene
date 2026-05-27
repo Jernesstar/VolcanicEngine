@@ -47,7 +47,7 @@ Scene:
         Components:
           TransformComponent:
             Transform:
-              Translation: [0, 0.312866569, 0.866874218]
+              Translation: [-12.0486975, 0.312866569, 0.866874218]
               Rotation: [-0.0316777006, -0, 0]
               Scale: [4.20052099, 4.7583971, 7.88464165]
           MeshComponent:
@@ -145,52 +145,6 @@ Scene:
             MaterialID: 0
           ScriptComponent:
             ModuleID: 2691709289590626850
-            Class: PlayerController
-            Fields:
-              - Field:
-                  Name: soundAsset
-                  Type: Asset
-                  Value:
-                    ID: 16624656892553940704
-                    Type: Audio
-              - Field:
-                  Name: meshAsset
-                  Type: Asset
-                  Value:
-                    ID: 0
-                    Type: None
-              - Field:
-                  Name: SomeBool
-                  Type: bool
-                  Value: false
-              - Field:
-                  Name: Signed8
-                  Type: int8
-                  Value: 0
-              - Field:
-                  Name: Unsigned32
-                  Type: uint32
-                  Value: 0
-              - Field:
-                  Name: Float
-                  Type: float
-                  Value: 0
-              - Field:
-                  Name: List
-                  Type: array
-                  Value: []
-              - Field:
-                  Name: Grid
-                  Type: GridSet
-                  Value:
-                    Width: 0
-                    Height: 0
-                    Data:
-                      []
-              - Field:
-                  Name: SomeVec3
-                  Type: Vec3
-                  Value: [0, 0, 0]
     - Entity:
         Name: Flames
         ID: 1113

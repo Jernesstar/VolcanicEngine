@@ -453,7 +453,8 @@ void RegisterAssetManager() {
 	engine->RegisterEnumValue("AssetType", "None",	  7);
 
 	engine->RegisterObjectType("Asset", sizeof(Asset),
-		asOBJ_VALUE | asOBJ_POD | asGetTypeTraits<Asset>());
+		asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_ALLINTS
+		| asGetTypeTraits<Asset>());
 	engine->RegisterObjectBehaviour("Asset", asBEHAVE_CONSTRUCT,
 		"void f()", asFUNCTION(AssetDefaultCtor), asCALL_CDECL_OBJLAST);
 	engine->RegisterObjectBehaviour("Asset", asBEHAVE_CONSTRUCT,

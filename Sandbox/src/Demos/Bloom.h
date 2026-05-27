@@ -181,17 +181,6 @@ void Bloom::OnUpdate(TimeStep ts) {
 	}
 	Renderer::EndPass();
 
-	Renderer::StartPass(drawPass2);
-	{
-		Renderer3D::Begin(camera);
-
-		for(int i = -20; i < 20; i++)
-			Renderer3D::DrawMesh(cube, { .Translation = { i, -1.0, 0.0f } });
-
-		Renderer3D::End();
-	}
-	Renderer::EndPass();
-
 	Renderer::Flush();
 
 	UIRenderer::EndFrame();

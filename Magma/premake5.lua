@@ -147,7 +147,7 @@ project "Editor"
         "SPIRV-Cross",
 
         "assimp",
-        "freetype",
+        -- "freetype",
         "stb_image",
         "efsw",
 
@@ -199,7 +199,7 @@ include "Magma/.builddeps/ImGuiFileDialog"
 include "Magma/.builddeps/ImGuizmo"
 include "Magma/.builddeps/ImGuiColorTextEdit"
 include "Magma/.builddeps/assimp"
-include "Magma/.builddeps/freetype"
+-- include "Magma/.builddeps/freetype"
 include "Magma/.builddeps/stb_image"
 include "Magma/.builddeps/efsw"
 include "Magma/.builddeps/glslang"

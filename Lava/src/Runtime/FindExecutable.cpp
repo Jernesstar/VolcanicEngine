@@ -6,6 +6,7 @@
 	#include <windows.h>
 #elif VOLCANICENGINE_LINUX
 	#include <unistd.h>
+	#include <climits>
 #endif
 
 namespace Lava {
