@@ -27,7 +27,7 @@ VolcaniCore provides the platform-agnostic abstractions and low-level graphics p
 ### 2. Magma Engine: System Integration
 The heart of the engine, Magma integrates high-level systems into a cohesive framework.
 *   **ECS (Powered by Flecs)**: A pure, high-performance Entity Component System. It leverages `flecs` for efficient cache-friendly data layouts and complex system queries.
-*   **Physics (NVIDIA PhysX)**: Full integration of the industry-standard PhysX engine. Supports rigid body dynamics, complex collision shapes (Box, Sphere, Capsule, Mesh), and high-precision raycasting.
+*   **Physics (NVIDIA PhysX)**: Integration of the industry-standard PhysX engine. Supports rigid body dynamics, complex collision shapes (Box, Sphere, Capsule, Mesh), and high-precision raycasting.
 *   **Scripting (AngelScript)**: A deeply integrated C++-like scripting language. Magma features a custom reflection system and metadata support, allowing for seamless communication between C++ systems and script logic.
 *   **Asset Pipeline**: A custom-built UUID-based management system. Assets (Meshes, Textures, Shaders, Scripts) are tracked via unique identifiers, supporting hot-reloading and automatic dependency tracking.
 
@@ -60,7 +60,7 @@ Found in Sandbox/Demos
 | **Bloom** | ![Bloom](Magma/assets/images/bloom-demo.gif) <br> PBR-correct multi-pass bloom filter using a downsampling/upsampling mip-chain to achieve high-quality light bleeding. |
 | **Particles** | ![Particles](Magma/assets/images/particles-demo.gif) <br> A compute-shader driven particle system. <br> Utilizes `StorageBuffers` for massive parallel updates and rendering of 1M+ particles. |
 | **Raycast** | ![Physics](Magma/assets/images/raycast-demo.gif) <br> An interactive sandbox demonstrating high-precision raycasting using PhysX rigid body bodies for object selection. <br> Object outlining via mask rendering and edge detection. |
-| **Cube** | ![Cube](Magma/assets/images/cube-demo.gif) <br> Showcase of using the isometric camera and a low-resolution frame buffer to create a pixel art affect <br> Object instancing enables 60+ FPS for 20,000 instances. |
+| **Cube** | ![Cube](Magma/assets/images/cube-demo.gif) <br> Showcase of using the isometric camera and a low-resolution frame buffer to create a pixel art effect <br> Object instancing enables 60+ FPS for 20,000 instances. |
 | **Shadows** | ![Shadows](Magma/assets/images/shadows-demo.gif) <br> Shadow casting using a shadowmap |
 
 ---
