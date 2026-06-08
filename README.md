@@ -2,12 +2,13 @@
 [![Version](https://img.shields.io/github/v/release/Jernesstar/VolcanicEngine?include_prereleases&style=for-the-badge)](https://github.com/Jernesstar/VolcanicEngine/releases)
 
 ### NOTE: A new-and-improved version of the project continues to be developed [here](https://github.com/Jernesstar/Volcanic-Engine)
+---
 
 # VolcanicEngine
 **VolcanicEngine** is a high-performance, modular 3D game engine developed in Modern C++.  
-It features a Vulkan-inspired graphics abstraction layer, a pure ECS architecture, and a fully integrated development environment with real-time debugging capabilities.  
+It features a Vulkan-inspired graphics abstraction layer, a pure ECS architecture, and an IDE with real-time debugging capabilities.  
 Inspired by **TheCherno's** *Game Engine* series  
-This is code **100%** AI-free.
+16K+ LOC, **100%** AI-free.
 
 ## 📂 Project Structure
 
@@ -21,7 +22,7 @@ This is code **100%** AI-free.
 ### 1. VolcaniCore: The Foundational Layer
 VolcaniCore provides the platform-agnostic abstractions and low-level graphics primitives that power the entire ecosystem.
 *   **Platform Abstraction**: Seamless windowing and input handling via GLFW, with a robust event-driven architecture.
-*   **Graphics API Abstraction**: A "Vulkan-style" abstraction over OpenGL. It introduces `RenderPass` and `Framebuffer` objects, enabling explicit control over the rendering pipeline and frame graph management.
+*   **Graphics API Abstraction**: A "Vulkan-style" abstraction over OpenGL. It introduces `RenderPass`, `Framebuffer` and other such objects, enabling explicit control over the rendering pipeline.
 *   **Resource Management**: Low-level wrappers for `Shader`, `Texture`, `UniformBuffer`, and `StorageBuffer` (SSBO) to ensure type safety and efficient GPU memory management.
 
 ### 2. Magma Engine: System Integration
@@ -63,33 +64,7 @@ Found in Sandbox/Demos
 | **Cube** | ![Cube](Magma/assets/images/cube-demo.gif) <br> Showcase of using the isometric camera and a low-resolution frame buffer to create a pixel art effect <br> Object instancing enables 60+ FPS for 20,000 instances. |
 | **Shadows** | ![Shadows](Magma/assets/images/shadows-demo.gif) <br> Shadow casting using a shadowmap |
 
----
-
-## 🛠 Build & Installation
-
-### Prerequisites
-- **Premake5**
-- **OpenGL 4.5+** compatible drivers
-
-### Clone & Initialize
-```bash
-git clone --recursive https://github.com/Jernesstar/VolcanicEngine.git
-cd VolcanicEngine
-```
-
-### Linux (Unix)
-```bash
-scripts/Unix/premake.sh
-scripts/Unix/build.sh
-```
-
-### Windows
-```cmd
-scripts/Windows/premake.bat
-scripts/Windows/build.bat
-```
-*For Visual Studio users:* Replace *premake.bat* with
-`.\vendor\premake\bin\Windows\premake5.exe vs2022`
+--
 
 ---
 
