@@ -64,8 +64,6 @@ Found in Sandbox/Demos
 | **Cube** | ![Cube](Magma/assets/images/cube-demo.gif) <br> Showcase of using the isometric camera and a low-resolution frame buffer to create a pixel art effect <br> Object instancing enables 60+ FPS for 20,000 instances. |
 | **Shadows** | ![Shadows](Magma/assets/images/shadows-demo.gif) <br> Shadow casting using a shadowmap |
 
---
-
 ---
 
 ## 📄 License
